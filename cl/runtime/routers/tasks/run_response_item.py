@@ -88,6 +88,8 @@ class RunResponseItem(BaseModel):
             # Save and submit task
             Context.current().save_one(handler_task)
             handler_queue.submit_task(handler_task)  # TODO: Rely on query instead
-            response_items.append(RunResponseItem(key=serialized_key, task_run_id=handler_task.task_id))
+            response_items.append(
+                RunResponseItem(key=serialized_key, task_run_id=handler_task.task_id)
+            )
 
         return response_items

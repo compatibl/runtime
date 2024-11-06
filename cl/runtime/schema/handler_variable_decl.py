@@ -81,6 +81,7 @@ class HandlerVariableDecl(MemberDecl):
         # Check for one of the supported container types
         if type_origin is list:
             # Get the type of value inside the container
+            result.vector = True
             value_type_ = type_args[0]
         else:
             # No container
