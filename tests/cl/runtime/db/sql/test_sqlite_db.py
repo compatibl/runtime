@@ -35,6 +35,8 @@ from stubs.cl.runtime import StubDataclassSingleton
 
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
+    """Checks that two iterables contain the same elements, regardless of order."""
+
     iterable_as_list = list(iterable) if not isinstance(iterable, list) else iterable
     other_iterable_as_list = list(other_iterable) if not isinstance(other_iterable, list) else other_iterable
 
@@ -49,6 +51,8 @@ def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iter
 
 
 def test_smoke():
+    """Smoke test."""
+
     db_class = ClassInfo.get_class_path(SqliteDb)
     with TestingContext(db_class=db_class) as context:
         record = StubDataclassRecord()
@@ -60,6 +64,8 @@ def test_smoke():
 
 
 def test_complex_records():
+    """Test 'save_many' method for various types."""
+
     db_class = ClassInfo.get_class_path(SqliteDb)
     with TestingContext(db_class=db_class) as context:
         samples = [
@@ -87,6 +93,8 @@ def test_complex_records():
 
 
 def test_basic_operations():
+    """Test save/load/delete methods for various types."""
+
     db_class = ClassInfo.get_class_path(SqliteDb)
     with TestingContext(db_class=db_class) as context:
         samples = [
@@ -129,6 +137,8 @@ def test_basic_operations():
 
 
 def test_record_upsert():
+    """Check that an existing entry is overridden when a new entry with the same key is saved."""
+
     db_class = ClassInfo.get_class_path(SqliteDb)
     with TestingContext(db_class=db_class) as context:
         # create sample and save
@@ -150,6 +160,8 @@ def test_record_upsert():
 
 
 def test_load_all():
+    """Test 'load_all' method."""
+
     db_class = ClassInfo.get_class_path(SqliteDb)
     with TestingContext(db_class=db_class) as context:
         base_samples = [
@@ -180,6 +192,8 @@ def test_load_all():
 
 @pytest.mark.skip("Performance test.")
 def test_performance():
+    """Test performance of save/load methods."""
+
     db_class = ClassInfo.get_class_path(SqliteDb)
     with TestingContext(db_class=db_class) as context:
         n = 1000
@@ -212,6 +226,8 @@ def test_performance():
 
 
 def test_singleton():
+    """Test singleton type saving."""
+
     db_class = ClassInfo.get_class_path(SqliteDb)
     with TestingContext(db_class=db_class) as context:
         singleton_sample = StubDataclassSingleton()
