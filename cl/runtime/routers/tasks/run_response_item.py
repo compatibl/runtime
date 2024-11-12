@@ -75,7 +75,7 @@ class RunResponseItem(BaseModel):
             else:
                 # Key is None, this is a @classmethod or @staticmethod
                 record_type = Schema.get_type_by_short_name(request.table)
-                u = f"{record_type.__module__}.{record_type.__name__}"
+                record_type_str = f"{record_type.__module__}.{record_type.__name__}"
                 method_name_pascal_case = CaseUtil.snake_to_pascal_case(request.method)
                 label = f"{record_type.__name__};{method_name_pascal_case}"
                 handler_task = StaticMethodTask(

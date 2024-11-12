@@ -23,6 +23,7 @@ from cl.runtime.log.log_entry import LogEntry
 from cl.runtime.log.log_entry_level_enum import LogEntryLevelEnum
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
+from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 
@@ -71,11 +72,16 @@ class TaskStatusResponseItem(BaseModel):
             # TODO: Add support message depending on exception type
             user_message = task.error_message
 
+            record_key = None
+            # Only InstanceMethodTask has `key_str` attribute
+            if isinstance(task, InstanceMethodTask):
+                record_key = task.key_str
+
             response_items.append(
                 TaskStatusResponseItem(
                     status_code=LEGACY_TASK_STATUS_NAMES_MAP.get(task.status.name),
                     task_run_id=str(task.task_id),
-                    key=str(task.task_id),
+                    key=record_key,
                     user_message=user_message,
                 ),
             )
