@@ -47,6 +47,15 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
     application_theme: str | None = missing()  # TODO: Replace by AppTheme
     """Application theme (dark, light, etc.)."""
 
+    user_secret_identifiers: List[str] | None = missing()
+    """
+    Suggested key names in My Keys section of the head and shoulders dialog.
+
+    Notes:
+        - This is a list of suggestions, no restriction on entering secrets with other names
+        - The secret names should be in snake_case, for example ["openai_api_key", "anthropic_api_key"] 
+    """
+
     def get_key(self) -> UiAppStateKey:
         return UiAppStateKey(user=self.user)
 
@@ -60,4 +69,4 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
         if default_app_state is not None and default_app_state.application_theme is not None:
             return default_app_state.application_theme
 
-        return "Light"
+        return "Light"  # TODO: Make System the new default when implemented
