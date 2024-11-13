@@ -69,4 +69,5 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
         if default_app_state is not None and default_app_state.application_theme is not None:
             return default_app_state.application_theme
 
-        return "Light"  # TODO: Make System the new default when implemented
+        # Default to System if not previously selected by the user
+        return "System"

@@ -14,4 +14,4 @@
 
 from typing import Literal
 
-AppTheme = Literal["Dark", "Light"]
+AppTheme = Literal["System", "Dark", "Light"]
