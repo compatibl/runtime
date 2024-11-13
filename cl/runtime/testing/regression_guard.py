@@ -29,7 +29,7 @@ from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
 
-_supported_extensions = ["txt"]
+_supported_extensions = ["txt", "yaml"]
 """The list of supported output file extensions (formats)."""
 
 key_serializer = StringSerializer()
@@ -60,11 +60,14 @@ class RegressionGuard:
         - File extension 'ext' is determined based on the verify method(s) called
     """
 
-    __guard_dict: ClassVar[Dict[str, Self]] = {}  # TODO: Set using ContextVars
-    """Dictionary of existing guards indexed by the combination of output_dir and ext."""
+    base_path: str
+    """Base path for the text excluding the channel, 'verify_all' method applies to all subdirs or this dir."""
 
-    __delegate_to: Self | None
-    """Delegate all function calls to this regression guard if set."""
+    output_path: str
+    """Output path for the test and channel, 'verify' method applies to this dir only."""
+
+    ext: str
+    """Output file extension (format), defaults to '.txt'"""
 
     __verified: bool
     """Verify method sets this flag to true, after which further writes raise an error."""
@@ -72,11 +75,11 @@ class RegressionGuard:
     __exception_text: str | None
     """Exception text from an earlier verification is reused instead of comparing the files again."""
 
-    output_path: str
-    """Output path including directory and channel."""
+    __delegate_to: Self | None
+    """Delegate all function calls to this regression guard if set (instance vars are not initialized in this case)."""
 
-    ext: str
-    """Output file extension (format), defaults to '.txt'"""
+    __guard_dict: ClassVar[Dict[str, Self]] = {}  # TODO: Set using ContextVars
+    """Dictionary of existing guards indexed by output_path."""
 
     def __init__(
         self,
@@ -113,7 +116,7 @@ class RegressionGuard:
             ext = "txt"
 
         # Check if regression guard already exists for the same combination of output_path and ext
-        dict_key = f"{output_path}.{ext}"
+        dict_key = f"{output_path}\\{ext}"
         if (existing_dict := self.__guard_dict.get(dict_key, None)) is not None:
             # Delegate to the existing guard if found, do not initialize other fields
             self.__delegate_to = existing_dict
@@ -125,6 +128,7 @@ class RegressionGuard:
             self.__delegate_to = None
             self.__verified = False
             self.__exception_text = None
+            self.base_path = base_path
             self.output_path = output_path
             self.ext = ext
 
@@ -161,7 +165,7 @@ class RegressionGuard:
             # Create the directory if does not exist
             os.makedirs(received_dir)
 
-        if self.ext == "txt":
+        if self.ext == "txt" or self.ext == "yaml":
             with open(received_path, "a") as file:
                 file.write(self._format_txt(value))
                 # Flush immediately to ensure all of the output is on disk in the event of test exception
@@ -191,6 +195,7 @@ class RegressionGuard:
 
         if errors_found and not silent:
             # Collect exception text from guards where it is present
+            guard_keys = cls.__guard_dict.keys()
             exc_text_blocks = [
                 exception_text
                 for guard in cls.__guard_dict.values()
