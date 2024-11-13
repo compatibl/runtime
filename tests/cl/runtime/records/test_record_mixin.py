@@ -62,7 +62,7 @@ def test_init_all():
     _DerivedFromDerivedWithInit().init_all()
     guard.write("Testing _DerivedFromDerivedWithoutInit:")
     _DerivedFromDerivedWithoutInit().init_all()
-    RegressionGuard.verify_all()
+    RegressionGuard().verify_all()
 
 
 if __name__ == "__main__":

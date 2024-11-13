@@ -26,7 +26,7 @@ def test_normalize_text():
     guard = RegressionGuard()
     guard.write(CharUtil.normalize_chars(f"{','.join(_REMOVED_CHARS)}"))
     guard.write(CharUtil.normalize_chars(f"{','.join(_REPLACED_CHARS)}"))
-    RegressionGuard.verify_all()
+    RegressionGuard().verify_all()
 
     for char in _FLAGGED_CHARS:
         with pytest.raises(Exception):

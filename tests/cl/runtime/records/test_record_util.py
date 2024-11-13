@@ -76,7 +76,7 @@ def test_init_all():
     guard.write("Testing _DerivedFromDerivedWithoutInit:")
     RecordUtil.init_all(_DerivedFromDerivedWithoutInit())
 
-    RegressionGuard.verify_all()
+    RegressionGuard().verify_all()
 
 
 def test_is_instance():

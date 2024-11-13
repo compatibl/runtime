@@ -42,7 +42,7 @@ def test_method():
         guard = RegressionGuard(channel=sample_type.__module__.rsplit(".", maxsplit=1)[1])
         guard.write(result_dict)
 
-    RegressionGuard.verify_all()
+    RegressionGuard().verify_all()
 
 
 if __name__ == "__main__":
