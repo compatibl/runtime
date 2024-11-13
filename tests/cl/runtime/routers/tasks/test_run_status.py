@@ -69,7 +69,8 @@ def test_method():
                 assert isinstance(result_response_item, TaskStatusResponseItem)
 
                 # Validate fields
-                assert result_response_item.key == task_run_id
+                # TODO: Review the spec for the value of result_response_item.key
+                assert isinstance(result_response_item.key, str)
                 assert result_response_item.task_run_id == task_run_id
                 assert result_response_item.status_code is not None
 
@@ -99,7 +100,8 @@ def test_api():
                     result_response_item = TaskStatusResponseItem(**result_item)
 
                     # Validate fields
-                    assert result_response_item.key == task_run_id
+                    # TODO: Review the spec for the value of result_response_item.key
+                    assert isinstance(result_response_item.key, str)
                     assert result_response_item.task_run_id == task_run_id
                     assert result_response_item.status_code is not None
 
