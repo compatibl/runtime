@@ -79,7 +79,7 @@ class RegressionGuard:
     """Delegate all function calls to this regression guard if set (instance vars are not initialized in this case)."""
 
     __guard_dict: ClassVar[Dict[str, Dict[str, Self]]] = {}  # TODO: Set using ContextVars
-    """Dictionary of existing guards indexed by output_path (outer dict) and channel/ext (inner dict)."""
+    """Dictionary of existing guards indexed by base_path (outer dict) and channel/ext (inner dict)."""
 
     def __init__(
         self,
@@ -115,11 +115,11 @@ class RegressionGuard:
             # Use txt if not specified
             ext = "txt"
 
-        # Get inner dictionary using output path
-        inner_dict = self.__guard_dict.setdefault(output_path, dict())
+        # Get inner dictionary using base path
+        inner_dict = self.__guard_dict.setdefault(base_path, dict())
 
-        # Check if regression guard already exists for the same combination of output_path and ext
-        inner_key = f"{channel}.{ext}"
+        # Check if regression guard already exists in inner dictionary for the same combination of channel and ext
+        inner_key = f"{channel}::{ext}"
         if (existing_dict := inner_dict.get(inner_key, None)) is not None:
             # Delegate to the existing guard if found, do not initialize other fields
             self.__delegate_to = existing_dict
@@ -198,11 +198,11 @@ class RegressionGuard:
         if self.__delegate_to is not None:
             return self.__delegate_to.verify_all(silent=silent)
 
-        # Get inner dictionary using output path
-        inner_dict = self.__guard_dict[self.output_path]
+        # Get inner dictionary using base path
+        inner_dict = self.__guard_dict[self.base_path]
 
         # Skip the delegated guards
-        inner_dict = {k: v for k, v in inner_dict.items() if v.__delegate_to is not None}
+        inner_dict = {k: v for k, v in inner_dict.items() if v.__delegate_to is None}
 
         # Call verify for all guards silently and check if all are true
         # Because 'all' is used, the comparison will not stop early
@@ -251,18 +251,15 @@ class RegressionGuard:
             else:
                 # Otherwise return True if exception text is None (it is set on verification failure)
                 return self.__exception_text is None
-        else:
-            # Otherwise set 'verified' flag and continue
-            self.__verified = True
 
         received_path = self._get_file_path("received")
         expected_path = self._get_file_path("expected")
         diff_path = self._get_file_path("diff")
 
+        # If received file does not yet exist, return True
         if not os.path.exists(received_path):
-            raise RuntimeError(
-                f"Regression guard error, cannot verify because " f"received file {received_path} does not yet exist."
-            )
+            # Do not set the __verified flag so that verification can be performed again at a later time
+            return True
 
         if os.path.exists(expected_path):
             # Expected file exists, compare
@@ -316,6 +313,10 @@ class RegressionGuard:
                 # Record into the object even if silent
                 self.__exception_text = exception_text
 
+                # Set the __verified flag so that verification returns the same result if attempted again
+                # This will prevent further writes to this channel and extension
+                self.__verified = True
+
                 if not silent:
                     # Raise exception only when not silent
                     raise RuntimeError(exception_text)
@@ -331,7 +332,12 @@ class RegressionGuard:
             if os.path.exists(diff_path):
                 os.remove(diff_path)
 
+            # Set the __verified flag so that verification returns the same result if attempted again
+            # This will prevent further writes to this channel and extension
+            self.__verified = True
+
             # Verification is considered successful if expected file has been created
+            self.__verified = True
             return True
 
     def _format_txt(self, value: Any) -> str:
