@@ -78,8 +78,8 @@ class RegressionGuard:
     __delegate_to: Self | None
     """Delegate all function calls to this regression guard if set (instance vars are not initialized in this case)."""
 
-    __guard_dict: ClassVar[Dict[str, Self]] = {}  # TODO: Set using ContextVars
-    """Dictionary of existing guards indexed by output_path."""
+    __guard_dict: ClassVar[Dict[str, Dict[str, Self]]] = {}  # TODO: Set using ContextVars
+    """Dictionary of existing guards indexed by output_path (outer dict) and channel/ext (inner dict)."""
 
     def __init__(
         self,
@@ -115,14 +115,17 @@ class RegressionGuard:
             # Use txt if not specified
             ext = "txt"
 
+        # Get inner dictionary using output path
+        inner_dict = self.__guard_dict.setdefault(output_path, dict())
+
         # Check if regression guard already exists for the same combination of output_path and ext
-        dict_key = f"{output_path}\\{ext}"
-        if (existing_dict := self.__guard_dict.get(dict_key, None)) is not None:
+        inner_key = f"{channel}.{ext}"
+        if (existing_dict := inner_dict.get(inner_key, None)) is not None:
             # Delegate to the existing guard if found, do not initialize other fields
             self.__delegate_to = existing_dict
         else:
             # Otherwise add self to dictionary
-            self.__guard_dict[dict_key] = self
+            inner_dict[inner_key] = self
 
             # Initialize fields
             self.__delegate_to = None
@@ -174,37 +177,50 @@ class RegressionGuard:
             # Should not be reached here because of a previous check in __init__
             _error_extension_not_supported(self.ext)
 
-    @classmethod
-    def verify_all(cls, *, silent: bool = False) -> None:
+    def verify_all(self, *, silent: bool = False) -> bool:
         """
-        For each created guard, verify that 'channel.received.ext' is the same as 'channel.expected.ext'.
-        Defaults to silent=False (raises exception) for calling at the end of the test.
+        Verify for all guards in this test that 'channel.received.ext' is the same as 'channel.expected.ext'.
+        Defaults to silent=True (no exception) to permit other tests to proceed.
 
         Notes:
             - If 'channel.expected.ext' does not exist, create from 'channel.received.ext'
             - If files are the same, delete 'channel.received.ext' and 'channel.diff.ext'
-            - If files differ, write 'channel.diff.ext' and optionally raise exception
+            - If files differ, write 'channel.diff.ext' and raise exception unless silent=True
+
+        Returns:
+            bool: True if verification succeeds and false otherwise
 
         Args:
-            silent: If true, write the diff file but do not raise exception
+            silent: If true, do not raise exception and only write the 'channel.diff.ext' file
         """
+
+        # Delegate to a previously created guard with the same combination of output_path and ext if exists
+        if self.__delegate_to is not None:
+            return self.__delegate_to.verify_all(silent=silent)
+
+        # Get inner dictionary using output path
+        inner_dict = self.__guard_dict[self.output_path]
+
+        # Skip the delegated guards
+        inner_dict = {k: v for k, v in inner_dict.items() if v.__delegate_to is not None}
 
         # Call verify for all guards silently and check if all are true
         # Because 'all' is used, the comparison will not stop early
-        errors_found = not all(guard.verify(silent=True) for guard in cls.__guard_dict.values())
+        errors_found = not all(guard.verify(silent=True) for guard in inner_dict.values())
 
         if errors_found and not silent:
             # Collect exception text from guards where it is present
-            guard_keys = cls.__guard_dict.keys()
             exc_text_blocks = [
                 exception_text
-                for guard in cls.__guard_dict.values()
+                for guard in inner_dict.values()
                 if (exception_text := guard._get_exception_text()) is not None
             ]
 
             # Merge the collected exception text blocks and raise an error
             exc_text_merged = "\n".join(exc_text_blocks)
             raise RuntimeError(exc_text_merged)
+
+        return not errors_found
 
     def verify(self, *, silent: bool = False) -> bool:
         """
@@ -225,7 +241,7 @@ class RegressionGuard:
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
         if self.__delegate_to is not None:
-            return self.verify(silent=silent)
+            return self.__delegate_to.verify(silent=silent)
 
         if self.__verified:
             # Already verified

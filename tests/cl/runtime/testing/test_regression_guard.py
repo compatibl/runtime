@@ -60,10 +60,10 @@ def perform_testing(base_path: str, full: bool = False):
         RegressionGuard(channel="dict_txt").write(test_dict)
 
         # Verify all guards
-        RegressionGuard.verify_all()
+        RegressionGuard().verify_all()
 
         # Verify again, should have no effect
-        RegressionGuard.verify_all()
+        RegressionGuard().verify_all()
 
 
 def test_function():
