@@ -48,6 +48,15 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
     Name: ApplicationTheme
     Comment: Application theme (dark, light, etc.).
     Optional: true
+  - Value:
+      Type: String
+    Name: UserSecretIdentifiers
+    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\
+      \nNotes:\n    - This is a list of suggestions, no restriction on entering secrets\
+      \ with other names\n    - The secret names should be in snake_case, for example\
+      \ [\"openai_api_key\", \"anthropic_api_key\"] "
+    Vector: true
+    Optional: true
   Keys:
   - User
 cl.runtime.backend.core.base_type_info.BaseTypeInfo:
@@ -153,6 +162,15 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
       Type: String
     Name: ApplicationTheme
     Comment: Application theme (dark, light, etc.).
+    Optional: true
+  - Value:
+      Type: String
+    Name: UserSecretIdentifiers
+    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\
+      \nNotes:\n    - This is a list of suggestions, no restriction on entering secrets\
+      \ with other names\n    - The secret names should be in snake_case, for example\
+      \ [\"openai_api_key\", \"anthropic_api_key\"] "
+    Vector: true
     Optional: true
   Keys:
   - User
