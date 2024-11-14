@@ -29,7 +29,6 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_entry import LogEntry
 from cl.runtime.log.log_entry_level_enum import LogEntryLevelEnum
 from cl.runtime.log.log_key import LogKey
-from cl.runtime.log.user_log_entry import UserLogEntry
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -142,7 +141,7 @@ class Context(ContextKey, RecordMixin[ContextKey]):
             # Save log entry to the database
             # Get log entry type and level
             if isinstance(exc_val, UserError):
-                log_type = UserLogEntry
+                log_type = LogEntry
                 level = LogEntryLevelEnum.USER_ERROR
             else:
                 log_type = LogEntry

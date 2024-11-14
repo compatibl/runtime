@@ -22,7 +22,6 @@ from cl.runtime.context.context import Context
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_entry import LogEntry
 from cl.runtime.log.log_entry_level_enum import LogEntryLevelEnum
-from cl.runtime.log.user_log_entry import UserLogEntry
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.dataclasses_extensions import missing
@@ -112,7 +111,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
             # Get log entry type and level
             if isinstance(e, UserError):
-                log_type = UserLogEntry
+                log_type = LogEntry
                 level = LogEntryLevelEnum.USER_ERROR
             else:
                 log_type = LogEntry
