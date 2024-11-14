@@ -25,7 +25,6 @@ from cl.runtime import Context
 from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
-from cl.runtime.log.log_message_level_enum import LogMessageLevelEnum
 from cl.runtime.routers.app import app_router
 from cl.runtime.routers.auth import auth_router
 from cl.runtime.routers.context_middleware import ContextMiddleware
@@ -45,7 +44,7 @@ server_app = FastAPI()
 
 
 # Universal exception handler function
-async def handle_exception(request, exc, log_level):
+async def handle_exception(request, exc):
 
     # Get context logger using request URL as name
     logger = Context.current().get_logger(str(request.url))
@@ -56,18 +55,23 @@ async def handle_exception(request, exc, log_level):
     # Output traceback
     traceback.print_exception(exc)
 
+    # TODO: Perform additional processing for UserError
+    if isinstance(exc, UserError):
+        # TODO: Perform additional processing
+        pass
+    else:
+        # TODO: Perform additional processing
+        pass
+
     # TODO (Roman): save all logs to db
     # Save log entry to the database
     log_type = LogMessage if isinstance(exc, UserError) else LogMessage
-    entry = log_type(  # noqa
-        message=str(exc),
-        level=log_level,
-    )
+    entry = LogMessage(message=str(exc))
     entry.init()
     Context.current().save_one(entry)
 
-    # Message to display for user
-    user_message = str(exc) if log_level == LogMessageLevelEnum.USER_ERROR else None
+    # Determine if the message should be  displayed for user
+    user_message = str(exc) if entry.priority >= 40 else None  # TODO: Configure the threshold in settings
 
     # Return 500 response to avoid exception handler multiple calls
     # IMPORTANT:
@@ -77,22 +81,10 @@ async def handle_exception(request, exc, log_level):
     return JSONResponse({"UserMessage": user_message}, status_code=500)
 
 
-# Add RuntimeError exception handler
-@server_app.exception_handler(RuntimeError)
+# Add an exception handler
+@server_app.exception_handler(Exception)
 async def http_exception_handler(request, exc):
-    return await handle_exception(request, exc, log_level=LogMessageLevelEnum.ERROR)
-
-
-# Add Warning exception handler
-@server_app.exception_handler(Warning)
-async def http_warning_handler(request, exc):
-    return await handle_exception(request, exc, log_level=LogMessageLevelEnum.WARNING)
-
-
-# Add UserError exception handler
-@server_app.exception_handler(UserError)
-async def http_user_error_handler(request, exc):
-    return await handle_exception(request, exc, log_level=LogMessageLevelEnum.USER_ERROR)
+    return await handle_exception(request, exc)
 
 
 # Get CORSMiddleware settings defined in Dynaconf from ApiSettings

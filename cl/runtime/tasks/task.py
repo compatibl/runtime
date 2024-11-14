@@ -21,7 +21,6 @@ from typing_extensions import Self
 from cl.runtime.context.context import Context
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
-from cl.runtime.log.log_message_level_enum import LogMessageLevelEnum
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.dataclasses_extensions import missing
@@ -106,22 +105,16 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
         except Exception as e:  # noqa
 
-            # Record the end time
-            end_time = DatetimeUtil.now()
-
-            # Get log entry type and level
+            # TODO: Perform additional processing for UserError
             if isinstance(e, UserError):
-                log_type = LogMessage
-                level = LogMessageLevelEnum.USER_ERROR
+                # TODO: Perform additional processing
+                pass
             else:
-                log_type = LogMessage
-                level = LogMessageLevelEnum.ERROR
+                # TODO: Perform additional processing
+                pass
 
             # Create log entry
-            log_message = log_type(  # noqa
-                message=str(e),
-                level=level,
-            )
+            log_message = LogMessage(message=str(e))
             log_message.init()
 
             # Save log entry to the database

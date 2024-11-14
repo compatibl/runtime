@@ -19,8 +19,6 @@ from typing import List
 from typing import cast
 from pydantic import BaseModel
 from cl.runtime import Context
-from cl.runtime.log.log_message import LogMessage
-from cl.runtime.log.log_message_level_enum import LogMessageLevelEnum
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask

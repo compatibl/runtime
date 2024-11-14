@@ -27,7 +27,6 @@ from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
-from cl.runtime.log.log_message_level_enum import LogMessageLevelEnum
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
@@ -139,19 +138,17 @@ class Context(ContextKey, RecordMixin[ContextKey]):
 
         if exc_val is not None:
             # Save log entry to the database
-            # Get log entry type and level
+
+            # TODO: Perform additional processing for UserError
             if isinstance(exc_val, UserError):
-                log_type = LogMessage
-                level = LogMessageLevelEnum.USER_ERROR
+                # TODO: Perform additional processing
+                pass
             else:
-                log_type = LogMessage
-                level = LogMessageLevelEnum.ERROR
+                # TODO: Perform additional processing
+                pass
 
             # Create log entry
-            log_message = log_type(  # noqa
-                message=str(exc_val),
-                level=level,
-            )
+            log_message = LogMessage(message=str(exc_val))
             log_message.init()
 
             # Save occurred error to self db
