@@ -46,6 +46,9 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
     optional_vector_element: bool | None = missing()  # TODO: Rename to optional_element or optional_field
     """Flag indicating optional vector item element."""
 
+    read_only: bool | None = None
+    """Flag indicating readonly element."""
+
     additive: bool | None = missing()
     """Optional flag indicating if the element is additive and that the total column can be shown in the UI."""
 
