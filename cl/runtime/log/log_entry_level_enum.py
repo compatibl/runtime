@@ -15,7 +15,7 @@
 from enum import IntEnum
 
 
-class LogEntryLevelEnum(IntEnum):
+class LogMessageLevelEnum(IntEnum):
     """Indicates the type of event."""
 
     ERROR = 1

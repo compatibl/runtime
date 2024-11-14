@@ -15,27 +15,27 @@
 from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime import RecordMixin
-from cl.runtime.log.log_entry_key import LogEntryKey
-from cl.runtime.log.log_entry_level_enum import LogEntryLevelEnum
+from cl.runtime.log.log_message_key import LogMessageKey
+from cl.runtime.log.log_message_level_enum import LogMessageLevelEnum
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.dataclasses_extensions import missing
 
 
 @dataclass(slots=True, kw_only=True)
-class LogEntry(LogEntryKey, RecordMixin[LogEntryKey]):
+class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
     """
     Refers to a record that captures specific information
     about events or actions occurring within an application.
     """
 
-    level: LogEntryLevelEnum = missing()
+    level: LogMessageLevelEnum = missing()
     """A type of event."""
 
     message: str = missing()
     """A descriptive message providing details about the event."""
 
-    def get_key(self) -> LogEntryKey:
-        return LogEntryKey(timestamp=self.timestamp)
+    def get_key(self) -> LogMessageKey:
+        return LogMessageKey(timestamp=self.timestamp)
 
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""

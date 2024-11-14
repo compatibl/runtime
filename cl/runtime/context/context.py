@@ -26,8 +26,8 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.log.log_entry import LogEntry
-from cl.runtime.log.log_entry_level_enum import LogEntryLevelEnum
+from cl.runtime.log.log_message import LogMessage
+from cl.runtime.log.log_message_level_enum import LogMessageLevelEnum
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
@@ -141,21 +141,21 @@ class Context(ContextKey, RecordMixin[ContextKey]):
             # Save log entry to the database
             # Get log entry type and level
             if isinstance(exc_val, UserError):
-                log_type = LogEntry
-                level = LogEntryLevelEnum.USER_ERROR
+                log_type = LogMessage
+                level = LogMessageLevelEnum.USER_ERROR
             else:
-                log_type = LogEntry
-                level = LogEntryLevelEnum.ERROR
+                log_type = LogMessage
+                level = LogMessageLevelEnum.ERROR
 
             # Create log entry
-            log_entry = log_type(  # noqa
+            log_message = log_type(  # noqa
                 message=str(exc_val),
                 level=level,
             )
-            log_entry.init()
+            log_message.init()
 
             # Save occurred error to self db
-            self.save_one(log_entry)
+            self.save_one(log_message)
 
         # Get context stack for the current asynchronous environment
         context_stack = context_stack_var.get()
