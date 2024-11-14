@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing_extensions import Self
-
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.dataclasses_extensions import missing

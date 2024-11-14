@@ -25,7 +25,6 @@ from typing import TypeGuard
 from typing import TypeVar
 from typing import runtime_checkable
 from uuid import UUID
-
 from typing_extensions import Self
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | None

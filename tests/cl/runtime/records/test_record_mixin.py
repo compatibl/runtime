@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing_extensions import Self
 
 import pytest
+from typing_extensions import Self
 from cl.runtime import RecordMixin
 from cl.runtime.db.protocols import TKey
 from cl.runtime.testing.regression_guard import RegressionGuard

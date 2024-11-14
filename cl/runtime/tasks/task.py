@@ -18,7 +18,6 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing_extensions import Self
-
 from cl.runtime.context.context import Context
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_entry import LogEntry

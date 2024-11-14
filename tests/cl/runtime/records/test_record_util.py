@@ -14,7 +14,6 @@
 
 import pytest
 from typing_extensions import Self
-
 from cl.runtime.db.protocols import TKey
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.testing.regression_guard import RegressionGuard

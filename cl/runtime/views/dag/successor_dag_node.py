@@ -14,8 +14,8 @@
 
 from dataclasses import dataclass
 from typing import List
-from typing_extensions import Self
 from typing import Optional
+from typing_extensions import Self
 from cl.runtime import Context
 from cl.runtime import RecordMixin
 from cl.runtime.log.exceptions.user_error import UserError
