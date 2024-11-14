@@ -196,10 +196,9 @@ class RecordResponse(BaseModel):
             else dict()
         )  # Handle not found record
 
-        # TODO: Optimize speed using dacite or similar library
-
+        # Serialize record to ui format
+        # TODO: Optimize speed
         ui_serializer = UiDictSerializer()
-        # serialize record to ui format
         record_dict_in_legacy_format = ui_serializer.serialize_data(record)
 
         # TODO: Update to return record_dict after legacy dict format is removed

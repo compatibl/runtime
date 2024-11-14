@@ -29,6 +29,21 @@ class TypeResponseUtil:
         record_type = Schema.get_type_by_short_name(request.name)
         result = Schema.for_type(record_type)
 
+        # TODO: Experimental patch to exclude entry_id field from top grid and editor but not the record picker
+        # This patch is activated in three cases:
+        # - Top grid
+        # - When a new record is created and the editor is opened
+        # - When getting the schema for the picker, however this is excluded by endswith("Key")
+        if request.name is not None and not request.name.endswith("Key"):
+            type_dict = list(result.values())[0] if len(result) > 0 else None
+            if type_dict is not None:
+                elements = type_dict.get("Elements", None)
+                if elements is not None:
+                    for index, element in enumerate(elements):
+                        if element.get("Name", None) == "EntryId":
+                            elements.pop(index)
+                            break
+
         for decl_name, decl_dict in result.items():
             # add Implement handlers block
             if declare_block := decl_dict.get("Declare"):
