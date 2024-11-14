@@ -82,11 +82,33 @@ class FloatUtil:
     def more_or_equal(cls, value_1: float, value_2: float) -> bool:
         """Returns true if the value_1 is more than value_2 minus tolerance."""
         return value_1 > value_2 - cls.tolerance
+    
+    @classmethod
+    def is_int(cls, value: float | None) -> bool:
+        """True if value is not None and is within tolerance from int, False otherwise."""
+        if value is None:
+            return False
+        else:
+            rounded_value = round(value)
+            result = cls.equal(rounded_value, value)
+            return result
 
     @classmethod
-    def get_int(cls, value: float) -> int:
-        """Convert float to int if within tolerance from int, error otherwise."""
-        result = int(round(value))
-        if not cls.equal(result, value):
+    def to_int(cls, value: float | None) -> int | None:
+        """Convert value to int if within tolerance from int, return None if value is None, error otherwise."""
+        if value is None:
+            return None
+        elif cls.equal(result := int(round(value)), value):
+            return result
+        else:
             raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
-        return result
+
+    @classmethod
+    def to_int_or_float(cls, value: float | None) -> int | float | None:
+        """Convert value to int if within tolerance from int, return the original value otherwise or if None."""
+        if value is None:
+            return None
+        elif cls.equal(result := int(round(value)), value):
+            return result
+        else:
+            return value
