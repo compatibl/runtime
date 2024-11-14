@@ -15,6 +15,8 @@
 import datetime as dt
 import time
 from dataclasses import dataclass
+from typing_extensions import Self
+
 from cl.runtime import Context
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.tasks.task import Task
@@ -26,10 +28,13 @@ from cl.runtime.tasks.task_status_enum import TaskStatusEnum
 class ProcessQueue(TaskQueue):
     """Execute tasks sequentially within the queue process."""
 
-    def init(self) -> None:
+    def init(self) -> Self:
         # Set default queue timeout with no tasks to 10 min
         if self.timeout_sec is None:
             self.timeout_sec = 10
+
+        # Return self to enable method chaining
+        return self
 
     def run_start_queue(self) -> None:
         context = Context.current()

@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
+from typing_extensions import Self
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.log.exceptions.user_error import UserError
@@ -34,10 +35,13 @@ class TrialKey(KeyMixin):
     def get_key_type(cls) -> Type:
         return TrialKey
 
-    def init(self) -> None:
+    def init(self) -> Self:
         # Check only if inside a key, will be set automatically if inside a record
         if is_key(self):
             self.check_trial_id(self.trial_id)
+
+        # Return self to enable method chaining
+        return self
 
     @classmethod
     def get_trial_id(cls, experiment: ExperimentKey, trial_label: str) -> str:

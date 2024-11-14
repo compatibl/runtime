@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 from typing import List
+from typing_extensions import Self
 from cl.runtime.settings.settings import Settings
 
 
@@ -54,8 +55,8 @@ class ApiSettings(Settings):
     max_age: int | None = None
     """Maximum time in seconds for browsers to cache the CORS response."""
 
-    def init(self) -> None:
-        """Same as __init__ but can be used when field values are set both during and after construction."""
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
         # Validate hostname
         if self.hostname is not None and not isinstance(self.hostname, str):
@@ -119,6 +120,9 @@ class ApiSettings(Settings):
 
         if self.max_age is not None and not isinstance(self.max_age, int):
             raise RuntimeError(f"{type(self).__name__} field 'max_age' must be an int or None.")
+
+        # Return self to enable method chaining
+        return self
 
     @classmethod
     def get_prefix(cls) -> str:

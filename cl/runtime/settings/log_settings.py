@@ -14,6 +14,8 @@
 
 import datetime as dt
 from dataclasses import dataclass
+from typing_extensions import Self
+
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.settings.settings import Settings
 
@@ -38,8 +40,8 @@ class LogSettings(Settings):
     level: str = "info"
     """Log level using logging module conventions (lower, upper or mixed case can be used)."""
 
-    def init(self) -> None:
-        """Same as __init__ but can be used when field values are set both during and after construction."""
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
         # Convert logging level to uppercase and validate its values
         self.level = self.level.upper()
@@ -49,6 +51,9 @@ class LogSettings(Settings):
                 f"Invalid log level: {self.level}, permitted values are: {', '.join(valid_levels)}. "
                 f"Lower, upper or mixed case can be used."
             )
+
+        # Return self to enable method chaining
+        return self
 
     @classmethod
     def get_prefix(cls) -> str:

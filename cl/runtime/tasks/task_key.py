@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
+from typing_extensions import Self
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.key_mixin import KeyMixin
@@ -36,10 +37,13 @@ class TaskKey(KeyMixin):
     task_id: str = missing()
     """Unique task identifier."""
 
-    def init(self) -> None:
+    def init(self) -> Self:
         # Check only if inside a key, will be set automatically if inside a record
         if is_key(self):
             Timestamp.validate(self.task_id, value_name="task_id", data_type="TaskKey")
+
+        # Return self to enable method chaining
+        return self
 
     @classmethod
     def get_key_type(cls) -> Type:

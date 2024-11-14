@@ -15,6 +15,7 @@
 import os
 from dataclasses import dataclass
 from typing import List
+from typing_extensions import Self
 from cl.runtime.configs.config import Config
 from cl.runtime.context.context import Context
 from cl.runtime.file.csv_file_reader import CsvFileReader
@@ -36,11 +37,14 @@ class PreloadSettings(Settings):
         - For JSON, the data is in json/ClassName/.../KeyToken1;KeyToken2.json where ... is optional dataset
     """
 
-    def init(self) -> None:
-        """Same as __init__ but can be used when field values are set both during and after construction."""
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.dirs = self.normalize_paths("dirs", self.dirs)
+
+        # Return self to enable method chaining
+        return self
 
     @classmethod
     def get_prefix(cls) -> str:

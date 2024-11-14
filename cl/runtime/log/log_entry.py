@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing_extensions import Self
+
 from cl.runtime import RecordMixin
 from cl.runtime.log.log_entry_key import LogEntryKey
 from cl.runtime.log.log_entry_level_enum import LogEntryLevelEnum
@@ -36,7 +38,10 @@ class LogEntry(LogEntryKey, RecordMixin[LogEntryKey]):
     def get_key(self) -> LogEntryKey:
         return LogEntryKey(timestamp=self.timestamp)
 
-    def init(self) -> None:
-        """Same as __init__ but can be used when field values are set both during and after construction."""
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
         if self.timestamp is None:
             self.timestamp = Timestamp.create()
+
+        # Return self to enable method chaining
+        return self

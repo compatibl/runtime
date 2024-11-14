@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing_extensions import Self
+
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.dataclasses_extensions import missing
@@ -32,6 +34,8 @@ class Trial(TrialKey, RecordMixin[TrialKey]):
     def get_key(self) -> TrialKey:
         return TrialKey(trial_id=self.trial_id)
 
-    def init(self) -> None:
+    def init(self) -> Self:
         """Generate trial_id in 'ExperimentId: TrialLabel' format."""
         self.trial_id = self.get_trial_id(self.experiment, self.trial_label)
+        # Return self to enable method chaining
+        return self

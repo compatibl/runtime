@@ -54,10 +54,13 @@ class ProjectSettings:
     __instance: ClassVar[ProjectSettings] = None
     """Singleton instance."""
 
-    def init(self) -> None:
-        """Same as __init__ but can be used when field values are set both during and after construction."""
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
         if self.project_levels != 1 and self.project_levels != 2:
             raise RuntimeError(f"Field 'ProjectSettings.project_levels' must be 1 or 2.")
+
+        # Return self to enable method chaining
+        return self
 
     @classmethod
     def get_project_root(cls) -> str:

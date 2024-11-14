@@ -26,6 +26,8 @@ from typing import TypeVar
 from typing import runtime_checkable
 from uuid import UUID
 
+from typing_extensions import Self
+
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | None
 """Supported primitive value types for serialized data in dictionary format."""
 
@@ -80,8 +82,8 @@ class RecordProtocol(KeyProtocol):
 class InitProtocol:
     """Protocol implemented by objects that require initialization."""
 
-    def init(self) -> None:
-        """Same as __init__ but can be used when field values are set both during and after construction."""
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
 
 class ValidateProtocol:
