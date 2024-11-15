@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import inspect
+from dataclasses import Field
 from dataclasses import dataclass
+from typing import Any
 from typing import Callable
 from typing import Type
 from typing_extensions import Self
 from cl.runtime import ClassInfo
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.schema.schema import Schema
 from cl.runtime.tasks.callable_task import CallableTask
@@ -36,6 +39,9 @@ class StaticMethodTask(CallableTask):
     method_name: str = missing()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
+    method_argument_values: dict[str, str] | None = field()
+    """Values for task arguments, if any."""
+
     def _execute(self) -> None:
         """Invoke the specified @staticmethod or @classmethod."""
 
@@ -47,7 +53,14 @@ class StaticMethodTask(CallableTask):
         method = getattr(record_type, method_name)
 
         # Invoke the callable
-        method()
+        if self.method_argument_values:
+            params = {
+                CaseUtil.pascal_to_snake_case(arg_name): arg_value
+                for arg_name, arg_value in self.method_argument_values.items()
+            }
+            method(**params)
+        else:
+            method()
 
     @classmethod
     def create(
@@ -64,7 +77,9 @@ class StaticMethodTask(CallableTask):
         result.type_str = f"{record_type.__module__}.{record_type.__name__}"
 
         # Check that __self__ is either absent (@staticmethod) or is a class (@classmethod)
-        if (method_cls := getattr(method_callable, "__self__", None)) is not None and not inspect.isclass(method_cls):
+        if (
+            method_cls := getattr(method_callable, "__self__", None)
+        ) is not None and not inspect.isclass(method_cls):
             raise RuntimeError(
                 f"Callable '{method_callable.__qualname__}' for task_id='{result.task_id}' is "
                 f"an instance method rather than @staticmethod or @classmethod, "

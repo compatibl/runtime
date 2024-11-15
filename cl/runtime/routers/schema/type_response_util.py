@@ -27,6 +27,7 @@ class TypeResponseUtil:
 
         # TODO: Check why empty module is passed, is module the short name prefix?
         record_type = Schema.get_type_by_short_name(request.name)
+        handler_args_elements = dict()
         result = Schema.for_type(record_type)
 
         # TODO: Experimental patch to exclude entry_id field from top grid and editor but not the record picker
@@ -46,10 +47,25 @@ class TypeResponseUtil:
 
         for decl_name, decl_dict in result.items():
             # add Implement handlers block
-            if declare_block := decl_dict.get("Declare"):
-                if handlers_block := declare_block.get("Handlers"):
-                    # TODO (Roman): skip abstract methods
-                    implement_block = [{"Name": handler_decl.get("Name")} for handler_decl in handlers_block]
-                    result[decl_name]["Implement"] = {"Handlers": implement_block}
+            if not (declare_block := decl_dict.get("Declare")):
+                continue
 
+            if not (handlers_block := declare_block.get("Handlers")):
+                continue
+
+            # TODO (Roman): skip abstract methods
+            implement_block = [
+                {"Name": handler_decl.get("Name")} for handler_decl in handlers_block
+            ]
+            result[decl_name]["Implement"] = {"Handlers": implement_block}
+
+            # create schema for method arguments if so present
+            for handler in handlers_block:
+                if not (params := handler.get("Params")):
+                    continue
+
+                handler_args_schema_name = f"{decl_name}{handler['Name']}Args"
+                handler_args_elements[handler_args_schema_name] = {"Elements": params}
+
+        result.update(handler_args_elements)
         return result

@@ -62,9 +62,10 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         log_method_info(__name__)
 
     # TODO (Roman): Restore after supporting handlers with parameters
-    # def run_instance_method_2a(self, param1: str, param2: str = None) -> None:
-    #     """Stub handler."""
-    #     log_method_info(__name__)
+    def run_instance_method_2a_with_params(self, param_1: str, param_2: str = None) -> None:
+        """Stub handler."""
+        log_method_info(__name__)
+        _logger.info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters()
     # def run_instance_method_2b(self, param1: str, param2: str = None) -> None:
@@ -92,10 +93,11 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         log_method_info(__name__)
 
     # TODO (Roman): Restore after supporting handlers with parameters
-    # @classmethod
-    # def run_class_method_2a(cls, param1: str, param2: str = None) -> None:
-    #     """Stub handler."""
-    #     log_method_info(__name__)
+    @classmethod
+    def run_class_method_2a_with_params(cls, param_1: str, param_2: str) -> None:
+        """Stub handler."""
+        log_method_info(__name__)
+        _logger.info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters
     # @classmethod()
