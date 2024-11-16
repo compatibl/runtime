@@ -262,9 +262,16 @@ class RegressionGuard:
             return True
 
         if os.path.exists(expected_path):
-            # Expected file exists, compare
-            if self.__cmp_files(received_path, expected_path):
-                # Received and expected match, delete the received file and diff file
+
+            # Read both files
+            with open(received_path, "r") as received_file:
+                received_lines = list(received_file.readlines())
+            with open(expected_path, "r") as expected_file:
+                expected_lines = list(expected_file.readlines())
+
+            # Expected file exists, ensure all lines match
+            if all(x == y for x, y in zip(received_lines, expected_lines)):
+                # All received and expected lines match, delete the received file and diff file
                 os.remove(received_path)
                 if os.path.exists(diff_path):
                     os.remove(diff_path)
@@ -272,13 +279,8 @@ class RegressionGuard:
                 # Return True to indicate verification has been successful
                 return True
             else:
-                # Receive an expected do not match, generate unified diff
+                # Some of the lines do not match, generate unified diff
                 # TODO: Handle diff for binary output
-                with open(received_path, "r") as received_file:
-                    received_lines = received_file.readlines()
-                with open(expected_path, "r") as expected_file:
-                    expected_lines = expected_file.readlines()
-
                 # Convert to list first because the returned object is a generator but
                 # we will need to iterate over the lines more than once
                 diff = list(
@@ -385,15 +387,3 @@ class RegressionGuard:
         """The diff between received and expected is written to 'channel.diff.ext' located next to the unit test."""
         result = f"{self.output_path}{file_type}.{self.ext}"
         return result
-
-    def __cmp_files(self, file_path_a: str, file_path_b: str) -> bool:
-        """Compare two files ignoring line endings."""
-        with open(file_path_a, "r") as file_a, open(file_path_b, "r") as file_b:
-            for line_a, line_b in zip(file_a, file_b):
-                # Strip line endings before comparing
-                if line_a.rstrip("\r\n") != line_b.rstrip("\r\n"):
-                    return False
-            # Check if there are any remaining lines in either file
-            if file_a.readline() or file_b.readline():
-                return False
-        return True
