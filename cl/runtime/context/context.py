@@ -75,19 +75,25 @@ class Context(ContextKey, RecordMixin[ContextKey]):
 
         # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
         if not self.is_deserialized:
-            # Set fields that are not specified to their values from 'Context.current()'
+            # Set fields that are not specified as __init__ param to their values from 'Context.current()'
+
+            # Required fields, error message if the field is not set in the root context
             if self.user is None:
-                self._root_context_field_not_set_error("user")
+                self._current_context_field_not_set_error("user")
                 self.user = Context.current().user
             if self.log is None:
-                self._root_context_field_not_set_error("log")
+                self._current_context_field_not_set_error("log")
                 self.log = Context.current().log
             if self.db is None:
-                self._root_context_field_not_set_error("db")
+                self._current_context_field_not_set_error("db")
                 self.db = Context.current().db
             if self.dataset is None:
-                self._root_context_field_not_set_error("dataset")
+                self._current_context_field_not_set_error("dataset")
                 self.dataset = Context.current().dataset
+                
+            # Optional fields, set to None if not set in the root context
+            if self.secrets is None:
+                self.secrets = Context.current().secrets
 
         # Replace fields that are set as keys by records from storage
         # First, load 'db' field of this context using 'Context.current()'
@@ -376,18 +382,18 @@ class Context(ContextKey, RecordMixin[ContextKey]):
         self.error_if_not_temp_db(self.db.db_id)
         self.db.delete_all_and_drop_db()  # noqa
 
-    def _root_context_field_not_set_error(self, field_name: str) -> None:
+    def _current_context_field_not_set_error(self, field_name: str) -> None:
         """Error message about a Context field not set."""
-        if type(self) is not Context:
+        # Get context stack for the current asynchronous environment
+        context_stack = context_stack_var.get()
+        if not (context_stack and len(context_stack) > 0):
             raise RuntimeError(
                 f"""
 Field '{field_name}' of the context class '{type(self).__name__}' is not set.
 The context in the outermost 'with' clause (root context) must set all fields
 of the Context class. Inside the 'with' clause, these fields will be populated
 from the current context.
-"""
-                + root_context_types_str
-            )
+""")
 
     @classmethod
     def error_if_not_temp_db(cls, db_id_or_database_name: str) -> None:
