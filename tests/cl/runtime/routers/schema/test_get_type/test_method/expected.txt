@@ -51,10 +51,7 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   - Value:
       Type: String
     Name: UserSecretIdentifiers
-    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\
-      \nNotes:\n    - This is a list of suggestions, no restriction on entering secrets\
-      \ with other names\n    - The secret names should be in snake_case, for example\
-      \ [\"openai_api_key\", \"anthropic_api_key\"] "
+    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
     Vector: true
     Optional: true
   Keys:
@@ -166,10 +163,7 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   - Value:
       Type: String
     Name: UserSecretIdentifiers
-    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\
-      \nNotes:\n    - This is a list of suggestions, no restriction on entering secrets\
-      \ with other names\n    - The secret names should be in snake_case, for example\
-      \ [\"openai_api_key\", \"anthropic_api_key\"] "
+    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
     Vector: true
     Optional: true
   Keys:
