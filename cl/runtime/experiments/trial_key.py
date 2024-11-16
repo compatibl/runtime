@@ -29,19 +29,11 @@ class TrialKey(KeyMixin):
     """Run and store the result of a single trial for the specified experiment."""
 
     trial_id: str = missing()
-    """Unique identifier of the trial using 'ExperimentId: TrialLabel' format."""
+    """Unique trial identifier in backslash-delimited format."""
 
     @classmethod
     def get_key_type(cls) -> Type:
         return TrialKey
-
-    def init(self) -> Self:
-        # Check only if inside a key, will be set automatically if inside a record
-        if is_key(self):
-            self.check_trial_id(self.trial_id)
-
-        # Return self to enable method chaining
-        return self
 
     @classmethod
     def get_trial_id(cls, experiment: ExperimentKey, trial_label: str) -> str:
@@ -68,13 +60,3 @@ class TrialKey(KeyMixin):
         cls.check_trial_id(trial_id)
         return trial_id
 
-    @classmethod
-    def check_trial_id(cls, trial_id: str) -> None:
-        """Check that trial_id has the expected 'ExperimentId: TrialLabel' format."""
-        ColonAndSpaceDelimitedUtil.validate(
-            value=trial_id,
-            token_count=2,
-            value_name="the argument of",
-            method_name="check_trial_id",
-            data_type="TrialKey",
-        )

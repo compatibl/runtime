@@ -31,10 +31,6 @@ class Trial(TrialKey, RecordMixin[TrialKey]):
     """Identifier of the trial is unique within the experiment."""
 
     def get_key(self) -> TrialKey:
+        # TODO: Add validation
+        self.trial_id = "\\".join((self.experiment.experiment_id, self.trial_label,))
         return TrialKey(trial_id=self.trial_id)
-
-    def init(self) -> Self:
-        """Generate trial_id in 'ExperimentId: TrialLabel' format."""
-        self.trial_id = self.get_trial_id(self.experiment, self.trial_label)
-        # Return self to enable method chaining
-        return self
