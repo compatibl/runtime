@@ -342,16 +342,26 @@ class RegressionGuard:
 
     def _format_txt(self, value: Any) -> str:
         """Format text for regression testing."""
+
+        # Convert to one of the supported output types
+        if is_record(value):
+            value = data_serializer.serialize_data(value)
+        elif is_key(value):
+            value = key_serializer.serialize_key(value)
+
         value_type = type(value)
         if value_type in primitive_types:
             # TODO: Use specialized conversion for primitive types
             return str(value) + "\n"
         elif value_type == dict:
-            return yaml.dump(value, default_flow_style=False, sort_keys=False) + "\n"
-        elif is_record(value_type):
-            return data_serializer.serialize_data(value)
-        elif is_key(value_type):
-            return key_serializer.serialize_key(value)
+            return yaml.dump(
+                value,
+                # Dumper=MyDumper,
+                default_flow_style=False,
+                allow_unicode=True,
+                sort_keys=False,
+                width=float("inf")  # Prevent line wrapping
+            ) + "\n"
         elif issubclass(value_type, Enum):
             return str(value)
         elif hasattr(value_type, "__iter__"):
