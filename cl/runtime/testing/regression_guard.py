@@ -39,6 +39,15 @@ data_serializer = DictSerializer()
 """Serializer for records."""
 
 
+# Custom Dumper to ensure proper block style for multi-line strings
+class NoExtraLineBreakDumper(yaml.Dumper):
+    def represent_scalar(self, tag, value, style=None):
+        """Use block style (|) for multiline strings."""
+        if '\n' in value:
+            style = '|'
+        return super().represent_scalar(tag, value, style)
+
+
 def _error_extension_not_supported(ext: str) -> Any:
     raise RuntimeError(
         f"Extension {ext} is not supported by RegressionGuard. "
@@ -358,11 +367,11 @@ class RegressionGuard:
         elif value_type == dict:
             return yaml.dump(
                 value,
-                # Dumper=MyDumper,
+                Dumper=NoExtraLineBreakDumper,
                 default_flow_style=False,
-                allow_unicode=True,
                 sort_keys=False,
-                width=float("inf")  # Prevent line wrapping
+                allow_unicode=True,  # Ensure Unicode characters are displayed as is
+                width=float("inf"),  # Prevent line wrapping
             ) + "\n"
         elif issubclass(value_type, Enum):
             return str(value)
