@@ -40,7 +40,10 @@ class TypeResponseUtil:
                 elements = type_dict.get("Elements", None)
                 if elements is not None:
                     for index, element in enumerate(elements):
-                        if element.get("Name", None) == "EntryId":
+                        if element.get("Name", None) in [
+                            "EntryId",
+                            "CompletionId"
+                        ]:
                             elements.pop(index)
                             break
 
