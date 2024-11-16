@@ -1,0 +1,14 @@
+Check short text without params with and without data, hash should be different
+Sample Text
+Sample Text (dfefd46585918f6ff272010f51f2f9d8)
+Check short text with params with and without data, hash should be different
+Sample Text (en-GB)
+Sample Text (en-GB, dfefd46585918f6ff272010f51f2f9d8)
+Check long text with and without data, hash should be different
+Long Text Long Text Long Text Long Text Long Text Long Text Long Text Long Text (en-GB, 574b9407554022fc3dd713719ac027e0)
+Long Text Long Text Long Text Long Text Long Text Long Text Long Text Long Text (en-GB, b622b302d28829c3e6f2d898ba3dfac1)
+Check multiline text with and without data, hash should be different
+Multiline Text (en-GB, b86db27f31d8cf12750802b481f9d95a)
+Multiline Text (en-GB, 80c5c5fe9b7e7af71655031aa4c6d36a)
+The same inputs one more time, hash should be the same
+Multiline Text (en-GB, 80c5c5fe9b7e7af71655031aa4c6d36a)
