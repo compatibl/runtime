@@ -31,7 +31,7 @@ def _get_uuid7() -> UUID:
 
 class Timestamp:
     """
-    UUIDv7 RFC-9562 based timestamp in time-ordered dash-delimited string format with additional
+    Globally unique UUIDv7 (RFC-9562) timestamp in time-ordered dash-delimited string format with additional
     strict time ordering guarantees within the same process, thread and context.
     """
 

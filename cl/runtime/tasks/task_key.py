@@ -37,6 +37,10 @@ class TaskKey(KeyMixin):
     task_id: str = missing()
     """Unique task identifier."""
 
+    @classmethod
+    def get_key_type(cls) -> Type:
+        return TaskKey
+
     def init(self) -> Self:
         # Check only if inside a key, will be set automatically if inside a record
         if is_key(self):
@@ -45,6 +49,3 @@ class TaskKey(KeyMixin):
         # Return self to enable method chaining
         return self
 
-    @classmethod
-    def get_key_type(cls) -> Type:
-        return TaskKey
