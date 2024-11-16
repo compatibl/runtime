@@ -48,4 +48,3 @@ class TaskKey(KeyMixin):
 
         # Return self to enable method chaining
         return self
-

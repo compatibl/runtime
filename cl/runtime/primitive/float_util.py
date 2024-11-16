@@ -82,7 +82,7 @@ class FloatUtil:
     def more_or_equal(cls, value_1: float, value_2: float) -> bool:
         """Returns true if the value_1 is more than value_2 minus tolerance."""
         return value_1 > value_2 - cls.tolerance
-    
+
     @classmethod
     def is_int(cls, value: float | None) -> bool:
         """True if value is not None and is within tolerance from int, False otherwise."""

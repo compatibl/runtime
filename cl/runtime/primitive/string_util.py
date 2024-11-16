@@ -14,8 +14,8 @@
 
 import hashlib
 import re
-from typing import TypeGuard, Iterable
-
+from typing import Iterable
+from typing import TypeGuard
 from cl.runtime.log.exceptions.user_error import UserError
 
 _DISALLOWED_DELIMITERS = {
@@ -43,11 +43,11 @@ class StringUtil:
 
     @classmethod
     def digest(
-            cls,
-            text: str,
-            *,
-            text_params: Iterable[str] | None = None,
-            hash_params: Iterable[str] | None = None,
+        cls,
+        text: str,
+        *,
+        text_params: Iterable[str] | None = None,
+        hash_params: Iterable[str] | None = None,
     ) -> str:
         """
         Return digest in one of the following two formats:

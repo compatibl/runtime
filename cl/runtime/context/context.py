@@ -26,8 +26,8 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.log_key import LogKey
+from cl.runtime.log.log_message import LogMessage
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -90,7 +90,7 @@ class Context(ContextKey, RecordMixin[ContextKey]):
             if self.dataset is None:
                 self._current_context_field_not_set_error("dataset")
                 self.dataset = Context.current().dataset
-                
+
             # Optional fields, set to None if not set in the root context
             if self.secrets is None:
                 self.secrets = Context.current().secrets
@@ -393,7 +393,8 @@ Field '{field_name}' of the context class '{type(self).__name__}' is not set.
 The context in the outermost 'with' clause (root context) must set all fields
 of the Context class. Inside the 'with' clause, these fields will be populated
 from the current context.
-""")
+"""
+            )
 
     @classmethod
     def error_if_not_temp_db(cls, db_id_or_database_name: str) -> None:

@@ -63,8 +63,9 @@ class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
             case "Critical":
                 self.priority = 5
             case _:
-                raise ValueError(f"Invalid logging level: {self.level}. Valid choices are:"
-                                 f"Debug, Info, Warning, Error, Critical")
+                raise ValueError(
+                    f"Invalid logging level: {self.level}. Valid choices are:" f"Debug, Info, Warning, Error, Critical"
+                )
 
         if self.message is None:
             self.message = "An error occurred. Contact technical support for assistance."
