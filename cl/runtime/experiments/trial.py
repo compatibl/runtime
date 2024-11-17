@@ -24,18 +24,5 @@ from cl.runtime.records.record_mixin import RecordMixin
 class Trial(TrialKey, RecordMixin[TrialKey]):
     """Run and store the result of a single trial for the specified experiment."""
 
-    experiment: ExperimentKey = missing()
-    """Experiment for which the trial is performed."""
-
-    trial_label: str = missing()
-    """Identifier of the trial is unique within the experiment."""
-
     def get_key(self) -> TrialKey:
-        # TODO: Add validation
-        self.trial_id = "\\".join(
-            (
-                self.experiment.experiment_id,
-                self.trial_label,
-            )
-        )
         return TrialKey(trial_id=self.trial_id)
