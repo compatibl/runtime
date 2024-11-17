@@ -43,8 +43,8 @@ data_serializer = DictSerializer()
 class NoExtraLineBreakDumper(yaml.Dumper):
     def represent_scalar(self, tag, value, style=None):
         """Use block style (|) for multiline strings."""
-        if '\n' in value:
-            style = '|'
+        if "\n" in value:
+            style = "|"
         return super().represent_scalar(tag, value, style)
 
 
@@ -365,14 +365,17 @@ class RegressionGuard:
             # TODO: Use specialized conversion for primitive types
             return str(value) + "\n"
         elif value_type == dict:
-            return yaml.dump(
-                value,
-                Dumper=NoExtraLineBreakDumper,
-                default_flow_style=False,
-                sort_keys=False,
-                allow_unicode=True,  # Ensure Unicode characters are displayed as is
-                width=float("inf"),  # Prevent line wrapping
-            ) + "\n"
+            return (
+                yaml.dump(
+                    value,
+                    Dumper=NoExtraLineBreakDumper,
+                    default_flow_style=False,
+                    sort_keys=False,
+                    allow_unicode=True,  # Ensure Unicode characters are displayed as is
+                    width=float("inf"),  # Prevent line wrapping
+                )
+                + "\n"
+            )
         elif issubclass(value_type, Enum):
             return str(value)
         elif hasattr(value_type, "__iter__"):

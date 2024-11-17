@@ -59,4 +59,3 @@ class TrialKey(KeyMixin):
         trial_id = f"{experiment.experiment_id}: {trial_label}"
         cls.check_trial_id(trial_id)
         return trial_id
-

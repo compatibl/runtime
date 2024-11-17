@@ -32,5 +32,10 @@ class Trial(TrialKey, RecordMixin[TrialKey]):
 
     def get_key(self) -> TrialKey:
         # TODO: Add validation
-        self.trial_id = "\\".join((self.experiment.experiment_id, self.trial_label,))
+        self.trial_id = "\\".join(
+            (
+                self.experiment.experiment_id,
+                self.trial_label,
+            )
+        )
         return TrialKey(trial_id=self.trial_id)
