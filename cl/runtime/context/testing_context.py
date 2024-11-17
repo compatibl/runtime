@@ -13,10 +13,15 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.convince.llms.llm_key import LlmKey
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
 from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.db.dataset_util import DatasetUtil
+from cl.runtime.experiments.experiment_key import ExperimentKey
+from cl.runtime.experiments.trial_key import TrialKey
+from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.settings import Settings
@@ -76,6 +81,20 @@ class TestingContext(Context):
 
             # Root dataset
             self.dataset = DatasetUtil.root()
+
+            # Set fields to their values in ContextSettings
+            if self.experiment is None:
+                if StringUtil.is_not_empty(experiment_id := ContextSettings.instance().experiment):
+                    self.experiment = ExperimentKey(experiment_id=experiment_id)
+            if self.trial is None:
+                if StringUtil.is_not_empty(trial_id := ContextSettings.instance().trial):
+                    self.trial = TrialKey(trial_id=trial_id)
+            if self.full_llm is None:
+                if StringUtil.is_not_empty(full_llm_id := ContextSettings.instance().full_llm):
+                    self.full_llm = LlmKey(llm_id=full_llm_id)
+            if self.mini_llm is None:
+                if StringUtil.is_not_empty(mini_llm_id := ContextSettings.instance().mini_llm):
+                    self.mini_llm = LlmKey(llm_id=mini_llm_id)
 
     def __enter__(self):
         """Supports 'with' operator for resource disposal."""
