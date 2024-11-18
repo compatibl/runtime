@@ -66,7 +66,7 @@ async def get_panel(
             "_t": "Script",
             "Name": None,
             "Language": "Markdown",
-            "Body": ["The following error occurred during the rendering of this view:", "", str(e)],
+            "Body": ["## The following error occurred during the rendering of this view:\n", f"{str(e)}"],
             "WordWrap": True,
         }
         error_view_dict = PanelResponseUtil._get_view_dict(error_view)
