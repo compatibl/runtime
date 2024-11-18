@@ -19,6 +19,9 @@ from fastapi import APIRouter
 from fastapi import Body
 from fastapi import Header
 from fastapi import Query
+
+from cl.runtime import Context
+from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
@@ -54,8 +57,20 @@ async def get_panel(
     key: str = Query(None, description="Primary key fields in semicolon-delimited format"),
     dataset: str = Query(None, description="Dataset string"),
 ):
-    """Return panel content by its displayed name."""
-    return PanelResponseUtil.get_content(PanelRequest(type=type, panel_id=panel_id, key=key, dataset=dataset))
+    try:
+        """Return panel content by its displayed name."""
+        return PanelResponseUtil.get_content(PanelRequest(type=type, panel_id=panel_id, key=key, dataset=dataset))
+    except Exception as e:
+        Context.current().save_one(LogMessage(message=str(e)))
+        error_view = {  # TODO: Refactor
+            "_t": "Script",
+            "Name": None,
+            "Language": "Markdown",
+            "Body": ["The following error occurred during the rendering of this view:", "", str(e)],
+            "WordWrap": True,
+        }
+        error_view_dict = PanelResponseUtil._get_view_dict(error_view)
+        return {"ViewOf": error_view_dict}
 
 
 @router.post("/save", response_model=SaveResponse)
@@ -66,15 +81,18 @@ async def save(
     user: str = Header(None, description="User identifier or identity token"),
 ) -> SaveResponse:
     """Save panel content."""
-
-    return SaveResponse.save_entity(
-        SaveRequest(
-            record_dict=record_in_dict,
-            old_record_key=old_record_key,
-            dataset=dataset,
-            user=user,
-        ),
-    )
+    try:
+        return SaveResponse.save_entity(
+            SaveRequest(
+                record_dict=record_in_dict,
+                old_record_key=old_record_key,
+                dataset=dataset,
+                user=user,
+            ),
+        )
+    except Exception as e:
+        Context.current().save_one(LogMessage(message=str(e)))
+        raise e
 
 
 @router.post("/delete_many", response_model=DeleteResponse)
