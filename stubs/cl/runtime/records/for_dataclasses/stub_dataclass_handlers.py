@@ -18,6 +18,7 @@ from logging import getLogger
 from cl.runtime.context.context import Context
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.views.binary_content import BinaryContent
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
@@ -193,3 +194,8 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         db = Context.current().db
         stub = StubDataclassRecord(id="saved_from_handler")
         db.save_one(stub)
+
+    def run_instance_method_with_binary_param(self, binary_data: BinaryContent):
+        """Stub method."""
+        log_method_info(__name__)
+        _logger.info(f"binary_data len={len(binary_data)}")
