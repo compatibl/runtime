@@ -27,8 +27,6 @@ class HandlerParamDecl(HandlerVariableDecl):
     name: str = missing()
     """Parameter name."""
 
-    _t: str = missing()
-
     @classmethod
     @cached
     def create(cls, name: str, variable_decl: HandlerVariableDecl) -> Self:
