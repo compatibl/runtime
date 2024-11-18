@@ -19,7 +19,6 @@ from fastapi import APIRouter
 from fastapi import Body
 from fastapi import Header
 from fastapi import Query
-
 from cl.runtime import Context
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.delete_request import DeleteRequest

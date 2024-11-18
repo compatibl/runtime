@@ -15,7 +15,6 @@
 from typing import List
 from fastapi import APIRouter
 from fastapi import Request
-
 from cl.runtime import Context
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem

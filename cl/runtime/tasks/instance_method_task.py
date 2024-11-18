@@ -14,8 +14,9 @@
 
 import inspect
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any
 from typing import Callable
+from typing import List
 from typing_extensions import Self
 from cl.runtime import ClassInfo
 from cl.runtime.context.context import Context
