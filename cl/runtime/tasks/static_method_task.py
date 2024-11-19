@@ -35,7 +35,7 @@ class StaticMethodTask(CallableTask):
     method_name: str = missing()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
-    method_argument_values: dict[str, str] | None = field()
+    method_params: dict[str, str] | None = field()
     """Values for task arguments, if any."""
 
     def _execute(self) -> None:
@@ -49,10 +49,10 @@ class StaticMethodTask(CallableTask):
         method = getattr(record_type, method_name)
 
         # Invoke the callable
-        if self.method_argument_values:
+        if self.method_params:
             params = {
                 CaseUtil.pascal_to_snake_case(arg_name): arg_value
-                for arg_name, arg_value in self.method_argument_values.items()
+                for arg_name, arg_value in self.method_params.items()
             }
             method(**params)
         else:

@@ -71,6 +71,7 @@ class RunResponseItem(BaseModel):
                     key_type_str=key_type_str,
                     key_str=serialized_key,
                     method_name=request.method,
+                    method_params=request.arguments_,
                 )
             else:
                 # Key is None, this is a @classmethod or @staticmethod
@@ -83,12 +84,14 @@ class RunResponseItem(BaseModel):
                     queue=handler_queue.get_key(),
                     type_str=record_type_str,
                     method_name=request.method,
-                    method_argument_values=request.arguments_,
+                    method_params=request.arguments_,
                 )
 
             # Save and submit task
             Context.current().save_one(handler_task)
             handler_queue.submit_task(handler_task)  # TODO: Rely on query instead
-            response_items.append(RunResponseItem(key=serialized_key, task_run_id=handler_task.task_id))
+            response_items.append(
+                RunResponseItem(key=serialized_key, task_run_id=handler_task.task_id)
+            )
 
         return response_items
