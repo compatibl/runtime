@@ -14,7 +14,9 @@
 
 from dataclasses import dataclass
 from typing import Callable
-from typing_extensions import Self
+
+from typing_extensions import Self, override
+
 from cl.runtime import ClassInfo
 from cl.runtime.context.context import Context
 from cl.runtime.primitive.case_util import CaseUtil
@@ -22,7 +24,6 @@ from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.info.method_info import MethodInfo
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.tasks.callable_task import CallableTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
@@ -47,6 +48,7 @@ class InstanceMethodTask(CallableTask):
     method_params: dict[str, str | dict] = field()
     """Values for task arguments, if any."""
 
+    @override
     def _execute(self) -> None:
         """Invoke the specified instance method."""
 
@@ -66,40 +68,8 @@ class InstanceMethodTask(CallableTask):
         method_name = self.normalize_method_name(self.method_name)
         method = getattr(record, method_name)
 
-        # Invoke the callable
-        if self.method_params:
-            from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
-
-            params = {
-                CaseUtil.pascal_to_snake_case(arg_name): arg_value
-                for arg_name, arg_value in self.method_params.items()
-            }
-
-            # s = UiDictSerializer()
-            # prepared_serialized_record = s.apply_ui_conversion(params)
-
-            method_info = MethodInfo(type(record), method_name)
-            # arg_name_to_type = {arg.name: arg.type.__name__ for arg in method_info.arguments}
-            arg_name_to_type = {arg.name: arg for arg in method_info.arguments}
-
-            # for k, v in prepared_serialized_record.items():
-            #     if isinstance(v, dict):
-            #         v["_type"] = arg_name_to_type[k]
-
-            # data_serializer = UiDictSerializer()
-            # record = data_serializer.deserialize_data(prepared_serialized_record)
-
-            for name, value in params.items():
-                if isinstance(value, dict):
-                    value = {
-                        CaseUtil.pascal_to_snake_case(arg_name): arg_value
-                        for arg_name, arg_value in value.items()
-                    }
-                    params[name] = arg_name_to_type[name].type(**value)
-
-            method(**params)
-        else:
-            method()
+        params = self.deserialize_method_params(type(record), method_name, self.method_params)
+        method(**params)
 
     @classmethod
     def create(

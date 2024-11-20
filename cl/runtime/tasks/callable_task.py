@@ -12,24 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import inspect
 import re
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import cast
+
 from inflection import underscore
-from typing_extensions import Self
-from cl.runtime.context.context import Context
-from cl.runtime.records.dataclasses_extensions import missing
-from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.schema.schema import Schema
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
+from cl.runtime.serialization.info.method_info import MethodInfo
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.tasks.task import Task
-from cl.runtime.tasks.task_key import TaskKey
 
 key_serializer = StringSerializer()
 param_dict_serializer = DictSerializer()  # TODO: Support complex params
@@ -52,3 +45,30 @@ class CallableTask(Task, ABC):
             # Already in snake_case, return unchanged argument
             result = method_name
         return result
+
+    @staticmethod
+    def deserialize_method_params(_type: type, method_name: str, method_params: dict) -> dict:
+        params = dict()
+        if not method_params:
+            return params
+
+        # convert names back to snake_case
+        params = {
+            CaseUtil.pascal_to_snake_case(param_name): param_value
+            for param_name, param_value in method_params.items()
+        }
+
+        # map param name to it's type
+        method_info = MethodInfo(_type, method_name)
+        param_types = {arg_info.name: arg_info for arg_info in method_info.arguments}
+
+        # deserialize each param
+        for param_name, param_value in params.items():
+            if isinstance(param_value, dict):
+                # in case of complex param type - apply snake_case to it attributes
+                param_value = {
+                    CaseUtil.pascal_to_snake_case(arg_name): arg_value
+                    for arg_name, arg_value in param_value.items()
+                }
+                params[param_name] = param_types[param_name].type(**param_value)
+        return params

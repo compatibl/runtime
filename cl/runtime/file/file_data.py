@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
 from cl.runtime.file.file_type_enum import FileTypeEnum
 from cl.runtime.records.dataclasses_extensions import missing
 
@@ -24,10 +25,8 @@ class FileData:
     name: str | None = missing()
     """Content name."""
 
-    # file_bytes: bytes = missing()
-    content: bytes = missing()
+    file_bytes: bytes = missing()
     """Embedded binary content to be displayed as the current view."""
 
-    # file_type: FileTypeEnum | None = missing()
-    content_type: FileTypeEnum | None = missing()
+    file_type: FileTypeEnum | None = missing()
     """Embedded binary content type."""
