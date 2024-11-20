@@ -86,7 +86,7 @@ class HandlerDeclareBlockDecl:
             else:
                 continue
 
-            params = cls._get_method_params(member)
+            params = cls.get_method_params(member)
             if params:
                 handler.params = params
 
@@ -100,7 +100,7 @@ class HandlerDeclareBlockDecl:
         return cls(handlers=handlers)
 
     @classmethod
-    def _get_method_params(cls, method: FunctionType | MethodType) -> List[HandlerParamDecl]:
+    def get_method_params(cls, method: FunctionType | MethodType) -> List[HandlerParamDecl]:
         """Extract parameters from a given method"""
         params: List[HandlerParamDecl] = []
 
