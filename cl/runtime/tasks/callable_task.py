@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from inflection import underscore
 
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.info.method_info import MethodInfo
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -64,16 +65,24 @@ class CallableTask(Task, ABC):
 
         # deserialize each param
         for param_name, param_values in params.items():
-            if isinstance(param_values, dict):
-                # decl = TypeDecl.for_type(param_types[param_name].type)
-                param_values_normalized = dict()
-                for arg_name, arg_value in param_values.items():
-                    name = CaseUtil.pascal_to_snake_case(arg_name)
-                    value = arg_value
-                    if arg_name == "FileBytes":
-                        value = base64.b64decode(value.encode())
+            if not isinstance(param_values, dict):
+                continue
 
-                    param_values_normalized[name] = value
+            param_decl = TypeDecl.for_type(param_types[param_name].type)
+            param_args = {
+                el.name: el.value.type_ for el in param_decl.elements if el.name and el.value
+            }
 
-                params[param_name] = param_types[param_name].type(**param_values_normalized)
+            param_values_normalized = dict()
+            for arg_name, arg_value in param_values.items():
+                name = CaseUtil.pascal_to_snake_case(arg_name)
+                value = arg_value
+                if param_args.get(arg_name) == "Binary":
+                    value = base64.b64decode(value.encode())
+
+                param_values_normalized[name] = value
+
+            # assign deserialized value instead of dict
+            params[param_name] = param_types[param_name].type(**param_values_normalized)
+
         return params
