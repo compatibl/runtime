@@ -28,7 +28,6 @@ from typing import Type
 from typing import cast
 from memoization import cached
 from typing_extensions import Self
-from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.protocols import KeyProtocol
@@ -37,10 +36,18 @@ from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.settings.context_settings import ContextSettings
 
 
-def is_key_record_or_enum(data_type):
-    """Return true if the type is a key or record based on the presence of 'get_key_type' method or an enum."""
+def is_data_key_record_or_enum(data_type):
+    """
+    Return true if the type is a data class based on presence '__slots__' attribute,
+    key or record based on the presence of 'get_key_type' method or an enum.
+    """
+
     return inspect.isclass(data_type) and (
-        (hasattr(data_type, "get_key_type") and not data_type.__name__.endswith("Mixin")) or issubclass(data_type, Enum)
+        (
+            not data_type.__name__.endswith("Mixin") and
+            (hasattr(data_type, "__slots__") or hasattr(data_type, "get_key_type"))
+        ) or
+        issubclass(data_type, Enum)
     )
 
 
@@ -109,7 +116,7 @@ class Schema:
             record_types = set(
                 record_type
                 for module in modules
-                for name, record_type in inspect.getmembers(module, is_key_record_or_enum)
+                for name, record_type in inspect.getmembers(module, is_data_key_record_or_enum)
             )
 
             # Ensure names are unique

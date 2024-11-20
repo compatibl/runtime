@@ -60,11 +60,6 @@ def get_type_dict() -> Dict[str, Type]:
 
         _type_dict = Schema.get_type_dict()
 
-        # TODO (Roman): include all needed types to type_dict automatically
-        # Add data types needed for UiAppState deserialization to type_dict manually
-        for type_ in (TabInfo, BaseTypeInfo):
-            _type_dict[type_.__name__] = type_
-
     return _type_dict
 
 
