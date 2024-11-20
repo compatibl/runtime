@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 from typing import Optional
 from cl.runtime import Context
 from cl.runtime.backend.core.app_theme import AppTheme
@@ -37,6 +37,9 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
 
     backend_version: str | None = missing()
     """DEPRECATED. Use versions instead."""
+
+    versions: Optional[Dict[str, str]] | None = missing()
+    """Component versions."""
 
     application_name: str | None = missing()
     """Application name."""
