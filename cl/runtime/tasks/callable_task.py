@@ -18,6 +18,7 @@ from inflection import underscore
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 from cl.runtime.tasks.task import Task
 
@@ -31,7 +32,7 @@ class MethodTask(Task, ABC):
     method_name: str = missing()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
-    method_params: dict[str, str | dict | None] | None = field(default_factory=dict)
+    method_params: dict[str, TPrimitive | dict] | None = field(default_factory=dict)
     """Values for task arguments, if any."""
 
     def normalized_method_name(self) -> str:

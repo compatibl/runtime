@@ -15,6 +15,8 @@
 from pydantic import BaseModel
 from pydantic import Field
 
+from cl.runtime.records.protocols import TPrimitive
+
 
 class RunRequest(BaseModel):
     """Request data type for the /tasks/run route."""
@@ -40,7 +42,7 @@ class RunRequest(BaseModel):
     keys: list[str | None] | str | None = Field(None)
     """Keys to be used."""
 
-    arguments_: dict[str, dict | str | None] | None = Field(None, alias="arguments")
+    arguments_: dict[str, dict | TPrimitive] | None = Field(None, alias="arguments")
     """Arguments for the task."""
 
     data_: dict[str, str] | None = Field(None, alias="data")

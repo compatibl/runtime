@@ -18,6 +18,7 @@ from logging import getLogger
 from typing import Any
 
 import datetime as dt
+from uuid import UUID
 
 from cl.runtime.context.context import Context
 from cl.runtime.file.file_data import FileData
@@ -63,6 +64,25 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         return StubHandlersKey(stub_id=self.stub_id)
 
     def run_instance_method_1a(self) -> None:
+        """Stub handler."""
+        log_method_info(__name__)
+
+    def run_instance_method_1a_with_int_param(self, int_param: int) -> None:
+        """Stub handler."""
+        log_method_info(__name__)
+
+    def run_instance_method_1a_with_primitive_params(
+        self,
+        str_param: str,
+        float_param: float,
+        bool_param: bool,
+        int_param: int,
+        date_param: dt.date,
+        time_param: dt.time,
+        datetime_param: dt.datetime,
+        uuid_param: UUID,
+        bytes_param: bytes,
+    ) -> None:
         """Stub handler."""
         log_method_info(__name__)
 
