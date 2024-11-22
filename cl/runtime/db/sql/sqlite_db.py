@@ -206,10 +206,21 @@ class SqliteDb(Db):
         if table_name not in schema_manager.existing_tables():
             return list()
 
+        # using primary keys (which are fields from key type) to sort the selection
+        pk_cols = [f'"{table_name}.{col}"' for col in schema_manager.get_primary_keys(record_type)]
+        sort_columns = ", ".join(pk_cols)
+
         # get subtypes for record_type and use them in match condition
         subtype_names = tuple(t.__name__ for t in Schema.get_type_successors(record_type))
         value_placeholders = ", ".join(["?"] * len(subtype_names))
-        sql_statement = f'SELECT * FROM "{table_name}" WHERE _type in ({value_placeholders});'
+        sql_statement = (f'SELECT * '
+                         f'FROM "{table_name}" '
+                         f'WHERE _type in ({value_placeholders})')
+
+        if sort_columns:
+            sql_statement += f' ORDER BY {sort_columns};'
+        else:
+            sql_statement += ';'
 
         reversed_columns_mapping = {
             v: k for k, v in schema_manager.get_columns_mapping(record_type.get_key_type()).items()
@@ -223,9 +234,8 @@ class SqliteDb(Db):
         for data in cursor.fetchall():
             # TODO (Roman): Select only needed columns on db side.
             data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
-            result.append(serializer.deserialize_data(data))
+            yield serializer.deserialize_data(data)
 
-        return RecordUtil.sort_records_by_key(result)
 
     def load_filter(
         self,
