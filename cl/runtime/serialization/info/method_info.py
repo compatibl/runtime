@@ -5,7 +5,6 @@ from typing import List
 from typing import Optional
 from typing import Type
 from typing import get_type_hints
-
 from cl.runtime.records.dataclasses_extensions import field
 
 

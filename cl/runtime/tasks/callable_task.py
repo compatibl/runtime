@@ -14,10 +14,10 @@
 import re
 from abc import ABC
 from dataclasses import dataclass
-
 from inflection import underscore
-
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.dataclasses_extensions import field
+from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 from cl.runtime.tasks.task import Task
 
@@ -25,31 +25,33 @@ data_serializer = UiDictSerializer()
 
 
 @dataclass(slots=True, kw_only=True)
-class CallableTask(Task, ABC):
+class MethodTask(Task, ABC):
     """Base class for tasks that invoke callables (class methods, functions, etc.)."""
 
-    @classmethod
-    def normalize_method_name(cls, method_name: str) -> str:
-        """If method name has uppercase letters, assume it is PascalCase and convert to snake_case."""
+    method_name: str = missing()
+    """The name of @staticmethod in snake_case or PascalCase format."""
 
-        if any(c.isupper() for c in method_name):
+    method_params: dict[str, str | dict] | None = field(default_factory=dict)
+    """Values for task arguments, if any."""
+
+    def normalized_method_name(self) -> str:
+        """If method name has uppercase letters, assume it is PascalCase and convert to snake_case."""
+        result = self.method_name
+        if any(c.isupper() for c in result):
             # Use inflection library
-            result = underscore(method_name)
+            result = underscore(result)
             # In addition, add underscore before numbers
             result = re.sub(r"([0-9]+)", r"_\1", result)
-        else:
-            # Already in snake_case, return unchanged argument
-            result = method_name
+
         return result
 
-    @staticmethod
-    def deserialize_method_params(method_params: dict) -> dict:
+    def deserialized_method_params(self) -> dict:
         """For every method's param - deserialize its value and assign back to it's param name."""
 
         # convert names back to snake_case
         params = {
             CaseUtil.pascal_to_snake_case(param_name): param_value
-            for param_name, param_value in method_params.items()
+            for param_name, param_value in self.method_params.items()
         }
 
         # deserialize each param value

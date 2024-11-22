@@ -15,9 +15,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from typing import List
-
 from typing_extensions import Dict
-
 from cl.runtime.file.file_data import FileData
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import RecordProtocol
@@ -93,9 +91,7 @@ class UiDictSerializer(DictSerializer):
                 elif isinstance(v, float):
                     value_type = "Double"
                 else:
-                    raise ValueError(
-                        f"Value of type {type(v)} is not supported in dict ui serialization. Value: {v}."
-                    )
+                    raise ValueError(f"Value of type {type(v)} is not supported in dict ui serialization. Value: {v}.")
 
                 serialized_dict_items.append({"key": k, "value": {value_type: v}})
 
@@ -154,9 +150,7 @@ class UiDictSerializer(DictSerializer):
 
         return table_record
 
-    def apply_ui_conversion(
-        self, data: TDataDict, element_decl: ElementDecl | None = None
-    ) -> TDataDict:
+    def apply_ui_conversion(self, data: TDataDict, element_decl: ElementDecl | None = None) -> TDataDict:
         """
         Apply conversion to make ui data serializable. Extract additional info about types from TypeDecl.
 

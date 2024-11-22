@@ -14,19 +14,16 @@
 
 from dataclasses import dataclass
 from typing import Callable
-
 from typing_extensions import Self
 from typing_extensions import override
-
 from cl.runtime import ClassInfo
 from cl.runtime.context.context import Context
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
-from cl.runtime.tasks.callable_task import CallableTask
+from cl.runtime.tasks.callable_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 key_serializer = StringSerializer()
@@ -34,7 +31,7 @@ param_dict_serializer = DictSerializer()  # TODO: Support complex params
 
 
 @dataclass(slots=True, kw_only=True)
-class InstanceMethodTask(CallableTask):
+class InstanceMethodTask(MethodTask):
     """Invoke a class instance method, do not use for @classmethod or @staticmethod."""
 
     key_type_str: str = missing()
@@ -42,12 +39,6 @@ class InstanceMethodTask(CallableTask):
 
     key_str: str = missing()
     """Key as semicolon-delimited string."""
-
-    method_name: str = missing()
-    """The name of instance method in snake_case or PascalCase format, do not use for @classmethod or @staticmethod."""
-
-    method_params: dict[str, str | dict] = field(default_factory=dict)
-    """Values for task arguments, if any."""
 
     @override
     def _execute(self) -> None:
@@ -66,10 +57,10 @@ class InstanceMethodTask(CallableTask):
         record = context.load_one(key_type, key)  # TODO: Require record type?
 
         # Convert the name to snake_case and get method callable
-        method_name = self.normalize_method_name(self.method_name)
+        method_name = self.normalized_method_name()
         method = getattr(record, method_name)
 
-        params = self.deserialize_method_params(self.method_params)
+        params = self.deserialized_method_params()
         method(**params)
 
     @classmethod

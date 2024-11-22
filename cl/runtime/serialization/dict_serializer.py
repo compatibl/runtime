@@ -21,7 +21,6 @@ from typing import List
 from typing import Tuple
 from typing import Type
 from typing import cast
-
 from cl.runtime.backend.core.base_type_info import BaseTypeInfo
 from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.file.file_data import FileData
@@ -45,9 +44,7 @@ _type_dict: Dict[str, Type] = None
 class_hierarchy_slots_dict: Dict[Type, Tuple] = dict()
 """Dictionary of slots in class hierarchy in the order of declaration from base to derived."""
 
-collect_slots = (
-    sys.version_info.major > 3 or sys.version_info.major == 3 and sys.version_info.minor >= 11
-)
+collect_slots = sys.version_info.major > 3 or sys.version_info.major == 3 and sys.version_info.minor >= 11
 """For Python 3.11 and later, __slots__ includes fields for this class only, use MRO to include base class slots."""
 
 
@@ -81,11 +78,7 @@ def _get_class_hierarchy_slots(data_type) -> Tuple[str]:
         if collect_slots:
             # For v3.11 and later, __slots__ includes fields for this class only, use MRO to collect base class slots
             # Exclude None or empty __slots__ (both are falsy)
-            slots_list = [
-                slots
-                for base in reversed(data_type.__mro__)
-                if (slots := getattr(base, "__slots__", None))
-            ]
+            slots_list = [slots for base in reversed(data_type.__mro__) if (slots := getattr(base, "__slots__", None))]
         else:
             # Otherwise get slots from this type only
             # Exclude None or empty __slots__ (both are falsy)
@@ -104,8 +97,7 @@ def _get_class_hierarchy_slots(data_type) -> Tuple[str]:
             duplicates = [slot for slot, count in counts.items() if count > 1]
             duplicates_str = ", ".join(duplicates)
             raise RuntimeError(
-                f"Duplicate field names found in class hierarchy "
-                f"for {data_type.__name__}: {duplicates_str}."
+                f"Duplicate field names found in class hierarchy " f"for {data_type.__name__}: {duplicates_str}."
             )
 
         class_hierarchy_slots_dict[data_type] = result
@@ -134,9 +126,7 @@ class DictSerializer:
     ]
     """Detect primitive type by checking if class name is in this list."""
 
-    def serialize_data(
-        self, data, select_fields: List[str] | None = None
-    ):  # TODO: Check if None should be supported
+    def serialize_data(self, data, select_fields: List[str] | None = None):  # TODO: Check if None should be supported
         """
         Serialize to dictionary containing primitive types, dictionaries, or iterables.
 
@@ -159,22 +149,14 @@ class DictSerializer:
             all_slots = _get_class_hierarchy_slots(data.__class__)
             # Serialize slot values in the order of declaration except those that are None
             result = {
-                (
-                    k
-                    if not self.pascalize_keys
-                    else CaseUtil.snake_to_pascal_case_keep_trailing_underscore(k)
-                ): (
-                    v
-                    if v.__class__.__name__ in self.primitive_type_names
-                    else self.serialize_data(v)
+                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case_keep_trailing_underscore(k)): (
+                    v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v)
                 )
                 for k in all_slots
                 if (not select_fields or k in select_fields) and (v := getattr(data, k)) is not None
             }
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
-            short_name = (
-                alias_dict[type_] if (type_ := data.__class__) in alias_dict else type_.__name__
-            )
+            short_name = alias_dict[type_] if (type_ := data.__class__) in alias_dict else type_.__name__
             # Cache type for subsequent reverse lookup
             type_dict = get_type_dict()
             type_dict[short_name] = type_
@@ -184,11 +166,7 @@ class DictSerializer:
         elif isinstance(data, dict):
             # Dictionary, return with serialized values
             result = {
-                k: (
-                    v
-                    if v.__class__.__name__ in self.primitive_type_names
-                    else self.serialize_data(v)
-                )
+                k: (v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v))
                 for k, v in data.items()
             }
             return result
@@ -198,29 +176,19 @@ class DictSerializer:
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
-            elif (
-                first_item is not None
-                and first_item.__class__.__name__ in self.primitive_type_names
-            ):
+            elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names:
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
                 return data
             else:
                 # Serialize each element of the iterable
                 return [
-                    (
-                        v
-                        if v.__class__.__name__ in self.primitive_type_names
-                        else self.serialize_data(v)
-                    )
-                    for v in data
+                    (v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v)) for v in data
                 ]
         elif isinstance(data, Enum):
             # Serialize enum as a dict using enum class short name and item name (rather than item value)
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
-            short_name = (
-                alias_dict[type_] if (type_ := type(data)) in alias_dict else type_.__name__
-            )
+            short_name = alias_dict[type_] if (type_ := type(data)) in alias_dict else type_.__name__
             # Cache type for subsequent reverse lookup
             type_dict = get_type_dict()
             type_dict[short_name] = type_
@@ -261,14 +229,8 @@ class DictSerializer:
                         )
 
                 deserialized_fields = {
-                    (
-                        CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k)
-                        if self.pascalize_keys
-                        else k
-                    ): (
-                        v
-                        if v.__class__.__name__ in self.primitive_type_names
-                        else self.deserialize_data(v)
+                    (CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k): (
+                        v if v.__class__.__name__ in self.primitive_type_names else self.deserialize_data(v)
                     )
                     for k, v in data.items()
                     if k != "_type"
@@ -294,11 +256,7 @@ class DictSerializer:
             else:
                 # Otherwise return a dictionary with recursively deserialized values
                 result = {
-                    k: (
-                        v
-                        if v.__class__.__name__ in self.primitive_type_names
-                        else self.deserialize_data(v)
-                    )
+                    k: (v if v.__class__.__name__ in self.primitive_type_names else self.deserialize_data(v))
                     for k, v in data.items()
                 }
                 return result
@@ -308,22 +266,14 @@ class DictSerializer:
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
-            elif (
-                first_item is not None
-                and first_item.__class__.__name__ in self.primitive_type_names
-            ):
+            elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names:
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
                 return data
             else:
                 # Deserialize each element of the iterable
                 return [
-                    (
-                        v
-                        if v.__class__.__name__ in self.primitive_type_names
-                        else self.deserialize_data(v)
-                    )
-                    for v in data
+                    (v if v.__class__.__name__ in self.primitive_type_names else self.deserialize_data(v)) for v in data
                 ]
 
         elif is_key(data) or is_record(data):
@@ -353,8 +303,6 @@ class DictSerializer:
             elif value == "N":
                 return False
             else:
-                raise RuntimeError(
-                    f"Serialized boolean field has value {value} but only Y or N are allowed."
-                )
+                raise RuntimeError(f"Serialized boolean field has value {value} but only Y or N are allowed.")
         else:
             return value

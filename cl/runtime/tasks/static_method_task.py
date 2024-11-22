@@ -16,30 +16,21 @@ import inspect
 from dataclasses import dataclass
 from typing import Callable
 from typing import Type
-
 from typing_extensions import Self
 from typing_extensions import override
-
 from cl.runtime import ClassInfo
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import missing
-from cl.runtime.tasks.callable_task import CallableTask
+from cl.runtime.tasks.callable_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StaticMethodTask(CallableTask):
+class StaticMethodTask(MethodTask):
     """Invoke a @staticmethod or @classmethod, do not use for instance methods."""
 
     type_str: str = missing()
     """Class type as dot-delimited string in module.ClassName format."""
-
-    method_name: str = missing()
-    """The name of @staticmethod in snake_case or PascalCase format."""
-
-    method_params: dict[str, str | dict] | None = field(default_factory=dict)
-    """Values for task arguments, if any."""
 
     @override
     def _execute(self) -> None:
@@ -49,10 +40,10 @@ class StaticMethodTask(CallableTask):
         record_type = ClassInfo.get_class_type(self.type_str)
 
         # Method callable is already bound to cls, it is not necessary to pass cls as an explicit parameter
-        method_name = self.normalize_method_name(self.method_name)
+        method_name = self.normalized_method_name()
         method = getattr(record_type, method_name)
 
-        params = self.deserialize_method_params(self.method_params)
+        params = self.deserialized_method_params()
         method(**params)
 
     @classmethod
@@ -70,9 +61,7 @@ class StaticMethodTask(CallableTask):
         result.type_str = f"{record_type.__module__}.{record_type.__name__}"
 
         # Check that __self__ is either absent (@staticmethod) or is a class (@classmethod)
-        if (
-            method_cls := getattr(method_callable, "__self__", None)
-        ) is not None and not inspect.isclass(method_cls):
+        if (method_cls := getattr(method_callable, "__self__", None)) is not None and not inspect.isclass(method_cls):
             raise RuntimeError(
                 f"Callable '{method_callable.__qualname__}' for task_id='{result.task_id}' is "
                 f"an instance method rather than @staticmethod or @classmethod, "

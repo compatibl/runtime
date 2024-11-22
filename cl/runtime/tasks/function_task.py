@@ -12,19 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import inspect
 from dataclasses import dataclass
 from typing import Callable
 from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.dataclasses_extensions import missing
-from cl.runtime.tasks.callable_task import CallableTask
-from cl.runtime.tasks.task_key import TaskKey
+from cl.runtime.tasks.callable_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 
 @dataclass(slots=True, kw_only=True)
-class FunctionTask(CallableTask):
+class FunctionTask(MethodTask):
     """Invoke a function defined in the module directly, do not use for class methods."""
 
     module: str = missing()

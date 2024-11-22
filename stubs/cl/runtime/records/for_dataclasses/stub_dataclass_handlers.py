@@ -15,7 +15,6 @@
 import inspect
 from dataclasses import dataclass
 from logging import getLogger
-
 from cl.runtime.context.context import Context
 from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
