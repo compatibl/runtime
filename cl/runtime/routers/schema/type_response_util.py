@@ -47,7 +47,7 @@ class TypeResponseUtil:
                             break
 
         for decl_name, decl_dict in result.items():
-            # add Implement handlers block
+            # Add Implement handlers block
             if not (declare_block := decl_dict.get("Declare")):
                 continue
 
@@ -58,30 +58,13 @@ class TypeResponseUtil:
             implement_block = [{"Name": handler_decl.get("Name")} for handler_decl in handlers_block]
             result[decl_name]["Implement"] = {"Handlers": implement_block}
 
-            # create schema for method arguments if so present
+            # Create schema for method arguments if so present
             for handler in handlers_block:
                 if not (params := handler.get("Params")):
                     continue
 
                 handler_args_schema_name = f"{decl_name}{handler['Name']}Args"
                 handler_args_elements[handler_args_schema_name] = {"Elements": params}
-
-                # add non-primitive params schema to root level
-                for param in params:
-                    if not (_t := param.get("_t")) or PrimitiveUtil.is_primitive(_t):
-                        continue
-
-                    # we need to hardcode module and type because it's hardcoded on FE side
-                    # TODO: fix this
-                    # param["_t"] = "Cl.Runtime.View.BinaryContent"
-                    # param["Data"]["Module"]["ModuleName"] = "Cl.Runtime.View"
-
-                    handler_args_elements[_t] = param["Data"]
-
-                    for el in param.get("Data", {}).get("Elements", []):
-                        if enum_el := el.get("Enum"):
-                            key_name = f"{enum_el['Module']['ModuleName']}.{enum_el['Name']}"
-                            handler_args_elements[key_name] = el
 
         result.update(handler_args_elements)
         return result
