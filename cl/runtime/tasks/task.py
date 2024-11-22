@@ -14,6 +14,7 @@
 
 import datetime as dt
 import time
+import traceback
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -119,6 +120,10 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
             # Save log entry to the database
             Context.current().save_one(log_message)
+
+            logger = Context.current().get_logger(__name__)
+            logger.debug("An error occurred: %s", e)
+            logger.debug("Stack trace:\n%s", traceback.format_exc())
 
             # Update task run record to report task failure
             self.status = TaskStatusEnum.FAILED
