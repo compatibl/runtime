@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import base64
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
@@ -51,7 +52,7 @@ class UiDictSerializer(DictSerializer):
             data["_t"] = FileData.__name__
             if content_value := data.get("Content"):  # type: str
                 attr_name = CaseUtil.snake_to_pascal_case(FileData.file_bytes.__name__)
-                data[attr_name] = content_value.encode()
+                data[attr_name] = base64.b64decode(content_value.encode())
                 del data["Content"]
 
     def serialize_data(self, data, select_fields: List[str] | None = None):
