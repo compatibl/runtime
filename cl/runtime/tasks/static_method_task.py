@@ -17,7 +17,8 @@ from dataclasses import dataclass
 from typing import Callable
 from typing import Type
 
-from typing_extensions import Self, override
+from typing_extensions import Self
+from typing_extensions import override
 
 from cl.runtime import ClassInfo
 from cl.runtime.primitive.case_util import CaseUtil
@@ -69,9 +70,7 @@ class StaticMethodTask(CallableTask):
         result.type_str = f"{record_type.__module__}.{record_type.__name__}"
 
         # Check that __self__ is either absent (@staticmethod) or is a class (@classmethod)
-        if (
-            method_cls := getattr(method_callable, "__self__", None)
-        ) is not None and not inspect.isclass(method_cls):
+        if (method_cls := getattr(method_callable, "__self__", None)) is not None and not inspect.isclass(method_cls):
             raise RuntimeError(
                 f"Callable '{method_callable.__qualname__}' for task_id='{result.task_id}' is "
                 f"an instance method rather than @staticmethod or @classmethod, "

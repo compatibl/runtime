@@ -100,8 +100,7 @@ class MethodInfo:
                 name=parameter.name,
                 type=method_hints.get(parameter.name, inspect.Parameter.empty),
                 default=parameter.default,
-                optional=parameter.default is not inspect.Parameter.empty
-                and parameter.default is None,
+                optional=parameter.default is not inspect.Parameter.empty and parameter.default is None,
             )
             for parameter in method_arguments.parameters.values()
             if parameter.name != "self"

@@ -15,7 +15,8 @@
 from dataclasses import dataclass
 from typing import Callable
 
-from typing_extensions import Self, override
+from typing_extensions import Self
+from typing_extensions import override
 
 from cl.runtime import ClassInfo
 from cl.runtime.context.context import Context

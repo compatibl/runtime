@@ -55,8 +55,7 @@ class CallableTask(Task, ABC):
 
         # convert names back to snake_case
         params = {
-            CaseUtil.pascal_to_snake_case(param_name): param_value
-            for param_name, param_value in method_params.items()
+            CaseUtil.pascal_to_snake_case(param_name): param_value for param_name, param_value in method_params.items()
         }
 
         # map param name to it's type
@@ -69,9 +68,7 @@ class CallableTask(Task, ABC):
                 continue
 
             param_decl = TypeDecl.for_type(param_types[param_name].type)
-            param_args = {
-                el.name: el.value.type_ for el in param_decl.elements if el.name and el.value
-            }
+            param_args = {el.name: el.value.type_ for el in param_decl.elements if el.name and el.value}
 
             param_values_normalized = dict()
             for arg_name, arg_value in param_values.items():
