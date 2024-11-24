@@ -40,7 +40,7 @@ class RunRequest(BaseModel):
     keys: list[str | None] | str | None = Field(None)
     """Keys to be used."""
 
-    arguments_: dict[str, dict | str] | None = Field(None, alias="arguments")
+    arguments_: dict[str, dict | str | None] | None = Field(None, alias="arguments")
     """Arguments for the task."""
 
     data_: dict[str, str] | None = Field(None, alias="data")

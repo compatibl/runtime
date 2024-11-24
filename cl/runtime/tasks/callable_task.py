@@ -31,7 +31,7 @@ class MethodTask(Task, ABC):
     method_name: str = missing()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
-    method_params: dict[str, str | dict] | None = field(default_factory=dict)
+    method_params: dict[str, str | dict | None] | None = field(default_factory=dict)
     """Values for task arguments, if any."""
 
     def normalized_method_name(self) -> str:
