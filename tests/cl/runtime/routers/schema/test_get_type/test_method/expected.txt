@@ -34,6 +34,11 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
     Comment: DEPRECATED. Use versions instead.
     Optional: true
   - Value:
+      Type: Dict
+    Name: Versions
+    Comment: Component versions.
+    Optional: true
+  - Value:
       Type: String
     Name: ApplicationName
     Comment: Application name.
@@ -144,6 +149,11 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
       Type: String
     Name: BackendVersion
     Comment: DEPRECATED. Use versions instead.
+    Optional: true
+  - Value:
+      Type: Dict
+    Name: Versions
+    Comment: Component versions.
     Optional: true
   - Value:
       Type: String
