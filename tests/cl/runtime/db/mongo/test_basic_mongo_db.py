@@ -23,8 +23,10 @@ from cl.runtime.records.class_info import ClassInfo
 from stubs.cl.runtime import StubDataclassDerivedRecord, StubDataclassNestedFields, StubDataclassComposite, \
     StubDataclassDerivedFromDerivedRecord, StubDataclassOtherDerivedRecord, StubDataclassListFields, \
     StubDataclassOptionalFields, StubDataclassDictFields, StubDataclassDictListFields, StubDataclassListDictFields, \
-    StubDataclassPrimitiveFields, StubDataclassSingleton
+    StubDataclassPrimitiveFields, StubDataclassSingleton, StubHandlers, StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
 
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
@@ -86,6 +88,10 @@ def test_complex_records():
             StubDataclassListDictFields(id="abc10"),
             StubDataclassPrimitiveFields(key_str_field="abc11"),
             StubDataclassSingleton(),
+            StubDataclassAliasedRecord(id="abc12"),
+            StubHandlers(stub_id="abc13"),
+            StubDataclassRecord(id="abc14"),
+            StubDataclassVersionedRecord(id="abc15"),
         ]
 
         context.save_many(samples)
@@ -114,6 +120,11 @@ def test_basic_operations():
             StubDataclassDictListFields(id="abc9"),
             StubDataclassListDictFields(id="abc10"),
             StubDataclassPrimitiveFields(key_str_field="abc11"),
+            StubDataclassSingleton(),
+            StubDataclassAliasedRecord(id="abc12"),
+            StubHandlers(stub_id="abc13"),
+            StubDataclassRecord(id="abc14"),
+            StubDataclassVersionedRecord(id="abc15"),
         ]
 
         sample_keys = [x.get_key() for x in samples]
