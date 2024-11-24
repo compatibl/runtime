@@ -51,8 +51,7 @@ class StaticMethodTask(CallableTask):
         # Invoke the callable
         if self.method_params:
             params = {
-                CaseUtil.pascal_to_snake_case(arg_name): arg_value
-                for arg_name, arg_value in self.method_params.items()
+                CaseUtil.pascal_to_snake_case(arg_name): arg_value for arg_name, arg_value in self.method_params.items()
             }
             method(**params)
         else:
@@ -73,9 +72,7 @@ class StaticMethodTask(CallableTask):
         result.type_str = f"{record_type.__module__}.{record_type.__name__}"
 
         # Check that __self__ is either absent (@staticmethod) or is a class (@classmethod)
-        if (
-            method_cls := getattr(method_callable, "__self__", None)
-        ) is not None and not inspect.isclass(method_cls):
+        if (method_cls := getattr(method_callable, "__self__", None)) is not None and not inspect.isclass(method_cls):
             raise RuntimeError(
                 f"Callable '{method_callable.__qualname__}' for task_id='{result.task_id}' is "
                 f"an instance method rather than @staticmethod or @classmethod, "

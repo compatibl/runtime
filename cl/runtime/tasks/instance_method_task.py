@@ -21,7 +21,8 @@ from typing_extensions import Self
 from cl.runtime import ClassInfo
 from cl.runtime.context.context import Context
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import missing, field
+from cl.runtime.records.dataclasses_extensions import field
+from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.dict_serializer import DictSerializer
@@ -72,8 +73,7 @@ class InstanceMethodTask(CallableTask):
         # Invoke the callable
         if self.method_params:
             params = {
-                CaseUtil.pascal_to_snake_case(arg_name): arg_value
-                for arg_name, arg_value in self.method_params.items()
+                CaseUtil.pascal_to_snake_case(arg_name): arg_value for arg_name, arg_value in self.method_params.items()
             }
             method(**params)
         else:
