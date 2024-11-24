@@ -14,6 +14,8 @@
 
 from __future__ import annotations
 from typing import Dict
+
+from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.schema import Schema
 
@@ -54,7 +56,9 @@ class TypeResponseUtil:
                 continue
 
             # TODO (Roman): skip abstract methods
-            implement_block = [{"Name": handler_decl.get("Name")} for handler_decl in handlers_block]
+            implement_block = [
+                {"Name": handler_decl.get("Name")} for handler_decl in handlers_block
+            ]
             result[decl_name]["Implement"] = {"Handlers": implement_block}
 
             # create schema for method arguments if so present
@@ -64,6 +68,23 @@ class TypeResponseUtil:
 
                 handler_args_schema_name = f"{decl_name}{handler['Name']}Args"
                 handler_args_elements[handler_args_schema_name] = {"Elements": params}
+
+                # add non-primitive params schema to root level
+                for param in params:
+                    if not (_t := param.get("_t")) or PrimitiveUtil.is_primitive(_t):
+                        continue
+
+                    # we need to hardcode module and type because it's hardcoded on FE side
+                    # TODO: fix this
+                    param["_t"] = "Cl.Runtime.View.BinaryContent"
+                    param["Data"]["Module"]["ModuleName"] = "Cl.Runtime.View"
+
+                    handler_args_elements["Cl.Runtime.View.BinaryContent"] = param["Data"]
+
+                    for el in param.get("Data", {}).get("Elements", []):
+                        if enum_el := el.get("Enum"):
+                            key_name = f"{enum_el['Module']['ModuleName']}.{enum_el['Name']}"
+                            handler_args_elements[key_name] = el
 
         result.update(handler_args_elements)
         return result
