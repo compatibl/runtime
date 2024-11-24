@@ -73,10 +73,10 @@ class TypeResponseUtil:
 
                     # we need to hardcode module and type because it's hardcoded on FE side
                     # TODO: fix this
-                    param["_t"] = "Cl.Runtime.View.BinaryContent"
-                    param["Data"]["Module"]["ModuleName"] = "Cl.Runtime.View"
+                    # param["_t"] = "Cl.Runtime.View.BinaryContent"
+                    # param["Data"]["Module"]["ModuleName"] = "Cl.Runtime.View"
 
-                    handler_args_elements["Cl.Runtime.View.BinaryContent"] = param["Data"]
+                    handler_args_elements[_t] = param["Data"]
 
                     for el in param.get("Data", {}).get("Elements", []):
                         if enum_el := el.get("Enum"):

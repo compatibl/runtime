@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.file.binary_content_type_enum import FileTypeEnum
+from cl.runtime.file.file_type_enum import FileTypeEnum
 from cl.runtime.records.dataclasses_extensions import missing
 
 
