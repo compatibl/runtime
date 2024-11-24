@@ -13,15 +13,12 @@
 # limitations under the License.
 
 import pytest
-
-from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import (
-    StubDataclassDerivedRecord,
-)
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.type_decl import TypeDecl
 from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
 
 type_decl_dict = {
     "Module": {"ModuleName": "Cl.Runtime.Backend.Core"},
@@ -46,9 +43,7 @@ class TestClass:
 def to_snake_case(data):
     if isinstance(data, dict):
         return {
-            CaseUtil.pascal_to_snake_case(key) if isinstance(key, str) else key: to_snake_case(
-                value
-            )
+            CaseUtil.pascal_to_snake_case(key) if isinstance(key, str) else key: to_snake_case(value)
             for key, value in data.items()
         }
     elif isinstance(data, list):
@@ -65,9 +60,7 @@ def test_to_type_decl_dict():
         type_decl = TypeDecl.for_type(record_type)
         type_decl_dict_ = type_decl.to_type_decl_dict()
 
-        assert isinstance(
-            type_decl_dict_, dict
-        ), f"Expected type: Dict, but got {type(type_decl_dict_)}"
+        assert isinstance(type_decl_dict_, dict), f"Expected type: Dict, but got {type(type_decl_dict_)}"
         assert len(type_decl_dict_) > 0, f"Result dictionary is empty!"
 
 
@@ -76,9 +69,7 @@ def test_type_without_handlers():
 
     assert type_decl.name == "StubDataclassDerivedRecord"
     assert type_decl.comment == "Stub derived class."
-    assert (
-        type_decl.declare is None
-    ), f"Class: {StubDataclassDerivedRecord} should not have handlers!"
+    assert type_decl.declare is None, f"Class: {StubDataclassDerivedRecord} should not have handlers!"
 
 
 def test_type_with_handlers():

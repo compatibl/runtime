@@ -54,9 +54,7 @@ class TypeResponseUtil:
                 continue
 
             # TODO (Roman): skip abstract methods
-            implement_block = [
-                {"Name": handler_decl.get("Name")} for handler_decl in handlers_block
-            ]
+            implement_block = [{"Name": handler_decl.get("Name")} for handler_decl in handlers_block]
             result[decl_name]["Implement"] = {"Handlers": implement_block}
 
             # create schema for method arguments if so present

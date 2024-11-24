@@ -18,6 +18,8 @@ from fastapi import APIRouter
 from fastapi import Header
 from fastapi import Query
 from starlette.requests import Request
+from cl.runtime import ClassInfo
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.routers.schema.type_hierarchy_request import TypeHierarchyRequest
 from cl.runtime.routers.schema.type_hierarchy_response_item import TypeHierarchyResponseItem
 from cl.runtime.routers.schema.type_request import TypeRequest

@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
+from dataclasses import dataclass
 from typing import Self
-
 from memoization import cached
-
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 
@@ -34,5 +33,4 @@ class HandlerParamDecl(HandlerVariableDecl):
     @cached
     def create(cls, name: str, variable_decl: HandlerVariableDecl) -> Self:
         result = cls(**asdict(variable_decl), name=name)  # type: ignore
-        result._t = "String"
         return result

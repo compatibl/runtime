@@ -15,17 +15,18 @@
 import inspect
 from dataclasses import dataclass
 from inspect import Parameter
-from typing import Iterable, List
-from types import FunctionType, MethodType
+from types import FunctionType
+from types import MethodType
+from typing import Iterable
+from typing import List
 from inflection import humanize
 from inflection import titleize
 from memoization import cached
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
-from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 from cl.runtime.schema.handler_param_decl import HandlerParamDecl
+from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 
 
 @dataclass(slots=True, kw_only=True)
@@ -37,9 +38,7 @@ class HandlerDeclareBlockDecl:
 
     @classmethod
     @cached
-    def get_type_methods(
-        cls, record_type: type, inherit: bool = False
-    ) -> "HandlerDeclareBlockDecl":
+    def get_type_methods(cls, record_type: type, inherit: bool = False) -> "HandlerDeclareBlockDecl":
         """Extract class public methods."""
 
         type_members: Iterable[str]
@@ -94,9 +93,7 @@ class HandlerDeclareBlockDecl:
             # Process method's return type
             # TODO: Add support of return comment
             if (return_type := member.__annotations__.get("return", None)) is not None:
-                handler.return_ = HandlerVariableDecl.create(
-                    value_type=return_type, record_type=record_type
-                )
+                handler.return_ = HandlerVariableDecl.create(value_type=return_type, record_type=record_type)
 
             handlers.append(handler)
 
