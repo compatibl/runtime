@@ -188,14 +188,7 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         """Stub method."""
         raise UserError("User error in handler.")
 
-    def run_save_to_db(self):
+    def run_instance_method_with_binary_param(self, pdf_file: BinaryContent, note_param: str):
         """Stub method."""
         log_method_info(__name__)
-        db = Context.current().db
-        stub = StubDataclassRecord(id="saved_from_handler")
-        db.save_one(stub)
-
-    def run_instance_method_with_binary_param(self, binary_data: BinaryContent):
-        """Stub method."""
-        log_method_info(__name__)
-        _logger.info(f"binary_data len={len(binary_data)}")
+        _logger.info(f"binary_data len={len(pdf_file.content)}")
