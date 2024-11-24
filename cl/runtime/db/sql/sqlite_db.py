@@ -213,14 +213,12 @@ class SqliteDb(Db):
         # get subtypes for record_type and use them in match condition
         subtype_names = tuple(t.__name__ for t in Schema.get_type_successors(record_type))
         value_placeholders = ", ".join(["?"] * len(subtype_names))
-        sql_statement = (f'SELECT * '
-                         f'FROM "{table_name}" '
-                         f'WHERE _type in ({value_placeholders})')
+        sql_statement = f'SELECT * FROM "{table_name}" WHERE _type in ({value_placeholders})'
 
         if sort_columns:
-            sql_statement += f' ORDER BY {sort_columns};'
+            sql_statement += f" ORDER BY {sort_columns};"
         else:
-            sql_statement += ';'
+            sql_statement += ";"
 
         reversed_columns_mapping = {
             v: k for k, v in schema_manager.get_columns_mapping(record_type.get_key_type()).items()
@@ -235,7 +233,6 @@ class SqliteDb(Db):
             # TODO (Roman): Select only needed columns on db side.
             data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
             yield serializer.deserialize_data(data)
-
 
     def load_filter(
         self,

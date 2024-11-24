@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime as dt
 import inspect
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Any
-
-import datetime as dt
 from uuid import UUID
-
 from cl.runtime.context.context import Context
 from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError

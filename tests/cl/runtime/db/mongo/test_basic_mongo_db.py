@@ -12,18 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import time
-from typing import Iterable, Any
-
 import pytest
-
+import time
+from typing import Any
+from typing import Iterable
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.records.class_info import ClassInfo
-from stubs.cl.runtime import StubDataclassDerivedRecord, StubDataclassNestedFields, StubDataclassComposite, \
-    StubDataclassDerivedFromDerivedRecord, StubDataclassOtherDerivedRecord, StubDataclassListFields, \
-    StubDataclassOptionalFields, StubDataclassDictFields, StubDataclassDictListFields, StubDataclassListDictFields, \
-    StubDataclassPrimitiveFields, StubDataclassSingleton, StubHandlers, StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassComposite
+from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
+from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDictFields
+from stubs.cl.runtime import StubDataclassDictListFields
+from stubs.cl.runtime import StubDataclassListDictFields
+from stubs.cl.runtime import StubDataclassListFields
+from stubs.cl.runtime import StubDataclassNestedFields
+from stubs.cl.runtime import StubDataclassOptionalFields
+from stubs.cl.runtime import StubDataclassOtherDerivedRecord
+from stubs.cl.runtime import StubDataclassPrimitiveFields
+from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord

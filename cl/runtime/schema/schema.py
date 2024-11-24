@@ -44,10 +44,10 @@ def is_data_key_record_or_enum(data_type):
 
     return inspect.isclass(data_type) and (
         (
-            not data_type.__name__.endswith("Mixin") and
-            (hasattr(data_type, "__slots__") or hasattr(data_type, "get_key_type"))
-        ) or
-        issubclass(data_type, Enum)
+            not data_type.__name__.endswith("Mixin")
+            and (hasattr(data_type, "__slots__") or hasattr(data_type, "get_key_type"))
+        )
+        or issubclass(data_type, Enum)
     )
 
 

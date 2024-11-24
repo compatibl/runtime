@@ -14,7 +14,6 @@
 
 from pydantic import BaseModel
 from pydantic import Field
-
 from cl.runtime.records.protocols import TPrimitive
 
 

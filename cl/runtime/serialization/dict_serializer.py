@@ -15,16 +15,17 @@
 import sys
 from collections import Counter
 from dataclasses import dataclass
-from datetime import datetime, date, timezone
+from datetime import date
+from datetime import datetime
+from datetime import timezone
 from enum import Enum
-from typing import Dict, get_type_hints
+from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Type
 from typing import cast
-
+from typing import get_type_hints
 from bson import Int64
-
 from cl.runtime.backend.core.base_type_info import BaseTypeInfo
 from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.log.exceptions.user_error import UserError
@@ -167,16 +168,17 @@ class DictSerializer:
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
-            elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names and first_item.__class__.__name__ not in self.date_type_names:
+            elif (
+                first_item is not None
+                and first_item.__class__.__name__ in self.primitive_type_names
+                and first_item.__class__.__name__ not in self.date_type_names
+            ):
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
                 return data
             else:
                 # Serialize each element of the iterable
-                return [
-                    v if self.is_primitive_and_not_date(v) else self.serialize_data(
-                        v) for v in data
-                ]
+                return [v if self.is_primitive_and_not_date(v) else self.serialize_data(v) for v in data]
         elif isinstance(data, Enum):
             # Serialize enum as a dict using enum class short name and item name (rather than item value)
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
@@ -189,7 +191,9 @@ class DictSerializer:
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def deserialize_data(self, data: TDataDict, type_: Type = None, field_name: str = None):  # TODO: Check if None should be supported
+    def deserialize_data(
+        self, data: TDataDict, type_: Type = None, field_name: str = None
+    ):  # TODO: Check if None should be supported
         """Deserialize object from data, invoke init_all after deserialization."""
 
         if isinstance(data, Int64):
@@ -324,7 +328,8 @@ class DictSerializer:
         if not type_ or not field_name:
             raise RuntimeError(
                 "Missing class or field name for resolving the type of MongoDB datetime object during "
-                "deserialization. Please ensure that the class and field name are correctly provided.")
+                "deserialization. Please ensure that the class and field name are correctly provided."
+            )
 
         field_type = sub_type or type_.__dataclass_fields__.get(field_name).type.__name__
 

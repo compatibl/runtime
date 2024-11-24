@@ -15,7 +15,8 @@
 import base64
 import datetime as dt
 import json
-from typing import List, Type
+from typing import List
+from typing import Type
 from uuid import UUID
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serialization.dict_serializer import DictSerializer

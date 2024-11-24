@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import Dict
+from typing import List
 from typing import Optional
 from cl.runtime import Context
 from cl.runtime.backend.core.app_theme import AppTheme
