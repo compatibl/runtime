@@ -48,13 +48,13 @@ class MethodTask(Task, ABC):
     def deserialized_method_params(self) -> dict:
         """For every method's param - deserialize its value and assign back to it's param name."""
 
-        # convert names back to snake_case
+        # Convert names back to snake_case
         params = {
             CaseUtil.pascal_to_snake_case(param_name): param_value
             for param_name, param_value in self.method_params.items()
         }
 
-        # deserialize each param value
+        # Deserialize each param value
         for param_name, param_values in params.items():
             if not isinstance(param_values, dict):
                 continue
@@ -62,7 +62,7 @@ class MethodTask(Task, ABC):
             prepared_serialized_record = data_serializer.apply_ui_conversion(param_values)
             type_instance = data_serializer.deserialize_data(prepared_serialized_record)
 
-            # assign deserialized value instead of dict
+            # Assign deserialized value instead of dict
             params[param_name] = type_instance
 
         return params
