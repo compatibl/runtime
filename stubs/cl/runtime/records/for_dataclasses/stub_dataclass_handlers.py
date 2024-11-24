@@ -15,6 +15,7 @@
 import inspect
 from dataclasses import dataclass
 from logging import getLogger
+
 from cl.runtime.context.context import Context
 from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
@@ -188,6 +189,12 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         raise UserError("User error in handler.")
 
     def run_instance_method_with_binary_param(self, pdf_file: FileData, note_param: str):
+        """Stub method."""
+        log_method_info(__name__)
+        _logger.info(f"binary_data len={len(pdf_file.file_bytes)}")
+
+    @staticmethod
+    def run_class_method_with_binary_param(pdf_file: FileData):
         """Stub method."""
         log_method_info(__name__)
         _logger.info(f"binary_data len={len(pdf_file.file_bytes)}")

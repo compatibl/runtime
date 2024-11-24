@@ -37,7 +37,7 @@ class StaticMethodTask(CallableTask):
     method_name: str = missing()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
-    method_params: dict[str, str] | None = field()
+    method_params: dict[str, str | dict] | None = field()
     """Values for task arguments, if any."""
 
     @override

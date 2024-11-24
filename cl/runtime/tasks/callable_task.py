@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import base64
 import re
 from abc import ABC
 from dataclasses import dataclass
@@ -63,12 +63,17 @@ class CallableTask(Task, ABC):
         param_types = {arg_info.name: arg_info for arg_info in method_info.arguments}
 
         # deserialize each param
-        for param_name, param_value in params.items():
-            if isinstance(param_value, dict):
-                # in case of complex param type - apply snake_case to it attributes
-                param_value = {
-                    CaseUtil.pascal_to_snake_case(arg_name): arg_value
-                    for arg_name, arg_value in param_value.items()
-                }
-                params[param_name] = param_types[param_name].type(**param_value)
+        for param_name, param_values in params.items():
+            if isinstance(param_values, dict):
+                # decl = TypeDecl.for_type(param_types[param_name].type)
+                param_values_normalized = dict()
+                for arg_name, arg_value in param_values.items():
+                    name = CaseUtil.pascal_to_snake_case(arg_name)
+                    value = arg_value
+                    if arg_name == "FileBytes":
+                        value = base64.b64decode(value.encode())
+
+                    param_values_normalized[name] = value
+
+                params[param_name] = param_types[param_name].type(**param_values_normalized)
         return params
