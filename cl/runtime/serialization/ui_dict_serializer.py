@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from typing import List
+
 from typing_extensions import Dict
+
+from cl.runtime.file.file_data import FileData
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
@@ -36,6 +38,23 @@ class UiDictSerializer(DictSerializer):
 
     pascalize_keys: bool = True
     """pascalize_keys is True by default."""
+
+    @staticmethod
+    def _check_patch_binary_content(data: TDataDict):
+        """
+        Handles binary data transformations.
+
+        For BinaryData frontend, always return type as 'BinaryContent',
+        so we need to patch the 'data' dict and rename attribute fields according to:
+        :class:`cl.runtime.file.file_data.FileData` attributes naming.
+        """
+
+        if (_type := data.get("_t")) and (_type == "BinaryContent"):
+            data["_t"] = FileData.__name__
+            if content_value := data.get("Content"):  # type: str
+                attr_name = CaseUtil.snake_to_pascal_case(FileData.file_bytes.__name__)
+                data[attr_name] = content_value.encode()
+                del data["Content"]
 
     def serialize_data(self, data, select_fields: List[str] | None = None):
 
@@ -74,7 +93,9 @@ class UiDictSerializer(DictSerializer):
                 elif isinstance(v, float):
                     value_type = "Double"
                 else:
-                    raise ValueError(f"Value of type {type(v)} is not supported in dict ui serialization. Value: {v}.")
+                    raise ValueError(
+                        f"Value of type {type(v)} is not supported in dict ui serialization. Value: {v}."
+                    )
 
                 serialized_dict_items.append({"key": k, "value": {value_type: v}})
 
@@ -133,19 +154,22 @@ class UiDictSerializer(DictSerializer):
 
         return table_record
 
-    def apply_ui_conversion(self, data: TDataDict, element_decl: ElementDecl | None = None) -> TDataDict:
+    def apply_ui_conversion(
+        self, data: TDataDict, element_decl: ElementDecl | None = None
+    ) -> TDataDict:
         """
         Apply conversion to make ui data serializable. Extract additional info about types from TypeDecl.
 
-        element_decl can be None for data with _t on root. Then, for nested fields will be used element decls from
-        specific TypeDecl object.
+        Parameter `element_decl` can be `None` for data with `_t` on root.
+        Then, for nested fields will be used element decls from a specific `TypeDecl` object.
         """
 
         if not self.pascalize_keys:
             raise RuntimeError("Expect ui serialization always with pascalized keys.")
 
         if isinstance(data, dict):
-            if (short_name := data.get("_t")) is not None:
+            if short_name := data.get("_t"):
+                self._check_patch_binary_content(data)
 
                 # Check _t and create TypeDecl object
                 type_dict = get_type_dict()
@@ -153,19 +177,15 @@ class UiDictSerializer(DictSerializer):
                 type_decl = TypeDecl.for_type(type_)
 
                 # Construct name to element decl map
-                type_decl_elements = (
-                    {
-                        # TODO (Roman): remove extra suffix for elements search after introducing field aliases.
-                        #   This is currently needed because ElementDecl removes the _ suffix from the field name.
-                        f"{element.name}{extra_suffix}": element
-                        for element in type_decl.elements
-                        for extra_suffix in ("", "_")
-                    }
-                    if type_decl.elements is not None
-                    else {}
-                )
+                type_decl_elements = {
+                    # TODO (Roman): remove extra suffix for elements search after introducing field aliases.
+                    #   This is currently needed because ElementDecl removes the _ suffix from the field name.
+                    f"{element.name}{extra_suffix}": element
+                    for element in type_decl.elements or {}
+                    for extra_suffix in ("", "_")
+                }
 
-                # Create empty result with _type attribute (instead of _t)
+                # Create an empty result with _type attribute (instead of _t)
                 result = {"_type": short_name}
                 for field, value in data.items():
                     if field == "_t":
@@ -174,11 +194,11 @@ class UiDictSerializer(DictSerializer):
                     # Expect pascal case fields
                     CaseUtil.check_pascal_case(field.removesuffix("_"))
 
-                    if (field_decl := type_decl_elements.get(field)) is not None:
+                    if field_decl := type_decl_elements.get(field):
                         # Apply ui conversion for values recursively
                         result[field] = self.apply_ui_conversion(value, field_decl)
                     else:
-                        # If element decl is not found for field in data raise RuntimeError
+                        # If element decl is not found for field in data, raise RuntimeError
                         raise RuntimeError(
                             f'Data conflicts with type declaration. Field "{field}" not found '
                             f'in "{short_name}" type elements.'
@@ -189,12 +209,12 @@ class UiDictSerializer(DictSerializer):
         elif isinstance(data, str):
             # Apply ui conversions for string values
 
-            if (enum := element_decl.enum) is not None:
+            if enum := element_decl.enum:
                 # Get enum type from element decl and convert value to dict supported by DictSerializer
                 enum_type_name = enum.name
                 return {"_enum": enum_type_name, "_name": CaseUtil.upper_to_pascal_case(data)}
 
-            elif (key := element_decl.key_) is not None:
+            elif key := element_decl.key_:
                 # Get key type from element decl
                 key_type_name = key.name
                 type_dict = get_type_dict()
@@ -206,7 +226,7 @@ class UiDictSerializer(DictSerializer):
 
                 return result
 
-        elif hasattr(data, "__iter__"):
+        elif hasattr(data, "__iter__") and not isinstance(data, bytes):
             # Apply ui conversion for each element in iterable
             return [self.apply_ui_conversion(x, element_decl) for x in data]  # noqa
 

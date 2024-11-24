@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import base64
 import re
 from abc import ABC
 from dataclasses import dataclass
@@ -19,14 +18,10 @@ from dataclasses import dataclass
 from inflection import underscore
 
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.info.method_info import MethodInfo
-from cl.runtime.serialization.string_serializer import StringSerializer
+from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 from cl.runtime.tasks.task import Task
 
-key_serializer = StringSerializer()
-param_dict_serializer = DictSerializer()  # TODO: Support complex params
+data_serializer = UiDictSerializer()
 
 
 @dataclass(slots=True, kw_only=True)
@@ -48,38 +43,24 @@ class CallableTask(Task, ABC):
         return result
 
     @staticmethod
-    def deserialize_method_params(_type: type, method_name: str, method_params: dict) -> dict:
-        params = dict()
-        if not method_params:
-            return params
+    def deserialize_method_params(method_params: dict) -> dict:
+        """For every method's param - deserialize its value and assign back to it's param name."""
 
         # convert names back to snake_case
         params = {
-            CaseUtil.pascal_to_snake_case(param_name): param_value for param_name, param_value in method_params.items()
+            CaseUtil.pascal_to_snake_case(param_name): param_value
+            for param_name, param_value in method_params.items()
         }
 
-        # map param name to it's type
-        method_info = MethodInfo(_type, method_name)
-        param_types = {arg_info.name: arg_info for arg_info in method_info.arguments}
-
-        # deserialize each param
+        # deserialize each param value
         for param_name, param_values in params.items():
             if not isinstance(param_values, dict):
                 continue
 
-            param_decl = TypeDecl.for_type(param_types[param_name].type)
-            param_args = {el.name: el.value.type_ for el in param_decl.elements if el.name and el.value}
-
-            param_values_normalized = dict()
-            for arg_name, arg_value in param_values.items():
-                name = CaseUtil.pascal_to_snake_case(arg_name)
-                value = arg_value
-                if param_args.get(arg_name) == "Binary":
-                    value = base64.b64decode(value.encode())
-
-                param_values_normalized[name] = value
+            prepared_serialized_record = data_serializer.apply_ui_conversion(param_values)
+            type_instance = data_serializer.deserialize_data(prepared_serialized_record)
 
             # assign deserialized value instead of dict
-            params[param_name] = param_types[param_name].type(**param_values_normalized)
+            params[param_name] = type_instance
 
         return params

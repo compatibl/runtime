@@ -46,7 +46,7 @@ class InstanceMethodTask(CallableTask):
     method_name: str = missing()
     """The name of instance method in snake_case or PascalCase format, do not use for @classmethod or @staticmethod."""
 
-    method_params: dict[str, str | dict] = field()
+    method_params: dict[str, str | dict] = field(default_factory=dict)
     """Values for task arguments, if any."""
 
     @override
@@ -69,7 +69,7 @@ class InstanceMethodTask(CallableTask):
         method_name = self.normalize_method_name(self.method_name)
         method = getattr(record, method_name)
 
-        params = self.deserialize_method_params(type(record), method_name, self.method_params)
+        params = self.deserialize_method_params(self.method_params)
         method(**params)
 
     @classmethod

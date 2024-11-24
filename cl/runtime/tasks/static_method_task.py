@@ -38,7 +38,7 @@ class StaticMethodTask(CallableTask):
     method_name: str = missing()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
-    method_params: dict[str, str | dict] | None = field()
+    method_params: dict[str, str | dict] | None = field(default_factory=dict)
     """Values for task arguments, if any."""
 
     @override
@@ -52,7 +52,7 @@ class StaticMethodTask(CallableTask):
         method_name = self.normalize_method_name(self.method_name)
         method = getattr(record_type, method_name)
 
-        params = self.deserialize_method_params(record_type, method_name, self.method_params)
+        params = self.deserialize_method_params(self.method_params)
         method(**params)
 
     @classmethod
@@ -70,7 +70,9 @@ class StaticMethodTask(CallableTask):
         result.type_str = f"{record_type.__module__}.{record_type.__name__}"
 
         # Check that __self__ is either absent (@staticmethod) or is a class (@classmethod)
-        if (method_cls := getattr(method_callable, "__self__", None)) is not None and not inspect.isclass(method_cls):
+        if (
+            method_cls := getattr(method_callable, "__self__", None)
+        ) is not None and not inspect.isclass(method_cls):
             raise RuntimeError(
                 f"Callable '{method_callable.__qualname__}' for task_id='{result.task_id}' is "
                 f"an instance method rather than @staticmethod or @classmethod, "
