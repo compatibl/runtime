@@ -14,7 +14,7 @@
 
 from dataclasses import asdict
 from dataclasses import dataclass
-from typing import Self
+from typing_extensions import Self
 from memoization import cached
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
