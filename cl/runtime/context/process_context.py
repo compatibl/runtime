@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from getpass import getuser
-from cl.convince.llms.llm_key import LlmKey
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
@@ -25,6 +24,7 @@ from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.settings import Settings
+from cl.convince.llms.llm_key import LlmKey
 
 
 @dataclass(slots=True, kw_only=True)

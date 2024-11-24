@@ -12,10 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import ast
 import base64
 import dataclasses
-import io
 from typing import Any
 from typing import Dict
 from typing import List
@@ -30,7 +28,6 @@ from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 from cl.runtime.view.dag.dag import Dag
-from cl.runtime.views.binary_content import BinaryContent
 from cl.runtime.views.html_view import HtmlView
 from cl.runtime.views.key_view import KeyView
 from cl.runtime.views.pdf_view import PdfView

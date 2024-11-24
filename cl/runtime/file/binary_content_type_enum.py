@@ -12,20 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import missing
-from cl.runtime.views.binary_content_type_enum import BinaryContentTypeEnum
+from enum import IntEnum
 
 
-@dataclass(slots=True, kw_only=True)
-class BinaryContent:
-    """Display the specified embedded binary content."""
+class FileTypeEnum(IntEnum):
+    """Binary content type enumeration."""
 
-    name: str | None = missing()
-    """Content name."""
+    UNDEFINED = 0
+    """Undefined content type."""
 
-    content: bytes = missing()
-    """Embedded binary content to be displayed as the current view."""
+    JPG = 1
+    """Jpg image type."""
 
-    content_type: BinaryContentTypeEnum | None = missing()
-    """Embedded binary content type."""
+    JPEG = 2
+    """Jpeg image type."""
+
+    HTML = 3
+    """Html content type."""
+
+    PLOTLY = 4
+    """The output provided by Plotly Graphing Library."""
+
+    PNG = 5
+    """PNG image type."""
+
+    SVG = 6
+    """SVG image type."""
+
+    CSV = 7
+    """Csv type."""
+
+    ZIP = 8
+    """Zip type."""
+
+    PDF = 9
+    """PDF type."""
+
+    XLSX = 10
+    """Excel type."""

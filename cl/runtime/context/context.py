@@ -20,7 +20,6 @@ from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Type
-from cl.convince.llms.llm_key import LlmKey
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context_key import ContextKey
 from cl.runtime.db.db_key import DbKey
@@ -38,6 +37,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.settings.context_settings import ContextSettings
+from cl.convince.llms.llm_key import LlmKey
 
 root_context_types_str = """
 The following root context types can be used in the outermost 'with' clause:

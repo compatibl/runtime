@@ -16,10 +16,9 @@ import inspect
 from dataclasses import dataclass
 from logging import getLogger
 from cl.runtime.context.context import Context
+from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.views.binary_content import BinaryContent
-from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
 _logger = getLogger(__name__)
@@ -188,7 +187,7 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         """Stub method."""
         raise UserError("User error in handler.")
 
-    def run_instance_method_with_binary_param(self, pdf_file: BinaryContent, note_param: str):
+    def run_instance_method_with_binary_param(self, pdf_file: FileData, note_param: str):
         """Stub method."""
         log_method_info(__name__)
-        _logger.info(f"binary_data len={len(pdf_file.content)}")
+        _logger.info(f"binary_data len={len(pdf_file.file_bytes)}")
