@@ -15,15 +15,18 @@
 import sys
 from collections import Counter
 from dataclasses import dataclass
+from datetime import datetime, date, timezone
 from enum import Enum
-from typing import Dict
+from typing import Dict, get_type_hints
 from typing import List
 from typing import Tuple
 from typing import Type
 from typing import cast
+
+from bson import Int64
+
 from cl.runtime.backend.core.base_type_info import BaseTypeInfo
 from cl.runtime.backend.core.tab_info import TabInfo
-from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import TDataDict
@@ -61,9 +64,6 @@ def get_type_dict() -> Dict[str, Type]:
         # Add data types needed for UiAppState deserialization to type_dict manually
         for type_ in (TabInfo, BaseTypeInfo):
             _type_dict[type_.__name__] = type_
-
-        _type_dict["BinaryContent"] = FileData
-        _type_dict[FileData.__name__] = FileData
 
     return _type_dict
 
@@ -112,19 +112,11 @@ class DictSerializer:
     pascalize_keys: bool = False
     """If true, pascalize keys during serialization."""
 
-    primitive_type_names = [
-        "NoneType",
-        "str",
-        "float",
-        "int",
-        "bool",
-        "date",
-        "time",
-        "datetime",
-        "bytes",
-        "UUID",
-    ]
+    primitive_type_names = ["NoneType", "str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"]
     """Detect primitive type by checking if class name is in this list."""
+
+    date_type_names = ["date", "time", "datetime"]
+    """Detect date types by checking if class name is in this list."""
 
     def serialize_data(self, data, select_fields: List[str] | None = None):  # TODO: Check if None should be supported
         """
@@ -138,6 +130,8 @@ class DictSerializer:
             data: Object to serialize
             select_fields: Fields of data object which will be used for serialization. If None - use all fields.
         """
+        if data.__class__.__name__ in self.date_type_names:
+            return self._serialize_to_mongo_datetime(data, data.__class__.__name__)
 
         if getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
@@ -149,8 +143,8 @@ class DictSerializer:
             all_slots = _get_class_hierarchy_slots(data.__class__)
             # Serialize slot values in the order of declaration except those that are None
             result = {
-                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case_keep_trailing_underscore(k)): (
-                    v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v)
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case_keep_trailing_underscore(k): (
+                    v if self.is_primitive_and_not_date(v) else self.serialize_data(v)
                 )
                 for k in all_slots
                 if (not select_fields or k in select_fields) and (v := getattr(data, k)) is not None
@@ -165,10 +159,7 @@ class DictSerializer:
             return result
         elif isinstance(data, dict):
             # Dictionary, return with serialized values
-            result = {
-                k: (v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v))
-                for k, v in data.items()
-            }
+            result = {k: v if self.is_primitive_and_not_date(v) else self.serialize_data(v) for k, v in data.items()}
             return result
         elif hasattr(data, "__iter__"):
             # Get the first item without iterating over the entire sequence
@@ -176,14 +167,15 @@ class DictSerializer:
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
-            elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names:
+            elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names and first_item.__class__.__name__ not in self.date_type_names:
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
                 return data
             else:
                 # Serialize each element of the iterable
                 return [
-                    (v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v)) for v in data
+                    v if self.is_primitive_and_not_date(v) else self.serialize_data(
+                        v) for v in data
                 ]
         elif isinstance(data, Enum):
             # Serialize enum as a dict using enum class short name and item name (rather than item value)
@@ -197,8 +189,15 @@ class DictSerializer:
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def deserialize_data(self, data: TDataDict):  # TODO: Check if None should be supported
+    def deserialize_data(self, data: TDataDict, type_: Type = None, field_name: str = None):  # TODO: Check if None should be supported
         """Deserialize object from data, invoke init_all after deserialization."""
+
+        if isinstance(data, Int64):
+            return int(data)
+
+        if isinstance(data, datetime):
+            original_field_type = DictSerializer._resolve_date_type(type_, field_name)
+            return DictSerializer._deserialize_mongo_datetime(data, original_field_type)
 
         if isinstance(data, dict):
             # Determine if the dictionary is a serialized dataclass or a dictionary
@@ -229,8 +228,8 @@ class DictSerializer:
                         )
 
                 deserialized_fields = {
-                    (CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k): (
-                        v if v.__class__.__name__ in self.primitive_type_names else self.deserialize_data(v)
+                    CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k: (
+                        v if self.is_primitive_and_not_date(v) else self.deserialize_data(v, deserialized_type, k)
                     )
                     for k, v in data.items()
                     if k != "_type"
@@ -256,7 +255,7 @@ class DictSerializer:
             else:
                 # Otherwise return a dictionary with recursively deserialized values
                 result = {
-                    k: (v if v.__class__.__name__ in self.primitive_type_names else self.deserialize_data(v))
+                    k: v if self.is_primitive_and_not_date(v) else self.deserialize_data(v, type_, field_name)
                     for k, v in data.items()
                 }
                 return result
@@ -269,17 +268,29 @@ class DictSerializer:
             elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names:
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
+                if first_item.__class__.__name__ == "datetime" and type_ and field_name:
+                    original_field_type = DictSerializer._resolve_date_type(type_, field_name)
+                    return [DictSerializer._deserialize_mongo_datetime(v, original_field_type) for v in data]
                 return data
             else:
                 # Deserialize each element of the iterable
                 return [
-                    (v if v.__class__.__name__ in self.primitive_type_names else self.deserialize_data(v)) for v in data
+                    v if self.is_primitive_and_not_date(v) else self.deserialize_data(v, type_, field_name)
+                    for v in data
                 ]
 
         elif is_key(data) or is_record(data):
             return data
         else:
             raise RuntimeError(f"Cannot deserialize data of type '{type(data)}'.")
+
+    def is_primitive_and_not_date(self, value) -> bool:
+        """
+        Check if the given value is of a primitive type, excluding date types.
+        MongoDB date, time, datetime types should be serialized/deserialized using specific rules.
+        """
+        class_name = value.__class__.__name__
+        return class_name in self.primitive_type_names and class_name not in self.date_type_names
 
     @classmethod
     def _serialize_primitive(cls, value: TPrimitive, class_name: str) -> TPrimitive:
@@ -304,5 +315,59 @@ class DictSerializer:
                 return False
             else:
                 raise RuntimeError(f"Serialized boolean field has value {value} but only Y or N are allowed.")
+        else:
+            return value
+
+    @classmethod
+    def _resolve_date_type(cls, type_: Type, field_name: str, sub_type: str = None) -> TPrimitive:
+        """Recursively determine the original date type for a MongoDB datetime object."""
+        if not type_ or not field_name:
+            raise RuntimeError(
+                "Missing class or field name for resolving the type of MongoDB datetime object during "
+                "deserialization. Please ensure that the class and field name are correctly provided.")
+
+        field_type = sub_type or type_.__dataclass_fields__.get(field_name).type.__name__
+
+        if field_type in DictSerializer.date_type_names:
+            return field_type
+
+        if field_type == "Dict":
+            args = get_type_hints(type_)[field_name].__args__
+            if len(args) == 1:
+                field_type = args[0].__args__[1].__name__
+                return DictSerializer._resolve_date_type(type_, field_name, field_type)
+            elif len(args) == 2:
+                field_type = args[1].__name__
+                return DictSerializer._resolve_date_type(type_, field_name, field_type)
+        elif field_type == "List":
+            args = get_type_hints(type_)[field_name].__args__
+            if len(args) == 1:
+                field_type = args[0].__name__
+                return DictSerializer._resolve_date_type(type_, field_name, field_type)
+            elif len(args) == 2:
+                field_type = args[1].__args__[0].__name__
+                return DictSerializer._resolve_date_type(type_, field_name, field_type)
+
+        raise RuntimeError(f"Unable to resolve type for field '{field_name}' in class '{type_.__name__}'.")
+
+    @classmethod
+    def _serialize_to_mongo_datetime(cls, value: TPrimitive, class_name: str) -> TPrimitive:
+        """Convert date and time objects into a datetime representation for MongoDB."""
+        if class_name == "date":
+            return datetime.combine(value, datetime.min.time())
+        if class_name == "time":
+            return datetime.combine(date.today(), value)
+        else:
+            return value
+
+    @classmethod
+    def _deserialize_mongo_datetime(cls, value: TPrimitive, class_name: str) -> TPrimitive:
+        """Convert a MongoDB datetime to its corresponding Python type."""
+        if class_name == "datetime":
+            return value.replace(tzinfo=timezone.utc)
+        elif class_name == "date":
+            return value.date()
+        elif class_name == "time":
+            return value.time()
         else:
             return value
