@@ -24,8 +24,10 @@ class FileData:
     name: str | None = missing()
     """Content name."""
 
-    file_bytes: bytes = missing()
+    # file_bytes: bytes = missing()
+    content: bytes = missing()
     """Embedded binary content to be displayed as the current view."""
 
-    file_type: FileTypeEnum | None = missing()
+    # file_type: FileTypeEnum | None = missing()
+    content_type: FileTypeEnum | None = missing()
     """Embedded binary content type."""
