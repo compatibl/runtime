@@ -105,7 +105,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             self._execute()
 
         except Exception as e:  # noqa
-
+            traceback.print_exception(e)  # TODO: Add full stack trade to the log message as well
             # TODO: Perform additional processing for UserError
             if isinstance(e, UserError):
                 # TODO: Perform additional processing
