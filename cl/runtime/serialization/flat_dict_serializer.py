@@ -15,8 +15,7 @@
 import base64
 import datetime as dt
 import json
-from typing import List
-from typing import Type
+from typing import List, Type
 from uuid import UUID
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serialization.dict_serializer import DictSerializer
@@ -36,7 +35,7 @@ class FlatDictSerializer(DictSerializer):
         if isinstance(data, str):
             return data
 
-        if data.__class__.__name__ in super().primitive_type_names:
+        if data.__class__.__name__ in (*super().primitive_type_names, "date", "time", "datetime"):
             serialized_data = data
         else:
             serialized_data = super().serialize_data(data, select_fields)
@@ -65,7 +64,7 @@ class FlatDictSerializer(DictSerializer):
         else:
             return serialized_data
 
-    def deserialize_data(self, data: TDataDict, type_: Type = None, field_name: str = None):
+    def deserialize_data(self, data: TDataDict, type_: Type | None = None):
         # check all str values if it is flattened from some type
         if isinstance(data, str):
             converted_data, custom_type = StringValueParser.parse(data)
@@ -93,4 +92,9 @@ class FlatDictSerializer(DictSerializer):
         else:
             converted_data = data
 
-        return super().deserialize_data(converted_data, type_, field_name)
+        if converted_data.__class__.__name__ == "date":
+            converted_data = dt.datetime.combine(converted_data, dt.datetime.min.time())
+        elif converted_data.__class__.__name__ == "time":
+            converted_data = dt.datetime.combine(dt.date.today(), converted_data)
+
+        return super().deserialize_data(converted_data, type_)

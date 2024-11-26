@@ -13,24 +13,19 @@
 # limitations under the License.
 
 import sys
+import datetime as dt
 from collections import Counter
 from dataclasses import dataclass
-from datetime import date
-from datetime import datetime
 from datetime import timezone
 from enum import Enum
-from typing import Dict
+from typing import Dict, TypeVar, Union
 from typing import List
 from typing import Tuple
 from typing import Type
 from typing import cast
-from typing import get_type_hints
-from bson import Int64
-from cl.runtime.backend.core.base_type_info import BaseTypeInfo
-from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.protocols import TDataDict
+from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
@@ -42,15 +37,20 @@ alias_dict: Dict[Type, str] = dict()
 """Dictionary of class name aliases using type as key (includes classes and enums with aliases only)."""
 
 # TODO: Initialize from settings
-_type_dict: Dict[str, Type] = None
+_type_dict: Dict[str, Type] | None = None
 """Dictionary of types using class name or alias as key (includes all classes and enums)."""
 
 class_hierarchy_slots_dict: Dict[Type, Tuple] = dict()
 """Dictionary of slots in class hierarchy in the order of declaration from base to derived."""
 
+class_hierarchy_annotations_dict: Dict[Type, Dict[str, Type]] = dict()
+"""Dictionary of annotations in class hierarchy."""
+
 collect_slots = sys.version_info.major > 3 or sys.version_info.major == 3 and sys.version_info.minor >= 11
 """For Python 3.11 and later, __slots__ includes fields for this class only, use MRO to include base class slots."""
 
+# TypeVar for any data type
+T = TypeVar("T")
 
 # TODO: Should classes not included packages be supported? If not do not update type dict in serializer.
 def get_type_dict() -> Dict[str, Type]:
@@ -99,6 +99,37 @@ def _get_class_hierarchy_slots(data_type) -> Tuple[str]:
         class_hierarchy_slots_dict[data_type] = result
         return cast(Tuple[str], result)
 
+def _get_class_hierarchy_annotations(data_type) -> Dict[str, Type]:
+    """
+    Return combined annotations dict for all classes in data_type hierarchy.
+    Checks type of fields with the same name and raises RuntimeError if there is a conflict.
+    """
+    if (result := class_hierarchy_annotations_dict.get(data_type, None)) is not None:
+        # Use cached value
+        return result
+    else:
+        # Collect all annotations in hierarchy
+
+        # Combined annotations for all types in hierarchy {field_name: field_type}
+        hierarchy_annots: Dict[str, Type] = {}
+
+        for base in reversed(data_type.__mro__):
+            if annot := getattr(base, "__annotations__", None):
+                for name_, type_ in annot.items():
+                    if (existing_annot_type := hierarchy_annots.get(name_)) and not issubclass(type_, existing_annot_type):
+                        # Existing type is not None and current type_ is not subclass - raise exception
+                        raise RuntimeError(
+                            f"Conflict field types in '{data_type.__name__}' class hierarchy for field {name_}. "
+                            f"Type in {base}: {type_}, type in base: {existing_annot_type}."
+                        )
+                    elif not existing_annot_type:
+                        # Existing type is None - add new annot to result dict
+                        hierarchy_annots[name_] = type_
+                    else:
+                        # Existing type is not None and current type_ is subclass - nothing to do
+                        pass
+
+        return hierarchy_annots
 
 # TODO: Add checks for to_node, from_node implementation for custom override of default serializer
 @dataclass(slots=True, kw_only=True)
@@ -108,11 +139,16 @@ class DictSerializer:
     pascalize_keys: bool = False
     """If true, pascalize keys during serialization."""
 
-    primitive_type_names = ["NoneType", "str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"]
+    primitive_type_names = [
+        "NoneType",
+        "str",
+        "float",
+        "int",
+        "bool",
+        "bytes",
+        "UUID",
+    ]
     """Detect primitive type by checking if class name is in this list."""
-
-    date_type_names = ["date", "time", "datetime"]
-    """Detect date types by checking if class name is in this list."""
 
     def serialize_data(self, data, select_fields: List[str] | None = None):  # TODO: Check if None should be supported
         """
@@ -126,8 +162,6 @@ class DictSerializer:
             data: Object to serialize
             select_fields: Fields of data object which will be used for serialization. If None - use all fields.
         """
-        if data.__class__.__name__ in self.date_type_names:
-            return self._serialize_to_mongo_datetime(data, data.__class__.__name__)
 
         if getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
@@ -139,8 +173,8 @@ class DictSerializer:
             all_slots = _get_class_hierarchy_slots(data.__class__)
             # Serialize slot values in the order of declaration except those that are None
             result = {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case_keep_trailing_underscore(k): (
-                    v if self.is_primitive_and_not_date(v) else self.serialize_data(v)
+                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case_keep_trailing_underscore(k)): (
+                    v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v)
                 )
                 for k in all_slots
                 if (not select_fields or k in select_fields) and (v := getattr(data, k)) is not None
@@ -153,9 +187,18 @@ class DictSerializer:
             # Add to result
             result["_type"] = short_name
             return result
+        elif data.__class__.__name__ == "date":
+            return dt.datetime.combine(data, dt.datetime.min.time())
+        elif data.__class__.__name__ == "time":
+            return dt.datetime.combine(dt.date.today(), data)
+        elif data.__class__.__name__ == "datetime":
+            return data
         elif isinstance(data, dict):
             # Dictionary, return with serialized values
-            result = {k: v if self.is_primitive_and_not_date(v) else self.serialize_data(v) for k, v in data.items()}
+            result = {
+                k: (v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v))
+                for k, v in data.items()
+            }
             return result
         elif hasattr(data, "__iter__"):
             # Get the first item without iterating over the entire sequence
@@ -163,17 +206,15 @@ class DictSerializer:
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
-            elif (
-                first_item is not None
-                and first_item.__class__.__name__ in self.primitive_type_names
-                and first_item.__class__.__name__ not in self.date_type_names
-            ):
+            elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names:
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
                 return data
             else:
                 # Serialize each element of the iterable
-                return [v if self.is_primitive_and_not_date(v) else self.serialize_data(v) for v in data]
+                return [
+                    (v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v)) for v in data
+                ]
         elif isinstance(data, Enum):
             # Serialize enum as a dict using enum class short name and item name (rather than item value)
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
@@ -186,17 +227,34 @@ class DictSerializer:
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def deserialize_data(
-        self, data: TDataDict, type_: Type = None, field_name: str = None
-    ):  # TODO: Check if None should be supported
-        """Deserialize object from data, invoke init_all after deserialization."""
+    @classmethod
+    def _handle_optional_annot(cls, type_):
+        """Extract inner type if 'type_' is Optional[...], otherwise return unchanged."""
 
-        if isinstance(data, Int64):
-            return int(data)
+        if type_ is None:
+            return None
 
-        if isinstance(data, datetime):
-            original_field_type = DictSerializer._resolve_date_type(type_, field_name)
-            return DictSerializer._deserialize_mongo_datetime(data, original_field_type)
+        # Check if type_ is a Union and process if only one argument is not None.
+        if (origin := getattr(type_, "__origin__", None)) and origin is Union and (union_args := getattr(type_, "__args__", None)):
+            not_none_union_args: List[int] = [arg for arg in union_args if arg is not type(None)]
+            if len(not_none_union_args) == 1:
+                return not_none_union_args[0]
+            else:
+                raise RuntimeError(f"Can not process Union: {type_}.")
+
+        # Return type_ if it is not Union
+        return type_
+
+    def deserialize_data(self, data: TDataField, type_: Type[T] | None = None):  # TODO: Check if None should be supported
+        """
+        Deserialize object from data, invoke init_all after deserialization.
+
+        The optional "type_" parameter will be passed recursively for fields that aren't primitives and aren't
+        serialized dataclasses. For a serialized dataclasses, the type is specified in the "_type" attribute.
+        """
+
+        # Extract inner type if type_ is Optional[...]
+        type_ = self._handle_optional_annot(type_)
 
         if isinstance(data, dict):
             # Determine if the dictionary is a serialized dataclass or a dictionary
@@ -226,9 +284,15 @@ class DictSerializer:
                             f"and there are no descendant records that can."
                         )
 
+                annots = _get_class_hierarchy_annotations(deserialized_type)
                 deserialized_fields = {
-                    CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k: (
-                        v if self.is_primitive_and_not_date(v) else self.deserialize_data(v, deserialized_type, k)
+                    (CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k): (
+                        v if v.__class__.__name__ in self.primitive_type_names
+                        else self.deserialize_data(
+                            v, annots.get(
+                                CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k
+                            )
+                        )
                     )
                     for k, v in data.items()
                     if k != "_type"
@@ -252,12 +316,40 @@ class DictSerializer:
                 result = deserialized_type[upper_case_value]  # noqa
                 return result
             else:
+
+                # Extract generic type arguments from dict annotation type, e.g. Dict[str, int] -> int
+                if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
+                    dict_value_annot_type = type_
+                else:
+                    if len(type_args) == 2:
+                        # Take second argument as value type
+                        dict_value_annot_type = type_args[1]
+                    else:
+                        raise RuntimeError(f"Can not extract value annotation type of dict from '{type_}'.")
+
                 # Otherwise return a dictionary with recursively deserialized values
                 result = {
-                    k: v if self.is_primitive_and_not_date(v) else self.deserialize_data(v, type_, field_name)
+                    k: (
+                        v if v.__class__.__name__ in self.primitive_type_names
+                        else self.deserialize_data(v, dict_value_annot_type)
+                    )
                     for k, v in data.items()
                 }
                 return result
+        elif data.__class__.__name__ == "datetime":
+            if type_ is None:
+                return data
+
+            if type_.__name__ == "datetime":
+                return data.replace(tzinfo=timezone.utc)
+            elif type_.__name__ == "date":
+                return data.date()
+            elif type_.__name__ == "time":
+                return data.time()
+            else:
+                return data
+        elif data.__class__.__name__ == "Int64":
+            return int(data)
         elif hasattr(data, "__iter__"):
             # Get the first item without iterating over the entire sequence
             first_item = next(iter(data), sentinel_value)
@@ -267,14 +359,24 @@ class DictSerializer:
             elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names:
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
-                if first_item.__class__.__name__ == "datetime" and type_ and field_name:
-                    original_field_type = DictSerializer._resolve_date_type(type_, field_name)
-                    return [DictSerializer._deserialize_mongo_datetime(v, original_field_type) for v in data]
                 return data
             else:
+                # Extract generic type arguments from annotation type, e.g. List[int] -> int
+                if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
+                    list_value_annot_type = type_
+                else:
+                    if len(type_args) == 1:
+                        # Take first argument as value type
+                        list_value_annot_type = type_args[0]
+                    else:
+                        raise RuntimeError(f"Can not extract value annotation type of iterable from '{type_}'.")
+
                 # Deserialize each element of the iterable
                 return [
-                    v if self.is_primitive_and_not_date(v) else self.deserialize_data(v, type_, field_name)
+                    (
+                        v if v.__class__.__name__ in self.primitive_type_names
+                        else self.deserialize_data(v, list_value_annot_type)
+                    )
                     for v in data
                 ]
 
@@ -282,14 +384,6 @@ class DictSerializer:
             return data
         else:
             raise RuntimeError(f"Cannot deserialize data of type '{type(data)}'.")
-
-    def is_primitive_and_not_date(self, value) -> bool:
-        """
-        Check if the given value is of a primitive type, excluding date types.
-        MongoDB date, time, datetime types should be serialized/deserialized using specific rules.
-        """
-        class_name = value.__class__.__name__
-        return class_name in self.primitive_type_names and class_name not in self.date_type_names
 
     @classmethod
     def _serialize_primitive(cls, value: TPrimitive, class_name: str) -> TPrimitive:
@@ -314,60 +408,5 @@ class DictSerializer:
                 return False
             else:
                 raise RuntimeError(f"Serialized boolean field has value {value} but only Y or N are allowed.")
-        else:
-            return value
-
-    @classmethod
-    def _resolve_date_type(cls, type_: Type, field_name: str, sub_type: str = None) -> TPrimitive:
-        """Recursively determine the original date type for a MongoDB datetime object."""
-        if not type_ or not field_name:
-            raise RuntimeError(
-                "Missing class or field name for resolving the type of MongoDB datetime object during "
-                "deserialization. Please ensure that the class and field name are correctly provided."
-            )
-
-        field_type = sub_type or type_.__dataclass_fields__.get(field_name).type.__name__
-
-        if field_type in DictSerializer.date_type_names:
-            return field_type
-
-        if field_type == "Dict":
-            args = get_type_hints(type_)[field_name].__args__
-            if len(args) == 1:
-                field_type = args[0].__args__[1].__name__
-                return DictSerializer._resolve_date_type(type_, field_name, field_type)
-            elif len(args) == 2:
-                field_type = args[1].__name__
-                return DictSerializer._resolve_date_type(type_, field_name, field_type)
-        elif field_type == "List":
-            args = get_type_hints(type_)[field_name].__args__
-            if len(args) == 1:
-                field_type = args[0].__name__
-                return DictSerializer._resolve_date_type(type_, field_name, field_type)
-            elif len(args) == 2:
-                field_type = args[1].__args__[0].__name__
-                return DictSerializer._resolve_date_type(type_, field_name, field_type)
-
-        raise RuntimeError(f"Unable to resolve type for field '{field_name}' in class '{type_.__name__}'.")
-
-    @classmethod
-    def _serialize_to_mongo_datetime(cls, value: TPrimitive, class_name: str) -> TPrimitive:
-        """Convert date and time objects into a datetime representation for MongoDB."""
-        if class_name == "date":
-            return datetime.combine(value, datetime.min.time())
-        if class_name == "time":
-            return datetime.combine(date.today(), value)
-        else:
-            return value
-
-    @classmethod
-    def _deserialize_mongo_datetime(cls, value: TPrimitive, class_name: str) -> TPrimitive:
-        """Convert a MongoDB datetime to its corresponding Python type."""
-        if class_name == "datetime":
-            return value.replace(tzinfo=timezone.utc)
-        elif class_name == "date":
-            return value.date()
-        elif class_name == "time":
-            return value.time()
         else:
             return value
