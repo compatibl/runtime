@@ -323,7 +323,7 @@ class DictSerializer:
 
                 # Extract generic type arguments from dict annotation type, e.g. Dict[str, int] -> int
                 if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
-                    dict_value_annot_type = type_
+                    dict_value_annot_type = None
                 else:
                     if len(type_args) == 2:
                         # Take second argument as value type
@@ -367,7 +367,7 @@ class DictSerializer:
             else:
                 # Extract generic type arguments from annotation type, e.g. List[int] -> int
                 if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
-                    list_value_annot_type = type_
+                    list_value_annot_type = None
                 else:
                     if len(type_args) == 1:
                         # Take first argument as value type

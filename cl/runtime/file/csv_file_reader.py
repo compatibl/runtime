@@ -69,36 +69,6 @@ class CsvFileReader(Reader):
             if records:
                 context.save_many(records)
 
-    @classmethod
-    def _prepare_csv_value(cls, csv_value: str, element_decl: ElementDecl):
-        """Prepare csv value before deserialization."""
-
-        # TODO (Roman): add ability to see difference between an empty string and None.
-        # Replace empty string to None
-        if csv_value is None or csv_value == "":
-            return None
-
-        if element_decl is None:
-            raise NotImplementedError()
-
-        if not element_decl.vector and (value_decl := element_decl.value) is not None:
-            # Convert primitive types
-            if value_decl.type_ == "Int":
-                return int(csv_value)
-            elif value_decl.type_ == "Double":
-                return float(csv_value)
-        elif (key := element_decl.key_) is not None and StringValueParser.parse(csv_value)[1] is None:
-            # Get key type from element decl
-            key_type_name = key.name
-            type_dict = get_type_dict()
-            key_type = type_dict.get(key_type_name)  # noqa
-
-            # Deserialize key from string
-            key_serializer = StringSerializer()
-            return key_serializer.deserialize_key(csv_value, key_type)
-
-        return csv_value
-
     def _deserialize_row(self, row_dict: Dict[str, Any]) -> RecordProtocol:
         """Deserialize row into a record."""
 
@@ -116,8 +86,10 @@ class CsvFileReader(Reader):
         # Get record type
         record_type = Schema.get_type_by_short_name(filename_without_extension)
 
-        # Normalize chars
-        row_dict = {CharUtil.normalize_chars(k): CharUtil.normalize_chars(v) for k, v in row_dict.items()}
+        # Normalize chars and set None for empty strings
+        row_dict = {
+            CharUtil.normalize_chars(k): CharUtil.normalize_chars(v) if v else None for k, v in row_dict.items()
+        }
         row_dict["_type"] = record_type.__name__
 
         return serializer.deserialize_data(row_dict)
