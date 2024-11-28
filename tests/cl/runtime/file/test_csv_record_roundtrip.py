@@ -22,7 +22,6 @@ import pandas as pd
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import is_key
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
 from stubs.cl.runtime import StubDataclassComposite
@@ -53,12 +52,11 @@ stub_entries: List[List[RecordProtocol]] = [  # noqa
     [StubDataclassDerivedFromDerivedRecord(id=f"abc4_n{i}") for i in range(5)],
     [StubDataclassOtherDerivedRecord(id=f"abc5_n{i}") for i in range(5)],
     [StubDataclassOptionalFields(id=f"abc7_n{i}") for i in range(5)],
-    # TODO(Roman): Restore after supporting dt.date and dt.time for Mongo
-    # [StubDataclassListFields(id=f"abc6_n{i}") for i in range(5)],
-    # [StubDataclassDictFields(id=f"abc8_n{i}") for i in range(5)],
-    # [StubDataclassDictListFields(id=f"abc9_n{i}") for i in range(5)],
-    # [StubDataclassListDictFields(id=f"abc10_n{i}") for i in range(5)],
-    # [StubDataclassPrimitiveFields(key_str_field=f"abc11_n{i}") for i in range(5)],
+    [StubDataclassListFields(id=f"abc6_n{i}") for i in range(5)],
+    [StubDataclassDictFields(id=f"abc8_n{i}") for i in range(5)],
+    [StubDataclassDictListFields(id=f"abc9_n{i}") for i in range(5)],
+    [StubDataclassListDictFields(id=f"abc10_n{i}") for i in range(5)],
+    [StubDataclassPrimitiveFields(key_str_field=f"abc11_n{i}") for i in range(5)],
 ]
 """Stub entries for testing."""
 
@@ -71,14 +69,7 @@ def save_records_to_csv(records: Iterable, file_path: str) -> None:
     for rec in records:
         serialized_record = flat_serializer.serialize_data(rec, is_root=True)
         serialized_record.pop("_type", None)
-        serialized_record_with_str_keys = {}
-        for k, v in serialized_record.items():
-            if is_key(key_v := getattr(rec, k, None)):
-                serialized_record_with_str_keys[k] = key_serializer.serialize_key(key_v)
-            else:
-                serialized_record_with_str_keys[k] = v
-
-        record_dicts.append(serialized_record_with_str_keys)
+        record_dicts.append(serialized_record)
 
     # Use pandas df to transform list of dicts to table format and write to file
     df = pd.DataFrame(record_dicts)

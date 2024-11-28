@@ -15,13 +15,14 @@
 import base64
 import datetime as dt
 import json
-from typing import List, Type
+from typing import List, Type, cast
 from uuid import UUID
-from cl.runtime.records.protocols import TDataDict
+from cl.runtime.records.protocols import TDataDict, is_key
 from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.string_value_parser_enum import StringValueCustomTypeEnum
-from cl.runtime.serialization.string_value_parser_enum import StringValueParser
+from cl.runtime.serialization.string_serializer import StringSerializer
 
+key_serializer = StringSerializer()
+"""Serializer for key to string conversion."""
 
 class FlatDictSerializer(DictSerializer):
     """
@@ -30,71 +31,100 @@ class FlatDictSerializer(DictSerializer):
     """
 
     primitive_type_names = ["NoneType", "float", "int"]
+    """Override primitive_type_names to enable formating for more types."""
+
+    @classmethod
+    def _is_json_str(cls, value: str) -> bool:
+        """A quick check that a string is most likely JSON."""
+        return value.startswith("{") and value.endswith("}")
 
     def serialize_data(self, data, select_fields: List[str] | None = None, *, is_root: bool = False):
-        if isinstance(data, str):
+
+        if data.__class__.__name__ in ("date", "datetime", "time"):
+            # Serialize date types to iso string
+            return data.isoformat()
+        elif data.__class__.__name__ == "UUID":
+            # Serialize UUID to string
+            return str(data)
+        elif data.__class__.__name__ == "bytes":
+            # Decode bytes to base64 string
+            return base64.b64encode(data).decode()
+        elif data.__class__.__name__ == "bool":
+            # Serialize bool to Y/N char
+            return "Y" if data else "N"
+        elif is_key(data):
+            # Serialize key as string
+            key_str = key_serializer.serialize_key(data)
+            if self._is_json_str(key_str):
+                raise RuntimeError(f"Key str must not match json condition, key_str value: {key_str}.")
+
+            return key_str
+        elif data.__class__.__name__ in super().primitive_type_names:
+            # If the data does not match the previous conditions
+            # and is a primitive for the base class, return unchanged.
             return data
-
-        if data.__class__.__name__ in (*super().primitive_type_names, "date", "time", "datetime"):
-            serialized_data = data
         else:
-            serialized_data = super().serialize_data(data, select_fields)
+            # All other types try to serialize as JSON string
+            json_data = super().serialize_data(data, select_fields)
 
-        value_custom_type = StringValueParser.get_custom_type(serialized_data)
+            if not isinstance(json_data, (dict, list)):
+                raise RuntimeError(
+                    f"Received value is not serializable to json. Value: {json_data}, input value: {data}."
+                )
 
-        if not is_root and value_custom_type is not None:
-            handled_serialized_value = None
-            if serialized_data.__class__.__name__ in ("date", "datetime", "time"):
-                handled_serialized_value = serialized_data.isoformat()
-            elif serialized_data.__class__.__name__ == "bool":
-                handled_serialized_value = self._deserialize_primitive(data, "bool")
-            elif serialized_data.__class__.__name__ == "UUID":
-                handled_serialized_value = str(data)
-            elif serialized_data.__class__.__name__ == "bytes":
-                handled_serialized_value = base64.b64encode(data).decode()
-            elif isinstance(serialized_data, (dict, list)):
-                # TODO (Roman): refactor to avoid nested data json dumps.
-                #  It is enough to do single json dump for the entire object.
-                handled_serialized_value = json.dumps(serialized_data)
-            return (
-                StringValueParser.add_type_prefix(handled_serialized_value, value_custom_type)
-                if handled_serialized_value is not None
-                else serialized_data
-            )
-        else:
-            return serialized_data
+            # If it is root, don't serialize to json string
+            if is_root:
+                return json_data
+            else:
+                return json.dumps(json_data)
 
     def deserialize_data(self, data: TDataDict, type_: Type | None = None):
-        # check all str values if it is flattened from some type
-        if isinstance(data, str):
-            converted_data, custom_type = StringValueParser.parse(data)
 
-            if custom_type is not None:
-                if custom_type == StringValueCustomTypeEnum.DATE:
-                    converted_data = dt.date.fromisoformat(converted_data)
-                elif custom_type == StringValueCustomTypeEnum.DATETIME:
-                    converted_data = dt.datetime.fromisoformat(converted_data)
-                elif custom_type == StringValueCustomTypeEnum.TIME:
-                    converted_data = dt.time.fromisoformat(converted_data)
-                elif custom_type == StringValueCustomTypeEnum.BOOL:
-                    converted_data = self._deserialize_primitive(converted_data, "bool")
-                elif custom_type == StringValueCustomTypeEnum.UUID:
-                    converted_data = UUID(converted_data)
-                elif custom_type == StringValueCustomTypeEnum.BYTES:
-                    converted_data = base64.b64decode(converted_data.encode())
+        # Extract inner type if type_ is Optional[...]
+        type_ = self._handle_optional_annot(type_)
+
+        if data.__class__.__name__ == "str":
+            data = cast(str, data)
+            if type_ is None or type_.__name__ == "str":
+                # Return unchanged if declared type is string
+                return data
+            elif type_.__name__ == "datetime":
+                # Deserialize datetime from iso string
+                return dt.datetime.fromisoformat(data)
+            elif type_.__name__ == "date":
+                # Deserialize date from iso string
+                return dt.date.fromisoformat(data)
+            elif type_.__name__ == "time":
+                # Deserialize time from iso string
+                return dt.time.fromisoformat(data)
+            elif type_.__name__ == "bool":
+                # Deserialize bool from string
+                if (bool_value := True if data == "Y" else False if data == "N" else None) is not None:
+                    return bool_value
                 else:
-                    converted_data = json.loads(converted_data)
-
-            # TODO (Roman): consider to add serialize_primitive() method and override it
-            # return deserialized primitives to avoid infinity recursion
-            if converted_data.__class__.__name__ in super().primitive_type_names:
-                return converted_data
+                    raise RuntimeError(f"Serialized boolean field has value {data} but only Y/N and 1/0 are allowed.")
+            elif type_.__name__ == "UUID":
+                # Create UUID from string
+                return UUID(data)
+            elif type_.__name__ == "bytes":
+                # Encode base64 string to bytes
+                return base64.b64decode(data.encode())
+            elif type_.__name__ == "int":
+                # Support string value for declared as int
+                return int(data)
+            elif type_.__name__ == "float":
+                # Support string value for declared as float
+                return float(data)
+            elif is_key(type_) and not self._is_json_str(data):
+                # Deserialize key as string if it is declared as key and is not a JSON string
+                return key_serializer.deserialize_key(data, type_)
+            else:
+                # All other types try to deserialize from JSON string
+                json_data = json.loads(data)
+                return super().deserialize_data(json_data, type_)
+        elif data.__class__.__name__ in super().primitive_type_names:
+            # Return primitive types unchanged
+            return data
         else:
-            converted_data = data
-
-        if converted_data.__class__.__name__ == "date":
-            converted_data = dt.datetime.combine(converted_data, dt.datetime.min.time())
-        elif converted_data.__class__.__name__ == "time":
-            converted_data = dt.datetime.combine(dt.date.today(), converted_data)
-
-        return super().deserialize_data(converted_data, type_)
+            # Call deserialize_data from base class
+            return super().deserialize_data(data, type_)

@@ -18,6 +18,7 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import timezone
 from enum import Enum
+from types import UnionType
 from typing import Dict, TypeVar, Union
 from typing import List
 from typing import Tuple
@@ -234,8 +235,11 @@ class DictSerializer:
         if type_ is None:
             return None
 
-        # Check if type_ is a Union and process if only one argument is not None.
-        if (origin := getattr(type_, "__origin__", None)) and origin is Union and (union_args := getattr(type_, "__args__", None)):
+        # Check if type_ is a UnionType or Union and process if only one argument is not None.
+        if (
+            (type_.__class__ is UnionType or getattr(type_, "__origin__", None) is Union)
+            and (union_args := getattr(type_, "__args__", None))
+        ):
             not_none_union_args: List[int] = [arg for arg in union_args if arg is not type(None)]
             if len(not_none_union_args) == 1:
                 return not_none_union_args[0]
