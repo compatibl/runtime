@@ -15,14 +15,18 @@
 import base64
 import datetime as dt
 import json
-from typing import List, Type, cast
+from typing import List
+from typing import Type
+from typing import cast
 from uuid import UUID
-from cl.runtime.records.protocols import TDataDict, is_key
+from cl.runtime.records.protocols import TDataDict
+from cl.runtime.records.protocols import is_key
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
 
 key_serializer = StringSerializer()
 """Serializer for key to string conversion."""
+
 
 class FlatDictSerializer(DictSerializer):
     """

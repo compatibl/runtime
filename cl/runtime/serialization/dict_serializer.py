@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import datetime as dt
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from datetime import timezone
 from enum import Enum
 from types import UnionType
-from typing import Dict, TypeVar, Union
+from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Type
+from typing import TypeVar
+from typing import Union
 from typing import cast
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
@@ -52,6 +54,7 @@ collect_slots = sys.version_info.major > 3 or sys.version_info.major == 3 and sy
 
 # TypeVar for any data type
 T = TypeVar("T")
+
 
 # TODO: Should classes not included packages be supported? If not do not update type dict in serializer.
 def get_type_dict() -> Dict[str, Type]:
@@ -100,6 +103,7 @@ def _get_class_hierarchy_slots(data_type) -> Tuple[str]:
         class_hierarchy_slots_dict[data_type] = result
         return cast(Tuple[str], result)
 
+
 def _get_class_hierarchy_annotations(data_type) -> Dict[str, Type]:
     """
     Return combined annotations dict for all classes in data_type hierarchy.
@@ -117,7 +121,9 @@ def _get_class_hierarchy_annotations(data_type) -> Dict[str, Type]:
         for base in reversed(data_type.__mro__):
             if annot := getattr(base, "__annotations__", None):
                 for name_, type_ in annot.items():
-                    if (existing_annot_type := hierarchy_annots.get(name_)) and not issubclass(type_, existing_annot_type):
+                    if (existing_annot_type := hierarchy_annots.get(name_)) and not issubclass(
+                        type_, existing_annot_type
+                    ):
                         # Existing type is not None and current type_ is not subclass - raise exception
                         raise RuntimeError(
                             f"Conflict field types in '{data_type.__name__}' class hierarchy for field {name_}. "
@@ -131,6 +137,7 @@ def _get_class_hierarchy_annotations(data_type) -> Dict[str, Type]:
                         pass
 
         return hierarchy_annots
+
 
 # TODO: Add checks for to_node, from_node implementation for custom override of default serializer
 @dataclass(slots=True, kw_only=True)
@@ -236,9 +243,8 @@ class DictSerializer:
             return None
 
         # Check if type_ is a UnionType or Union and process if only one argument is not None.
-        if (
-            (type_.__class__ is UnionType or getattr(type_, "__origin__", None) is Union)
-            and (union_args := getattr(type_, "__args__", None))
+        if (type_.__class__ is UnionType or getattr(type_, "__origin__", None) is Union) and (
+            union_args := getattr(type_, "__args__", None)
         ):
             not_none_union_args: List[int] = [arg for arg in union_args if arg is not type(None)]
             if len(not_none_union_args) == 1:
@@ -249,7 +255,9 @@ class DictSerializer:
         # Return type_ if it is not Union
         return type_
 
-    def deserialize_data(self, data: TDataField, type_: Type[T] | None = None):  # TODO: Check if None should be supported
+    def deserialize_data(
+        self, data: TDataField, type_: Type[T] | None = None
+    ):  # TODO: Check if None should be supported
         """
         Deserialize object from data, invoke init_all after deserialization.
 
@@ -291,11 +299,13 @@ class DictSerializer:
                 annots = _get_class_hierarchy_annotations(deserialized_type)
                 deserialized_fields = {
                     (CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k): (
-                        v if v.__class__.__name__ in self.primitive_type_names
+                        v
+                        if v.__class__.__name__ in self.primitive_type_names
                         else self.deserialize_data(
-                            v, annots.get(
+                            v,
+                            annots.get(
                                 CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k
-                            )
+                            ),
                         )
                     )
                     for k, v in data.items()
@@ -334,7 +344,8 @@ class DictSerializer:
                 # Otherwise return a dictionary with recursively deserialized values
                 result = {
                     k: (
-                        v if v.__class__.__name__ in self.primitive_type_names
+                        v
+                        if v.__class__.__name__ in self.primitive_type_names
                         else self.deserialize_data(v, dict_value_annot_type)
                     )
                     for k, v in data.items()
@@ -378,7 +389,8 @@ class DictSerializer:
                 # Deserialize each element of the iterable
                 return [
                     (
-                        v if v.__class__.__name__ in self.primitive_type_names
+                        v
+                        if v.__class__.__name__ in self.primitive_type_names
                         else self.deserialize_data(v, list_value_annot_type)
                     )
                     for v in data
