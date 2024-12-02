@@ -16,20 +16,21 @@ import base64
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
-from typing import List
+from typing import Type
 from typing_extensions import Dict
 from cl.runtime.file.file_data import FileData
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
+from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
-from cl.runtime.schema.element_decl import ElementDecl
-from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serialization.dict_serializer import DictSerializer
+from cl.runtime.serialization.dict_serializer import T
 from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
-from cl.runtime.serialization.dict_serializer import get_type_dict
 from cl.runtime.serialization.string_serializer import StringSerializer
+
+key_serializer = StringSerializer()
 
 
 @dataclass(slots=True, kw_only=True)
@@ -39,41 +40,33 @@ class UiDictSerializer(DictSerializer):
     pascalize_keys: bool = True
     """pascalize_keys is True by default."""
 
-    @staticmethod
-    def _check_patch_binary_content(data: TDataDict):
-        """
-        Handles binary data transformations.
+    primitive_type_names = [
+        "NoneType",
+        "float",
+        "int",
+        "bool",
+        "bytes",
+        "UUID",
+    ]
+    """Override primitive fields. In particular, str is not a primitive in ui format."""
 
-        For BinaryData frontend, always return type as 'BinaryContent',
-        so we need to patch the 'data' dict and rename attribute fields according to:
-        :class:`cl.runtime.file.file_data.FileData` attributes naming.
-        """
-
-        if (_type := data.get("_t")) and (_type == "BinaryContent"):
-            data["_t"] = FileData.__name__
-            if content_value := data.get("Content"):  # type: str
-                attr_name = CaseUtil.snake_to_pascal_case(FileData.file_bytes.__name__)
-                data[attr_name] = base64.b64decode(content_value.encode())
-                del data["Content"]
-
-    def serialize_data(self, data, select_fields: List[str] | None = None):
+    def serialize_data(self, data):
 
         if not self.pascalize_keys:
-            raise RuntimeError("Expect ui serialization always with pascalized keys.")
+            raise RuntimeError("UI serialization format only supports pascalize_keys=True mode.")
 
         if data is None:
             return None
 
-        if data.__class__.__name__ in self.primitive_type_names:
+        if data.__class__.__name__ == "str":
             return data
         elif isinstance(data, Enum):
             # Serialize enum as its name
-            serialized_enum = super(UiDictSerializer, self).serialize_data(data, select_fields)
+            serialized_enum = super(UiDictSerializer, self).serialize_data(data)
             pascal_case_value = serialized_enum.get("_name")
             return pascal_case_value
         elif is_key(data):
             # Serialize key as string
-            key_serializer = StringSerializer()
             return key_serializer.serialize_key(data)
         elif isinstance(data, dict):
             # Serialize dict as list of dicts in format [{"key": [key], "value": [value_as_legacy_variant]}]
@@ -103,7 +96,7 @@ class UiDictSerializer(DictSerializer):
             # Invoke 'init' for each class in class hierarchy that implements it, in the order from base to derived
             RecordUtil.init_all(data)
 
-            serialized_data = super(UiDictSerializer, self).serialize_data(data, select_fields)
+            serialized_data = super(UiDictSerializer, self).serialize_data(data)
 
             # Replace "_type" with "_t"
             if "_type" in serialized_data:
@@ -114,7 +107,7 @@ class UiDictSerializer(DictSerializer):
 
             return serialized_data
         else:
-            return super(UiDictSerializer, self).serialize_data(data, select_fields)
+            return super(UiDictSerializer, self).serialize_data(data)
 
     def serialize_record_for_table(self, record: RecordProtocol) -> Dict[str, Any]:
         """
@@ -122,109 +115,80 @@ class UiDictSerializer(DictSerializer):
         Contains only fields of supported types, _key and _t will be added based on record.
         """
 
-        key_serializer = StringSerializer()
         all_slots = _get_class_hierarchy_slots(record.__class__)
 
         # Get subset of slots which supported in table format
-        table_slots = [
-            slot
+        table_slots = {
+            slot: slot_v
             for slot in all_slots
             if (slot_v := getattr(record, slot))
             and (
                 # TODO (Roman): check other types for table format
-                # select fields if it is primitive, key or enum
-                slot_v.__class__.__name__ in self.primitive_type_names
+                # Check if field is primitive, key or enum
+                slot_v.__class__.__name__ in (*self.primitive_type_names, "str")
                 or is_key(slot_v)
                 or isinstance(slot_v, Enum)
             )
-        ]
+        }
+
+        table_record = type(record)(**table_slots)  # noqa
 
         # Serialize record to ui format using table_slots
-        table_record: Dict[str, Any] = self.serialize_data(record, select_fields=table_slots)
+        table_dict: Dict[str, Any] = self.serialize_data(table_record)
 
         # Replace "_type" with "_t"
-        if "_type" in table_record:
-            table_record["_t"] = record.__class__.__name__
-            del table_record["_type"]
+        if "_type" in table_dict:
+            table_dict["_t"] = record.__class__.__name__
+            del table_dict["_type"]
 
         # Add "_key"
-        table_record["_key"] = key_serializer.serialize_key(record.get_key())
+        table_dict["_key"] = key_serializer.serialize_key(record.get_key())
 
-        return table_record
+        return table_dict
 
-    def apply_ui_conversion(self, data: TDataDict, element_decl: ElementDecl | None = None) -> TDataDict:
+    @classmethod
+    def _check_patch_binary_content(cls, data: TDataDict, short_type_name: str):
         """
-        Apply conversion to make ui data serializable. Extract additional info about types from TypeDecl.
+        Handles binary data transformations.
 
-        Parameter `element_decl` can be `None` for data with `_t` on root.
-        Then, for nested fields will be used element decls from a specific `TypeDecl` object.
+        For BinaryData frontend, always return type as 'BinaryContent',
+        so we need to patch the 'data' dict and rename attribute fields according to:
+        :class:`cl.runtime.file.file_data.FileData` attributes naming.
         """
+
+        if short_type_name == "BinaryContent":
+            data["_t"] = FileData.__name__
+            if content_value := data.pop("Content"):  # type: str
+                attr_name = CaseUtil.snake_to_pascal_case(FileData.file_bytes.__name__)
+                data[attr_name] = base64.b64decode(content_value.encode())
+
+    def deserialize_data(self, data: TDataField, type_: Type[T] | None = None):
 
         if not self.pascalize_keys:
-            raise RuntimeError("Expect ui serialization always with pascalized keys.")
+            raise RuntimeError("UI serialization format only supports pascalize_keys=True mode.")
+
+        # Extract inner type if type_ is Optional[...]
+        type_ = self._handle_optional_annot(type_)
 
         if isinstance(data, dict):
-            if short_name := data.get("_t"):
-                self._check_patch_binary_content(data)
+            # Copying data to ensure input dictionary is immutable
+            data = data.copy()
 
-                # Check _t and create TypeDecl object
-                type_dict = get_type_dict()
-                type_ = type_dict.get(short_name)  # noqa
-                type_decl = TypeDecl.for_type(type_)
+            # Replace _t attribute to _type and deserialize with method in base class
+            if short_type_name := data.pop("_t"):
+                # Apply additional conversion for BinaryContent
+                self._check_patch_binary_content(data, short_type_name)
 
-                # Construct name to element decl map
-                type_decl_elements = {
-                    # TODO (Roman): remove extra suffix for elements search after introducing field aliases.
-                    #   This is currently needed because ElementDecl removes the _ suffix from the field name.
-                    f"{element.name}{extra_suffix}": element
-                    for element in type_decl.elements or {}
-                    for extra_suffix in ("", "_")
-                }
-
-                # Create an empty result with _type attribute (instead of _t)
-                result = {"_type": short_name}
-                for field, value in data.items():
-                    if field == "_t":
-                        continue
-
-                    # Expect pascal case fields
-                    CaseUtil.check_pascal_case(field.removesuffix("_"))
-
-                    if field_decl := type_decl_elements.get(field):
-                        # Apply ui conversion for values recursively
-                        result[field] = self.apply_ui_conversion(value, field_decl)
-                    else:
-                        # If element decl is not found for field in data, raise RuntimeError
-                        raise RuntimeError(
-                            f'Data conflicts with type declaration. Field "{field}" not found '
-                            f'in "{short_name}" type elements.'
-                        )
-
-                return result
-
+                data["_type"] = short_type_name
+                return super(UiDictSerializer, self).deserialize_data(data, type_)
         elif isinstance(data, str):
-            # Apply ui conversions for string values
-
-            if enum := element_decl.enum:
-                # Get enum type from element decl and convert value to dict supported by DictSerializer
-                enum_type_name = enum.name
-                return {"_enum": enum_type_name, "_name": CaseUtil.upper_to_pascal_case(data)}
-
-            elif key := element_decl.key_:
-                # Get key type from element decl
-                key_type_name = key.name
-                type_dict = get_type_dict()
-                key_type = type_dict.get(key_type_name)  # noqa
-
+            if type_ is None or type_.__name__ == "str":
+                return data
+            elif is_key(type_):
                 # Deserialize key from string
-                key_serializer = StringSerializer()
-                result = key_serializer.deserialize_key(data, key_type)
+                return key_serializer.deserialize_key(data, type_)  # noqa
+            elif issubclass(type_, Enum):
+                # Deserialize enum from string using type in declaration
+                return type_[CaseUtil.pascal_to_upper_case(data)]
 
-                return result
-
-        elif hasattr(data, "__iter__") and not isinstance(data, bytes):
-            # Apply ui conversion for each element in iterable
-            return [self.apply_ui_conversion(x, element_decl) for x in data]  # noqa
-
-        # Return unchanged data if there is no ui conversion
-        return data
+        return super(UiDictSerializer, self).deserialize_data(data, type_)

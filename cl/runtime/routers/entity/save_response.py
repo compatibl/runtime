@@ -58,10 +58,8 @@ class SaveResponse(BaseModel):
         if ui_record.get("_t") == "UiTypeState":
             return SaveResponse(key=None)
 
-        prepared_serialized_record = data_serializer.apply_ui_conversion(ui_record)
-
         # Deserialize record
-        record = data_serializer.deserialize_data(prepared_serialized_record)
+        record = data_serializer.deserialize_data(ui_record)
 
         if request.old_record_key is None:
             existing_record = context.load_one(

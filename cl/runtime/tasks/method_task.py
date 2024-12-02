@@ -61,8 +61,7 @@ class MethodTask(CallableTask, ABC):
             if not isinstance(param_values, dict):
                 continue
 
-            prepared_serialized_record = data_serializer.apply_ui_conversion(param_values)
-            type_instance = data_serializer.deserialize_data(prepared_serialized_record)
+            type_instance = data_serializer.deserialize_data(param_values)
 
             # Assign deserialized value instead of dict
             params[param_name] = type_instance

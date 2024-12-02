@@ -15,7 +15,6 @@
 import base64
 import datetime as dt
 import json
-from typing import List
 from typing import Type
 from typing import cast
 from uuid import UUID
@@ -42,7 +41,7 @@ class FlatDictSerializer(DictSerializer):
         """A quick check that a string is most likely JSON."""
         return value.startswith("{") and value.endswith("}")
 
-    def serialize_data(self, data, select_fields: List[str] | None = None, *, is_root: bool = False):
+    def serialize_data(self, data, *, is_root: bool = False):
 
         if data.__class__.__name__ in ("date", "datetime", "time"):
             # Serialize date types to iso string
@@ -69,7 +68,7 @@ class FlatDictSerializer(DictSerializer):
             return data
         else:
             # All other types try to serialize as JSON string
-            json_data = super().serialize_data(data, select_fields)
+            json_data = super().serialize_data(data)
 
             if not isinstance(json_data, (dict, list)):
                 raise RuntimeError(

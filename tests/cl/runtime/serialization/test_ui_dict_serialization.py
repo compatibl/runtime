@@ -39,10 +39,11 @@ def test_data_serialization():
         StubDataclassOtherDerivedRecord,
         StubDataclassListFields,
         StubDataclassOptionalFields,
+        # TODO (Roman): Uncomment when serialization format supports all dict value types
         # StubDataclassDictFields,
         # StubDataclassDictListFields,
         # StubDataclassListDictFields,
-        # StubDataclassPrimitiveFields,
+        StubDataclassPrimitiveFields,
         StubDataclassSingleton,
     ]
 
@@ -52,8 +53,7 @@ def test_data_serialization():
         obj_1 = sample_type()
         serialized_1 = serializer.serialize_data(obj_1)
 
-        prepared_serialized_1 = serializer.apply_ui_conversion(serialized_1)
-        obj_2 = serializer.deserialize_data(prepared_serialized_1)
+        obj_2 = serializer.deserialize_data(serialized_1)
         serialized_2 = serializer.serialize_data(obj_2)
 
         assert obj_1 == obj_2
