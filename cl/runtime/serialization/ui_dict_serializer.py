@@ -175,14 +175,15 @@ class UiDictSerializer(DictSerializer):
             data = data.copy()
 
             # Replace _t attribute to _type and deserialize with method in base class
-            if short_type_name := data.pop("_t"):
+            if short_type_name := data.pop("_t", None):
                 # Apply additional conversion for BinaryContent
                 self._check_patch_binary_content(data, short_type_name)
 
                 data["_type"] = short_type_name
                 return super(UiDictSerializer, self).deserialize_data(data, type_)
         elif isinstance(data, str):
-            if type_ is None or type_.__name__ == "str":
+            # TODO (Roman): Remove check for Any when no longer supported.
+            if type_ is None or type_.__name__ == "str" or type_ is Any:
                 return data
             elif is_key(type_):
                 # Deserialize key from string

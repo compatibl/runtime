@@ -15,6 +15,7 @@
 import base64
 import datetime as dt
 import json
+from typing import Any
 from typing import Type
 from typing import cast
 from uuid import UUID
@@ -88,7 +89,8 @@ class FlatDictSerializer(DictSerializer):
 
         if data.__class__.__name__ == "str":
             data = cast(str, data)
-            if type_ is None or type_.__name__ == "str":
+            # TODO (Roman): Remove check for Any when no longer supported.
+            if type_ is None or type_.__name__ == "str" or type_ is Any:
                 # Return unchanged if declared type is string
                 return data
             elif type_.__name__ == "datetime":

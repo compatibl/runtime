@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from datetime import timezone
 from enum import Enum
 from types import UnionType
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Tuple
@@ -121,20 +122,8 @@ def _get_class_hierarchy_annotations(data_type) -> Dict[str, Type]:
         for base in reversed(data_type.__mro__):
             if annot := getattr(base, "__annotations__", None):
                 for name_, type_ in annot.items():
-                    if (existing_annot_type := hierarchy_annots.get(name_)) and not issubclass(
-                        type_, existing_annot_type
-                    ):
-                        # Existing type is not None and current type_ is not subclass - raise exception
-                        raise RuntimeError(
-                            f"Conflict field types in '{data_type.__name__}' class hierarchy for field {name_}. "
-                            f"Type in {base}: {type_}, type in base: {existing_annot_type}."
-                        )
-                    elif not existing_annot_type:
-                        # Existing type is None - add new annot to result dict
-                        hierarchy_annots[name_] = type_
-                    else:
-                        # Existing type is not None and current type_ is subclass - nothing to do
-                        pass
+                    # TODO (Roman): Implement a robust type conflict checking function
+                    hierarchy_annots[name_] = type_
 
         return hierarchy_annots
 
