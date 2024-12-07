@@ -34,6 +34,10 @@ from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_key import StubDataclassAbstractKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
 
@@ -326,6 +330,34 @@ def test_load_filter():
         loaded_records = context.load_filter(StubDataclassDerivedRecord, filter_obj)
         assert len(loaded_records) == len(matching_records)
         assert all(x.derived_str_field == filter_obj.derived_str_field for x in loaded_records)
+
+
+def test_abstract_key():
+    """Test final record for which some of the fields are in base record."""
+
+    # TODO: Do not hardcode DB name
+    db_class = ClassInfo.get_class_path(BasicMongoDb)
+    with TestingContext(db_class=db_class) as context:
+
+        final_record = StubDataclassFinalRecord(id="a")
+        context.save_one(final_record)
+        final_key = final_record.get_key()
+        load_using_record = context.load_one(type(final_record), final_record)
+        load_using_key = context.load_one(type(final_record), final_key)
+        assert load_using_record is final_record  # Same object is returned without lookup
+        assert load_using_key == final_record  # Not the same object but equal
+
+        nested_record = StubDataclassNestedFinalRecord(id="b")
+        nested_record.final_key = StubDataclassFinalKey(id="c")
+        nested_record.final_record = StubDataclassFinalRecord(id="d")
+        context.save_one(nested_record)
+        nested_key = nested_record.get_key()
+        load_using_record = context.load_one(type(nested_record), nested_record)
+        load_using_key = context.load_one(type(nested_record), nested_key)
+        assert load_using_record is nested_record  # Same object is returned without lookup
+        assert load_using_key == nested_record  # Not the same object but equal
+
+    pass
 
 
 if __name__ == "__main__":

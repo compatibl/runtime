@@ -107,7 +107,6 @@ class HandlerDeclareBlockDecl:
         method_signature = inspect.signature(method)
         method_params = method_signature.parameters
         for param_name, param in method_params.items():
-            # type: (str, Parameter)
             if param_name in {"self", "cls"}:
                 continue
 
