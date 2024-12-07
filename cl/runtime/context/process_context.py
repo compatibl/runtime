@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from getpass import getuser
-from cl.convince.llms.llm_key import LlmKey
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
@@ -76,9 +75,3 @@ class ProcessContext(Context):
             if self.trial is None:
                 if StringUtil.is_not_empty(trial_id := ContextSettings.instance().trial):
                     self.trial = TrialKey(trial_id=trial_id)
-            if self.full_llm is None:
-                if StringUtil.is_not_empty(full_llm_id := ContextSettings.instance().full_llm):
-                    self.full_llm = LlmKey(llm_id=full_llm_id)
-            if self.mini_llm is None:
-                if StringUtil.is_not_empty(mini_llm_id := ContextSettings.instance().mini_llm):
-                    self.mini_llm = LlmKey(llm_id=mini_llm_id)

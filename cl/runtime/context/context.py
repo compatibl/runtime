@@ -20,7 +20,6 @@ from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Type
-from cl.convince.llms.llm_key import LlmKey
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context_key import ContextKey
 from cl.runtime.db.db_key import DbKey
@@ -77,12 +76,6 @@ class Context(ContextKey, RecordMixin[ContextKey]):
     trial: TrialKey | None = None
     """Key of the running trial."""
 
-    full_llm: LlmKey | None = None
-    """Key of the default full LLM."""
-
-    mini_llm: LlmKey | None = None
-    """Key of the default mini LLM."""
-
     is_deserialized: bool = False
     """Use this flag to determine if this context instance has been deserialized from data."""
 
@@ -115,10 +108,6 @@ class Context(ContextKey, RecordMixin[ContextKey]):
                 self.experiment = Context.current().experiment
             if self.trial is None:
                 self.trial = Context.current().trial
-            if self.full_llm is None:
-                self.full_llm = Context.current().full_llm
-            if self.mini_llm is None:
-                self.mini_llm = Context.current().mini_llm
 
         # Replace fields that are set as keys by records from storage
         # First, load 'db' field of this context using 'Context.current()'

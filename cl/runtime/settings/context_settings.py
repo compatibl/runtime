@@ -49,12 +49,6 @@ class ContextSettings(Settings):
     trial: str | None = None
     """String identifier of the running trial."""
 
-    full_llm: str | None = None
-    """String identifier of the default full LLM."""
-
-    mini_llm: str | None = None
-    """String identifier of the default mini LLM."""
-
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
