@@ -32,6 +32,9 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
 
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
@@ -240,6 +243,32 @@ def test_singleton():
         all_records = list(context.load_all(other_singleton_sample.__class__))
         assert len(all_records) == 1
         assert all_records[0] == other_singleton_sample
+
+
+def test_abstract_key():
+    """Test final record for which some of the fields are in base record."""
+
+    # TODO: Do not hardcode DB name
+    db_class = ClassInfo.get_class_path(SqliteDb)
+    with TestingContext(db_class=db_class) as context:
+
+        final_record = StubDataclassFinalRecord(id="a")
+        context.save_one(final_record)
+        final_key = final_record.get_key()
+        load_using_record = context.load_one(type(final_record), final_record)
+        load_using_key = context.load_one(type(final_record), final_key)
+        assert load_using_record is final_record  # Same object is returned without lookup
+        assert load_using_key == final_record  # Not the same object but equal
+
+        nested_record = StubDataclassNestedFinalRecord(id="b")
+        nested_record.final_key = StubDataclassFinalKey(id="c")
+        nested_record.final_record = StubDataclassFinalRecord(id="d")
+        context.save_one(nested_record)
+        nested_key = nested_record.get_key()
+        load_using_record = context.load_one(type(nested_record), nested_record)
+        load_using_key = context.load_one(type(nested_record), nested_key)
+        assert load_using_record is nested_record  # Same object is returned without lookup
+        assert load_using_key == nested_record  # Not the same object but equal
 
 
 if __name__ == "__main__":
