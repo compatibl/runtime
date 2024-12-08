@@ -99,7 +99,10 @@ class SqliteSchemaManager:
 
     def _get_type_fields(self, type_: Type) -> Dict[str, Type]:  # TODO: Consolidate this and similar code in Schema
         """Return field name and type of annotation based type declaration."""
-        return type_.__annotations__
+        annotations = {}
+        for base in reversed(type_.__mro__):
+            annotations.update(getattr(base, '__annotations__', {}))
+        return annotations
 
     # TODO (Roman): make cached but only for key types
     def get_columns_mapping(self, type_: Type) -> Dict[str, str]:
