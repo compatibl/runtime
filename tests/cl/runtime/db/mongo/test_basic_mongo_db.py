@@ -33,8 +33,8 @@ from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubHandlers
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_key import StubDataclassAbstractKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
@@ -356,8 +356,6 @@ def test_abstract_key():
         load_using_key = context.load_one(type(nested_record), nested_key)
         assert load_using_record is nested_record  # Same object is returned without lookup
         assert load_using_key == nested_record  # Not the same object but equal
-
-    pass
 
 
 if __name__ == "__main__":

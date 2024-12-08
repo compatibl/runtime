@@ -13,11 +13,14 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type, TYPE_CHECKING, Any
-
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import Type
 from cl.runtime.records.empty_mixin import EmptyMixin
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_record import StubDataclassAbstractRecord  # type: ignore
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_record import (
+    StubDataclassAbstractRecord,  # type: ignore
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
 
 KEY_TYPE = StubDataclassFinalKey if TYPE_CHECKING else EmptyMixin
@@ -36,5 +39,3 @@ class StubDataclassFinalRecord(StubDataclassAbstractRecord, RecordMixin[StubData
 
     def get_key(self) -> StubDataclassFinalKey:
         return StubDataclassFinalKey(id=self.id)
-
-

@@ -14,7 +14,9 @@
 
 from dataclasses import dataclass
 from typing import Type
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_key import StubDataclassAbstractKey  # type: ignore
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_key import (
+    StubDataclassAbstractKey,  # type: ignore
+)
 
 
 @dataclass(slots=True, kw_only=True)

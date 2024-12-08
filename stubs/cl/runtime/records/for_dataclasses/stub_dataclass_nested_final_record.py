@@ -14,7 +14,9 @@
 
 from dataclasses import dataclass
 from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_record import StubDataclassAbstractRecord  # type: ignore
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_record import (
+    StubDataclassAbstractRecord,  # type: ignore
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
 
@@ -23,13 +25,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import
 class StubDataclassNestedFinalRecord(StubDataclassRecord):
     """Some of the fields are in base record."""
 
-    final_key:  StubDataclassFinalKey = StubDataclassFinalKey()
+    final_key: StubDataclassFinalKey = StubDataclassFinalKey()
     """Final key field."""
 
     final_record: StubDataclassFinalRecord = StubDataclassFinalRecord()
     """Final record field."""
-
-
-
-
-
