@@ -23,11 +23,12 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_record imp
 )
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
 
-KEY_TYPE = StubDataclassFinalKey if TYPE_CHECKING else EmptyMixin
+_FINAL_KEY = StubDataclassFinalKey if TYPE_CHECKING else EmptyMixin
+"""Add final key type as an additional base only when type checking to avoid multiple inheritance of dataclasses."""
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassFinalRecord(StubDataclassAbstractRecord, RecordMixin[StubDataclassFinalKey], KEY_TYPE):
+class StubDataclassFinalRecord(StubDataclassAbstractRecord, _FINAL_KEY, RecordMixin[StubDataclassFinalKey]):
     """Some of the fields are in base record."""
 
     final_field: str = "abc"
