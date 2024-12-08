@@ -18,7 +18,7 @@ from dataclasses import fields
 from dataclasses import is_dataclass
 from types import NoneType
 from types import UnionType
-from typing import Any
+from typing import Any, TypeVar
 from typing import Iterable
 from typing import List
 from typing import Type
@@ -29,13 +29,17 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record
 
+TObj = TypeVar("TObj")
 
 class RecordUtil:
     """Utilities for working with records."""
 
     @classmethod
-    def init_all(cls, obj) -> None:
-        """Invoke 'init' for each class in the order from base to derived, then validate against schema."""
+    def init_all(cls, obj: TObj) -> TObj:
+        """
+        Invoke 'init' for each class in the order from base to derived, then validate against schema.
+        Return self to enable method chaining.
+        """
 
         # Keep track of which init methods in class hierarchy were already called
         invoked = set()
@@ -51,6 +55,9 @@ class RecordUtil:
 
         # Perform validation against the schema only after all init methods are called
         cls.validate(obj)
+
+        # Return argument to enable method chaining
+        return obj
 
     @classmethod
     def validate(cls, obj) -> None:

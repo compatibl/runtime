@@ -17,6 +17,9 @@ from typing import Callable
 from typing import Generic
 from typing import Type
 from typing import TypeVar
+
+from typing_extensions import Self
+
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.record_util import RecordUtil
 
@@ -36,6 +39,9 @@ class RecordMixin(Generic[TKey]):
     def get_key(self) -> TKey:
         """Return a new key object whose fields populated from self, do not return self."""
 
-    def init_all(self) -> None:
-        """Invoke 'init' for each class in the order from base to derived, then validate against schema."""
-        RecordUtil.init_all(self)
+    def init_all(self) -> Self:
+        """
+        Invoke 'init' for each class in the order from base to derived, then validate against schema.
+        Return self to enable method chaining.
+        """
+        return RecordUtil.init_all(self)
