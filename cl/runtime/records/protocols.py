@@ -96,13 +96,16 @@ def is_record(type_or_obj: Any) -> TypeGuard[RecordProtocol]:
     """Check if type or object is a key (supports RecordProtocol) based on the presence of 'get_key' attribute."""
     return hasattr(type_or_obj, "get_key")
 
-
-def is_key(type_or_obj: Any) -> TypeGuard[KeyProtocol]:
+def is_key(type_or_obj: Any) -> bool:
     """
     Check if type or object is a key (supports KeyProtocol) but not a record (does not support RecordProtocol)
     based on the presence of 'get_key_type' attribute and the absence of 'get_key' attribute.
     """
-    return hasattr(type_or_obj, "get_key_type") and not hasattr(type_or_obj, "get_key")
+    return hasattr(type_or_obj, "get_key_type") and not hasattr(type_or_obj, "get_key")  # TODO: Check if abstract
+
+def is_key_guard(type_or_obj: Any) -> TypeGuard[KeyProtocol]:
+    """Same as is_key but returns a type guard."""
+    return is_key(type_or_obj)
 
 
 def has_init(type_or_obj: Any) -> TypeGuard[InitProtocol]:
