@@ -1,0 +1,62 @@
+# Copyright (C) 2023-present The Project Contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import pytest
+from abc import ABC, abstractmethod
+from cl.runtime.records.key_util import KeyUtil
+from cl.runtime.records.method_util import MethodUtil
+from cl.runtime.schema.module_decl import ModuleDecl
+from cl.runtime.schema.type_decl import TypeDecl
+
+class AbstractClass(ABC):
+    """Sample abstract class."""
+
+    @abstractmethod
+    def instance_method(self) -> None:
+        """Abstract instance method."""
+
+    @classmethod
+    @abstractmethod
+    def class_method(cls) -> None:
+        """Abstract class method."""
+
+class FinalClass(AbstractClass):
+    """Sample final class."""
+
+    def instance_method(self) -> None:
+        """Implemented instance method."""
+
+    @classmethod
+    def class_method(cls) -> None:
+        """Implemented class method."""
+
+
+def test_is_implemented():
+    """Test MethodUtil.is_implemented."""
+
+    # Abstract type
+    assert MethodUtil.is_implemented(AbstractClass, "instance_method") == False
+    assert MethodUtil.is_implemented(AbstractClass, "class_method") == False
+
+    # Final type
+    assert MethodUtil.is_implemented(FinalClass, "instance_method") == True
+    assert MethodUtil.is_implemented(FinalClass, "class_method") == True
+
+    # Final type instance
+    assert MethodUtil.is_implemented(FinalClass(), "instance_method") == True
+    assert MethodUtil.is_implemented(FinalClass(), "class_method") == True
+
+
+if __name__ == "__main__":
+    pytest.main([__file__])
