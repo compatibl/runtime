@@ -17,9 +17,7 @@ from typing import Callable
 from typing import Generic
 from typing import Type
 from typing import TypeVar
-
 from typing_extensions import Self
-
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.record_util import RecordUtil
 

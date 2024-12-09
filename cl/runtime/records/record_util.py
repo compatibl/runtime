@@ -18,10 +18,11 @@ from dataclasses import fields
 from dataclasses import is_dataclass
 from types import NoneType
 from types import UnionType
-from typing import Any, TypeVar
+from typing import Any
 from typing import Iterable
 from typing import List
 from typing import Type
+from typing import TypeVar
 from typing import Union
 from typing import get_args
 from typing import get_origin
@@ -30,6 +31,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record
 
 TObj = TypeVar("TObj")
+
 
 class RecordUtil:
     """Utilities for working with records."""

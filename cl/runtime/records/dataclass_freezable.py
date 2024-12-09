@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 
 
 @dataclass(slots=True, kw_only=True)
@@ -31,10 +32,10 @@ class DataclassFreezable(ABC):
 
     def freeze(self) -> None:
         """Freeze the record so its fields can no longer be modified. Once frozen, the record cannot be unfrozen."""
-        object.__setattr__(self, '_DataclassFreezable__frozen', True)
+        object.__setattr__(self, "_DataclassFreezable__frozen", True)
 
     def __setattr__(self, key, value):
         """Override to check if the record is frozen."""
-        if getattr(self, '_DataclassFreezable__frozen', False):
+        if getattr(self, "_DataclassFreezable__frozen", False):
             raise AttributeError(f"Cannot modify field {type(self).__name__}.{key} because the record is frozen.")
         object.__setattr__(self, key, value)

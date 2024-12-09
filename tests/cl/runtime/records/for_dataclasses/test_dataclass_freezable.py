@@ -35,5 +35,6 @@ def test_dataclass_freezable():
     with pytest.raises(AttributeError):
         record.value = "xyz"
 
+
 if __name__ == "__main__":
     pytest.main([__file__])

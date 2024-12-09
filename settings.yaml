@@ -7,8 +7,8 @@ default:
 
   # Documented in ContextSettings class
   runtime_context_packages:
-      - cl.runtime
-      - stubs.cl.runtime
+    - cl.runtime
+    - stubs.cl.runtime
   runtime_context_db_class: cl.runtime.db.sql.sqlite_db.SqliteDb
 
   # Documented in ApiSettings class

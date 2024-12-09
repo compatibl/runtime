@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from typing import List
 from typing_extensions import Self
+from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.settings.settings import Settings
 
 
@@ -25,13 +26,13 @@ class ContextSettings(Settings):
     context_id: str | None = None
     """Context identifier, if not specified a time-ordered UUID will be used."""
 
-    packages: List[str]
+    packages: List[str] = missing()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
     log_class: str = "cl.runtime.log.file.file_log.FileLog"  # TODO: Deprecated, switch to class-specific fields
     """Default log class in module.ClassName format."""
 
-    db_class: str  # TODO: Deprecated, switch to class-specific fields
+    db_class: str = missing()  # TODO: Deprecated, switch to class-specific fields
     """Default database class in module.ClassName format."""
 
     db_temp_prefix: str = "temp;"
