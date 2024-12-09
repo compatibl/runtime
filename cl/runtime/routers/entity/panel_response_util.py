@@ -57,7 +57,7 @@ class PanelResponseUtil(BaseModel):
 
         # Deserialize key from string to object
         serializer = StringSerializer()
-        key_obj = serializer.deserialize_key(data=request.key, type_=type_.get_key_type())
+        key_obj = serializer.deserialize_key(request.key, type_.get_key_type())
 
         # Get database from the current context
         db = Context.current().db

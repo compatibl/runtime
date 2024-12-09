@@ -22,12 +22,8 @@ from cl.runtime.file.reader import Reader
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.char_util import CharUtil
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.schema.element_decl import ElementDecl
 from cl.runtime.schema.schema import Schema
-from cl.runtime.serialization.dict_serializer import get_type_dict
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
-from cl.runtime.serialization.string_serializer import StringSerializer
-from cl.runtime.serialization.string_value_parser_enum import StringValueParser
 
 serializer = FlatDictSerializer()
 

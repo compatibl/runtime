@@ -128,6 +128,26 @@ def _get_class_hierarchy_annotations(data_type) -> Dict[str, Type]:
         return hierarchy_annots
 
 
+def handle_optional_annot(type_):
+    """Extract inner type if 'type_' is Optional[...], otherwise return unchanged."""
+
+    if type_ is None:
+        return None
+
+    # Check if type_ is a UnionType or Union and process if only one argument is not None.
+    if (type_.__class__ is UnionType or getattr(type_, "__origin__", None) is Union) and (
+        union_args := getattr(type_, "__args__", None)
+    ):
+        not_none_union_args: List[int] = [arg for arg in union_args if arg is not type(None)]
+        if len(not_none_union_args) == 1:
+            return not_none_union_args[0]
+        else:
+            raise RuntimeError(f"Can not process Union: {type_}.")
+
+    # Return type_ if it is not Union
+    return type_
+
+
 # TODO: Add checks for to_node, from_node implementation for custom override of default serializer
 @dataclass(slots=True, kw_only=True)
 class DictSerializer:
@@ -223,26 +243,6 @@ class DictSerializer:
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    @classmethod
-    def _handle_optional_annot(cls, type_):
-        """Extract inner type if 'type_' is Optional[...], otherwise return unchanged."""
-
-        if type_ is None:
-            return None
-
-        # Check if type_ is a UnionType or Union and process if only one argument is not None.
-        if (type_.__class__ is UnionType or getattr(type_, "__origin__", None) is Union) and (
-            union_args := getattr(type_, "__args__", None)
-        ):
-            not_none_union_args: List[int] = [arg for arg in union_args if arg is not type(None)]
-            if len(not_none_union_args) == 1:
-                return not_none_union_args[0]
-            else:
-                raise RuntimeError(f"Can not process Union: {type_}.")
-
-        # Return type_ if it is not Union
-        return type_
-
     def deserialize_data(
         self, data: TDataField, type_: Type[T] | None = None
     ):  # TODO: Check if None should be supported
@@ -254,7 +254,7 @@ class DictSerializer:
         """
 
         # Extract inner type if type_ is Optional[...]
-        type_ = self._handle_optional_annot(type_)
+        type_ = handle_optional_annot(type_)
 
         if isinstance(data, dict):
             # Determine if the dictionary is a serialized dataclass or a dictionary

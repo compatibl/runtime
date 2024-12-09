@@ -16,20 +16,19 @@ import base64
 import datetime as dt
 from enum import Enum
 from typing import Any
-from typing import Dict
-from typing import Iterator
-from typing import List
+from typing import Generator
+from typing import Tuple
 from typing import Type
+from typing import get_type_hints
 from uuid import UUID
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.schema.schema import Schema
+from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import is_key
 
 # TODO (Roman): remove dependency from dict_serializer
-from cl.runtime.serialization.dict_serializer import DictSerializer
+from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
 from cl.runtime.serialization.dict_serializer import alias_dict
 from cl.runtime.serialization.dict_serializer import get_type_dict
-from cl.runtime.serialization.string_value_parser_enum import StringValueCustomTypeEnum
-from cl.runtime.serialization.string_value_parser_enum import StringValueParser
 
 primitive_type_names = ["NoneType", "str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"]
 """Detect primitive type by checking if class name is in this list."""
@@ -40,6 +39,69 @@ class StringSerializer:
     """Serialize key to string, flattening hierarchical structure."""
 
     @classmethod
+    def serialize_primitive(cls, value: TPrimitive) -> str | None:
+        """Serialize primitive type to string."""
+        if value is None:
+            return None
+        elif value.__class__.__name__ == "str":
+            return value
+        elif value.__class__.__name__ in ("date", "datetime", "time"):
+            # Serialize date types to iso string
+            return value.isoformat()
+        elif value.__class__.__name__ in ("UUID", "int", "float"):
+            # Serialize UUID to string
+            return str(value)
+        elif value.__class__.__name__ == "bytes":
+            # Decode bytes to base64 string
+            return base64.b64encode(value).decode()
+        elif value.__class__.__name__ == "bool":
+            # Serialize bool to Y/N char
+            return "Y" if value else "N"
+        else:
+            raise RuntimeError(f"Value of type {value.__class__} is not primitive.")
+
+    @classmethod
+    def deserialize_primitive(cls, str_value: str, type_: Type) -> TPrimitive:
+        """Deserialize string to primitive type."""
+        if str_value is None:
+            return None
+        elif type_.__name__ == "str":
+            return str_value
+        # TODO (Roman): Remove check for Any when no longer supported.
+        elif type_ is None or type_.__name__ == "str" or type_ is Any:
+            # Return unchanged if declared type is string
+            return str_value
+        elif type_.__name__ == "datetime":
+            # Deserialize datetime from iso string
+            return dt.datetime.fromisoformat(str_value)
+        elif type_.__name__ == "date":
+            # Deserialize date from iso string
+            return dt.date.fromisoformat(str_value)
+        elif type_.__name__ == "time":
+            # Deserialize time from iso string
+            return dt.time.fromisoformat(str_value)
+        elif type_.__name__ == "bool":
+            # Deserialize bool from string
+            if (bool_value := True if str_value == "Y" else False if str_value == "N" else None) is not None:
+                return bool_value
+            else:
+                raise RuntimeError(f"Serialized boolean field has value {str_value} but only Y/N and 1/0 are allowed.")
+        elif type_.__name__ == "UUID":
+            # Create UUID from string
+            return UUID(str_value)
+        elif type_.__name__ == "bytes":
+            # Encode base64 string to bytes
+            return base64.b64decode(str_value.encode())
+        elif type_.__name__ == "int":
+            # Support string value for declared as int
+            return int(str_value)
+        elif type_.__name__ == "float":
+            # Support string value for declared as float
+            return float(str_value)
+        else:
+            raise RuntimeError(f"Type '{type_}' is not primitive.")
+
+    @classmethod
     def _serialize_key_token(cls, data) -> str:
         """Serialize key field to string token."""
 
@@ -47,61 +109,21 @@ class StringSerializer:
             # TODO (Roman): make different None and empty string
             return ""
 
-        if isinstance(data, str):
-            return data
-
-        value_custom_type = StringValueParser.get_custom_type(data)
-
-        if value_custom_type in [
-            StringValueCustomTypeEnum.DATA,
-            StringValueCustomTypeEnum.DICT,
-            StringValueCustomTypeEnum.LIST,
-        ]:
-            raise ValueError(f"Value {str(data)} of type {type(data)} is not supported in key.")
-
-        if value_custom_type in [
-            StringValueCustomTypeEnum.DATE,
-            StringValueCustomTypeEnum.DATETIME,
-            StringValueCustomTypeEnum.TIME,
-        ]:
-            result = data.isoformat()
-        elif value_custom_type == StringValueCustomTypeEnum.ENUM:
+        if isinstance(data, Enum):
             # Get enum short name and cache to type_dict
             short_name = alias_dict[type_] if (type_ := type(data)) in alias_dict else type_.__name__
             type_dict = get_type_dict()
             type_dict[short_name] = type_
 
-            result = f"{short_name}.{data.name}"
-        elif value_custom_type == StringValueCustomTypeEnum.UUID:
-            result = str(data)
-        elif value_custom_type == StringValueCustomTypeEnum.BYTES:
-            result = base64.b64encode(data).decode()
+            return f"{short_name}.{data.name}"
         else:
-            result = str(data)
-
-        return StringValueParser.add_type_prefix(result, value_custom_type)
+            return cls.serialize_primitive(data)
 
     @classmethod
-    def _deserialize_key_token(cls, data: str, custom_type: StringValueCustomTypeEnum | None) -> Any:
-        """Deserialize key string token of custom type."""
-
-        if custom_type is None:
-            return data if data != "" else None
-
-        if custom_type == StringValueCustomTypeEnum.DATE:
-            return dt.date.fromisoformat(data)
-        elif custom_type == StringValueCustomTypeEnum.DATETIME:
-            return dt.datetime.fromisoformat(data)
-        elif custom_type == StringValueCustomTypeEnum.TIME:
-            return dt.time.fromisoformat(data)
-        elif custom_type == StringValueCustomTypeEnum.BOOL:
-            return DictSerializer._deserialize_primitive(data, "bool")
-        elif custom_type == StringValueCustomTypeEnum.INT:
-            return int(data)
-        elif custom_type == StringValueCustomTypeEnum.FLOAT:
-            return float(data)
-        elif custom_type == StringValueCustomTypeEnum.ENUM:
-            enum_type, enum_value = data.split(".")
+    def _deserialize_key_token(cls, token: str, slot_type: Type):
+        """Deserialize single key token in str format."""
+        if issubclass(slot_type, Enum):
+            enum_type, enum_value = token.split(".")
             type_dict = get_type_dict()
             deserialized_type = type_dict.get(enum_type, None)  # noqa
             if deserialized_type is None:
@@ -112,111 +134,67 @@ class StringSerializer:
 
             # Get enum value
             return deserialized_type[enum_value]  # noqa
-        elif custom_type == StringValueCustomTypeEnum.UUID:
-            return UUID(data)
-        elif custom_type == StringValueCustomTypeEnum.BYTES:
-            return base64.b64decode(data.encode())
+        elif (primitive := cls.deserialize_primitive(token, slot_type)) is not None:
+            return primitive
         else:
-            return data
+            raise RuntimeError(f"Unsupported key field type: {slot_type}.")
 
-    def serialize_key(self, data, add_type_prefix: bool = False):
+    @classmethod
+    def _iter_key_slots(cls, key: KeyProtocol) -> Generator[Tuple[KeyProtocol, str, Type], None, None]:
+        """
+        Iterate over key slots including slots of embedded keys.
+        If slot type is key - create embedded key object and yield its slots.
+        """
+
+        key_slots = _get_class_hierarchy_slots(key.__class__)
+        key_hints = get_type_hints(key.__class__)
+
+        for slot in key_slots:
+            slot_type = key_hints.get(slot)
+
+            if slot_type is not None and is_key(slot_type):
+                # Create nested key object
+                nested_key = slot_type()
+                setattr(key, slot, nested_key)
+                yield from cls._iter_key_slots(nested_key)
+            else:
+                yield key, slot, slot_type
+
+    def serialize_key(self, data):
         """Serialize key to string, flattening for composite keys."""
 
         key_slots = data.get_key_type().__slots__
         result = ";".join(
             (
-                self._serialize_key_token(v)  # TODO: Apply rules depending on the specific primitive type
+                self._serialize_key_token(v)
                 if (v := getattr(data, k)).__class__.__name__ in primitive_type_names or isinstance(v, Enum)
-                else self.serialize_key(v, add_type_prefix=True)
+                else self.serialize_key(v)
             )
             for k in key_slots
         )
 
-        if add_type_prefix:
-            key_short_name = alias_dict[type_] if (type_ := data.get_key_type()) in alias_dict else type_.__name__
-
-            # TODO (Roman): consider to have separated cache dict for key types
-            type_dict = get_type_dict()
-            type_dict[key_short_name] = type_
-            type_token = StringValueParser.add_type_prefix(key_short_name, StringValueCustomTypeEnum.KEY)
-            result = f"{type_token};{result}"
-
         return result
 
-    # TODO (Roman): add errors with description for invalid keys
-    def _fill_key_slots(self, tokens_iterator: Iterator[str], type_: Type | None = None) -> Any:
-        """
-        Sequentially fill slots of key type_ with values from iterator. If type_ is None try to determine type from
-        tokens. Values should be in specific format and will be deserialized. Function is recursive for embedded keys.
+    def deserialize_key(self, key_as_str: str, key_type: Type[KeyProtocol]):
+        """Deserialize ';' delimited key string."""
 
-        Embedded keys are defined by separated tokens in a specific format that contain the type of the embedded key.
-        Other tokens contain serialized field values.
+        key_tokens = key_as_str.split(";")
+        key_obj = key_type()
 
-        Example:
-            KeyType.__slots__ = ("int_field", "str_field", "embedded_key_field", "other_str_field")
-            EmbeddedKeyType.__slots__ = ("int_field", "str_field")
+        slots_iterator = iter(self._iter_key_slots(key_obj))
+        for token in key_tokens:
+            obj, slot, slot_type = next(slots_iterator)
 
-            tokens = ("::#key#KeyType", "::#int#1", "str1", "::#key#EmbeddedKeyType", "::#int#2", "str2", "str3")
-
-            Result:
-                KeyType(
-                    int_field = 1,
-                    str_field = "str1",
-                    EmbeddedKeyType(
-                        int_field = 2,
-                        str_field = "str2"
-                    ),
-                    other_str_field = "str3"
+            if (
+                slot_type is not None
+                and slot_type.__name__ not in primitive_type_names
+                and not issubclass(slot_type, Enum)
+            ):
+                raise RuntimeError(
+                    f"Unsupported key field type '{slot_type}' in class '{obj.__class__}' for field '{slot}'"
                 )
-        """
 
-        # Contains slot values
-        slot_values: Dict[str, Any] = {}
+            slot_value = self._deserialize_key_token(token, slot_type)
+            setattr(obj, slot, slot_value)
 
-        # Init slots iterator if type_ is specified
-        slots_iterator = iter(type_.__slots__) if type_ else None
-
-        # Reserve first slot from slots iterator
-        slot = next(slots_iterator) if slots_iterator else None
-
-        # Iterate over tokens using tokens iterator
-        while token := next(tokens_iterator, None):
-            # Parse token to value and custom type
-            token, token_type = StringValueParser.parse(token)
-
-            # If token is key get type and fill embedded key slots recursively using the same iterator instance
-            if token_type == StringValueCustomTypeEnum.KEY:
-                # TODO (Roman): verify proper way to get type in serialization.
-                current_type = Schema.get_type_by_short_name(token)
-
-                if current_type is None:
-                    raise RuntimeError(
-                        f"Class not found for name or alias '{token}' during key deserialization. "
-                        f"Ensure all serialized classes are included in package import settings."
-                    )
-
-                key = self._fill_key_slots(tokens_iterator, current_type)
-
-                # slots_iterator == None means the root key object, so return it, otherwise assign the associated slot
-                if slots_iterator is None:
-                    return key
-                else:
-                    slot_values[slot] = key
-            else:
-                # Deserialize token and assign the associated slot
-                slot_values[slot] = self._deserialize_key_token(token, token_type)
-
-            # Reserve next slot for next token
-            slot = next(slots_iterator, None)
-
-            # If the slots are over - break.
-            if slot is None:
-                break
-
-        # Construct final key object
-        return type_(**slot_values)
-
-    def deserialize_key(self, data: str, type_: Type | None = None) -> KeyProtocol:
-        """Deserialize key object from string representation."""
-
-        return self._fill_key_slots(iter(data.split(";")), type_)
+        return key_obj

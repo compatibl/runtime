@@ -28,6 +28,7 @@ from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.dict_serializer import T
 from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
+from cl.runtime.serialization.dict_serializer import handle_optional_annot
 from cl.runtime.serialization.string_serializer import StringSerializer
 
 key_serializer = StringSerializer()
@@ -136,12 +137,8 @@ class UiDictSerializer(DictSerializer):
         # Serialize record to ui format using table_slots
         table_dict: Dict[str, Any] = self.serialize_data(table_record)
 
-        # Replace "_type" with "_t"
-        if "_type" in table_dict:
-            table_dict["_t"] = record.__class__.__name__
-            del table_dict["_type"]
-
-        # Add "_key"
+        # Add "_t" and "_key" attributes
+        table_dict["_t"] = record.__class__.__name__
         table_dict["_key"] = key_serializer.serialize_key(record.get_key())
 
         return table_dict
@@ -168,7 +165,7 @@ class UiDictSerializer(DictSerializer):
             raise RuntimeError("UI serialization format only supports pascalize_keys=True mode.")
 
         # Extract inner type if type_ is Optional[...]
-        type_ = self._handle_optional_annot(type_)
+        type_ = handle_optional_annot(type_)
 
         if isinstance(data, dict):
             # Copying data to ensure input dictionary is immutable
