@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from typing_extensions import Self
 from contextvars import ContextVar
 from dataclasses import dataclass
 from typing import Dict
@@ -122,7 +123,7 @@ class Context(ContextKey, RecordMixin[ContextKey]):
         return ContextKey(context_id=self.context_id)
 
     @classmethod
-    def current(cls):
+    def current(cls) -> Self:
         """Return the current context or None if not set."""
 
         # Get context stack for the current asynchronous environment
