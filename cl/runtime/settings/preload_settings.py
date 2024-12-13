@@ -14,7 +14,7 @@
 
 import os
 from dataclasses import dataclass
-from typing import List
+from typing import List, Type
 from typing_extensions import Self
 from cl.runtime.configs.config import Config
 from cl.runtime.context.context import Context
@@ -50,20 +50,29 @@ class PreloadSettings(Settings):
     def get_prefix(cls) -> str:
         return "runtime_preload"
 
-    def save_and_configure(self) -> None:
+    def save_and_configure(self, *, final_record_types: List[Type] | None = None) -> None:
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
 
         # Get current context
         context = Context.current()
 
-        # Process CSV preloads
+        # Create a list of CSV preloads
         csv_files = self._get_files("csv")
+        if final_record_types is not None:
+            # Limit to the specified types
+            record_class_names = [record_type.__name__ for record_type in final_record_types]
+            csv_files = [
+                csv_file for csv_file in csv_files
+                if os.path.basename(csv_file).split(".")[0] in record_class_names
+            ]
+
+        # Preload from CSV
         [CsvFileReader(file_path=csv_file).read_and_save() for csv_file in csv_files]
 
         # TODO: Process YAML and JSON preloads
 
         # Execute run_config on all preloaded Config records
-        config_records = Context.current().load_all(Config)
+        config_records = context.load_all(Config)
         tuple(config_record.run_configure() for config_record in config_records)
 
     def _get_files(self, ext: str) -> List[str]:
