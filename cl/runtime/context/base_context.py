@@ -13,19 +13,29 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+import threading
 from abc import ABC
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Type, Dict
+
+import asyncio
 from typing_extensions import Self
 from cl.runtime.records.dataclass_freezable import DataclassFreezable
 from cl.runtime.records.record_util import RecordUtil
 
-_STACK_VAR: ContextVar[List[BaseContext] | None] = ContextVar("_STACK_VAR", default=None)
+_CONTEXT_STACK_VAR: ContextVar[List[BaseContext] | None] = ContextVar("_CONTEXT_STACK_VAR", default=None)
 """
 Context adds self to the stack on __enter__ and removes self on __exit__.
 Each asynchronous environment has its own stack.
 """
+
+_ROOT_CONTEXT_DICT: Dict[Type, BaseContext] = {}
+"""Dictionary of root contexts by final type."""
+
+_ROOT_CONTEXT_DICT_LOCK = threading.Lock()
+"""Thread lock for the dictionary of root contexts by final type."""
 
 
 @dataclass(slots=True, kw_only=True)
@@ -55,7 +65,7 @@ class BaseContext(DataclassFreezable, ABC):
         
         # Inherit settings from the previous context in stack if present.
         # Each asynchronous environment has its own context stack.
-        context_stack = _STACK_VAR.get()
+        context_stack = _CONTEXT_STACK_VAR.get()
         current_context = context_stack[-1] if context_stack else None
         if current_context is not None:
             # The fields variable will contain public fields for the final class and its bases
@@ -79,17 +89,23 @@ class BaseContext(DataclassFreezable, ABC):
     
     @classmethod
     def current(cls) -> Self:
-        """Return the current context or None if not set."""
+        """Return the current context, or if does not exist create from settings if allow_root is True."""
 
         # Get context stack for the current asynchronous environment
-        context_stack = _STACK_VAR.get()
+        context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack and len(context_stack) > 0:
             return context_stack[-1]
         else:
-            raise RuntimeError(
-                f"Current {cls.__name__} can only be accessed inside 'with {cls.__name__}(...)' clause.\n"
-                f"Note that the outermost 'with' clause must use {cls.__name__}(allow_root=True, ...) which\n"
-                f"will permit creating the root context for the current asynchronous environment from settings.")
+            # Use root context created from settings
+            result = _ROOT_CONTEXT_DICT.get(cls, None)
+            if result is None:
+                # Create subject to another check for None in case another thread has already created it
+                created_context = cls(allow_root=True)
+                RecordUtil.init_all(created_context)
+                with _ROOT_CONTEXT_DICT_LOCK:
+                    # If another thread already created it, the existing value will be returned
+                    result = _ROOT_CONTEXT_DICT.setdefault(cls, created_context)
+            return result
 
     def __enter__(self):
         """Supports 'with' operator for resource disposal."""
@@ -101,12 +117,12 @@ class BaseContext(DataclassFreezable, ABC):
         self.freeze()
 
         # Get context stack for the current asynchronous environment
-        context_stack = _STACK_VAR.get()
+        context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack is None:
             # Context stack not found, assign new root context only if allow_root=True
             if self.allow_root:
                 context_stack = []
-                _STACK_VAR.set(context_stack)
+                _CONTEXT_STACK_VAR.set(context_stack)
             else:
                 raise RuntimeError(
                     f"The outermost 'with' clause must use {type(self).__name__}(allow_root=True, ...) which\n"
@@ -124,7 +140,7 @@ class BaseContext(DataclassFreezable, ABC):
         """Supports 'with' operator for resource disposal."""
 
         # Get context stack for the current asynchronous environment
-        context_stack = _STACK_VAR.get()
+        context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack is None or len(context_stack) == 0:
             class_name = {type(self).__name__}
             raise RuntimeError(f"Current {class_name} must not be cleared explicitly, this occurs automatically\n"
