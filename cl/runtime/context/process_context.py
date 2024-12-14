@@ -40,7 +40,9 @@ class ProcessContext(Context):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
-        # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
+        # Do not execute this code on frozen or deserialized context instances
+        #   - If the instance is frozen, init_all has already been executed
+        #   - If the instance is deserialized, init_all has been executed before serialization
         if not self.is_frozen() and not self.is_deserialized:
             # Confirm we are not inside a test, error otherwise
             if Settings.is_inside_test:
@@ -57,23 +59,29 @@ class ProcessContext(Context):
             else:
                 self.context_id = Settings.process_timestamp
 
-            # Set user
-            # TODO: Set in based on auth for enterprise cloud deployments
-            # TODO: Use LastName, FirstName format for enterprise if possible
-            self.user = UserKey(username=getuser())
+            # Set user from OS if not specified directly
+            if self.user is None:
+                # TODO: Set in based on auth for enterprise cloud deployments
+                # TODO: Use LastName, FirstName format for enterprise if possible
+                self.user = UserKey(username=getuser())
 
-            # Create the log class specified in settings
-            log_type = ClassInfo.get_class_type(context_settings.log_class)
-            self.log = log_type(log_id=self.context_id)
+            # Use log from settings if not specified directly
+            if self.log is None:
+                # Create the log class specified in settings
+                log_type = ClassInfo.get_class_type(context_settings.log_class)
+                self.log = log_type(log_id=self.context_id)
 
-            # Create the database class specified in settings
-            db_type = ClassInfo.get_class_type(context_settings.db_class)
+            # Use database class from settings if not specified directly
+            if self.db is None:
+                # Create the database class specified in settings
+                db_type = ClassInfo.get_class_type(context_settings.db_class)
 
-            # Use context_id as db_id
-            self.db = db_type(db_id=self.context_id)
+                # Use context_id as db_id unless specified directly
+                self.db = db_type(db_id=self.context_id)
 
-            # Root dataset
-            self.dataset = DatasetUtil.root()
+            # Use root dataset if not specified directly
+            if self.dataset is None:
+                self.dataset = DatasetUtil.root()
 
             # Set fields to their values in ContextSettings
             if self.experiment is None:

@@ -37,6 +37,9 @@ from cl.runtime.serialization.string_serializer import StringSerializer
 invalid_db_name_symbols = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
 
+invalid_db_name_symbols_msg = r'<space>/\."$*<>:|?'
+"""Invalid MongoDB database name symbols (for the error message)."""
+
 invalid_db_name_regex = re.compile(f"[{invalid_db_name_symbols}]")
 """Precompiled regex to check for invalid MongoDB database name symbols."""
 
@@ -352,7 +355,7 @@ class BasicMongoDb(Db):
         if invalid_db_name_regex.search(db_id):
             raise RuntimeError(
                 f"MongoDB db_id='{db_id}' is not valid because it contains "
-                f"special characters from this list: {invalid_db_name_symbols}"
+                f"special characters from this list: '{invalid_db_name_symbols_msg}'"
             )
 
         # Check for maximum byte length of less than 64 (use Unicode bytes, not string chars to count)

@@ -46,10 +46,10 @@ class Context(BaseContext):
     log: LogKey = missing()
     """Log of the context, 'Context.current().log' is used if not specified."""
 
-    db: DbKey = missing()
+    db: DbKey | None = None
     """Database of the context, 'Context.current().db' is used if not specified."""
 
-    dataset: str = missing()
+    dataset: str | None = None
     """Dataset of the context, 'Context.current().dataset' is used if not specified."""
 
     secrets: Dict[str, str] | None = None

@@ -48,7 +48,9 @@ class BaseContext(DataclassFreezable, ABC):
     def init(self) -> Self:
         """Initialize fields that are not set with values from the current context."""
 
-        # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
+        # Do not execute this code on frozen or deserialized context instances
+        #   - If the instance is frozen, init_all has already been executed
+        #   - If the instance is deserialized, init_all has been executed before serialization
         if not self.is_frozen() and not self.is_deserialized:
 
             # Inherit settings from the previous context in stack if present.

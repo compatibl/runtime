@@ -40,7 +40,7 @@ class TestingContext(Context):
         - This module not itself import pytest or unittest package
     """
 
-    db_class: str | None = None
+    db_class: str | None = None  # TODO: Find another way to override to avoid duplication with db field
     """Override for the database class in module.ClassName format."""
 
     def __post_init__(self):
@@ -50,7 +50,9 @@ class TestingContext(Context):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
-        # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
+        # Do not execute this code on frozen or deserialized context instances
+        #   - If the instance is frozen, init_all has already been executed
+        #   - If the instance is deserialized, init_all has been executed before serialization
         if not self.is_frozen() and not self.is_deserialized:
             # Confirm we are inside a test, error otherwise
             if not Settings.is_inside_test:
@@ -66,28 +68,34 @@ class TestingContext(Context):
             if self.context_id is None:
                 self.context_id = env_name
 
-            # Set user to env name for unit testing
-            self.user = UserKey(username=env_name)
+            # Set user from OS if not specified directly
+            if self.user is None:
+                # Set user to env name for unit testing
+                self.user = UserKey(username=env_name)
 
-            # TODO: Set log field here explicitly instead of relying on implicit detection of test environment
-            log_type = ClassInfo.get_class_type(context_settings.log_class)
-            self.log = log_type(log_id=self.context_id)
+            # Use log from settings if not specified directly
+            if self.log is None:
+                # TODO: Set log field here explicitly instead of relying on implicit detection of test environment
+                log_type = ClassInfo.get_class_type(context_settings.log_class)
+                self.log = log_type(log_id=self.context_id)
 
-            # Use database class from settings unless this class provides an override
-            if self.db_class is not None:
-                db_class = self.db_class
-            else:
-                db_class = context_settings.db_class
+            # Use database class from settings if not specified directly
+            if self.db is None:
+                if self.db_class is not None:
+                    db_class = self.db_class
+                else:
+                    db_class = context_settings.db_class
 
-            # Use 'temp' followed by context_id converted to semicolon-delimited format for db_id
-            db_id = "temp;" + self.context_id.replace(".", ";")
+                # Use 'temp' followed by context_id converted to semicolon-delimited format for db_id
+                db_id = "temp;" + self.context_id.replace(".", ";")
 
-            # Instantiate a new database object for every test
-            db_type = ClassInfo.get_class_type(db_class)
-            self.db = db_type(db_id=db_id)
+                # Instantiate a new database object for every test
+                db_type = ClassInfo.get_class_type(db_class)
+                self.db = db_type(db_id=db_id)
 
-            # Root dataset
-            self.dataset = DatasetUtil.root()
+            # Use root dataset if not specified directly
+            if self.dataset is None:
+                self.dataset = DatasetUtil.root()
 
             # Set fields to their values in ContextSettings
             if self.experiment is None:
@@ -109,8 +117,8 @@ class TestingContext(Context):
         # Call '__enter__' method of base first
         Context.__enter__(self)
 
-        # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
-        if not self.is_frozen() and not self.is_deserialized:
+        # Execute on root instances only if they are not deserialized (e.g. not the instances passed to a task queue)
+        if self.db is not None and self.is_root and not self.is_deserialized:
             # Delete all existing data in temp database and drop DB in case it was not cleaned up
             # due to abnormal termination of the previous test run
             self.db.delete_all_and_drop_db()  # noqa
@@ -120,8 +128,8 @@ class TestingContext(Context):
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Supports 'with' operator for resource disposal."""
 
-        # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
-        if not self.is_frozen() and not self.is_deserialized:
+        # Execute on root instances only if they are not deserialized (e.g. not the instances passed to a task queue)
+        if self.db is not None and self.is_root and not self.is_deserialized:
             # Delete all data in temp database and drop DB to clean up
             self.db.delete_all_and_drop_db()  # noqa
 

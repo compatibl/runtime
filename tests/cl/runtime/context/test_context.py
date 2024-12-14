@@ -42,6 +42,10 @@ def _perform_testing(
         max_sleep_duration: float = MAX_SLEEP_DURATION,
 ):
     """Use for testing in-process or in multiple threads."""
+    
+    # Use a temporary TestingContext without custom contex_id to get db for the subsequent named contexts
+    with TestingContext() as temp_context:
+        db = temp_context.db
 
     # Task label
     task_label = f"async task {task_index}{'.inner' if is_inner else ''}"
@@ -62,7 +66,7 @@ def _perform_testing(
                                f"{context_id}")
 
     context_id_1 = f"Context A for {task_label}"
-    with TestingContext(context_id=context_id_1) as context_a:
+    with TestingContext(context_id=context_id_1, db=db) as context_a:
         print(f"Inside {task_label}: Enter Context A")
 
         # Sleep between entering 'with' clause and calling 'current'
@@ -81,7 +85,7 @@ def _perform_testing(
         assert Context.current() is context_a
 
         context_id_2 = f"Context B for {task_label}"
-        with Context(context_id=context_id_2) as context_b:
+        with Context(context_id=context_id_2, db=db) as context_b:
             print(f"Inside {task_label}: Enter Context B")
 
             # Sleep between entering 'with' clause and calling 'current'
@@ -129,6 +133,10 @@ async def _perform_testing_async(
         max_sleep_duration: float = MAX_SLEEP_DURATION,
 ):
     """Use for testing in async loop."""
+
+    # Use a temporary TestingContext without custom contex_id to get db for the subsequent named contexts
+    with TestingContext() as temp_context:
+        db = temp_context.db
     
     # Task label
     task_label = f"async task {task_index}{'.inner' if is_inner else ''}"
@@ -149,7 +157,7 @@ async def _perform_testing_async(
                                f"{context_id}")
 
     context_id_1 = f"Context A for {task_label}"
-    with TestingContext(context_id=context_id_1) as context_a:
+    with TestingContext(context_id=context_id_1, db=db) as context_a:
         print(f"Inside {task_label}: Enter Context A")
 
         # Sleep between entering 'with' clause and calling 'current'
@@ -168,7 +176,7 @@ async def _perform_testing_async(
         assert Context.current() is context_a
 
         context_id_2 = f"Context B for {task_label}"
-        with Context(context_id=context_id_2) as context_b:
+        with Context(context_id=context_id_2, db=db) as context_b:
             print(f"Inside {task_label}: Enter Context B")
 
             # Sleep between entering 'with' clause and calling 'current'
