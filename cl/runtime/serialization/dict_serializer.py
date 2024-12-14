@@ -297,7 +297,7 @@ class DictSerializer:
                         )
                     )
                     for k, v in data.items()
-                    if k != "_type"
+                    if k != "_type" and not k.startswith("_")
                 }
                 result = deserialized_type(**deserialized_fields)  # noqa
 
