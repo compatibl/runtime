@@ -96,16 +96,11 @@ class BaseContext(DataclassFreezable, ABC):
         if context_stack and len(context_stack) > 0:
             return context_stack[-1]
         else:
-            # Use root context created from settings
-            result = _ROOT_CONTEXT_DICT.get(cls, None)
-            if result is None:
-                # Create subject to another check for None in case another thread has already created it
-                created_context = cls(allow_root=True)
-                RecordUtil.init_all(created_context)
-                with _ROOT_CONTEXT_DICT_LOCK:
-                    # If another thread already created it, the existing value will be returned
-                    result = _ROOT_CONTEXT_DICT.setdefault(cls, created_context)
-            return result
+            raise RuntimeError(
+                f"A 'with {cls.__name__}(...)' clause has either:\n"
+                f"  - Not been invoked before calling the {cls.__name__}.current() method, or\n"
+                f"  - Has been invoked in a different asynchronous environment (i.e., in a different thread or\n"
+                f"    before entering an async function) than the {cls.__name__}.current() method.\n")
 
     def __enter__(self):
         """Supports 'with' operator for resource disposal."""
@@ -143,15 +138,20 @@ class BaseContext(DataclassFreezable, ABC):
         context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack is None or len(context_stack) == 0:
             class_name = {type(self).__name__}
-            raise RuntimeError(f"Current {class_name} must not be cleared explicitly, this occurs automatically\n"
-                               f"on exit from 'with {class_name}(...)' clause.")
+            raise RuntimeError(
+                f"A 'with {class_name.__name__}(...)' clause has been invoked in a different asynchronous\n"
+                f"environment (i.e., in a different thread or before entering an async function)\n"
+                f"than the environment where the exit from this clause had occurred.\n")
 
         # Restore the previous current context on exiting from 'with Context(...)' clause
         current_context = context_stack.pop()
         if current_context is not self:
             class_name = {type(self).__name__}
-            raise RuntimeError(f"Current context must be modified by entering into a new "
-                               f"'with {class_name}(...)' clause and not in any other way.")
+            raise RuntimeError(
+                f"Current context has been modified other than by entering into a\n"
+                f"'with {class_name}(...)' clause in the same asynchronous\n"
+                f"environment (i.e., the same thread and async function) as\n"
+                f"the environment where the exit from this clause had occurred.\n")
 
         # Return False to propagate exception to the caller
         return False
