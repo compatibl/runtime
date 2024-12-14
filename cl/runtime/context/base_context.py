@@ -42,37 +42,48 @@ class BaseContext(DataclassFreezable, ABC):
     is_root: bool = False
     """True when the context is used in the outermost 'with' clause."""
 
+    is_deserialized: bool = False
+    """Use this flag to determine if this context instance has been deserialized from data."""
+
     def init(self) -> Self:
         """Initialize fields that are not set with values from the current context."""
-        
-        # Inherit settings from the previous context in stack if present.
-        # Each asynchronous environment has its own context stack.
-        context_stack = _CONTEXT_STACK_VAR.get()
-        parent_context = context_stack[-1] if context_stack else None
-        if parent_context is None:
-            if self.is_root:
-                if _DEFAULT_CONTEXT is not None and self is not _DEFAULT_CONTEXT:
-                    # Do not set from parent context when initializing the default context
-                    parent_context = _DEFAULT_CONTEXT
-            else:
-                class_name = type(self).__name__
-                raise RuntimeError(
-                    f"To run {class_name}.init_all() outside of 'with' clause, use {class_name}(is_root=True, ...)\n"
-                    f"If this error occurs inside a 'with' clause, this indicates the 'with' clause has been\n"
-                    f"invoked in a different asynchronous environment (i.e., in a different thread or before\n"
-                    f"entering an async function) than the current call to {class_name}.init_all().\n")
 
-        if parent_context:
-            # The fields variable will contain public fields for the final class and its bases
-            fields = [field for field in self.__dataclass_fields__.keys() if not field.startswith("_")]
-            # Set empty fields to the values from the current context if it is set
-            for field in fields:
-                if getattr(self, field) is None:
-                    if (current_value := getattr(parent_context, field, None)) is not None:
-                        setattr(self, field, current_value)
+        # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
+        if not self.is_frozen() and not self.is_deserialized:
+
+            # Inherit settings from the previous context in stack if present.
+            # Each asynchronous environment has its own context stack.
+            context_stack = _CONTEXT_STACK_VAR.get()
+            parent_context = context_stack[-1] if context_stack else None
+            if parent_context is None:
+                if self.is_root:
+                    if _DEFAULT_CONTEXT is not None and self is not _DEFAULT_CONTEXT:
+                        # Do not set from parent context when initializing the default context
+                        parent_context = _DEFAULT_CONTEXT
+                else:
+                    class_name = type(self).__name__
+                    raise RuntimeError(
+                        f"To run {class_name}.init_all() outside of 'with', use {class_name}(is_root=True, ...)\n"
+                        f"If this error occurs inside a 'with' clause, this indicates the 'with' clause has been\n"
+                        f"invoked in a different asynchronous environment (i.e., in a different thread or before\n"
+                        f"entering an async function) than the current call to {class_name}.init_all().\n")
+
+            if parent_context:
+                # The fields variable will contain public fields for the final class and its bases
+                fields = [field for field in self.__dataclass_fields__.keys() if not field.startswith("_")]
+                # Set empty fields to the values from the current context if it is set
+                for field in fields:
+                    if getattr(self, field, None) is None:
+                        if (current_value := getattr(parent_context, field, None)) is not None:
+                            setattr(self, field, current_value)
 
         # Return self to enable method chaining
         return self
+
+    @classmethod
+    def clear(cls) -> None:
+        """Clear the context stack for the current asynchronous environment, calling 'current' after this will raise."""
+        _CONTEXT_STACK_VAR.set(None)
 
     @classmethod
     def current(cls) -> Self:

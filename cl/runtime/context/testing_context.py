@@ -13,6 +13,10 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import final
+
+from typing_extensions import Self
+
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
 from cl.runtime.context.env_util import EnvUtil
@@ -25,6 +29,7 @@ from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.settings import Settings
 
 
+@final
 @dataclass(slots=True, kw_only=True)
 class TestingContext(Context):
     """
@@ -39,10 +44,14 @@ class TestingContext(Context):
     """Override for the database class in module.ClassName format."""
 
     def __post_init__(self):
-        """Configure fields that were not specified in constructor."""
+        """Set is_root=True before running init_all."""
+        self.is_root = True
+
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
         # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
-        if not self.is_deserialized:
+        if not self.is_frozen() and not self.is_deserialized:
             # Confirm we are inside a test, error otherwise
             if not Settings.is_inside_test:
                 raise RuntimeError(f"TestingContext created outside a test.")
@@ -88,6 +97,12 @@ class TestingContext(Context):
                 if StringUtil.is_not_empty(trial_id := ContextSettings.instance().trial):
                     self.trial = TrialKey(trial_id=trial_id)
 
+        # Freeze to prevent further modifications (ok to call even if already frozen)
+        self.freeze()
+
+        # Return self to enable method chaining
+        return self
+
     def __enter__(self):
         """Supports 'with' operator for resource disposal."""
 
@@ -95,7 +110,7 @@ class TestingContext(Context):
         Context.__enter__(self)
 
         # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
-        if not self.is_deserialized:
+        if not self.is_frozen() and not self.is_deserialized:
             # Delete all existing data in temp database and drop DB in case it was not cleaned up
             # due to abnormal termination of the previous test run
             self.db.delete_all_and_drop_db()  # noqa
@@ -106,7 +121,7 @@ class TestingContext(Context):
         """Supports 'with' operator for resource disposal."""
 
         # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
-        if not self.is_deserialized:
+        if not self.is_frozen() and not self.is_deserialized:
             # Delete all data in temp database and drop DB to clean up
             self.db.delete_all_and_drop_db()  # noqa
 

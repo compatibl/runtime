@@ -14,6 +14,8 @@
 
 from dataclasses import dataclass
 from getpass import getuser
+from typing import final
+from typing_extensions import Self
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
@@ -26,15 +28,20 @@ from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.settings import Settings
 
 
+@final
 @dataclass(slots=True, kw_only=True)
 class ProcessContext(Context):
     """Context for a standalone process."""
 
     def __post_init__(self):
-        """Configure context."""
+        """Set is_root=True before running init_all."""
+        self.is_root = True
+
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
         # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
-        if not self.is_deserialized:
+        if not self.is_frozen() and not self.is_deserialized:
             # Confirm we are not inside a test, error otherwise
             if Settings.is_inside_test:
                 raise RuntimeError(
@@ -75,3 +82,9 @@ class ProcessContext(Context):
             if self.trial is None:
                 if StringUtil.is_not_empty(trial_id := ContextSettings.instance().trial):
                     self.trial = TrialKey(trial_id=trial_id)
+
+        # Freeze to prevent further modifications (ok to call even if already frozen)
+        # TODO!!!!! self.freeze()
+
+        # Return self to enable method chaining
+        return self
