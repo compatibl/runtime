@@ -13,17 +13,13 @@
 # limitations under the License.
 
 from __future__ import annotations
-
 import threading
 from abc import ABC
 from contextvars import ContextVar
-from dataclasses import dataclass, field
-from typing import List, Type, Dict
-
-import asyncio
+from dataclasses import dataclass
+from typing import List
 from typing_extensions import Self
 from cl.runtime.records.dataclass_freezable import DataclassFreezable
-from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.record_util import RecordUtil
 
 _CONTEXT_STACK_VAR: ContextVar[List[BaseContext] | None] = ContextVar("_CONTEXT_STACK_VAR", default=None)
@@ -32,11 +28,11 @@ Context adds self to the stack on __enter__ and removes self on __exit__.
 Each asynchronous environment has its own stack.
 """
 
-_ROOT_CONTEXT_DICT: Dict[Type, BaseContext] = {}
-"""Dictionary of root contexts by final type."""
+_DEFAULT_CONTEXT: BaseContext | None = None
+"""Default context is created based on settings."""
 
-_ROOT_CONTEXT_DICT_LOCK = threading.Lock()
-"""Thread lock for the dictionary of root contexts by final type."""
+_DEFAULT_CONTEXT_LOCK = threading.Lock()
+"""Thread lock for the default context."""
 
 
 @dataclass(slots=True, kw_only=True)
@@ -55,10 +51,9 @@ class BaseContext(DataclassFreezable, ABC):
         parent_context = context_stack[-1] if context_stack else None
         if parent_context is None:
             if self.is_root:
-                default_context = _ROOT_CONTEXT_DICT.get(type(self), None)
-                if default_context is not None and self is not default_context:
+                if _DEFAULT_CONTEXT is not None and self is not _DEFAULT_CONTEXT:
                     # Do not set from parent context when initializing the default context
-                    parent_context = default_context
+                    parent_context = _DEFAULT_CONTEXT
             else:
                 class_name = type(self).__name__
                 raise RuntimeError(
@@ -163,14 +158,14 @@ class BaseContext(DataclassFreezable, ABC):
             To use the context set using 'with' clause, use the 'current' method instead.
         """
 
-        # Check if root context already exists
-        result = _ROOT_CONTEXT_DICT.get(cls, None)
-        if result is None:
+        # Check if default context already exists
+        global _DEFAULT_CONTEXT
+        if _DEFAULT_CONTEXT is None:
             created_context = cls(is_root=True)
             RecordUtil.init_all(created_context)
-            with _ROOT_CONTEXT_DICT_LOCK:
+            with _DEFAULT_CONTEXT_LOCK:
                 # If another thread created the root context it after the initial check above
                 # but before the following line, the existing value will be returned.
                 # Otherwise, the created value will be added to the dict and returned.
-                result = _ROOT_CONTEXT_DICT.setdefault(cls, created_context)
-        return result
+                _DEFAULT_CONTEXT = created_context
+        return _DEFAULT_CONTEXT
