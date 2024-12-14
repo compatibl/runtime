@@ -23,6 +23,7 @@ from typing import List, Type, Dict
 import asyncio
 from typing_extensions import Self
 from cl.runtime.records.dataclass_freezable import DataclassFreezable
+from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.record_util import RecordUtil
 
 _CONTEXT_STACK_VAR: ContextVar[List[BaseContext] | None] = ContextVar("_CONTEXT_STACK_VAR", default=None)
@@ -42,23 +43,8 @@ _ROOT_CONTEXT_DICT_LOCK = threading.Lock()
 class BaseContext(DataclassFreezable, ABC):
     """Context extensions add features that are serialized with the context for out-of-process execution."""
 
-    allow_root: bool = False
-    """
-    Creating the root context for the current asynchronous environment from settings 
-    is permitted only when this field is True.
-    
-    Notes:
-        - This field should be True only when there are no outer 'with' clauses, for example inside
-          an async FastAPI route method or at the start of a unit test. 
-        - In all other cases it should have the default value of False so the new context instance inherits
-          its settings from the previous current context (i.e., the last context in stack for the current
-          asynchronous environment).
-        - Each asynchronous environment (the combination of thread and even loop within the thread)
-          has its own context stack.
-    """
-
-    _is_root: bool = field(init=False, default=False)
-    """Indicates that self is root context of the current asynchronous environment."""
+    is_root: bool = False
+    """True when the context is used in the outermost 'with' clause."""
 
     def init(self) -> Self:
         """Initialize fields that are not set with values from the current context."""
@@ -66,30 +52,36 @@ class BaseContext(DataclassFreezable, ABC):
         # Inherit settings from the previous context in stack if present.
         # Each asynchronous environment has its own context stack.
         context_stack = _CONTEXT_STACK_VAR.get()
-        current_context = context_stack[-1] if context_stack else None
-        if current_context is not None:
+        parent_context = context_stack[-1] if context_stack else None
+        if parent_context is None:
+            if self.is_root:
+                default_context = _ROOT_CONTEXT_DICT.get(type(self), None)
+                if default_context is not None and self is not default_context:
+                    # Do not set from parent context when initializing the default context
+                    parent_context = default_context
+            else:
+                class_name = type(self).__name__
+                raise RuntimeError(
+                    f"To run {class_name}.init_all() outside of 'with' clause, use {class_name}(is_root=True, ...)\n"
+                    f"If this error occurs inside a 'with' clause, this indicates the 'with' clause has been\n"
+                    f"invoked in a different asynchronous environment (i.e., in a different thread or before\n"
+                    f"entering an async function) than the current call to {class_name}.init_all().\n")
+
+        if parent_context:
             # The fields variable will contain public fields for the final class and its bases
             fields = [field for field in self.__dataclass_fields__.keys() if not field.startswith("_")]
             # Set empty fields to the values from the current context if it is set
             for field in fields:
                 if getattr(self, field) is None:
-                    if (current_value := getattr(current_context, field, None)) is not None:
+                    if (current_value := getattr(parent_context, field, None)) is not None:
                         setattr(self, field, current_value)
-        elif self.allow_root:
-            # Set flag indicating self is root context for the current asynchronous environment
-            self._is_root = True
-        else:
-            class_name = type(self).__name__
-            raise RuntimeError(f"Outside 'with {class_name}(...)' clause, a new {class_name} can only be created\n"
-                               f"if allow_root=True is set. This flag permits creating the root context in the\n"
-                               f"current asynchronous environment from settings.")
 
         # Return self to enable method chaining
         return self
-    
+
     @classmethod
     def current(cls) -> Self:
-        """Return the current context, or if does not exist create from settings if allow_root is True."""
+        """Return the current context, or if does not exist create from settings if is_root is True."""
 
         # Get context stack for the current asynchronous environment
         context_stack = _CONTEXT_STACK_VAR.get()
@@ -114,14 +106,19 @@ class BaseContext(DataclassFreezable, ABC):
         # Get context stack for the current asynchronous environment
         context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack is None:
-            # Context stack not found, assign new root context only if allow_root=True
-            if self.allow_root:
-                context_stack = []
-                _CONTEXT_STACK_VAR.set(context_stack)
-            else:
-                raise RuntimeError(
-                    f"The outermost 'with' clause must use {type(self).__name__}(allow_root=True, ...) which\n"
-                    f"will permit creating the root context for the current asynchronous environment from settings.")
+            if context_stack is None:
+                # Context stack not found, assign new root context only if allow_root=True
+                if self.is_root:
+                    context_stack = []
+                    _CONTEXT_STACK_VAR.set(context_stack)
+                else:
+                    class_name = type(self).__name__
+                    raise RuntimeError(
+                        f"The outermost 'with' clause in each asynchronous environment (thread and async method)\n"
+                        f"must set is_root flag to True: 'with {class_name}(is_root=True, ...)'\n"
+                        f"If this error occurred inside a 'with' clause, this indicates it has been invoked\n"
+                        f"in a different asynchronous environment (i.e., in a different thread or before\n"
+                        f"entering an async function) than this clause.\n")
 
         # Check if self is already the current context
         if context_stack and context_stack[-1] is self:
@@ -155,3 +152,25 @@ class BaseContext(DataclassFreezable, ABC):
 
         # Return False to propagate exception to the caller
         return False
+
+    @classmethod
+    def _default(cls) -> Self:
+        """
+        Return the default context, or create if it does not exist.
+
+        Notes:
+            The 'with' clause does not change the root context which is based solely on settings.
+            To use the context set using 'with' clause, use the 'current' method instead.
+        """
+
+        # Check if root context already exists
+        result = _ROOT_CONTEXT_DICT.get(cls, None)
+        if result is None:
+            created_context = cls(is_root=True)
+            RecordUtil.init_all(created_context)
+            with _ROOT_CONTEXT_DICT_LOCK:
+                # If another thread created the root context it after the initial check above
+                # but before the following line, the existing value will be returned.
+                # Otherwise, the created value will be added to the dict and returned.
+                result = _ROOT_CONTEXT_DICT.setdefault(cls, created_context)
+        return result
