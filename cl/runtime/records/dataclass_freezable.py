@@ -20,22 +20,26 @@ from dataclasses import field
 @dataclass(slots=True, kw_only=True)
 class DataclassFreezable(ABC):
     """
-    Derive from this class to add the ability to freeze the record from further modifications of its fields.
-    Once frozen, the record cannot be unfrozen.
+    Derive from this class to add the ability to freeze the instance from further modifications of its fields.
+    Once frozen, the instance cannot be unfrozen.
     """
 
     __frozen: bool = field(default=False, init=False)
     """
-    Indicates the record is frozen so its fields can no longer be modified.
-    Once frozen, the record cannot be unfrozen.
+    Indicates the instance is frozen so its fields can no longer be modified.
+    Once frozen, the instance cannot be unfrozen.
     """
 
+    def is_frozen(self) -> bool:
+        """Check if the instance is frozen."""
+        return self.__frozen
+
     def freeze(self) -> None:
-        """Freeze the record so its fields can no longer be modified. Once frozen, the record cannot be unfrozen."""
+        """Freeze the instance so its fields can no longer be modified. Once frozen, the instance cannot be unfrozen."""
         object.__setattr__(self, "_DataclassFreezable__frozen", True)
 
     def __setattr__(self, key, value):
-        """Override to check if the record is frozen."""
+        """Override to check if the instance is frozen."""
         if getattr(self, "_DataclassFreezable__frozen", False):
             raise AttributeError(f"Cannot modify field {type(self).__name__}.{key} because the record is frozen.")
         object.__setattr__(self, key, value)
