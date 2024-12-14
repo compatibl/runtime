@@ -22,7 +22,6 @@ from typing import List
 from typing import Optional
 from typing import Type
 from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.context.context_key import ContextKey
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
@@ -31,12 +30,10 @@ from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.log.log_message import LogMessage
-from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.settings.context_settings import ContextSettings
 
 root_context_types_str = """
@@ -53,8 +50,11 @@ Each asynchronous context has its own stack.
 
 
 @dataclass(slots=True, kw_only=True)
-class Context(ContextKey, RecordMixin[ContextKey]):
+class Context:
     """Protocol implemented by context objects providing logging, database, dataset, and progress reporting."""
+
+    context_id: str = missing()
+    """Unique context identifier."""
 
     user: UserKey = missing()
     """Current user, 'Context.current().user' is used if not specified."""
@@ -118,9 +118,6 @@ class Context(ContextKey, RecordMixin[ContextKey]):
         # After this all remaining fields can be loaded using database from this context
         if is_key(self.log):
             self.log = self.load_one(LogKey, self.log)
-
-    def get_key(self) -> ContextKey:
-        return ContextKey(context_id=self.context_id)
 
     @classmethod
     def current(cls) -> Self:
