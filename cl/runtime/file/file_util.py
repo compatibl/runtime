@@ -37,7 +37,7 @@ class FileUtil:
         if invalid_filename_regex.search(filename):
             raise RuntimeError(
                 f"Filename '{filename}' is not valid because it contains special characters "
-                f"from this list: {invalid_filename_symbols}"
+                f"from this list: '{invalid_filename_symbols}'"
             )
 
     @classmethod
@@ -46,7 +46,7 @@ class FileUtil:
         if invalid_path_regex.search(path):
             raise RuntimeError(
                 f"Directory or file path '{path}' is not valid because it contains special characters "
-                f"from this list: {invalid_path_symbols}"
+                f"from this list: '{invalid_path_symbols}'"
             )
 
     @classmethod
