@@ -66,7 +66,7 @@ def _perform_testing(
         default_context = StubBaseExtensionContext._default()  # noqa
         assert Context.current().extension(StubBaseExtensionContext) is default_context
         assert Context.current().extension(StubDerivedExtensionContext) is default_context
-        assert default_context.base_field == "default"
+        assert default_context.base_field == "abc"
 
 async def _perform_testing_async(
     *,
@@ -96,7 +96,7 @@ async def _perform_testing_async(
         default_context = StubBaseExtensionContext._default()  # noqa
         assert Context.current().extension(StubBaseExtensionContext) is default_context
         assert Context.current().extension(StubDerivedExtensionContext) is default_context
-        assert default_context.base_field == "default"
+        assert default_context.base_field == "abc"
 
 
 async def _gather(rnd: Random):

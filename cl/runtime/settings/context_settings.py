@@ -44,9 +44,6 @@ class ContextSettings(Settings):
     db_uri: str | None = None
     """Optional database URI to connect to the database. Required for basic mongo db data source."""
 
-    experiment: str | None = None
-    """String identifier of the running experiment."""
-
     trial: str | None = None
     """String identifier of the running trial."""
 

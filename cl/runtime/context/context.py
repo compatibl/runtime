@@ -55,9 +55,6 @@ class Context(BaseContext):
     secrets: Dict[str, str] | None = None
     """Context-specific secrets take precedence over those defined via Dynaconf."""
 
-    experiment: ExperimentKey | None = None
-    """Key of the running experiment."""
-
     trial: TrialKey | None = None
     """Key of the running trial."""
 

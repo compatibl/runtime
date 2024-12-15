@@ -97,7 +97,7 @@ class BaseContext(DataclassFreezable, ABC):
             # Check for extensions in specified in constructor of the current context
             if self.extensions:
                 # Check for duplicate extension types in the current context
-                extension_types = [e.get_extension_category() for e in self.extensions]
+                extension_types = [e.get_base_type() for e in self.extensions]
                 ExtensionContext.check_duplicate_types(extension_types, "extensions in the current context")
                 # Initialize extensions in the current context
                 [RecordUtil.init_all(x) for x in self.extensions]
@@ -108,14 +108,14 @@ class BaseContext(DataclassFreezable, ABC):
             # extensions that are present in the current context are omitted from the parent contexts
             if parent_context and parent_context.extensions:
                 # Check for duplicate extension types in the parent context
-                parent_extension_types = [e.get_extension_category() for e in parent_context.extensions]
+                parent_extension_types = [e.get_base_type() for e in parent_context.extensions]
                 ExtensionContext.check_duplicate_types(parent_extension_types, "extensions in the parent context")
                 # Combine with parent
                 if self.extensions:
                     # Both are present, combine preserving order from base to derived
                     # except base extensions that are present in derived are omitted
                     self.extensions = [
-                        x for x in parent_context.extensions if x.get_extension_category() not in extension_types
+                        x for x in parent_context.extensions if x.get_base_type() not in extension_types
                     ] + self.extensions
                 else:
                     # Only parent extensions are present, deep copy
@@ -152,7 +152,7 @@ class BaseContext(DataclassFreezable, ABC):
 
     def extension(self, extension_type: Type[TExtensionContext]) -> TExtensionContext:
         """
-        Return extension context for the category returned by extension_type.get_extension_category(...) method.
+        Return extension context for the category returned by extension_type.get_base_type(...) method.
 
         Notes:
             - If not found in this Context instance, it will search the Context stack in reverse order of creation
@@ -163,7 +163,7 @@ class BaseContext(DataclassFreezable, ABC):
         if result is not None:
             # If found, check that it is an instance of 'extension_type'
             if not isinstance(result, extension_type):
-                category_str = extension_type.get_extension_category().__name__
+                category_str = extension_type.get_base_type().__name__
                 found_type_str = type(result).__name__
                 expected_type_str = extension_type.__name__
                 raise RuntimeError(

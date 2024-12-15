@@ -83,10 +83,6 @@ class ProcessContext(Context):
             if self.dataset is None:
                 self.dataset = DatasetUtil.root()
 
-            # Set fields to their values in ContextSettings
-            if self.experiment is None:
-                if StringUtil.is_not_empty(experiment_id := ContextSettings.instance().experiment):
-                    self.experiment = ExperimentKey(experiment_id=experiment_id)
             if self.trial is None:
                 if StringUtil.is_not_empty(trial_id := ContextSettings.instance().trial):
                     self.trial = TrialKey(trial_id=trial_id)

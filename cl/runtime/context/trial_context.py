@@ -18,23 +18,24 @@ from typing import Type
 from typing_extensions import Self
 
 from cl.runtime.context.extension_context import ExtensionContext
+from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.dataclasses_extensions import missing
 
 
 @dataclass(slots=True, kw_only=True)
-class StubBaseExtensionContext(ExtensionContext):
-    """Base extension context."""
+class TrialContext(ExtensionContext):
+    """Context for a single trial in an experiment."""
 
-    base_field: str = "abc"
-    """Field of the base class."""
+    trial: TrialKey = missing()
+    """Trial key specified by this context."""
     
     @classmethod
     def get_base_type(cls) -> Type:
         """Return base class of this extension category even if called from a derived class, do not use 'return cls'."""
-        return StubBaseExtensionContext
+        return TrialContext
 
     @classmethod
     def create_default(cls) -> Self:
         """Create default extension instance, this method will be called for the class returned by 'get_base_type'."""
-        return StubBaseExtensionContext()
-
+        raise RuntimeError(
+            "TrialContext does not have a default, specify using 'with Context(extensions=[TrialContext(...)])'.")
