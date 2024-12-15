@@ -145,8 +145,8 @@ class BaseContext(DataclassFreezable, ABC):
 
     def extension(self, extension_type: Type[TContextExtension]) -> TContextExtension:
         """Return the Extension instance of the specified type, error message if not found."""
-        # Find the first context extension of the specified type (only one should be present)
-        result = next((x for x in self.extensions if isinstance(x, extension_type)), None)
+        # Find the first context extension of the specified type (only one should be present, None if not found)
+        result = next((x for x in self.extensions if isinstance(x, extension_type)), None) if self.extensions else None
         if result is None:
             # Return the default extension for this type if not found in self.extensions
             result = extension_type._default()  # noqa
