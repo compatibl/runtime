@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, Dict
 from typing import Optional
 from typing import Tuple
 from typing import Union
@@ -24,8 +24,15 @@ from matplotlib.image import AxesImage
 class MatplotlibUtil:
     """Utilities for plots created using Matplotlib."""
 
-    @staticmethod
-    def heatmap(data: np.ndarray, row_labels: List[str], col_labels: List[str], ax=None, **kwargs):
+    @classmethod
+    def heatmap(
+        cls,
+        data: np.ndarray,
+        row_labels: List[str],
+        col_labels: List[str],
+        ax=None,
+        **kwargs,
+    ):  # TODO: Review the use of kwargs
         """
         Create a heatmap from a numpy array and two lists of labels.
 
@@ -70,13 +77,14 @@ class MatplotlibUtil:
 
         return im
 
-    @staticmethod
+    @classmethod
     def annotate_heatmap(
+        cls,
         im: AxesImage,
         labels: List[List[str]],
         textcolors: Union[str, Tuple[str]] = ("black", "white"),
         threshold: Optional[float] = None,
-        **textkw,
+        **textkw, # TODO: Review the use of kwargs
     ):
         """
         A function to annotate a heatmap.
@@ -126,3 +134,19 @@ class MatplotlibUtil:
                 texts.append(text)
 
         return texts
+
+    @classmethod
+    def no_metadata(cls) -> Dict[str, str]:
+        """Return empty metadata for Matplotlib to prevent version changes from creating test diffs."""
+        return {
+            'Title': '',
+            'Author': '',
+            'Description': '',
+            'Copyright': '',
+            'CreationTime': '',
+            'Software': '',
+            'Disclaimer': '',
+            'Warning': '',
+            'Source': '',
+            'Comment': ''
+        }

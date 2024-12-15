@@ -21,6 +21,7 @@ from cl.runtime import Context
 from cl.runtime import View
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.plots.plot import Plot
 from cl.runtime.views.png_view import PngView
 
@@ -45,7 +46,7 @@ class MatplotlibPlot(Plot):
 
         # Save to bytes
         png_buffer = io.BytesIO()
-        fig.savefig(png_buffer, format="png", transparent=transparent)
+        fig.savefig(png_buffer, format="png", transparent=transparent, metadata=MatplotlibUtil.no_metadata())
 
         # Get the PNG image bytes and wrap in PngView
         png_bytes = png_buffer.getvalue()
@@ -73,7 +74,7 @@ class MatplotlibPlot(Plot):
 
         # Save
         file_path = os.path.join(base_dir, f"{self.plot_id}.png")
-        fig.savefig(file_path, transparent=transparent)
+        fig.savefig(file_path, transparent=transparent, metadata=MatplotlibUtil.no_metadata())
 
     def _get_pyplot_theme(self) -> str:
         """Get value to be set as matplotlib.pyplot theme."""
