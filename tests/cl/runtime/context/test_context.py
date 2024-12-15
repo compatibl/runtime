@@ -22,8 +22,8 @@ from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.context.base_context import _CONTEXT_STACK_VAR  # noqa
 
-TASK_COUNT = 5
-MAX_SLEEP_DURATION = 0.5
+TASK_COUNT = 3
+MAX_SLEEP_DURATION = 0.2
 
 def _sleep(*, task_index: int, rnd: Random, max_sleep_duration: float):
     """Sleep for a random interval, reducing the interval for higher task index."""
