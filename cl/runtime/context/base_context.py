@@ -111,6 +111,8 @@ class BaseContext(DataclassFreezable, ABC):
                 # Check for duplicate extension types in the current context
                 extension_types = [type(e) for e in self.extensions]
                 ContextExtension.check_duplicate_types(extension_types, "extensions in the current context")
+                # Initialize extensions in the current context
+                [RecordUtil.init_all(x) for x in self.extensions]
             if parent_context and parent_context.extensions:
                 # Check for duplicate extension types in the parent context
                 parent_extension_types = [type(e) for e in parent_context.extensions]
