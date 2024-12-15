@@ -12,28 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations
 from dataclasses import dataclass
 from dataclasses import field
-from typing import ClassVar
 from typing import Dict
 from typing import Iterable
 from typing import Type
 from typing import cast
 from typing_extensions import Self
-from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TQuery
 from cl.runtime.serialization.string_serializer import StringSerializer
 
 key_serializer = StringSerializer()
 """Serializer for keys used in cache lookup."""
 
-_local_cache_instance: LocalCache | None = None
+_local_cache_instance = None
 """Singleton instance is created on first access."""
 
 
