@@ -97,23 +97,26 @@ class BaseContext(DataclassFreezable, ABC):
                     if getattr(self, field, None) is None:
                         if (current_value := getattr(parent_context, field, None)) is not None:
                             setattr(self, field, current_value)
-                # Combine extensions with the parent type preserving order from base to derived,
-                # except for the extensions that are present in the current context are omitted
-                # from the parent contexts
+
+            # Combine extensions with the parent type preserving order from base to derived,
+            # except for the extensions that are present in the current context are omitted
+            # from the parent contexts
+            if self.extensions:
+                # Check for duplicate extension types in the current context
+                extension_types = [type(e) for e in self.extensions]
+                ContextExtension.check_duplicate_types(extension_types, "extensions in the current context")
+            if parent_context and parent_context.extensions:
+                # Check for duplicate extension types in the parent context
+                parent_extension_types = [type(e) for e in parent_context.extensions]
+                ContextExtension.check_duplicate_types(parent_extension_types, "extensions in the parent context")
+                # Combine with parent
                 if self.extensions:
-                    extension_types = [type(e) for e in self.extensions]
-                    ContextExtension.check_duplicate_types(
-                        extension_types, "extensions in the current context")
-                    if parent_context.extensions:
-                        parent_extension_types = [type(e) for e in parent_context.extensions]
-                        ContextExtension.check_duplicate_types(
-                            parent_extension_types, "extensions in the parent context")
-                        self.extensions = list(
-                            dict.fromkeys(
-                                [x for x in parent_context.extensions if type(x) not in extension_types] +
-                                self.extensions
-                            )
-                        )
+                    # Both are present, combine preserving order from base to derived
+                    # except base extensions that are present in derived are omitted
+                    self.extensions = [x for x in parent_context.extensions if type(x) not in extension_types] + self.extensions
+                else:
+                    # Only parent extensions are present, deep copy
+                    self.extensions = list(parent_context.extensions)
 
         # Return self to enable method chaining
         return self

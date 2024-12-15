@@ -53,7 +53,8 @@ class ContextExtension(DataclassFreezable):
         # Fast check to see if there are duplicates
         if len(set(types)) < len(types):
             # Only if found, slower search for duplicates
-            duplicate_types = [t for t in types if types.count(t) > 1]
+            duplicate_types = set(t for t in types if types.count(t) > 1)
             if duplicate_types:
                 duplicate_type_names = "\n".join(t.__name__ for t in duplicate_types)
-                raise ValueError(f"Duplicate context extension type(s) found in {where_msg}:\n{duplicate_type_names}\n")
+                raise RuntimeError(f"Duplicate context extension type(s) found in {where_msg}:\n"
+                                   f"{duplicate_type_names}\n")

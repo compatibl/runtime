@@ -38,7 +38,8 @@ async def _sleep_async(*, task_index: int, rnd: Random, max_sleep_duration: floa
 def _perform_testing(
         *,
         task_index: int,
-        rnd: Random, is_inner: bool = False,
+        rnd: Random,
+        is_inner: bool = False,
         max_sleep_duration: float = MAX_SLEEP_DURATION,
 ):
     """Use for testing in-process or in multiple threads."""
@@ -129,7 +130,8 @@ def _perform_testing(
 async def _perform_testing_async(
         *,
         task_index: int,
-        rnd: Random, is_inner: bool = False,
+        rnd: Random,
+        is_inner: bool = False,
         max_sleep_duration: float = MAX_SLEEP_DURATION,
 ):
     """Use for testing in async loop."""
