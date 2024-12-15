@@ -124,16 +124,16 @@ if __name__ == "__main__":
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
         PreloadSettings.instance().save_and_configure()
 
-        # Find wwwroot directory, error if not found
-        wwwroot_dir = ProjectSettings.get_wwwroot()
+    # Find wwwroot directory, error if not found
+    wwwroot_dir = ProjectSettings.get_wwwroot()
 
-        # Mount static client files
-        server_app.mount("/", StaticFiles(directory=wwwroot_dir, html=True))
+    # Mount static client files
+    server_app.mount("/", StaticFiles(directory=wwwroot_dir, html=True))
 
-        # Open new browser tab in the default browser using http protocol.
-        # It will switch to https if cert is present.
-        webbrowser.open_new_tab(f"http://{api_settings.hostname}:{api_settings.port}")
+    # Open new browser tab in the default browser using http protocol.
+    # It will switch to https if cert is present.
+    webbrowser.open_new_tab(f"http://{api_settings.hostname}:{api_settings.port}")
 
-        # Run Uvicorn using hostname and port specified by Dynaconf
-        api_settings = ApiSettings.instance()
-        uvicorn.run(server_app, host=api_settings.hostname, port=api_settings.port)
+    # Run Uvicorn using hostname and port specified by Dynaconf
+    api_settings = ApiSettings.instance()
+    uvicorn.run(server_app, host=api_settings.hostname, port=api_settings.port)

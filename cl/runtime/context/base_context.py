@@ -15,7 +15,7 @@
 from __future__ import annotations
 import threading
 from abc import ABC
-from contextvars import ContextVar
+from contextvars import ContextVar, Token
 from dataclasses import dataclass
 from typing import List
 from typing_extensions import Self
@@ -83,9 +83,14 @@ class BaseContext(DataclassFreezable, ABC):
         return self
 
     @classmethod
-    def clear(cls) -> None:
-        """Clear the context stack for the current asynchronous environment, calling 'current' after this will raise."""
-        _CONTEXT_STACK_VAR.set(None)
+    def reset_before(cls) -> Token:
+        """Set context stack to None before async method execution, return a token for its previous state."""
+        return _CONTEXT_STACK_VAR.set(None)
+
+    @classmethod
+    def reset_after(cls, token: Token) -> None:
+        """Restore context stack to the previous state after async method execution."""
+        _CONTEXT_STACK_VAR.reset(token)
 
     @classmethod
     def current(cls) -> Self:

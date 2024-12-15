@@ -250,14 +250,17 @@ def test_in_threads():
 def test_in_async_loop():
     """Test in different async environments."""
 
-    # Clear the context in case it was not cleared on exit from the previous test
-    Context.clear()
+    # Save previous state of context stack before async method execution
+    state_before = Context.reset_before()
+    try:
+        # Create a local random instance with seed
+        rnd = Random(0)
 
-    # Create a local random instance with seed
-    rnd = Random(0)
-
-    # Run using cooperative multitasking (asyncio)
-    asyncio.run(_gather(rnd))
+        # Run using cooperative multitasking (asyncio)
+        asyncio.run(_gather(rnd))
+    finally:
+        # Restore previous state of context stack after async method execution even if an exception occurred
+        Context.reset_after(state_before)
 
 
 if __name__ == "__main__":

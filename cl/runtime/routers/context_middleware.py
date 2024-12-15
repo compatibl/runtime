@@ -14,61 +14,37 @@
 
 import asyncio
 import contextvars
+import random
+
 from starlette.requests import Request
 from starlette.types import ASGIApp
-from cl.runtime.context.context import context_stack_var
+from cl.runtime import Context
 from cl.runtime.context.process_context import ProcessContext
 
 
 class ContextMiddleware:
-    """
-    Middleware to create an isolated context environment for API calls.
-
-    - Create an isolated contextvars.Context as a copy of the current contextvars context.
-    - Create an isolated runtime context stack.
-    - Execute with the request-specific runtime Context.
-    """
+    """Middleware to wrap ProcessContext around the implementation."""
 
     def __init__(self, app: ASGIApp):
         self.app = app
 
     async def __call__(self, scope, receive, send) -> None:
-        if scope["type"] not in ("http", "websocket"):
-            await self.app(scope, receive, send)
-            return
-
-        # Copy contextvars.Context
-        ctx = contextvars.copy_context()
-
-        def init_context_stack():
-            """Create isolated runtime contex stack as copy of current context stack."""
-
-            # Get the current context stack value
-            current_context_stack = context_stack_var.get()
-
-            # Create a copy if the current context stack is not None
-            new_context_stack = None if current_context_stack is None else [x for x in current_context_stack]
-
-            # Set the copy as the new stack for the current asynchronous environment
-            context_stack_var.set(new_context_stack)
-
-        # Replace current context stack with a copy to avoid sharing the same context stack across requests
-        ctx.run(init_context_stack)
-
-        def call_in_event_loop():
-            """A non-coroutine that we will run with contextvars.Context.run"""
-
-            async def app_with_context():
-                # Create a starlette request
-                request = Request(scope, receive)
-
-                # Create context with user-defined secrets
-                secrets = {k: v for k, v in request.headers.items()}
-                with ProcessContext(secrets=secrets):
+        if scope["type"] in ("http", "websocket"):
+            # TODO: Create a test setting to enable this other than by uncommenting
+            # duration = random.uniform(0, 10)
+            # print(f"Before request processing: {duration}")
+            # Save previous state of context stack before async method execution
+            state_before = Context.reset_before()
+            try:
+                with ProcessContext():
+                    # TODO: Create a test setting to enable this other than by uncommenting
+                    # await asyncio.sleep(duration)
                     await self.app(scope, receive, send)
-
-            loop = asyncio.get_running_loop()
-            return loop.create_task(app_with_context())
-
-        # Execute request in isolated contextvars.Context
-        await ctx.run(call_in_event_loop)
+            finally:
+                # Restore previous state of context stack after async method execution even if an exception occurred
+                Context.reset_after(state_before)
+            # TODO: Create a test setting to enable this other than by uncommenting
+            # print(f"After request processing: {duration}")
+        else:
+            # If it's not an http or websocket request, pass it through unchanged
+            await self.app(scope, receive, send)
