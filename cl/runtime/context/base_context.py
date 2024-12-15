@@ -12,38 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations
 import threading
 from abc import ABC
 from contextvars import ContextVar, Token
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+from typing import List, Type, TypeVar
 from typing_extensions import Self
+
+from cl.runtime.context.context_extension import ContextExtension
 from cl.runtime.records.dataclass_freezable import DataclassFreezable
 from cl.runtime.records.record_util import RecordUtil
 
-_CONTEXT_STACK_VAR: ContextVar[List[BaseContext] | None] = ContextVar("_CONTEXT_STACK_VAR", default=None)
+_CONTEXT_STACK_VAR: ContextVar[List | None] = ContextVar("_CONTEXT_STACK_VAR", default=None)
 """
 Context adds self to the stack on __enter__ and removes self on __exit__.
 Each asynchronous environment has its own stack.
 """
 
-_DEFAULT_CONTEXT: BaseContext | None = None
-"""Default context is created based on settings."""
+_DEFAULT_CONTEXT = None
+"""Default context is created based on settings, then used to set values not modified explicitly by __init__ params."""
 
 _DEFAULT_CONTEXT_LOCK = threading.Lock()
 """Thread lock for the default context."""
 
+TContextExtension = TypeVar("TContextExtension")
+"""Generic parameter for the context extension variable."""
 
 @dataclass(slots=True, kw_only=True)
 class BaseContext(DataclassFreezable, ABC):
-    """Context extensions add features that are serialized with the context for out-of-process execution."""
+    """Base class for Context, should not be initialized directly."""
 
     is_root: bool = False
-    """True when the context is used in the outermost 'with' clause."""
+    """Set this field to True when the context is used in the outermost 'with' clause."""
 
     is_deserialized: bool = False
-    """Use this flag to determine if this context instance has been deserialized from data."""
+    """Use this flag to determine if this context instance has been deserialized, e.g. inside an out-of-process task."""
+
+    extensions: List[ContextExtension] | None = None
+    """
+    Context extensions provide additional functionality that is not built into the Context class.
+    
+    Notes:
+        - Return the extension type specified in the constructor of the current context if specified
+        - Otherwise search for the extension of the same type in the context chain
+        - If no extension is found in the context chain for a given extension type, the default extension
+          created from settings will be returned
+        - Each extension type must be final and derived directly from ContextExtension base
+    """
 
     def init(self) -> Self:
         """Initialize fields that are not set with values from the current context."""
@@ -72,12 +87,33 @@ class BaseContext(DataclassFreezable, ABC):
 
             if parent_context:
                 # The fields variable will contain public fields for the final class and its bases
-                fields = [field for field in self.__dataclass_fields__.keys() if not field.startswith("_")]
-                # Set empty fields to the values from the current context if it is set
+                # Exclude the extensions field which will be merged rather than replaced
+                fields = [
+                    field for field in self.__dataclass_fields__.keys()
+                    if not field.startswith("_") and not field == "extensions"
+                ]
+                # Set empty fields to the values from the current context if it is set, except for extensions
                 for field in fields:
                     if getattr(self, field, None) is None:
                         if (current_value := getattr(parent_context, field, None)) is not None:
                             setattr(self, field, current_value)
+                # Combine extensions with the parent type preserving order from base to derived,
+                # except for the extensions that are present in the current context are omitted
+                # from the parent contexts
+                if self.extensions:
+                    extension_types = [type(e) for e in self.extensions]
+                    ContextExtension.check_duplicate_types(
+                        extension_types, "extensions in the current context")
+                    if parent_context.extensions:
+                        parent_extension_types = [type(e) for e in parent_context.extensions]
+                        ContextExtension.check_duplicate_types(
+                            parent_extension_types, "extensions in the parent context")
+                        self.extensions = list(
+                            dict.fromkeys(
+                                [x for x in parent_context.extensions if type(x) not in extension_types] +
+                                self.extensions
+                            )
+                        )
 
         # Return self to enable method chaining
         return self
@@ -107,14 +143,25 @@ class BaseContext(DataclassFreezable, ABC):
                 f"  - Has been invoked in a different asynchronous environment (i.e., in a different thread or\n"
                 f"    before entering an async function) than the {cls.__name__}.current() method.\n")
 
+    def extension(self, extension_type: Type[TContextExtension]) -> TContextExtension:
+        """Return the Extension instance of the specified type, error message if not found."""
+        # Find the first context extension of the specified type (only one should be present)
+        result = next((x for x in self.extensions if isinstance(x, extension_type)), None)
+        if result is None:
+            # Return the default extension for this type if not found in self.extensions
+            result = extension_type._default()  # noqa
+        return result
+
     def __enter__(self):
         """Supports 'with' operator for resource disposal."""
 
         # Initialize to populate empty values from the current context or settings
         RecordUtil.init_all(self)
 
-        # Freeze to prevent further modifications (ok to call even if already frozen)
+        # Freeze self and extensions to prevent further modifications (ok to call even if already frozen)
         self.freeze()
+        if self.extensions:
+            [x.freeze() for x in self.extensions]
 
         # Get context stack for the current asynchronous environment
         context_stack = _CONTEXT_STACK_VAR.get()
@@ -187,3 +234,4 @@ class BaseContext(DataclassFreezable, ABC):
                 # Otherwise, the created value will be added to the dict and returned.
                 _DEFAULT_CONTEXT = created_context
         return _DEFAULT_CONTEXT
+

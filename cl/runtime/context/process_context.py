@@ -91,8 +91,5 @@ class ProcessContext(Context):
                 if StringUtil.is_not_empty(trial_id := ContextSettings.instance().trial):
                     self.trial = TrialKey(trial_id=trial_id)
 
-        # Freeze to prevent further modifications (ok to call even if already frozen)
-        # TODO!!!!! self.freeze()
-
         # Return self to enable method chaining
         return self
