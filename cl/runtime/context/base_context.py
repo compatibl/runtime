@@ -43,7 +43,7 @@ TExtensionContext = TypeVar("TExtensionContext")
 
 @dataclass(slots=True, kw_only=True)
 class BaseContext(DataclassFreezable, ABC):
-    """Base class for Context, should not be initialized directly."""
+    """Base for the main Context class, should not be used in any other way."""
 
     is_root: bool = False
     """Set this field to True when the context is used in the outermost 'with' clause."""
@@ -52,16 +52,7 @@ class BaseContext(DataclassFreezable, ABC):
     """Use this flag to determine if this context instance has been deserialized, e.g. inside an out-of-process task."""
 
     extensions: List[ExtensionContext] | None = None
-    """
-    Extension contexts provide additional functionality that is not built into the Context class.
-    
-    Notes:
-        - Return the extension type specified in the constructor of the current context if specified
-        - Otherwise search for the extension of the same type in the context chain
-        - If no extension is found in the context chain for a given extension type, the default extension
-          created from settings will be returned
-        - Each extension type must be final and derived directly from ExtensionContext base
-    """
+    """Extension contexts provide additional functionality not included in the main Context class."""
 
     def init(self) -> Self:
         """Initialize fields that are not set with values from the current context."""
@@ -103,25 +94,28 @@ class BaseContext(DataclassFreezable, ABC):
                         if (current_value := getattr(parent_context, field, None)) is not None:
                             setattr(self, field, current_value)
 
-            # Combine extensions with the parent type preserving order from base to derived,
-            # except for the extensions that are present in the current context are omitted
-            # from the parent contexts
+            # Check for extensions in specified in constructor of the current context
             if self.extensions:
                 # Check for duplicate extension types in the current context
-                extension_types = [type(e) for e in self.extensions]
+                extension_types = [e.get_extension_category() for e in self.extensions]
                 ExtensionContext.check_duplicate_types(extension_types, "extensions in the current context")
                 # Initialize extensions in the current context
                 [RecordUtil.init_all(x) for x in self.extensions]
+            else:
+                extension_types = []
+
+            # Combine extensions with the parent type preserving order from base to derived, except those
+            # extensions that are present in the current context are omitted from the parent contexts
             if parent_context and parent_context.extensions:
                 # Check for duplicate extension types in the parent context
-                parent_extension_types = [type(e) for e in parent_context.extensions]
+                parent_extension_types = [e.get_extension_category() for e in parent_context.extensions]
                 ExtensionContext.check_duplicate_types(parent_extension_types, "extensions in the parent context")
                 # Combine with parent
                 if self.extensions:
                     # Both are present, combine preserving order from base to derived
                     # except base extensions that are present in derived are omitted
                     self.extensions = [
-                        x for x in parent_context.extensions if type(x) not in extension_types
+                        x for x in parent_context.extensions if x.get_extension_category() not in extension_types
                     ] + self.extensions
                 else:
                     # Only parent extensions are present, deep copy
@@ -157,11 +151,27 @@ class BaseContext(DataclassFreezable, ABC):
             )
 
     def extension(self, extension_type: Type[TExtensionContext]) -> TExtensionContext:
-        """Return the Extension instance of the specified type, error message if not found."""
+        """
+        Return extension context for the category returned by extension_type.get_extension_category(...) method.
+
+        Notes:
+            - If not found in this Context instance, it will search the Context stack in reverse order of creation
+            - If not found, return default instance created by passing no parameters to 'extension_type' constructor
+        """
         # Find the first extension context of the specified type (only one should be present, None if not found)
         result = next((x for x in self.extensions if isinstance(x, extension_type)), None) if self.extensions else None
-        if result is None:
-            # Return the default extension for this type if not found in self.extensions
+        if result is not None:
+            # If found, check that it is an instance of 'extension_type'
+            if not isinstance(result, extension_type):
+                category_str = extension_type.get_extension_category().__name__
+                found_type_str = type(result).__name__
+                expected_type_str = extension_type.__name__
+                raise RuntimeError(
+                    f"Extension context for the category {category_str} has type {found_type_str} which is not\n"
+                    f"a subclass of type {expected_type_str} passed to the extension(...) method of main Context."
+                )
+        else:
+            # If not found, return default instance created by passing no parameters to 'extension_type' ctor
             result = extension_type._default()  # noqa
         return result
 

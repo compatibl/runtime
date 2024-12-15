@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import threading
+from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Dict
 from typing import List
@@ -30,7 +31,17 @@ _DEFAULT_CONTEXT_LOCK = threading.Lock()
 
 @dataclass(slots=True, kw_only=True)
 class ExtensionContext(DataclassFreezable):
-    """Base class for the defaults objects stored in Context.defaults field."""
+    """Base class extension contexts in the 'extensions' field of the main context class Context."""
+
+    @classmethod
+    @abstractmethod
+    def get_extension_category(cls) -> Type:
+        """Return base class of each extension category even if called from a derived class."""
+
+    @classmethod
+    @abstractmethod
+    def create_default(cls) -> Self:
+        """Create default context for the extension category returned by 'get_extension_category' method."""
 
     @classmethod
     def _default(cls) -> Self:
@@ -41,12 +52,24 @@ class ExtensionContext(DataclassFreezable):
 
         # First check without a lock to avoid the overhead of acquiring the lock if the value already exists
         global _DEFAULT_DICT
-        if (result := _DEFAULT_DICT.get(cls, None)) is None:
-            created_extension = cls()
+        extension_category = cls.get_extension_category()
+        # First check is readonly, no lock required
+        if (result := _DEFAULT_DICT.get(extension_category, None)) is None:
+            # If not found, try to create
+            created_extension = cls.create_default()
+            created_extension_category = created_extension.get_extension_category()
+            if not isinstance(created_extension, cls):
+                raise RuntimeError(
+                    f"Default extension has type {type(created_extension).__name__} which is not a"
+                    f"subclass of the requested extension type {cls.__name__}.")
+            if not isinstance(created_extension, created_extension_category):
+                raise RuntimeError(
+                    f"Default extension has type {type(created_extension).__name__} which is not a"
+                    f"subclass of its own extension category {created_extension_category.__name__}.")
             RecordUtil.init_all(created_extension)
             with _DEFAULT_CONTEXT_LOCK:
                 # Use setdefault to ensure the value is not created between the first and second check
-                result = _DEFAULT_DICT.setdefault(cls, created_extension)
+                result = _DEFAULT_DICT.setdefault(extension_category, created_extension)
         return result
 
     @classmethod
