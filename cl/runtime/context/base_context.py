@@ -17,12 +17,11 @@ from abc import ABC
 from contextvars import ContextVar
 from contextvars import Token
 from dataclasses import dataclass
-from dataclasses import field
 from typing import List
 from typing import Type
 from typing import TypeVar
 from typing_extensions import Self
-from cl.runtime.context.context_extension import ContextExtension
+from cl.runtime.context.extension_context import ExtensionContext
 from cl.runtime.records.dataclass_freezable import DataclassFreezable
 from cl.runtime.records.record_util import RecordUtil
 
@@ -38,8 +37,8 @@ _DEFAULT_CONTEXT = None
 _DEFAULT_CONTEXT_LOCK = threading.Lock()
 """Thread lock for the default context."""
 
-TContextExtension = TypeVar("TContextExtension")
-"""Generic parameter for the context extension variable."""
+TExtensionContext = TypeVar("TExtensionContext")
+"""Generic parameter for the extension context."""
 
 
 @dataclass(slots=True, kw_only=True)
@@ -52,16 +51,16 @@ class BaseContext(DataclassFreezable, ABC):
     is_deserialized: bool = False
     """Use this flag to determine if this context instance has been deserialized, e.g. inside an out-of-process task."""
 
-    extensions: List[ContextExtension] | None = None
+    extensions: List[ExtensionContext] | None = None
     """
-    Context extensions provide additional functionality that is not built into the Context class.
+    Extension contexts provide additional functionality that is not built into the Context class.
     
     Notes:
         - Return the extension type specified in the constructor of the current context if specified
         - Otherwise search for the extension of the same type in the context chain
         - If no extension is found in the context chain for a given extension type, the default extension
           created from settings will be returned
-        - Each extension type must be final and derived directly from ContextExtension base
+        - Each extension type must be final and derived directly from ExtensionContext base
     """
 
     def init(self) -> Self:
@@ -110,13 +109,13 @@ class BaseContext(DataclassFreezable, ABC):
             if self.extensions:
                 # Check for duplicate extension types in the current context
                 extension_types = [type(e) for e in self.extensions]
-                ContextExtension.check_duplicate_types(extension_types, "extensions in the current context")
+                ExtensionContext.check_duplicate_types(extension_types, "extensions in the current context")
                 # Initialize extensions in the current context
                 [RecordUtil.init_all(x) for x in self.extensions]
             if parent_context and parent_context.extensions:
                 # Check for duplicate extension types in the parent context
                 parent_extension_types = [type(e) for e in parent_context.extensions]
-                ContextExtension.check_duplicate_types(parent_extension_types, "extensions in the parent context")
+                ExtensionContext.check_duplicate_types(parent_extension_types, "extensions in the parent context")
                 # Combine with parent
                 if self.extensions:
                     # Both are present, combine preserving order from base to derived
@@ -157,9 +156,9 @@ class BaseContext(DataclassFreezable, ABC):
                 f"    before entering an async function) than the {cls.__name__}.current() method.\n"
             )
 
-    def extension(self, extension_type: Type[TContextExtension]) -> TContextExtension:
+    def extension(self, extension_type: Type[TExtensionContext]) -> TExtensionContext:
         """Return the Extension instance of the specified type, error message if not found."""
-        # Find the first context extension of the specified type (only one should be present, None if not found)
+        # Find the first extension context of the specified type (only one should be present, None if not found)
         result = next((x for x in self.extensions if isinstance(x, extension_type)), None) if self.extensions else None
         if result is None:
             # Return the default extension for this type if not found in self.extensions

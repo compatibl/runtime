@@ -21,7 +21,7 @@ from typing import TypeVar
 
 _STACK_DICT: ContextVar = ContextVar("_STACK_DICT", default=None)
 """
-Each context extension adds self to the stack value where its type is key on __enter__ and removes self on __exit__.
+Each extension context adds self to the stack value where its type is key on __enter__ and removes self on __exit__.
 Each asynchronous context has its own stack dictionary.
 """
 

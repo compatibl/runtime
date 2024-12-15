@@ -29,13 +29,13 @@ _DEFAULT_CONTEXT_LOCK = threading.Lock()
 
 
 @dataclass(slots=True, kw_only=True)
-class ContextExtension(DataclassFreezable):
+class ExtensionContext(DataclassFreezable):
     """Base class for the defaults objects stored in Context.defaults field."""
 
     @classmethod
     def _default(cls) -> Self:
         """
-        Return the default context extension instance for this type, or create and cache it if does not exist.
+        Return the default extension context instance for this type, or create and cache it if does not exist.
         This method is safe to call from different asynchronous environments (threads or asyncio tasks).
         """
 
@@ -59,5 +59,5 @@ class ContextExtension(DataclassFreezable):
             if duplicate_types:
                 duplicate_type_names = "\n".join(t.__name__ for t in duplicate_types)
                 raise RuntimeError(
-                    f"Duplicate context extension type(s) found in {where_msg}:\n" f"{duplicate_type_names}\n"
+                    f"Duplicate extension context type(s) found in {where_msg}:\n" f"{duplicate_type_names}\n"
                 )
