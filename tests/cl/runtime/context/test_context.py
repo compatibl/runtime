@@ -13,37 +13,39 @@
 # limitations under the License.
 
 import pytest
-import time
 import asyncio
+import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
-
+from cl.runtime.context.base_context import _CONTEXT_STACK_VAR  # noqa
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
-from cl.runtime.context.base_context import _CONTEXT_STACK_VAR  # noqa
 
 TASK_COUNT = 3
 MAX_SLEEP_DURATION = 0.2
+
 
 def _sleep(*, task_index: int, rnd: Random, max_sleep_duration: float):
     """Sleep for a random interval, reducing the interval for higher task index."""
     duration = rnd.uniform(0, max_sleep_duration) * (TASK_COUNT - task_index) / TASK_COUNT
     time.sleep(duration)
 
+
 async def _sleep_async(*, task_index: int, rnd: Random, max_sleep_duration: float):
     """Sleep for a random interval, reducing the interval for higher task index."""
     duration = rnd.uniform(0, max_sleep_duration) * (TASK_COUNT - task_index) / TASK_COUNT
     await asyncio.sleep(duration)
 
+
 def _perform_testing(
-        *,
-        task_index: int,
-        rnd: Random,
-        is_inner: bool = False,
-        max_sleep_duration: float = MAX_SLEEP_DURATION,
+    *,
+    task_index: int,
+    rnd: Random,
+    is_inner: bool = False,
+    max_sleep_duration: float = MAX_SLEEP_DURATION,
 ):
     """Use for testing in-process or in multiple threads."""
-    
+
     # Use a temporary TestingContext without custom contex_id to get db for the subsequent named contexts
     with TestingContext() as temp_context:
         db = temp_context.db
@@ -63,8 +65,9 @@ def _perform_testing(
         context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack is not None and len(context_stack) > 0:
             context_id = context_stack[-1].context_id  # noqa
-            raise RuntimeError(f"Leaked context from the outside asynchronous environment before the {task_label}:\n"
-                               f"{context_id}")
+            raise RuntimeError(
+                f"Leaked context from the outside asynchronous environment before the {task_label}:\n" f"{context_id}"
+            )
 
     context_id_1 = f"Context A for {task_label}"
     with TestingContext(context_id=context_id_1, db=db) as context_a:
@@ -94,12 +97,7 @@ def _perform_testing(
 
             # Run an inner method that changes the context
             if not is_inner:
-                _perform_testing(
-                    task_index = task_index,
-                    rnd=rnd,
-                    is_inner=True,
-                    max_sleep_duration=max_sleep_duration
-                )
+                _perform_testing(task_index=task_index, rnd=rnd, is_inner=True, max_sleep_duration=max_sleep_duration)
 
             # New current context
             assert Context.current() is context_b
@@ -124,22 +122,24 @@ def _perform_testing(
         context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack is not None and len(context_stack) > 0:
             context_id = context_stack[-1].context_id  # noqa
-            raise RuntimeError(f"Leaked context from the outside asynchronous environment after the {task_label}:\n"
-                               f"{context_id}")
+            raise RuntimeError(
+                f"Leaked context from the outside asynchronous environment after the {task_label}:\n" f"{context_id}"
+            )
+
 
 async def _perform_testing_async(
-        *,
-        task_index: int,
-        rnd: Random,
-        is_inner: bool = False,
-        max_sleep_duration: float = MAX_SLEEP_DURATION,
+    *,
+    task_index: int,
+    rnd: Random,
+    is_inner: bool = False,
+    max_sleep_duration: float = MAX_SLEEP_DURATION,
 ):
     """Use for testing in async loop."""
 
     # Use a temporary TestingContext without custom contex_id to get db for the subsequent named contexts
     with TestingContext() as temp_context:
         db = temp_context.db
-    
+
     # Task label
     task_label = f"async task {task_index}{'.inner' if is_inner else ''}"
 
@@ -155,8 +155,9 @@ async def _perform_testing_async(
         context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack is not None and len(context_stack) > 0:
             context_id = context_stack[-1].context_id  # noqa
-            raise RuntimeError(f"Leaked context from the outside asynchronous environment before the {task_label}:\n"
-                               f"{context_id}")
+            raise RuntimeError(
+                f"Leaked context from the outside asynchronous environment before the {task_label}:\n" f"{context_id}"
+            )
 
     context_id_1 = f"Context A for {task_label}"
     with TestingContext(context_id=context_id_1, db=db) as context_a:
@@ -187,10 +188,7 @@ async def _perform_testing_async(
             # Await an async method that changes the context
             if not is_inner:
                 await _perform_testing_async(
-                    task_index = task_index,
-                    rnd=rnd,
-                    is_inner=True,
-                    max_sleep_duration=max_sleep_duration
+                    task_index=task_index, rnd=rnd, is_inner=True, max_sleep_duration=max_sleep_duration
                 )
 
             # New current context
@@ -204,7 +202,6 @@ async def _perform_testing_async(
         assert Context.current() is context_a
         print(f"Inside {task_label}: Exit Context A")
 
-
     # Sleep between entering 'with' clause and calling 'current'
     await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
 
@@ -217,29 +214,33 @@ async def _perform_testing_async(
         context_stack = _CONTEXT_STACK_VAR.get()
         if context_stack is not None and len(context_stack) > 0:
             context_id = context_stack[-1].context_id  # noqa
-            raise RuntimeError(f"Leaked context from the outside asynchronous environment after the {task_label}:\n"
-                               f"{context_id}")
+            raise RuntimeError(
+                f"Leaked context from the outside asynchronous environment after the {task_label}:\n" f"{context_id}"
+            )
+
 
 async def _gather(rnd: Random):
     """Gather async functions."""
     tasks = [_perform_testing_async(task_index=i, rnd=rnd) for i in range(TASK_COUNT)]
     await asyncio.gather(*tasks)
 
+
 def test_in_process():
     """Test in different threads."""
-    
+
     # Create a local random instance with seed
     rnd = Random(0)
 
     # Run sequentially in-process
     [_perform_testing(task_index=task_index, rnd=rnd, max_sleep_duration=0) for task_index in range(TASK_COUNT)]
 
+
 def test_in_threads():
     """Test in different threads."""
 
     # Create a local random instance with seed
     rnd = Random(0)
-    
+
     # Run in parallel threads
     with ThreadPoolExecutor(max_workers=TASK_COUNT) as executor:
         futures = [
@@ -248,6 +249,7 @@ def test_in_threads():
         ]
     for future in futures:
         future.result()
+
 
 def test_in_async_loop():
     """Test in different async environments."""

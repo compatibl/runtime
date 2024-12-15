@@ -14,9 +14,10 @@
 
 import threading
 from dataclasses import dataclass
+from typing import Dict
+from typing import List
+from typing import Type
 from typing_extensions import Self
-from typing import Dict, Type, List
-
 from cl.runtime.records.dataclass_freezable import DataclassFreezable
 from cl.runtime.records.record_util import RecordUtil
 
@@ -25,6 +26,7 @@ _DEFAULT_DICT: Dict = {}
 
 _DEFAULT_CONTEXT_LOCK = threading.Lock()
 """Thread lock for the default context."""
+
 
 @dataclass(slots=True, kw_only=True)
 class ContextExtension(DataclassFreezable):
@@ -56,5 +58,6 @@ class ContextExtension(DataclassFreezable):
             duplicate_types = set(t for t in types if types.count(t) > 1)
             if duplicate_types:
                 duplicate_type_names = "\n".join(t.__name__ for t in duplicate_types)
-                raise RuntimeError(f"Duplicate context extension type(s) found in {where_msg}:\n"
-                                   f"{duplicate_type_names}\n")
+                raise RuntimeError(
+                    f"Duplicate context extension type(s) found in {where_msg}:\n" f"{duplicate_type_names}\n"
+                )

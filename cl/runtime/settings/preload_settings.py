@@ -14,7 +14,8 @@
 
 import os
 from dataclasses import dataclass
-from typing import List, Type
+from typing import List
+from typing import Type
 from typing_extensions import Self
 from cl.runtime.configs.config import Config
 from cl.runtime.context.context import Context
@@ -62,8 +63,7 @@ class PreloadSettings(Settings):
             # Limit to the specified types
             record_class_names = [record_type.__name__ for record_type in final_record_types]
             csv_files = [
-                csv_file for csv_file in csv_files
-                if os.path.basename(csv_file).split(".")[0] in record_class_names
+                csv_file for csv_file in csv_files if os.path.basename(csv_file).split(".")[0] in record_class_names
             ]
 
         # Preload from CSV

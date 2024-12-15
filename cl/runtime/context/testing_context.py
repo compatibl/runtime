@@ -14,9 +14,7 @@
 
 from dataclasses import dataclass
 from typing import final
-
 from typing_extensions import Self
-
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
 from cl.runtime.context.env_util import EnvUtil

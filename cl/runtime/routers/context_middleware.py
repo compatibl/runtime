@@ -15,7 +15,6 @@
 import asyncio
 import contextvars
 import random
-
 from starlette.requests import Request
 from starlette.types import ASGIApp
 from cl.runtime import Context

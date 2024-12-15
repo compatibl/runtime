@@ -14,7 +14,10 @@
 
 from contextvars import ContextVar
 from dataclasses import dataclass
-from typing import Dict, Type, Any, TypeVar
+from typing import Any
+from typing import Dict
+from typing import Type
+from typing import TypeVar
 
 _STACK_DICT: ContextVar = ContextVar("_STACK_DICT", default=None)
 """
@@ -32,6 +35,7 @@ _CONTEXT_DICT: Dict[str, Any] = {}
 """Stores the current context for each prefix."""
 
 TContext = TypeVar("TContext")
+
 
 @dataclass(slots=True, kw_only=True)
 class ContextManager:
@@ -54,4 +58,3 @@ class ContextManager:
         if not _ASYNC_SENTINEL:
             raise RuntimeError("Current context can only be updated in async context of the process root.")
         _CONTEXT_DICT[type(context)] = context
-

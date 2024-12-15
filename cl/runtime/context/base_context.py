@@ -14,11 +14,14 @@
 
 import threading
 from abc import ABC
-from contextvars import ContextVar, Token
-from dataclasses import dataclass, field
-from typing import List, Type, TypeVar
+from contextvars import ContextVar
+from contextvars import Token
+from dataclasses import dataclass
+from dataclasses import field
+from typing import List
+from typing import Type
+from typing import TypeVar
 from typing_extensions import Self
-
 from cl.runtime.context.context_extension import ContextExtension
 from cl.runtime.records.dataclass_freezable import DataclassFreezable
 from cl.runtime.records.record_util import RecordUtil
@@ -37,6 +40,7 @@ _DEFAULT_CONTEXT_LOCK = threading.Lock()
 
 TContextExtension = TypeVar("TContextExtension")
 """Generic parameter for the context extension variable."""
+
 
 @dataclass(slots=True, kw_only=True)
 class BaseContext(DataclassFreezable, ABC):
@@ -83,13 +87,15 @@ class BaseContext(DataclassFreezable, ABC):
                         f"To run {class_name}.init_all() outside of 'with', use {class_name}(is_root=True, ...)\n"
                         f"If this error occurs inside a 'with' clause, this indicates the 'with' clause has been\n"
                         f"invoked in a different asynchronous environment (i.e., in a different thread or before\n"
-                        f"entering an async function) than the current call to {class_name}.init_all().\n")
+                        f"entering an async function) than the current call to {class_name}.init_all().\n"
+                    )
 
             if parent_context:
                 # The fields variable will contain public fields for the final class and its bases
                 # Exclude the extensions field which will be merged rather than replaced
                 fields = [
-                    field for field in self.__dataclass_fields__.keys()
+                    field
+                    for field in self.__dataclass_fields__.keys()
                     if not field.startswith("_") and not field == "extensions"
                 ]
                 # Set empty fields to the values from the current context if it is set, except for extensions
@@ -113,7 +119,9 @@ class BaseContext(DataclassFreezable, ABC):
                 if self.extensions:
                     # Both are present, combine preserving order from base to derived
                     # except base extensions that are present in derived are omitted
-                    self.extensions = [x for x in parent_context.extensions if type(x) not in extension_types] + self.extensions
+                    self.extensions = [
+                        x for x in parent_context.extensions if type(x) not in extension_types
+                    ] + self.extensions
                 else:
                     # Only parent extensions are present, deep copy
                     self.extensions = list(parent_context.extensions)
@@ -144,7 +152,8 @@ class BaseContext(DataclassFreezable, ABC):
                 f"A 'with {cls.__name__}(...)' clause has either:\n"
                 f"  - Not been invoked before calling the {cls.__name__}.current() method, or\n"
                 f"  - Has been invoked in a different asynchronous environment (i.e., in a different thread or\n"
-                f"    before entering an async function) than the {cls.__name__}.current() method.\n")
+                f"    before entering an async function) than the {cls.__name__}.current() method.\n"
+            )
 
     def extension(self, extension_type: Type[TContextExtension]) -> TContextExtension:
         """Return the Extension instance of the specified type, error message if not found."""
@@ -181,7 +190,8 @@ class BaseContext(DataclassFreezable, ABC):
                         f"must set is_root flag to True: 'with {class_name}(is_root=True, ...)'\n"
                         f"If this error occurred inside a 'with' clause, this indicates it has been invoked\n"
                         f"in a different asynchronous environment (i.e., in a different thread or before\n"
-                        f"entering an async function) than this clause.\n")
+                        f"entering an async function) than this clause.\n"
+                    )
 
         # Check if self is already the current context
         if context_stack and context_stack[-1] is self:
@@ -201,7 +211,8 @@ class BaseContext(DataclassFreezable, ABC):
             raise RuntimeError(
                 f"A 'with {class_name.__name__}(...)' clause has been invoked in a different asynchronous\n"
                 f"environment (i.e., in a different thread or before entering an async function)\n"
-                f"than the environment where the exit from this clause had occurred.\n")
+                f"than the environment where the exit from this clause had occurred.\n"
+            )
 
         # Restore the previous current context on exiting from 'with Context(...)' clause
         current_context = context_stack.pop()
@@ -211,7 +222,8 @@ class BaseContext(DataclassFreezable, ABC):
                 f"Current context has been modified other than by entering into a\n"
                 f"'with {class_name}(...)' clause in the same asynchronous\n"
                 f"environment (i.e., the same thread and async function) as\n"
-                f"the environment where the exit from this clause had occurred.\n")
+                f"the environment where the exit from this clause had occurred.\n"
+            )
 
         # Return False to propagate exception to the caller
         return False
@@ -237,4 +249,3 @@ class BaseContext(DataclassFreezable, ABC):
                 # Otherwise, the created value will be added to the dict and returned.
                 _DEFAULT_CONTEXT = created_context
         return _DEFAULT_CONTEXT
-
