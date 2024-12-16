@@ -34,16 +34,12 @@ class ProcessContext(Context):
     """Context for a standalone process."""
 
     def __post_init__(self):
-        """Set is_root=True before running init_all."""
-        self.is_root = True
-
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+        """Configure fields that were not specified in constructor."""
 
         # Do not execute this code on frozen or deserialized context instances
         #   - If the instance is frozen, init_all has already been executed
         #   - If the instance is deserialized, init_all has been executed before serialization
-        if not self.is_frozen() and not self.is_deserialized:
+        if not self.is_deserialized:
             # Confirm we are not inside a test, error otherwise
             if Settings.is_inside_test:
                 raise RuntimeError(

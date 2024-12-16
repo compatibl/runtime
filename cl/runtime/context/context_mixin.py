@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
+from abc import ABC
+from abc import abstractmethod
 from typing import Type
 
-from cl.runtime.context.base_context import BaseContext
 
+class ContextMixin(ABC):
+    """Optional mixin class for a context, code must not rely on inheritance from this class."""
 
-@dataclass(slots=True, kw_only=True)
-class StubBaseExtensionContext(BaseContext):
-    """Base extension context."""
+    __slots__ = ()
+    """To prevent creation of __dict__ in derived types."""
 
     @classmethod
+    @abstractmethod
     def get_key_type(cls) -> Type:
         """
         To get the current context for cls, ContextManager will perform dict lookup based cls.get_key_type().
@@ -33,8 +35,3 @@ class StubBaseExtensionContext(BaseContext):
             - Contexts that have different key types are isolated from each other and have independent 'with' clauses
             - As all contexts are singletons and have no key fields, get_key method is not required
         """
-        return StubBaseExtensionContext
-
-    base_field: str = "abc"
-    """Field of the base class."""
-

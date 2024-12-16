@@ -38,20 +38,14 @@ class TestingContext(Context):
         - This module not itself import pytest or unittest package
     """
 
-    db_class: str | None = None  # TODO: Find another way to override to avoid duplication with db field
-    """Override for the database class in module.ClassName format."""
-
     def __post_init__(self):
-        """Set is_root=True before running init_all."""
-        self.is_root = True
-
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+        """Configure fields that were not specified in constructor."""
 
         # Do not execute this code on frozen or deserialized context instances
         #   - If the instance is frozen, init_all has already been executed
         #   - If the instance is deserialized, init_all has been executed before serialization
-        if not self.is_frozen() and not self.is_deserialized:
+        if not self.is_deserialized:
+
             # Confirm we are inside a test, error otherwise
             if not Settings.is_inside_test:
                 raise RuntimeError(f"TestingContext created outside a test.")
@@ -108,8 +102,9 @@ class TestingContext(Context):
         # Call '__enter__' method of base first
         Context.__enter__(self)
 
-        # Execute on root instances only if they are not deserialized (e.g. not the instances passed to a task queue)
-        if self.db is not None and self.is_root and not self.is_deserialized:
+        # Execute on default (root) context instances only if they are not deserialized
+        # (e.g. not the instances passed to a task queue)
+        if self.db is not None and not self.is_deserialized:
             # Delete all existing data in temp database and drop DB in case it was not cleaned up
             # due to abnormal termination of the previous test run
             self.db.delete_all_and_drop_db()  # noqa
@@ -119,8 +114,9 @@ class TestingContext(Context):
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Supports 'with' operator for resource disposal."""
 
-        # Execute on root instances only if they are not deserialized (e.g. not the instances passed to a task queue)
-        if self.db is not None and self.is_root and not self.is_deserialized:
+        # Execute on default (root) context instances only if they are not deserialized
+        # (e.g. not the instances passed to a task queue)
+        if self.db is not None and not self.is_deserialized:
             # Delete all data in temp database and drop DB to clean up
             self.db.delete_all_and_drop_db()  # noqa
 

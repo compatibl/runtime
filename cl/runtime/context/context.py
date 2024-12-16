@@ -14,23 +14,30 @@
 
 import logging
 from dataclasses import dataclass
+from getpass import getuser
 from typing import Dict
 from typing import Iterable
 from typing import Type
 from typing_extensions import Self
+
+from cl.runtime import ClassInfo
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.base_context import BaseContext
+from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.log.log_key import LogKey
+from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
@@ -46,6 +53,9 @@ class Context(BaseContext):
     log: LogKey = missing()
     """Log of the context, 'Context.current().log' is used if not specified."""
 
+    db_class: str | None = None  # TODO: Find another way to override to avoid duplication with db field
+    """Override for the database class in module.ClassName format."""
+
     db: DbKey | None = None
     """Database of the context, 'Context.current().db' is used if not specified."""
 
@@ -58,8 +68,49 @@ class Context(BaseContext):
     trial: TrialKey | None = None
     """Key of the running trial."""
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    @classmethod
+    def get_key_type(cls) -> Type:
+        """
+        To get the current context for cls, ContextManager will perform dict lookup based cls.get_key_type().
+
+        Notes:
+            - Return as specific type rather than type(self) to avoid variation across derived types
+            - The returned type may be a base context class or a dedicated key type
+            - Contexts that have different key types are isolated from each other and have independent 'with' clauses
+            - As all contexts are singletons and have no key fields, get_key method is not required
+        """
+        return Context
+
+    def __post_init__(self):
+        """Set fields to their values in 'Context.current()' if not specified."""
+
+        # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
+        if not self.is_deserialized:
+            # Set fields that are not specified as __init__ param to their values from 'Context.current()'
+
+            # Required fields, error message if the field is not set in the root context
+            if self.context_id is None:
+                self._current_context_field_not_set_error("context_id")
+                self.context_id = Context.current().context_id
+            if self.user is None:
+                self._current_context_field_not_set_error("user")
+                self.user = Context.current().user
+            if self.log is None:
+                self._current_context_field_not_set_error("log")
+                self.log = Context.current().log
+            if self.db is None:
+                self._current_context_field_not_set_error("db")
+                self.db = Context.current().db
+            if self.dataset is None:
+                self._current_context_field_not_set_error("dataset")
+                self.dataset = Context.current().dataset
+
+            # Optional fields, set to None if not set in the root context
+            # The root context uses ContextSettings values of these fields
+            if self.secrets is None:
+                self.secrets = Context.current().secrets
+            if self.trial is None:
+                self.trial = Context.current().trial
 
         # Replace fields that are set as keys by records from storage
         # First, load 'db' field of this context using 'Context.current()'
@@ -275,6 +326,18 @@ class Context(BaseContext):
         # Additional check in context in case a custom database implementation does not check it
         self.error_if_not_temp_db(self.db.db_id)
         self.db.delete_all_and_drop_db()  # noqa
+
+    def _current_context_field_not_set_error(self, field_name: str) -> None:
+        """Error message about a Context field not set."""
+        # Get context stack for the current asynchronous environment
+        context_stack = self._get_context_stack()
+        if not context_stack:
+            raise RuntimeError(f"""
+Field '{field_name}' of the context class '{type(self).__name__}' is not set.
+The context in the outermost 'with' clause (root context) must set all fields
+of the Context class. Inside the 'with' clause, these fields will be populated
+from the current context.
+""")
 
     @classmethod
     def error_if_not_temp_db(cls, db_id_or_database_name: str) -> None:

@@ -28,9 +28,6 @@ def test_dataclass_freezable():
     record = StubDataclassFreezable()
     record.value = "def"
 
-    # Freeze record
-    record.freeze()
-
     # Attempt to modify field after freezing
     with pytest.raises(AttributeError):
         record.value = "xyz"

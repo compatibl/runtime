@@ -17,7 +17,6 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
-from cl.runtime.context.base_context import _CONTEXT_STACK_VAR  # noqa
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
 from stubs.cl.runtime.context.stub_base_extension_context import StubBaseExtensionContext
@@ -50,23 +49,29 @@ def _perform_testing(
     # Sleep before entering the task
     _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
     with TestingContext():
+
         _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
-        assert Context.current().extension(StubBaseExtensionContext) is StubBaseExtensionContext._default()  # noqa
+
+        with pytest.raises(RuntimeError):
+            # Ensure that current context is not leaked outside the 'with clause' before the test
+            StubBaseExtensionContext.current()
+
         stub_context_1 = StubBaseExtensionContext(base_field="stub_context_1")
-        with TestingContext(extensions=[stub_context_1]):
+        with stub_context_1:
+
             _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
-            assert Context.current().extension(StubBaseExtensionContext) is stub_context_1
+            assert StubBaseExtensionContext.current() is stub_context_1
+
             stub_context_2 = StubDerivedExtensionContext(derived_field="stub_context_2")
-            with TestingContext(extensions=[stub_context_2]):
+            with stub_context_2:
                 _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
-                assert Context.current().extension(StubDerivedExtensionContext) is stub_context_2
-            assert Context.current().extension(StubBaseExtensionContext) is stub_context_1
-        
-        # Check the default extension context
-        default_context = StubBaseExtensionContext._default()  # noqa
-        assert Context.current().extension(StubBaseExtensionContext) is default_context
-        assert Context.current().extension(StubDerivedExtensionContext) is default_context
-        assert default_context.base_field == "abc"
+                assert StubDerivedExtensionContext.current() is stub_context_2
+
+            assert StubBaseExtensionContext.current() is stub_context_1
+
+        with pytest.raises(RuntimeError):
+            # Ensure that current context is not leaked outside the 'with clause' after the test
+            StubBaseExtensionContext.current()
 
 async def _perform_testing_async(
     *,
@@ -79,40 +84,57 @@ async def _perform_testing_async(
 
     # Sleep before entering the task
     await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
-    with TestingContext():
-        await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
-        assert Context.current().extension(StubBaseExtensionContext) is StubBaseExtensionContext._default()  # noqa
-        stub_context_1 = StubBaseExtensionContext(base_field="stub_context_1")
-        with TestingContext(extensions=[stub_context_1]):
-            await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
-            assert Context.current().extension(StubBaseExtensionContext) is stub_context_1
-            stub_context_2 = StubDerivedExtensionContext(derived_field="stub_context_2")
-            with TestingContext(extensions=[stub_context_2]):
-                await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
-                assert Context.current().extension(StubDerivedExtensionContext) is stub_context_2
-            assert Context.current().extension(StubBaseExtensionContext) is stub_context_1
+    with Context():
 
-        # Check the default extension context
-        default_context = StubBaseExtensionContext._default()  # noqa
-        assert Context.current().extension(StubBaseExtensionContext) is default_context
-        assert Context.current().extension(StubDerivedExtensionContext) is default_context
-        assert default_context.base_field == "abc"
+        await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
+
+        with pytest.raises(RuntimeError):
+            # Ensure that current context is not leaked outside the 'with clause' before the test
+            StubBaseExtensionContext.current()
+
+        stub_context_1 = StubBaseExtensionContext(base_field="stub_context_1")
+        with stub_context_1:
+
+            await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
+            assert StubBaseExtensionContext.current() is stub_context_1
+
+            stub_context_2 = StubDerivedExtensionContext(derived_field="stub_context_2")
+            with stub_context_2:
+                await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
+                assert StubDerivedExtensionContext.current() is stub_context_2
+
+            assert StubBaseExtensionContext.current() is stub_context_1
+
+        with pytest.raises(RuntimeError):
+            # Ensure that current context is not leaked outside the 'with clause' before the test
+            StubBaseExtensionContext.current()
 
 
 async def _gather(rnd: Random):
     """Gather async functions."""
-    tasks = [_perform_testing_async(task_index=i, rnd=rnd) for i in range(TASK_COUNT)]
-    await asyncio.gather(*tasks)
+    state_before = Context.reset_before()
+    try:
+        tasks = [_perform_testing_async(task_index=i, rnd=rnd) for i in range(TASK_COUNT)]
+        await asyncio.gather(*tasks)
+    finally:
+        Context.reset_after(state_before)
 
 
 def test_error_handling():
     """Test error handling in specifying extensions."""
     stub_context_1 = StubBaseExtensionContext(base_field="stub_context_1")
-    stub_context_2 = StubBaseExtensionContext(base_field="stub_context_2")
-    with pytest.raises(RuntimeError):
-        # Two extension instances of the same type
-        with TestingContext(extensions=[stub_context_1, stub_context_2]):
+    stub_context_2 = StubDerivedExtensionContext(base_field="stub_context_2")
+
+    # Outer context all of the fields of the inner context, ok
+    with stub_context_1:
+        with stub_context_2:
             pass
+
+    # Outer context is missing some fields from the inner context, raise
+    with pytest.raises(RuntimeError):
+        with stub_context_2:
+            with stub_context_1:
+                pass
 
 
 def test_in_process():
