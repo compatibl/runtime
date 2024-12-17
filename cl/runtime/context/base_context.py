@@ -86,18 +86,32 @@ class BaseContext(ContextMixin, ABC):
         _CONTEXT_STACK_DICT_VAR.reset(token)
 
     @classmethod
-    def current(cls) -> Self:
-        """Return the context from the innermost 'with' clause or default context if not inside 'with' clause."""
+    def current_or_none(cls) -> Self:
+        """Return the context from the innermost 'with' clause or None context if not inside 'with' clause."""
 
         # Get context stack for the current asynchronous environment
         context_stack = cls._get_context_stack()
 
-        # Return if exists, otherwise error message
+        # Return if current context exists, or None if it is empty
         if context_stack:
             return context_stack[-1]
         else:
-            raise RuntimeError(f"{cls.__name__}.current() is undefined outside the "
-                               f"outermost 'with {cls.__name__}(...)' clause.")
+            return None
+
+    @classmethod
+    def current(cls) -> Self:
+        """Return the context from the innermost 'with' clause or default context if not inside 'with' clause."""
+
+        # Get current context stack or None if it is empty
+        result = cls.current_or_none()
+
+        # Return if exists, otherwise error message
+        if result:
+            return result
+        else:
+            raise RuntimeError(
+                f"{cls.__name__}.current() is undefined outside the outermost 'with {cls.__name__}(...)' clause.\n"
+                f"To receive None instead of an exception, use {cls.__name__}.current_or_none()\n")
 
     def __enter__(self):
         """Supports 'with' operator for resource disposal."""
