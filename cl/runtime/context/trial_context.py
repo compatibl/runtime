@@ -14,28 +14,40 @@
 
 from dataclasses import dataclass
 from typing import Type
-
-from typing_extensions import Self
-
-from cl.runtime.context.extension_context import ExtensionContext
-from cl.runtime.experiments.trial_key import TrialKey
+from cl.runtime.context.base_context import BaseContext
 from cl.runtime.records.dataclasses_extensions import missing
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialContext(ExtensionContext):
+class TrialContext(BaseContext):
     """Context for a single trial in an experiment."""
 
-    trial: TrialKey = missing()
-    """Trial key specified by this context."""
+    trial_id: str | None = None
+    """Trial identifier specified by this context, or None if not running a trial."""
+
+    def __post_init__(self):
+        """Combine with the value from 'TrialContext.current()' using dot delimiter."""
+
+        # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
+        if not self.is_deserialized:
+
+            # Combine with the previous trial_id if set
+            if (prev_context := TrialContext.current_or_none()) is not None and prev_context.trial_id is not None:
+                if self.trial_id is not None:
+                    self.trial_id = f"{prev_context.trial_id}.{self.trial_id}"
+                else:
+                    self.trial_id = prev_context.trial_id
+
     
     @classmethod
-    def get_base_type(cls) -> Type:
-        """Return base class of this extension category even if called from a derived class, do not use 'return cls'."""
-        return TrialContext
+    def get_key_type(cls) -> Type:
+        """
+        To get the current context for cls, ContextManager will perform dict lookup based cls.get_key_type().
 
-    @classmethod
-    def create_default(cls) -> Self:
-        """Create default extension instance, this method will be called for the class returned by 'get_base_type'."""
-        raise RuntimeError(
-            "TrialContext does not have a default, specify using 'with Context(extensions=[TrialContext(...)])'.")
+        Notes:
+            - Return as specific type rather than type(self) to avoid variation across derived types
+            - The returned type may be a base context class or a dedicated key type
+            - Contexts that have different key types are isolated from each other and have independent 'with' clauses
+            - As all contexts are singletons and have no key fields, get_key method is not required
+        """
+

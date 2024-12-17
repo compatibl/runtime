@@ -21,7 +21,6 @@ from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.settings.context_settings import ContextSettings
@@ -78,10 +77,6 @@ class ProcessContext(Context):
             # Use root dataset if not specified directly
             if self.dataset is None:
                 self.dataset = DatasetUtil.root()
-
-            if self.trial is None:
-                if StringUtil.is_not_empty(trial_id := ContextSettings.instance().trial):
-                    self.trial = TrialKey(trial_id=trial_id)
 
         # Return self to enable method chaining
         return self

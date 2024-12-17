@@ -29,7 +29,6 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.dataclasses_extensions import missing
@@ -64,9 +63,6 @@ class Context(BaseContext):
 
     secrets: Dict[str, str] | None = None
     """Context-specific secrets take precedence over those defined via Dynaconf."""
-
-    trial: TrialKey | None = None
-    """Key of the running trial."""
 
     @classmethod
     def get_key_type(cls) -> Type:
@@ -109,8 +105,6 @@ class Context(BaseContext):
             # The root context uses ContextSettings values of these fields
             if self.secrets is None:
                 self.secrets = Context.current().secrets
-            if self.trial is None:
-                self.trial = Context.current().trial
 
         # Replace fields that are set as keys by records from storage
         # First, load 'db' field of this context using 'Context.current()'
