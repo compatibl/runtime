@@ -26,7 +26,7 @@ class TrialContext(BaseContext):
     """Trial identifier specified by this context, or None if not running a trial."""
 
     def __post_init__(self):
-        """Combine with the value from 'TrialContext.current()' using dot delimiter."""
+        """Combine with the value from the previous trial context using dot delimiter."""
 
         # Do not execute this code on deserialized context instances (e.g. when they are passed to a task queue)
         if not self.is_deserialized:

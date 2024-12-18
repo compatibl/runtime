@@ -15,10 +15,11 @@
 import multiprocessing
 import os
 from dataclasses import dataclass
-from typing import Final
+from typing import Final, List
 from uuid import UUID
 from celery import Celery
 from cl.runtime import Context
+from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.settings.context_settings import ContextSettings
@@ -56,19 +57,16 @@ context_serializer = DictSerializer()
 @celery_app.task(max_retries=0)  # Do not retry failed tasks
 def execute_task(
     task_id: str,
-    context_data: TDataDict,
+    context_manager_data: List[TDataDict],
 ) -> None:
     """Invoke 'run_task' method of the specified task."""
 
-    # Set is_deserialized flag in context data, will be used to skip some of the initialization code
-    context_data["is_deserialized"] = True
-
     # Deserialize context from 'context_data' parameter to run with the same settings as the caller context
-    with context_serializer.deserialize_data(context_data) as context:
+    with ContextManager(context_manager_data):
 
         # Load and run the task
         task_key = TaskKey(task_id=task_id)
-        task = context.load_one(Task, task_key)
+        task = Context.current().load_one(Task, task_key)
         task.run_task()
 
 
@@ -138,13 +136,12 @@ class CeleryQueue(TaskQueue):
 
     def submit_task(self, task: TaskKey):
         # Get and serialize current context
-        context = Context.current()
-        context_data = context_serializer.serialize_data(context)
+        context_manager_data = ContextManager.serialize_all_current()
 
         # Pass parameters to the Celery task signature
         execute_task_signature = execute_task.s(
             task.task_id,
-            context_data,
+            context_manager_data,
         )
 
         # Submit task to Celery with completed and error links

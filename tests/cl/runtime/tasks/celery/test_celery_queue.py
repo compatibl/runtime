@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime import Context
+from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
@@ -53,10 +54,10 @@ def test_method(celery_test_queue_fixture):
         task_key = _create_task(queue.get_key())
 
         # Call 'execute_task' method in-process
-        context_data = context_serializer.serialize_data(context)
+        context_manager_data = ContextManager.serialize_all_current()
         execute_task(
             task_key.task_id,
-            context_data,
+            context_manager_data,
         )
 
 
