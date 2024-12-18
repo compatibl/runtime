@@ -24,7 +24,7 @@ from typing_extensions import Self
 from cl.runtime.context.context_mixin import ContextMixin
 from cl.runtime.records.record_util import RecordUtil
 
-_CONTEXT_STACK_DICT_VAR: ContextVar[DefaultDict[Type, List] | None] = ContextVar("_CONTEXT_STACK_DICT_VAR", default=None)
+_CONTEXT_STACK_DICT_VAR: ContextVar[DefaultDict[str, List] | None] = ContextVar("_CONTEXT_STACK_DICT_VAR", default=None)
 """
 Context adds self to the stack on __enter__ and removes self on __exit__,
 Each asynchronous environment has its own stack dictionary
@@ -168,7 +168,7 @@ class BaseContext(ContextMixin, ABC):
 
     @classmethod
     def _get_context_stack(cls) -> List[Self]:
-        """Return context stack for cls.key_type()."""
+        """Return context stack for cls.get_context_type()."""
 
         # Get context stack dict, create if None
         context_stack_dict = _CONTEXT_STACK_DICT_VAR.get()
@@ -176,9 +176,9 @@ class BaseContext(ContextMixin, ABC):
             context_stack_dict = defaultdict(list)
             _CONTEXT_STACK_DICT_VAR.set(context_stack_dict)
 
-        # Look up in dict using cls.get_key_type() rather than cls itself
-        key_type = cls.get_key_type()
+        # Look up in dict using cls.get_context_type() rather than cls itself
+        context_type = cls.get_context_type()
 
         # The defaultdict will create an empty list if the key does not exist
-        context_stack = context_stack_dict[key_type]
+        context_stack = context_stack_dict[context_type]
         return context_stack

@@ -40,17 +40,15 @@ class StubContext(BaseContext):
     """If True, an error will be raised inside __exit__ method for testing purposes."""
 
     @classmethod
-    def get_key_type(cls) -> Type:
+    def get_context_type(cls) -> str:
         """
-        The lookup of current context for cls will be done using the type returned by this method as key.
+        The lookup of current context for cls will be done using the key returned by cls.get_context_type().
 
         Notes:
-            - Return as specific type rather than type(self) to avoid variation across derived types
-            - The returned type may be a base context class or a dedicated key type
-            - Contexts that have different key types are isolated from each other and have independent 'with' clauses
-            - As all contexts are singletons and have no key fields, get_key method is not required
+          - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
+          - By convention, the returned string is the name of the base class for this context type in PascalCase
         """
-        return StubContext
+        return "StubContext"
 
     def __post_init__(self):
         """Runs after __init__."""
