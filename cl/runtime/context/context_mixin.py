@@ -15,9 +15,10 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import Type
+from cl.runtime.records.init_mixin import InitMixin
 
 
-class ContextMixin(ABC):
+class ContextMixin(InitMixin, ABC):
     """Optional mixin class for a context, code must not rely on inheritance from this class."""
 
     __slots__ = ()
@@ -35,3 +36,11 @@ class ContextMixin(ABC):
             - Contexts that have different key types are isolated from each other and have independent 'with' clauses
             - As all contexts are singletons and have no key fields, get_key method is not required
         """
+
+    @abstractmethod
+    def __enter__(self):
+        """Supports 'with' operator for resource disposal."""
+
+    @abstractmethod
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Supports 'with' operator for resource disposal."""

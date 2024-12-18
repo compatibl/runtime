@@ -12,25 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod
-from typing import Generic
-from typing import TypeVar
-from cl.runtime.records.init_mixin import InitMixin
-from cl.runtime.records.protocols import KeyProtocol
-
-TKey = TypeVar("TKey", bound=KeyProtocol)  # TODO: Remove duplicate TKey definition
+from typing_extensions import Self
+from cl.runtime.records.record_util import RecordUtil
 
 
-class RecordMixin(Generic[TKey], InitMixin):
-    """
-    Optional mixin class for a record, code must not rely on inheritance from this class.
-    Derive MyRecord from both MyKey and RecordMixin[MyKey] as in MyRecord(MyKey, RecordMixin[MyKey]).
-    """
+class InitMixin:
+    """Optional mixin class adding init_all(), code must not rely on inheritance from this class."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
 
-    @abstractmethod
-    def get_key(self) -> TKey:
-        """Return a new key object whose fields populated from self, do not return self."""
-
+    def init_all(self) -> Self:
+        """
+        Invoke 'init' for each class in the order from base to derived, then validate against schema.
+        Return self to enable method chaining.
+        """
+        return RecordUtil.init_all(self)
