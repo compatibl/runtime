@@ -19,7 +19,7 @@ from cl.runtime.context.base_context import BaseContext
 
 
 @dataclass(slots=True, kw_only=True)
-class StubBaseExtensionContext(BaseContext):
+class StubContext(BaseContext):
     """Base extension context."""
 
     @classmethod
@@ -33,7 +33,7 @@ class StubBaseExtensionContext(BaseContext):
             - Contexts that have different key types are isolated from each other and have independent 'with' clauses
             - As all contexts are singletons and have no key fields, get_key method is not required
         """
-        return StubBaseExtensionContext
+        return StubContext
 
     base_field: str = "abc"
     """Field of the base class."""

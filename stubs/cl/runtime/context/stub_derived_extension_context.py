@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from stubs.cl.runtime.context.stub_base_extension_context import StubBaseExtensionContext
+from stubs.cl.runtime.context.stub_context import StubContext
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDerivedExtensionContext(StubBaseExtensionContext):
+class StubDerivedContext(StubContext):
     """Base extension context."""
 
     derived_field: str = "def"
