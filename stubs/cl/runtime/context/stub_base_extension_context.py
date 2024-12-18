@@ -25,7 +25,7 @@ class StubBaseExtensionContext(BaseContext):
     @classmethod
     def get_key_type(cls) -> Type:
         """
-        To get the current context for cls, ContextManager will perform dict lookup based cls.get_key_type().
+        The lookup of current context for cls will be done using the type returned by this method as key.
 
         Notes:
             - Return as specific type rather than type(self) to avoid variation across derived types

@@ -1,0 +1,94 @@
+# Copyright (C) 2023-present The Project Contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import pytest
+from typing import List
+
+from cl.runtime import Context
+from cl.runtime.context.base_context import BaseContext
+from cl.runtime.context.context_manager import ContextManager
+from cl.runtime.context.testing_context import TestingContext
+from cl.runtime.context.trial_context import TrialContext
+
+
+def _perform_serialization_test(contexts: List[BaseContext]):
+    """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
+
+    # Serialize current contexts into data and then deserialize data into a ContextManager instance
+    serialized_data = ContextManager.serialize_all_current()
+    deserialized_context_manager = ContextManager(serialized_data)
+
+    # Ensure the deserialized list is identical to the argument
+    if not contexts:
+        assert not deserialized_context_manager._all_contexts  # noqa
+    else:
+        assert len(contexts) == len(deserialized_context_manager._all_contexts)  # noqa
+        for context, deserialized_context in zip(contexts, deserialized_context_manager._all_contexts):  # noqa
+            # Set is_deserialized for the left hand side because ContextManager will set it for the right hand side
+            context.is_deserialized = True
+            assert context == deserialized_context
+
+def _perform_manager_test(contexts: List[BaseContext]):
+    """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
+
+    # Save contextvars for BaseContext
+    token = BaseContext.reset_before()
+
+    try:
+        # Serialize current contexts into data and then deserialize data into a ContextManager instance
+        serialized_data = ContextManager._serialize_contexts(contexts)  # noqa
+        with ContextManager(serialized_data):
+            if contexts:
+                for context in contexts:
+                    current_context = type(context).current_or_none()
+                    context.is_deserialized = True
+                    assert context == current_context
+    finally:
+        # Restore contextvars for BaseContext
+        BaseContext.reset_after(token)
+
+def test_context_manager():
+    """Test ContextManager class."""
+
+    # No contexts defined
+    _perform_serialization_test([])
+    _perform_manager_test([])
+
+    # Create TestContext() but do not use 'with' clause
+    context_external = TestingContext()
+    _perform_manager_test([context_external])
+
+    # Inside a single 'with TestContext()' clause
+    with TestingContext() as context_1:
+        _perform_serialization_test([context_1])
+    # Recreate using ContextManager
+    _perform_manager_test([context_1])
+
+    # Inside two nested 'with' clauses for the same key type Context
+    with TestingContext() as context_1:
+        with Context(dataset="abc") as context_2:
+            _perform_serialization_test([context_2])
+    # Recreate using ContextManager
+    _perform_manager_test([context_2])
+
+    # Inside two nested 'with' clauses for different same key types
+    with TestingContext() as context_1:
+        with TrialContext(trial_id="abc") as context_2:
+            _perform_serialization_test([context_1, context_2])
+    # Recreate using ContextManager
+    _perform_manager_test([context_1, context_2])
+
+
+if __name__ == "__main__":
+    pytest.main([__file__])

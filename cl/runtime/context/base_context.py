@@ -76,18 +76,8 @@ class BaseContext(ContextMixin, ABC):
         return self
 
     @classmethod
-    def reset_before(cls) -> Token:
-        """Set context stack to None before async method execution, return a token for its previous state."""
-        return _CONTEXT_STACK_DICT_VAR.set(None)
-
-    @classmethod
-    def reset_after(cls, token: Token) -> None:
-        """Restore context stack to the previous state after async method execution."""
-        _CONTEXT_STACK_DICT_VAR.reset(token)
-
-    @classmethod
     def current_or_none(cls) -> Self:
-        """Return the context from the innermost 'with' clause or None context if not inside 'with' clause."""
+        """Return the context from the innermost 'with' for cls.key_type(), or None outside the outermost 'with'."""
 
         # Get context stack for the current asynchronous environment
         context_stack = cls._get_context_stack()
@@ -100,7 +90,7 @@ class BaseContext(ContextMixin, ABC):
 
     @classmethod
     def current(cls) -> Self:
-        """Return the context from the innermost 'with' clause or default context if not inside 'with' clause."""
+        """Return the context from the innermost 'with' for cls.key_type(), error outside the outermost 'with'."""
 
         # Get current context stack or None if it is empty
         result = cls.current_or_none()
@@ -112,6 +102,32 @@ class BaseContext(ContextMixin, ABC):
             raise RuntimeError(
                 f"{cls.__name__}.current() is undefined outside the outermost 'with {cls.__name__}(...)' clause.\n"
                 f"To receive None instead of an exception, use {cls.__name__}.current_or_none()\n")
+
+    @classmethod
+    def all_current(cls) -> List[Self]:
+        """
+        Return the list of current contexts across all key types, or an empty list if none exist.
+        This method is used by the ContextManager to restore the current contexts for out-of-process
+        task execution.
+        """
+        context_stack_dict = _CONTEXT_STACK_DICT_VAR.get()
+        if context_stack_dict is not None:
+            # Get current contexts as last in each context stack, skip those that are None or empty
+            result = [context_stack[-1] for context_stack in context_stack_dict.values() if context_stack]
+        else:
+            # Otherwise return an empty list
+            result = []
+        return result
+
+    @classmethod
+    def reset_before(cls) -> Token:
+        """Set context stack to None before async method execution, return a token for its previous state."""
+        return _CONTEXT_STACK_DICT_VAR.set(None)
+
+    @classmethod
+    def reset_after(cls, token: Token) -> None:
+        """Restore context stack to the previous state after async method execution."""
+        _CONTEXT_STACK_DICT_VAR.reset(token)
 
     def __enter__(self):
         """Supports 'with' operator for resource disposal."""
@@ -138,7 +154,7 @@ class BaseContext(ContextMixin, ABC):
         # Get context stack for the current asynchronous environment
         context_stack = self._get_context_stack()
         if context_stack is None or len(context_stack) == 0:
-            class_name = {type(self).__name__}
+            class_name = type(self).__name__
             raise RuntimeError(f"Current {class_name} stack has been cleared inside 'with {class_name}(...)' clause.")
 
         # Restore the previous current context on exiting from 'with Context(...)' clause
@@ -152,7 +168,7 @@ class BaseContext(ContextMixin, ABC):
 
     @classmethod
     def _get_context_stack(cls) -> List[Self]:
-        """Return context stack for cls.base_type()."""
+        """Return context stack for cls.key_type()."""
 
         # Get context stack dict, create if None
         context_stack_dict = _CONTEXT_STACK_DICT_VAR.get()
