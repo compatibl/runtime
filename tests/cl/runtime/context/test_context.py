@@ -52,9 +52,8 @@ def _perform_testing(
 
         _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
 
-        with pytest.raises(RuntimeError):
-            # Ensure that current context is not leaked outside the 'with clause' before the test
-            StubContext.current()
+        # Ensure current context is not leaked outside 'with' clauses before the test
+        assert StubContext.current_or_none() is None
 
         stub_context_1 = StubContext(base_field="stub_context_1")
         with stub_context_1:
@@ -69,8 +68,11 @@ def _perform_testing(
 
             assert StubContext.current() is stub_context_1
 
-        with pytest.raises(RuntimeError):
-            # Ensure that current context is not leaked outside the 'with clause' after the test
+        # Ensure current context is not leaked outside 'with' clauses after the test
+        assert StubContext.current_or_none() is None
+
+        with pytest.raises(RuntimeError, match="outside the outermost"):
+            # Ensure calling 'current' outside 'with clause' raises
             StubContext.current()
 
 async def _perform_testing_async(
@@ -85,6 +87,9 @@ async def _perform_testing_async(
     # Sleep before entering the task
     await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
     with TestingContext():
+
+        # Ensure current context is not leaked outside 'with' clauses before the test
+        assert StubContext.current_or_none() is None
 
         await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
 
@@ -105,8 +110,11 @@ async def _perform_testing_async(
 
             assert StubContext.current() is stub_context_1
 
-        with pytest.raises(RuntimeError):
-            # Ensure that current context is not leaked outside the 'with clause' before the test
+        # Ensure current context is not leaked outside 'with' clauses after the test
+        assert StubContext.current_or_none() is None
+
+        with pytest.raises(RuntimeError, match="outside the outermost"):
+            # Ensure calling 'current' outside 'with clause' raises
             StubContext.current()
 
 
@@ -120,23 +128,82 @@ async def _gather(rnd: Random):
         Context.reset_after(state_before)
 
 # TODO: Restore after creating the standard way to init context classes
-@pytest.mark.skip("Restore after creating the standard way to init context classes")
 def test_error_handling():
     """Test error handling in specifying extensions."""
+
     stub_context_1 = StubContext(base_field="stub_context_1")
     stub_context_2 = StubDerivedContext(base_field="stub_context_2")
 
     # Outer context all of the fields of the inner context, ok
+    assert StubContext.current_or_none() is None
     with stub_context_1:
         with stub_context_2:
             pass
+    assert StubContext.current_or_none() is None
 
-    # Outer context is missing some fields from the inner context, raise
+    # TODO: Outer context is missing some fields from the inner context, raise
+    if False:
+        with pytest.raises(RuntimeError):
+            with stub_context_2:
+                with stub_context_1:
+                    pass
+        assert StubContext.current_or_none() is None
+
+    # Outer context raises on __post__init__
     with pytest.raises(RuntimeError):
-        with stub_context_2:
+        with StubContext(error_on_post_init=True):
             with stub_context_1:
                 pass
+    assert StubContext.current_or_none() is None
 
+    # Inner context raises on __post__init__
+    with pytest.raises(RuntimeError):
+        with stub_context_1:
+            with StubContext(error_on_post_init=True):
+                pass
+    assert StubContext.current_or_none() is None
+
+    # Outer context raises on init
+    with pytest.raises(RuntimeError):
+        with StubContext(error_on_init=True):
+            with stub_context_1:
+                pass
+    assert StubContext.current_or_none() is None
+
+    # Inner context raises on init
+    with pytest.raises(RuntimeError):
+        with stub_context_1:
+            with StubContext(error_on_init=True):
+                pass
+    assert StubContext.current_or_none() is None
+
+    # Outer context raises on enter
+    with pytest.raises(RuntimeError):
+        with StubContext(error_on_enter=True):
+            with stub_context_1:
+                pass
+    assert StubContext.current_or_none() is None
+
+    # Inner context raises on enter
+    with pytest.raises(RuntimeError):
+        with stub_context_1:
+            with StubContext(error_on_enter=True):
+                pass
+    assert StubContext.current_or_none() is None
+
+    # Outer context raises on exit
+    with pytest.raises(RuntimeError):
+        with StubContext(error_on_exit=True):
+            with stub_context_1:
+                pass
+    assert StubContext.current_or_none() is None
+
+    # Inner context raises on exit
+    with pytest.raises(RuntimeError):
+        with stub_context_1:
+            with StubContext(error_on_exit=True):
+                pass
+    assert StubContext.current_or_none() is None
 
 def test_in_process():
     """Test in different threads."""
