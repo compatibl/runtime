@@ -17,6 +17,8 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
+
+from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
 
@@ -253,7 +255,7 @@ def test_in_async_loop():
     """Test in different async environments."""
 
     # Save previous state of context stack before async method execution
-    state_before = Context.reset_before()
+    contextvar_token = BaseContext.clear_contextvar()
     try:
         # Create a local random instance with seed
         rnd = Random(0)
@@ -262,7 +264,7 @@ def test_in_async_loop():
         asyncio.run(_gather(rnd))
     finally:
         # Restore previous state of context stack after async method execution even if an exception occurred
-        Context.reset_after(state_before)
+        BaseContext.restore_contextvar(contextvar_token)
 
 
 if __name__ == "__main__":

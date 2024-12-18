@@ -61,9 +61,9 @@ class ContextManager:
     def __enter__(self):
         """Invoke __enter__ for each item in the 'contexts' field."""
 
-        # Save contextvars before entering into contexts
+        # Set ContextVar=None before async task execution, get a token for restoring its previous state
         if self._token is None:
-            self._token = BaseContext.reset_before()
+            self._token = BaseContext.clear_contextvar()
         else:
             raise RuntimeError("Nested 'with' clauses are not permitted or necessary with ContextManager.")
 
@@ -100,9 +100,10 @@ class ContextManager:
                 # Run __exit__ on the removed element with exception parameters
                 entered_context.__exit__(exc_type, exc_val, exc_tb)
         finally:
-            # Restore contextvars whether or not there was an exception during __exit__ calls
+            # Restore ContextVar to its previous state after async task execution using a token
+            # from 'clear_contextvar' whether or not an exception occurred
             if self._token is not None:
-                 BaseContext.reset_after(self._token)
+                 BaseContext.restore_contextvar(self._token)
             else:
                 raise RuntimeError("Detected ContextManager.__exit__ without a preceding ContextManager.__enter__.")
 

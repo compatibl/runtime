@@ -18,6 +18,7 @@ import random
 from starlette.requests import Request
 from starlette.types import ASGIApp
 from cl.runtime import Context
+from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.process_context import ProcessContext
 
 
@@ -32,16 +33,19 @@ class ContextMiddleware:
             # TODO: Create a test setting to enable this other than by uncommenting
             # duration = random.uniform(0, 10)
             # print(f"Before request processing: {duration}")
-            # Save previous state of context stack before async method execution
-            state_before = Context.reset_before()
+
+            # Set ContextVar=None before async task execution, get a token for restoring its previous state
+            token = BaseContext.clear_contextvar()
             try:
                 with ProcessContext():
                     # TODO: Create a test setting to enable this other than by uncommenting
                     # await asyncio.sleep(duration)
                     await self.app(scope, receive, send)
             finally:
-                # Restore previous state of context stack after async method execution even if an exception occurred
-                Context.reset_after(state_before)
+                # Restore ContextVar to its previous state after async task execution using a token
+                # from 'clear_contextvar' whether or not an exception occurred
+                BaseContext.restore_contextvar(token)
+
             # TODO: Create a test setting to enable this other than by uncommenting
             # print(f"After request processing: {duration}")
         else:

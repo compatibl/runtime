@@ -120,13 +120,13 @@ class BaseContext(ContextMixin, ABC):
         return result
 
     @classmethod
-    def reset_before(cls) -> Token:
-        """Set context stack to None before async method execution, return a token for its previous state."""
+    def clear_contextvar(cls) -> Token:
+        """Set ContextVar=None before async task execution, return a token for restoring its previous state."""
         return _CONTEXT_STACK_DICT_VAR.set(None)
 
     @classmethod
-    def reset_after(cls, token: Token) -> None:
-        """Restore context stack to the previous state after async method execution."""
+    def restore_contextvar(cls, token: Token) -> None:
+        """Restore ContextVar to its previous state after async task execution using a token from 'clear_contextvar'."""
         _CONTEXT_STACK_DICT_VAR.reset(token)
 
     def __enter__(self):

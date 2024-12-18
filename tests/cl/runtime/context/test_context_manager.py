@@ -42,8 +42,8 @@ def _perform_serialization_test(contexts: List[BaseContext]):
 def _perform_manager_test(contexts: List[BaseContext]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
-    # Save contextvars for BaseContext
-    token = BaseContext.reset_before()
+    # Set ContextVar=None before async task execution, get a token for restoring its previous state
+    token = BaseContext.clear_contextvar()
 
     try:
         # Serialize current contexts into data and then deserialize data into a ContextManager instance
@@ -55,8 +55,9 @@ def _perform_manager_test(contexts: List[BaseContext]):
                     context.is_deserialized = True
                     assert context == current_context
     finally:
-        # Restore contextvars for BaseContext
-        BaseContext.reset_after(token)
+        # Restore ContextVar to its previous state after async task execution using a token
+        # from 'clear_contextvar' whether or not an exception occurred
+        BaseContext.restore_contextvar(token)
 
 def test_context_manager():
     """Test ContextManager class."""
