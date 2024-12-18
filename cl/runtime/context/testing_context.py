@@ -97,23 +97,37 @@ class TestingContext(Context):
         # Call '__enter__' method of base first
         Context.__enter__(self)
 
-        # Execute on default (root) context instances only if they are not deserialized
-        # (e.g. not the instances passed to a task queue)
-        if self.db is not None and not self.is_deserialized:
-            # Delete all existing data in temp database and drop DB in case it was not cleaned up
-            # due to abnormal termination of the previous test run
-            self.db.delete_all_and_drop_db()  # noqa
+        try:
+            # Execute on default (root) context instances only if they are not deserialized
+            # (e.g. not the instances passed to a task queue)
+            if self.db is not None and not self.is_deserialized:
+                # Delete all existing data in temp database and drop DB in case it was not cleaned up
+                # due to abnormal termination of the previous test run
+                self.db.delete_all_and_drop_db()  # noqa
+        except Exception as e:
+            # Treat the exception as though it happened outside the 'with' clause:
+            #   - Call __exit__ method of base class without passing exception details
+            #   - Then rethrow the exception
+            Context.__exit__(self, None, None, None)
+            raise e
 
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Supports 'with' operator for resource disposal."""
 
-        # Execute on default (root) context instances only if they are not deserialized
-        # (e.g. not the instances passed to a task queue)
-        if self.db is not None and not self.is_deserialized:
-            # Delete all data in temp database and drop DB to clean up
-            self.db.delete_all_and_drop_db()  # noqa
-
-        # Call '__exit__' method of base last
-        return Context.__exit__(self, exc_type, exc_val, exc_tb)
+        try:
+            # Execute on default (root) context instances only if they are not deserialized
+            # (e.g. not the instances passed to a task queue)
+            if self.db is not None and not self.is_deserialized:
+                # Delete all data in temp database and drop DB to clean up
+                self.db.delete_all_and_drop_db()  # noqa
+        except Exception as e:
+            # Treat the exception as though it happened outside the 'with' clause:
+            #   - Call __exit__ method of base class without passing exception details
+            #   - Then rethrow the exception
+            Context.__exit__(self, None, None, None)
+            raise e
+        else:
+            # Otherwise delegate to the __exit__ method of base
+            return Context.__exit__(self, exc_type, exc_val, exc_tb)

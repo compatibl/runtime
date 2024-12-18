@@ -15,12 +15,29 @@
 from dataclasses import dataclass
 from typing import Type
 
+from typing_extensions import Self
+
 from cl.runtime.context.base_context import BaseContext
 
 
 @dataclass(slots=True, kw_only=True)
 class StubContext(BaseContext):
     """Base extension context."""
+
+    base_field: str = "abc"
+    """Field of the base class."""
+
+    error_on_post_init: bool = False
+    """If True, an error will be raised inside '__post_init__' method for testing purposes."""
+
+    error_on_init: bool = False
+    """If True, an error will be raised inside 'init' method (not __init__) for testing purposes."""
+
+    error_on_enter: bool = False
+    """If True, an error will be raised inside __enter__ method for testing purposes."""
+
+    error_on_exit: bool = False
+    """If True, an error will be raised inside __exit__ method for testing purposes."""
 
     @classmethod
     def get_key_type(cls) -> Type:
@@ -35,6 +52,49 @@ class StubContext(BaseContext):
         """
         return StubContext
 
-    base_field: str = "abc"
-    """Field of the base class."""
+    def __post_init__(self):
+        """Runs after __init__."""
+
+        if self.error_on_post_init:
+            raise RuntimeError("StubContext.error_on_post_init is set.")
+
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+        if self.error_on_init:
+            raise RuntimeError("StubContext.error_on_init is set.")
+
+        # Return self to enable method chaining
+        return self
+
+    def __enter__(self):
+        """Supports 'with' operator for resource disposal."""
+
+        # Call __enter__ method of base class
+        BaseContext.__enter__(self)
+
+        try:
+            if self.error_on_enter:
+                raise RuntimeError("StubContext.error_on_enter is set.")
+        except Exception as e:
+            # Treat the exception as though it happened outside the 'with' clause:
+            #   - Call __exit__ method of base class without passing exception details
+            #   - Then rethrow the exception
+            BaseContext.__exit__(self, None, None, None)
+            raise e
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Supports 'with' operator for resource disposal."""
+
+        try:
+            if self.error_on_exit:
+                raise RuntimeError("StubContext.error_on_exit is set.")
+        except Exception as e:
+            # Treat the exception as though it happened outside the 'with' clause:
+            #   - Call __exit__ method of base class without passing exception details
+            #   - Then rethrow the exception
+            BaseContext.__exit__(self, None, None, None)
+            raise e
+        else:
+            # Otherwise delegate to the __exit__ method of base
+            return BaseContext.__exit__(self, exc_type, exc_val, exc_tb)
 

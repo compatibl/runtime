@@ -75,33 +75,36 @@ class ContextManager:
             # Assign empty list as it could be None
             self._entered_contexts = []
 
-        # Enter into each context in the order specified, skip if self._contexts is None or empty
+        # Enter into each context in the order specified
         if self._all_contexts:
             for context in self._all_contexts:
                 try:
                     context.__enter__()
                     self._entered_contexts.append(context)
                 except Exception as e:
-                    # Call __exit__ in reverse entry order with exception details on the context entered into
-                    # when the exception occurred and clear self._entered_contexts field
-                    self._exit_and_clear_entered_contexts(e)
-
-                    # Exit the for loop if an exception had occurred
-                    break
+                    # This will call __exit__ in reverse order for all contexts entered into so far
+                    # The exception is not passed to these __exit__ calls as it did not occur inside these contexts
+                    self.__exit__(None, None, None)
+                    # Rethrow
+                    raise e
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Invoke __exit__ for each item in the 'contexts' field."""
 
-        # Call __exit__ in reverse entry order on the contexts entered into so far
-        # and clear self._entered_contexts field
-        self._exit_and_clear_entered_contexts()
-
-        # Only after exiting from all contexts can we restore contextvars
-        if self._token is not None:
-             BaseContext.reset_after(self._token)
-        else:
-            raise RuntimeError("Detected ContextManager.__exit__ without a preceding ContextManager.__enter__.")
+        try:
+            # Remove (pop) from the list and call __exit__ in reverse entry order on the contexts entered into so far
+            while self._entered_contexts:
+                # Remove the last remaining element
+                entered_context = self._entered_contexts.pop()
+                # Run __exit__ on the removed element with exception parameters
+                entered_context.__exit__(exc_type, exc_val, exc_tb)
+        finally:
+            # Restore contextvars whether or not there was an exception during __exit__ calls
+            if self._token is not None:
+                 BaseContext.reset_after(self._token)
+            else:
+                raise RuntimeError("Detected ContextManager.__exit__ without a preceding ContextManager.__enter__.")
 
         # Return False to propagate exception to the caller
         return False
@@ -130,13 +133,3 @@ class ContextManager:
                 context_data["is_deserialized"] = True
         return result
 
-    def _exit_and_clear_entered_contexts(self, e: Exception | None = None) -> None:
-        """Manually call __exit__ for the contexts entered into with exception details if provided."""
-        exc_type = type(e) if e else None
-        exc_value = e
-        exc_traceback = e.__traceback__ if e else None
-        while self._entered_contexts:
-            # Remove the last remaining element
-            entered_context = self._entered_contexts.pop()
-            # Run __exit__ on the removed element with exception parameters
-            entered_context.__exit__(exc_type, exc_value, exc_traceback)
