@@ -14,12 +14,14 @@
 
 from contextvars import Token
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import Dict
+from typing import List
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.serialization.dict_serializer import DictSerializer
 
 _DICT_SERIALIZER = DictSerializer()
 """Serializer used to serialize and deserialize contexts."""
+
 
 @dataclass(slots=True, kw_only=True)
 class ContextManager:
@@ -52,8 +54,10 @@ class ContextManager:
 
                 # Ensure context is derived from BaseContext
                 if not isinstance(context, BaseContext):
-                    raise RuntimeError(f"Context {type(context).__name__} cannot be activated by ContextManager "
-                                       f"because it is not derived from {BaseContext.__name__}.")
+                    raise RuntimeError(
+                        f"Context {type(context).__name__} cannot be activated by ContextManager "
+                        f"because it is not derived from {BaseContext.__name__}."
+                    )
 
                 # Mark as deserialized to prevent repeat initialization
                 context.is_deserialized = True
@@ -88,7 +92,6 @@ class ContextManager:
                     # Rethrow
                     raise e
 
-
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Invoke __exit__ for each item in the 'contexts' field."""
 
@@ -103,7 +106,7 @@ class ContextManager:
             # Restore ContextVar to its previous state after async task execution using a token
             # from 'clear_contextvar' whether or not an exception occurred
             if self._token is not None:
-                 BaseContext.restore_contextvar(self._token)
+                BaseContext.restore_contextvar(self._token)
             else:
                 raise RuntimeError("Detected ContextManager.__exit__ without a preceding ContextManager.__enter__.")
 
@@ -133,4 +136,3 @@ class ContextManager:
             for context_data in result:
                 context_data["is_deserialized"] = True
         return result
-

@@ -14,7 +14,6 @@
 
 import pytest
 from typing import List
-
 from cl.runtime import Context
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.context_manager import ContextManager
@@ -39,6 +38,7 @@ def _perform_serialization_test(contexts: List[BaseContext]):
             context.is_deserialized = True
             assert context == deserialized_context
 
+
 def _perform_manager_test(contexts: List[BaseContext]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
@@ -59,6 +59,7 @@ def _perform_manager_test(contexts: List[BaseContext]):
         # from 'clear_contextvar' whether or not an exception occurred
         BaseContext.restore_contextvar(token)
 
+
 def test_context_manager():
     """Test ContextManager class."""
 
@@ -66,11 +67,11 @@ def test_context_manager():
     _perform_serialization_test([])
     _perform_manager_test([])
 
-    # Create TestContext() but do not use 'with' clause
+    # Create TestingContext() but do not use 'with' clause
     context_external = TestingContext()
     _perform_manager_test([context_external])
 
-    # Inside a single 'with TestContext()' clause
+    # Inside a single 'with TestingContext()' clause
     with TestingContext() as context_1:
         _perform_serialization_test([context_1])
     # Recreate using ContextManager

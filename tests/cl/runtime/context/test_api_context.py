@@ -17,13 +17,13 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
-
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
 
 TASK_COUNT = 3
 MAX_SLEEP_DURATION = 0.2
+
 
 def _verify_current_context(*, is_inner: bool, where_str: str):
     """Check for current context, raise an error if it exists when is_inner is False."""
@@ -37,10 +37,12 @@ def _verify_current_context(*, is_inner: bool, where_str: str):
             class_name = type(current_context).__name__
             raise RuntimeError(
                 f"Context.current() is leaked from outside the asynchronous environment {where_str}:\n"
-                f"Leaked context identifier: {current_context.context_id}")
+                f"Leaked context identifier: {current_context.context_id}"
+            )
         except RuntimeError:
             # Raised as expected, continue
             pass
+
 
 def _sleep(*, task_index: int, rnd: Random, max_sleep_duration: float):
     """Sleep for a random interval, reducing the interval for higher task index."""
@@ -200,6 +202,7 @@ async def _gather(rnd: Random):
     """Gather async functions."""
     tasks = [_perform_testing_async(task_index=i, rnd=rnd) for i in range(TASK_COUNT)]
     await asyncio.gather(*tasks)
+
 
 def test_error_handling():
     """Test error handling in specifying extensions."""

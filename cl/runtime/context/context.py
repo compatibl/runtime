@@ -19,7 +19,6 @@ from typing import Dict
 from typing import Iterable
 from typing import Type
 from typing_extensions import Self
-
 from cl.runtime import ClassInfo
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.base_context import BaseContext
@@ -324,12 +323,14 @@ class Context(BaseContext):
         # Get context stack for the current asynchronous environment
         context_stack = self._get_context_stack()
         if not context_stack:
-            raise RuntimeError(f"""
+            raise RuntimeError(
+                f"""
 Field '{field_name}' of the context class '{type(self).__name__}' is not set.
 The context in the outermost 'with' clause (root context) must set all fields
 of the Context class. Inside the 'with' clause, these fields will be populated
 from the current context.
-""")
+"""
+            )
 
     @classmethod
     def error_if_not_temp_db(cls, db_id_or_database_name: str) -> None:

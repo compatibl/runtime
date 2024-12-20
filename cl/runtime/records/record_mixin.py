@@ -33,4 +33,3 @@ class RecordMixin(Generic[TKey], InitMixin):
     @abstractmethod
     def get_key(self) -> TKey:
         """Return a new key object whose fields populated from self, do not return self."""
-

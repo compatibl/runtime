@@ -17,10 +17,10 @@ from collections import defaultdict
 from contextvars import ContextVar
 from contextvars import Token
 from dataclasses import dataclass
-from typing import List, DefaultDict
+from typing import DefaultDict
+from typing import List
 from typing import Type
 from typing_extensions import Self
-
 from cl.runtime.context.context_mixin import ContextMixin
 from cl.runtime.records.record_util import RecordUtil
 
@@ -64,7 +64,8 @@ class BaseContext(ContextMixin, ABC):
                     raise RuntimeError(
                         f"Creating a context with type {type(self).__name__} which is missing some of the fields\n"
                         f"present in the current context type {type(parent_context).__name__} is not permitted.\n"
-                        f"Missing fields: {missing_fields_str}\n")
+                        f"Missing fields: {missing_fields_str}\n"
+                    )
 
                 # Set empty fields to the values from the parent context
                 for field in parent_fields:
@@ -101,7 +102,8 @@ class BaseContext(ContextMixin, ABC):
         else:
             raise RuntimeError(
                 f"{cls.__name__}.current() is undefined outside the outermost 'with {cls.__name__}(...)' clause.\n"
-                f"To receive None instead of an exception, use {cls.__name__}.current_or_none()\n")
+                f"To receive None instead of an exception, use {cls.__name__}.current_or_none()\n"
+            )
 
     @classmethod
     def all_current(cls) -> List[Self]:
@@ -131,7 +133,7 @@ class BaseContext(ContextMixin, ABC):
 
     def __enter__(self):
         """Supports 'with' operator for resource disposal."""
-    
+
         # Initialize to populate empty values from the current context or settings
         RecordUtil.init_all(self)
 

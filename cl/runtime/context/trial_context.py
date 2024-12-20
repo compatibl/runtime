@@ -31,7 +31,7 @@ class TrialContext(BaseContext):
         but 'with TrialContext(...)' clause would still be present.
       - If trial_id is None, this TrialContext is disregarded
     """
-    
+
     @classmethod
     def get_context_type(cls) -> str:
         """

@@ -14,9 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-
 from typing_extensions import Self
-
 from cl.runtime.context.base_context import BaseContext
 
 
@@ -95,4 +93,3 @@ class StubContext(BaseContext):
         else:
             # Otherwise delegate to the __exit__ method of base
             return BaseContext.__exit__(self, exc_type, exc_val, exc_tb)
-

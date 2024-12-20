@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List, Dict
+from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Union
@@ -84,7 +85,7 @@ class MatplotlibUtil:
         labels: List[List[str]],
         textcolors: Union[str, Tuple[str]] = ("black", "white"),
         threshold: Optional[float] = None,
-        **textkw, # TODO: Review the use of kwargs
+        **textkw,  # TODO: Review the use of kwargs
     ):
         """
         A function to annotate a heatmap.
@@ -139,14 +140,14 @@ class MatplotlibUtil:
     def no_metadata(cls) -> Dict[str, str]:
         """Return empty metadata for Matplotlib to prevent version changes from creating test diffs."""
         return {
-            'Title': '',
-            'Author': '',
-            'Description': '',
-            'Copyright': '',
-            'CreationTime': '',
-            'Software': '',
-            'Disclaimer': '',
-            'Warning': '',
-            'Source': '',
-            'Comment': ''
+            "Title": "",
+            "Author": "",
+            "Description": "",
+            "Copyright": "",
+            "CreationTime": "",
+            "Software": "",
+            "Disclaimer": "",
+            "Warning": "",
+            "Source": "",
+            "Comment": "",
         }

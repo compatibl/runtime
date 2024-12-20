@@ -100,7 +100,7 @@ server_app.add_middleware(
     max_age=api_settings.max_age,
 )
 
-# Middleware for executing each API call in isolated context
+# Middleware for clearing contextvars and restoring their previous state after async task execution
 server_app.add_middleware(ContextMiddleware)
 
 # Routers

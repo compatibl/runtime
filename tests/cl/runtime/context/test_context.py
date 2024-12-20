@@ -17,7 +17,6 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
-
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
@@ -77,6 +76,7 @@ def _perform_testing(
             # Ensure calling 'current' outside 'with clause' raises
             StubContext.current()
 
+
 async def _perform_testing_async(
     *,
     task_index: int,
@@ -128,6 +128,7 @@ async def _gather(rnd: Random):
         await asyncio.gather(*tasks)
     finally:
         BaseContext.restore_contextvar(contextvar_token)
+
 
 # TODO: Restore after creating the standard way to init context classes
 def test_error_handling():
@@ -206,6 +207,7 @@ def test_error_handling():
             with StubContext(error_on_exit=True):
                 pass
     assert StubContext.current_or_none() is None
+
 
 def test_in_process():
     """Test in different threads."""

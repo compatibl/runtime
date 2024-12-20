@@ -15,7 +15,8 @@
 import multiprocessing
 import os
 from dataclasses import dataclass
-from typing import Final, List
+from typing import Final
+from typing import List
 from uuid import UUID
 from celery import Celery
 from cl.runtime import Context
