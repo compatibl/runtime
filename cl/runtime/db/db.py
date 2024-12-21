@@ -34,9 +34,6 @@ from cl.runtime.settings.context_settings import ContextSettings
 class Db(DbKey, RecordMixin[DbKey], ABC):
     """Polymorphic data storage with dataset isolation."""
 
-    # TODO: Do not store here, instead get from settings once during the initial Context construction
-    __default: ClassVar[Db | None] = None
-
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id)
 
@@ -202,20 +199,3 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def close_connection(self) -> None:
         """Close database connection to releasing resource locks."""
-
-    @classmethod
-    def default(cls) -> Db:
-        """Default database is initialized from settings and cannot be modified in code."""
-
-        if Db.__default is None:
-            # Load from configuration if not set
-            context_settings = ContextSettings.instance()  # TODO: Refactor to place this inside Context
-            db_type = ClassInfo.get_class_type(context_settings.db_class)
-            context_id = context_settings.context_id.replace(".", ";")
-            # TODO: Add code to obtain from preloads if only key is specified
-            if context_settings.db_uri:
-                Db.__default = db_type(db_id=context_id, client_uri=context_settings.db_uri)
-            else:
-                Db.__default = db_type(db_id=context_id)
-
-        return Db.__default
