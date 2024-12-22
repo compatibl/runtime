@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Dict
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.file.reader import Reader
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.char_util import CharUtil
@@ -63,7 +64,7 @@ class CsvFileReader(Reader):
 
             # Save records to the specified database
             if records:
-                context.save_many(records)
+                DbContext.save_many(records)
 
     def _deserialize_row(self, row_dict: Dict[str, Any]) -> RecordProtocol:
         """Deserialize row into a record."""

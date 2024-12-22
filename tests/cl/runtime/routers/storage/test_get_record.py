@@ -15,6 +15,8 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.routers.storage import storage_router
 from cl.runtime.routers.storage.record_request import RecordRequest
@@ -29,7 +31,7 @@ def test_method():
     with TestingContext() as context:
         # Save test record
         record = StubDataclassRecord(id=__name__)
-        context.save_one(record)
+        DbContext.save_one(record)
 
         # Run the coroutine wrapper added by the FastAPI decorator and get the result
         request_obj = RecordRequest(type="StubDataclassRecord", key=record.id)
@@ -56,7 +58,7 @@ def test_api():
         with TestClient(test_app) as test_client:
             # Save test record
             record = StubDataclassRecord(id=__name__)
-            context.save_one(record)
+            DbContext.save_one(record)
 
             # Request parameters
             request_obj = RecordRequest(type="StubDataclassRecord", key=record.id)

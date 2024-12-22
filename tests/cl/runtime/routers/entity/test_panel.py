@@ -55,7 +55,7 @@ def test_method():
 
     # TODO: Use TestingContext instead
     with TestingContext() as context:
-        context.save_one(stub_viewers)
+        DbContext.save_one(stub_viewers)
 
         for request, expected_result in zip(requests, expected_results):
             request_object = PanelRequest(**request)
@@ -71,7 +71,7 @@ def test_api():
 
     # TODO: Use TestingContext instead
     with TestingContext() as context:
-        context.save_one(stub_viewers)
+        DbContext.save_one(stub_viewers)
 
         test_app = FastAPI()
         test_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"])

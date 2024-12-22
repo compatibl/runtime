@@ -15,6 +15,8 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.routers.entity import entity_router
 from cl.runtime.routers.entity.save_request import SaveRequest
@@ -40,8 +42,8 @@ def test_method():
         save_new_record_request_obj = SaveRequest(record_dict=create_record_payload)
 
         save_new_record_result = SaveResponse.save_entity(save_new_record_request_obj)
-        new_record_in_db = context.load_one(StubDataclassDerivedRecord, StubDataclassRecordKey(id="new_record"))
-        records_count = len(list(context.load_all(StubDataclassDerivedRecord)))
+        new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, StubDataclassRecordKey(id="new_record"))
+        records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
 
         # Check if the result is a SaveResponse instance
         assert isinstance(save_new_record_result, SaveResponse)
@@ -54,14 +56,14 @@ def test_method():
 
         # Test updating existing record
         existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value")
-        context.save_one(existing_record)
+        DbContext.save_one(existing_record)
         update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
 
         update_record_result = SaveResponse.save_entity(update_record_request_obj)
-        updated_record_in_db = context.load_one(
+        updated_record_in_db = DbContext.load_one(
             StubDataclassDerivedRecord, StubDataclassRecordKey(id="existing_record")
         )
-        records_count = len(list(context.load_all(StubDataclassDerivedRecord)))
+        records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
 
         # Check if the result is a SaveResponse instance
         assert isinstance(update_record_result, SaveResponse)
@@ -93,8 +95,8 @@ def test_api():
                 params=request_params,
             )
             save_new_record_json = save_new_record_response.json()
-            new_record_in_db = context.load_one(StubDataclassDerivedRecord, StubDataclassRecordKey(id="new_record"))
-            records_count = len(list(context.load_all(StubDataclassDerivedRecord)))
+            new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, StubDataclassRecordKey(id="new_record"))
+            records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
 
             assert save_new_record_response.status_code == 200
             # Check that response contains the key of the new record
@@ -108,7 +110,7 @@ def test_api():
 
             # Test updating existing record
             existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value")
-            context.save_one(existing_record)
+            DbContext.save_one(existing_record)
             update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
             request_params = {
                 "old_record_key": update_record_request_obj.old_record_key,
@@ -120,8 +122,8 @@ def test_api():
                 params=request_params,
             )
             update_record_json = update_record_response.json()
-            updated_record_in_db = context.load_one(StubDataclassDerivedRecord, existing_record.get_key())
-            records_count = len(list(context.load_all(StubDataclassDerivedRecord)))
+            updated_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, existing_record.get_key())
+            records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
 
             assert update_record_response.status_code == 200
             # Check that response contains the key of the new record

@@ -15,6 +15,8 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.routers.entity import entity_router
 from cl.runtime.routers.entity.delete_request import DeleteRequest
@@ -29,7 +31,7 @@ def test_method():
         existing_records = [
             StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}") for i in range(5)
         ]
-        context.save_many(existing_records)
+        DbContext.save_many(existing_records)
 
         delete_records_payload = [
             {"_key": record.id, "_t": "StubDataclassDerivedRecord"} for record in existing_records[:3]
@@ -37,7 +39,7 @@ def test_method():
         delete_records_request_obj = DeleteRequest(record_keys=delete_records_payload)
 
         delete_records_result = DeleteResponse.delete_many(delete_records_request_obj)
-        records_in_db = sorted(context.load_all(StubDataclassDerivedRecord), key=lambda x: x.id)
+        records_in_db = sorted(DbContext.load_all(StubDataclassDerivedRecord), key=lambda x: x.id)
 
         # Check if the result is a DeleteResponse instance
         assert isinstance(delete_records_result, DeleteResponse)
@@ -59,7 +61,7 @@ def test_api():
             existing_records = [
                 StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}") for i in range(5)
             ]
-            context.save_many(existing_records)
+            DbContext.save_many(existing_records)
 
             delete_records_payload = [
                 {"_key": record.id, "_t": "StubDataclassDerivedRecord"} for record in existing_records[:3]
@@ -71,7 +73,7 @@ def test_api():
                 json=[key.model_dump() for key in delete_records_request_obj.record_keys],
             )
             delete_records_json = delete_records_response.json()
-            records_in_db = sorted(context.load_all(StubDataclassDerivedRecord), key=lambda x: x.id)
+            records_in_db = sorted(DbContext.load_all(StubDataclassDerivedRecord), key=lambda x: x.id)
 
             assert delete_records_response.status_code == 200
             # Check if the JSON response is correct (empty dict)

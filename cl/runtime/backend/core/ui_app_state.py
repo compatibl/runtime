@@ -21,6 +21,7 @@ from cl.runtime.backend.core.app_theme import AppTheme
 from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey
 from cl.runtime.backend.core.user_key import UserKey
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.record_mixin import RecordMixin
@@ -69,7 +70,7 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
 
         default_app_state_key = UiAppStateKey(user=UserKey(username="root"))  # TODO: Review the use of root default
 
-        default_app_state = Context.current().load_one(UiAppStateKey, default_app_state_key, is_record_optional=True)
+        default_app_state = DbContext.load_one(UiAppStateKey, default_app_state_key, is_record_optional=True)
         if default_app_state is not None and default_app_state.application_theme is not None:
             return default_app_state.application_theme
 

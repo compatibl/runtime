@@ -20,6 +20,7 @@ from fastapi import Body
 from fastapi import Header
 from fastapi import Query
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse
@@ -60,7 +61,7 @@ async def get_panel(
         """Return panel content by its displayed name."""
         return PanelResponseUtil.get_content(PanelRequest(type=type, panel_id=panel_id, key=key, dataset=dataset))
     except Exception as e:
-        Context.current().save_one(LogMessage(message=str(e)))
+        DbContext.save_one(LogMessage(message=str(e)))
         error_view = {  # TODO: Refactor
             "_t": "Script",
             "Name": None,
@@ -90,7 +91,7 @@ async def save(
             ),
         )
     except Exception as e:
-        Context.current().save_one(LogMessage(message=str(e)))
+        DbContext.save_one(LogMessage(message=str(e)))
         raise e
 
 

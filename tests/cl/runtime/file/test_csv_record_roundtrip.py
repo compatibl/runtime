@@ -19,6 +19,8 @@ from typing import List
 from typing import Tuple
 from typing import Type
 import pandas as pd
+
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.protocols import RecordProtocol
@@ -98,7 +100,7 @@ def test_roundtrip():
 
                 read_records_from_csv(file_path, entry_type)
 
-                actual_records = list(context.load_all(entry_type))
+                actual_records = list(DbContext.load_all(entry_type))
 
                 assert actual_records == expected_entries
             finally:

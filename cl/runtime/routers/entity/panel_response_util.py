@@ -19,6 +19,7 @@ from typing import Dict
 from typing import List
 from pydantic import BaseModel
 from cl.runtime.context.context import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.plots.plot_key import PlotKey
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.response_util import to_legacy_dict
@@ -60,7 +61,7 @@ class PanelResponseUtil(BaseModel):
         key_obj = serializer.deserialize_key(request.key, type_.get_key_type())
 
         # Get database from the current context
-        db = Context.current().db
+        db = DbContext.get_db()
 
         # Load record from the database
         record = db.load_one(type_, key_obj, dataset=request.dataset)
@@ -104,7 +105,7 @@ class PanelResponseUtil(BaseModel):
 
         if isinstance(view, PlotView):
             # Load plot for view if it is key
-            plot = Context.current().load_one(PlotKey, view.plot)
+            plot = DbContext.load_one(PlotKey, view.plot)
             if plot is None:
                 raise RuntimeError(f"Not found plot for key {view.plot}.")
 
@@ -113,7 +114,7 @@ class PanelResponseUtil(BaseModel):
 
         elif isinstance(view, KeyView):
             # Load record for view
-            record = Context.current().load_one(type(view.key), view.key)
+            record = DbContext.load_one(type(view.key), view.key)
             if record is None:
                 raise RuntimeError(f"Not found record for key {view.key}.")
 

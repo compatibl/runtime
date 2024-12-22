@@ -35,7 +35,7 @@ def _create_task(queue: TaskQueueKey) -> TaskKey:
 
     method_callable = StubHandlers.run_static_method_1a
     task = StaticMethodTask.create(queue=queue, record_type=StubHandlers, method_callable=method_callable)
-    Context.current().save_one(task)
+    DbContext.save_one(task)
     return task.get_key()
 
 
@@ -48,7 +48,7 @@ def test_method(celery_test_queue_fixture):
         # Create queue
         queue_id = f"test_celery_queue.test_method"
         queue = CeleryQueue(queue_id=queue_id)
-        context.save_one(queue)
+        DbContext.save_one(queue)
 
         # Create task
         task_key = _create_task(queue.get_key())
@@ -69,7 +69,7 @@ def test_api(celery_test_queue_fixture):
         # Create queue
         queue_id = f"test_celery_queue.test_api"
         queue = CeleryQueue(queue_id=queue_id)
-        context.save_one(queue)
+        DbContext.save_one(queue)
 
         # Create task
         task_key = _create_task(queue.get_key())

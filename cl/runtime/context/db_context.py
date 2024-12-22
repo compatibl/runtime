@@ -61,7 +61,7 @@ class DbContext(BaseContext):
 
         # First, load 'db' field of this context using 'Context.current()'
         if self.db is not None and is_key(self.db):
-            self.db = Context.current().load_one(DbKey, self.db)  # TODO: Revise to use DB settings
+            self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
 
         # Return self to enable method chaining
         return self
@@ -69,16 +69,24 @@ class DbContext(BaseContext):
     @classmethod
     def get_db(cls) -> Db:
         """Return DB for the current DbContext inside 'with DbContext(...)', and default DB from settings outside."""
-        current_context = DbContext.current_or_none()
-        if current_context:
-            result = current_context.db
-            if is_key(current_context.db):
+        if (db_context := DbContext.current_or_none()) is not None:
+            if db_context.db is None:
+                raise NotImplementedError()
+            result = db_context.db
+            if is_key(result):
                 # Load DB in the current context from the root DB specified in settings
-                result = Context.current().load_one(Db, result)  # TODO: Revise
+                result = Context.current().load_one(Db, db_context.db)  # TODO: Revise
+                db_context.db = result
+            return result
+        elif (current_context := Context.current_or_none()) is not None:
+            result = current_context.db
+            if is_key(result):
+                # Load DB in the current context from the root DB specified in settings
+                result = DbContext.load_one(Db, result)  # TODO: Revise
                 current_context.db = result
             return result
         else:
-            result = Context.current().load_one(Db, current_context.db)  # TODO: Revise
+            result = DbContext.load_one(Db, current_context.db)  # TODO: Revise
 
     @classmethod
     def get_dataset(cls) -> str | None:
@@ -94,7 +102,7 @@ class DbContext(BaseContext):
         """
         if cls.current_or_none() is not None:
             # Gather those tokens that are not None from contexts that have the same DB as the current context
-            db_id = DbContext.current().db.db_id
+            db_id = DbDbContext.get_db().db_id
             tokens = [
                 dataset for context in cls._get_context_stack() 
                 if db_id == context.db.db_id and (dataset := context.dataset) is not None

@@ -19,6 +19,7 @@ from typing import Type
 from typing_extensions import Self
 from cl.runtime.configs.config import Config
 from cl.runtime.context.context import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.settings.settings import Settings
 
@@ -72,7 +73,7 @@ class PreloadSettings(Settings):
         # TODO: Process YAML and JSON preloads
 
         # Execute run_config on all preloaded Config records
-        config_records = context.load_all(Config)
+        config_records = DbContext.load_all(Config)
         tuple(config_record.run_configure() for config_record in config_records)
 
     def _get_files(self, ext: str) -> List[str]:

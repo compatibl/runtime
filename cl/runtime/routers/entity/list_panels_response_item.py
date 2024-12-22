@@ -16,6 +16,7 @@ from __future__ import annotations
 from typing import List
 from pydantic import BaseModel
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
@@ -52,7 +53,7 @@ class ListPanelsResponseItem(BaseModel):
             key = key_serializer.deserialize_key(request.key, request_type.get_key_type())
 
             # If the record is not found, display panel tabs for the base type
-            record = Context.current().load_one(request_type, key, is_record_optional=True)
+            record = DbContext.load_one(request_type, key, is_record_optional=True)
             actual_type = request_type if record is None else type(record)
         else:
             actual_type = request_type

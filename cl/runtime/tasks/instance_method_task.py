@@ -18,6 +18,7 @@ from typing_extensions import Self
 from typing_extensions import override
 from cl.runtime import ClassInfo
 from cl.runtime.context.context import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
@@ -48,13 +49,13 @@ class InstanceMethodTask(MethodTask):
         context = Context.current()
 
         # Save self to ensure the worker process loads the same record
-        context.save_one(self)
+        DbContext.save_one(self)
 
         key_type = ClassInfo.get_class_type(self.key_type_str)
         key = key_serializer.deserialize_key(self.key_str, key_type)
 
         # Load record from storage
-        record = context.load_one(key_type, key)  # TODO: Require record type?
+        record = DbContext.load_one(key_type, key)  # TODO: Require record type?
 
         # Convert the name to snake_case and get method callable
         method_name = self.normalized_method_name()

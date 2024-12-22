@@ -21,6 +21,7 @@ from urllib import parse
 import pandas as pd
 from pydantic import BaseModel
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
@@ -36,7 +37,7 @@ def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[Type
     key_serializer = StringSerializer()
 
     key_objs = [key_serializer.deserialize_key(key, request_type.get_key_type()) for key in request.keys]
-    records = Context.current().load_many(key_objs, ignore_not_found=True)
+    records = DbContext.load_many(key_objs, ignore_not_found=True)
 
     # TODO (Bohdan): Implement with_dependencies logic.
     # if request.with_dependencies:
@@ -46,7 +47,7 @@ def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[Type
     #         for dag_node in Dag.create_data_connection_dag_from_record(data=record).nodes
     #         if dag_node.data.node_data_reference
     #     ]
-    #     records = context.load_many(key_objs, ignore_not_found=True)
+    #     records = DbContext.load_many(key_objs, ignore_not_found=True)
 
     type_to_records_map = defaultdict(list)
     for record in records:

@@ -16,6 +16,7 @@ from typing import List
 from fastapi import APIRouter
 from fastapi import Request
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
@@ -43,7 +44,7 @@ async def tasks_run(request: Request, payload: RunRequest):
         payload.headers = headers
         return RunResponseItem.run_tasks(payload)
     except Exception as e:
-        Context.current().save_one(LogMessage(message=str(e)))
+        DbContext.save_one(LogMessage(message=str(e)))
         raise e
 
 
@@ -69,5 +70,5 @@ async def tasks_result(payload: TaskResultRequest):
     try:
         return TaskResultResponseItem.get_task_results(request=payload)
     except Exception as e:
-        Context.current().save_one(LogMessage(message=str(e)))
+        DbContext.save_one(LogMessage(message=str(e)))
         raise e

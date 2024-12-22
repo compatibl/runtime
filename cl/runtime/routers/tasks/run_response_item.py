@@ -17,6 +17,7 @@ import traceback
 from typing import List
 from pydantic import BaseModel
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
@@ -88,7 +89,7 @@ class RunResponseItem(BaseModel):
                 )
 
             # Save and submit task
-            Context.current().save_one(handler_task)
+            DbContext.save_one(handler_task)
             handler_queue.submit_task(handler_task)  # TODO: Rely on query instead
             response_items.append(RunResponseItem(key=serialized_key, task_run_id=handler_task.task_id))
 

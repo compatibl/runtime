@@ -19,6 +19,7 @@ from typing import List
 from typing import cast
 from pydantic import BaseModel
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
@@ -63,7 +64,7 @@ class TaskStatusResponseItem(BaseModel):
         context = Context.current()
 
         task_keys = [TaskKey(task_id=x) for x in request.task_run_ids]  # TODO: Update if task_run_id is UUID
-        tasks = cast(Iterable[Task], context.load_many(Task, task_keys))
+        tasks = cast(Iterable[Task], DbContext.load_many(Task, task_keys))
 
         response_items = []
         for task in tasks:

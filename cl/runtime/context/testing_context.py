@@ -37,9 +37,6 @@ class TestingContext(Context):
         - This module not itself import pytest or unittest package
     """
 
-    use_mongo_mock: bool = True
-    """Use mongomock in-memory DB for testing instead of pymongo client."""  # TODO: Move to MongoTestingContext
-
     def __post_init__(self):
         """Configure fields that were not specified in constructor."""
 
@@ -55,7 +52,7 @@ class TestingContext(Context):
             # Get test name in 'module.test_function' or 'module.TestClass.test_method' format inside a test
             context_settings = ContextSettings.instance()
 
-            # For the test, env name is dot-delimited test module, class in snake_case (if any), and method or function
+            # For a test, env name is dot-delimited test module, class in snake_case (if any), and method or function
             env_name = EnvUtil.get_env_name()
 
             # Use test name in dot-delimited format for context_id unless specified by the caller
@@ -75,20 +72,17 @@ class TestingContext(Context):
 
             # Use database class from settings if not specified directly
             if self.db is None:
-                if self.use_mongo_mock:
-                    self.db = self.get_temp_db()
+                if self.db_class is not None:
+                    db_class = self.db_class
                 else:
-                    if self.db_class is not None:
-                        db_class = self.db_class
-                    else:
-                        db_class = context_settings.db_class
+                    db_class = context_settings.db_class
 
-                    # Use 'temp' followed by context_id converted to semicolon-delimited format for db_id
-                    db_id = "temp;" + self.context_id.replace(".", ";")
+                # Use 'temp' followed by context_id converted to semicolon-delimited format for db_id
+                db_id = "temp;" + self.context_id.replace(".", ";")
 
-                    # Instantiate a new database object for every test
-                    db_type = ClassInfo.get_class_type(db_class)
-                    self.db = db_type(db_id=db_id)
+                # Instantiate a new database object for every test
+                db_type = ClassInfo.get_class_type(db_class)
+                self.db = db_type(db_id=db_id)
 
             # Use root dataset if not specified directly
             if self.dataset is None:
@@ -137,17 +131,3 @@ class TestingContext(Context):
         else:
             # Otherwise delegate to the __exit__ method of base
             return Context.__exit__(self, exc_type, exc_val, exc_tb)
-
-    def get_temp_db_name(self, *, delimiter: str = ";"):
-        """Return the name of the temporary test DB that will be cleared before and after each test."""
-        return "temp;" + self.context_id.replace(".", delimiter)
-
-    def get_temp_db(self) -> BasicMongoDb:
-        """Return the name of the temporary test DB that will be cleared before and after each test."""
-
-        # Unique db name for each test with semicolon delimiter
-        db_id = self.get_temp_db_name(delimiter=";")
-
-        # Pass use_mongo_mock parameter to BasicMongoDb constructor
-        db = BasicMongoDb(db_id=db_id, use_mongo_mock=self.use_mongo_mock)
-        return db

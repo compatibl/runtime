@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.tasks.process_queue import ProcessQueue
 from cl.runtime.testing.regression_guard import RegressionGuard
@@ -34,7 +36,7 @@ def test_process_queue():
         # Create and save tasks
         task_count = 2
         tasks = [StubTask(label=f"{i}", queue=queue_key) for i in range(task_count)]
-        context.save_many(tasks)
+        DbContext.save_many(tasks)
 
         # Start queue
         queue.run_start_queue()

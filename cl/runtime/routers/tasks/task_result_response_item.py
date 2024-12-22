@@ -19,6 +19,7 @@ from typing import List
 from typing import cast
 from pydantic import BaseModel
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.task_result_request import TaskResultRequest
 from cl.runtime.tasks.task import Task
@@ -50,8 +51,8 @@ class TaskResultResponseItem(BaseModel):
         context = Context.current()
 
         task_keys = [TaskKey(task_id=x) for x in request.task_run_ids]
-        tasks = cast(Iterable[Task], context.load_many(Task, task_keys))
-        context.save_many(tasks)
+        tasks = cast(Iterable[Task], DbContext.load_many(Task, task_keys))
+        DbContext.save_many(tasks)
 
         response_items = []
         for task in tasks:

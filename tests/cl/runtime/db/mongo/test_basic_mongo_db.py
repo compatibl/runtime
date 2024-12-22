@@ -16,13 +16,11 @@ import pytest
 import time
 from typing import Any
 from typing import Iterable
-
-from cl.runtime import Context
+from cl.runtime import Db
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.mongo.mongo_testing_context import MongoTestingContext
+from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
-from cl.runtime.records.class_info import ClassInfo
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -46,7 +44,15 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubD
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
 
 USE_MONGO_MOCK = True
+"""Change to False to test on MongoDB server running on localhost with default port."""
 
+def _get_test_db() -> Db:
+    """Get SQLite database with name based on test namespace."""
+    # For the test, env name is dot-delimited test module, class in snake_case (if any), and method or function
+    env_name = EnvUtil.get_env_name()
+    # Replace period by semicolon in DB name due to MongoDB restrictions
+    db_name = env_name.replace(".", ";")
+    return BasicMongoDb(db_id=db_name, use_mongo_mock=USE_MONGO_MOCK)
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
     """Checks that two iterables contain the same elements, regardless of order."""
@@ -67,8 +73,8 @@ def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iter
 # @pytest.mark.skip("Requires MongoDB server.")  # TODO: Switch test to MongoMock
 def test_smoke():
     """Smoke test."""
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
             # Create test record and populate with sample data
             record = StubDataclassRecord()
             key = record.get_key()
@@ -89,8 +95,8 @@ def test_smoke():
 def test_complex_records():
     """Test 'save_many' method for various types."""
 
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
             samples = [
                 StubDataclassRecord(id="abc1"),
                 StubDataclassNestedFields(id="abc2"),
@@ -122,8 +128,8 @@ def test_complex_records():
 def test_basic_operations():
     """Test save/load/delete methods for various types."""
 
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
             samples = [
                 StubDataclassRecord(id="abc1"),
                 StubDataclassNestedFields(id="abc2"),
@@ -171,8 +177,8 @@ def test_basic_operations():
 def test_record_upsert():
     """Check that an existing entry is overridden when a new entry with the same key is saved."""
 
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
             # Create sample and save
             sample = StubDataclassRecord()
             DbContext.save_one(sample)
@@ -194,8 +200,8 @@ def test_record_upsert():
 def test_load_all():
     """Test 'load_all' method."""
 
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
             base_samples = [
                 StubDataclassRecord(id="base1"),
                 StubDataclassRecord(id="base2"),
@@ -226,8 +232,8 @@ def test_load_all():
 def test_performance():
     """Test performance of save/load methods."""
 
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
             n = 1000
             samples = [StubDataclassPrimitiveFields(key_str_field=f"key{i}") for i in range(n)]
             sample_keys = [sample.get_key() for sample in samples]
@@ -260,8 +266,8 @@ def test_performance():
 def test_singleton():
     """Test singleton type saving."""
 
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
             singleton_sample = StubDataclassSingleton()
             DbContext.save_one(singleton_sample)
             loaded_sample = DbContext.load_one(StubDataclassSingleton, singleton_sample.get_key())
@@ -321,8 +327,8 @@ def test_check_db_id():
 def test_load_filter():
     """Test 'load_filter' method."""
 
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
             # Create test record and populate with sample data
             offset = 0
             matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="a") for i in range(2)]
@@ -339,8 +345,8 @@ def test_load_filter():
 def test_abstract_key():
     """Test final record for which some of the fields are in base record."""
 
-    with MongoTestingContext(use_mongo_mock=USE_MONGO_MOCK) as testing_context:
-        with DbContext(db=testing_context.get_temp_db()):
+    with TestingContext():
+        with DbContext(db=_get_test_db()):
 
             final_record = StubDataclassFinalRecord(id="a")
             DbContext.save_one(final_record)

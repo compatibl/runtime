@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.configs.config import Config
 from cl.runtime.context.context import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.plots.group_bar_plot import GroupBarPlot
 from stubs.cl.runtime import StubDagViewers
 from stubs.cl.runtime import StubDataclassComposite
@@ -91,7 +92,7 @@ class StubRuntimeConfig(Config):
         ]
 
         # save stubs to db
-        Context.current().save_many(all_records)
+        DbContext.save_many(all_records)
 
     def run_configure_plots(self) -> None:
         """Configure plots."""
@@ -100,4 +101,4 @@ class StubRuntimeConfig(Config):
         bar_plot.group_labels = ["Single Group"] * 2
         bar_plot.bar_labels = ["Bar 1", "Bar 2"]
         bar_plot.values = [85.5, 92]
-        Context.current().save_one(bar_plot)
+        DbContext.save_one(bar_plot)

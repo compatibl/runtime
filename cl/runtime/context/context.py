@@ -47,7 +47,7 @@ class Context(BaseContext):
     """Override for the database class in module.ClassName format."""
 
     db: DbKey | None = None
-    """Database of the context, 'Context.current().db' is used if not specified."""
+    """Database of the context, 'DbContext.get_db()' is used if not specified."""
 
     dataset: str | None = None
     """Dataset of the context, 'Context.current().dataset' is used if not specified."""
@@ -98,7 +98,7 @@ class Context(BaseContext):
         # Replace fields that are set as keys by records from storage
         # First, load 'db' field of this context using 'Context.current()'
         if is_key(self.db):
-            self.db = Context.current().load_one(DbKey, self.db)
+            self.db = DbContext.load_one(DbKey, self.db)
 
         # After this all remaining fields can be loaded using database from this context
         if is_key(self.log):

@@ -20,6 +20,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.context.context import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.primitive.datetime_util import DatetimeUtil
@@ -99,7 +100,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
         try:
             # Set status to Running and save
             self.status = TaskStatusEnum.RUNNING
-            context.save_one(self)
+            DbContext.save_one(self)
 
             # Run the payload
             self._execute()
@@ -119,7 +120,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             log_message.init()
 
             # Save log entry to the database
-            Context.current().save_one(log_message)
+            DbContext.save_one(log_message)
 
             logger = Context.current().get_logger(__name__)
             logger.debug("An error occurred: %s", e)
@@ -131,7 +132,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             self.elapsed_sec = 0.0  # TODO: Implement
             self.remaining_sec = 0.0
             self.error_message = str(e)
-            context.save_one(self)
+            DbContext.save_one(self)
         else:
             # Record the end time
             end_time = DatetimeUtil.now()
@@ -141,7 +142,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             self.progress_pct = 100.0
             self.elapsed_sec = 0.0  # TODO: Implement
             self.remaining_sec = 0.0
-            context.save_one(self)
+            DbContext.save_one(self)
 
     @classmethod
     def wait_for_completion(cls, task_key: TaskKey, timeout_sec: int = 10) -> None:  # TODO: Rename or move
@@ -150,7 +151,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
         context = Context.current()
         start_datetime = DatetimeUtil.now()
         while DatetimeUtil.now() < start_datetime + dt.timedelta(seconds=timeout_sec):
-            task = context.load_one(Task, task_key)
+            task = DbContext.load_one(Task, task_key)
             if task.status == TaskStatusEnum.COMPLETED:
                 # Test success, task has been completed
                 return

@@ -19,6 +19,7 @@ from typing import List
 from pydantic import BaseModel
 from pydantic import Field
 from cl.runtime.context.context import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.routers.schema.type_request import TypeRequest
@@ -51,7 +52,7 @@ class SelectResponse(BaseModel):
         record_type = ClassInfo.get_class_type(f"{record_module}.{record_class}")
 
         # Get database from the current context
-        db = Context.current().db
+        db = DbContext.get_db()
 
         # TODO (Roman): replace temporary load_all to load_filter
         if not hasattr(db, "load_all"):

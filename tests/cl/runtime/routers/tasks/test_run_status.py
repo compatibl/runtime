@@ -18,6 +18,7 @@ from typing import List
 from fastapi import FastAPI
 from starlette.testclient import TestClient
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.routers.tasks import tasks_router
 from cl.runtime.routers.tasks.run_response_item import handler_queue
@@ -41,7 +42,7 @@ def _save_tasks_and_get_requests() -> List[Dict]:
         )
         for i in range(2)
     ]
-    Context.current().save_many(tasks)
+    DbContext.save_many(tasks)
 
     requests = [
         {

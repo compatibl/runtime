@@ -61,7 +61,7 @@ class StubPlotViewers(StubViewers):
         matrix_plot = self._create_confusion_matrix_plot()
         matrix_plot.plot_id = "confusion_matrix_plot"
 
-        Context.current().save_one(matrix_plot)
+        DbContext.save_one(matrix_plot)
 
         # Return PlotView
         return PlotView(plot=matrix_plot.get_key())

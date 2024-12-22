@@ -22,6 +22,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
@@ -68,7 +69,7 @@ async def handle_exception(request, exc):
     log_type = LogMessage if isinstance(exc, UserError) else LogMessage
     entry = LogMessage(message=str(exc))
     entry.init()
-    Context.current().save_one(entry)
+    DbContext.save_one(entry)
 
     # Determine if the message should be  displayed for user
     user_message = str(exc) if entry.priority >= 40 else None  # TODO: Configure the threshold in settings

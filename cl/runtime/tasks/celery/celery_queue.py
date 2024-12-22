@@ -21,6 +21,7 @@ from uuid import UUID
 from celery import Celery
 from cl.runtime import Context
 from cl.runtime.context.context_manager import ContextManager
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.settings.context_settings import ContextSettings
@@ -67,7 +68,7 @@ def execute_task(
 
         # Load and run the task
         task_key = TaskKey(task_id=task_id)
-        task = Context.current().load_one(Task, task_key)
+        task = DbContext.load_one(Task, task_key)
         task.run_task()
 
 

@@ -19,7 +19,7 @@ from typing import Dict
 from typing import List
 from pydantic import BaseModel
 from pydantic import Field
-from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey
 from cl.runtime.backend.core.ui_type_state import UiTypeState
@@ -127,7 +127,7 @@ class RecordResponse(BaseModel):
             record_type = ClassInfo.get_class_type(f"{key_module}.{key_class}")
 
         # Get database from the current context
-        db = Context.current().db
+        db = DbContext.get_db()
 
         # Load record from storage
         key_serializer = StringSerializer()
