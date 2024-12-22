@@ -19,6 +19,7 @@ from typing import Iterable
 from typing import Type
 from typing import cast
 from pymongo import MongoClient
+from mongomock import MongoClient as MongoClientMock
 from pymongo.database import Database
 from cl.runtime.context.context import Context
 from cl.runtime.db.db import Db
@@ -62,6 +63,9 @@ class BasicMongoDb(Db):
 
     client_uri: str = "mongodb://localhost:27017/"
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
+
+    use_mongo_mock: bool = False
+    """Use mongomock in-memory DB for testing instead of pymongo client."""
 
     def load_one(
         self,
@@ -321,10 +325,11 @@ class BasicMongoDb(Db):
         """Get PyMongo client object."""
         if (client := _client_dict.get(self.client_uri, None)) is None:
             # Create if it does not exist
-            client = MongoClient(
-                self.client_uri,
-                uuidRepresentation="standard",
-            )
+            client_type = MongoClient if not self.use_mongo_mock else MongoClientMock
+            client = client_type(
+                    self.client_uri,
+                    uuidRepresentation="standard",
+                )
             # TODO: Implement dispose logic
             _client_dict[self.client_uri] = client
         return client
