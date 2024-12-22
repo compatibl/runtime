@@ -14,28 +14,20 @@
 
 import logging
 from dataclasses import dataclass
-from getpass import getuser
 from typing import Dict
 from typing import Iterable
 from typing import Type
-from typing_extensions import Self
-from cl.runtime import ClassInfo
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.env_util import EnvUtil
-from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
-from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.log.log_key import LogKey
-from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.settings.context_settings import ContextSettings
-from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
@@ -135,7 +127,7 @@ class Context(BaseContext):
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
             record_or_key: Record (returned without lookup) or key in object, tuple or string format
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
             is_key_optional: If True, return None when key is none found instead of an error
             is_record_optional: If True, return None when record is not found instead of an error
@@ -164,7 +156,7 @@ class Context(BaseContext):
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
         """
         return self.db.load_many(  # noqa
@@ -186,7 +178,7 @@ class Context(BaseContext):
 
         Args:
             record_type: Type of the records to load
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
         """
         return self.db.load_all(  # noqa
@@ -209,7 +201,7 @@ class Context(BaseContext):
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
             filter_obj: Instance of 'record_type' whose fields are used for the query
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
         """
         return self.db.load_filter(  # noqa
@@ -275,7 +267,7 @@ class Context(BaseContext):
         Args:
             key_type: Key type to delete, used to determine the database table
             key: Key in object, tuple or string format
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
         """
         self.db.delete_one(  # noqa

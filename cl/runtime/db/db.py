@@ -54,7 +54,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
             record_or_key: Record (returned without lookup) or key in object, tuple or string format
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
             is_key_optional: If True, return None when key is none found instead of an error
             is_record_optional: If True, return None when record is not found instead of an error
@@ -76,7 +76,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
         """
 
@@ -93,7 +93,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
         """
 
@@ -112,7 +112,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
             filter_obj: Instance of 'record_type' whose fields are used for the query
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
         """
 
@@ -165,7 +165,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         Args:
             key_type: Key type to delete, used to determine the database table
             key: Key in object, tuple or string format
-            dataset: If specified, append to the root dataset of the database
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
             identity: Identity token for database access and row-level security
         """
 

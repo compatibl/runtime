@@ -24,12 +24,14 @@ class TrialContext(BaseContext):
 
     trial_id: str | None = None
     """
-    Trial identifier specified by this context. 
-    
+    Trial identifier can be a single token or multiple tokens in backslash-delimited format.
+
     Notes:
-      - Because 'with' clause cannot be under if/else, in some cases trial_id may be conditionally None
+      - Trial identifiers for the TrialContext stack are concatenated in the order entered
+      - Because 'with' clause cannot be under if/else, in some cases trial_id may be None
         but 'with TrialContext(...)' clause would still be present.
-      - If trial_id is None, this TrialContext is disregarded
+      - If trial_id is None, it is is disregarded
+      - If trial_id is None for the entire the TrialContext stack, this method returns None
     """
 
     @classmethod
@@ -50,13 +52,13 @@ class TrialContext(BaseContext):
         the TrialContext stack in the order entered, or None outside 'with TrialContext(...)' clause.
 
         Notes:
-          - Because 'with' clause cannot be under if/else, in some cases trial_id may be conditionally None
+          - Because 'with' clause cannot be under if/else, in some cases trial_id may be None
             but 'with TrialContext(...)' clause would still be present.
-          - If trial_id is None, the corresponding TrialContext is disregarded
+          - If trial_id is None, it is is disregarded
           - If trial_id is None for the entire the TrialContext stack, this method returns None
         """
         if cls.current_or_none() is not None:
-            # Gather those tokens from the context stack that are not None
+            # Gather those tokens that are not None
             tokens = [trial_id for context in cls._get_context_stack() if (trial_id := context.trial_id) is not None]
             # Consider the possibility that after removing tokens that are None, the list becomes empty
             if tokens:
