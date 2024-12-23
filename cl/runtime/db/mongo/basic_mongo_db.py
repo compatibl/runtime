@@ -22,6 +22,7 @@ from pymongo import MongoClient
 from mongomock import MongoClient as MongoClientMock
 from pymongo.database import Database
 from cl.runtime.context.context import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
 from cl.runtime.db.protocols import TKey
@@ -306,8 +307,8 @@ class BasicMongoDb(Db):
     def delete_all_and_drop_db(self) -> None:
         # Check that db_id and db_name both match temp_db_prefix
         db_name = self._get_db_name()
-        Context.error_if_not_temp_db(self.db_id)
-        Context.error_if_not_temp_db(db_name)
+        self.error_if_not_temp_db(self.db_id)
+        self.error_if_not_temp_db(db_name)
 
         # Drop the entire database without possibility of recovery, this
         # relies on the temp_db_prefix check above to prevent unintended use

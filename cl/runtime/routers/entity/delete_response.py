@@ -14,6 +14,7 @@
 
 from pydantic import BaseModel
 from cl.runtime import Context
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.serialization.dict_serializer import get_type_dict
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -29,13 +30,12 @@ class DeleteResponse(BaseModel):
     @staticmethod
     def delete_many(request: DeleteRequest) -> "DeleteResponse":
         """Delete entities."""
-        context = Context.current()
         type_dict = get_type_dict()
 
         record_key_dicts = [key.model_dump() for key in request.record_keys]
         deserialized_record_keys = [
             key_serializer.deserialize_key(key["_key"], type_dict[key["_t"]].get_key_type()) for key in record_key_dicts
         ]
-        context.delete_many(deserialized_record_keys, dataset=request.dataset)
+        DbContext.delete_many(deserialized_record_keys, dataset=request.dataset)
 
         return DeleteResponse()

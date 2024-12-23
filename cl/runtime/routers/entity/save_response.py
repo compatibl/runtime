@@ -36,8 +36,6 @@ class SaveResponse(BaseModel):
     @staticmethod
     def save_entity(request: SaveRequest) -> "SaveResponse":
         """Save entity."""
-        context = Context.current()
-
         # Get ui record and apply ui conversion
         ui_record = request.record_dict.model_dump()
 
@@ -74,7 +72,7 @@ class SaveResponse(BaseModel):
 
         if request.old_record_key is not None and request.old_record_key != key_serializer.serialize_key(record):
             old_record_key_obj = key_serializer.deserialize_key(request.old_record_key, type(record.get_key()))
-            context.delete_one(key_type=type(record.get_key()), key=old_record_key_obj, dataset=request.dataset)
+            DbContext.delete_one(key_type=type(record.get_key()), key=old_record_key_obj, dataset=request.dataset)
         DbContext.save_one(record, dataset=request.dataset)
 
         return SaveResponse(key=key_serializer.serialize_key(record))

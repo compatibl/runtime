@@ -378,7 +378,7 @@ class SqliteDb(Db):
 
     def delete_all_and_drop_db(self) -> None:
         # Check that db_id matches temp_db_prefix
-        Context.error_if_not_temp_db(self.db_id)
+        self.error_if_not_temp_db(self.db_id)
 
         # Close connection
         self.close_connection()
@@ -388,7 +388,7 @@ class SqliteDb(Db):
         # as well in case this approach changes later.
         db_file_path = self._get_db_file()
         db_filename = os.path.basename(db_file_path)
-        Context.error_if_not_temp_db(db_filename)
+        self.error_if_not_temp_db(db_filename)
 
         # Delete database file if exists, all checks gave been performed
         if os.path.exists(db_file_path):
