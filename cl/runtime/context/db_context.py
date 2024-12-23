@@ -59,6 +59,12 @@ class DbContext(BaseContext):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
+        # TODO: Make DB settings independent from Context
+        if self.db is None:
+            self.db = Context.current().db
+        if self.dataset is None:
+            self.dataset = Context.current().dataset
+
         # First, load 'db' field of this context using 'Context.current()'
         if self.db is not None and is_key(self.db):
             self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
