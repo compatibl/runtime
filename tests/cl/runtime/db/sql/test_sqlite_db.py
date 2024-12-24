@@ -41,9 +41,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record
 
 def _get_test_db() -> Db:
     """Get SQLite database with name based on test namespace."""
-    # For the test, env name is dot-delimited test module, class in snake_case (if any), and method or function
-    env_name = EnvUtil.get_env_name()
-    return SqliteDb(db_id=env_name)
+    db_name = Db._get_test_db_name()  # TODO: Refactor
+    return SqliteDb(db_id=db_name)
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
     """Checks that two iterables contain the same elements, regardless of order."""

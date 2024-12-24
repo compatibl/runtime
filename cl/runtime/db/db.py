@@ -19,6 +19,8 @@ from dataclasses import dataclass
 from typing import ClassVar
 from typing import Iterable
 from typing import Type
+
+from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.protocols import KeyProtocol
@@ -199,6 +201,14 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def close_connection(self) -> None:
         """Close database connection to releasing resource locks."""
+
+    @classmethod
+    def _get_test_db_name(cls) -> str:
+        """Get SQLite database with name based on test namespace."""
+        # For the test, env name is dot-delimited test module, class in snake_case (if any), and method or function
+        env_name = EnvUtil.get_env_name()
+        result = f"temp;{env_name.replace('.', ';')}"
+        return result
 
     @classmethod
     def error_if_not_temp_db(cls, db_id_or_database_name: str) -> None:

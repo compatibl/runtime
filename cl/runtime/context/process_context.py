@@ -15,13 +15,9 @@
 from dataclasses import dataclass
 from getpass import getuser
 from typing import final
-from typing_extensions import Self
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
-from cl.runtime.db.dataset_util import DatasetUtil
-from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.settings import Settings
@@ -65,18 +61,6 @@ class ProcessContext(Context):
                 # Create the log class specified in settings
                 log_type = ClassInfo.get_class_type(context_settings.log_class)
                 self.log = log_type(log_id=self.context_id)
-
-            # Use database class from settings if not specified directly
-            if self.db is None:
-                # Create the database class specified in settings
-                db_type = ClassInfo.get_class_type(context_settings.db_class)
-
-                # Use context_id as db_id unless specified directly
-                self.db = db_type(db_id=self.context_id)
-
-            # Use root dataset if not specified directly
-            if self.dataset is None:
-                self.dataset = DatasetUtil.root()
 
         # Return self to enable method chaining
         return self

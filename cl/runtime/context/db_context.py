@@ -16,21 +16,25 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Type
 from typing_extensions import Self
-from cl.runtime import Db, Context
+from cl.runtime import Db, Context, ClassInfo
 from cl.runtime.context.base_context import BaseContext
+from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
+from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
 class DbContext(BaseContext):
     """Includes database and dataset."""
 
-    db: DbKey | None = None
+    db: Db | None = None
     """Database of the storage context."""
 
     dataset: str | None = None
@@ -59,67 +63,115 @@ class DbContext(BaseContext):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
-        # TODO: Make DB settings independent from Context
-        if self.db is None:
-            self.db = Context.current().db
-        if self.dataset is None:
-            self.dataset = Context.current().dataset
+        # Do not execute this code on frozen or deserialized context instances
+        #   - If the instance is frozen, init_all has already been executed
+        #   - If the instance is deserialized, init_all has been executed before serialization
+        if not self.is_deserialized:
 
-        # First, load 'db' field of this context using 'Context.current()'
-        if self.db is not None and is_key(self.db):
-            self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
+            # Get context settings
+            context_settings = ContextSettings.instance()
+
+            # Use database class from settings if not specified directly
+            if self.db is None:
+                if (current_context := DbContext.current_or_none()) is not None:
+                    # Use DB from the current DbContext at the time of init execution
+                    self.db = current_context.db
+                else:
+                    # Otherwise use default DB
+                    self.db = self._get_default_db()
+
+            # Use root dataset if not specified directly
+            if self.dataset is None:
+                self.dataset = DatasetUtil.root()
+
+            #  Load 'db' field of this context using 'Context.current()'
+            if self.db is not None and is_key(self.db):
+                self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
 
         # Return self to enable method chaining
         return self
+
+    def __enter__(self):
+        """Supports 'with' operator for resource disposal."""
+
+        # Call '__enter__' method of base first
+        Context.__enter__(self)
+
+        try:
+            # Execute on default (root) context instances only if they are not deserialized
+            # (e.g. not the instances passed to a task queue)
+            if self.db is not None and not self.is_deserialized:
+                # Delete all existing data in temp database and drop DB in case it was not cleaned up
+                # due to abnormal termination of the previous test run
+                self.db.delete_all_and_drop_db()  # noqa
+        except Exception as e:
+            # Treat the exception as though it happened outside the 'with' clause:
+            #   - Call __exit__ method of base class without passing exception details
+            #   - Then rethrow the exception
+            Context.__exit__(self, None, None, None)
+            raise e
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Supports 'with' operator for resource disposal."""
+
+        try:
+            # Execute on default (root) context instances only if they are not deserialized
+            # (e.g. not the instances passed to a task queue)
+            if self.db is not None and not self.is_deserialized:
+                # Delete all data in temp database and drop DB to clean up
+                self.db.delete_all_and_drop_db()  # noqa
+        except Exception as e:
+            # Treat the exception as though it happened outside the 'with' clause:
+            #   - Call __exit__ method of base class without passing exception details
+            #   - Then rethrow the exception
+            Context.__exit__(self, None, None, None)
+            raise e
+        else:
+            # Otherwise delegate to the __exit__ method of base
+            return Context.__exit__(self, exc_type, exc_val, exc_tb)
     
     @classmethod
     def get_db(cls) -> Db:
-        """Return DB for the current DbContext inside 'with DbContext(...)', and default DB from settings outside."""
+        """
+        Return DB for the current DbContext inside the 'with DbContext(...)' clause.
+        Return the default DB from settings outside the outermost 'with DbContext(...)' clause.
+        """
         if (db_context := DbContext.current_or_none()) is not None:
-            if db_context.db is None:
-                raise NotImplementedError()
-            result = db_context.db
-            if is_key(result):
-                # Load DB in the current context from the root DB specified in settings
-                result = Context.current().load_one(Db, db_context.db)  # TODO: Revise
-                db_context.db = result
-            return result
-        elif (current_context := Context.current_or_none()) is not None:
-            result = current_context.db
-            if is_key(result):
-                # Load DB in the current context from the root DB specified in settings
-                result = DbContext.load_one(Db, result)  # TODO: Revise
-                current_context.db = result
-            return result
+            # Use DB from the current context
+            return db_context.db
         else:
-            result = DbContext.load_one(Db, current_context.db)  # TODO: Revise
+            # Use default DB
+            return cls._get_default_db()
 
     @classmethod
     def get_dataset(cls) -> str | None:
         """
-        Unique dataset in backslash-delimited format obtained by concatenating identifiers from
-        the DbContext stack in the order entered, or None outside 'with DbContext(...)' clause.
+        Unique dataset in backslash-delimited format obtained by concatenating identifiers from the DbContext stack
+        for the same DB as the current context in the order entered, or None outside 'with DbContext(...)' clause.
 
         Notes:
-          - Because 'with' clause cannot be under if/else, in some cases dataset may be None
-            but 'with DbContext(...)' clause would still be present.
-          - If dataset is None, it is is disregarded
-          - If dataset is None for the entire the DbContext stack, this method returns None
+          - If dataset field is None for any dataset in the stack, it is is disregarded
+          - If dataset field is None for the entire the DbContext stack, this method returns root dataset
         """
-        if cls.current_or_none() is not None:
+        if (current_context := DbContext.current_or_none()) is not None:
             # Gather those tokens that are not None from contexts that have the same DB as the current context
-            db_id = DbDbContext.get_db().db_id
+            current_db_id = current_context.db.db_id
             tokens = [
                 dataset for context in cls._get_context_stack() 
-                if db_id == context.db.db_id and (dataset := context.dataset) is not None
+                if current_db_id == context.db.db_id and (dataset := context.dataset) is not None
             ]
             # Consider the possibility that after removing tokens that are None, the list becomes empty
             if tokens:
-                return "\\".join(tokens)  # Concatenate
+                # Concatenate datasets from the context stack for the same DB as the current context
+                return "\\".join(tokens)
             else:
-                return None
+                # Return root dataset if empty
+                return DatasetUtil.root()
         else:
-            return None
+            # Return root dataset outside the outermost 'with DbContext(...)' clause
+            return DatasetUtil.root()
 
     @classmethod
     def load_one(
@@ -315,3 +367,34 @@ class DbContext(BaseContext):
             dataset=dataset,
             identity=identity,
         )
+
+    @classmethod
+    def _get_default_db(cls):
+        """Get default DB from settings."""
+        # Get context settings
+        context_settings = ContextSettings.instance()
+
+        # Create the database class specified in settings
+        db_type = ClassInfo.get_class_type(context_settings.db_class)
+
+        # If not inside a test
+        if not Settings.is_inside_test:
+
+            # Use db_id from settings for context_id unless specified by the caller
+            if context_settings.context_id is not None:
+                db_id = context_settings.context_id
+            else:
+                db_id = Settings.process_timestamp
+
+        # Inside test
+        else:
+
+            # For a test, env name is dot-delimited test module, class in snake_case (if any), and method or function
+            env_name = EnvUtil.get_env_name()
+
+            # Use 'temp' followed by context_id converted to semicolon-delimited format for db_id
+            db_id = "temp;" + env_name.replace(".", ";")
+
+        # Create and return
+        result = db_type(db_id=db_id)
+        return result

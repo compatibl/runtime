@@ -14,7 +14,6 @@
 
 import pytest
 from typing import List
-from cl.runtime import Context
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.context.testing_context import TestingContext
@@ -79,7 +78,7 @@ def test_context_manager():
 
     # Inside two nested 'with' clauses for the same key type Context
     with TestingContext() as context_1:
-        with Context(dataset="abc") as context_2:
+        with TestingContext(context_id="abc") as context_2:
             _perform_serialization_test([context_2])
     # Recreate using ContextManager
     _perform_manager_test([context_2])

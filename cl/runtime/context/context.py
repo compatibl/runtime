@@ -36,15 +36,6 @@ class Context(BaseContext):
     log: LogKey = missing()
     """Log of the context, 'Context.current().log' is used if not specified."""
 
-    db_class: str | None = None  # TODO: Find another way to override to avoid duplication with db field
-    """Override for the database class in module.ClassName format."""
-
-    db: DbKey | None = None
-    """Database of the context, 'DbContext.get_db()' is used if not specified."""
-
-    dataset: str | None = None
-    """Dataset of the context, 'Context.current().dataset' is used if not specified."""
-
     secrets: Dict[str, str] | None = None
     """Context-specific secrets take precedence over those defined via Dynaconf."""
 
@@ -76,22 +67,11 @@ class Context(BaseContext):
             if self.log is None:
                 self._current_context_field_not_set_error("log")
                 self.log = Context.current().log
-            if self.db is None:
-                self._current_context_field_not_set_error("db")
-                self.db = Context.current().db
-            if self.dataset is None:
-                self._current_context_field_not_set_error("dataset")
-                self.dataset = Context.current().dataset
 
             # Optional fields, set to None if not set in the root context
             # The root context uses ContextSettings values of these fields
             if self.secrets is None:
                 self.secrets = Context.current().secrets
-
-        # Replace fields that are set as keys by records from storage
-        # First, load 'db' field of this context using 'Context.current()'
-        if is_key(self.db):
-            self.db = DbContext.load_one(DbKey, self.db)
 
         # After this all remaining fields can be loaded using database from this context
         if is_key(self.log):

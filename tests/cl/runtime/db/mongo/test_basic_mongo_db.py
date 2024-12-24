@@ -43,15 +43,13 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
 
-USE_MONGO_MOCK = True
+USE_MONGO_MOCK = False
 """Change to False to test on MongoDB server running on localhost with default port."""
 
 def _get_test_db() -> Db:
     """Get SQLite database with name based on test namespace."""
     # For the test, env name is dot-delimited test module, class in snake_case (if any), and method or function
-    env_name = EnvUtil.get_env_name()
-    # Replace period by semicolon in DB name due to MongoDB restrictions
-    db_name = env_name.replace(".", ";")
+    db_name = Db._get_test_db_name()  # TODO: Refactor
     return BasicMongoDb(db_id=db_name, use_mongo_mock=USE_MONGO_MOCK)
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
