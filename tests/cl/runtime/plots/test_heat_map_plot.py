@@ -68,45 +68,41 @@ num_models = 4
 
 
 def test_smoke(local_dir_fixture):
-    with TestingContext() as context:
-        row_labels = []
+    row_labels = []
 
-        for i in range(num_metrics):
-            row_labels += [f"Metric {i + 1}"] * num_models
+    for i in range(num_metrics):
+        row_labels += [f"Metric {i + 1}"] * num_models
 
-        col_labels = [f"Model {i + 1}" for i in range(num_models)] * num_metrics
+    col_labels = [f"Model {i + 1}" for i in range(num_models)] * num_metrics
 
-        heat_map_plot = HeatMapPlot(plot_id="heat_map_plot")
-        heat_map_plot.title = "Model Comparison"
-        heat_map_plot.row_labels = row_labels
-        heat_map_plot.col_labels = col_labels
-        heat_map_plot.received_values = received_values
-        heat_map_plot.expected_values = expected_values
-        heat_map_plot.x_label = "Models"
-        heat_map_plot.y_label = "Metrics"
-        heat_map_plot.save_png()
+    heat_map_plot = HeatMapPlot(plot_id="heat_map_plot")
+    heat_map_plot.title = "Model Comparison"
+    heat_map_plot.row_labels = row_labels
+    heat_map_plot.col_labels = col_labels
+    heat_map_plot.received_values = received_values
+    heat_map_plot.expected_values = expected_values
+    heat_map_plot.x_label = "Models"
+    heat_map_plot.y_label = "Metrics"
+    heat_map_plot.save_png()
 
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
 def test_dark_theme(local_dir_fixture):
-    with TestingContext() as context:
+    row_labels = []
+    for i in range(num_metrics):
+        row_labels += [f"Metric {i + 1}"] * num_models
 
-        row_labels = []
+    col_labels = [f"Model {i + 1}" for i in range(num_models)] * num_metrics
 
-        for i in range(num_metrics):
-            row_labels += [f"Metric {i + 1}"] * num_models
-
-        col_labels = [f"Model {i + 1}" for i in range(num_models)] * num_metrics
-
-        heat_map_plot = HeatMapPlot(plot_id="heat_map_plot")
-        heat_map_plot.title = "Model Comparison"
-        heat_map_plot.row_labels = row_labels
-        heat_map_plot.col_labels = col_labels
-        heat_map_plot.received_values = received_values
-        heat_map_plot.expected_values = expected_values
-        heat_map_plot.x_label = "Models"
-        heat_map_plot.y_label = "Metrics"
-        heat_map_plot.save_png()
+    heat_map_plot = HeatMapPlot(plot_id="heat_map_plot")
+    heat_map_plot.title = "Model Comparison"
+    heat_map_plot.row_labels = row_labels
+    heat_map_plot.col_labels = col_labels
+    heat_map_plot.received_values = received_values
+    heat_map_plot.expected_values = expected_values
+    heat_map_plot.x_label = "Models"
+    heat_map_plot.y_label = "Metrics"
+    heat_map_plot.save_png()
 
 
 if __name__ == "__main__":

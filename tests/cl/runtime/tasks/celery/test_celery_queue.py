@@ -15,6 +15,7 @@
 import pytest
 from cl.runtime import Context
 from cl.runtime.context.context_manager import ContextManager
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
@@ -64,19 +65,17 @@ def test_method(celery_test_queue_fixture):
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
 def test_api(celery_test_queue_fixture):
     """Test submitting task for execution out of process."""
+    # Create queue
+    queue_id = f"test_celery_queue.test_api"
+    queue = CeleryQueue(queue_id=queue_id)
+    DbContext.save_one(queue)
 
-    with TestingContext() as context:
-        # Create queue
-        queue_id = f"test_celery_queue.test_api"
-        queue = CeleryQueue(queue_id=queue_id)
-        DbContext.save_one(queue)
+    # Create task
+    task_key = _create_task(queue.get_key())
 
-        # Create task
-        task_key = _create_task(queue.get_key())
-
-        # Submit task and check for its completion
-        queue.submit_task(task_key)
-        Task.wait_for_completion(task_key)
+    # Submit task and check for its completion
+    queue.submit_task(task_key)
+    Task.wait_for_completion(task_key)
 
 
 if __name__ == "__main__":

@@ -90,22 +90,20 @@ def read_records_from_csv(file_path: Path, entry_type: Type[RecordProtocol]):
 
 
 def test_roundtrip():
+    for test_entries in (*stub_entries,):
+        file_path = None
+        try:
+            expected_entries, file_path = save_test_records(test_entries)
+            entry_type = type(expected_entries[0])
 
-    with TestingContext() as context:
-        for test_entries in (*stub_entries,):
-            file_path = None
-            try:
-                expected_entries, file_path = save_test_records(test_entries)
-                entry_type = type(expected_entries[0])
+            read_records_from_csv(file_path, entry_type)
 
-                read_records_from_csv(file_path, entry_type)
+            actual_records = list(DbContext.load_all(entry_type))
 
-                actual_records = list(DbContext.load_all(entry_type))
-
-                assert actual_records == expected_entries
-            finally:
-                if file_path is not None:
-                    file_path.unlink(missing_ok=True)
+            assert actual_records == expected_entries
+        finally:
+            if file_path is not None:
+                file_path.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

@@ -30,45 +30,44 @@ def test_csv_file_reader():
     """Test CsvFileReader class."""
 
     # Create a new instance of local cache for the test
-    with TestingContext() as context:
-        env_dir = EnvUtil.get_env_dir()
-        file_path = os.path.join(env_dir, "StubDataclassDerivedRecord.csv")
-        # TODO: Change the API not to take record type or make it optional
-        file_reader = CsvFileReader(file_path=file_path)
-        file_reader.read_and_save()
+    env_dir = EnvUtil.get_env_dir()
+    file_path = os.path.join(env_dir, "StubDataclassDerivedRecord.csv")
+    # TODO: Change the API not to take record type or make it optional
+    file_reader = CsvFileReader(file_path=file_path)
+    file_reader.read_and_save()
 
-        file_path = os.path.join(env_dir, "StubDataclassNestedFields.csv")
-        file_reader = CsvFileReader(file_path=file_path)
-        file_reader.read_and_save()
+    file_path = os.path.join(env_dir, "StubDataclassNestedFields.csv")
+    file_reader = CsvFileReader(file_path=file_path)
+    file_reader.read_and_save()
 
-        file_path = os.path.join(env_dir, "StubDataclassComposite.csv")
-        file_reader = CsvFileReader(file_path=file_path)
-        file_reader.read_and_save()
+    file_path = os.path.join(env_dir, "StubDataclassComposite.csv")
+    file_reader = CsvFileReader(file_path=file_path)
+    file_reader.read_and_save()
 
-        # Verify
-        # TODO: Check count using load_all or count method of Db when created
-        for i in range(1, 3):
-            key = StubDataclassRecordKey(id=f"derived_id_{i}")
-            record = DbContext.load_one(StubDataclassRecord, key)
-            assert record == StubDataclassDerivedRecord(
-                id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
-            )
+    # Verify
+    # TODO: Check count using load_all or count method of Db when created
+    for i in range(1, 3):
+        key = StubDataclassRecordKey(id=f"derived_id_{i}")
+        record = DbContext.load_one(StubDataclassRecord, key)
+        assert record == StubDataclassDerivedRecord(
+            id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
+        )
 
-        for i in range(1, 4):
-            expected_record = StubDataclassNestedFields(
-                id=f"nested_{i}",
-            )
-            record = DbContext.load_one(StubDataclassNestedFields, expected_record.get_key())
-            assert record == expected_record
+    for i in range(1, 4):
+        expected_record = StubDataclassNestedFields(
+            id=f"nested_{i}",
+        )
+        record = DbContext.load_one(StubDataclassNestedFields, expected_record.get_key())
+        assert record == expected_record
 
-        for i in range(1, 4):
-            expected_record = StubDataclassComposite(
-                primitive=f"nested_primitive_{i}",
-                embedded_1=StubDataclassRecordKey(id=f"embedded_key_id_{i}a"),
-                embedded_2=StubDataclassRecordKey(id=f"embedded_key_id_{i}b"),
-            )
-            record = DbContext.load_one(StubDataclassComposite, expected_record.get_key())
-            assert record == expected_record
+    for i in range(1, 4):
+        expected_record = StubDataclassComposite(
+            primitive=f"nested_primitive_{i}",
+            embedded_1=StubDataclassRecordKey(id=f"embedded_key_id_{i}a"),
+            embedded_2=StubDataclassRecordKey(id=f"embedded_key_id_{i}b"),
+        )
+        record = DbContext.load_one(StubDataclassComposite, expected_record.get_key())
+        assert record == expected_record
 
 
 if __name__ == "__main__":

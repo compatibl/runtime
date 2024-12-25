@@ -22,39 +22,37 @@ from stubs.cl.runtime import StubHandlers
 
 
 def test_smoke():
-    """Test 'test_create' method."""
+    """Smoke test."""
+    records = [
+        StubHandlers(stub_id="abc"),
+    ]
+    DbContext.save_many(records)
 
-    with TestingContext() as context:
-        records = [
-            StubHandlers(stub_id="abc"),
-        ]
-        DbContext.save_many(records)
+    object_and_instance_handler_on_object = [(x, x.run_instance_method_1a) for x in records]
+    key_and_instance_handler_on_object = [(x.get_key(), x.run_instance_method_1a) for x in records]
+    object_and_instance_handler_on_class = [(x, StubHandlers.run_instance_method_1a) for x in records]
+    key_and_instance_handler_on_class = [(x.get_key(), StubHandlers.run_instance_method_1a) for x in records]
+    object_and_class_handler_on_class = [(x, StubHandlers.run_class_method_1a) for x in records]
+    key_and_class_handler_on_class = [(x.get_key(), StubHandlers.run_class_method_1a) for x in records]
 
-        object_and_instance_handler_on_object = [(x, x.run_instance_method_1a) for x in records]
-        key_and_instance_handler_on_object = [(x.get_key(), x.run_instance_method_1a) for x in records]
-        object_and_instance_handler_on_class = [(x, StubHandlers.run_instance_method_1a) for x in records]
-        key_and_instance_handler_on_class = [(x.get_key(), StubHandlers.run_instance_method_1a) for x in records]
-        object_and_class_handler_on_class = [(x, StubHandlers.run_class_method_1a) for x in records]
-        key_and_class_handler_on_class = [(x.get_key(), StubHandlers.run_class_method_1a) for x in records]
+    sample_inputs = (
+        object_and_instance_handler_on_object
+        + key_and_instance_handler_on_object
+        + object_and_instance_handler_on_class
+        + key_and_instance_handler_on_class
+        + object_and_class_handler_on_class
+        + key_and_class_handler_on_class
+    )
 
-        sample_inputs = (
-            object_and_instance_handler_on_object
-            + key_and_instance_handler_on_object
-            + object_and_instance_handler_on_class
-            + key_and_instance_handler_on_class
-            + object_and_class_handler_on_class
-            + key_and_class_handler_on_class
+    for sample_input in sample_inputs:
+        record_or_key = sample_input[0]
+        method_callable = sample_input[1]
+        task = InstanceMethodTask.create(
+            queue=TaskQueueKey(queue_id="Sample Queue"),
+            record_or_key=record_or_key,
+            method_callable=method_callable,
         )
-
-        for sample_input in sample_inputs:
-            record_or_key = sample_input[0]
-            method_callable = sample_input[1]
-            task = InstanceMethodTask.create(
-                queue=TaskQueueKey(queue_id="Sample Queue"),
-                record_or_key=record_or_key,
-                method_callable=method_callable,
-            )
-            task.run_task()
+        task.run_task()
 
 
 if __name__ == "__main__":

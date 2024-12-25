@@ -21,20 +21,18 @@ from stubs.cl.runtime import StubHandlers
 
 def test_create():
     """Test 'test_create' method."""
+    sample_inputs = [
+        (StubHandlers, StubHandlers.run_class_method_1a),
+        (StubHandlers, StubHandlers.run_static_method_1a),
+    ]
 
-    with TestingContext():
-        sample_inputs = [
-            (StubHandlers, StubHandlers.run_class_method_1a),
-            (StubHandlers, StubHandlers.run_static_method_1a),
-        ]
-
-        for sample_input in sample_inputs:
-            record_type = sample_input[0]
-            method_callable = sample_input[1]
-            task = StaticMethodTask.create(
-                queue=TaskQueueKey(queue_id="Sample Queue"), record_type=record_type, method_callable=method_callable
-            )
-            task.run_task()
+    for sample_input in sample_inputs:
+        record_type = sample_input[0]
+        method_callable = sample_input[1]
+        task = StaticMethodTask.create(
+            queue=TaskQueueKey(queue_id="Sample Queue"), record_type=record_type, method_callable=method_callable
+        )
+        task.run_task()
 
 
 if __name__ == "__main__":

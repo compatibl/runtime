@@ -32,10 +32,8 @@ from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubHandlers
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_key import StubDataclassAbstractKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
@@ -71,298 +69,279 @@ def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iter
 # @pytest.mark.skip("Requires MongoDB server.")  # TODO: Switch test to MongoMock
 def test_smoke():
     """Smoke test."""
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
-            # Create test record and populate with sample data
-            record = StubDataclassRecord()
-            key = record.get_key()
+    with DbContext(db=_get_test_db()):
+        # Create test record and populate with sample data
+        record = StubDataclassRecord()
+        key = record.get_key()
 
-            # Save a single record
-            DbContext.save_many([record])
+        # Save a single record
+        DbContext.save_many([record])
 
-            # Load using record or key
-            loaded_records = DbContext.load_many(StubDataclassRecord, [record, key, None])
-            assert loaded_records[0] is record  # Same object is returned without lookup
-            assert loaded_records[1] == record  # Not the same object but equal
-            assert loaded_records[2] is None
+        # Load using record or key
+        loaded_records = DbContext.load_many(StubDataclassRecord, [record, key, None])
+        assert loaded_records[0] is record  # Same object is returned without lookup
+        assert loaded_records[1] == record  # Not the same object but equal
+        assert loaded_records[2] is None
 
-            assert DbContext.load_one(StubDataclassRecord, record) is record  # Same object is returned without lookup
-            assert DbContext.load_one(StubDataclassRecord, key) == record  # Not the same object but equal
+        assert DbContext.load_one(StubDataclassRecord, record) is record  # Same object is returned without lookup
+        assert DbContext.load_one(StubDataclassRecord, key) == record  # Not the same object but equal
 
 
 def test_complex_records():
     """Test 'save_many' method for various types."""
+    with DbContext(db=_get_test_db()):
+        samples = [
+            StubDataclassRecord(id="abc1"),
+            StubDataclassNestedFields(id="abc2"),
+            StubDataclassComposite(),
+            StubDataclassDerivedRecord(id="abc3"),
+            StubDataclassDerivedFromDerivedRecord(id="abc4"),
+            StubDataclassOtherDerivedRecord(id="abc5"),
+            StubDataclassListFields(id="abc6"),
+            StubDataclassOptionalFields(id="abc7"),
+            StubDataclassDictFields(id="abc8"),
+            StubDataclassDictListFields(id="abc9"),
+            StubDataclassListDictFields(id="abc10"),
+            StubDataclassPrimitiveFields(key_str_field="abc11"),
+            StubDataclassSingleton(),
+            StubDataclassAliasedRecord(id="abc12", a=123),
+            StubHandlers(stub_id="abc13"),
+            StubDataclassRecord(id="abc14"),
+            StubDataclassVersionedRecord(id="abc15"),
+        ]
 
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
-            samples = [
-                StubDataclassRecord(id="abc1"),
-                StubDataclassNestedFields(id="abc2"),
-                StubDataclassComposite(),
-                StubDataclassDerivedRecord(id="abc3"),
-                StubDataclassDerivedFromDerivedRecord(id="abc4"),
-                StubDataclassOtherDerivedRecord(id="abc5"),
-                StubDataclassListFields(id="abc6"),
-                StubDataclassOptionalFields(id="abc7"),
-                StubDataclassDictFields(id="abc8"),
-                StubDataclassDictListFields(id="abc9"),
-                StubDataclassListDictFields(id="abc10"),
-                StubDataclassPrimitiveFields(key_str_field="abc11"),
-                StubDataclassSingleton(),
-                StubDataclassAliasedRecord(id="abc12", a=123),
-                StubHandlers(stub_id="abc13"),
-                StubDataclassRecord(id="abc14"),
-                StubDataclassVersionedRecord(id="abc15"),
-            ]
+        DbContext.save_many(samples)
 
-            DbContext.save_many(samples)
+        sample_keys = [sample.get_key() for sample in samples]
+        loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
 
-            sample_keys = [sample.get_key() for sample in samples]
-            loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
-
-            assert loaded_records == samples
+        assert loaded_records == samples
 
 
 def test_basic_operations():
     """Test save/load/delete methods for various types."""
+    with DbContext(db=_get_test_db()):
+        samples = [
+            StubDataclassRecord(id="abc1"),
+            StubDataclassNestedFields(id="abc2"),
+            StubDataclassComposite(),
+            StubDataclassDerivedRecord(id="abc3"),
+            StubDataclassDerivedFromDerivedRecord(id="abc4"),
+            StubDataclassOtherDerivedRecord(id="abc5"),
+            StubDataclassListFields(id="abc6"),
+            StubDataclassOptionalFields(id="abc7"),
+            StubDataclassDictFields(id="abc8"),
+            StubDataclassDictListFields(id="abc9"),
+            StubDataclassListDictFields(id="abc10"),
+            StubDataclassPrimitiveFields(key_str_field="abc11"),
+            StubDataclassSingleton(),
+            StubDataclassAliasedRecord(id="abc12", a=123),
+            StubHandlers(stub_id="abc13"),
+            StubDataclassRecord(id="abc14"),
+            StubDataclassVersionedRecord(id="abc15"),
+        ]
 
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
-            samples = [
-                StubDataclassRecord(id="abc1"),
-                StubDataclassNestedFields(id="abc2"),
-                StubDataclassComposite(),
-                StubDataclassDerivedRecord(id="abc3"),
-                StubDataclassDerivedFromDerivedRecord(id="abc4"),
-                StubDataclassOtherDerivedRecord(id="abc5"),
-                StubDataclassListFields(id="abc6"),
-                StubDataclassOptionalFields(id="abc7"),
-                StubDataclassDictFields(id="abc8"),
-                StubDataclassDictListFields(id="abc9"),
-                StubDataclassListDictFields(id="abc10"),
-                StubDataclassPrimitiveFields(key_str_field="abc11"),
-                StubDataclassSingleton(),
-                StubDataclassAliasedRecord(id="abc12", a=123),
-                StubHandlers(stub_id="abc13"),
-                StubDataclassRecord(id="abc14"),
-                StubDataclassVersionedRecord(id="abc15"),
-            ]
+        sample_keys = [x.get_key() for x in samples]
 
-            sample_keys = [x.get_key() for x in samples]
+        # Load from empty tables
+        loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
+        assert loaded_records == [None] * len(samples)
 
-            # Load from empty tables
-            loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
-            assert loaded_records == [None] * len(samples)
+        # Populate tables
+        DbContext.save_many(samples)
 
-            # Populate tables
-            DbContext.save_many(samples)
+        # Load one by one for all keys because each type is different
+        loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
+        assert loaded_records == samples
 
-            # Load one by one for all keys because each type is different
-            loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
-            assert loaded_records == samples
+        # Delete first and last record
+        DbContext.delete_many([sample_keys[0], sample_keys[-1]])
+        loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
+        assert loaded_records == [None, *samples[1:-1], None]
 
-            # Delete first and last record
-            DbContext.delete_many([sample_keys[0], sample_keys[-1]])
-            loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
-            assert loaded_records == [None, *samples[1:-1], None]
-
-            # Delete all records
-            DbContext.delete_many(sample_keys)
-            loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
-            assert loaded_records == [None] * len(samples)
+        # Delete all records
+        DbContext.delete_many(sample_keys)
+        loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
+        assert loaded_records == [None] * len(samples)
 
 
 def test_record_upsert():
     """Check that an existing entry is overridden when a new entry with the same key is saved."""
+    with DbContext(db=_get_test_db()):
+        # Create sample and save
+        sample = StubDataclassRecord()
+        DbContext.save_one(sample)
+        loaded_record = DbContext.load_one(StubDataclassRecord, sample.get_key())
+        assert loaded_record == sample
 
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
-            # Create sample and save
-            sample = StubDataclassRecord()
-            DbContext.save_one(sample)
-            loaded_record = DbContext.load_one(StubDataclassRecord, sample.get_key())
-            assert loaded_record == sample
+        # create sample with the same key and save
+        override_sample = StubDataclassDerivedRecord()
+        DbContext.save_one(override_sample)
+        loaded_record = DbContext.load_one(StubDataclassDerivedRecord, sample.get_key())
+        assert loaded_record == override_sample
 
-            # create sample with the same key and save
-            override_sample = StubDataclassDerivedRecord()
-            DbContext.save_one(override_sample)
-            loaded_record = DbContext.load_one(StubDataclassDerivedRecord, sample.get_key())
-            assert loaded_record == override_sample
-
-            override_sample = StubDataclassDerivedFromDerivedRecord()
-            DbContext.save_one(override_sample)
-            loaded_record = DbContext.load_one(StubDataclassDerivedFromDerivedRecord, sample.get_key())
-            assert loaded_record == override_sample
+        override_sample = StubDataclassDerivedFromDerivedRecord()
+        DbContext.save_one(override_sample)
+        loaded_record = DbContext.load_one(StubDataclassDerivedFromDerivedRecord, sample.get_key())
+        assert loaded_record == override_sample
 
 
 def test_load_all():
     """Test 'load_all' method."""
+    with DbContext(db=_get_test_db()):
+        base_samples = [
+            StubDataclassRecord(id="base1"),
+            StubDataclassRecord(id="base2"),
+            StubDataclassRecord(id="base3"),
+        ]
 
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
-            base_samples = [
-                StubDataclassRecord(id="base1"),
-                StubDataclassRecord(id="base2"),
-                StubDataclassRecord(id="base3"),
-            ]
+        derived_samples = [
+            StubDataclassDerivedRecord(id="derived1"),
+            StubDataclassDerivedFromDerivedRecord(id="derived2"),
+        ]
 
-            derived_samples = [
-                StubDataclassDerivedRecord(id="derived1"),
-                StubDataclassDerivedFromDerivedRecord(id="derived2"),
-            ]
+        other_derived_samples = [
+            StubDataclassOtherDerivedRecord(id="derived3"),
+        ]
 
-            other_derived_samples = [
-                StubDataclassOtherDerivedRecord(id="derived3"),
-            ]
+        all_samples = base_samples + derived_samples + other_derived_samples
 
-            all_samples = base_samples + derived_samples + other_derived_samples
+        DbContext.save_many(all_samples)
 
-            DbContext.save_many(all_samples)
+        loaded_records = DbContext.load_all(StubDataclassRecord)
+        assert _assert_equals_iterable_without_ordering(all_samples, loaded_records)
 
-            loaded_records = DbContext.load_all(StubDataclassRecord)
-            assert _assert_equals_iterable_without_ordering(all_samples, loaded_records)
-
-            loaded_records = DbContext.load_all(StubDataclassDerivedRecord)
-            assert _assert_equals_iterable_without_ordering(derived_samples, loaded_records)
+        loaded_records = DbContext.load_all(StubDataclassDerivedRecord)
+        assert _assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
 @pytest.mark.skip("Performance test.")
 def test_performance():
     """Test performance of save/load methods."""
+    with DbContext(db=_get_test_db()):
+        n = 1000
+        samples = [StubDataclassPrimitiveFields(key_str_field=f"key{i}") for i in range(n)]
+        sample_keys = [sample.get_key() for sample in samples]
 
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
-            n = 1000
-            samples = [StubDataclassPrimitiveFields(key_str_field=f"key{i}") for i in range(n)]
-            sample_keys = [sample.get_key() for sample in samples]
+        print(f">>> Test stub type: {StubDataclassPrimitiveFields.__name__}, {n=}.")
+        start_time = time.time()
+        DbContext.save_many(samples)
+        end_time = time.time()
 
-            print(f">>> Test stub type: {StubDataclassPrimitiveFields.__name__}, {n=}.")
-            start_time = time.time()
-            DbContext.save_many(samples)
-            end_time = time.time()
+        print(f"Save many bulk: {end_time - start_time}s.")
 
-            print(f"Save many bulk: {end_time - start_time}s.")
+        start_time = time.time()
+        for sample in samples:
+            DbContext.save_one(sample)
+        end_time = time.time()
+        print(f"Save many one by one: {end_time - start_time}s.")
 
-            start_time = time.time()
-            for sample in samples:
-                DbContext.save_one(sample)
-            end_time = time.time()
-            print(f"Save many one by one: {end_time - start_time}s.")
+        start_time = time.time()
+        list(DbContext.load_many(sample_keys))
+        end_time = time.time()
+        print(f"Load many bulk: {end_time - start_time}s.")
 
-            start_time = time.time()
-            list(DbContext.load_many(sample_keys))
-            end_time = time.time()
-            print(f"Load many bulk: {end_time - start_time}s.")
-
-            start_time = time.time()
-            for key in sample_keys:
-                DbContext.load_one(type(key), key)
-            end_time = time.time()
-            print(f"Load many one by one: {end_time - start_time}s.")
+        start_time = time.time()
+        for key in sample_keys:
+            DbContext.load_one(type(key), key)
+        end_time = time.time()
+        print(f"Load many one by one: {end_time - start_time}s.")
 
 
 def test_singleton():
     """Test singleton type saving."""
+    with DbContext(db=_get_test_db()):
+        singleton_sample = StubDataclassSingleton()
+        DbContext.save_one(singleton_sample)
+        loaded_sample = DbContext.load_one(StubDataclassSingleton, singleton_sample.get_key())
+        assert loaded_sample == singleton_sample
 
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
-            singleton_sample = StubDataclassSingleton()
-            DbContext.save_one(singleton_sample)
-            loaded_sample = DbContext.load_one(StubDataclassSingleton, singleton_sample.get_key())
-            assert loaded_sample == singleton_sample
-
-            other_singleton_sample = StubDataclassSingleton(str_field="other")
-            DbContext.save_one(other_singleton_sample)
-            all_records = list(DbContext.load_all(other_singleton_sample.__class__))
-            assert len(all_records) == 1
-            assert all_records[0] == other_singleton_sample
+        other_singleton_sample = StubDataclassSingleton(str_field="other")
+        DbContext.save_one(other_singleton_sample)
+        all_records = list(DbContext.load_all(other_singleton_sample.__class__))
+        assert len(all_records) == 1
+        assert all_records[0] == other_singleton_sample
 
 
 def test_check_db_id():
-    """Test '_get_db_name' method."""
+    """Test 'check_db_id' method."""
+    # Check for length
+    BasicMongoDb.check_db_id("a" * 63)
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("a" * 64)
 
-    with TestingContext():
-            # Check for length
-            BasicMongoDb.check_db_id("a" * 63)
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("a" * 64)
+    # Letters, numbers and underscore are allowed
+    BasicMongoDb.check_db_id("abc")
+    BasicMongoDb.check_db_id("123")
+    BasicMongoDb.check_db_id("abc_xyz")
 
-            # Letters, numbers and underscore are allowed
-            BasicMongoDb.check_db_id("abc")
-            BasicMongoDb.check_db_id("123")
-            BasicMongoDb.check_db_id("abc_xyz")
+    # Semicolon is allowed even though it is not in the suggested list
+    BasicMongoDb.check_db_id("abc;xyz")
 
-            # Semicolon is allowed even though it is not in the suggested list
-            BasicMongoDb.check_db_id("abc;xyz")
+    # Check for space
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("abc xyz")
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("abc ")
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id(" xyz")
 
-            # Check for space
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("abc xyz")
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("abc ")
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id(" xyz")
+    # Check for period
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("abc.xyz")
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("abc.")
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id(".xyz")
 
-            # Check for period
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("abc.xyz")
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("abc.")
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id(".xyz")
-
-            # Check for other symbols
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("abc:xyz")
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("abc|xyz")
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("abc\\xyz")
-            with pytest.raises(RuntimeError):
-                BasicMongoDb.check_db_id("abc/xyz")
+    # Check for other symbols
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("abc:xyz")
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("abc|xyz")
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("abc\\xyz")
+    with pytest.raises(RuntimeError):
+        BasicMongoDb.check_db_id("abc/xyz")
 
 
 def test_load_filter():
     """Test 'load_filter' method."""
+    with DbContext(db=_get_test_db()):
+        # Create test record and populate with sample data
+        offset = 0
+        matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="a") for i in range(2)]
+        offset = len(matching_records)
+        non_matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="b") for i in range(2)]
+        DbContext.save_many(matching_records + non_matching_records)
 
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
-            # Create test record and populate with sample data
-            offset = 0
-            matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="a") for i in range(2)]
-            offset = len(matching_records)
-            non_matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="b") for i in range(2)]
-            DbContext.save_many(matching_records + non_matching_records)
-
-            filter_obj = StubDataclassDerivedRecord(id=None, derived_str_field="a")
-            loaded_records = DbContext.load_filter(StubDataclassDerivedRecord, filter_obj)
-            assert len(loaded_records) == len(matching_records)
-            assert all(x.derived_str_field == filter_obj.derived_str_field for x in loaded_records)
+        filter_obj = StubDataclassDerivedRecord(id=None, derived_str_field="a")
+        loaded_records = DbContext.load_filter(StubDataclassDerivedRecord, filter_obj)
+        assert len(loaded_records) == len(matching_records)
+        assert all(x.derived_str_field == filter_obj.derived_str_field for x in loaded_records)
 
 
 def test_abstract_key():
     """Test final record for which some of the fields are in base record."""
+    with DbContext(db=_get_test_db()):
 
-    with TestingContext():
-        with DbContext(db=_get_test_db()):
+        final_record = StubDataclassFinalRecord(id="a")
+        DbContext.save_one(final_record)
+        final_key = final_record.get_key()
+        load_using_record = DbContext.load_one(type(final_record), final_record)
+        load_using_key = DbContext.load_one(type(final_record), final_key)
+        assert load_using_record is final_record  # Same object is returned without lookup
+        assert load_using_key == final_record  # Not the same object but equal
 
-            final_record = StubDataclassFinalRecord(id="a")
-            DbContext.save_one(final_record)
-            final_key = final_record.get_key()
-            load_using_record = DbContext.load_one(type(final_record), final_record)
-            load_using_key = DbContext.load_one(type(final_record), final_key)
-            assert load_using_record is final_record  # Same object is returned without lookup
-            assert load_using_key == final_record  # Not the same object but equal
-
-            nested_record = StubDataclassNestedFinalRecord(id="b")
-            nested_record.final_key = StubDataclassFinalKey(id="c")
-            nested_record.final_record = StubDataclassFinalRecord(id="d")
-            DbContext.save_one(nested_record)
-            nested_key = nested_record.get_key()
-            load_using_record = DbContext.load_one(type(nested_record), nested_record)
-            load_using_key = DbContext.load_one(type(nested_record), nested_key)
-            assert load_using_record is nested_record  # Same object is returned without lookup
-            assert load_using_key == nested_record  # Not the same object but equal
+        nested_record = StubDataclassNestedFinalRecord(id="b")
+        nested_record.final_key = StubDataclassFinalKey(id="c")
+        nested_record.final_record = StubDataclassFinalRecord(id="d")
+        DbContext.save_one(nested_record)
+        nested_key = nested_record.get_key()
+        load_using_record = DbContext.load_one(type(nested_record), nested_record)
+        load_using_key = DbContext.load_one(type(nested_record), nested_key)
+        assert load_using_record is nested_record  # Same object is returned without lookup
+        assert load_using_key == nested_record  # Not the same object but equal
 
 
 if __name__ == "__main__":

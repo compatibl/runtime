@@ -53,15 +53,12 @@ def _encrypt_value(value: str) -> str:
 @pytest.mark.skip("Requires RSA key to decrypt.")
 def test_decrypt_secret():
     """Test ContextUtil.decrypt_secret method."""
-
-    with TestingContext() as context:
-
-        key = "test_key"
-        value = "secret_value"
-        encrypted_value = _encrypt_value(value)
-        context.secrets[key] = encrypted_value
-        secret_value_decrypted = ContextUtil.decrypt_secret(key)
-        assert secret_value_decrypted == value
+    key = "test_key"
+    value = "secret_value"
+    encrypted_value = _encrypt_value(value)
+    context.secrets[key] = encrypted_value
+    secret_value_decrypted = ContextUtil.decrypt_secret(key)
+    assert secret_value_decrypted == value
 
 
 if __name__ == "__main__":
