@@ -15,25 +15,20 @@
 import datetime as dt
 import inspect
 from dataclasses import dataclass
-from logging import getLogger
-from typing import Any
 from uuid import UUID
-from cl.runtime.context.context import Context
+
+from cl.runtime.context.log_context import LogContext
 from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
-_logger = getLogger(__name__)
 
+def _log_method_info():  # TODO: Move into testing directory
+    """Print information about the caller method using stack inspection."""
 
-def log_method_info(name: str):  # TODO: Move into testing directory
-    """Print information about the caller method."""
-
-    # Get logger from the current context
-    context = Context.current()
-    logger = context.get_logger(name)
+    # Get logger from LogContext
+    logger = LogContext.get_logger(module_name=__name__)
 
     # Record method information from stack frame
     current_frame = inspect.currentframe()
@@ -63,11 +58,11 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
 
     def run_instance_method_1a(self) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     def run_instance_method_1a_with_int_param(self, int_param: int) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     def run_instance_method_1a_with_primitive_params(
         self,
@@ -82,101 +77,101 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         bytes_param: bytes,
     ) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     def run_instance_method_1b(self) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     def run_instance_method_2a_with_params(self, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
-        _logger.info(f"param_1={param_1} param_2={param_2}")
+        _log_method_info()
+        LogContext.get_logger(module_name=__name__).info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters()
     def run_instance_method_2b(self, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     def run_instance_method_3a(self, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters()
     def run_instance_method_3b(self, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     @classmethod
     def run_class_method_1a(cls) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     @classmethod
     def run_class_method_1b(cls) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
     def run_class_method_2a_with_params(cls, param_1: str, param_2: str) -> None:
         """Stub handler."""
-        log_method_info(__name__)
-        _logger.info(f"param_1={param_1} param_2={param_2}")
+        _log_method_info()
+        LogContext.get_logger(module_name=__name__).info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
     def run_class_method_2b(cls, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
     def run_class_method_3a(cls, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
     def run_class_method_3b(cls, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     @staticmethod
     def run_static_method_1a() -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     @staticmethod
     def run_static_method_1b() -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @staticmethod
     def run_static_method_2a(param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @staticmethod
     def run_static_method_2b(param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @staticmethod
     def run_static_method_3a(*, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @staticmethod
     def run_static_method_3b(*, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        log_method_info(__name__)
+        _log_method_info()
 
     # TODO (Roman): Restore after supporting handlers with parameters
     # def run_with_args(
@@ -186,7 +181,7 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
     #     enum_arg: StubIntEnum,
     #     data_arg: Any,
     # ) -> None:
-    #     _logger.info(
+    #     LogContext.get_logger(module_name=__name__).info(
     #         f"handler_with_arguments(int_arg={int_arg} datetime_arg={datetime_arg}"
     #         f"enum_arg={enum_arg} data_arg={data_arg})"
     #     )
@@ -216,11 +211,11 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
 
     def run_instance_method_with_binary_param(self, pdf_file: FileData, note_param: str):
         """Stub method."""
-        log_method_info(__name__)
-        _logger.info(f"binary_data len={len(pdf_file.file_bytes)}")
+        _log_method_info()
+        LogContext.get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
 
     @staticmethod
     def run_class_method_with_binary_param(pdf_file: FileData):
         """Stub method."""
-        log_method_info(__name__)
-        _logger.info(f"binary_data len={len(pdf_file.file_bytes)}")
+        _log_method_info()
+        LogContext.get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")

@@ -13,29 +13,30 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.context.log_context import LogContext
 from cl.runtime.context.testing_context import TestingContext
 
 
 def test_smoke():
     """Smoke test."""
 
-    with TestingContext() as context:
-        # Get context logger
-        logger = context.get_logger(__name__)
+    # Get logger from LogContext outside the outermost 'with LogContext(...)' clause
+    logger = LogContext.get_logger(module_name=__name__)
 
-        # Standard messages
-        module_name = __name__
-        logger.debug(f"Debug log message in {module_name}")
-        logger.info(f"Info log message in {module_name}")
-        logger.warning(f"Warning log message in {module_name}")
-        logger.error(f"Error log message in {module_name}")
-        logger.critical(f"Critical log message in {module_name}")
+    # Standard messages
+    module_name = __name__
+    logger.debug(f"Debug log message in {module_name}")
+    logger.info(f"Info log message in {module_name}")
+    logger.warning(f"Warning log message in {module_name}")
+    logger.error(f"Error log message in {module_name}")
+    logger.critical(f"Critical log message in {module_name}")
 
-        # Exception message
-        try:
-            raise RuntimeError(f"Sample RuntimeError text in {module_name}")
-        except RuntimeError:
-            logger.exception(f"Exception log message in {module_name}")
+    # Exception message
+    try:
+        raise RuntimeError(f"Sample RuntimeError text in {module_name}")
+    except RuntimeError:
+        logger.exception(f"Exception log message in {module_name}")
 
 
 if __name__ == "__main__":

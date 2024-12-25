@@ -23,6 +23,7 @@ from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
+from cl.runtime.context.log_context import LogContext
 from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
@@ -48,7 +49,8 @@ server_app = FastAPI()
 async def handle_exception(request, exc):
 
     # Get context logger using request URL as name
-    logger = Context.current().get_logger(str(request.url))
+    # TODO: Record str(request.url) and other request info
+    logger = LogContext.get_logger(module_name=__name__)
 
     # Log the exception
     logger.error(repr(exc))

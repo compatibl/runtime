@@ -56,11 +56,5 @@ class ProcessContext(Context):
                 # TODO: Use LastName, FirstName format for enterprise if possible
                 self.user = UserKey(username=getuser())
 
-            # Use log from settings if not specified directly
-            if self.log is None:
-                # Create the log class specified in settings
-                log_type = ClassInfo.get_class_type(context_settings.log_class)
-                self.log = log_type(log_id=self.context_id)
-
         # Return self to enable method chaining
         return self

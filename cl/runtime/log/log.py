@@ -52,22 +52,6 @@ class Log(LogKey, RecordMixin[LogKey], ABC):
 
         return Log.__default
 
-    def get_logger(self, name: str) -> logging.Logger:
-        """Get logger for the specified name, invoke with __name__ as the argument."""
-
-        # Create logger and add filter for custom fields
-        logger = logging.getLogger(name)
-        logger.addFilter(LogFilter())
-
-        # Set level
-        logger.setLevel(self.level)
-
-        # Add handlers
-        log_handlers = self.get_log_handlers()
-        [logger.addHandler(log_handler) for log_handler in log_handlers]
-
-        return logger
-
     @abstractmethod
     def get_log_handlers(self) -> Iterable[logging.Handler]:
         """Return an iterable of log handlers to be added to the logger."""

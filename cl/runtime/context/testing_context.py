@@ -64,12 +64,6 @@ class TestingContext(Context):
                 # Set user to env name for unit testing
                 self.user = UserKey(username=env_name)
 
-            # Use log from settings if not specified directly
-            if self.log is None:
-                # TODO: Set log field here explicitly instead of relying on implicit detection of test environment
-                log_type = ClassInfo.get_class_type(context_settings.log_class)
-                self.log = log_type(log_id=self.context_id)
-
         # Return self to enable method chaining
         return self
 

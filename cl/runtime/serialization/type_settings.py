@@ -16,6 +16,8 @@ from logging import getLogger
 from typing import Dict
 from typing import Type
 
+from cl.runtime.context.log_context import LogContext
+
 logger = getLogger(__name__)  # TODO: Use standard way to get default logger
 
 
@@ -60,4 +62,5 @@ class TypeSettings:
 
         # Log an attempt to override already set value
         if type_name != type_alias:
+            logger = LogContext.get_logger(module_name=__name__)
             logger.warning(f"Alias {type_alias} for {type_path} is ignored because alias already exists for this type.")

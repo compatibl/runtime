@@ -33,9 +33,6 @@ class Context(BaseContext):
     user: UserKey = missing()
     """Current user, 'Context.current().user' is used if not specified."""
 
-    log: LogKey = missing()
-    """Log of the context, 'Context.current().log' is used if not specified."""
-
     secrets: Dict[str, str] | None = None
     """Context-specific secrets take precedence over those defined via Dynaconf."""
 
@@ -64,25 +61,14 @@ class Context(BaseContext):
             if self.user is None:
                 self._current_context_field_not_set_error("user")
                 self.user = Context.current().user
-            if self.log is None:
-                self._current_context_field_not_set_error("log")
-                self.log = Context.current().log
 
             # Optional fields, set to None if not set in the root context
             # The root context uses ContextSettings values of these fields
             if self.secrets is None:
                 self.secrets = Context.current().secrets
 
-        # After this all remaining fields can be loaded using database from this context
-        if is_key(self.log):
-            self.log = self.load_one(LogKey, self.log)
-
         # Return self to enable method chaining
         return self
-
-    def get_logger(self, name: str) -> logging.Logger:
-        """Get logger for the specified name, invoke with __name__ as the argument."""
-        return self.log.get_logger(name)  # noqa
 
     def _current_context_field_not_set_error(self, field_name: str) -> None:
         """Error message about a Context field not set."""

@@ -14,11 +14,8 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from logging import getLogger
 from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime.views.stub_viewers_key import StubViewersKey
-
-_logger = getLogger(__name__)
 
 
 @dataclass(slots=True, kw_only=True)

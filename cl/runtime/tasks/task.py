@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.context.context import Context
 from cl.runtime.context.db_context import DbContext
+from cl.runtime.context.log_context import LogContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.primitive.datetime_util import DatetimeUtil
@@ -119,7 +120,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             # Save log entry to the database
             DbContext.save_one(log_message)
 
-            logger = Context.current().get_logger(__name__)
+            logger = LogContext.get_logger(module_name=__name__)
             logger.debug("An error occurred: %s", e)
             logger.debug("Stack trace:\n%s", traceback.format_exc())
 
