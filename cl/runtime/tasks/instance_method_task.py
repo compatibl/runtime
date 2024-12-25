@@ -45,9 +45,6 @@ class InstanceMethodTask(MethodTask):
     def _execute(self) -> None:
         """Invoke the specified instance method."""
 
-        # Get current context
-        context = Context.current()
-
         # Save self to ensure the worker process loads the same record
         DbContext.save_one(self)
 

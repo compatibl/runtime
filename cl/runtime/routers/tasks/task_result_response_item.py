@@ -47,9 +47,6 @@ class TaskResultResponseItem(BaseModel):
     def get_task_results(cls, request: TaskResultRequest) -> List[TaskResultResponseItem]:
         """Get results for tasks in request."""
 
-        # Get current context
-        context = Context.current()
-
         task_keys = [TaskKey(task_id=x) for x in request.task_run_ids]
         tasks = cast(Iterable[Task], DbContext.load_many(Task, task_keys))
         DbContext.save_many(tasks)

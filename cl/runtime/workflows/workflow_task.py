@@ -30,9 +30,6 @@ class WorkflowTask(Task):
     """Tasks run in parallel in the order of phases, however each phase waits until its prerequisites are completed."""
 
     def _execute(self) -> None:
-        # Get current context
-        context = Context.current()
-
         # Check that phases do not specify prerequisites
         phases = DbContext.load_many(WorkflowPhase, self.phases)  # TODO: Error message if not found
         if any(phase.prerequisites is not None for phase in phases):

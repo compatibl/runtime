@@ -55,9 +55,6 @@ class PreloadSettings(Settings):
     def save_and_configure(self, *, final_record_types: List[Type] | None = None) -> None:
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
 
-        # Get current context
-        context = Context.current()
-
         # Create a list of CSV preloads
         csv_files = self._get_files("csv")
         if final_record_types is not None:

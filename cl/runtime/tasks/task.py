@@ -93,10 +93,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
-        # Record the start time
-        start_time = DatetimeUtil.now()
 
-        context = Context.current()
         try:
             # Set status to Running and save
             self.status = TaskStatusEnum.RUNNING
@@ -148,7 +145,6 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     def wait_for_completion(cls, task_key: TaskKey, timeout_sec: int = 10) -> None:  # TODO: Rename or move
         """Wait for completion of the specified task run before exiting from this method (not async/await)."""
 
-        context = Context.current()
         start_datetime = DatetimeUtil.now()
         while DatetimeUtil.now() < start_datetime + dt.timedelta(seconds=timeout_sec):
             task = DbContext.load_one(Task, task_key)

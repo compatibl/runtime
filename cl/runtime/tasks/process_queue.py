@@ -37,7 +37,6 @@ class ProcessQueue(TaskQueue):
         return self
 
     def run_start_queue(self) -> None:
-        context = Context.current()
         queue_id = self.queue_id
 
         # Set timeout

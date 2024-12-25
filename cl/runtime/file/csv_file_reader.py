@@ -38,7 +38,6 @@ class CsvFileReader(Reader):
 
     def read_and_save(self) -> None:
         # Get current context
-        context = Context.current()
 
         with open(self.file_path, mode="r", encoding="utf-8") as file:
             # The reader is an iterable of row dicts
