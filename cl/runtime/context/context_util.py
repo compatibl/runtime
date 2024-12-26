@@ -17,23 +17,23 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
-from cl.runtime import Context
+from cl.runtime.context.user_context import UserContext
 
 
-class ContextUtil:
+class UserContextUtil:
     """Helper methods for Context."""
 
     @classmethod
     def decrypt_secret(cls, key: str) -> str | None:
-        """Decrypt the specified key in Context.current().secrets, return None if not found."""
+        """Decrypt the specified secret in UserContext, None if no current UserContext or key is not found."""
 
         # Get secrets field of the current context, return None if not specified
-        secrets = Context.current().secrets
-        if secrets is None:
+        user_context = UserContext.current_or_none()
+        if (encrypted_secrets := user_context.encrypted_secrets if user_context is not None else None) is None:
             return None
 
         # Get secret by key, return None if key is not present
-        encrypted_value = secrets.get(key)
+        encrypted_value = encrypted_secrets.get(key)
         if encrypted_value is None:
             return None
 

@@ -21,9 +21,6 @@ from cl.runtime.context.base_context import BaseContext
 class Context(BaseContext):
     """Protocol implemented by context objects providing logging, database, dataset, and progress reporting."""
 
-    secrets: Dict[str, str] | None = None
-    """Context-specific secrets take precedence over those defined via Dynaconf."""
-
     @classmethod
     def get_context_type(cls) -> str:
         """

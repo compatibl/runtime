@@ -19,7 +19,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cl.runtime.context.context_util import ContextUtil
+from cl.runtime.context.context_util import UserContextUtil
+from cl.runtime.context.user_context import UserContext
 
 
 def _generate_rsa_private_cert() -> str:
@@ -51,12 +52,13 @@ def _encrypt_value(value: str) -> str:
 
 @pytest.mark.skip("Requires RSA key to decrypt.")
 def test_decrypt_secret():
-    """Test ContextUtil.decrypt_secret method."""
+    """Test UserContextUtil.decrypt_secret method."""
     key = "test_key"
     value = "secret_value"
     encrypted_value = _encrypt_value(value)
-    context.secrets[key] = encrypted_value
-    secret_value_decrypted = ContextUtil.decrypt_secret(key)
+    user_context = UserContext.current_or_none()
+    user_context.encrypted_secrets[key] = encrypted_value
+    secret_value_decrypted = UserContextUtil.decrypt_secret(key)
     assert secret_value_decrypted == value
 
 

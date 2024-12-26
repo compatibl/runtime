@@ -12,19 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 from dataclasses import dataclass
 from getpass import getuser
 from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.context.process_context import ProcessContext
-from cl.runtime.db.db_key import DbKey
-from cl.runtime.log.log_key import LogKey
 from cl.runtime.records.dataclasses_extensions import missing
-from cl.runtime.records.protocols import is_key
-from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
@@ -34,7 +28,7 @@ class UserContext(BaseContext):
     user: UserKey = missing()
     """Current user."""
 
-    secrets: Dict[str, str] | None = None
+    encrypted_secrets: Dict[str, str] | None = None
     """User secrets specified here take precedence over those defined via Dynaconf."""
 
     @classmethod
