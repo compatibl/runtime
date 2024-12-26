@@ -19,8 +19,9 @@ from cl.runtime.context.testing_context import TestingContext
 def test_smoke():
     """Smoke test."""
 
-    with TestingContext() as context:
-        assert context.context_id == "test_unit_test_context.test_smoke"
+    with TestingContext() as testing_context:
+        assert testing_context.is_inside_test == True  # TODO: Rename to is_testing
+        assert testing_context.testing_namespace == "test_unit_test_context.test_smoke"
 
 
 if __name__ == "__main__":

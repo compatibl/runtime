@@ -18,7 +18,6 @@ from typing import final
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
 from cl.runtime.context.testing_context import TestingContext
-from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.settings import Settings
 
@@ -28,33 +27,3 @@ from cl.runtime.settings.settings import Settings
 class ProcessContext(Context):
     """Context for a standalone process."""
 
-    def __post_init__(self):
-        """Configure fields that were not specified in constructor."""
-
-        # Do not execute this code on frozen or deserialized context instances
-        #   - If the instance is frozen, init_all has already been executed
-        #   - If the instance is deserialized, init_all has been executed before serialization
-        if not self.is_deserialized:
-            # Confirm we are not inside a test, error otherwise
-            if Settings.is_inside_test:
-                raise RuntimeError(
-                    f"'{type(self).__name__}' is used inside a test, " f"use '{TestingContext.__name__}' instead."
-                )
-
-            # Get context settings
-            context_settings = ContextSettings.instance()
-
-            # Use db_id from settings for context_id unless specified by the caller
-            if context_settings.context_id is not None:
-                self.context_id = context_settings.context_id
-            else:
-                self.context_id = Settings.process_timestamp
-
-            # Set user from OS if not specified directly
-            if self.user is None:
-                # TODO: Set in based on auth for enterprise cloud deployments
-                # TODO: Use LastName, FirstName format for enterprise if possible
-                self.user = UserKey(username=getuser())
-
-        # Return self to enable method chaining
-        return self

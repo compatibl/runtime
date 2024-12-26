@@ -37,26 +37,4 @@ class TestingContext(Context):
         - This module not itself import pytest or unittest package
     """
 
-    def __post_init__(self):
-        """Configure fields that were not specified in constructor."""
-
-        # Do not execute this code on frozen or deserialized context instances
-        #   - If the instance is frozen, init_all has already been executed
-        #   - If the instance is deserialized, init_all has been executed before serialization
-        if not self.is_deserialized:
-
-            # Confirm we are inside a test, error otherwise
-            if not Settings.is_inside_test:
-                raise RuntimeError(f"TestingContext created outside a test.")
-
-            # For a test, env name is dot-delimited test module, class in snake_case (if any), and method or function
-            env_name = EnvUtil.get_env_name()
-
-            # Set user from OS if not specified directly
-            if self.user is None:
-                # Set user to env name for unit testing
-                self.user = UserKey(username=env_name)
-
-        # Return self to enable method chaining
-        return self
 
