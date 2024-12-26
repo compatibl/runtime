@@ -15,15 +15,12 @@
 import pytest
 from typing import Dict
 from typing import List
-from fastapi import FastAPI
-from starlette.testclient import TestClient
-from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.routers.tasks import tasks_router
 from cl.runtime.routers.tasks.run_response_item import handler_queue
 from cl.runtime.routers.tasks.task_result_request import TaskResultRequest
 from cl.runtime.routers.tasks.task_result_response_item import TaskResultResponseItem
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
+from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
@@ -74,10 +71,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /tasks/run/result route."""
-
-    test_app = FastAPI()
-    test_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         for request in _save_tasks_and_get_requests():
             response = test_client.post("/tasks/run/result", json=request)
             assert response.status_code == 200

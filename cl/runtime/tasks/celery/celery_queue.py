@@ -20,7 +20,7 @@ from typing import List
 from celery import Celery
 from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.testing_context import TestingContext
+from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.settings.context_settings import ContextSettings
@@ -137,8 +137,8 @@ class CeleryQueue(TaskQueue):
 
     def submit_task(self, task: TaskKey):
 
-        # Wrap into TestingContext if inside test and into NoOpContext otherwise
-        with TestingContext():
+        # Wrap into ProcessContext if inside test and into NoOpContext otherwise
+        with ProcessContext():
 
             # Get and serialize current context
             context_manager_data = ContextManager.serialize_all_current()

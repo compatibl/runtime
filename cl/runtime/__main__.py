@@ -14,27 +14,19 @@
 
 import os
 import traceback
-import uuid
 import webbrowser
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.log_context import LogContext
 from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
-from cl.runtime.routers.app import app_router
-from cl.runtime.routers.auth import auth_router
+from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.routers.context_middleware import ContextMiddleware
-from cl.runtime.routers.entity import entity_router
-from cl.runtime.routers.health import health_router
-from cl.runtime.routers.schema import schema_router
-from cl.runtime.routers.storage import storage_router
-from cl.runtime.routers.tasks import tasks_router
 from cl.runtime.settings.api_settings import ApiSettings
 from cl.runtime.settings.preload_settings import PreloadSettings
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -106,14 +98,8 @@ server_app.add_middleware(
 # Middleware for clearing contextvars and restoring their previous state after async task execution
 server_app.add_middleware(ContextMiddleware)
 
-# Routers
-server_app.include_router(app_router.router, prefix="", tags=["App"])
-server_app.include_router(health_router.router, prefix="", tags=["Health Check"])
-server_app.include_router(auth_router.router, prefix="/auth", tags=["Authorization"])
-server_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"])
-server_app.include_router(storage_router.router, prefix="/storage", tags=["Storage"])
-server_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"])
-server_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
+# Add routers
+ServerUtil.include_routers(server_app)
 
 if __name__ == "__main__":
     with ProcessContext():

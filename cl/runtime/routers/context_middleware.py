@@ -12,14 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
-import contextvars
-import random
-from starlette.requests import Request
 from starlette.types import ASGIApp
-from cl.runtime import Context
 from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.process_context import ProcessContext
 
 
@@ -30,26 +24,21 @@ class ContextMiddleware:
         self.app = app
 
     async def __call__(self, scope, receive, send) -> None:
-        if scope["type"] in ("http", "websocket"):
-            # TODO: Create a test setting to enable this other than by uncommenting
-            # duration = random.uniform(0, 10)
-            # print(f"Before request processing: {duration}")
+        # TODO: Create a test setting to enable this other than by uncommenting
+        # duration = random.uniform(0, 10)
+        # print(f"Before request processing: {duration}")
 
-            # Set ContextVar=None before async task execution, get a token for restoring its previous state
-            token = BaseContext.clear_contextvar()
-            try:
-                with ProcessContext():
-                    with DbContext():
-                        # TODO: Create a test setting to enable this other than by uncommenting
-                        # await asyncio.sleep(duration)
-                        await self.app(scope, receive, send)
-            finally:
-                # Restore ContextVar to its previous state after async task execution using a token
-                # from 'clear_contextvar' whether or not an exception occurred
-                BaseContext.restore_contextvar(token)
+        # Set ContextVar=None before async task execution, get a token for restoring its previous state
+        token = BaseContext.clear_contextvar()
+        try:
+            with ProcessContext():
+                # TODO: Create a test setting to enable this other than by uncommenting
+                # await asyncio.sleep(duration)
+                await self.app(scope, receive, send)
+        finally:
+            # Restore ContextVar to its previous state after async task execution using a token
+            # from 'clear_contextvar' whether or not an exception occurred
+            BaseContext.restore_contextvar(token)
 
-            # TODO: Create a test setting to enable this other than by uncommenting
-            # print(f"After request processing: {duration}")
-        else:
-            # If it's not an http or websocket request, pass it through unchanged
-            await self.app(scope, receive, send)
+        # TODO: Create a test setting to enable this other than by uncommenting
+        # print(f"After request processing: {duration}")

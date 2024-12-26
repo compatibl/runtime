@@ -13,11 +13,9 @@
 # limitations under the License.
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
+from cl.runtime.testing.testing_client import TestingClient
 
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.routers.entity import entity_router
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -76,10 +74,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /entity/save route."""
-
-    test_app = FastAPI()
-    test_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         # Test saving new record
         save_new_record_request_obj = SaveRequest(record_dict=create_record_payload)
         request_params = {

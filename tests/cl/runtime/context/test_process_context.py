@@ -19,13 +19,11 @@ from cl.runtime.settings.context_settings import ContextSettings
 context_settings = ContextSettings.instance()
 
 
-def test_process_context():
+def test_smoke():
     """Smoke test."""
 
-    # Check that ProcessContext cannot be invoked inside a test
-    with pytest.raises(RuntimeError):
-        with ProcessContext():
-            pass
+    assert ProcessContext.is_testing() == True
+    assert ProcessContext.get_process_namespace() == "test_process_context.test_smoke"
 
 
 if __name__ == "__main__":

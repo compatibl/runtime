@@ -13,11 +13,9 @@
 # limitations under the License.
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
+from cl.runtime.testing.testing_client import TestingClient
 
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.routers.entity import entity_router
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -70,9 +68,7 @@ def test_api():
 
     DbContext.save_one(stub_viewers)
 
-    test_app = FastAPI()
-    test_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         for request, expected_result in zip(requests, expected_results):
             # Split request headers and query
             request_headers = {"user": request.get("user")}

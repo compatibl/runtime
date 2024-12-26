@@ -13,12 +13,10 @@
 # limitations under the License.
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
-from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.testing.testing_client import TestingClient
 
 requests = [{"name": "UiAppState"}, {"name": "UiAppState", "user": "TestUser"}]
 
@@ -36,10 +34,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /schema/typeV2 route."""
-
-    test_app = FastAPI()
-    test_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         for request in requests:
             # Split request headers and query
             request_headers = {"user": request.get("user")}

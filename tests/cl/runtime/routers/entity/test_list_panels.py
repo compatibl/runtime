@@ -16,10 +16,8 @@ import pytest
 import inspect
 from typing import List
 from typing import Type
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
+from cl.runtime.testing.testing_client import TestingClient
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.routers.entity import entity_router
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
 from stubs.cl.runtime import StubDataViewers
@@ -66,10 +64,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /entity/list_panels route."""
-
-    test_app = FastAPI()
-    test_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         for request in requests:
             # Split request headers and query
             request_headers = {"user": request.get("user")}

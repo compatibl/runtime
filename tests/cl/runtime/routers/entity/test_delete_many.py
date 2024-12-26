@@ -13,8 +13,7 @@
 # limitations under the License.
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
+from cl.runtime.testing.testing_client import TestingClient
 
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.routers.entity import entity_router
@@ -51,10 +50,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /entity/delete_many route."""
-
-    test_app = FastAPI()
-    test_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         existing_records = [
             StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}") for i in range(5)
         ]

@@ -13,11 +13,9 @@
 # limitations under the License.
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
+from cl.runtime.testing.testing_client import TestingClient
 
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.routers.storage import storage_router
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.routers.storage.record_response import RecordResponse
 from cl.runtime.testing.regression_guard import RegressionGuard
@@ -49,10 +47,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /storage/record route."""
-
-    test_app = FastAPI()
-    test_app.include_router(storage_router.router, prefix="/storage", tags=["Storage"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         # Save test record
         record = StubDataclassRecord(id=__name__)
         DbContext.save_one(record)

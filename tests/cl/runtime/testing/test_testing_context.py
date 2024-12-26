@@ -20,8 +20,7 @@ def test_smoke():
     """Smoke test."""
 
     with TestingContext() as testing_context:
-        assert testing_context.is_testing == True  # TODO: Rename to is_testing
-        assert testing_context.testing_namespace == "test_unit_test_context.test_smoke"
+        assert testing_context.testing_namespace_or_none == "test_unit_test_context.test_smoke"
 
 
 if __name__ == "__main__":

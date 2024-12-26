@@ -13,16 +13,75 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from getpass import getuser
-from typing import final
-from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.context.context import Context
-from cl.runtime.settings.context_settings import ContextSettings
+
+from typing_extensions import Self
+
+from cl.runtime.context.base_context import BaseContext
+from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.settings.settings import Settings
 
 
-@final
 @dataclass(slots=True, kw_only=True)
-class ProcessContext(Context):
-    """Context for a standalone process."""
+class ProcessContext(BaseContext):
+    """Provides information about the currently running test."""
+
+    testing: bool = False
+    """True inside a test, False otherwise (this field is passed to out-of-process tasks)."""
+
+    process_namespace: str = missing()
+    """Used to set database name and similar parameters (this field is passed to out-of-process tasks)."""
+
+    @classmethod
+    def get_context_type(cls) -> str:
+        """
+        The lookup of current context for cls will be done using the key returned by cls.get_context_type().
+
+        Notes:
+          - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
+          - By convention, the returned string is the name of the base class for this context type in PascalCase
+        """
+        return "Process"
+
+    def init(self) -> Self:
+        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+
+        # Do not execute this code on frozen or deserialized context instances
+        #   - If the instance is frozen, init_all has already been executed
+        #   - If the instance is deserialized, init_all has been executed before serialization
+        if not self.is_deserialized:
+
+            # If not specified, set based on the current context
+            if self.testing is None:
+                self.testing = self.is_testing()
+            if self.process_namespace is None:
+                self.process_namespace = self.get_process_namespace()
+
+        # Return self to enable method chaining
+        return self
+
+    @classmethod
+    def is_testing(cls) -> bool:
+        """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
+        if (current_context := ProcessContext.current_or_none()) is not None:
+            # Get from the current ProcessContext if exists
+            return current_context.is_testing()
+        else:
+            # Otherwise set based on the current process
+            return Settings.is_inside_test
+
+    @classmethod
+    def get_process_namespace(cls) -> str:
+        """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
+        if (current_context := ProcessContext.current_or_none()) is not None:
+            # Get from the current ProcessContext if exists
+            return current_context.process_namespace
+        else:
+            # Otherwise set based on the current process
+            if Settings.is_inside_test:
+                # Return test_module.test_module or test_module.test_class.test_method inside a test
+                return EnvUtil.get_env_name()  # TODO: Move code from EnvUtil
+            else:
+                # Return None outside a test
+                return "main"  # TODO: Use context_id
 

@@ -21,6 +21,7 @@ from typing import Iterable
 from typing import Type
 
 from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.protocols import KeyProtocol
@@ -205,10 +206,11 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @classmethod
     def _get_test_db_name(cls) -> str:
         """Get SQLite database with name based on test namespace."""
-        # For the test, env name is dot-delimited test module, class in snake_case (if any), and method or function
-        env_name = EnvUtil.get_env_name()
-        result = f"temp;{env_name.replace('.', ';')}"
-        return result
+        if ProcessContext.is_testing():
+            result = f"temp;{ProcessContext.get_process_namespace().replace('.', ';')}"
+            return result
+        else:
+            raise RuntimeError("Attempting to get test DB name outside a test.")
 
     @classmethod
     def error_if_not_temp_db(cls, db_id_or_database_name: str) -> None:

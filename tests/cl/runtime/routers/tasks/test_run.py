@@ -13,11 +13,8 @@
 # limitations under the License.
 
 import pytest
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
 
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.routers.tasks import tasks_router
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
 from cl.runtime.routers.tasks.run_response_item import RunResponseItem
@@ -25,6 +22,7 @@ from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.testing.pytest.pytest_fixtures import celery_test_queue_fixture
+from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubHandlers
 
@@ -96,9 +94,7 @@ def test_api(celery_test_queue_fixture):
 
     DbContext.save_one(stub_handlers)
 
-    test_app = FastAPI()
-    test_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         for request in simple_requests + save_to_db_requests:
             response = test_client.post("/tasks/run", json=request)
             assert response.status_code == 200

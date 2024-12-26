@@ -13,11 +13,7 @@
 # limitations under the License.
 
 import pytest
-import asyncio
-import sys
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
-from cl.runtime.routers.health import health_router
+from cl.runtime.testing.testing_client import TestingClient
 from cl.runtime.routers.health.health_response import HealthResponse
 from cl.runtime.routers.user_request import UserRequest
 
@@ -42,10 +38,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /health route."""
-
-    test_app = FastAPI()
-    test_app.include_router(health_router.router, prefix="", tags=["Health Check"])
-    with TestClient(test_app) as test_client:
+    with TestingClient() as test_client:
         for request in requests:
             response = test_client.get("/health", headers=request)
             assert response.status_code == 200

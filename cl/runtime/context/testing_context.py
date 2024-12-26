@@ -38,6 +38,7 @@ class TestingContext(BaseContext):
 
     def __init__(self):
         """Set test parameters inside test."""
+
         # Copying to a context instance field ensures the context remains the same for out-of-process tasks
         self.testing_namespace_or_none = self.get_testing_namespace_or_none()
 
