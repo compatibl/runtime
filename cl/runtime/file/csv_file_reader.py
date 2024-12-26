@@ -17,7 +17,6 @@ import os
 from dataclasses import dataclass
 from typing import Any
 from typing import Dict
-from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.file.reader import Reader
 from cl.runtime.primitive.case_util import CaseUtil

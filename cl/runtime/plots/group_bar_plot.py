@@ -17,7 +17,6 @@ from typing import List
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from cl.runtime import Context
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.records.dataclasses_extensions import field
 

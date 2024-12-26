@@ -16,9 +16,8 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Type
 from typing_extensions import Self
-from cl.runtime import Db, Context, ClassInfo
+from cl.runtime import Db, ClassInfo
 from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
@@ -28,8 +27,6 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.settings.context_settings import ContextSettings
-from cl.runtime.settings.settings import Settings
-
 
 @dataclass(slots=True, kw_only=True)
 class DbContext(BaseContext):

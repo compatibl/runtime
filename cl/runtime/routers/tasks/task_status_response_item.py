@@ -18,7 +18,6 @@ from typing import Iterable
 from typing import List
 from typing import cast
 from pydantic import BaseModel
-from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest

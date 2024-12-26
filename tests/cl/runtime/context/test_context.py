@@ -18,7 +18,6 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
 from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.context import Context
 from stubs.cl.runtime.context.stub_context import StubContext
 from stubs.cl.runtime.context.stub_derived_context import StubDerivedContext
 

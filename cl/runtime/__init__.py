@@ -2,7 +2,6 @@ from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.db.db import Db
-from cl.runtime.context.context import Context
 from cl.runtime.db.local.local_cache import LocalCache
 from cl.runtime.views.view import View
 from cl.runtime.views.record_view import RecordView

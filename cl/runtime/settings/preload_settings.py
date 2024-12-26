@@ -18,7 +18,6 @@ from typing import List
 from typing import Type
 from typing_extensions import Self
 from cl.runtime.configs.config import Config
-from cl.runtime.context.context import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.settings.settings import Settings

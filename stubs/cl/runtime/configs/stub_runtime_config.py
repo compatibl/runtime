@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from cl.runtime.configs.config import Config
-from cl.runtime.context.context import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.plots.group_bar_plot import GroupBarPlot
 from stubs.cl.runtime import StubDagViewers

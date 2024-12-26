@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from pydantic import BaseModel
-from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.routers.entity.save_request import SaveRequest

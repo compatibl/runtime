@@ -17,7 +17,6 @@ import os
 from abc import abstractmethod
 from dataclasses import dataclass
 from matplotlib import pyplot as plt
-from cl.runtime import Context
 from cl.runtime import View
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.context.env_util import EnvUtil

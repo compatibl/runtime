@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime import Context
 from cl.runtime import RecordMixin
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.records.dataclasses_extensions import missing

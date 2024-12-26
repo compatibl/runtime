@@ -19,7 +19,6 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing_extensions import Self
-from cl.runtime.context.context import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.log_context import LogContext
 from cl.runtime.log.exceptions.user_error import UserError

@@ -21,7 +21,6 @@ from typing import cast
 from pymongo import MongoClient
 from mongomock import MongoClient as MongoClientMock
 from pymongo.database import Database
-from cl.runtime.context.context import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer

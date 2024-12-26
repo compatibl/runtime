@@ -15,7 +15,6 @@
 from __future__ import annotations
 from typing import List
 from pydantic import BaseModel
-from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest

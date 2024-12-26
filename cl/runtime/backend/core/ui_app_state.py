@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import List
 from typing import Optional
-from cl.runtime import Context
 from cl.runtime.backend.core.app_theme import AppTheme
 from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey

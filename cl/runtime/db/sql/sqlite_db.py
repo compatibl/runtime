@@ -22,7 +22,6 @@ from typing import Dict
 from typing import Iterable
 from typing import Tuple
 from typing import Type
-from cl.runtime.context.context import Context
 from cl.runtime.db.db import Db
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord

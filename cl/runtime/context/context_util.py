@@ -21,7 +21,7 @@ from cl.runtime.context.user_context import UserContext
 
 
 class UserContextUtil:
-    """Helper methods for Context."""
+    """Helper methods for UserContext."""
 
     @classmethod
     def decrypt_secret(cls, key: str) -> str | None:
