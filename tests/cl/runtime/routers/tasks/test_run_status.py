@@ -19,7 +19,6 @@ from fastapi import FastAPI
 from starlette.testclient import TestClient
 from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.routers.tasks import tasks_router
 from cl.runtime.routers.tasks.run_response_item import handler_queue
 from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
@@ -57,54 +56,49 @@ def _save_tasks_and_get_requests() -> List[Dict]:
 def test_method():
     """Test coroutine for /tasks/run/status route."""
 
-    with TestingContext() as context:
+    for request in _save_tasks_and_get_requests():
+        request_obj = TaskStatusRequest(**request)
+        result = TaskStatusResponseItem.get_task_statuses(request_obj)
 
+        assert isinstance(result, list)
+        for result_response_item, task_run_id in zip(result, request_obj.task_run_ids):
+
+            # Validate type
+            assert isinstance(result_response_item, TaskStatusResponseItem)
+
+            # Validate fields
+            # TODO: Review the spec for the value of result_response_item.key
+            assert isinstance(result_response_item.key, str)
+            assert result_response_item.task_run_id == task_run_id
+            assert result_response_item.status_code is not None
+
+
+def test_api():
+    """Test REST API for /tasks/run/status route."""
+
+    test_app = FastAPI()
+    test_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
+    with TestClient(test_app) as test_client:
         for request in _save_tasks_and_get_requests():
-            request_obj = TaskStatusRequest(**request)
-            result = TaskStatusResponseItem.get_task_statuses(request_obj)
 
+            # Invoke
+            response = test_client.post("/tasks/run/status", json=request)
+            assert response.status_code == 200
+            result = response.json()
+
+            # Validate
             assert isinstance(result, list)
-            for result_response_item, task_run_id in zip(result, request_obj.task_run_ids):
+            request_obj = TaskStatusRequest(**request)
+            for result_item, task_run_id in zip(result, request_obj.task_run_ids):
 
-                # Validate type
-                assert isinstance(result_response_item, TaskStatusResponseItem)
+                # Validate with Pydantic
+                result_response_item = TaskStatusResponseItem(**result_item)
 
                 # Validate fields
                 # TODO: Review the spec for the value of result_response_item.key
                 assert isinstance(result_response_item.key, str)
                 assert result_response_item.task_run_id == task_run_id
                 assert result_response_item.status_code is not None
-
-
-def test_api():
-    """Test REST API for /tasks/run/status route."""
-
-    # TODO: Use TestingContext instead
-    with TestingContext():
-
-        test_app = FastAPI()
-        test_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
-        with TestClient(test_app) as test_client:
-            for request in _save_tasks_and_get_requests():
-
-                # Invoke
-                response = test_client.post("/tasks/run/status", json=request)
-                assert response.status_code == 200
-                result = response.json()
-
-                # Validate
-                assert isinstance(result, list)
-                request_obj = TaskStatusRequest(**request)
-                for result_item, task_run_id in zip(result, request_obj.task_run_ids):
-
-                    # Validate with Pydantic
-                    result_response_item = TaskStatusResponseItem(**result_item)
-
-                    # Validate fields
-                    # TODO: Review the spec for the value of result_response_item.key
-                    assert isinstance(result_response_item.key, str)
-                    assert result_response_item.task_run_id == task_run_id
-                    assert result_response_item.status_code is not None
 
 
 if __name__ == "__main__":

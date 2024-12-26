@@ -15,7 +15,6 @@
 import pytest
 
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.tasks.process_queue import ProcessQueue
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime.tasks.stub_task import StubTask
@@ -24,27 +23,25 @@ from stubs.cl.runtime.tasks.stub_task import StubTask
 def test_process_queue():
     """Test ProcessQueue class."""
 
-    with TestingContext() as context:
+    guard = RegressionGuard()
 
-        guard = RegressionGuard()
+    # Create queue
+    queue = ProcessQueue(queue_id="test_process_queue")
+    queue.timeout_sec = 2
+    queue_key = queue.get_key()
 
-        # Create queue
-        queue = ProcessQueue(queue_id="test_process_queue")
-        queue.timeout_sec = 2
-        queue_key = queue.get_key()
+    # Create and save tasks
+    task_count = 2
+    tasks = [StubTask(label=f"{i}", queue=queue_key) for i in range(task_count)]
+    DbContext.save_many(tasks)
 
-        # Create and save tasks
-        task_count = 2
-        tasks = [StubTask(label=f"{i}", queue=queue_key) for i in range(task_count)]
-        DbContext.save_many(tasks)
+    # Start queue
+    queue.run_start_queue()
 
-        # Start queue
-        queue.run_start_queue()
+    # Stop queue
+    # TODO: Stop queue
 
-        # Stop queue
-        # TODO: Stop queue
-
-        guard.verify()
+    guard.verify()
 
 
 if __name__ == "__main__":

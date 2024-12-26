@@ -15,7 +15,6 @@
 import pytest
 
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers

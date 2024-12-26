@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime import LocalCache
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.settings.aliases.package_alias import PackageAlias
 
 

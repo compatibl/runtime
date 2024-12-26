@@ -20,7 +20,6 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cl.runtime.context.context_util import ContextUtil
-from cl.runtime.context.testing_context import TestingContext
 
 
 def _generate_rsa_private_cert() -> str:

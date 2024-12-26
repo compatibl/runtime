@@ -21,7 +21,6 @@ from typing import Type
 import pandas as pd
 
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer

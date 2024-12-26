@@ -13,10 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime import Context
 from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import execute_task
@@ -44,22 +42,20 @@ def _create_task(queue: TaskQueueKey) -> TaskKey:
 def test_method(celery_test_queue_fixture):
     """Test calling 'execute_task' method in-process."""
 
-    with TestingContext() as context:
+    # Create queue
+    queue_id = f"test_celery_queue.test_method"
+    queue = CeleryQueue(queue_id=queue_id)
+    DbContext.save_one(queue)
 
-        # Create queue
-        queue_id = f"test_celery_queue.test_method"
-        queue = CeleryQueue(queue_id=queue_id)
-        DbContext.save_one(queue)
+    # Create task
+    task_key = _create_task(queue.get_key())
 
-        # Create task
-        task_key = _create_task(queue.get_key())
-
-        # Call 'execute_task' method in-process
-        context_manager_data = ContextManager.serialize_all_current()
-        execute_task(
-            task_key.task_id,
-            context_manager_data,
-        )
+    # Call 'execute_task' method in-process
+    context_manager_data = ContextManager.serialize_all_current()
+    execute_task(
+        task_key.task_id,
+        context_manager_data,
+    )
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict

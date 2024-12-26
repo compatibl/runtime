@@ -15,7 +15,6 @@
 import pytest
 
 from cl.runtime.context.log_context import LogContext
-from cl.runtime.context.testing_context import TestingContext
 
 
 def test_smoke():

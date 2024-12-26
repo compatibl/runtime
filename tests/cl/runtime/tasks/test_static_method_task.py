@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.tasks.static_method_task import StaticMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers

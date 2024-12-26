@@ -17,7 +17,6 @@ from getpass import getuser
 from typing import final
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.context.context import Context
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.settings import Settings
 

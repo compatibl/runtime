@@ -15,7 +15,8 @@
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from cl.runtime.context.testing_context import TestingContext
+
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.routers.tasks import tasks_router
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
@@ -63,73 +64,70 @@ expected_records_in_db = [[StubDataclassRecord(id="saved_from_handler")]]
 def test_method(celery_test_queue_fixture):
     """Test coroutine for /tasks/run route."""
 
-    with TestingContext() as context:
-        DbContext.save_one(stub_handlers)
+    DbContext.save_one(stub_handlers)
 
-        for request in simple_requests + save_to_db_requests:
-            request_object = RunRequest(**request)
-            result = RunResponseItem.run_tasks(request_object)
+    for request in simple_requests + save_to_db_requests:
+        request_object = RunRequest(**request)
+        result = RunResponseItem.run_tasks(request_object)
 
-            assert isinstance(result, list)
+        assert isinstance(result, list)
 
-            for result_item in result:
-                assert isinstance(result_item, (RunResponseItem, RunErrorResponseItem))
-                assert result_item.task_run_id is not None
+        for result_item in result:
+            assert isinstance(result_item, (RunResponseItem, RunErrorResponseItem))
+            assert result_item.task_run_id is not None
 
-                if request_object.keys:
-                    assert result_item.key is not None
-                    assert result_item.key in request_object.keys
+            if request_object.keys:
+                assert result_item.key is not None
+                assert result_item.key in request_object.keys
 
-        for request, expected_records in zip(save_to_db_requests, expected_records_in_db):
-            expected_keys = [rec.get_key() for rec in expected_records]
+    for request, expected_records in zip(save_to_db_requests, expected_records_in_db):
+        expected_keys = [rec.get_key() for rec in expected_records]
 
-            request_object = RunRequest(**request)
-            response_items = RunResponseItem.run_tasks(request_object)
-            [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
-            actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
-            assert actual_records == expected_records
+        request_object = RunRequest(**request)
+        response_items = RunResponseItem.run_tasks(request_object)
+        [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
+        actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
+        assert actual_records == expected_records
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
 def test_api(celery_test_queue_fixture):
     """Test REST API for /tasks/run route."""
 
-    # TODO: Use TestingContext instead
-    with TestingContext() as context:
-        DbContext.save_one(stub_handlers)
+    DbContext.save_one(stub_handlers)
 
-        test_app = FastAPI()
-        test_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
-        with TestClient(test_app) as test_client:
-            for request in simple_requests + save_to_db_requests:
-                response = test_client.post("/tasks/run", json=request)
-                assert response.status_code == 200
-                result = response.json()
+    test_app = FastAPI()
+    test_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
+    with TestClient(test_app) as test_client:
+        for request in simple_requests + save_to_db_requests:
+            response = test_client.post("/tasks/run", json=request)
+            assert response.status_code == 200
+            result = response.json()
 
-                # Check that the result is a list
-                assert isinstance(result, list)
+            # Check that the result is a list
+            assert isinstance(result, list)
 
-                # Check if each item in the result has valid data to construct RunResponseItem
-                for item in result:
-                    RunResponseItem(**item)
-                    assert item.get("TaskRunId") is not None
+            # Check if each item in the result has valid data to construct RunResponseItem
+            for item in result:
+                RunResponseItem(**item)
+                assert item.get("TaskRunId") is not None
 
-                    if request.get("keys"):
-                        assert item.get("Key") is not None
-                        assert item.get("Key") in request["keys"]
+                if request.get("keys"):
+                    assert item.get("Key") is not None
+                    assert item.get("Key") in request["keys"]
 
-            for request, expected_records in zip(save_to_db_requests, expected_records_in_db):
-                expected_keys = [rec.get_key() for rec in expected_records]
+        for request, expected_records in zip(save_to_db_requests, expected_records_in_db):
+            expected_keys = [rec.get_key() for rec in expected_records]
 
-                test_client.post("/tasks/run", json=request)
-                request_object = RunRequest(**request)
-                response_items = RunResponseItem.run_tasks(request_object)
-                [
-                    Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id))
-                    for response_item in response_items
-                ]
-                actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
-                assert actual_records == expected_records
+            test_client.post("/tasks/run", json=request)
+            request_object = RunRequest(**request)
+            response_items = RunResponseItem.run_tasks(request_object)
+            [
+                Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id))
+                for response_item in response_items
+            ]
+            actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
+            assert actual_records == expected_records
 
 
 if __name__ == "__main__":

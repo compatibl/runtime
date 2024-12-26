@@ -20,7 +20,6 @@ from typing import Iterable
 from cl.runtime import Db
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.env_util import EnvUtil
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.db.sql.sqlite_db import SqliteDb
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord

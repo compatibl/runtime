@@ -13,28 +13,21 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import final
-from typing_extensions import Self
-from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.context.context import Context
-from cl.runtime.context.env_util import EnvUtil
-from cl.runtime.db.dataset_util import DatasetUtil
-from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
-from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.primitive.string_util import StringUtil
-from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.settings.context_settings import ContextSettings
-from cl.runtime.settings.settings import Settings
+from cl.runtime.context.base_context import BaseContext
 
 
 @dataclass(slots=True, kw_only=True)
-class TestingContext(Context):
-    """
-    Utilities for both pytest and unittest.
+class TestingContext(BaseContext):
+    """Provides information about the currently running test."""
 
-    Notes:
-        - The name TestingContext was selected to avoid Test prefix and does not indicate it is for a specific package
-        - This module not itself import pytest or unittest package
-    """
+    @classmethod
+    def get_context_type(cls) -> str:
+        """
+        The lookup of current context for cls will be done using the key returned by cls.get_context_type().
 
+        Notes:
+          - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
+          - By convention, the returned string is the name of the base class for this context type in PascalCase
+        """
+        return "Testing"
 

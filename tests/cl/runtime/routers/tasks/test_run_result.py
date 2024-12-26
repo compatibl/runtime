@@ -19,7 +19,6 @@ from fastapi import FastAPI
 from starlette.testclient import TestClient
 from cl.runtime import Context
 from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.routers.tasks import tasks_router
 from cl.runtime.routers.tasks.run_response_item import handler_queue
 from cl.runtime.routers.tasks.task_result_request import TaskResultRequest
@@ -57,49 +56,45 @@ def _save_tasks_and_get_requests() -> List[Dict]:
 def test_method():
     """Test coroutine for /tasks/run/result route."""
 
-    # TODO: Use TestingContext instead
-    with TestingContext() as context:
-        for request in _save_tasks_and_get_requests():
-            request_obj = TaskResultRequest(**request)
-            result = TaskResultResponseItem.get_task_results(request_obj)
+    for request in _save_tasks_and_get_requests():
+        request_obj = TaskResultRequest(**request)
+        result = TaskResultResponseItem.get_task_results(request_obj)
 
-            assert isinstance(result, list)
-            for result_response_item, task_run_id in zip(result, request_obj.task_run_ids):
+        assert isinstance(result, list)
+        for result_response_item, task_run_id in zip(result, request_obj.task_run_ids):
 
-                # Validate type
-                assert isinstance(result_response_item, TaskResultResponseItem)
+            # Validate type
+            assert isinstance(result_response_item, TaskResultResponseItem)
 
-                # Validate fields
-                assert result_response_item.key == task_run_id
-                assert result_response_item.task_run_id == task_run_id
-                assert result_response_item.result is not None
+            # Validate fields
+            assert result_response_item.key == task_run_id
+            assert result_response_item.task_run_id == task_run_id
+            assert result_response_item.result is not None
 
 
 def test_api():
     """Test REST API for /tasks/run/result route."""
 
-    # TODO: Use TestingContext instead
-    with TestingContext() as context:
-        test_app = FastAPI()
-        test_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
-        with TestClient(test_app) as test_client:
-            for request in _save_tasks_and_get_requests():
-                response = test_client.post("/tasks/run/result", json=request)
-                assert response.status_code == 200
+    test_app = FastAPI()
+    test_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
+    with TestClient(test_app) as test_client:
+        for request in _save_tasks_and_get_requests():
+            response = test_client.post("/tasks/run/result", json=request)
+            assert response.status_code == 200
 
-                result = response.json()
+            result = response.json()
 
-                assert isinstance(result, list)
-                request_obj = TaskResultRequest(**request)
-                for result_item, task_run_id in zip(result, request_obj.task_run_ids):
+            assert isinstance(result, list)
+            request_obj = TaskResultRequest(**request)
+            for result_item, task_run_id in zip(result, request_obj.task_run_ids):
 
-                    # Validate with Pydantic
-                    result_response_item = TaskResultResponseItem(**result_item)
+                # Validate with Pydantic
+                result_response_item = TaskResultResponseItem(**result_item)
 
-                    # Validate fields
-                    assert result_response_item.key == task_run_id
-                    assert result_response_item.task_run_id == task_run_id
-                    assert result_response_item.result is not None
+                # Validate fields
+                assert result_response_item.key == task_run_id
+                assert result_response_item.task_run_id == task_run_id
+                assert result_response_item.result is not None
 
 
 if __name__ == "__main__":

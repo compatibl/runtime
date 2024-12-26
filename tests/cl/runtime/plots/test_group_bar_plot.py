@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.plots.group_bar_plot import GroupBarPlot
 from cl.runtime.testing.pytest.pytest_fixtures import local_dir_fixture
 
