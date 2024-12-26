@@ -25,7 +25,7 @@ from cl.runtime.records.protocols import is_key
 
 @dataclass(slots=True, kw_only=True)
 class LogContext(BaseContext):
-    """Protocol implemented by context objects providing logging, database, dataset, and progress reporting."""
+    """Provides get_logger() method returning a configured logger."""
 
     @classmethod
     def get_context_type(cls) -> str:

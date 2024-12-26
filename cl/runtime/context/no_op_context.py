@@ -13,16 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Dict
 from cl.runtime.context.base_context import BaseContext
 
 
 @dataclass(slots=True, kw_only=True)
-class Context(BaseContext):
-    """Protocol implemented by context objects providing logging, database, dataset, and progress reporting."""
-
-    secrets: Dict[str, str] | None = None
-    """Context-specific secrets take precedence over those defined via Dynaconf."""
+class NoOpContext(BaseContext):
+    """Performs no action, use to conditionally substitute for another context."""
 
     @classmethod
     def get_context_type(cls) -> str:
@@ -33,18 +29,4 @@ class Context(BaseContext):
           - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
           - By convention, the returned string is the name of the base class for this context type in PascalCase
         """
-        return "Context"
-
-    def _current_context_field_not_set_error(self, field_name: str) -> None:
-        """Error message about a Context field not set."""
-        # Get context stack for the current asynchronous environment
-        context_stack = self._get_context_stack()
-        if not context_stack:
-            raise RuntimeError(
-                f"""
-Field '{field_name}' of the context class '{type(self).__name__}' is not set.
-The context in the outermost 'with' clause (root context) must set all fields
-of the Context class. Inside the 'with' clause, these fields will be populated
-from the current context.
-"""
-            )
+        return "NoOp"

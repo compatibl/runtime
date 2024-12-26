@@ -17,11 +17,10 @@ import os
 from dataclasses import dataclass
 from typing import Final
 from typing import List
-from uuid import UUID
 from celery import Celery
-from cl.runtime import Context
 from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.context.db_context import DbContext
+from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.settings.context_settings import ContextSettings
@@ -137,17 +136,21 @@ class CeleryQueue(TaskQueue):
         """Cancel all active runs and stop queue workers."""
 
     def submit_task(self, task: TaskKey):
-        # Get and serialize current context
-        context_manager_data = ContextManager.serialize_all_current()
 
-        # Pass parameters to the Celery task signature
-        execute_task_signature = execute_task.s(
-            task.task_id,
-            context_manager_data,
-        )
+        # Wrap into TestingContext if inside test and into NoOpContext otherwise
+        with TestingContext():
 
-        # Submit task to Celery with completed and error links
-        execute_task_signature.apply_async(
-            retry=False,  # Do not retry in case the task fails
-            ignore_result=True,  # TODO: Do not publish to the Celery result backend
-        )
+            # Get and serialize current context
+            context_manager_data = ContextManager.serialize_all_current()
+
+            # Pass parameters to the Celery task signature
+            execute_task_signature = execute_task.s(
+                task.task_id,
+                context_manager_data,
+            )
+
+            # Submit task to Celery with completed and error links
+            execute_task_signature.apply_async(
+                retry=False,  # Do not retry in case the task fails
+                ignore_result=True,  # TODO: Do not publish to the Celery result backend
+            )
