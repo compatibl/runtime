@@ -49,15 +49,8 @@ class TestingContext(Context):
             if not Settings.is_inside_test:
                 raise RuntimeError(f"TestingContext created outside a test.")
 
-            # Get test name in 'module.test_function' or 'module.TestClass.test_method' format inside a test
-            context_settings = ContextSettings.instance()
-
             # For a test, env name is dot-delimited test module, class in snake_case (if any), and method or function
             env_name = EnvUtil.get_env_name()
-
-            # Use test name in dot-delimited format for context_id unless specified by the caller
-            if self.context_id is None:
-                self.context_id = env_name
 
             # Set user from OS if not specified directly
             if self.user is None:

@@ -18,7 +18,7 @@ from stubs.cl.runtime.context.stub_context import StubContext
 
 @dataclass(slots=True, kw_only=True)
 class StubDerivedContext(StubContext):
-    """Base extension context."""
+    """Context derived from StubContext."""
 
     derived_field: str = "def"
     """Field of the base class."""

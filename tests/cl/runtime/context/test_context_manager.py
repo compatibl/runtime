@@ -16,8 +16,8 @@ import pytest
 from typing import List
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.context_manager import ContextManager
-from cl.runtime.context.testing_context import TestingContext
 from cl.runtime.context.trial_context import TrialContext
+from stubs.cl.runtime.context.stub_context import StubContext
 
 
 def _perform_serialization_test(contexts: List[BaseContext]):
@@ -66,26 +66,26 @@ def test_context_manager():
     _perform_serialization_test([])
     _perform_manager_test([])
 
-    # Create TestingContext() but do not use 'with' clause
-    context_external = TestingContext()
+    # Create StubContext() but do not use 'with' clause
+    context_external = StubContext()
     _perform_manager_test([context_external])
 
-    # Inside a single 'with TestingContext()' clause
-    with TestingContext() as context_1:
+    # Inside a single 'with StubContext()' clause
+    with StubContext() as context_1:
         _perform_serialization_test([context_1])
     # Recreate using ContextManager
     _perform_manager_test([context_1])
 
-    # Inside two nested 'with' clauses for the same key type Context
-    with TestingContext() as context_1:
-        with TestingContext(context_id="abc") as context_2:
+    # Inside two nested 'with' clauses for the same key type StubContext
+    with StubContext() as context_1:
+        with StubContext(stub_context_id="modified_stub_context_id") as context_2:
             _perform_serialization_test([context_2])
     # Recreate using ContextManager
     _perform_manager_test([context_2])
 
     # Inside two nested 'with' clauses for different same key types
-    with TestingContext() as context_1:
-        with TrialContext(trial_id="abc") as context_2:
+    with StubContext() as context_1:
+        with TrialContext(trial_id="modified_trial_id") as context_2:
             _perform_serialization_test([context_1, context_2])
     # Recreate using ContextManager
     _perform_manager_test([context_1, context_2])

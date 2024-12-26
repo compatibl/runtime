@@ -131,7 +131,7 @@ class BaseContext(ContextMixin, ABC):
         """Restore ContextVar to its previous state after async task execution using a token from 'clear_contextvar'."""
         _CONTEXT_STACK_DICT_VAR.reset(token)
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         """Supports 'with' operator for resource disposal."""
 
         # Initialize to populate empty values from the current context or settings
@@ -150,7 +150,7 @@ class BaseContext(ContextMixin, ABC):
         context_stack.append(self)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Supports 'with' operator for resource disposal."""
 
         # Get context stack for the current asynchronous environment
@@ -165,7 +165,7 @@ class BaseContext(ContextMixin, ABC):
             class_name = {type(self).__name__}
             raise RuntimeError(f"Current {class_name} has been modified inside 'with {class_name}(...)' clause.")
 
-        # Return False to propagate exception to the caller
+        # Return False to propagate the exception (if any) that occurred inside the 'with' block
         return False
 
     @classmethod

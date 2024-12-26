@@ -14,6 +14,9 @@
 
 from abc import ABC
 from abc import abstractmethod
+
+from typing_extensions import Self
+
 from cl.runtime.records.init_mixin import InitMixin
 
 
@@ -35,9 +38,9 @@ class ContextMixin(InitMixin, ABC):
         """
 
     @abstractmethod
-    def __enter__(self):
+    def __enter__(self) -> Self:
         """Supports 'with' operator for resource disposal."""
 
     @abstractmethod
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Supports 'with' operator for resource disposal."""

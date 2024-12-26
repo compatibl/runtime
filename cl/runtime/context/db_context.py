@@ -91,7 +91,7 @@ class DbContext(BaseContext):
         # Return self to enable method chaining
         return self
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         """Supports 'with' operator for resource disposal."""
 
         # Call '__enter__' method of base first
@@ -110,10 +110,9 @@ class DbContext(BaseContext):
             #   - Then rethrow the exception
             Context.__exit__(self, None, None, None)
             raise e
-
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Supports 'with' operator for resource disposal."""
 
         try:

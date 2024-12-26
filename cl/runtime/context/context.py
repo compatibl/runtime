@@ -27,9 +27,6 @@ from cl.runtime.records.protocols import is_key
 class Context(BaseContext):
     """Protocol implemented by context objects providing logging, database, dataset, and progress reporting."""
 
-    context_id: str = missing()
-    """Unique context identifier."""
-
     user: UserKey = missing()
     """Current user, 'Context.current().user' is used if not specified."""
 
@@ -54,10 +51,6 @@ class Context(BaseContext):
         if not self.is_deserialized:
             # Set fields that are not specified as __init__ param to their values from 'Context.current()'
 
-            # Required fields, error message if the field is not set in the root context
-            if self.context_id is None:
-                self._current_context_field_not_set_error("context_id")
-                self.context_id = Context.current().context_id
             if self.user is None:
                 self._current_context_field_not_set_error("user")
                 self.user = Context.current().user

@@ -16,6 +16,9 @@ from contextvars import Token
 from dataclasses import dataclass
 from typing import Dict
 from typing import List
+
+from typing_extensions import Self
+
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.serialization.dict_serializer import DictSerializer
 
@@ -31,7 +34,10 @@ class ContextManager:
     """All contexts that will be entered into during out-of-process task execution."""
 
     _entered_contexts: List[BaseContext] | None = None
-    """The current list of entered contexts."""
+    """
+    Contexts for which __enter__ method has been called inside ContextManager.__enter__ so far.
+    For each of these contexts, __exit__ will be invoked in case of an error in ContextManager.__enter__ method.
+    """
 
     _token: Token | None = None
     """Context token is saved in ContextManager.__enter__ and restored in ContextManager.__exit__."""
@@ -62,7 +68,7 @@ class ContextManager:
                 # Mark as deserialized to prevent repeat initialization
                 context.is_deserialized = True
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         """Invoke __enter__ for each item in the 'contexts' field."""
 
         # Set ContextVar=None before async task execution, get a token for restoring its previous state
@@ -91,8 +97,9 @@ class ContextManager:
                     self.__exit__(None, None, None)
                     # Rethrow
                     raise e
+        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Invoke __exit__ for each item in the 'contexts' field."""
 
         try:
@@ -110,7 +117,7 @@ class ContextManager:
             else:
                 raise RuntimeError("Detected ContextManager.__exit__ without a preceding ContextManager.__enter__.")
 
-        # Return False to propagate exception to the caller
+        # Return False to propagate the exception (if any) that occurred inside the 'with' block
         return False
 
     @classmethod
