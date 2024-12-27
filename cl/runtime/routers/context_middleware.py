@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from starlette.types import ASGIApp
-
 from cl.runtime import Db
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.db_context import DbContext

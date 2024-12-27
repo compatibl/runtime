@@ -20,7 +20,6 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-
 from cl.runtime import Db
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.log_context import LogContext
