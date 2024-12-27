@@ -71,7 +71,7 @@ class EnvUtil:
             if default_dir is not None and default_dir != "":
                 result = default_dir
             else:
-                RuntimeError(
+                raise RuntimeError(
                     f"Not invoked inside a function or method that starts from '{test_function_pattern}' "
                     f"and 'default_dir' is None or empty."
                 )
@@ -113,8 +113,12 @@ class EnvUtil:
         test_function_pattern: str | None = None,
     ) -> str | None:
         """
-        Return test_module.test_function or test_module.test_class.test_function by searching the stack frame
-        for 'test_' or a custom test function name pattern.
+        Return test_module<delim>test_function or test_module<delim>test_class<delim>test_function
+        by searching the call stack for test_function_pattern and collapsing levels with identical name into one,
+        where <delim> is period when is_name is True and os.sep when is_name is False.
+
+        Notes:
+            Implemented by searching the stack frame for 'test_' or a custom test function name pattern.
 
         Args:
             is_name: If True, return dot delimited name, otherwise return directory path

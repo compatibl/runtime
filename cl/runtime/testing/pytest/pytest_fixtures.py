@@ -16,18 +16,22 @@ import pytest
 import os
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
+from cl.runtime.testing.pytest.pytest_util import PytestUtil
 
 
 @pytest.fixture(scope="function")
 def testing_work_dir(request):
     """Pytest module fixture to make test module directory the local directory during test execution."""
 
-    # Change test working directory to the directory of test source
-    # so output files are placed next to the test module
-    os.chdir(request.fspath.dirname)
+    work_dir = PytestUtil.get_env_dir(request)
+
+    # Change test working directory, create if does not exist
+    if not os.path.exists(work_dir):
+        os.makedirs(work_dir)
+    os.chdir(work_dir)
 
     # Back to the test
-    yield
+    yield work_dir
 
     # Change directory back before exiting the text
     os.chdir(request.config.invocation_dir)

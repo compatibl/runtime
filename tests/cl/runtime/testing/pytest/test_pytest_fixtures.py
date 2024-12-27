@@ -14,31 +14,55 @@
 
 import pytest
 import os
+
+from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.testing.pytest.pytest_fixtures import testing_work_dir
 
+def _test_working_dir(*, actual: str, expected: str):
+    """Test for EnvUtil.env_dir and EnvUtil.env_name."""
+    dir_name = os.path.dirname(__file__)
+    expected_dir = os.path.join(dir_name, expected.replace(".", os.sep))
+    assert actual == expected_dir
+    assert os.getcwd() == expected_dir
+    assert EnvUtil.get_env_dir() == expected_dir
 
-def _normalize_path(path: str) -> str:
-    """Normalize path to a standard form for comparison."""
-    # Expand user directory (e.g., ~/ on Unix-like systems)
-    path = os.path.expanduser(path)
-    # Resolve any symbolic links and normalize the path
-    path = os.path.realpath(path)
-    # Convert to absolute path
-    path = os.path.abspath(path)
-    return path
+class TestPytestFixtures:
+    """Stub pytest class."""
 
+    def test_pytest_fixtures(self, testing_work_dir):
+        """All three names match, one-token path."""
+        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures")
 
-def test_testing_work_dir(testing_work_dir):
-    """Test that testing_work_dir makes current working directory the same as the test directory."""
+    def test_in_instance_method(self, testing_work_dir):
+        """Method name does not match, two-token path"""
+        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_in_instance_method")
 
-    # Get directories
-    current_dir = os.getcwd()  # Current working directory
-    test_dir = os.path.dirname(os.path.abspath(__file__))  # Directory where this test is located
+    def test_in_class_method(self, testing_work_dir):
+        """Method name does not match, two-token path"""
+        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_in_class_method")
 
-    # Normalize for comparison and compare
-    current_dir = _normalize_path(current_dir)
-    test_dir = _normalize_path(test_dir)
-    assert current_dir == test_dir
+class TestClass:
+    """Stub pytest class."""
+
+    def test_pytest_fixtures(self, testing_work_dir):
+        """Method name matches module name, still three-token path as they are not next to each other."""
+        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_class.test_pytest_fixtures")
+
+    def test_in_instance_method(self, testing_work_dir):
+        """Method name does not match class name or module name, three-token path."""
+        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_class.test_in_instance_method")
+
+    def test_in_class_method(self, testing_work_dir):
+        """Method name does not match class name or module name, three-token path."""
+        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_class.test_in_class_method")
+
+def test_pytest_fixtures(testing_work_dir):
+    """Function name matches, one-token path."""
+    _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures")
+
+def test_in_function(testing_work_dir):
+    """Function name does not match, two-token path."""
+    _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_in_function")
 
 
 if __name__ == "__main__":
