@@ -22,7 +22,7 @@ from cl.runtime.tasks.static_method_task import StaticMethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
-from cl.runtime.testing.pytest.pytest_fixtures import celery_test_queue_fixture
+from cl.runtime.testing.pytest.pytest_fixtures import testing_celery_queue
 from stubs.cl.runtime import StubHandlers
 
 context_serializer = DictSerializer()
@@ -39,7 +39,7 @@ def _create_task(queue: TaskQueueKey) -> TaskKey:
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_method(celery_test_queue_fixture):
+def test_method(testing_celery_queue):
     """Test calling 'execute_task' method in-process."""
 
     # Create queue
@@ -59,7 +59,7 @@ def test_method(celery_test_queue_fixture):
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_api(celery_test_queue_fixture):
+def test_api(testing_celery_queue):
     """Test submitting task for execution out of process."""
     # Create queue
     queue_id = f"test_celery_queue.test_api"

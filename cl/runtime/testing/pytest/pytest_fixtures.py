@@ -18,8 +18,8 @@ from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 
 
-@pytest.fixture(scope="module")
-def testing_dir(request):
+@pytest.fixture(scope="function")
+def testing_work_dir(request):
     """Pytest module fixture to make test module directory the local directory during test execution."""
 
     # Change test working directory to the directory of test source
@@ -33,8 +33,8 @@ def testing_dir(request):
     os.chdir(request.config.invocation_dir)
 
 
-@pytest.fixture(scope="session")
-def celery_test_queue_fixture():
+@pytest.fixture(scope="session")  # TODO: Use a named celery queue for each test
+def testing_celery_queue():
     """Pytest session fixture to start Celery test queue for test execution."""
     print("Starting celery workers, will delete the existing tasks.")
     celery_delete_existing_tasks()

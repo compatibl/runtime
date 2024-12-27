@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.plots.heat_map_plot import HeatMapPlot
-from cl.runtime.testing.pytest.pytest_fixtures import testing_dir
+from cl.runtime.testing.pytest.pytest_fixtures import testing_work_dir
 
 expected_values = [
     85.5,
@@ -66,7 +66,7 @@ num_metrics = 5
 num_models = 4
 
 
-def test_smoke(testing_dir):
+def test_smoke(testing_work_dir):
     row_labels = []
 
     for i in range(num_metrics):
@@ -86,7 +86,7 @@ def test_smoke(testing_dir):
 
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
-def test_dark_theme(testing_dir):
+def test_dark_theme(testing_work_dir):
     row_labels = []
     for i in range(num_metrics):
         row_labels += [f"Metric {i + 1}"] * num_models
