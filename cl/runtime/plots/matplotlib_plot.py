@@ -20,6 +20,7 @@ from matplotlib import pyplot as plt
 from cl.runtime import View
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.plots.plot import Plot
 from cl.runtime.views.png_view import PngView
@@ -58,10 +59,6 @@ class MatplotlibPlot(Plot):
         # Create figure
         fig = self._create_figure()
 
-        # Check if transparency required
-        is_dark_theme = UiAppState.get_current_user_app_theme() == "Dark"  # TODO: Move to PlotSettings
-        transparent = is_dark_theme
-
         # Create directory if does not exist
         base_dir = EnvUtil.get_env_dir()
         if not os.path.exists(base_dir):
@@ -71,12 +68,24 @@ class MatplotlibPlot(Plot):
         if self.plot_id is None or self.plot_id == "":
             raise RuntimeError("Cannot save figure as png because 'plot_id' field is not set.")
 
+        # Transparent in dark theme
+        transparent = self.is_dark_theme()
+
         # Save
         file_path = os.path.join(base_dir, f"{self.plot_id}.png")
         fig.savefig(file_path, transparent=transparent, metadata=MatplotlibUtil.no_metadata())
 
-    def _get_pyplot_theme(self) -> str:
+    @classmethod
+    def is_dark_theme(cls) -> bool:
+        """True if dark UI theme when invoked from a process, and False inside tests."""
+        if ProcessContext.is_testing():
+            result = False
+        else:
+            result = UiAppState.get_current_user_app_theme() == "Dark"  # TODO: Move to PlotSettings
+        return result
+
+    @classmethod
+    def _get_pyplot_theme(cls) -> str:
         """Get value to be set as matplotlib.pyplot theme."""
-        is_dark_theme = UiAppState.get_current_user_app_theme() == "Dark"  # TODO: Move to PlotSettings
-        theme = "dark_background" if is_dark_theme else "default"
+        theme = "dark_background" if cls.is_dark_theme() else "default"
         return theme
