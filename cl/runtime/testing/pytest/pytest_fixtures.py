@@ -19,7 +19,7 @@ from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 
 
 @pytest.fixture(scope="module")
-def local_dir_fixture(request):
+def testing_dir(request):
     """Pytest module fixture to make test module directory the local directory during test execution."""
 
     # Change test working directory to the directory of test source

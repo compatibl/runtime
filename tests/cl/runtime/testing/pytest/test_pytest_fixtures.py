@@ -14,7 +14,7 @@
 
 import pytest
 import os
-from cl.runtime.testing.pytest.pytest_fixtures import local_dir_fixture
+from cl.runtime.testing.pytest.pytest_fixtures import testing_dir
 
 
 def _normalize_path(path: str) -> str:
@@ -28,8 +28,8 @@ def _normalize_path(path: str) -> str:
     return path
 
 
-def test_local_dir_fixture(local_dir_fixture):
-    """Test that local_dir_fixture makes current working directory the same as the test directory."""
+def test_testing_dir(testing_dir):
+    """Test that testing_dir makes current working directory the same as the test directory."""
 
     # Get directories
     current_dir = os.getcwd()  # Current working directory

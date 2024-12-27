@@ -14,10 +14,10 @@
 
 import pytest
 from cl.runtime.plots.group_bar_plot import GroupBarPlot
-from cl.runtime.testing.pytest.pytest_fixtures import local_dir_fixture
+from cl.runtime.testing.pytest.pytest_fixtures import testing_dir
 
 
-def test_single_group(local_dir_fixture):
+def test_single_group(testing_dir):
     group_bar_plot = GroupBarPlot(plot_id="group_bar_plot")
     group_bar_plot.group_labels = ["Single Group"] * 2
     group_bar_plot.bar_labels = ["Bar 1", "Bar 2"]
@@ -26,7 +26,7 @@ def test_single_group(local_dir_fixture):
 
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
-def test_dark_theme(local_dir_fixture):
+def test_dark_theme(testing_dir):
     group_bar_plot = GroupBarPlot(plot_id="group_bar_plot")
     group_bar_plot.group_labels = ["Single Group"] * 2
     group_bar_plot.bar_labels = ["Bar 1", "Bar 2"]
@@ -34,7 +34,7 @@ def test_dark_theme(local_dir_fixture):
     group_bar_plot.save_png()
 
 
-def test_4_groups_2_bars(local_dir_fixture):
+def test_4_groups_2_bars(testing_dir):
     num_groups = 4
     num_bars = 2
 
@@ -62,7 +62,7 @@ def test_4_groups_2_bars(local_dir_fixture):
     group_bar_plot.save_png()
 
 
-def test_4_groups_5_bars(local_dir_fixture):
+def test_4_groups_5_bars(testing_dir):
     num_groups = 4
     num_bars = 5
 
