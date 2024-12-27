@@ -13,7 +13,10 @@
 # limitations under the License.
 
 from starlette.types import ASGIApp
+
+from cl.runtime import Db
 from cl.runtime.context.base_context import BaseContext
+from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.process_context import ProcessContext
 
 
@@ -32,9 +35,10 @@ class ContextMiddleware:
         token = BaseContext.clear_contextvar()
         try:
             with ProcessContext():
-                # TODO: Create a test setting to enable this other than by uncommenting
-                # await asyncio.sleep(duration)
-                await self.app(scope, receive, send)
+                with DbContext(db=Db.create()):
+                    # TODO: Create a test setting to enable this other than by uncommenting
+                    # await asyncio.sleep(duration)
+                    await self.app(scope, receive, send)
         finally:
             # Restore ContextVar to its previous state after async task execution using a token
             # from 'clear_contextvar' whether or not an exception occurred

@@ -50,7 +50,7 @@ class UserContext(BaseContext):
             return user_context.user
         elif ProcessContext.is_testing():
             # Use process namespace as the user
-            return UserKey(username=ProcessContext.get_process_namespace())
+            return UserKey(username=ProcessContext.get_env_name())
         else:
             # User reported by OS
             os_user_id = getuser()

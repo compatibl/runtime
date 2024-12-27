@@ -20,6 +20,8 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
+
+from cl.runtime import Db
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.log_context import LogContext
 from cl.runtime.context.process_context import ProcessContext
@@ -103,15 +105,16 @@ ServerUtil.include_routers(server_app)
 
 if __name__ == "__main__":
     with ProcessContext():
-        # TODO: This only works for the Mongo celery backend
-        celery_delete_existing_tasks()
+        with DbContext(db=Db.create()):
+            # TODO: This only works for the Mongo celery backend
+            celery_delete_existing_tasks()
 
-        # Start Celery workers (will exit when the current process exits)
-        log_dir = os.path.join(ProjectSettings.get_project_root(), "logs")  # TODO: Make unique
-        celery_start_queue(log_dir=log_dir)
+            # Start Celery workers (will exit when the current process exits)
+            log_dir = os.path.join(ProjectSettings.get_project_root(), "logs")  # TODO: Make unique
+            celery_start_queue(log_dir=log_dir)
 
-        # Save records from preload directory to DB and execute run_configure on all preloaded Config records
-        PreloadSettings.instance().save_and_configure()
+            # Save records from preload directory to DB and execute run_configure on all preloaded Config records
+            PreloadSettings.instance().save_and_configure()
 
     # Find wwwroot directory, error if not found
     wwwroot_dir = ProjectSettings.get_wwwroot()

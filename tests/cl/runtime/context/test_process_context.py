@@ -23,7 +23,7 @@ def test_smoke():
     """Smoke test."""
 
     assert ProcessContext.is_testing() == True
-    assert ProcessContext.get_process_namespace() == "test_process_context.test_smoke"
+    assert ProcessContext.get_env_name() == "test_process_context.test_smoke"
 
 
 if __name__ == "__main__":

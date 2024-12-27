@@ -27,7 +27,7 @@ class ProcessContext(BaseContext):
     testing: bool = False
     """True inside a test, False otherwise (this field is passed to out-of-process tasks)."""
 
-    process_namespace: str = missing()
+    env_name: str = missing()
     """Used to set database name and similar parameters (this field is passed to out-of-process tasks)."""
 
     @classmethod
@@ -52,8 +52,8 @@ class ProcessContext(BaseContext):
             # If not specified, set based on the current context
             if self.testing is None:
                 self.testing = self.is_testing()
-            if self.process_namespace is None:
-                self.process_namespace = self.get_process_namespace()
+            if self.env_name is None:
+                self.env_name = self.get_env_name()
 
         # Return self to enable method chaining
         return self
@@ -63,17 +63,17 @@ class ProcessContext(BaseContext):
         """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
         if (current_context := ProcessContext.current_or_none()) is not None:
             # Get from the current ProcessContext if exists
-            return current_context.is_testing()
+            return current_context.testing
         else:
             # Otherwise set based on the current process
             return Settings.is_inside_test
 
     @classmethod
-    def get_process_namespace(cls) -> str:
+    def get_env_name(cls) -> str:
         """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
         if (current_context := ProcessContext.current_or_none()) is not None:
             # Get from the current ProcessContext if exists
-            return current_context.process_namespace
+            return current_context.env_name
         else:
             # Otherwise set based on the current process
             if Settings.is_inside_test:

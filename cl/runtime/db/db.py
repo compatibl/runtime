@@ -203,13 +203,31 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         """Close database connection to releasing resource locks."""
 
     @classmethod
-    def _get_test_db_name(cls) -> str:
+    def _get_test_db_name(cls) -> str:  # TODO: Use fixture instead
         """Get SQLite database with name based on test namespace."""
         if ProcessContext.is_testing():
-            result = f"temp;{ProcessContext.get_process_namespace().replace('.', ';')}"
+            result = f"temp;{ProcessContext.get_env_name().replace('.', ';')}"
             return result
         else:
             raise RuntimeError("Attempting to get test DB name outside a test.")
+
+    @classmethod
+    def create(cls, *, db_type: Type | None = None, db_id: str | None = None):
+        """Create DB of the specified type, or use DB type from context settings if not specified."""
+
+        # Get DB type from context settings if not specified
+        if db_type is None:
+            context_settings = ContextSettings.instance()
+            db_type = ClassInfo.get_class_type(context_settings.db_class)
+
+        # Get DB identifier if not specified
+        if db_id is None:
+            env_name = EnvUtil.get_env_name()
+            db_id = env_name.replace(".", ";")
+
+        # Create and return a new DB instance
+        result = db_type(db_id=db_id)
+        return result
 
     @classmethod
     def error_if_not_temp_db(cls, db_id_or_database_name: str) -> None:
