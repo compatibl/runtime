@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Type, Iterator
-
 import pytest
 import os
-
+from typing import Iterator
+from typing import Type
 from _pytest.fixtures import FixtureRequest
-
-from cl.runtime import ClassInfo, Db
+from cl.runtime import ClassInfo
+from cl.runtime import Db
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
@@ -42,6 +41,7 @@ def _create_db(request: FixtureRequest, db_type: Type | None = None):
     # Create and return a new DB instance
     result = db_type(db_id=db_id)
     return result
+
 
 @pytest.fixture(scope="function")
 def testing_work_dir(request: FixtureRequest) -> Iterator[str]:

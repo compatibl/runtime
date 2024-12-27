@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
@@ -118,10 +117,7 @@ def test_api(testing_celery_queue):
             test_client.post("/tasks/run", json=request)
             request_object = RunRequest(**request)
             response_items = RunResponseItem.run_tasks(request_object)
-            [
-                Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id))
-                for response_item in response_items
-            ]
+            [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
             actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
             assert actual_records == expected_records
 

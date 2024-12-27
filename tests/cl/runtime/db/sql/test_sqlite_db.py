@@ -16,7 +16,6 @@ import pytest
 import time
 from typing import Any
 from typing import Iterable
-
 from cl.runtime import Db
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.env_util import EnvUtil
@@ -38,10 +37,12 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import St
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
 
+
 def _get_test_db() -> Db:
     """Get SQLite database with name based on test namespace."""
     db_name = Db._get_test_db_name()  # TODO: Refactor
     return SqliteDb(db_id=db_name)
+
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
     """Checks that two iterables contain the same elements, regardless of order."""

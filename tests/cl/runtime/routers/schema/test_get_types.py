@@ -14,10 +14,10 @@
 
 import pytest
 from fastapi import FastAPI
-from cl.runtime.testing.testing_client import TestingClient
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
 from cl.runtime.routers.user_request import UserRequest
+from cl.runtime.testing.testing_client import TestingClient
 
 requests = [{}, {"user": "TestUser"}]
 

@@ -16,7 +16,6 @@ import inspect
 import os
 from typing import cast
 from _pytest.fixtures import FixtureRequest
-
 from cl.runtime.primitive.case_util import CaseUtil
 
 

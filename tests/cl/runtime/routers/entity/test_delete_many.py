@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.testing.testing_client import TestingClient
-
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.routers.entity import entity_router
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse
-from stubs.cl.runtime import StubDataclassDerivedRecord
 from cl.runtime.testing.pytest.pytest_fixtures import testing_db
+from cl.runtime.testing.testing_client import TestingClient
+from stubs.cl.runtime import StubDataclassDerivedRecord
+
 
 def test_method(testing_db):
     """Test coroutine for /entity/delete_many route."""

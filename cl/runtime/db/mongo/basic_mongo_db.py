@@ -18,8 +18,8 @@ from typing import Dict
 from typing import Iterable
 from typing import Type
 from typing import cast
-from pymongo import MongoClient
 from mongomock import MongoClient as MongoClientMock
+from pymongo import MongoClient
 from pymongo.database import Database
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.db.db import Db
@@ -327,9 +327,9 @@ class BasicMongoDb(Db):
             # Create if it does not exist
             client_type = MongoClient if not self.use_mongo_mock else MongoClientMock
             client = client_type(
-                    self.client_uri,
-                    uuidRepresentation="standard",
-                )
+                self.client_uri,
+                uuidRepresentation="standard",
+            )
             # TODO: Implement dispose logic
             _client_dict[self.client_uri] = client
         return client

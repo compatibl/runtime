@@ -13,14 +13,13 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.testing.testing_client import TestingClient
-
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
+from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecordKey
-from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
 # Test save record payloads
 create_record_payload = {"Id": "new_record", "DerivedStrField": "test", "_t": "StubDataclassDerivedRecord"}
@@ -57,9 +56,7 @@ def test_method(testing_db):
     update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
 
     update_record_result = SaveResponse.save_entity(update_record_request_obj)
-    updated_record_in_db = DbContext.load_one(
-        StubDataclassDerivedRecord, StubDataclassRecordKey(id="existing_record")
-    )
+    updated_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, StubDataclassRecordKey(id="existing_record"))
     records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
 
     # Check if the result is a SaveResponse instance

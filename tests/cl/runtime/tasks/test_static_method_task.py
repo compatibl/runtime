@@ -15,9 +15,9 @@
 import pytest
 from cl.runtime.tasks.static_method_task import StaticMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 from stubs.cl.runtime import StubHandlers
 
-from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
 def test_create(testing_db):
     """Test 'test_create' method."""

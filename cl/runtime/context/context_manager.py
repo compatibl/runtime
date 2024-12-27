@@ -16,9 +16,7 @@ from contextvars import Token
 from dataclasses import dataclass
 from typing import Dict
 from typing import List
-
 from typing_extensions import Self
-
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.serialization.dict_serializer import DictSerializer
 

@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.testing.testing_client import TestingClient
-
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.routers.storage.record_response import RecordResponse
-from cl.runtime.testing.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubDataclassRecord
 from cl.runtime.testing.pytest.pytest_fixtures import testing_db
+from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.testing.testing_client import TestingClient
+from stubs.cl.runtime import StubDataclassRecord
+
 
 def test_method(testing_db):
     """Test coroutine for /storage/record route."""

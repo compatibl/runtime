@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.testing.testing_client import TestingClient
 from cl.runtime.routers.health.health_response import HealthResponse
 from cl.runtime.routers.user_request import UserRequest
+from cl.runtime.testing.testing_client import TestingClient
 
 requests = [{}, {"user": "TestUser"}]
 expected_result = {"status": 200}

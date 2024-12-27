@@ -13,9 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from typing_extensions import Self
-
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.records.dataclasses_extensions import missing
@@ -84,4 +82,3 @@ class ProcessContext(BaseContext):
             else:
                 # Return None outside a test
                 return "main"  # TODO: Use context_id
-

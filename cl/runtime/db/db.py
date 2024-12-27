@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from typing import ClassVar
 from typing import Iterable
 from typing import Type
-
 from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey

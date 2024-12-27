@@ -15,7 +15,6 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from typing_extensions import Self
-
 from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.routers.server_util import ServerUtil
 
@@ -61,4 +60,3 @@ class TestingClient(TestClient):
 
         # Return False to propagate the exception (if any) that occurred inside the 'with' block
         return False
-

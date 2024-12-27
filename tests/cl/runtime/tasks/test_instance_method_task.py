@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 from stubs.cl.runtime import StubHandlers
 
-from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
 def test_smoke(testing_db):
     """Smoke test."""

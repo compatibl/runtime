@@ -16,7 +16,8 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Type
 from typing_extensions import Self
-from cl.runtime import Db, ClassInfo
+from cl.runtime import ClassInfo
+from cl.runtime import Db
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
@@ -27,6 +28,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.settings.context_settings import ContextSettings
+
 
 @dataclass(slots=True, kw_only=True)
 class DbContext(BaseContext):
@@ -74,7 +76,8 @@ class DbContext(BaseContext):
                 else:
                     raise RuntimeError(
                         "Field DbContext.db is required for the outermost 'with DbContext(...)' clause. "
-                        "It can only be omitted for inner 'with DbContext(...)' clauses.")
+                        "It can only be omitted for inner 'with DbContext(...)' clauses."
+                    )
 
             # Use root dataset if not specified directly
             if self.dataset is None:
@@ -126,7 +129,7 @@ class DbContext(BaseContext):
         else:
             # Otherwise delegate to the __exit__ method of base
             return BaseContext.__exit__(self, exc_type, exc_val, exc_tb)
-    
+
     @classmethod
     def get_db(cls) -> Db:
         """
@@ -140,7 +143,8 @@ class DbContext(BaseContext):
             if ProcessContext.is_testing():
                 raise RuntimeError(
                     "To use DB in a test, specify testing_db pytest fixture or "
-                    "use 'with DbContext(...)' clause if not using pytest.")
+                    "use 'with DbContext(...)' clause if not using pytest."
+                )
             else:
                 raise RuntimeError("Attempting to access DB outside the outermost 'with DbContext(...)' clause.")
 
@@ -158,7 +162,8 @@ class DbContext(BaseContext):
             # Gather those tokens that are not None from contexts that have the same DB as the current context
             current_db_id = current_context.db.db_id
             tokens = [
-                dataset for context in cls._get_context_stack() 
+                dataset
+                for context in cls._get_context_stack()
                 if current_db_id == context.db.db_id and (dataset := context.dataset) is not None
             ]
             # Consider the possibility that after removing tokens that are None, the list becomes empty
@@ -366,4 +371,3 @@ class DbContext(BaseContext):
             dataset=dataset,
             identity=identity,
         )
-

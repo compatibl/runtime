@@ -14,9 +14,9 @@
 
 import pytest
 import os
-
 from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.testing.pytest.pytest_fixtures import testing_work_dir
+
 
 def _test_working_dir(*, actual: str, expected: str):
     """Test for EnvUtil.env_dir and EnvUtil.env_name."""
@@ -25,6 +25,7 @@ def _test_working_dir(*, actual: str, expected: str):
     assert actual == expected_dir
     assert os.getcwd() == expected_dir
     assert EnvUtil.get_env_dir() == expected_dir
+
 
 class TestPytestFixtures:
     """Stub pytest class."""
@@ -41,6 +42,7 @@ class TestPytestFixtures:
         """Method name does not match, two-token path"""
         _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_in_class_method")
 
+
 class TestClass:
     """Stub pytest class."""
 
@@ -56,9 +58,11 @@ class TestClass:
         """Method name does not match class name or module name, three-token path."""
         _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_class.test_in_class_method")
 
+
 def test_pytest_fixtures(testing_work_dir):
     """Function name matches, one-token path."""
     _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures")
+
 
 def test_in_function(testing_work_dir):
     """Function name does not match, two-token path."""

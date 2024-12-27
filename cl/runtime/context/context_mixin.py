@@ -14,9 +14,7 @@
 
 from abc import ABC
 from abc import abstractmethod
-
 from typing_extensions import Self
-
 from cl.runtime.records.init_mixin import InitMixin
 
 

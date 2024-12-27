@@ -16,12 +16,13 @@ import pytest
 import inspect
 from typing import List
 from typing import Type
-from cl.runtime.testing.testing_client import TestingClient
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
-from stubs.cl.runtime import StubDataViewers
 from cl.runtime.testing.pytest.pytest_fixtures import testing_db
+from cl.runtime.testing.testing_client import TestingClient
+from stubs.cl.runtime import StubDataViewers
+
 
 def _get_viewer_names_in_pascal_case(record_type: Type) -> List[str]:
     """Get methods with name that starts from 'view_'."""

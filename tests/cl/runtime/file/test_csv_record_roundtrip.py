@@ -19,12 +19,12 @@ from typing import List
 from typing import Tuple
 from typing import Type
 import pandas as pd
-
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -37,7 +37,6 @@ from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
-from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
 flat_serializer = FlatDictSerializer()
 """Serializer for file serialization."""
