@@ -66,17 +66,15 @@ class DbContext(BaseContext):
         #   - If the instance is deserialized, init_all has been executed before serialization
         if not self.is_deserialized:
 
-            # Get context settings
-            context_settings = ContextSettings.instance()
-
             # Use database class from settings if not specified directly
             if self.db is None:
                 if (current_context := DbContext.current_or_none()) is not None:
                     # Use DB from the current DbContext at the time of init execution
                     self.db = current_context.db
                 else:
-                    # Otherwise use default DB
-                    self.db = self._get_default_db()
+                    raise RuntimeError(
+                        "Field DbContext.db is required for the outermost 'with DbContext(...)' clause. "
+                        "It can only be omitted for inner 'with DbContext(...)' clauses.")
 
             # Use root dataset if not specified directly
             if self.dataset is None:
@@ -139,8 +137,12 @@ class DbContext(BaseContext):
             # Use DB from the current context
             return db_context.db
         else:
-            # Use default DB
-            return cls._get_default_db()
+            if ProcessContext.is_testing():
+                raise RuntimeError(
+                    "To use DB in a test, specify testing_db pytest fixture or "
+                    "use 'with DbContext(...)' clause if not using pytest.")
+            else:
+                raise RuntimeError("Attempting to access DB outside the outermost 'with DbContext(...)' clause.")
 
     @classmethod
     def get_dataset(cls) -> str | None:
@@ -365,18 +367,3 @@ class DbContext(BaseContext):
             identity=identity,
         )
 
-    @classmethod
-    def _get_default_db(cls):
-        """Get default DB from settings."""
-        # Get context settings
-        context_settings = ContextSettings.instance()
-
-        # Create the database class specified in settings
-        db_type = ClassInfo.get_class_type(context_settings.db_class)
-
-        # If not inside a test
-        db_id = "temp;" + ProcessContext.get_process_namespace().replace(".", ";")
-
-        # Create and return
-        result = db_type(db_id=db_id)
-        return result
