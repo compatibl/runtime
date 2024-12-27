@@ -21,7 +21,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
 from stubs.cl.runtime import StubDataViewers
-
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
 def _get_viewer_names_in_pascal_case(record_type: Type) -> List[str]:
     """Get methods with name that starts from 'view_'."""
@@ -42,7 +42,7 @@ requests = [
 ]
 
 
-def test_method():
+def test_method(testing_db):
     """Test coroutine for /entity/list_panels route."""
 
     for request in requests:
@@ -62,7 +62,7 @@ def test_method():
         assert panel_names_set == expected_panel_names_set
 
 
-def test_api():
+def test_api(testing_db):
     """Test REST API for /entity/list_panels route."""
     with TestingClient() as test_client:
         for request in requests:

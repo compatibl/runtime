@@ -20,6 +20,7 @@ from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecordKey
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
 # Test save record payloads
 create_record_payload = {"Id": "new_record", "DerivedStrField": "test", "_t": "StubDataclassDerivedRecord"}
@@ -31,7 +32,7 @@ update_record_payload = {
 }
 
 
-def test_method():
+def test_method(testing_db):
     """Test coroutine for /entity/save route."""
 
     # Test saving new record
@@ -72,7 +73,7 @@ def test_method():
     assert records_count == 2
 
 
-def test_api():
+def test_api(testing_db):
     """Test REST API for /entity/save route."""
     with TestingClient() as test_client:
         # Test saving new record

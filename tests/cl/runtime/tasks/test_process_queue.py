@@ -19,8 +19,9 @@ from cl.runtime.tasks.process_queue import ProcessQueue
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime.tasks.stub_task import StubTask
 
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
-def test_process_queue():
+def test_process_queue(testing_db):
     """Test ProcessQueue class."""
 
     guard = RegressionGuard()

@@ -20,9 +20,9 @@ from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.routers.storage.record_response import RecordResponse
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassRecord
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
-
-def test_method():
+def test_method(testing_db):
     """Test coroutine for /storage/record route."""
 
     # Save test record
@@ -45,7 +45,7 @@ def test_method():
     guard.verify()
 
 
-def test_api():
+def test_api(testing_db):
     """Test REST API for /storage/record route."""
     with TestingClient() as test_client:
         # Save test record

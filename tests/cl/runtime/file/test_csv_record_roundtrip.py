@@ -37,6 +37,7 @@ from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
 flat_serializer = FlatDictSerializer()
 """Serializer for file serialization."""
@@ -88,7 +89,7 @@ def read_records_from_csv(file_path: Path, entry_type: Type[RecordProtocol]):
     loader.read_and_save()
 
 
-def test_roundtrip():
+def test_roundtrip(testing_db):
     for test_entries in (*stub_entries,):
         file_path = None
         try:

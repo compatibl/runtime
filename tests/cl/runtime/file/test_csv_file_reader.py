@@ -18,6 +18,7 @@ import os
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.env_util import EnvUtil
 from cl.runtime.file.csv_file_reader import CsvFileReader
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassNestedFields
@@ -25,7 +26,7 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 
 
-def test_csv_file_reader():
+def test_csv_file_reader(testing_db):
     """Test CsvFileReader class."""
 
     # Create a new instance of local cache for the test

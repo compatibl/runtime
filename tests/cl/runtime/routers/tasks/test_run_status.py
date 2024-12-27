@@ -24,6 +24,7 @@ from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
+from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 
 def _save_tasks_and_get_requests() -> List[Dict]:
     """Creates and saves tasks."""
@@ -50,7 +51,7 @@ def _save_tasks_and_get_requests() -> List[Dict]:
     return requests
 
 
-def test_method():
+def test_method(testing_db):
     """Test coroutine for /tasks/run/status route."""
 
     for request in _save_tasks_and_get_requests():
@@ -70,7 +71,7 @@ def test_method():
             assert result_response_item.status_code is not None
 
 
-def test_api():
+def test_api(testing_db):
     """Test REST API for /tasks/run/status route."""
     with TestingClient() as test_client:
         for request in _save_tasks_and_get_requests():
