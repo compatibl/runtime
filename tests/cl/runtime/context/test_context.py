@@ -52,6 +52,10 @@ def _perform_testing(
     assert StubContext.current_or_none() is None
     _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
 
+    with pytest.raises(RuntimeError):
+        # Ensure that current context is not leaked outside the 'with clause' before the test
+        StubContext.current()
+
     stub_context_1 = StubContext(stub_context_id="stub_context_1")
     with stub_context_1:
 
@@ -61,9 +65,11 @@ def _perform_testing(
         stub_context_2 = StubDerivedContext(derived_field="stub_context_2")
         with stub_context_2:
             _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
+            assert StubContext.current() is stub_context_2
             assert StubDerivedContext.current() is stub_context_2
 
         assert StubContext.current() is stub_context_1
+        assert StubDerivedContext.current() is stub_context_1
 
     # Ensure current context is not leaked outside 'with' clauses after the test
     assert StubContext.current_or_none() is None
@@ -102,9 +108,11 @@ async def _perform_testing_async(
         stub_context_2 = StubDerivedContext(derived_field="stub_context_2")
         with stub_context_2:
             await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
+            assert StubContext.current() is stub_context_2
             assert StubDerivedContext.current() is stub_context_2
 
         assert StubContext.current() is stub_context_1
+        assert StubDerivedContext.current() is stub_context_1
 
     # Ensure current context is not leaked outside 'with' clauses after the test
     assert StubContext.current_or_none() is None

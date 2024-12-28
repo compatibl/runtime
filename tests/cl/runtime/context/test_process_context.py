@@ -19,11 +19,11 @@ from cl.runtime.settings.context_settings import ContextSettings
 context_settings = ContextSettings.instance()
 
 
-def test_smoke():
+def test_process_context():
     """Smoke test."""
 
     assert ProcessContext.is_testing() == True
-    assert ProcessContext.get_env_name() == "test_process_context.test_smoke"
+    assert ProcessContext.get_env_name() == "test_process_context"
 
 
 if __name__ == "__main__":
