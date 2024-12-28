@@ -15,13 +15,12 @@
 from abc import abstractmethod
 from typing import Generic
 from typing import TypeVar
-from cl.runtime.records.init_mixin import InitMixin
 from cl.runtime.records.protocols import KeyProtocol
 
 TKey = TypeVar("TKey", bound=KeyProtocol)  # TODO: Remove duplicate TKey definition
 
 
-class RecordMixin(Generic[TKey], InitMixin):
+class RecordMixin(Generic[TKey]):
     """
     Optional mixin class for a record, code must not rely on inheritance from this class.
     Derive MyRecord from both MyKey and RecordMixin[MyKey] as in MyRecord(MyKey, RecordMixin[MyKey]).

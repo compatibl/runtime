@@ -15,9 +15,10 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import Type
+from cl.runtime.records.init_mixin import InitMixin
 
 
-class KeyMixin(ABC):
+class KeyMixin(InitMixin, ABC):
     """Optional mixin class for a primary key object, code must not rely on inheritance from this class."""
 
     __slots__ = ()

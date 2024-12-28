@@ -16,11 +16,12 @@ import pytest
 from typing_extensions import Self
 from cl.runtime import RecordMixin
 from cl.runtime.db.protocols import TKey
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.testing.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclassRecord, StubDataclassRecordKey
 
 
-class _Base(RecordMixin[StubDataclassRecord]):
+class _Base(RecordMixin[StubDataclassRecord], StubDataclassRecordKey):
     """Test class."""
 
     def get_key(self) -> TKey:
