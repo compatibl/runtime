@@ -14,7 +14,11 @@
 
 from dataclasses import dataclass
 from typing import Type
+
+from typing_extensions import Self
+
 from cl.runtime.context.base_context import BaseContext
+from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.dataclasses_extensions import missing
 
 
@@ -22,16 +26,13 @@ from cl.runtime.records.dataclasses_extensions import missing
 class TrialContext(BaseContext):
     """Context for a single trial in an experiment."""
 
-    trial_id: str | None = None
+    trial: TrialKey | None = None
     """
     Trial identifier can be a single token or multiple tokens in backslash-delimited format.
 
     Notes:
       - Trial identifiers for the TrialContext stack are concatenated in the order entered
-      - Because 'with' clause cannot be under if/else, in some cases trial_id may be None
-        but 'with TrialContext(...)' clause would still be present.
-      - If trial_id is None, it is is disregarded
-      - If trial_id is None for the entire the TrialContext stack, this method returns None
+      - If trial field is None, it is is disregarded
     """
 
     @classmethod
@@ -46,24 +47,26 @@ class TrialContext(BaseContext):
         return "TrialContext"
 
     @classmethod
-    def get_trial_id(cls) -> str | None:
-        """
-        Unique trial identifier in backslash-delimited format obtained by concatenating identifiers from
-        the TrialContext stack in the order entered, or None outside 'with TrialContext(...)' clause.
-
-        Notes:
-          - Because 'with' clause cannot be under if/else, in some cases trial_id may be None
-            but 'with TrialContext(...)' clause would still be present.
-          - If trial_id is None, it is is disregarded
-          - If trial_id is None for the entire the TrialContext stack, this method returns None
-        """
-        if cls.current_or_none() is not None:
-            # Gather those tokens that are not None
-            tokens = [trial_id for context in cls.get_context_stack() if (trial_id := context.trial_id) is not None]
+    def get_trial_or_none(cls) -> TrialKey | None:
+        """Concatenates trial identifiers from the context stack, returns None if no current context or all are None."""
+        if (context_stack := cls.get_context_stack()) is not None:
+            # Gather those trial keys that are not None
+            trial_keys = [trial for context in context_stack if (trial := context.trial) is not None]
             # Consider the possibility that after removing tokens that are None, the list becomes empty
-            if tokens:
-                return "\\".join(tokens)  # Concatenate
+            if trial_keys:
+                # Concatenate
+                trial_id = "\\".join([trial_key.trial_id for trial_key in trial_keys])
+                return TrialKey(trial_id=trial_id)
             else:
                 return None
         else:
+            # If not defined, return None
             return None
+
+    @classmethod
+    def get_trial(cls) -> TrialKey:
+        """Concatenates trial identifiers from the context stack, error if no current context or all are None."""
+        if (result := cls.get_trial_or_none()) is not None:
+            return result
+        else:
+            raise RuntimeError("Trial is not specified or method invoked outside the outermost 'with' clause.")
