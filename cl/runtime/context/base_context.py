@@ -12,16 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextvars import ContextVar
 from contextvars import Token
 from dataclasses import dataclass
 from typing import DefaultDict
 from typing import List
-from typing import Type
 from typing_extensions import Self
-from cl.runtime.context.context_mixin import ContextMixin
 from cl.runtime.records.record_util import RecordUtil
 
 _CONTEXT_STACK_DICT_VAR: ContextVar[DefaultDict[str, List] | None] = ContextVar("_CONTEXT_STACK_DICT_VAR", default=None)
@@ -32,11 +30,22 @@ Each asynchronous environment has its own stack dictionary
 
 
 @dataclass(slots=True, kw_only=True)
-class BaseContext(ContextMixin, ABC):
-    """Base for the main Context class, should not be used in any other way."""
+class BaseContext(ABC):
+    """Abstract base of context classes."""
 
     is_deserialized: bool = False
     """Use this flag to determine if this context instance has been deserialized, e.g. inside an out-of-process task."""
+
+    @classmethod
+    @abstractmethod
+    def get_context_type(cls) -> str:
+        """
+        The lookup of current context for cls will be done using the key returned by cls.get_context_type().
+
+        Notes:
+          - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
+          - By convention, the returned string is the name of the base class for this context type in PascalCase
+        """
 
     def init(self) -> Self:
         """Initialize fields that are not set with values from the current context."""
