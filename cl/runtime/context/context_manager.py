@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import List
 from typing_extensions import Self
-from cl.runtime.context.base_context import BaseContext
+from cl.runtime.context.base_context import BaseContext, _CONTEXT_STACK_DICT_VAR
 from cl.runtime.serialization.dict_serializer import DictSerializer
 
 _DICT_SERIALIZER = DictSerializer()
@@ -38,7 +38,7 @@ class ContextManager:
     """
 
     _token: Token | None = None
-    """Context token is saved in ContextManager.__enter__ and restored in ContextManager.__exit__."""
+    """Stores the state of all context stacks saved in __enter__ and restored in __exit__ of this class."""
 
     def __init__(self, data: List[Dict]):
         """Create from contexts serialized into a list of dicts."""
@@ -71,7 +71,7 @@ class ContextManager:
 
         # Set ContextVar=None before async task execution, get a token for restoring its previous state
         if self._token is None:
-            self._token = BaseContext.clear_contextvar()
+            self._token = self.save_and_clear_state()
         else:
             raise RuntimeError("Nested 'with' clauses are not permitted or necessary with ContextManager.")
 
@@ -109,14 +109,24 @@ class ContextManager:
                 entered_context.__exit__(exc_type, exc_val, exc_tb)
         finally:
             # Restore ContextVar to its previous state after async task execution using a token
-            # from 'clear_contextvar' whether or not an exception occurred
+            # from 'save_and_clear_state' whether or not an exception occurred
             if self._token is not None:
-                BaseContext.restore_contextvar(self._token)
+                self.restore_state(self._token)
             else:
                 raise RuntimeError("Detected ContextManager.__exit__ without a preceding ContextManager.__enter__.")
 
         # Return False to propagate the exception (if any) that occurred inside the 'with' block
         return False
+    
+    @classmethod
+    def save_and_clear_state(cls) -> Token:
+        """Save state for all context stacks into a token, then clear state."""
+        return _CONTEXT_STACK_DICT_VAR.set(None)
+
+    @classmethod
+    def restore_state(cls, token: Token) -> None:
+        """Restore state for all context stacks from the token returned by 'save_and_clear_state'."""
+        _CONTEXT_STACK_DICT_VAR.reset(token)
 
     @classmethod
     def serialize_all_current(cls) -> List[Dict]:

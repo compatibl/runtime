@@ -18,6 +18,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
 from cl.runtime.context.base_context import BaseContext
+from cl.runtime.context.context_manager import ContextManager
 from stubs.cl.runtime.context.stub_context import StubContext
 from stubs.cl.runtime.context.stub_derived_context import StubDerivedContext
 
@@ -124,12 +125,12 @@ async def _perform_testing_async(
 
 async def _gather(rnd: Random):
     """Gather async functions."""
-    contextvar_token = BaseContext.clear_contextvar()
+    token = ContextManager.save_and_clear_state()
     try:
         tasks = [_perform_testing_async(task_index=i, rnd=rnd) for i in range(TASK_COUNT)]
         await asyncio.gather(*tasks)
     finally:
-        BaseContext.restore_contextvar(contextvar_token)
+        ContextManager.restore_state(token)
 
 
 # TODO: Restore after creating the standard way to init context classes
@@ -241,7 +242,7 @@ def test_in_async_loop():
     """Test in different async environments."""
 
     # Save previous state of context stack before async method execution
-    contextvar_token = BaseContext.clear_contextvar()
+    token = ContextManager.save_and_clear_state()
     try:
         # Create a local random instance with seed
         rnd = Random(0)
@@ -250,7 +251,7 @@ def test_in_async_loop():
         asyncio.run(_gather(rnd))
     finally:
         # Restore previous state of context stack after async method execution even if an exception occurred
-        BaseContext.restore_contextvar(contextvar_token)
+        ContextManager.restore_state(token)
 
 
 if __name__ == "__main__":

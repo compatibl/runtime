@@ -14,7 +14,7 @@
 
 from starlette.types import ASGIApp
 from cl.runtime import Db
-from cl.runtime.context.base_context import BaseContext
+from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.context.db_context import DbContext
 from cl.runtime.context.process_context import ProcessContext
 
@@ -31,7 +31,7 @@ class ContextMiddleware:
         # print(f"Before request processing: {duration}")
 
         # Set ContextVar=None before async task execution, get a token for restoring its previous state
-        token = BaseContext.clear_contextvar()
+        token = ContextManager.save_and_clear_state()
         try:
             with ProcessContext():
                 with DbContext(db=Db.create()):
@@ -40,8 +40,8 @@ class ContextMiddleware:
                     await self.app(scope, receive, send)
         finally:
             # Restore ContextVar to its previous state after async task execution using a token
-            # from 'clear_contextvar' whether or not an exception occurred
-            BaseContext.restore_contextvar(token)
+            # from 'save_and_clear_state' whether or not an exception occurred
+            ContextManager.restore_state(token)
 
         # TODO: Create a test setting to enable this other than by uncommenting
         # print(f"After request processing: {duration}")
