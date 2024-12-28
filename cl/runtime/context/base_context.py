@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from typing import DefaultDict
 from typing import List
 from typing_extensions import Self
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.record_util import RecordUtil
 
 _CONTEXT_STACK_DICT_VAR: ContextVar[DefaultDict[str, List] | None] = ContextVar("_CONTEXT_STACK_DICT_VAR", default=None)
@@ -29,11 +30,8 @@ Each asynchronous environment has its own stack dictionary
 
 
 @dataclass(slots=True, kw_only=True)
-class BaseContext(ABC):
+class BaseContext(Freezable, ABC):
     """Abstract base of context classes."""
-
-    is_deserialized: bool = False
-    """Use this flag to determine if this context instance has been deserialized, e.g. inside an out-of-process task."""
 
     @classmethod
     @abstractmethod
@@ -45,44 +43,6 @@ class BaseContext(ABC):
           - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
           - By convention, the returned string is the name of the base class for this context type in PascalCase
         """
-
-    def init(self) -> Self:
-        """Initialize fields that are not set with values from the current context."""
-
-        # If the instance is deserialized, init_all has been executed before serialization
-        # TODO: Review and determine if init_all must be executed in celery
-        if False and not self.is_deserialized:  # TODO: !!!!!!!!!!!!!!!!!!!!!!!
-
-            # Each asynchronous environment has its own context stack.
-            context_stack = self.get_context_stack()
-
-            # Look for parent context in context stack, it will be empty outside the outermost 'with' clause
-            parent_context = context_stack[-1] if context_stack else None
-
-            # Copy fields from the parent context if they are not set in the current context
-            if parent_context:
-
-                # Raise if the new context is missing some fields present in the parent context
-                # Get public fields for the final class and its bases of self and parent_context
-                self_fields = [x for x in self.__dataclass_fields__.keys() if not x.startswith("_")]
-                parent_fields = [x for x in parent_context.__dataclass_fields__.keys() if not x.startswith("_")]
-                missing_fields = [x for x in parent_fields if x not in self_fields]
-                if missing_fields:
-                    missing_fields_str = "\n".join(missing_fields)
-                    raise RuntimeError(
-                        f"Creating a context with type {type(self).__name__} which is missing some of the fields\n"
-                        f"present in the current context type {type(parent_context).__name__} is not permitted.\n"
-                        f"Missing fields: {missing_fields_str}\n"
-                    )
-
-                # Set empty fields to the values from the parent context
-                for field in parent_fields:
-                    if getattr(self, field, None) is None:
-                        if (current_value := getattr(parent_context, field, None)) is not None:
-                            setattr(self, field, current_value)
-
-        # Return self to enable method chaining
-        return self
 
     @classmethod
     def current_or_none(cls) -> Self:

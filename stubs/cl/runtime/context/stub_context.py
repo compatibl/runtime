@@ -57,12 +57,6 @@ class StubContext(BaseContext):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
-        # Do not execute this code on deserialized or current context instances
-        #   - If the instance is deserialized, init_all has already been executed before serialization
-        #   - If the instance is current, init_all has already been executed inside __enter__
-        if self.is_deserialized or self.current_or_none() is self:
-            return self
-
         if self.error_on_init:
             raise RuntimeError("StubContext.error_on_init is set.")
 

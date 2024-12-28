@@ -61,12 +61,6 @@ class DbContext(BaseContext):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
-        # Do not execute this code on deserialized or current context instances
-        #   - If the instance is deserialized, init_all has already been executed before serialization
-        #   - If the instance is current, init_all has already been executed inside __enter__
-        if self.is_deserialized or self.current_or_none() is self:
-            return self
-
         # Use database class from settings if not specified directly
         if self.db is None:
             if (current_context := DbContext.current_or_none()) is not None:

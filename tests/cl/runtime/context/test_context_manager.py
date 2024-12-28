@@ -17,6 +17,7 @@ from typing import List
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.context.trial_context import TrialContext
+from cl.runtime.experiments.trial_key import TrialKey
 from stubs.cl.runtime.context.stub_context import StubContext
 
 
@@ -33,8 +34,7 @@ def _perform_serialization_test(contexts: List[BaseContext]):
     else:
         assert len(contexts) == len(deserialized_context_manager._all_contexts)  # noqa
         for context, deserialized_context in zip(contexts, deserialized_context_manager._all_contexts):  # noqa
-            # Set is_deserialized for the left hand side because ContextManager will set it for the right hand side
-            context.is_deserialized = True
+            # !!!!!!!!!!!!!!!!!!!!!!1 context.is_deserialized = True
             assert context == deserialized_context
 
 
@@ -51,7 +51,7 @@ def _perform_manager_test(contexts: List[BaseContext]):
             if contexts:
                 for context in contexts:
                     current_context = type(context).current_or_none()
-                    context.is_deserialized = True
+                    # !!!!!!!!!!!!!!!!!!!!!!1 context.is_deserialized = True
                     assert context == current_context
     finally:
         # Restore ContextVar to its previous state after async task execution using a token
@@ -85,7 +85,7 @@ def test_context_manager():
 
     # Inside two nested 'with' clauses for different same key types
     with StubContext() as context_1:
-        with TrialContext(trial_id="modified_trial_id") as context_2:
+        with TrialContext(trial=TrialKey(trial_id="modified_trial_id")) as context_2:
             _perform_serialization_test([context_1, context_2])
     # Recreate using ContextManager
     _perform_manager_test([context_1, context_2])

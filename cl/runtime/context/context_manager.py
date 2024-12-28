@@ -48,23 +48,21 @@ class ContextManager:
         self._entered_contexts = None
         self._token = None
 
-        # Deserialize if data is not empty
+        # Deserialize and freeze if data is not empty
         if data:
             self._all_contexts = _DICT_SERIALIZER.deserialize_data(data, list)
 
         # Perform checks and apply settings
         if self._all_contexts:
             for context in self._all_contexts:
-
                 # Ensure context is derived from BaseContext
                 if not isinstance(context, BaseContext):
                     raise RuntimeError(
                         f"Context {type(context).__name__} cannot be activated by ContextManager "
                         f"because it is not derived from {BaseContext.__name__}."
                     )
-
-                # Mark as deserialized to prevent repeat initialization
-                context.is_deserialized = True
+                # Freeze
+                context.freeze()
 
     def __enter__(self) -> Self:
         """Invoke __enter__ for each item in the 'contexts' field."""
@@ -145,9 +143,4 @@ class ContextManager:
 
         # Use serializer
         result = _DICT_SERIALIZER.serialize_data(contexts)
-
-        # Set is_deserialized to True to prevent repeated initialization
-        if result:
-            for context_data in result:
-                context_data["is_deserialized"] = True
         return result
