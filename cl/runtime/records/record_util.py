@@ -27,6 +27,8 @@ from typing import Union
 from typing import get_args
 from typing import get_origin
 from cl.runtime.log.exceptions.user_error import UserError
+from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record
 
@@ -39,7 +41,7 @@ class RecordUtil:
     @classmethod
     def init_all(cls, obj: TObj) -> TObj:
         """
-        Invoke 'init' for each class in the order from base to derived, then validate against schema.
+        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
         Return self to enable method chaining.
         """
 
@@ -54,6 +56,9 @@ class RecordUtil:
                 invoked.add(qualname)
                 # Invoke 'init' method of superclass if it exists, otherwise do nothing
                 class_init(obj)
+
+        # Call freeze method if implemented, continue without error if not
+        FreezableUtil.try_freeze(obj)
 
         # Perform validation against the schema only after all init methods are called
         cls.validate(obj)

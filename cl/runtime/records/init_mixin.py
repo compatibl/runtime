@@ -24,7 +24,7 @@ class InitMixin:
 
     def init_all(self) -> Self:
         """
-        Invoke 'init' for each class in the order from base to derived, then validate against schema.
+        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
         Return self to enable method chaining.
         """
         return RecordUtil.init_all(self)
