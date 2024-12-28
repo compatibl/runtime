@@ -121,7 +121,7 @@ class DbContext(BaseContext):
             current_db_id = current_context.db.db_id
             tokens = [
                 dataset
-                for context in cls._get_context_stack()
+                for context in cls.get_context_stack()
                 if current_db_id == context.db.db_id and (dataset := context.dataset) is not None
             ]
             # Consider the possibility that after removing tokens that are None, the list becomes empty

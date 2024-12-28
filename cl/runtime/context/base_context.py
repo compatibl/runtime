@@ -54,7 +54,7 @@ class BaseContext(ABC):
         if False and not self.is_deserialized:  # TODO: !!!!!!!!!!!!!!!!!!!!!!!
 
             # Each asynchronous environment has its own context stack.
-            context_stack = self._get_context_stack()
+            context_stack = self.get_context_stack()
 
             # Look for parent context in context stack, it will be empty outside the outermost 'with' clause
             parent_context = context_stack[-1] if context_stack else None
@@ -89,7 +89,7 @@ class BaseContext(ABC):
         """Return the context from the innermost 'with' for cls.key_type(), or None outside the outermost 'with'."""
 
         # Get context stack for the current asynchronous environment
-        context_stack = cls._get_context_stack()
+        context_stack = cls.get_context_stack()
 
         # Return if current context exists, or None if it is empty
         if context_stack:
@@ -137,7 +137,7 @@ class BaseContext(ABC):
 
         # Get context stack for the current asynchronous environment, at least one element is guaranteed
         # because constructing_default parameter is not passed
-        context_stack = self._get_context_stack()
+        context_stack = self.get_context_stack()
 
         # Check if self is already the current context
         if context_stack and context_stack[-1] is self:
@@ -152,7 +152,7 @@ class BaseContext(ABC):
         """Supports 'with' operator for resource disposal."""
 
         # Get context stack for the current asynchronous environment
-        context_stack = self._get_context_stack()
+        context_stack = self.get_context_stack()
         if context_stack is None or len(context_stack) == 0:
             class_name = type(self).__name__
             raise RuntimeError(f"Current {class_name} stack has been cleared inside 'with {class_name}(...)' clause.")
@@ -167,7 +167,7 @@ class BaseContext(ABC):
         return False
 
     @classmethod
-    def _get_context_stack(cls) -> List[Self]:
+    def get_context_stack(cls) -> List[Self]:
         """Return context stack for cls.get_context_type()."""
 
         # Get context stack dict, create if None

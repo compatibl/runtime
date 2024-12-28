@@ -59,7 +59,7 @@ class TrialContext(BaseContext):
         """
         if cls.current_or_none() is not None:
             # Gather those tokens that are not None
-            tokens = [trial_id for context in cls._get_context_stack() if (trial_id := context.trial_id) is not None]
+            tokens = [trial_id for context in cls.get_context_stack() if (trial_id := context.trial_id) is not None]
             # Consider the possibility that after removing tokens that are None, the list becomes empty
             if tokens:
                 return "\\".join(tokens)  # Concatenate
