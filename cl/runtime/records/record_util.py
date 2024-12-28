@@ -45,6 +45,11 @@ class RecordUtil:
         Return self to enable method chaining.
         """
 
+        # Do nothing if already frozen
+        if FreezableUtil.is_frozen(obj):
+            # Return argument to enable method chaining
+            return obj
+
         # Keep track of which init methods in class hierarchy were already called
         invoked = set()
 
@@ -57,7 +62,7 @@ class RecordUtil:
                 # Invoke 'init' method of superclass if it exists, otherwise do nothing
                 class_init(obj)
 
-        # Call freeze method if implemented, continue without error if not
+        # After the init methods, call freeze method if implemented, continue without error if not
         FreezableUtil.try_freeze(obj)
 
         # Perform validation against the schema only after all init methods are called

@@ -19,17 +19,19 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 
 
-def test_try_freeze():
+def test_freezable_util():
     """Test for FreezableUtil.."""
 
     # Try freezing a freezable object
     freezable_record = StubDataclassSimpleFreezable()
     FreezableUtil.try_freeze(freezable_record)
+    assert FreezableUtil.is_frozen(freezable_record)
     assert freezable_record.is_frozen()
 
     # Try freezing a non-freezable object
     nonfreezable_record = StubDataclassRecord()
     FreezableUtil.try_freeze(nonfreezable_record)
+    assert not FreezableUtil.is_frozen(nonfreezable_record)
 
 if __name__ == "__main__":
     pytest.main([__file__])
