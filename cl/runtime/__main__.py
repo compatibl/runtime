@@ -63,7 +63,7 @@ async def handle_exception(request, exc):
     # Save log entry to the database
     log_type = LogMessage if isinstance(exc, UserError) else LogMessage
     entry = LogMessage(message=str(exc))
-    entry.init()
+    entry.init_all()
     DbContext.save_one(entry)
 
     # Determine if the message should be  displayed for user
