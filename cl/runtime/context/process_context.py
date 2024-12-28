@@ -44,16 +44,17 @@ class ProcessContext(BaseContext):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
-        # Do not execute this code on frozen or deserialized context instances
-        #   - If the instance is frozen, init_all has already been executed
-        #   - If the instance is deserialized, init_all has been executed before serialization
-        if not self.is_deserialized:
+        # Do not execute this code on deserialized or current context instances
+        #   - If the instance is deserialized, init_all has already been executed before serialization
+        #   - If the instance is current, init_all has already been executed inside __enter__
+        if self.is_deserialized or self.current_or_none() is self:
+            return self
 
-            # If not specified, set based on the current context
-            if self.testing is None:
-                self.testing = self.is_testing()
-            if self.env_name is None:
-                self.env_name = self.get_env_name()
+        # If not specified, set based on the current context
+        if self.testing is None:
+            self.testing = self.is_testing()
+        if self.env_name is None:
+            self.env_name = self.get_env_name()
 
         # Return self to enable method chaining
         return self

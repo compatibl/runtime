@@ -61,29 +61,30 @@ class DbContext(BaseContext):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
-        # Do not execute this code on frozen or deserialized context instances
-        #   - If the instance is frozen, init_all has already been executed
-        #   - If the instance is deserialized, init_all has been executed before serialization
-        if not self.is_deserialized:
+        # Do not execute this code on deserialized or current context instances
+        #   - If the instance is deserialized, init_all has already been executed before serialization
+        #   - If the instance is current, init_all has already been executed inside __enter__
+        if self.is_deserialized or self.current_or_none() is self:
+            return self
 
-            # Use database class from settings if not specified directly
-            if self.db is None:
-                if (current_context := DbContext.current_or_none()) is not None:
-                    # Use DB from the current DbContext at the time of init execution
-                    self.db = current_context.db
-                else:
-                    raise RuntimeError(
-                        "Field DbContext.db is required for the outermost 'with DbContext(...)' clause. "
-                        "It can only be omitted for inner 'with DbContext(...)' clauses."
-                    )
+        # Use database class from settings if not specified directly
+        if self.db is None:
+            if (current_context := DbContext.current_or_none()) is not None:
+                # Use DB from the current DbContext at the time of init execution
+                self.db = current_context.db
+            else:
+                raise RuntimeError(
+                    "Field DbContext.db is required for the outermost 'with DbContext(...)' clause. "
+                    "It can only be omitted for inner 'with DbContext(...)' clauses."
+                )
 
-            # Use root dataset if not specified directly
-            if self.dataset is None:
-                self.dataset = DatasetUtil.root()
+        # Use root dataset if not specified directly
+        if self.dataset is None:
+            self.dataset = DatasetUtil.root()
 
-            #  Load 'db' field of this context using 'Context.current()'
-            if self.db is not None and is_key(self.db):
-                self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
+        #  Load 'db' field of this context using 'Context.current()'
+        if self.db is not None and is_key(self.db):
+            self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
 
         # Return self to enable method chaining
         return self
