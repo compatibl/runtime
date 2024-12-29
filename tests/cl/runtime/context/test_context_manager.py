@@ -17,7 +17,6 @@ from typing import List
 from cl.runtime.context.base_context import BaseContext
 from cl.runtime.context.context_manager import ContextManager
 from cl.runtime.context.trial_context import TrialContext
-from cl.runtime.experiments.trial_key import TrialKey
 from stubs.cl.runtime.context.stub_context import StubContext
 
 
@@ -85,7 +84,7 @@ def test_context_manager():
 
     # Inside two nested 'with' clauses for different same key types
     with StubContext() as context_1:
-        with TrialContext(trial=TrialKey(trial_id="modified_trial_id")) as context_2:
+        with TrialContext(trial_id="modified_trial_id") as context_2:
             _perform_serialization_test([context_1, context_2])
     # Recreate using ContextManager
     _perform_manager_test([context_1, context_2])

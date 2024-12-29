@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Iterable
+
+from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.float_util import FloatUtil
@@ -39,19 +42,16 @@ class FormatUtil:
             case "str":
                 # Return None for an empty string
                 return value if value else None
-            case "int":
-                return str(value)  # TODO: Use IntUtil
             case "float":
                 return FloatUtil.format(value)
+            case "bool":
+                return BoolUtil.format(value)
+            case "int":
+                return str(value)  # TODO: Use IntUtil
             case "date":
                 return DateUtil.to_str(value)
             case "datetime":
                 return DatetimeUtil.to_str(value)
             case _:
+                # TODO: Add the remaining primitive types
                 raise RuntimeError(f"Type {type_name} cannot be converted to string using FormatUtil.format method.")
-
-    @classmethod
-    def concat_or_none(cls, *values: TPrimitive | None, delim: str) -> str | None:
-        """Concatenate strings using the specified delimiter, disregarding values that are None."""
-        raise NotImplementedError()
-
