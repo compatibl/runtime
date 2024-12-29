@@ -45,19 +45,6 @@ class BaseContext(Freezable, ABC):
         """
 
     @classmethod
-    def current_or_none(cls) -> Self:
-        """Return the context from the innermost 'with' for cls.key_type(), or None outside the outermost 'with'."""
-
-        # Get context stack for the current asynchronous environment
-        context_stack = cls.get_context_stack()
-
-        # Return if current context exists, or None if it is empty
-        if context_stack:
-            return context_stack[-1]
-        else:
-            return None
-
-    @classmethod
     def current(cls) -> Self:
         """Return the context from the innermost 'with' for cls.key_type(), error outside the outermost 'with'."""
 
@@ -72,6 +59,19 @@ class BaseContext(Freezable, ABC):
                 f"{cls.__name__}.current() is undefined outside the outermost 'with {cls.__name__}(...)' clause.\n"
                 f"To receive None instead of an exception, use {cls.__name__}.current_or_none()\n"
             )
+
+    @classmethod
+    def current_or_none(cls) -> Self:
+        """Return the context from the innermost 'with' for cls.key_type(), or None outside the outermost 'with'."""
+
+        # Get context stack for the current asynchronous environment
+        context_stack = cls.get_context_stack()
+
+        # Return if current context exists, or None if it is empty
+        if context_stack:
+            return context_stack[-1]
+        else:
+            return None
 
     @classmethod
     def all_current(cls) -> List[Self]:
