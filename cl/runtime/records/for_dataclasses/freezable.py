@@ -21,8 +21,10 @@ from dataclasses import field
 class Freezable(ABC):
     """
     Derive a dataclass from this base to add the ability to freeze from further modifications of its fields.
-    Once frozen, the instance cannot be unfrozen. This has an effect only on set performance but not on get performance.
-    This implementation is specific to dataclasses, use the appropriate class for each framework.
+    Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
+
+    Notes:
+        This base should be used for dataclass objects, use the appropriate base for each framework.
     """
 
     __frozen: bool = field(default=False, init=False)
@@ -55,5 +57,5 @@ class Freezable(ABC):
     def __setattr__(self, key, value):
         """Raise an error if invoked for a frozen instance.."""
         if getattr(self, "_Freezable__frozen", False):
-            raise AttributeError(f"Cannot modify field {type(self).__name__}.{key} because the instance is frozen.")
+            raise AttributeError(f"Cannot modify field {type(self).__name__}.{key} because the object is frozen.")
         object.__setattr__(self, key, value)

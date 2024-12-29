@@ -18,6 +18,14 @@ class FreezableUtil:
     """Helper methods for any implementation of Freezable, not specific to dataclasses."""
 
     @classmethod
+    def is_freezable(cls, possibly_freezable: Any):
+        """
+        Return True 'freeze' method if implemented, False otherwise (even if the dataclass attribute 'frozen' is set).
+        This method does not rely on inheritance from Freezable and is not specific to dataclasses.
+        """
+        return hasattr(possibly_freezable, "freeze")
+
+    @classmethod
     def is_frozen(cls, possibly_freezable: Any):
         """
         Call 'is_frozen' method if implemented, return False if not (even if the dataclass attribute 'frozen' is set).

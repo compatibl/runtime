@@ -29,6 +29,7 @@ from typing import Union
 from typing import cast
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_key
@@ -301,8 +302,15 @@ class DictSerializer:
                 }
                 result = deserialized_type(**deserialized_fields)  # noqa
 
-                # Invoke 'init' for each class in class hierarchy that implements it, in the order from base to derived
-                RecordUtil.init_all(result)
+                # TODO: Refactor by passing event types to init method
+                if FreezableUtil.is_freezable(result):
+                    # If the record is freezable, freeze and validate against the schema
+                    # but do not invoke init on load because init was invoked prior to saving
+                    result.freeze()
+                    RecordUtil.validate(result)
+                else:
+                    # Invoke init for all classes in hierarchy
+                    RecordUtil.init_all(result)
                 return result
             elif (short_name := data.get("_enum", None)) is not None:
                 # If _enum is specified, create an instance of _enum using _name
