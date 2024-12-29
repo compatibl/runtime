@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.context.base_context import BaseContext
+from cl.runtime.primitive.format_util import FormatUtil
 from cl.runtime.records.dataclasses_extensions import missing
 
 
@@ -45,14 +46,16 @@ class TrialContext(BaseContext):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
+        # Convert the specified value to string using FormatUtil
+        self.trial_id = FormatUtil.format_or_none(self.trial_id)
         # Get value from the current context
         previous = context.trial_id if (context := self.current_or_none()) is not None else None
-        if not self.trial_id:
-            # None or empty in this context, copy previous value
-            self.trial_id = previous
-        elif previous:
+        if self.trial_id and previous:
             # Both not None and not empty, combine using backslash separator
             self.trial_id = f"{previous}\\{self.trial_id}"
+        elif previous:
+            # None or empty in this context, copy previous value
+            self.trial_id = previous
 
         # Return self to enable method chaining
         return self
