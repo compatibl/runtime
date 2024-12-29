@@ -15,6 +15,8 @@
 import re
 from abc import ABC
 from dataclasses import dataclass
+from typing import Dict, Any
+
 from inflection import underscore
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.dataclasses_extensions import field
@@ -33,7 +35,7 @@ class MethodTask(CallableTask, ABC):
     method_name: str = missing()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
-    method_params: dict[str, TPrimitive | dict] | None = field(default_factory=dict)
+    method_params: Dict[str, str] | None = field(default_factory=dict)  # TODO: Allow values other than string
     """Values for task arguments, if any."""
 
     def normalized_method_name(self) -> str:
