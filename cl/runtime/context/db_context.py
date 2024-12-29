@@ -61,20 +61,24 @@ class DbContext(BaseContext):
     def init(self) -> Self:
         """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
 
-        # Use database class from settings if not specified directly
+        # Initialize from the current context
         if self.db is None:
-            if (current_context := DbContext.current_or_none()) is not None:
-                # Use DB from the current DbContext at the time of init execution
-                self.db = current_context.db
-            else:
-                raise RuntimeError(
-                    "Field DbContext.db is required for the outermost 'with DbContext(...)' clause. "
-                    "It can only be omitted for inner 'with DbContext(...)' clauses."
-                )
+            self.db = self.get_db()
 
-        # Use root dataset if not specified directly
-        if self.dataset is None:
-            self.dataset = DatasetUtil.root()
+        # Get previous dataset value from the latest context in context stack that has the same DB
+        reversed_stack = reversed(self.get_context_stack())
+        # Set to root dataset if no previous contexts with the same DB are found in context stack
+        previous_dataset = next((
+            context.dataset for context in reversed_stack
+            if context.db.db_id == self.db.db_id
+        ), DatasetUtil.root())
+
+        if self.dataset:
+            # If specified for this instance, combine with previous using backslash separator
+            self.dataset = f"{previous_dataset}\\{self.dataset}"
+        else:
+            # Otherwise use previous
+            self.dataset = previous_dataset
 
         #  Load 'db' field of this context using 'Context.current()'
         if self.db is not None and is_key(self.db):
@@ -90,12 +94,12 @@ class DbContext(BaseContext):
         Return the default DB from settings outside the outermost 'with DbContext(...)' clause.
         """
         if (db_context := DbContext.current_or_none()) is not None:
-            # Use DB from the current context
+            # Use the value from the current context if not None
             return db_context.db
         else:
             if ProcessContext.is_testing():
                 raise RuntimeError(
-                    "To use DB in a test, specify testing_db pytest fixture or "
+                    "To use DB in a test, specify testing_db or similar pytest fixture or "
                     "use 'with DbContext(...)' clause if not using pytest."
                 )
             else:
@@ -111,23 +115,11 @@ class DbContext(BaseContext):
           - If dataset field is None for any dataset in the stack, it is is disregarded
           - If dataset field is None for the entire the DbContext stack, this method returns root dataset
         """
-        if (current_context := DbContext.current_or_none()) is not None:
-            # Gather those tokens that are not None from contexts that have the same DB as the current context
-            current_db_id = current_context.db.db_id
-            tokens = [
-                dataset
-                for context in cls.get_context_stack()
-                if current_db_id == context.db.db_id and (dataset := context.dataset) is not None
-            ]
-            # Consider the possibility that after removing tokens that are None, the list becomes empty
-            if tokens:
-                # Concatenate datasets from the context stack for the same DB as the current context
-                return "\\".join(tokens)
-            else:
-                # Return root dataset if empty
-                return DatasetUtil.root()
+        if (context := cls.current_or_none()) is not None:
+            # Use the value from the current context if not None
+            return context.dataset
         else:
-            # Return root dataset outside the outermost 'with DbContext(...)' clause
+            # Otherwise return root dataset
             return DatasetUtil.root()
 
     @classmethod
