@@ -83,7 +83,7 @@ class CsvFileReader(Reader):
 
         # Normalize chars and set None for empty strings
         row_dict = {
-            CharUtil.normalize_chars(k): CharUtil.normalize_chars(v) if v else None for k, v in row_dict.items()
+            CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()
         }
         row_dict["_type"] = record_type.__name__
 

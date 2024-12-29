@@ -17,20 +17,36 @@ from cl.runtime.primitive.char_util import _FLAGGED_CHARS
 from cl.runtime.primitive.char_util import _REMOVED_CHARS
 from cl.runtime.primitive.char_util import _REPLACED_CHARS
 from cl.runtime.primitive.char_util import CharUtil
-from cl.runtime.testing.regression_guard import RegressionGuard
 
 
-def test_normalize_text():
-    """Test CharUtil.normalize_text."""
+def test_normalize():
+    """Test CharUtil.normalize."""
 
-    guard = RegressionGuard()
-    guard.write(CharUtil.normalize_chars(f"{','.join(_REMOVED_CHARS)}"))
-    guard.write(CharUtil.normalize_chars(f"{','.join(_REPLACED_CHARS)}"))
-    RegressionGuard().verify_all()
+    assert CharUtil.normalize(f"{','.join(_REMOVED_CHARS)}") == ",,,"
+    assert CharUtil.normalize(f"{','.join(_REPLACED_CHARS)}") == "    "
+
+    with pytest.raises(Exception):
+        CharUtil.normalize(None)  # noqa
+    with pytest.raises(Exception):
+        CharUtil.normalize("")
 
     for char in _FLAGGED_CHARS:
         with pytest.raises(Exception):
-            CharUtil.normalize_chars(f"abc{char}def")
+            CharUtil.normalize(f"abc{char}def")
+
+
+def test_normalize_or_none():
+    """Test CharUtil.normalize_or_none."""
+
+    assert CharUtil.normalize_or_none(f"{','.join(_REMOVED_CHARS)}") == ",,,"
+    assert CharUtil.normalize_or_none(f"{','.join(_REPLACED_CHARS)}") == "    "
+
+    assert CharUtil.normalize_or_none(None) is None
+    assert CharUtil.normalize_or_none("") is None
+
+    for char in _FLAGGED_CHARS:
+        with pytest.raises(Exception):
+            CharUtil.normalize_or_none(f"abc{char}def")
 
 
 def test_describe_char():
