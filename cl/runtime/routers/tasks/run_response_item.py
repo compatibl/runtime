@@ -18,7 +18,7 @@ from typing import List
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
 from cl.runtime.schema.schema import Schema

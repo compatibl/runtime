@@ -14,7 +14,7 @@
 
 from abc import ABC
 from dataclasses import dataclass, fields
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)

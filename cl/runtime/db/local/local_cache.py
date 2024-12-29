@@ -21,7 +21,7 @@ from typing_extensions import Self
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serialization.string_serializer import StringSerializer

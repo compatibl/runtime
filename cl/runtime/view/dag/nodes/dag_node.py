@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Dict
 from typing import Optional
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.view.dag.dag_node_data import DagNodeData
 from cl.runtime.view.dag.dag_node_position import DagNodePosition
 

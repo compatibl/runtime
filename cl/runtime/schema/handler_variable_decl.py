@@ -22,7 +22,7 @@ from typing import get_origin
 from memoization import cached
 from typing_extensions import Self
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.member_decl import MemberDecl
 from cl.runtime.schema.value_decl import ValueDecl
 

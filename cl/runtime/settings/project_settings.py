@@ -21,7 +21,7 @@ from typing import List
 from typing import Literal
 from typing import cast
 from typing_extensions import Self
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 
 SETTINGS_FILES_ENVVAR = "CL_SETTINGS_FILES"
 """The name of environment variable used to override the settings file(s) names or locations."""

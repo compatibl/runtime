@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.parsers.locale_key import LocaleKey
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
 

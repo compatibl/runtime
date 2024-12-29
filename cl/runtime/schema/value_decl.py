@@ -17,7 +17,7 @@ from typing import Literal
 from typing import Type
 from typing_extensions import Self
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 
 PrimitiveTypeLiteral = Literal[
     "String", "Double", "Bool", "Int", "Long", "Date", "Time", "DateTime", "UUID", "Binary", "Dict"

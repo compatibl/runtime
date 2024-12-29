@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import List
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.handler_param_decl import HandlerParamDecl
 from cl.runtime.schema.handler_type import HandlerType
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl

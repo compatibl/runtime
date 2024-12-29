@@ -23,7 +23,7 @@ from uuid import UUID
 from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.field_kind import FieldKind
 
 primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)

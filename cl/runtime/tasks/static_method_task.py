@@ -20,7 +20,7 @@ from typing_extensions import Self
 from typing_extensions import override
 from cl.runtime import ClassInfo
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 

@@ -19,7 +19,7 @@ from typing_extensions import Self
 from cl.runtime import RecordMixin
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.view.dag.dag_edge import DagEdge
 from cl.runtime.view.dag.dag_layout_enum import DagLayoutEnum

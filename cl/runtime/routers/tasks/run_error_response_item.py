@@ -14,7 +14,7 @@
 
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
 class RunErrorResponseItem(BaseModel):

@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing_extensions import Self
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.enum_decl_key import EnumDeclKey
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.member_decl import MemberDecl

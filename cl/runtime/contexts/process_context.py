@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.settings.settings import Settings
 
 

@@ -22,7 +22,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.plots.matrix_util import MatrixUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)

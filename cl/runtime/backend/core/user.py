@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
 

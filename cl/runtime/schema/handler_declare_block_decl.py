@@ -23,7 +23,7 @@ from inflection import humanize
 from inflection import titleize
 from memoization import cached
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.handler_param_decl import HandlerParamDecl
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl

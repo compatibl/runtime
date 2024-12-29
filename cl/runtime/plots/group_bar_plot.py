@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)

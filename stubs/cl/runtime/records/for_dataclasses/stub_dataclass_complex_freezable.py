@@ -15,7 +15,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable

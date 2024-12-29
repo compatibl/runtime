@@ -18,7 +18,7 @@ from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)

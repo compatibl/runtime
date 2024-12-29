@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Dict
-from cl.runtime.records.dataclasses_extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.serialization.sentinel_type import sentinel_value
 from cl.runtime.settings.aliases.package_alias_key import PackageAliasKey

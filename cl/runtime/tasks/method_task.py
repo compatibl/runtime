@@ -19,8 +19,8 @@ from typing import Dict, Any
 
 from inflection import underscore
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import required
-from cl.runtime.records.dataclasses_extensions import optional
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 from cl.runtime.tasks.callable_task import CallableTask
 
