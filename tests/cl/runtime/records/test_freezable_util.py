@@ -29,9 +29,9 @@ def test_freezable_util():
     assert freezable_record.is_frozen()
 
     # Try freezing a non-freezable object
-    nonfreezable_record = StubDataclassRecord()
-    FreezableUtil.try_freeze(nonfreezable_record)
-    assert not FreezableUtil.is_frozen(nonfreezable_record)
+    non_freezable_record = StubDataclassRecord()
+    FreezableUtil.try_freeze(non_freezable_record)
+    assert not FreezableUtil.is_frozen(non_freezable_record)
 
 if __name__ == "__main__":
     pytest.main([__file__])

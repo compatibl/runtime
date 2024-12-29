@@ -52,17 +52,17 @@ def test_complex_freezable():
     with pytest.raises(AttributeError):
         record.freezable_obj = StubDataclassSimpleFreezable()
     with pytest.raises(AttributeError):
-        record.nonfreezable_obj = StubDataclassData()
+        record.non_freezable_obj = StubDataclassData()
     with pytest.raises(AttributeError):
-        record.nonfreezable_list = [StubDataclassSimpleFreezable()]
+        record.non_freezable_list = [StubDataclassSimpleFreezable()]
 
     # Attempt to modify freezable fields after freezing
     with pytest.raises(Exception):
         record.freezable_obj.value = "xyz"
 
     # Attempt to modify non-freezable fields after freezing
-    record.nonfreezable_obj.str_field = "xyz"
-    record.nonfreezable_list.append(StubDataclassSimpleFreezable())
+    record.non_freezable_obj.str_field = "xyz"
+    record.non_freezable_list.append(StubDataclassSimpleFreezable())
 
 def test_try_freeze():
     """Test for FreezableUtil.."""

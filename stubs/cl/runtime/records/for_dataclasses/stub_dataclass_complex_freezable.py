@@ -31,10 +31,10 @@ class StubDataclassComplexFreezable(Freezable):
     freezable_obj: StubDataclassSimpleFreezable = required(default_factory=lambda: StubDataclassSimpleFreezable())
     """Embedded freezable object, will be frozen."""
 
-    nonfreezable_obj: StubDataclassData = required(default_factory=lambda: StubDataclassData())
+    non_freezable_obj: StubDataclassData = required(default_factory=lambda: StubDataclassData())
     """Embedded non-freezable object, will be frozen."""
 
-    nonfreezable_list: List[StubDataclassSimpleFreezable] = required(default_factory=lambda: [
+    non_freezable_list: List[StubDataclassSimpleFreezable] = required(default_factory=lambda: [
         StubDataclassSimpleFreezable(),
         StubDataclassSimpleFreezable(),
     ])
