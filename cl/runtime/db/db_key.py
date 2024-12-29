@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -22,7 +22,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class DbKey(KeyMixin):
     """Polymorphic data storage with dataset isolation."""
 
-    db_id: str = missing()
+    db_id: str = required()
     """Unique database identifier."""
 
     @classmethod

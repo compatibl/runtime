@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -28,7 +28,7 @@ class EnumItemLabelKey(KeyMixin):
         - This UI setting does not affect the REST API
     """
 
-    enum_item_name: str = missing()
+    enum_item_name: str = required()
     """Item name without reference to an enum (the setting will apply to this field name in every enum)."""
 
     @classmethod

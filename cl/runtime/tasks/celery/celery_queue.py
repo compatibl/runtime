@@ -124,7 +124,7 @@ def celery_start_queue(*, log_dir: str) -> None:
 class CeleryQueue(TaskQueue):
     """Execute tasks using Celery."""
 
-    # max_workers: int = missing()  # TODO: Implement support for max_workers
+    # max_workers: int = required()  # TODO: Implement support for max_workers
     """The maximum number of processes running concurrently."""
 
     # TODO: @abstractmethod

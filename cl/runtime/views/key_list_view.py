@@ -15,12 +15,12 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime import View
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class KeyListView(View):
     """List of generic keys in ClassName;key_field_1;key_field_2 format, records are loaded and displayed."""
 
-    key_list: List[str] = missing()
+    key_list: List[str] = required()
     """List of generic keys in ClassName;key_field_1;key_field_2 format, records are loaded and displayed."""

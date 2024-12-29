@@ -16,7 +16,7 @@ from dataclasses import asdict
 from dataclasses import dataclass
 from memoization import cached
 from typing_extensions import Self
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 
 
@@ -24,7 +24,7 @@ from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 class HandlerParamDecl(HandlerVariableDecl):
     """Handler parameter declaration."""
 
-    name: str = missing()
+    name: str = required()
     """Parameter name."""
 
     @classmethod

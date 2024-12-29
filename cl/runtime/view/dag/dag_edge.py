@@ -15,23 +15,23 @@
 from dataclasses import dataclass
 from typing import Any
 from typing import Dict
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class DagEdge:
     """Directed acyclic graph (DAG) node edge."""
 
-    id_: str = missing()
+    id_: str = required()
     """Unique edge identifier."""
 
-    label: str | None = missing()
+    label: str | None = required()
     """Optional edge label."""
 
-    source: str = missing()
+    source: str = required()
     """Source node id."""
 
-    target: str = missing()
+    target: str = required()
     """Target node id."""
 
     def to_networkx(self) -> Dict[str, Any]:

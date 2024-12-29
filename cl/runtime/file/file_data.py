@@ -14,18 +14,18 @@
 
 from dataclasses import dataclass
 from cl.runtime.file.file_type_enum import FileTypeEnum
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class FileData:
     """Display the specified embedded binary content."""
 
-    name: str | None = missing()
+    name: str | None = required()
     """Content name."""
 
-    file_bytes: bytes = missing()
+    file_bytes: bytes = required()
     """Embedded binary content to be displayed as the current view."""
 
-    file_type: FileTypeEnum | None = missing()
+    file_type: FileTypeEnum | None = required()
     """Embedded binary content type."""

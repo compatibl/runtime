@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -22,7 +22,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class SuccessorDagKey(KeyMixin):
     """Directed acyclic graph (DAG) where each node defines its successors."""
 
-    dag_id: str = missing()
+    dag_id: str = required()
     """Unique DAG identifier."""
 
     @classmethod

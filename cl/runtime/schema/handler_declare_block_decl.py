@@ -23,7 +23,7 @@ from inflection import humanize
 from inflection import titleize
 from memoization import cached
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.handler_param_decl import HandlerParamDecl
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
@@ -33,7 +33,7 @@ from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 class HandlerDeclareBlockDecl:
     """Handler declaration block in type declaration."""
 
-    handlers: List[HandlerDeclareDecl] = missing()
+    handlers: List[HandlerDeclareDecl] = required()
     """Handler declaration data."""
 
     @classmethod

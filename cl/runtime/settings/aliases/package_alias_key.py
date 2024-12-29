@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -29,7 +29,7 @@ class PackageAliasKey(KeyMixin):
         - Use to organize types and DB tables by package in large projects
     """
 
-    package_pattern: str = missing()
+    package_pattern: str = required()
     """Glob pattern for the dot-delimited module determines if the alias applies to a class."""
 
     @classmethod

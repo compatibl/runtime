@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Dict
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.serialization.sentinel_type import sentinel_value
 from cl.runtime.settings.aliases.package_alias_key import PackageAliasKey
@@ -34,7 +34,7 @@ class PackageAlias(PackageAliasKey, RecordMixin[PackageAliasKey]):
         - Use to organize types and DB tables by package in large projects
     """
 
-    package_alias: str = missing()
+    package_alias: str = required()
     """When specified, alias.ClassName is used in storage and REST API, otherwise ClassName is used without a prefix."""
 
     def get_key(self) -> PackageAliasKey:

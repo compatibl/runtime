@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.enum_decl_key import EnumDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.value_decl import ValueDecl
@@ -24,20 +24,20 @@ from cl.runtime.schema.value_decl import ValueDecl
 class MemberDecl:
     """Type member declaration."""
 
-    value: ValueDecl | None = missing()  # TODO: Flatten value and other types to a single field
+    value: ValueDecl | None = required()  # TODO: Flatten value and other types to a single field
     """Value or primitive element declaration."""
 
-    enum: EnumDeclKey | None = missing()
+    enum: EnumDeclKey | None = required()
     """Enumeration element declaration."""
 
-    data: TypeDeclKey | None = missing()
+    data: TypeDeclKey | None = required()
     """Data element declaration."""
 
     key_: TypeDeclKey | None = field(name="Key")  # TODO: Remove trailing _ automatically instead
     """Key element declaration."""
 
-    query: TypeDeclKey | None = missing()
+    query: TypeDeclKey | None = required()
     """Query element declaration."""
 
-    condition: TypeDeclKey | None = missing()
+    condition: TypeDeclKey | None = required()
     """Condition element declaration."""

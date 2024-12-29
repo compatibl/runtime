@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.tasks.task import Task
 from cl.runtime.workflows.workflow_phase import WorkflowPhase
 from cl.runtime.workflows.workflow_phase_key import WorkflowPhaseKey
@@ -25,7 +25,7 @@ from cl.runtime.workflows.workflow_phase_key import WorkflowPhaseKey
 class WorkflowTask(Task):
     """Parent of workflow phase tasks who are in turn parents of tasks assigned to each phase."""
 
-    phases: List[WorkflowPhaseKey] = missing()
+    phases: List[WorkflowPhaseKey] = required()
     """Tasks run in parallel in the order of phases, however each phase waits until its prerequisites are completed."""
 
     def _execute(self) -> None:

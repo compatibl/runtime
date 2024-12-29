@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.tasks.task import Task
 from cl.runtime.workflows.workflow_phase_key import WorkflowPhaseKey
 
@@ -22,7 +22,7 @@ from cl.runtime.workflows.workflow_phase_key import WorkflowPhaseKey
 class WorkflowPhaseTask(Task):
     """Child of the workflow task and parent of tasks assigned to the specified workflow phase."""
 
-    phase: WorkflowPhaseKey = missing()
+    phase: WorkflowPhaseKey = required()
     """Tasks run in parallel in the order of phases, however each phase waits until its prerequisites are completed."""
 
     def _execute(self) -> None:

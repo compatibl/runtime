@@ -23,7 +23,7 @@ from uuid import UUID
 from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.field_kind import FieldKind
 
 primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
@@ -37,19 +37,19 @@ primitive_modules = ["builtins", "datetime", "uuid"]
 class FieldDecl:
     """Field declaration."""
 
-    name: str = missing()
+    name: str = required()
     """Field name."""
 
-    label: str | None = missing()
+    label: str | None = required()
     """Field label (if not specified, titleized name is used instead)."""
 
-    comment: str | None = missing()
+    comment: str | None = required()
     """Field comment."""
 
-    field_kind: FieldKind = missing()
+    field_kind: FieldKind = required()
     """Kind of the element within the container if the field is a container, otherwise kind of the field itself."""
 
-    field_type: str = missing()
+    field_type: str = required()
     """Field type name for builtins and uuid modules and module.ClassName for all other types."""
 
     container_type: str | None = None

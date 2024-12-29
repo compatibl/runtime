@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.settings.labels.package_label_key import PackageLabelKey
 
@@ -28,7 +28,7 @@ class PackageLabel(PackageLabelKey, RecordMixin[PackageLabelKey]):
         - This UI setting does not affect the REST API
     """
 
-    package_label: str = missing()
+    package_label: str = required()
     """Custom package label overrides the standard 'package_alias' -> 'Package Alias' transformation."""
 
     def get_key(self) -> PackageLabelKey:

@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.settings.settings import Settings
 
 
@@ -27,7 +27,7 @@ class ProcessContext(Context):
     testing: bool = False
     """True inside a test, False otherwise (this field is passed to out-of-process tasks)."""
 
-    env_name: str = missing()
+    env_name: str = required()
     """Used to set database name and similar parameters (this field is passed to out-of-process tasks)."""
 
     @classmethod

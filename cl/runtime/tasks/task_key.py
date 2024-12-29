@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Type
 from typing_extensions import Self
 from cl.runtime.primitive.timestamp import Timestamp
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_key
 
@@ -34,7 +34,7 @@ class TaskKey(KeyMixin):
           the Running and optionally Paused state and ending in one of Completed, Failed, or Cancelled states
     """
 
-    task_id: str = missing()
+    task_id: str = required()
     """Unique task identifier."""
 
     @classmethod

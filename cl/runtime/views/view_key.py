@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 
@@ -24,10 +24,10 @@ from cl.runtime.records.protocols import KeyProtocol
 class ViewKey(KeyMixin):
     """This type is returned from a viewer method as object or key."""
 
-    view_for: str = missing()
+    view_for: str = required()
     """Generic key in ClassName;key_field_1;key_field_2 format of the record for which the view is provided."""
 
-    view_name: str = missing()
+    view_name: str = required()
     """Name of the view displayed in the front end."""
 
     @classmethod

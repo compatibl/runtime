@@ -14,15 +14,15 @@
 
 from dataclasses import dataclass
 from cl.runtime.backend.core.base_type_info import BaseTypeInfo
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class TabInfo:
     """Tab info."""
 
-    type: BaseTypeInfo = missing()
+    type: BaseTypeInfo = required()
     """Type."""
 
-    # key: Tuple | None = missing()  # TODO: Add generic key support
+    # key: Tuple | None = required()  # TODO: Add generic key support
     """Key."""

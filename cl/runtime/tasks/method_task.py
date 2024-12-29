@@ -20,7 +20,7 @@ from typing import Dict, Any
 from inflection import underscore
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 from cl.runtime.tasks.callable_task import CallableTask
@@ -32,7 +32,7 @@ data_serializer = UiDictSerializer()
 class MethodTask(CallableTask, ABC):
     """Base class for method tasks that invoke handlers from classes."""
 
-    method_name: str = missing()
+    method_name: str = required()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
     method_params: Dict[str, str] | None = field(default_factory=dict)  # TODO: Allow values other than string

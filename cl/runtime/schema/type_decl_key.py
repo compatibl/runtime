@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 
@@ -24,10 +24,10 @@ from cl.runtime.schema.module_decl_key import ModuleDeclKey
 class TypeDeclKey(KeyMixin):
     """Provides information about a class, its fields, and its methods."""
 
-    module: ModuleDeclKey = missing()  # TODO: Merge with name to always use full name
+    module: ModuleDeclKey = required()  # TODO: Merge with name to always use full name
     """Module reference."""
 
-    name: str = missing()
+    name: str = required()
     """Type name is unique when combined with module."""
 
     @classmethod

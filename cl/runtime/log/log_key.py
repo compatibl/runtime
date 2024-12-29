@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -22,7 +22,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class LogKey(KeyMixin):
     """A target for log messages."""
 
-    log_id: str = missing()
+    log_id: str = required()
     """Unique log identifier."""
 
     @classmethod

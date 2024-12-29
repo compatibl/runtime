@@ -14,28 +14,28 @@
 
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 class RunErrorResponseItem(BaseModel):
     """Data type for a single item in the response list for the /tasks/run route in case of an error."""
 
-    task_run_id: str | None = missing()
+    task_run_id: str | None = required()
     """Task run id."""
 
-    key: str | None = missing()
+    key: str | None = required()
     """Key of the record."""
 
-    name: str | None = missing()
+    name: str | None = required()
     """Name of the exception."""
 
-    status_code: int | None = missing()
+    status_code: int | None = required()
     """Status code of the task."""
 
-    message: str | None = missing()
+    message: str | None = required()
     """Message of the exception."""
 
-    stack_trace: str | None = missing()
+    stack_trace: str | None = required()
     """Stack trace of the exception."""
 
     class Config:

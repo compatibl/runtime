@@ -32,7 +32,7 @@ from inflection import titleize
 from memoization import cached
 from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.element_decl import ElementDecl
@@ -127,38 +127,38 @@ def get_name_of_type_decl_dict(dict_: Dict[str, Dict]) -> Optional[str]:
 class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     """Provides information about a class, its fields, and its methods."""
 
-    label: str | None = missing()
+    label: str | None = required()
     """Type label."""
 
-    comment: str | None = missing()
+    comment: str | None = required()
     """Type comment. Contains additional information."""
 
-    kind: TypeKind | None = missing()
+    kind: TypeKind | None = required()
     """Type kind."""
 
-    display_kind: DisplayKindLiteral = missing()  # TODO: Make optional, treat None as Basic
+    display_kind: DisplayKindLiteral = required()  # TODO: Make optional, treat None as Basic
     """Display kind."""
 
-    inherit: TypeDeclKey | None = missing()
+    inherit: TypeDeclKey | None = required()
     """Parent type reference."""
 
-    declare: HandlerDeclareBlockDecl | None = missing()  # TODO: Flatten or use block for abstract flag
+    declare: HandlerDeclareBlockDecl | None = required()  # TODO: Flatten or use block for abstract flag
     """Handler declaration block."""
 
-    elements: List[ElementDecl] | None = missing()  # TODO: Consider renaming to fields
+    elements: List[ElementDecl] | None = required()  # TODO: Consider renaming to fields
     """Element declaration block."""
 
-    keys: List[str] | None = missing()
+    keys: List[str] | None = required()
     """Array of key element names (specify in base class only)."""
 
     # TODO: Consider moving to Table class
-    # indexes: List[TypeIndexDecl] | None = missing()
+    # indexes: List[TypeIndexDecl] | None = required()
     """Defines indexes for the type."""
 
-    immutable: bool | None = missing()
+    immutable: bool | None = required()
     """Immutable flag."""
 
-    permanent: bool | None = missing()
+    permanent: bool | None = required()
     """When the record is saved, also save it permanently."""
 
     def get_key(self) -> TypeDeclKey:

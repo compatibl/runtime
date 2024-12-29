@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -22,7 +22,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class ConfigKey(KeyMixin):
     """Performs configuration using parameters specified in this record."""
 
-    config_id: str = missing()
+    config_id: str = required()
     """Unique configuration identifier."""
 
     @classmethod

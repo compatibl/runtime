@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.settings.labels.class_label_key import ClassLabelKey
 
@@ -28,7 +28,7 @@ class ClassLabel(ClassLabelKey, RecordMixin[ClassLabelKey]):
         - This UI setting does not affect the REST API
     """
 
-    class_label: str = missing()
+    class_label: str = required()
     """Custom class label overrides the standard 'ClassName' -> 'Class Label' transformation."""
 
     def get_key(self) -> ClassLabelKey:

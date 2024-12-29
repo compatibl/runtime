@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -23,7 +23,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class StubDataclassAliasedRecordKey(KeyMixin):  # TODO: Specify alias and add derived aliased class
     """Stub record class with typename alias."""
 
-    id: str = missing()
+    id: str = required()
 
     @classmethod
     def get_key_type(cls) -> Type:

@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import List
 from typing import final
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.views.view import View
 
 
@@ -25,5 +25,5 @@ from cl.runtime.views.view import View
 class RecordListView(View):
     """View that displays a list of record specified via their primary keys."""
 
-    view_of: List[str] = missing()
+    view_of: List[str] = required()
     """Primary keys of the displayed records."""

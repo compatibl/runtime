@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.contexts.context import Context
 from cl.runtime.primitive.format_util import FormatUtil
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)

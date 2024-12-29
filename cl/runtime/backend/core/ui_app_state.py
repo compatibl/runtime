@@ -22,7 +22,7 @@ from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
 
@@ -30,28 +30,28 @@ from cl.runtime.records.record_mixin import RecordMixin
 class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
     """UiAppState."""
 
-    opened_tabs: List[TabInfo] | None = missing()
+    opened_tabs: List[TabInfo] | None = required()
     """Information about opened tabs."""
 
-    active_tab_index: int | None = missing()
+    active_tab_index: int | None = required()
     """Index of active opened tab."""
 
-    backend_version: str | None = missing()
+    backend_version: str | None = required()
     """DEPRECATED. Use versions instead."""
 
-    versions: Optional[Dict[str, str]] | None = missing()
+    versions: Optional[Dict[str, str]] | None = required()
     """Component versions."""
 
-    application_name: str | None = missing()
+    application_name: str | None = required()
     """Application name."""
 
-    read_only: bool | None = missing()
+    read_only: bool | None = required()
     """Flag indicating that UI is read-only."""
 
-    application_theme: str | None = missing()  # TODO: Replace by AppTheme
+    application_theme: str | None = required()  # TODO: Replace by AppTheme
     """Application theme (dark, light, etc.)."""
 
-    user_secret_identifiers: List[str] | None = missing()
+    user_secret_identifiers: List[str] | None = required()
     """
     Suggested key names in My Keys section of the head and shoulders dialog.
 

@@ -20,7 +20,7 @@ from typing_extensions import Self
 from typing_extensions import override
 from cl.runtime import ClassInfo
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
@@ -29,7 +29,7 @@ from cl.runtime.tasks.task_queue_key import TaskQueueKey
 class StaticMethodTask(MethodTask):
     """Invoke a @staticmethod or @classmethod, do not use for instance methods."""
 
-    type_str: str = missing()
+    type_str: str = required()
     """Class type as dot-delimited string in module.ClassName format."""
 
     @override

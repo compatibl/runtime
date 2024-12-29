@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.view.dag.nodes.dag_node import DagNode
 
 
@@ -23,5 +23,5 @@ class AddTextNode(DagNode):
     Represent a Dag node that adds a specified text to the input data.
     """
 
-    text_to_add: str = missing()
+    text_to_add: str = required()
     """The text to add to the input data."""

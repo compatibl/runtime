@@ -15,18 +15,18 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class EnumItemDecl:
     """Enum item declaration."""
 
-    name: str = missing()
+    name: str = required()
     """Item name."""
 
-    label: str | None = missing()
+    label: str | None = required()
     """Item label (if not specified, titleized name is used instead)."""
 
-    comment: str | None = missing()
+    comment: str | None = required()
     """Item additional information."""

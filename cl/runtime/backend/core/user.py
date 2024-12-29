@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
 
@@ -23,10 +23,10 @@ from cl.runtime.records.record_mixin import RecordMixin
 class User(UserKey, RecordMixin[UserKey]):
     """User which is allowed to log in."""
 
-    first_name: str = missing()
+    first_name: str = required()
     """First name of the user."""
 
-    last_name: str = missing()
+    last_name: str = required()
     """Last name of the user."""
 
     email: str | None = None

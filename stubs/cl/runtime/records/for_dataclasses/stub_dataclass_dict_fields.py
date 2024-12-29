@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing import Dict
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord

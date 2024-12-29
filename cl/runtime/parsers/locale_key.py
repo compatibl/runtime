@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -22,7 +22,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class LocaleKey(KeyMixin):
     """Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)."""
 
-    locale_id: str = missing()
+    locale_id: str = required()
     """Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)."""
 
     @classmethod

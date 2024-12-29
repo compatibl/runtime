@@ -20,7 +20,7 @@ TDefault = TypeVar("TDefault")
 TDefaultFactory = Callable[[], TDefault]
 
 
-def missing() -> TDefault:
+def required() -> TDefault:
     """Use to define a field that can be set after construction but required for using the object."""
     return dataclasses.field(default=None)
 

@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime import RecordMixin
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.views.dag.successor_dag_key import SuccessorDagKey
 from cl.runtime.views.dag.successor_dag_node import SuccessorDagNode
@@ -26,10 +26,10 @@ from cl.runtime.views.dag.successor_dag_node_key import SuccessorDagNodeKey
 class SuccessorDag(SuccessorDagKey, RecordMixin[SuccessorDagKey]):
     """Directed acyclic graph (DAG) where each node defines its successors."""
 
-    title: str = missing()
+    title: str = required()
     """Title of the DAG."""
 
-    root_node: SuccessorDagNodeKey = missing()
+    root_node: SuccessorDagNodeKey = required()
     """Root node of the DAG."""
 
     def get_key(self) -> SuccessorDagKey:

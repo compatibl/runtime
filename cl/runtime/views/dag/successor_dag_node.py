@@ -19,7 +19,7 @@ from typing_extensions import Self
 from cl.runtime import RecordMixin
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.view.dag.dag_edge import DagEdge
 from cl.runtime.view.dag.dag_layout_enum import DagLayoutEnum
@@ -33,13 +33,13 @@ from cl.runtime.views.dag.successor_dag_node_key import SuccessorDagNodeKey
 class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
     """Single node of SuccessorDag, defines its successors."""
 
-    dag: SuccessorDagKey = missing()
+    dag: SuccessorDagKey = required()
     """The DAG this node belongs to (included in node_id)."""
 
-    dag_node_id: str = missing()
+    dag_node_id: str = required()
     """Unique node identifier within the dag (included in node_id)."""
 
-    node_yaml: str = missing()
+    node_yaml: str = required()
     """Node details in YAML format."""
 
     successor_nodes: List[SuccessorDagNodeKey] | None = None

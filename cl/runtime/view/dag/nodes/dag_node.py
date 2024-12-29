@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Dict
 from typing import Optional
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.view.dag.dag_node_data import DagNodeData
 from cl.runtime.view.dag.dag_node_position import DagNodePosition
 
@@ -25,13 +25,13 @@ from cl.runtime.view.dag.dag_node_position import DagNodePosition
 class DagNode:
     """Directed acyclic graph (DAG) node."""
 
-    id_: str = missing()
+    id_: str = required()
     """Node unique identifier."""
 
-    position: DagNodePosition | None = missing()
+    position: DagNodePosition | None = required()
     """Node UI position."""
 
-    data: DagNodeData = missing()
+    data: DagNodeData = required()
     """Node internal data."""
 
     def to_networkx(self) -> Dict[str, Any]:

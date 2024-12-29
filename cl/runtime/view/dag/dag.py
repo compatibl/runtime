@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import List
 import networkx as nx
 from cl.runtime import RecordMixin
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.view.dag.dag_edge import DagEdge
 from cl.runtime.view.dag.dag_key import DagKey
 from cl.runtime.view.dag.dag_layout_enum import DagLayoutEnum
@@ -28,10 +28,10 @@ from cl.runtime.view.dag.nodes.dag_node import DagNode
 class Dag(DagKey, RecordMixin[DagKey]):
     """Structure and visual representation of a directed acyclic graph (DAG)."""
 
-    nodes: List[DagNode] = missing()
+    nodes: List[DagNode] = required()
     """List of DAG nodes."""
 
-    edges: List[DagEdge] = missing()
+    edges: List[DagEdge] = required()
     """List of DAG edges."""
 
     def get_key(self) -> DagKey:

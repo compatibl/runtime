@@ -22,7 +22,7 @@ from typing import get_origin
 from memoization import cached
 from typing_extensions import Self
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.member_decl import MemberDecl
 from cl.runtime.schema.value_decl import ValueDecl
 
@@ -31,16 +31,16 @@ from cl.runtime.schema.value_decl import ValueDecl
 class HandlerVariableDecl(MemberDecl):
     """Handler parameter or return variable declaration."""
 
-    vector: bool | None = missing()  # TODO: Similar change to vector in element decl
+    vector: bool | None = required()  # TODO: Similar change to vector in element decl
     """Flag indicating variable size array (vector) container."""
 
-    optional: bool | None = missing()
+    optional: bool | None = required()
     """Flag indicating optional element."""
 
-    label: str | None = missing()
+    label: str | None = required()
     """Parameter label."""
 
-    comment: str | None = missing()
+    comment: str | None = required()
     """Parameter comment. Contains addition information about handler parameter."""
 
     @classmethod

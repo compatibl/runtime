@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.views.script_language_enum import ScriptLanguageEnum
 
 
@@ -23,14 +23,14 @@ from cl.runtime.views.script_language_enum import ScriptLanguageEnum
 class Script:
     """Script body element."""
 
-    name: str = missing()
+    name: str = required()
     """Script name."""
 
-    language: ScriptLanguageEnum | None = missing()
+    language: ScriptLanguageEnum | None = required()
     """Script Language."""
 
-    body: List[str] = missing()
+    body: List[str] = required()
     """Body"""
 
-    word_wrap: bool | None = missing()
+    word_wrap: bool | None = required()
     """Automatically wrap text to the next line when it reaches the end of a line or a specified margin."""

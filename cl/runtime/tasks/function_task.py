@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Callable
 from typing import Type
 from typing_extensions import Self
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 
@@ -24,10 +24,10 @@ from cl.runtime.tasks.task_queue_key import TaskQueueKey
 class FunctionTask(Callable):
     """Invoke a function defined in the module directly, do not use for class methods."""
 
-    module: str = missing()
+    module: str = required()
     """Module string in dot-delimited format."""
 
-    function_name: str = missing()
+    function_name: str = required()
     """Function name in snake_case or PascalCase format."""
 
     def _execute(self) -> None:

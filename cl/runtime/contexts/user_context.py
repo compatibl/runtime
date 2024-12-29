@@ -18,14 +18,14 @@ from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class UserContext(Context):
     """User-specific settings and data."""
 
-    user: UserKey = missing()
+    user: UserKey = required()
     """Current user."""
 
     encrypted_secrets: Dict[str, str] | None = None

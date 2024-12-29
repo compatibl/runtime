@@ -13,18 +13,18 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class BaseTypeInfo:
     """Base type info."""
 
-    name: str = missing()
+    name: str = required()
     """Name of type."""
 
-    module: str = missing()
+    module: str = required()
     """Module of type."""
 
-    label: str = missing()
+    label: str = required()
     """Label of type."""

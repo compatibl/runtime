@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Type
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 
@@ -25,10 +25,10 @@ from cl.runtime.schema.type_decl_key import TypeDeclKey
 class UiTypeStateKey(KeyMixin):
     """Defines some default settings for a type."""
 
-    type_: TypeDeclKey = missing()
+    type_: TypeDeclKey = required()
     """Type reference."""
 
-    user: UserKey | None = missing()
+    user: UserKey | None = required()
     """A user the app state is applied for."""
 
     @classmethod

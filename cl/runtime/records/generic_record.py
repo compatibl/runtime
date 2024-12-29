@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Iterable
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.generic_key import GenericKey
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.record_mixin import RecordMixin
@@ -26,13 +26,13 @@ from cl.runtime.records.record_mixin import RecordMixin
 class GenericRecord:
     """Generic record can represent any record type."""
 
-    key_type_str: str = missing()
+    key_type_str: str = required()
     """Key type as dot-delimited string in module.ClassNameKey format inclusive of Key suffix if present."""
 
-    key_fields: Iterable[str] = missing()
+    key_fields: Iterable[str] = required()
     """Names of primary key fields."""
 
-    data_dict: Dict = missing()
+    data_dict: Dict = required()
     """Dictionary of data fields (including the primary key fields) in the order of declaration."""
 
     def get_key(self) -> KeyProtocol:

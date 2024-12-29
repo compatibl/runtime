@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -28,7 +28,7 @@ class MethodLabelKey(KeyMixin):
         - This UI setting does not affect the REST API
     """
 
-    method_name: str = missing()
+    method_name: str = required()
     """Method name without reference to a class (the setting will apply to this method name in every class)."""
 
     @classmethod

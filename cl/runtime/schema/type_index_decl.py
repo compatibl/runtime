@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.index_decl import IndexDecl
 
 
@@ -23,8 +23,8 @@ from cl.runtime.schema.index_decl import IndexDecl
 class TypeIndexDecl:
     """Type index declaration."""
 
-    name: str | None = missing()
+    name: str | None = required()
     """Index name."""
 
-    elements: List[IndexDecl] = missing()
+    elements: List[IndexDecl] = required()
     """Index elements."""

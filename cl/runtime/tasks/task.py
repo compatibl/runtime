@@ -25,7 +25,7 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
@@ -48,13 +48,13 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     label: str | None = None  # TODO: Make required
     """Label for information purposes only (should not be used in processing)."""
 
-    queue: TaskQueueKey = missing()
+    queue: TaskQueueKey = required()
     """The queue that will run the task once it is saved."""
 
-    status: TaskStatusEnum = missing()
+    status: TaskStatusEnum = required()
     """Begins from Pending, continues to Running or Paused, and ends with Completed, Failed, or Cancelled."""
 
-    progress_pct: float = missing()
+    progress_pct: float = required()
     """Task progress in percent from 0 to 100."""
 
     elapsed_sec: float | None = None

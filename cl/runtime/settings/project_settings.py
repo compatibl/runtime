@@ -21,7 +21,7 @@ from typing import List
 from typing import Literal
 from typing import cast
 from typing_extensions import Self
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 SETTINGS_FILES_ENVVAR = "CL_SETTINGS_FILES"
 """The name of environment variable used to override the settings file(s) names or locations."""
@@ -45,10 +45,10 @@ class ProjectSettings:
                 --- package files (files from each package are under a separate package root)
     """
 
-    project_root: str = missing()
+    project_root: str = required()
     """Project root directory is the location of .env or settings.yaml file."""
 
-    project_levels: int = missing()
+    project_levels: int = required()
     """Number of levels in project layout (one or two)."""
 
     __instance: ClassVar[ProjectSettings] = None

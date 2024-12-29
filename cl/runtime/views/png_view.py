@@ -14,12 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime import View
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class PngView(View):
     """Bytes for a png image."""
 
-    png_bytes: bytes = missing()
+    png_bytes: bytes = required()
     """Bytes for a png image."""

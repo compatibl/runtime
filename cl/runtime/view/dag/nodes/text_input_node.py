@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.view.dag.nodes.dag_node import DagNode
 
 
@@ -23,5 +23,5 @@ class TextInputNode(DagNode):
     Represent a DAG node that takes input text and returns it as is.
     """
 
-    text: str = missing()
+    text: str = required()
     """The input text for the node."""

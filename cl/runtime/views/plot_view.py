@@ -15,12 +15,12 @@
 from dataclasses import dataclass
 from cl.runtime import View
 from cl.runtime.plots.plot_key import PlotKey
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class PlotView(View):
     """Plot key or record."""
 
-    plot: PlotKey = missing()
+    plot: PlotKey = required()
     """Plot key or record."""

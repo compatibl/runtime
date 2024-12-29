@@ -14,12 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime import View
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class HtmlView(View):
     """Bytes for an HTML view."""
 
-    html_bytes: bytes = missing()
+    html_bytes: bytes = required()
     """Bytes for an HTML view."""

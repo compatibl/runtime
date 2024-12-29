@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -28,7 +28,7 @@ class ClassLabelKey(KeyMixin):
         - This UI setting does not affect the REST API
     """
 
-    class_name: str = missing()
+    class_name: str = required()
     """Class name without module (the setting will apply to this class name in every module)."""
 
     @classmethod

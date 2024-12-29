@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -23,7 +23,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class UserKey(KeyMixin):
     """User which is allowed to log in."""
 
-    username: str = missing()  # TODO: Consider renaming to user_id, requires matching UI and auth changes
+    username: str = required()  # TODO: Consider renaming to user_id, requires matching UI and auth changes
     """Unique user identifier."""
 
     @classmethod

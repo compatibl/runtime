@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Type
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -31,7 +31,7 @@ class TaskQueueKey(KeyMixin):
           the Running and optionally Paused state and ending in one of Completed, Failed, or Cancelled states
     """
 
-    queue_id: str = missing()
+    queue_id: str = required()
     """Unique task queue identifier."""
 
     @classmethod

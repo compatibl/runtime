@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.protocols import TKeyDict
 
 
@@ -21,8 +21,8 @@ from cl.runtime.records.protocols import TKeyDict
 class GenericKey:
     """Generic key can be substituted for any key type other than itself."""
 
-    key_type_str: str = missing()
+    key_type_str: str = required()
     """Key type as dot-delimited string in module.ClassNameKey format inclusive of Key suffix if present."""
 
-    key_dict: TKeyDict = missing()
+    key_dict: TKeyDict = required()
     """Dictionary of key fields in the order of declaration."""

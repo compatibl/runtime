@@ -14,12 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime import View
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class KeyView(View):
     """Generic key in ClassName;key_field_1;key_field_2 format, record is loaded and displayed."""
 
-    key: str = missing()
+    key: str = required()
     """Generic key in ClassName;key_field_1;key_field_2 format, record is loaded and displayed."""

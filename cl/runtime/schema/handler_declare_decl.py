@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime.records.dataclasses_extensions import field
-from cl.runtime.records.dataclasses_extensions import missing
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.handler_param_decl import HandlerParamDecl
 from cl.runtime.schema.handler_type import HandlerType
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
@@ -25,23 +25,23 @@ from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 class HandlerDeclareDecl:
     """Handler declaration data."""
 
-    name: str = missing()
+    name: str = required()
     """Handler name."""
 
-    label: str | None = missing()
+    label: str | None = required()
     """Handler label."""
 
-    comment: str | None = missing()
+    comment: str | None = required()
     """Handler comment."""
 
     type_: HandlerType = field(name="Type")
     """Handler type."""
 
-    params: List[HandlerParamDecl] | None = missing()
+    params: List[HandlerParamDecl] | None = required()
     """Handler parameters."""
 
     return_: HandlerVariableDecl | None = field(name="Return")  # TODO: Remove trailing _ automatically
     """Handler return value."""
 
-    static: bool | None = missing()
+    static: bool | None = required()
     """If set as true, handler will be static, otherwise non-static."""
