@@ -17,33 +17,47 @@ from cl.runtime.primitive.case_util import CaseUtil
 
 
 class BoolUtil:
-    """Helper methods for working with booleans."""
+    """Helper methods for working with bool type."""
 
     @classmethod
-    def parse_required_bool(
-        cls, field_value: str | None, *, field_name: str | None = None
-    ) -> bool:  # TODO: Move to Util class
-        """Parse an optional boolean value."""
-        match field_value:
+    def format(cls, value: bool) -> str:
+        """Serialize True as uppercase 'Y' and False as uppercase 'N', error if argument is None."""
+        result = cls.format_or_none(value)
+        if result is None:
+            raise RuntimeError("Argument of BoolUtil.format is None, use format_or_none to accept.")
+        return result
+
+    @classmethod
+    def format_or_none(cls, value: bool | None) -> str | None:
+        """Serialize True as uppercase 'Y' and False as uppercase 'N', return None if argument is None."""
+        if value is None:
+            return None
+        if type(value) is not bool:
+            raise RuntimeError(f"Argument of BoolUtil.format_or_none has type {type(value).__name__}, "
+                               f"only bool is accepted.")
+        return "Y" if value else "N"
+
+    @classmethod
+    def parse(cls, value: str | None, *, name: str | None = None) -> bool:
+        """Parse an optional boolean value, param 'name' is used for error reporting only."""
+        match value:
             case None | "":
-                field_name = CaseUtil.snake_to_pascal_case(field_name)
-                for_field = f"for field {field_name}" if field_name is not None else " for a Y/N field"
+                name = CaseUtil.snake_to_pascal_case(name)
+                for_field = f"for field {name}" if name is not None else " for a Y/N field"
                 raise UserError(f"The value {for_field} is empty. Valid values are Y or N.")
             case "Y":
                 return True
             case "N":
                 return False
             case _:
-                field_name = CaseUtil.snake_to_pascal_case(field_name)
-                for_field = f" for field {field_name}" if field_name is not None else " for a Y/N field"
-                raise UserError(f"The value {for_field} must be Y, N or an empty string.\nField value: {field_value}")
+                name = CaseUtil.snake_to_pascal_case(name)
+                for_field = f" for field {name}" if name is not None else " for a Y/N field"
+                raise UserError(f"The value {for_field} must be Y, N or an empty string.\nField value: {value}")
 
     @classmethod
-    def parse_optional_bool(
-        cls, field_value: str | None, *, field_name: str | None = None
-    ) -> bool | None:  # TODO: Move to Util class
-        """Parse an optional boolean value."""
-        match field_value:
+    def parse_or_none(cls, value: str | None, *, name: str | None = None) -> bool | None:
+        """Parse an optional boolean value, param 'name' is used for error reporting only."""
+        match value:
             case None | "":
                 return None
             case "Y":
@@ -51,6 +65,6 @@ class BoolUtil:
             case "N":
                 return False
             case _:
-                field_name = CaseUtil.snake_to_pascal_case(field_name)
-                for_field = f" for field {field_name}" if field_name is not None else ""
-                raise UserError(f"The value{for_field} must be Y, N or an empty string.\nField value: {field_value}")
+                name = CaseUtil.snake_to_pascal_case(name)
+                for_field = f" for field {name}" if name is not None else ""
+                raise UserError(f"The value{for_field} must be Y, N or an empty string.\nField value: {value}")
