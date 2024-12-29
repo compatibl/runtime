@@ -15,7 +15,6 @@
 import re
 from typing import Pattern
 from cl.runtime.primitive.char_util import CharUtil
-from cl.runtime.primitive.string_util import StringUtil
 
 _alphanumeric_re: Pattern = re.compile(r"[^a-zA-Z0-9 .]")
 """Match sequences where all characters are either letters or digits, also allowing dot and space."""
@@ -41,11 +40,17 @@ _digit_without_space_re: Pattern = re.compile(r"(?<! )\d")
 
 class CaseUtil:
     """Utilities for case conversion and other operations on string."""
+    
+    @classmethod
+    def is_empty(cls, value: str | None) -> bool:
+        """Returns true if the string is None or ''."""
+        # We cannot reuse the method from StringUtil here to avoid a cyclic reference
+        return value is None or value == ""
 
     @classmethod
     def pascal_to_snake_case(cls, value: str | None) -> str | None:
         """Convert PascalCase to snake_case using custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
         cls.check_pascal_case(value)
         # Add underscores between consecutive uppercase letters
@@ -61,7 +66,7 @@ class CaseUtil:
     @classmethod
     def upper_to_snake_case(cls, value: str | None) -> str | None:
         """Convert UPPER_CASE to snake_case using custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
         cls.check_upper_case(value)
         return value.lower()
@@ -69,7 +74,7 @@ class CaseUtil:
     @classmethod
     def snake_to_upper_case(cls, value: str | None) -> str | None:
         """Convert snake_case to UPPER_CASE using custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
         cls.check_snake_case(value)
         return value.upper()
@@ -77,7 +82,7 @@ class CaseUtil:
     @classmethod
     def snake_to_pascal_case(cls, value: str | None) -> str | None:
         """Convert snake_case to PascalCase using custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
         cls.check_snake_case(value)
         input_tokens = value.split(".")
@@ -92,7 +97,7 @@ class CaseUtil:
     @classmethod
     def upper_to_pascal_case(cls, value: str | None) -> str | None:
         """Convert UPPER_CASE to PascalCase using custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
         cls.check_upper_case(value)
         return cls.snake_to_pascal_case(value.lower())
@@ -100,7 +105,7 @@ class CaseUtil:
     @classmethod
     def pascal_to_upper_case(cls, value: str | None) -> str | None:
         """Convert PascalCase to UPPER_CASE using custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
         cls.check_pascal_case(value)
         snake_case_value = cls.pascal_to_snake_case(value)
@@ -109,7 +114,7 @@ class CaseUtil:
     @classmethod
     def pascal_to_title_case(cls, value: str | None) -> str | None:
         """Convert PascalCase to Title Case using custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
         cls.check_pascal_case(value)
         snake_case_value = cls.pascal_to_snake_case(value)
@@ -121,7 +126,7 @@ class CaseUtil:
     @classmethod
     def snake_to_title_case(cls, value: str | None) -> str | None:
         """Convert snake_case to Title Case using custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
         cls.check_snake_case(value)
         pascal_case_value = cls.snake_to_pascal_case(value)
@@ -133,7 +138,7 @@ class CaseUtil:
         Convert snake_case_ to PascalCase_ using custom rule for separators in front of digits
         and keep ending underscore.
         """
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
 
         return cls.snake_to_pascal_case(value.removesuffix("_")) + ("_" if value.endswith("_") else "")
@@ -144,7 +149,7 @@ class CaseUtil:
         Convert PascalCase_ to snake_case_ using custom rule for separators in front of digits
         and keep ending underscore.
         """
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             return value
 
         return cls.pascal_to_snake_case(value.removesuffix("_")) + ("_" if value.endswith("_") else "")
@@ -152,7 +157,7 @@ class CaseUtil:
     @classmethod
     def check_snake_case(cls, value: str | None) -> None:
         """Error message if arg is not snake_case or does not follow custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             # Consider None or empty string compliant with the format
             return
         cls._check_non_alphanumeric(value, "snake_case", allow_underscore=True)
@@ -164,7 +169,7 @@ class CaseUtil:
     @classmethod
     def check_pascal_case(cls, value: str | None) -> None:
         """Error message if arg is not PascalCase or does not follow custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             # Consider None or empty string compliant with the format
             return
         cls._check_non_alphanumeric(value, "PascalCase", allow_underscore=False)
@@ -177,7 +182,7 @@ class CaseUtil:
     @classmethod
     def check_title_case(cls, value: str | None) -> None:
         """Error message if arg is not Title Case or does not follow custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             # Consider None or empty string compliant with the format
             return
         cls._check_non_alphanumeric(value, "Title Case", allow_underscore=False)
@@ -188,7 +193,7 @@ class CaseUtil:
     @classmethod
     def check_upper_case(cls, value: str | None) -> None:
         """Error message if arg is not UPPER_CASE or does not follow custom rule for separators in front of digits."""
-        if StringUtil.is_empty(value):
+        if cls.is_empty(value):
             # Consider None or empty string compliant with the format
             return
         cls._check_non_alphanumeric(value, "UPPER_CASE", allow_underscore=True)
