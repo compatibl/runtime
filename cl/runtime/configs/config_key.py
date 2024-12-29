@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class ConfigKey(KeyMixin):
     """Performs configuration using parameters specified in this record."""
 

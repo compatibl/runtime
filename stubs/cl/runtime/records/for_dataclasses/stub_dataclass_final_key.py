@@ -19,7 +19,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_key import
 )
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class StubDataclassFinalKey(StubDataclassAbstractKey):
     """Final key derived from base key."""
 

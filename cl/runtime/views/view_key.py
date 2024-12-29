@@ -19,7 +19,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class ViewKey(KeyMixin):
     """This type is returned from a viewer method as object or key."""
 

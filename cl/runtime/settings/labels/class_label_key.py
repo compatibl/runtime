@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class ClassLabelKey(KeyMixin):
     """
     Custom class label overrides the standard 'ClassName' -> 'Class Label' transformation.

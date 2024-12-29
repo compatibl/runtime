@@ -20,7 +20,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class UiTypeStateKey(KeyMixin):
     """Defines some default settings for a type."""
 

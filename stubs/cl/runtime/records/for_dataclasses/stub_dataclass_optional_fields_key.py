@@ -17,7 +17,7 @@ from typing import Type
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class StubDataclassOptionalFieldsKey(KeyMixin):
     """Stub derived class."""
 

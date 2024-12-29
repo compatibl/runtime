@@ -24,7 +24,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class StubDataclassPrimitiveFieldsKey(KeyMixin):
     """Stub record whose elements are primitive types."""
 

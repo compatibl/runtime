@@ -17,7 +17,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import TKeyDict
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class GenericKey:
     """Generic key can be substituted for any key type other than itself."""
 

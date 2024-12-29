@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class LocaleKey(KeyMixin):
     """Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)."""
 

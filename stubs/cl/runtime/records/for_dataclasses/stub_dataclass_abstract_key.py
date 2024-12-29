@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True)
 class StubDataclassAbstractKey(KeyMixin, ABC):
     """Base key provides common functionality to multiple final keys."""
 
