@@ -70,7 +70,7 @@ class TrialContext(BaseContext):
     def get_trial_or_none(cls) -> str | None:
         """Concatenates trial identifiers from the context stack, returns None if no current context or all are None."""
         if (context := cls.current_or_none()) is not None and context.trial_id is not None:
-            # Use the value from context if not None
+            # Use the value from the current context if not None
             return context.trial_id
         else:
             # Otherwise return None
