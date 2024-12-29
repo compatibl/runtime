@@ -14,11 +14,8 @@
 
 from dataclasses import dataclass
 from typing import Type
-from typing_extensions import Self
-from cl.runtime.primitive.colon_and_space_delimited_util import ColonAndSpaceDelimitedUtil
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key
 
 
 @dataclass(slots=True, kw_only=True)
@@ -31,20 +28,3 @@ class ExperimentKey(KeyMixin):
     @classmethod
     def get_key_type(cls) -> Type:
         return ExperimentKey
-
-    def init(self) -> Self:
-        # Check only if inside a key, will be set automatically if inside a record
-        if is_key(self):
-            self.check_experiment_id(self.experiment_id)
-        # Return self to enable method chaining
-        return self
-
-    @classmethod
-    def check_experiment_id(cls, experiment_id: str) -> None:
-        """Check that experiment_id does not have semicolon-and-space delimiter."""
-        ColonAndSpaceDelimitedUtil.validate(
-            value=experiment_id,
-            token_count=1,
-            value_name="experiment_id",
-            data_type="ExperimentKey",
-        )
