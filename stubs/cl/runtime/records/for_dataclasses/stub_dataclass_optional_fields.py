@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import List
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
@@ -30,7 +29,7 @@ class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin[St
     optional_str: str | None = "xyz"
     """Optional string."""
 
-    required_list_of_optional_str: List[str | None] = field(default_factory=lambda: ["abc", None])
+    required_list_of_optional_str: List[str | None] = required(default_factory=lambda: ["abc", None])
     """Required list of optional strings."""
 
     optional_list_of_optional_str: List[str | None] | None = None
@@ -39,7 +38,7 @@ class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin[St
     optional_float: float | None = 1.23
     """Optional float."""
 
-    required_list_of_optional_float: List[float | None] = field(default_factory=lambda: [1.23, None])
+    required_list_of_optional_float: List[float | None] = required(default_factory=lambda: [1.23, None])
     """Required list of optional floats."""
 
     optional_list_of_optional_float: List[float | None] | None = None
@@ -50,7 +49,7 @@ class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin[St
     optional_data: StubDataclassData | None = None
     """Optional data."""
 
-    required_list_of_optional_data: List[StubDataclassData | None] = field(
+    required_list_of_optional_data: List[StubDataclassData | None] = required(
         default_factory=lambda: [StubDataclassData(), None]
     )
     """Required list of optional data."""
@@ -61,7 +60,7 @@ class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin[St
     optional_key: StubDataclassRecordKey | None = None
     """Optional key."""
 
-    required_list_of_optional_key: List[StubDataclassRecordKey | None] = field(
+    required_list_of_optional_key: List[StubDataclassRecordKey | None] = required(
         default_factory=lambda: [StubDataclassRecordKey(), None]
     )
     """Required list of optional key."""
@@ -72,7 +71,7 @@ class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin[St
     optional_record: StubDataclassRecord | None = None
     """Optional record."""
 
-    required_list_of_optional_record: List[StubDataclassRecord | None] = field(
+    required_list_of_optional_record: List[StubDataclassRecord | None] = required(
         default_factory=lambda: [StubDataclassRecord(), None]
     )
     """Required list of optional record."""

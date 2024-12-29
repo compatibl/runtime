@@ -14,7 +14,7 @@
 
 from abc import ABC
 from dataclasses import dataclass, fields
-from dataclasses import field
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
@@ -27,7 +27,7 @@ class Freezable(ABC):
         This base should be used for dataclass objects, use the appropriate base for each framework.
     """
 
-    __frozen: bool = field(default=False, init=False)
+    __frozen: bool = required(default=False, init=False)
     """
     Indicates the instance is frozen so its fields can no longer be modified.
     Once frozen, the instance cannot be unfrozen.

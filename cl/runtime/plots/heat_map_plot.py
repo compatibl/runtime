@@ -20,33 +20,32 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
-from cl.runtime.plots.plot import Plot
-from cl.runtime.records.dataclasses_extensions import field
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class HeatMapPlot(MatplotlibPlot):
     """Heat map visualization."""
 
-    title: str = field()
+    title: str = required()
     """Plot title."""
 
-    row_labels: List[str] = field()
+    row_labels: List[str] = required()
     """Row label for each cell in the same order of cells as other fields."""
 
-    col_labels: List[str] = field()
+    col_labels: List[str] = required()
     """Column label for each cell in the same order of cells as other fields."""
 
-    received_values: List[str] = field()
+    received_values: List[str] = required()
     """Received value for each cell in the same order of cells as other fields."""
 
-    expected_values: List[str] = field()
+    expected_values: List[str] = required()
     """Expected (correct) value for each cell in the same order of cells as other fields."""
 
-    x_label: str = field()
+    x_label: str = required()
     """x-axis label."""
 
-    y_label: str = field()
+    y_label: str = required()
     """y-axis label."""
 
     def _create_figure(self) -> plt.Figure:

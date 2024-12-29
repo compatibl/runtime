@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.enum_decl_key import EnumDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
@@ -33,7 +32,7 @@ class MemberDecl:
     data: TypeDeclKey | None = required()
     """Data element declaration."""
 
-    key_: TypeDeclKey | None = field(name="Key")  # TODO: Remove trailing _ automatically instead
+    key_: TypeDeclKey | None = required()
     """Key element declaration."""
 
     query: TypeDeclKey | None = required()

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.dataclasses_extensions import field
+from cl.runtime.records.dataclasses_extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data import (
@@ -27,25 +27,25 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubD
 class StubDataclassNestedFields(StubDataclassRecord):
     """Stub derived class."""
 
-    base_field: StubDataclassData = field(default_factory=StubDataclassData)
+    base_field: StubDataclassData = required(default_factory=StubDataclassData)
     """Stub field."""
 
-    derived_field: StubDataclassDerivedData = field(default_factory=StubDataclassDerivedData)
+    derived_field: StubDataclassDerivedData = required(default_factory=StubDataclassDerivedData)
     """Stub field."""
 
-    derived_from_derived_field: StubDataclassDerivedFromDerivedData = field(
+    derived_from_derived_field: StubDataclassDerivedFromDerivedData = required(
         default_factory=StubDataclassDerivedFromDerivedData
     )
     """Stub field."""
 
-    polymorphic_field: StubDataclassData = field(default_factory=StubDataclassDerivedData)
+    polymorphic_field: StubDataclassData = required(default_factory=StubDataclassDerivedData)
     """Declared StubDataclassData but provided an instance of StubDataclassDerivedData."""
 
-    polymorphic_derived_field: StubDataclassDerivedData = field(default_factory=StubDataclassDerivedFromDerivedData)
+    polymorphic_derived_field: StubDataclassDerivedData = required(default_factory=StubDataclassDerivedFromDerivedData)
     """Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData."""
 
-    key_field: StubDataclassRecordKey = field(default_factory=lambda: StubDataclassRecordKey(id="uvw"))
+    key_field: StubDataclassRecordKey = required(default_factory=lambda: StubDataclassRecordKey(id="uvw"))
     """Stub field."""
 
-    record_as_key_field: StubDataclassRecordKey = field(default_factory=lambda: StubDataclassRecord())
+    record_as_key_field: StubDataclassRecordKey = required(default_factory=lambda: StubDataclassRecord())
     """Stub field with key type initialized to record type instance."""

@@ -16,7 +16,6 @@ import datetime as dt
 from dataclasses import dataclass
 from typing import Dict
 from cl.runtime.primitive.date_util import DateUtil
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
@@ -89,25 +88,25 @@ def stub_dataclass_derived_record_dict_factory() -> Dict[str, StubDataclassDeriv
 class StubDataclassDictFields(StubDataclassRecord):
     """Stub record whose elements are dictionaries."""
 
-    str_dict: Dict[str, str] = field(default_factory=stub_dataclass_str_dict_factory)
+    str_dict: Dict[str, str] = required(default_factory=stub_dataclass_str_dict_factory)
     """Stub field."""
 
-    float_dict: Dict[str, float] = field(default_factory=stub_dataclass_float_dict_factory)
+    float_dict: Dict[str, float] = required(default_factory=stub_dataclass_float_dict_factory)
     """Stub field."""
 
-    date_dict: Dict[str, dt.date] = field(default_factory=stub_dataclass_date_dict_factory)
+    date_dict: Dict[str, dt.date] = required(default_factory=stub_dataclass_date_dict_factory)
     """Stub field."""
 
-    data_dict: Dict[str, StubDataclassData] = field(default_factory=stub_dataclass_data_dict_factory)
+    data_dict: Dict[str, StubDataclassData] = required(default_factory=stub_dataclass_data_dict_factory)
     """Stub field."""
 
-    key_dict: Dict[str, StubDataclassRecordKey] = field(default_factory=stub_dataclass_key_dict_factory)
+    key_dict: Dict[str, StubDataclassRecordKey] = required(default_factory=stub_dataclass_key_dict_factory)
     """Stub field."""
 
-    record_dict: Dict[str, StubDataclassRecord] = field(default_factory=stub_dataclass_record_dict_factory)
+    record_dict: Dict[str, StubDataclassRecord] = required(default_factory=stub_dataclass_record_dict_factory)
     """Stub field."""
 
-    derived_record_dict: Dict[str, StubDataclassDerivedRecord] = field(
+    derived_record_dict: Dict[str, StubDataclassDerivedRecord] = required(
         default_factory=stub_dataclass_derived_record_dict_factory
     )
     """Stub field."""

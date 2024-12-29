@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import List
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.handler_param_decl import HandlerParamDecl
 from cl.runtime.schema.handler_type import HandlerType
@@ -34,13 +33,13 @@ class HandlerDeclareDecl:
     comment: str | None = required()
     """Handler comment."""
 
-    type_: HandlerType = field(name="Type")
+    type_: HandlerType = required()
     """Handler type."""
 
     params: List[HandlerParamDecl] | None = required()
     """Handler parameters."""
 
-    return_: HandlerVariableDecl | None = field(name="Return")  # TODO: Remove trailing _ automatically
+    return_: HandlerVariableDecl | None = required()
     """Handler return value."""
 
     static: bool | None = required()

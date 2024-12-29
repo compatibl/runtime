@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from dataclasses import field
 from typing import Dict
 from typing import Iterable
 from typing import Type
@@ -22,6 +21,7 @@ from typing_extensions import Self
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.log.exceptions.user_error import UserError
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -37,7 +37,7 @@ _local_cache_instance = None
 class LocalCache:
     """In-memory cache for objects without serialization."""
 
-    __cache: Dict[KeyProtocol, RecordProtocol] = field(default_factory=lambda: {})
+    __cache: Dict[KeyProtocol, RecordProtocol] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
     def load_one(

@@ -22,20 +22,20 @@ from matplotlib.colors import LinearSegmentedColormap
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.plots.matrix_util import MatrixUtil
-from cl.runtime.records.dataclasses_extensions import field
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class ConfusionMatrixPlot(MatplotlibPlot):
     """Confusion matrix visualization for a categorical experiment."""
 
-    title: str = field()
+    title: str = required()
     """Plot title."""
 
-    received_categories: List[str] = field()
+    received_categories: List[str] = required()
     """List of received (predicted) categories for each trial."""
 
-    expected_categories: List[str] = field()
+    expected_categories: List[str] = required()
     """List of expected (correct) categories in the same order of trials as received (predicted) categories."""
 
     x_label: str | None = "Predicted"

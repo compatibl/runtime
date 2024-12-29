@@ -20,40 +20,88 @@ TDefault = TypeVar("TDefault")
 TDefaultFactory = Callable[[], TDefault]
 
 
-def required() -> TDefault:
-    """Use to define a field that can be set after construction but required for using the object."""
-    return dataclasses.field(default=None)
-
-
-def field(
+def required(
     *,
     default: TDefault | None = None,
     default_factory: TDefaultFactory | None = None,
+    init: bool = True,
     name: str | None = None,  # TODO: Review use when trailing _ is removed automatically
     label: str | None = None,
     subtype: str | None = None,
     formatter: str | None = None,
 ) -> TDefault:
-    """Field in dataclass with additional parameters to define runtime-specific metadata.
+    """
+    Use to specify a field in dataclass that can be omitted in __init__ but must be set before validation.
 
     Args:
-        default: Default value (None if not specified)
-        default_factory: Factory to generate a new instance for default value (for container types)
-        name: Override field name in REST (label will be titleized version of this parameter)
+        default: Default value for primitive types, None if not specified
+        default_factory: Factory to generate default value for mutable types
+        init: True by default, if False the field is omitted from __init__ params
+        name: Override field name in REST (label will be titleized version of this parameter unless set directly)
         label: Override titleized name in UI
-        subtype: Override field type, the only permitted value is 'long' for int field type
+        subtype: Subtype within the Python type, for example 'long' for int Python type
         formatter: Standard formatter name (without curly brackets) or raw Python format string (in curly brackets)
     """
-    metadata = {
+    # Create metadata dict, include only those fields that are not None, set to None if no such fields
+    args = {
         "name": name,
         "label": label,
         "subtype": subtype,
         "formatter": formatter,  # TODO: switch to formatter in other places as format causes Python warnings
     }
+    metadata = {key: value for key, value in args.items() if value is not None} if args else None
+
     if default_factory is None:
-        return dataclasses.field(default=default, metadata=metadata)
+        return dataclasses.field(default=default, init=init, metadata=metadata)
     elif default is None:
-        return dataclasses.field(default_factory=default_factory, metadata=metadata)
+        return dataclasses.field(default_factory=default_factory, init=init, metadata=metadata)
+    else:
+        raise RuntimeError(
+            f"Params default={default} and default_factory={default_factory} "
+            f"are mutually exclusive but both are specified."
+        )
+
+
+def optional(
+    *,
+    default: TDefault | None = None,
+    default_factory: TDefaultFactory | None = None,
+    init: bool = True,
+    name: str | None = None,  # TODO: Review use when trailing _ is removed automatically
+    label: str | None = None,
+    subtype: str | None = None,
+    formatter: str | None = None,
+) -> TDefault:
+    """
+    Use to specify an optional field in dataclass with additional parameters.
+
+    Notes:
+        If no parameters are necessary other than 'default', the default value can be
+        specified in dataclass definition instead of using this method.
+
+    Args:
+        default: Default value for primitive types, None if not specified
+        default_factory: Factory to generate default value for mutable types
+        init: True by default, if False the field is omitted from __init__ params
+        name: Override field name in REST (label will be titleized version of this parameter unless set directly)
+        label: Override titleized name in UI
+        subtype: Subtype within the Python type, for example 'long' for int Python type
+        formatter: Standard formatter name (without curly brackets) or raw Python format string (in curly brackets)
+    """
+    # Create metadata dict, include only those fields that are not None, set to None if no such fields
+    args = {
+        "name": name,
+        "label": label,
+        "subtype": subtype,
+        "formatter": formatter,  # TODO: switch to formatter in other places as format causes Python warnings
+        "optional": True
+    }
+    metadata = {key: value for key, value in args.items() if value is not None}
+
+    if default_factory is None:
+        return dataclasses.field(default=default, init=init, metadata=metadata)
+    elif default is None:
+        return dataclasses.field(default_factory=default_factory, init=init, metadata=metadata)
     else:
         raise RuntimeError(
             f"Params default={default} and default_factory={default_factory} "

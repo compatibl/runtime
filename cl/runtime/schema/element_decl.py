@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing_extensions import Self
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.schema.enum_decl_key import EnumDeclKey
 from cl.runtime.schema.field_decl import FieldDecl
@@ -52,7 +51,7 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
     additive: bool | None = required()
     """Optional flag indicating if the element is additive and that the total column can be shown in the UI."""
 
-    format_: str | None = field(name="Format")  # TODO: Use Python interpolated string format
+    format_: str | None = required()  # TODO: Use Python interpolated string format
     """Specifies UI Format for the element."""
 
     alternate_of: str | None = required()

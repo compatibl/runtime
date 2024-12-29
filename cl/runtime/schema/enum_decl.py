@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import List
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.enum_decl_key import EnumDeclKey

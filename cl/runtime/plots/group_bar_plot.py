@@ -18,23 +18,23 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
-from cl.runtime.records.dataclasses_extensions import field
+from cl.runtime.records.dataclasses_extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class GroupBarPlot(MatplotlibPlot):
     """Base class for the 2D bar plot."""
 
-    title: str = field()
+    title: str = required()
     """Plot title."""
 
-    bar_labels: List[str] = field()
+    bar_labels: List[str] = required()
     """List of bar labels."""
 
-    group_labels: List[str] = field()
+    group_labels: List[str] = required()
     """List of group labels."""
 
-    values: List[float] = field()
+    values: List[float] = required()
     """List of values in the same order as bar and group labels."""
 
     bar_axis_label: str | None = None

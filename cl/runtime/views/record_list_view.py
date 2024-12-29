@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from typing import List
 from typing import final
-from cl.runtime.records.dataclasses_extensions import field
 from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.views.view import View
 

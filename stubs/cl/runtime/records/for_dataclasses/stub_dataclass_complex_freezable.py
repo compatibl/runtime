@@ -15,6 +15,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
+from cl.runtime.records.dataclasses_extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
@@ -27,13 +28,13 @@ class StubDataclassComplexFreezable(Freezable):
     value: str = "abc"
     """String value."""
 
-    freezable_obj: StubDataclassSimpleFreezable = field(default_factory=lambda: StubDataclassSimpleFreezable())
+    freezable_obj: StubDataclassSimpleFreezable = required(default_factory=lambda: StubDataclassSimpleFreezable())
     """Embedded freezable object, will be frozen."""
 
-    nonfreezable_obj: StubDataclassData = field(default_factory=lambda: StubDataclassData())
+    nonfreezable_obj: StubDataclassData = required(default_factory=lambda: StubDataclassData())
     """Embedded non-freezable object, will be frozen."""
 
-    nonfreezable_list: List[StubDataclassSimpleFreezable] = field(default_factory=lambda: [
+    nonfreezable_list: List[StubDataclassSimpleFreezable] = required(default_factory=lambda: [
         StubDataclassSimpleFreezable(),
         StubDataclassSimpleFreezable(),
     ])
