@@ -38,14 +38,11 @@ class PreloadSettings(Settings):
         - For JSON, the data is in json/ClassName/.../KeyToken1;KeyToken2.json where ... is optional dataset
     """
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.dirs = self.normalize_paths("dirs", self.dirs)
-
-        # Return self to enable method chaining
-        return self
 
     @classmethod
     def get_prefix(cls) -> str:

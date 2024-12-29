@@ -41,10 +41,7 @@ class TaskKey(KeyMixin):
     def get_key_type(cls) -> Type:
         return TaskKey
 
-    def init(self) -> Self:
+    def init(self) -> None:
         # Check only if inside a key, will be set automatically if inside a record
         if is_key(self):
             Timestamp.validate(self.task_id, value_name="task_id", data_type="TaskKey")
-
-        # Return self to enable method chaining
-        return self

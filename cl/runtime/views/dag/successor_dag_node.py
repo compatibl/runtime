@@ -48,7 +48,7 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
     successor_edges: List[str] | None = None
     """List of successor edge names in the same order as successor_nodes (must have the same size if not None)."""
 
-    def init(self) -> Self:
+    def init(self) -> None:
         # Generate from dag_id and node_name fields
         self.node_id = f"{self.dag.dag_id}: {self.dag_node_id}"
 
@@ -74,9 +74,6 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
                 f"In DAG node {self.node_id}, the number of edges is {edge_count} "
                 f"which does not match number of successors {successor_count}."
             )
-
-        # Return self to enable method chaining
-        return self
 
     def get_key(self) -> SuccessorDagNodeKey:
         return SuccessorDagNodeKey(node_id=self.node_id)

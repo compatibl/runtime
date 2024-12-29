@@ -81,8 +81,8 @@ class RecordProtocol(KeyProtocol):
 class InitProtocol:
     """Protocol implemented by objects that require initialization."""
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
 
 class ValidateProtocol:

@@ -40,8 +40,8 @@ class Locale(LocaleKey, RecordMixin[LocaleKey], ABC):
     def get_key(self) -> LocaleKey:
         return LocaleKey(locale_id=self.locale_id)
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
         # Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)
         locale_tokens = self.locale_id.split("-")
@@ -71,6 +71,3 @@ class Locale(LocaleKey, RecordMixin[LocaleKey], ABC):
         # Assign fields after validation
         self.language = locale_tokens[0]
         self.country = locale_tokens[1]
-
-        # Return self to enable method chaining
-        return self

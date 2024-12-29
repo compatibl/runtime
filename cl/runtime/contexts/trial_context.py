@@ -43,8 +43,8 @@ class TrialContext(Context):
         """
         return "TrialContext"
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
         # Convert the specified value to string using FormatUtil
         self.trial_id = FormatUtil.format_or_none(self.trial_id)
@@ -56,9 +56,6 @@ class TrialContext(Context):
         elif previous:
             # None or empty in this context, copy previous value
             self.trial_id = previous
-
-        # Return self to enable method chaining
-        return self
 
     @classmethod
     def get_trial(cls) -> str:

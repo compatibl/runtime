@@ -41,17 +41,14 @@ class ProcessContext(Context):
         """
         return "Process"
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
         # If not specified, set based on the current context
         if self.testing is None:
             self.testing = self.is_testing()
         if self.env_name is None:
             self.env_name = self.get_env_name()
-
-        # Return self to enable method chaining
-        return self
 
     @classmethod
     def is_testing(cls) -> bool:

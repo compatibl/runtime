@@ -54,14 +54,11 @@ class StubContext(Context):
         if self.error_on_post_init:
             raise RuntimeError("StubContext.error_on_post_init is set.")
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
         if self.error_on_init:
             raise RuntimeError("StubContext.error_on_init is set.")
-
-        # Return self to enable method chaining
-        return self
 
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource disposal."""

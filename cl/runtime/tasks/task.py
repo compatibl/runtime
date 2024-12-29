@@ -69,7 +69,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     def get_key(self) -> TaskKey:
         return TaskKey(task_id=self.task_id)
 
-    def init(self) -> Self:
+    def init(self) -> None:
         # Set or validate task_id
         if self.task_id is None:
             # Automatically generate time-ordered unique task run identifier in UUIDv7 format if not specified
@@ -83,9 +83,6 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             self.status = TaskStatusEnum.PENDING
         if self.progress_pct is None:
             self.progress_pct = 0.0
-
-        # Return self to enable method chaining
-        return self
 
     @abstractmethod
     def _execute(self) -> None:

@@ -27,13 +27,10 @@ from cl.runtime.tasks.task_status_enum import TaskStatusEnum
 class ProcessQueue(TaskQueue):
     """Execute tasks sequentially within the queue process."""
 
-    def init(self) -> Self:
+    def init(self) -> None:
         # Set default queue timeout with no tasks to 10 min
         if self.timeout_sec is None:
             self.timeout_sec = 10
-
-        # Return self to enable method chaining
-        return self
 
     def run_start_queue(self) -> None:
         queue_id = self.queue_id

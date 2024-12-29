@@ -39,8 +39,8 @@ class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
     def get_key(self) -> LogMessageKey:
         return LogMessageKey(timestamp=self.timestamp)
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
         # Set timestamp
         if self.timestamp is None:
@@ -69,6 +69,3 @@ class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
 
         if self.message is None:
             self.message = "An error occurred. Contact technical support for assistance."
-
-        # Return self to enable method chaining
-        return self

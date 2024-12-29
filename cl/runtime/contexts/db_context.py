@@ -59,8 +59,8 @@ class DbContext(Context):
         """
         return "Db"
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
         # Initialize from the current context
         if self.db is None:
@@ -86,9 +86,6 @@ class DbContext(Context):
         #  Load 'db' field of this context using 'Context.current()'
         if self.db is not None and is_key(self.db):
             self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
-
-        # Return self to enable method chaining
-        return self
 
     @classmethod
     def get_db(cls) -> Db:

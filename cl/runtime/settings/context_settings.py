@@ -47,8 +47,8 @@ class ContextSettings(Settings):
     trial: str | None = None
     """String identifier of the running trial."""
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
 
         if self.context_id is not None and not isinstance(self.context_id, str):
             raise RuntimeError(f"{type(self).__name__} field 'context_id' must be None or a string.")
@@ -73,9 +73,6 @@ class ContextSettings(Settings):
             raise RuntimeError(
                 f"{type(self).__name__} field 'db_class' must be a string " f"in module.ClassName format."
             )
-
-        # Return self to enable method chaining
-        return self
 
     @classmethod
     def get_prefix(cls) -> str:

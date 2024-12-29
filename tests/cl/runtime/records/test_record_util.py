@@ -38,34 +38,25 @@ class _Base:
     def get_key(self) -> TKey:
         raise NotImplementedError()
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
         RegressionGuard().write("> _Base.init")
-
-        # Return self to enable method chaining
-        return self
 
 
 class _Derived(_Base):
     """Test class."""
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
         RegressionGuard().write(">> _Derived.init")
-
-        # Return self to enable method chaining
-        return self
 
 
 class _DerivedFromDerivedWithInit(_Derived):
     """Test class."""
 
-    def init(self) -> Self:
-        """Similar to __init__ but can use fields set after construction, return self to enable method chaining."""
+    def init(self) -> None:
+        """Similar to __init__ but can use fields set after construction."""
         RegressionGuard().write(">>> _DerivedFromDerivedWithInit.init")
-
-        # Return self to enable method chaining
-        return self
 
 
 class _DerivedFromDerivedWithoutInit(_Derived):
