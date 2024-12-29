@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.routers.storage.record_response import RecordResponse
 from cl.runtime.testing.pytest.pytest_fixtures import testing_db

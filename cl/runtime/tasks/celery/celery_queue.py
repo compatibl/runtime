@@ -18,9 +18,9 @@ from dataclasses import dataclass
 from typing import Final
 from typing import List
 from celery import Celery
-from cl.runtime.context.context_manager import ContextManager
-from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.process_context import ProcessContext
+from cl.runtime.contexts.context_manager import ContextManager
+from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.settings.context_settings import ContextSettings

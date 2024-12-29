@@ -15,7 +15,7 @@
 from logging import getLogger
 from typing import Dict
 from typing import Type
-from cl.runtime.context.log_context import LogContext
+from cl.runtime.contexts.log_context import LogContext
 
 logger = getLogger(__name__)  # TODO: Use standard way to get default logger
 

@@ -15,7 +15,7 @@
 import pytest
 from typing import Dict
 from typing import List
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.tasks.run_response_item import handler_queue
 from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
 from cl.runtime.routers.tasks.task_status_response_item import TaskStatusResponseItem

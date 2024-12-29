@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime import RecordMixin
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.views.dag.successor_dag_key import SuccessorDagKey

@@ -17,8 +17,8 @@ from typing import Iterable
 from typing import Type
 from typing_extensions import Self
 from cl.runtime import Db
-from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.process_context import ProcessContext
+from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
@@ -30,7 +30,7 @@ from cl.runtime.records.protocols import is_key
 
 
 @dataclass(slots=True, kw_only=True)
-class DbContext(BaseContext):
+class DbContext(Context):
     """Includes database and dataset."""
 
     db: Db | None = None

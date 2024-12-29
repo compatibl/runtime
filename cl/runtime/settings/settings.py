@@ -27,7 +27,7 @@ from dotenv import find_dotenv
 from dotenv import load_dotenv
 from dynaconf import Dynaconf
 from typing_extensions import Self
-from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR

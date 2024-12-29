@@ -14,7 +14,7 @@
 
 import pytest
 import os
-from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.contexts.env_util import EnvUtil
 
 
 def _test_env_dir_and_name(*, expected_name: str):

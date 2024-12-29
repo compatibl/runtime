@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from pydantic import BaseModel
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.serialization.dict_serializer import get_type_dict
 from cl.runtime.serialization.string_serializer import StringSerializer

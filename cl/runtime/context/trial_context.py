@@ -14,13 +14,13 @@
 
 from dataclasses import dataclass
 from typing_extensions import Self
-from cl.runtime.context.base_context import BaseContext
+from cl.runtime.contexts.context import Context
 from cl.runtime.primitive.format_util import FormatUtil
 from cl.runtime.records.dataclasses_extensions import missing
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialContext(BaseContext):
+class TrialContext(Context):
     """Context for a single trial in an experiment."""
 
     trial_id: str | None = None

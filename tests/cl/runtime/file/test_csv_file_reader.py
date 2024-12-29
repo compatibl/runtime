@@ -14,8 +14,8 @@
 
 import pytest
 import os
-from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 from stubs.cl.runtime import StubDataclassComposite

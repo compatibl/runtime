@@ -14,14 +14,14 @@
 
 from dataclasses import dataclass
 from typing_extensions import Self
-from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.records.dataclasses_extensions import missing
 from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
-class ProcessContext(BaseContext):
+class ProcessContext(Context):
     """Provides information about the currently running test."""
 
     testing: bool = False

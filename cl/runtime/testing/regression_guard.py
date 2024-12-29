@@ -22,7 +22,7 @@ from typing import Dict
 from typing import Literal
 import yaml
 from typing_extensions import Self
-from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.schema.field_decl import primitive_types

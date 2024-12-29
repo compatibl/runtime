@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import List
 from typing_extensions import Self
-from cl.runtime.context.base_context import BaseContext, _CONTEXT_STACK_DICT_VAR
+from cl.runtime.contexts.context import Context, _CONTEXT_STACK_DICT_VAR
 from cl.runtime.serialization.dict_serializer import DictSerializer
 
 _DICT_SERIALIZER = DictSerializer()
@@ -28,10 +28,10 @@ _DICT_SERIALIZER = DictSerializer()
 class ContextManager:
     """Records current context for each context key type and restores them during out-of-process task execution."""
 
-    _all_contexts: List[BaseContext] | None = None
+    _all_contexts: List[Context] | None = None
     """All contexts that will be entered into during out-of-process task execution."""
 
-    _entered_contexts: List[BaseContext] | None = None
+    _entered_contexts: List[Context] | None = None
     """
     Contexts for which __enter__ method has been called inside ContextManager.__enter__ so far.
     For each of these contexts, __exit__ will be invoked in case of an error in ContextManager.__enter__ method.
@@ -55,11 +55,11 @@ class ContextManager:
         # Perform checks and apply settings
         if self._all_contexts:
             for context in self._all_contexts:
-                # Ensure context is derived from BaseContext
-                if not isinstance(context, BaseContext):
+                # Ensure context is derived from Context
+                if not isinstance(context, Context):
                     raise RuntimeError(
                         f"Context {type(context).__name__} cannot be activated by ContextManager "
-                        f"because it is not derived from {BaseContext.__name__}."
+                        f"because it is not derived from {Context.__name__}."
                     )
                 # Freeze
                 context.freeze()
@@ -131,14 +131,14 @@ class ContextManager:
         """Serialize all current contexts to a list of dicts, each dict represents one serialized context."""
 
         # Get current contexts for all key types
-        contexts = BaseContext.all_current()
+        contexts = Context.all_current()
 
         # Serialize
         result = cls._serialize_contexts(contexts)
         return result
 
     @classmethod
-    def _serialize_contexts(cls, contexts: List[BaseContext]) -> List[Dict]:
+    def _serialize_contexts(cls, contexts: List[Context]) -> List[Dict]:
         """Serialize argument contexts to a list of dicts, each dict represents one serialized context."""
 
         # Use serializer

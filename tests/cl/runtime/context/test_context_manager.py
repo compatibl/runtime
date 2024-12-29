@@ -14,13 +14,13 @@
 
 import pytest
 from typing import List
-from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.context_manager import ContextManager
-from cl.runtime.context.trial_context import TrialContext
-from stubs.cl.runtime.context.stub_context import StubContext
+from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.context_manager import ContextManager
+from cl.runtime.contexts.trial_context import TrialContext
+from stubs.cl.runtime.contexts.stub_context import StubContext
 
 
-def _perform_serialization_test(contexts: List[BaseContext]):
+def _perform_serialization_test(contexts: List[Context]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Serialize current contexts into data and then deserialize data into a ContextManager instance
@@ -36,7 +36,7 @@ def _perform_serialization_test(contexts: List[BaseContext]):
             assert context == deserialized_context
 
 
-def _perform_manager_test(contexts: List[BaseContext]):
+def _perform_manager_test(contexts: List[Context]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Set ContextVar=None before async task execution, get a token for restoring its previous state

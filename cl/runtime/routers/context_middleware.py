@@ -14,9 +14,9 @@
 
 from starlette.types import ASGIApp
 from cl.runtime import Db
-from cl.runtime.context.context_manager import ContextManager
-from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.process_context import ProcessContext
+from cl.runtime.contexts.context_manager import ContextManager
+from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.process_context import ProcessContext
 
 
 class ContextMiddleware:

@@ -17,10 +17,9 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
-from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.context_manager import ContextManager
-from stubs.cl.runtime.context.stub_context import StubContext
-from stubs.cl.runtime.context.stub_derived_context import StubDerivedContext
+from cl.runtime.contexts.context_manager import ContextManager
+from stubs.cl.runtime.contexts.stub_context import StubContext
+from stubs.cl.runtime.contexts.stub_derived_context import StubDerivedContext
 
 TASK_COUNT = 3
 MAX_SLEEP_DURATION = 0.2
@@ -146,14 +145,6 @@ def test_error_handling():
         with stub_context_2:
             pass
     assert StubContext.current_or_none() is None
-
-    # TODO: Outer context is missing some fields from the inner context, uncomment after fixing the check
-    if False:
-        with pytest.raises(RuntimeError):
-            with stub_context_2:
-                with stub_context_1:
-                    pass
-        assert StubContext.current_or_none() is None
 
     # Outer context raises on __post__init__
     with pytest.raises(RuntimeError):

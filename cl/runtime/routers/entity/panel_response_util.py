@@ -18,7 +18,7 @@ from typing import Any
 from typing import Dict
 from typing import List
 from pydantic import BaseModel
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.plots.plot_key import PlotKey
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.response_util import to_legacy_dict

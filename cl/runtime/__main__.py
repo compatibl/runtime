@@ -21,9 +21,9 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 from cl.runtime import Db
-from cl.runtime.context.db_context import DbContext
-from cl.runtime.context.log_context import LogContext
-from cl.runtime.context.process_context import ProcessContext
+from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.log_context import LogContext
+from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.context_middleware import ContextMiddleware

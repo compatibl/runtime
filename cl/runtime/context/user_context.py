@@ -16,13 +16,13 @@ from dataclasses import dataclass
 from getpass import getuser
 from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.context.base_context import BaseContext
-from cl.runtime.context.process_context import ProcessContext
+from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.records.dataclasses_extensions import missing
 
 
 @dataclass(slots=True, kw_only=True)
-class UserContext(BaseContext):
+class UserContext(Context):
     """User-specific settings and data."""
 
     user: UserKey = missing()

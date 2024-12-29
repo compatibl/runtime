@@ -16,7 +16,7 @@ import pytest
 import os
 from pathlib import Path
 import pandas as pd
-from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.plots.confusion_matrix_plot import ConfusionMatrixPlot
 from cl.runtime.testing.pytest.pytest_fixtures import testing_work_dir
 

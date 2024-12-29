@@ -19,7 +19,7 @@ from fastapi import APIRouter
 from fastapi import Body
 from fastapi import Header
 from fastapi import Query
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse

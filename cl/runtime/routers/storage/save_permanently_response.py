@@ -20,7 +20,7 @@ from typing import Type
 from urllib import parse
 import pandas as pd
 from pydantic import BaseModel
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest

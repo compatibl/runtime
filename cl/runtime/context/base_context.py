@@ -30,7 +30,7 @@ Each asynchronous environment has its own stack dictionary
 
 
 @dataclass(slots=True, kw_only=True)
-class BaseContext(Freezable, ABC):
+class Context(Freezable, ABC):
     """Abstract base of context classes."""
 
     @classmethod

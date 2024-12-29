@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.tasks.process_queue import ProcessQueue
 from cl.runtime.testing.pytest.pytest_fixtures import testing_db
 from cl.runtime.testing.regression_guard import RegressionGuard

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.context.log_context import LogContext
+from cl.runtime.contexts.log_context import LogContext
 
 
 def test_smoke():

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from stubs.cl.runtime.context.stub_context import StubContext
+from stubs.cl.runtime.contexts.stub_context import StubContext
 
 
 @dataclass(slots=True, kw_only=True)

@@ -18,7 +18,7 @@ from typing import Dict
 from typing import List
 from pydantic import BaseModel
 from pydantic import Field
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.routers.schema.type_request import TypeRequest

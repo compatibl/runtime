@@ -19,8 +19,8 @@ from dataclasses import dataclass
 from matplotlib import pyplot as plt
 from cl.runtime import View
 from cl.runtime.backend.core.ui_app_state import UiAppState
-from cl.runtime.context.env_util import EnvUtil
-from cl.runtime.context.process_context import ProcessContext
+from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.plots.plot import Plot
 from cl.runtime.views.png_view import PngView

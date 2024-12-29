@@ -15,7 +15,7 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from typing_extensions import Self
-from cl.runtime.context.process_context import ProcessContext
+from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.routers.server_util import ServerUtil
 
 

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.context.process_context import ProcessContext
+from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.settings.context_settings import ContextSettings
 
 context_settings = ContextSettings.instance()

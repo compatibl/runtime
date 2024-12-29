@@ -14,7 +14,7 @@
 
 import pytest
 import os
-from cl.runtime.context.env_util import EnvUtil
+from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.testing.pytest.pytest_fixtures import testing_work_dir
 
 

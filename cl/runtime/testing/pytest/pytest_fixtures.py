@@ -19,7 +19,7 @@ from typing import Type
 from _pytest.fixtures import FixtureRequest
 from cl.runtime import ClassInfo
 from cl.runtime import Db
-from cl.runtime.context.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue

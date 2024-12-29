@@ -15,11 +15,11 @@
 from dataclasses import dataclass
 from typing import Type
 from typing_extensions import Self
-from cl.runtime.context.base_context import BaseContext
+from cl.runtime.contexts.context import Context
 
 
 @dataclass(slots=True, kw_only=True)
-class StubContext(BaseContext):
+class StubContext(Context):
     """Stub context."""
 
     stub_context_id: str = "abc"
@@ -67,7 +67,7 @@ class StubContext(BaseContext):
         """Supports 'with' operator for resource disposal."""
 
         # Call __enter__ method of base class
-        BaseContext.__enter__(self)
+        Context.__enter__(self)
 
         try:
             if self.error_on_enter:
@@ -76,7 +76,7 @@ class StubContext(BaseContext):
             # Treat the exception as though it happened outside the 'with' clause:
             #   - Call __exit__ method of base class without passing exception details
             #   - Then rethrow the exception
-            BaseContext.__exit__(self, None, None, None)
+            Context.__exit__(self, None, None, None)
             raise e
         return self
 
@@ -90,8 +90,8 @@ class StubContext(BaseContext):
             # Treat the exception as though it happened outside the 'with' clause:
             #   - Call __exit__ method of base class without passing exception details
             #   - Then rethrow the exception
-            BaseContext.__exit__(self, None, None, None)
+            Context.__exit__(self, None, None, None)
             raise e
         else:
             # Otherwise delegate to the __exit__ method of base
-            return BaseContext.__exit__(self, exc_type, exc_val, exc_tb)
+            return Context.__exit__(self, exc_type, exc_val, exc_tb)

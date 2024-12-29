@@ -16,7 +16,7 @@ import logging
 from dataclasses import dataclass
 from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.context.base_context import BaseContext
+from cl.runtime.contexts.context import Context
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.records.dataclasses_extensions import missing
@@ -24,7 +24,7 @@ from cl.runtime.records.protocols import is_key
 
 
 @dataclass(slots=True, kw_only=True)
-class LogContext(BaseContext):
+class LogContext(Context):
     """Provides get_logger() method returning a configured logger."""
 
     @classmethod
