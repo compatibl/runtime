@@ -119,7 +119,7 @@ def test_basic_operations():
         sample_keys = [x.get_key() for x in samples]
 
         # Load from empty tables
-        loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
+        loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
         assert loaded_records == [None] * len(samples)
 
         # Populate tables
@@ -131,12 +131,12 @@ def test_basic_operations():
 
         # Delete first and last record
         DbContext.delete_many([sample_keys[0], sample_keys[-1]])
-        loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
+        loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
         assert loaded_records == [None, *samples[1:-1], None]
 
         # Delete all records
         DbContext.delete_many(sample_keys)
-        loaded_records = [DbContext.load_one(type(key), key, is_record_optional=True) for key in sample_keys]
+        loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
         assert loaded_records == [None] * len(samples)
 
 

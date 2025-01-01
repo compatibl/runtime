@@ -126,12 +126,10 @@ class DbContext(Context):
     def load_one(
         cls,
         record_type: Type[TRecord],
-        record_or_key: TRecord | KeyProtocol | None,
+        record_or_key: KeyProtocol,
         *,
         dataset: str | None = None,
-        is_key_optional: bool = False,
-        is_record_optional: bool = False,
-    ) -> TRecord | None:
+    ) -> TRecord:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup)
 
@@ -139,15 +137,36 @@ class DbContext(Context):
             record_type: Record type to load, error if the result is not this type or its subclass
             record_or_key: Record (returned without lookup) or key in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            is_key_optional: If True, return None when key is none found instead of an error
-            is_record_optional: If True, return None when record is not found instead of an error
         """
         return cls.get_db().load_one(  # noqa
             record_type,
             record_or_key,
             dataset=dataset,
-            is_key_optional=is_key_optional,
-            is_record_optional=is_record_optional,
+        )
+
+    @classmethod
+    def load_one_or_none(
+        cls,
+        record_type: Type[TRecord],
+        record_or_key: KeyProtocol | None,
+        *,
+        dataset: str | None = None,
+    ) -> TRecord | None:
+        """
+        Load a single record from DB using a key. If a record is passed instead of a key, it is returned without
+        DB lookup. Return None if the key or record argument is None, or if the record is not found in DB.
+
+        Args:
+            record_type: Record type to load, error if the result is not this type or its subclass
+            record_or_key: Record (returned without lookup) or key in object, tuple or string format
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+        """
+        return cls.get_db().load_one(  # noqa
+            record_type,
+            record_or_key,
+            dataset=dataset,
+            is_key_optional=True,
+            is_record_optional=True,
         )
 
     @classmethod
