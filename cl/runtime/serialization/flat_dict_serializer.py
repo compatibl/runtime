@@ -77,8 +77,11 @@ class FlatDictSerializer(DictSerializer):
         if data.__class__.__name__ == "str":
             data = cast(str, data)
 
-            # TODO (Roman): Remove check for Any when it is no longer supported.
-            if type_ is Any:
+            if type_ is None:
+                # TODO: Error message should include class and field name
+                raise RuntimeError("Field specified in data but is not in schema.")
+            elif type_ is Any:
+                # TODO (Roman): Remove check for Any when it is no longer supported.
                 return data
             elif type_.__name__ in str_primitive_type_names:
                 return StringSerializer.deserialize_primitive(data, type_)
