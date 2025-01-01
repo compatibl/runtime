@@ -46,7 +46,6 @@ class LocalCache:
         record_or_key: TRecord | KeyProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
         is_key_optional: bool = False,
         is_record_optional: bool = False,
     ) -> TRecord | None:
@@ -91,7 +90,6 @@ class LocalCache:
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         # TODO: Implement directly for better performance
         result = [
@@ -99,7 +97,6 @@ class LocalCache:
                 record_type,
                 x,
                 dataset=dataset,
-                identity=identity,
                 is_key_optional=True,  # TODO: Keep the existing defaults for load_many
                 is_record_optional=True,  # TODO: Keep the existing defaults for load_many
             )
@@ -112,7 +109,6 @@ class LocalCache:
         record_type: Type[TRecord],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         raise NotImplementedError()
 
@@ -122,7 +118,6 @@ class LocalCache:
         filter_obj: TRecord,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord]:
         raise NotImplementedError()
 
@@ -131,7 +126,6 @@ class LocalCache:
         record: RecordProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         # If record is None, do nothing
         if record is None:
@@ -155,7 +149,6 @@ class LocalCache:
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         # TODO: Review performance compared to a custom implementation for save_many
         [self.save_one(x) for x in records]
@@ -166,7 +159,6 @@ class LocalCache:
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         raise NotImplementedError()
 
@@ -175,7 +167,6 @@ class LocalCache:
         keys: Iterable[KeyProtocol] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         # Validate the dataset and if necessary convert to delimited string
         raise NotImplementedError()

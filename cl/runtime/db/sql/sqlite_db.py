@@ -99,7 +99,6 @@ class SqliteDb(Db):
         record_or_key: TRecord | KeyProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
         is_key_optional: bool = False,
         is_record_optional: bool = False,
     ) -> TRecord | None:
@@ -111,7 +110,7 @@ class SqliteDb(Db):
                 raise UserError(f"Key is None when trying to load record type {record_type.__name__} from DB.")
 
         # Delegate to load_many
-        result = next(iter(self.load_many(record_type, [record_or_key], dataset=dataset, identity=identity)))
+        result = next(iter(self.load_many(record_type, [record_or_key], dataset=dataset)))
 
         # Check if the record was not found
         if not is_record_optional and result is None:
@@ -124,7 +123,6 @@ class SqliteDb(Db):
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         serializer = FlatDictSerializer()
         schema_manager = self._get_schema_manager()
@@ -194,7 +192,6 @@ class SqliteDb(Db):
         record_type: Type[TRecord],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         serializer = FlatDictSerializer()
         schema_manager = self._get_schema_manager()
@@ -239,7 +236,6 @@ class SqliteDb(Db):
         filter_obj: TRecord,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord]:
         raise NotImplementedError()
 
@@ -248,16 +244,14 @@ class SqliteDb(Db):
         record: RecordProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
-        return self.save_many([record], dataset=dataset, identity=identity)
+        return self.save_many([record], dataset=dataset)
 
     def save_many(
         self,
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
 
         # Call on_save if defined
@@ -327,17 +321,15 @@ class SqliteDb(Db):
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         # TODO (Yauheni): Add implementation independent from delete_many()
-        self.delete_many([key], dataset=dataset, identity=identity)
+        self.delete_many([key], dataset=dataset)
 
     def delete_many(
         self,
         keys: Iterable[KeyProtocol] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         serializer = FlatDictSerializer()
         schema_manager = self._get_schema_manager()

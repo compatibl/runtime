@@ -19,7 +19,10 @@ from cl.runtime.records.init_mixin import InitMixin
 
 
 class KeyMixin(InitMixin, ABC):
-    """Optional mixin class for a primary key object, code must not rely on inheritance from this class."""
+    """
+    Optional mixin class for a primary key object, code must not rely on inheritance from this class
+    as long as all of its methods are implemented.
+    """
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""

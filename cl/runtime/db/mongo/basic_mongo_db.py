@@ -73,7 +73,6 @@ class BasicMongoDb(Db):
         record_or_key: TRecord | KeyProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
         is_key_optional: bool = False,
         is_record_optional: bool = False,
     ) -> TRecord | None:
@@ -95,11 +94,9 @@ class BasicMongoDb(Db):
             # Return record without lookup and regardless of dataset
             return cast(RecordProtocol, record_or_key)
         elif getattr(record_or_key, "get_key_type"):
-            # Confirm dataset and identity are both None
+            # Confirm dataset is not None
             if dataset is not None:
                 raise RuntimeError("BasicMongo database type does not support datasets.")
-            if identity is not None:
-                raise RuntimeError("BasicMongo database type does not support row-level security.")
 
             # Key, get collection name from key type by removing Key suffix if present
             key_type = record_or_key.get_key_type()
@@ -128,7 +125,6 @@ class BasicMongoDb(Db):
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         # TODO: Implement directly for better performance
         result = [
@@ -136,7 +132,6 @@ class BasicMongoDb(Db):
                 record_type,
                 x,
                 dataset=dataset,
-                identity=identity,
                 is_key_optional=True,  # TODO: Keep the existing defaults for load_many
                 is_record_optional=True,  # TODO: Keep the existing defaults for load_many
             )
@@ -149,16 +144,13 @@ class BasicMongoDb(Db):
         record_type: Type[TRecord],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         # Confirm record_type is a record type
         if not is_record(record_type):
             raise RuntimeError(f"Type {record_type.__name__} is not a record.")
-        # Confirm dataset and identity are both None
+        # Confirm dataset is not None
         if dataset is not None:
             raise RuntimeError("BasicMongo database type does not support datasets.")
-        if identity is not None:
-            raise RuntimeError("BasicMongo database type does not support row-level security.")
 
         # Key, get collection name from key type by removing Key suffix if present
         key_type = record_type.get_key_type()
@@ -184,16 +176,13 @@ class BasicMongoDb(Db):
         filter_obj: TRecord,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord]:
         # Confirm record_type is a record type
         if not is_record(record_type):
             raise RuntimeError(f"Type {record_type.__name__} is not a record.")
-        # Confirm dataset and identity are both None
+        # Confirm dataset is not None
         if dataset is not None:
             raise RuntimeError("BasicMongo database type does not support datasets.")
-        if identity is not None:
-            raise RuntimeError("BasicMongo database type does not support row-level security.")
 
         # Key, get collection name from key type by removing Key suffix if present
         key_type = record_type.get_key_type()
@@ -220,7 +209,6 @@ class BasicMongoDb(Db):
         record: RecordProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         # If record is None, do nothing  # TODO: Review if this should raise an exception instead
         if record is None:
@@ -230,11 +218,9 @@ class BasicMongoDb(Db):
         if not is_record(record):
             raise RuntimeError(f"Attempting to save {type(record).__name__} which is not a record.")
 
-        # Confirm dataset and identity are both None
+        # Confirm dataset is not None
         if dataset is not None:
             raise RuntimeError("BasicMongo database type does not support datasets.")
-        if identity is not None:
-            raise RuntimeError("BasicMongo database type does not support row-level security.")
 
         # Call on_save if defined
         if hasattr(record, "on_save"):
@@ -263,10 +249,9 @@ class BasicMongoDb(Db):
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         # TODO: Temporary, replace by independent implementation
-        [self.save_one(x, dataset=dataset, identity=identity) for x in records]
+        [self.save_one(x, dataset=dataset) for x in records]
         return
 
     def delete_one(
@@ -275,13 +260,10 @@ class BasicMongoDb(Db):
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
-        # Confirm dataset and identity are both None
+        # Confirm dataset is not None
         if dataset is not None:
             raise RuntimeError("BasicMongo database type does not support datasets.")
-        if identity is not None:
-            raise RuntimeError("BasicMongo database type does not support row-level security.")
 
         # Get collection name from key type by removing Key suffix if present
         collection_name = key_type.__name__  # TODO: Decision on short alias
@@ -298,10 +280,9 @@ class BasicMongoDb(Db):
         keys: Iterable[KeyProtocol] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         for key in keys:
-            self.delete_one(type(key), key, dataset=dataset, identity=identity)
+            self.delete_one(type(key), key, dataset=dataset)
 
     def delete_all_and_drop_db(self) -> None:
         # Check that db_id and db_name both match temp_db_prefix

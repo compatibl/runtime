@@ -129,7 +129,6 @@ class DbContext(Context):
         record_or_key: TRecord | KeyProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
         is_key_optional: bool = False,
         is_record_optional: bool = False,
     ) -> TRecord | None:
@@ -140,7 +139,6 @@ class DbContext(Context):
             record_type: Record type to load, error if the result is not this type or its subclass
             record_or_key: Record (returned without lookup) or key in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
             is_key_optional: If True, return None when key is none found instead of an error
             is_record_optional: If True, return None when record is not found instead of an error
         """
@@ -148,7 +146,6 @@ class DbContext(Context):
             record_type,
             record_or_key,
             dataset=dataset,
-            identity=identity,
             is_key_optional=is_key_optional,
             is_record_optional=is_record_optional,
         )
@@ -160,7 +157,6 @@ class DbContext(Context):
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
@@ -170,13 +166,11 @@ class DbContext(Context):
             record_type: Record type to load, error if the result is not this type or its subclass
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
         """
         return cls.get_db().load_many(  # noqa
             record_type,
             records_or_keys,
             dataset=dataset,
-            identity=identity,
         )
 
     @classmethod
@@ -185,7 +179,6 @@ class DbContext(Context):
         record_type: Type[TRecord],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         """
         Load all records of the specified type and its subtypes (excludes other types in the same DB table).
@@ -193,12 +186,10 @@ class DbContext(Context):
         Args:
             record_type: Type of the records to load
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
         """
         return cls.get_db().load_all(  # noqa
             record_type,
             dataset=dataset,
-            identity=identity,
         )
 
     @classmethod
@@ -208,7 +199,6 @@ class DbContext(Context):
         filter_obj: TRecord,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord]:
         """
         Load records where values of those fields that are set in the filter match the filter.
@@ -217,13 +207,11 @@ class DbContext(Context):
             record_type: Record type to load, error if the result is not this type or its subclass
             filter_obj: Instance of 'record_type' whose fields are used for the query
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
         """
         return cls.get_db().load_filter(  # noqa
             record_type,
             filter_obj,
             dataset=dataset,
-            identity=identity,
         )
 
     @classmethod
@@ -232,7 +220,6 @@ class DbContext(Context):
         record: RecordProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         """
         Save records to storage.
@@ -240,12 +227,10 @@ class DbContext(Context):
         Args:
             record: Record or None.
             dataset: Target dataset as a delimited string, list of levels, or None
-            identity: Identity token for database access and row-level security
         """
         cls.get_db().save_one(  # noqa
             record,
             dataset=dataset,
-            identity=identity,
         )
 
     @classmethod
@@ -254,7 +239,6 @@ class DbContext(Context):
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         """
         Save records to storage.
@@ -262,12 +246,10 @@ class DbContext(Context):
         Args:
             records: Iterable of records.
             dataset: Target dataset as a delimited string, list of levels, or None
-            identity: Identity token for database access and row-level security
         """
         cls.get_db().save_many(  # noqa
             records,
             dataset=dataset,
-            identity=identity,
         )
 
     @classmethod
@@ -277,7 +259,6 @@ class DbContext(Context):
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         """
         Delete one record for the specified key type using its key in one of several possible formats.
@@ -286,13 +267,11 @@ class DbContext(Context):
             key_type: Key type to delete, used to determine the database table
             key: Key in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
         """
         cls.get_db().delete_one(  # noqa
             key_type,
             key,
             dataset=dataset,
-            identity=identity,
         )
 
     @classmethod
@@ -301,7 +280,6 @@ class DbContext(Context):
         keys: Iterable[KeyProtocol] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         """
         Delete records using an iterable of keys.
@@ -309,10 +287,8 @@ class DbContext(Context):
         Args:
             keys: Iterable of keys.
             dataset: Target dataset as a delimited string, list of levels, or None
-            identity: Identity token for database access and row-level security
         """
         cls.get_db().delete_many(  # noqa
             keys,
             dataset=dataset,
-            identity=identity,
         )

@@ -33,7 +33,6 @@ class DbProtocol(Protocol):
         record_or_key: TRecord | KeyProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
         is_key_optional: bool = False,
         is_record_optional: bool = False,
     ) -> TRecord | None:
@@ -44,7 +43,6 @@ class DbProtocol(Protocol):
             record_type: Record type to load, error if the result is not this type or its subclass
             record_or_key: Record (returned without lookup) or key in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
             is_key_optional: If True, return None when key is none found instead of an error
             is_record_optional: If True, return None when record is not found instead of an error
         """
@@ -55,7 +53,6 @@ class DbProtocol(Protocol):
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
@@ -65,7 +62,6 @@ class DbProtocol(Protocol):
             record_type: Record type to load, error if the result is not this type or its subclass
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
         """
 
     def load_all(
@@ -73,7 +69,6 @@ class DbProtocol(Protocol):
         record_type: Type[TRecord],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         """
         Load all records of the specified type and its subtypes (excludes other types in the same DB table).
@@ -81,7 +76,6 @@ class DbProtocol(Protocol):
         Args:
             record_type: Type of the records to load
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
         """
 
     def load_filter(
@@ -90,7 +84,6 @@ class DbProtocol(Protocol):
         filter_obj: TRecord,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> Iterable[TRecord]:
         """
         Load records where values of those fields that are set in the filter match the filter.
@@ -99,7 +92,6 @@ class DbProtocol(Protocol):
             record_type: Record type to load, error if the result is not this type or its subclass
             filter_obj: Instance of 'record_type' whose fields are used for the query
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
         """
 
     def save_one(
@@ -107,7 +99,6 @@ class DbProtocol(Protocol):
         record: RecordProtocol | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         """
         Save records to storage.
@@ -115,7 +106,6 @@ class DbProtocol(Protocol):
         Args:
             record: Record or None.
             dataset: Target dataset as a delimited string, list of levels, or None
-            identity: Identity token for database access and row-level security
         """
 
     def save_many(
@@ -123,7 +113,6 @@ class DbProtocol(Protocol):
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         """
         Save records to storage.
@@ -131,7 +120,6 @@ class DbProtocol(Protocol):
         Args:
             records: Iterable of records.
             dataset: Target dataset as a delimited string, list of levels, or None
-            identity: Identity token for database access and row-level security
         """
 
     def delete_one(
@@ -140,7 +128,6 @@ class DbProtocol(Protocol):
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         """
         Delete one record for the specified key type using its key in one of several possible formats.
@@ -149,7 +136,6 @@ class DbProtocol(Protocol):
             key_type: Key type to delete, used to determine the database table
             key: Key in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            identity: Identity token for database access and row-level security
         """
 
     def delete_many(
@@ -157,7 +143,6 @@ class DbProtocol(Protocol):
         keys: Iterable[KeyProtocol] | None,
         *,
         dataset: str | None = None,
-        identity: str | None = None,
     ) -> None:
         """
         IMPORTANT: !!! DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY
