@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_record import (
     StubDataclassAbstractRecord,  # type: ignore
@@ -25,8 +25,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import
 class StubDataclassNestedFinalRecord(StubDataclassRecord):
     """Some of the fields are in base record."""
 
-    final_key: StubDataclassFinalKey = StubDataclassFinalKey()
+    final_key: StubDataclassFinalKey = field(default_factory=StubDataclassFinalKey)
     """Final key field."""
 
-    final_record: StubDataclassFinalRecord = StubDataclassFinalRecord()
+    final_record: StubDataclassFinalRecord = field(default_factory=StubDataclassFinalRecord)
     """Final record field."""
