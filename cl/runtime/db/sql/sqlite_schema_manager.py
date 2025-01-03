@@ -23,6 +23,7 @@ from typing import Type
 from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
 
 
@@ -88,7 +89,7 @@ class SqliteSchemaManager:
 
         # Return key type name inclusive of Key suffix
         key_type = cast(KeyProtocol, type_).get_key_type()
-        return key_type.__name__  # TODO: Also include module
+        return TypeUtil.name(key_type)  # TODO: Also include module
 
     def existing_tables(self) -> List[str]:
         """Return existing tables in db."""
@@ -112,7 +113,7 @@ class SqliteSchemaManager:
         key_type = cast(KeyProtocol, type_).get_key_type()
 
         # Get table name inclusive of Key suffix if present
-        key_fields_class_name: str = key_type.__name__  # TODO: Also include module
+        key_fields_class_name: str = TypeUtil.name(key_type)  # TODO: Also include module
 
         # Get fields
         key_fields = self._get_type_fields(key_type)

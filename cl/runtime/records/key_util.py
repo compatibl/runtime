@@ -50,7 +50,7 @@ class KeyUtil:
             # TODO: Determine if a flag is needed for element types to prevent keys lookup
             return None
             # raise RuntimeError(
-            #    f"Cannot get key fields because record type {record_type.__name__} "
+            #    f"Cannot get key fields because record type {TypeUtil.name(record_type)} "
             #    f"does not implement 'get_key' method."
             # )
 

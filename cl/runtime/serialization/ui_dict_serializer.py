@@ -25,6 +25,7 @@ from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.dict_serializer import T
 from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
@@ -101,7 +102,7 @@ class UiDictSerializer(DictSerializer):
 
             # Replace "_type" with "_t"
             if "_type" in serialized_data:
-                serialized_data["_t"] = data.__class__.__name__
+                serialized_data["_t"] = TypeUtil.name(data)
                 del serialized_data["_type"]
 
             serialized_data = {k: v for k, v in serialized_data.items()}
@@ -138,7 +139,7 @@ class UiDictSerializer(DictSerializer):
         table_dict: Dict[str, Any] = self.serialize_data(table_record)
 
         # Add "_t" and "_key" attributes
-        table_dict["_t"] = record.__class__.__name__
+        table_dict["_t"] = TypeUtil.name(record)
         table_dict["_key"] = key_serializer.serialize_key(record.get_key())
 
         return table_dict

@@ -15,6 +15,7 @@
 from abc import ABC
 from dataclasses import dataclass, fields
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
@@ -57,5 +58,5 @@ class Freezable(ABC):
     def __setattr__(self, key, value):
         """Raise an error if invoked for a frozen instance.."""
         if getattr(self, "_Freezable__frozen", False):
-            raise AttributeError(f"Cannot modify field {type(self).__name__}.{key} because the object is frozen.")
+            raise AttributeError(f"Cannot modify field {TypeUtil.name(self)}.{key} because the object is frozen.")
         object.__setattr__(self, key, value)

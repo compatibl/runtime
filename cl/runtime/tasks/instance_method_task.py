@@ -21,6 +21,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.tasks.method_task import MethodTask
@@ -85,7 +86,7 @@ class InstanceMethodTask(MethodTask):
 
         # Get key type and key
         key_type = record_or_key.get_key_type()
-        result.key_type_str = f"{key_type.__module__}.{key_type.__name__}"
+        result.key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
         result.key_str = key_serializer.serialize_key(record_or_key)
 
         # Two tokens because the callable is bound to a class or its instance
@@ -101,5 +102,5 @@ class InstanceMethodTask(MethodTask):
 
         # Set label and return
         method_name_pascal_case = CaseUtil.snake_to_pascal_case(result.method_name)
-        result.label = f"{key_type.__name__};{result.key_str};{method_name_pascal_case}"
+        result.label = f"{TypeUtil.name(key_type)};{result.key_str};{method_name_pascal_case}"
         return result

@@ -32,6 +32,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -107,14 +108,14 @@ class SqliteDb(Db):
             if is_key_optional:
                 return None
             else:
-                raise UserError(f"Key is None when trying to load record type {record_type.__name__} from DB.")
+                raise UserError(f"Key is None when trying to load record type {TypeUtil.name(record_type)} from DB.")
 
         # Delegate to load_many
         result = next(iter(self.load_many(record_type, [record_or_key], dataset=dataset)))
 
         # Check if the record was not found
         if not is_record_optional and result is None:
-            raise UserError(f"{record_type.__name__} record is not found for key {record_or_key}")
+            raise UserError(f"{TypeUtil.name(record_type)} record is not found for key {record_or_key}")
         return result
 
     def load_many(

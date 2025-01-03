@@ -20,6 +20,7 @@ from typing import List
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.plots.plot_key import PlotKey
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.response_util import to_legacy_dict
 from cl.runtime.routers.response_util import to_record_dict
@@ -79,7 +80,7 @@ class PanelResponseUtil(BaseModel):
         ):
             viewer_name: str = found_viewers[0]
         else:
-            raise Exception(f"Type {record_type.__name__} has no view with the name {request.panel_id}.")
+            raise Exception(f"Type {TypeUtil.name(record_type)} has no view with the name {request.panel_id}.")
 
         # Call the viewer and get the result
         viewer = getattr(record, viewer_name)

@@ -24,6 +24,7 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.string_serializer import StringSerializer
 
 key_serializer = StringSerializer()
@@ -54,7 +55,8 @@ class LocalCache:
             if is_key_optional:
                 return None
             else:
-                raise UserError(f"Key is None when trying to load record type {record_type.__name__} from DB.")
+                typename = TypeUtil.name(record_type)
+                raise UserError(f"Key is None when trying to load record type {typename} from DB.")
 
         if record_or_key is None or getattr(record_or_key, "get_key", None) is not None:
             # Key instance is Record or None, return without lookup
@@ -78,11 +80,12 @@ class LocalCache:
 
             # Check if the record was not found
             if not is_record_optional and result is None:
-                raise UserError(f"{record_type.__name__} record is not found for key {record_or_key}")
+                typename = TypeUtil.name(record_type)
+                raise UserError(f"{typename} record is not found for key {record_or_key}")
             return result
 
         else:
-            raise RuntimeError(f"Type {record_or_key.__class__.__name__} is not a record or key.")
+            raise RuntimeError(f"Type {TypeUtil.name(record_or_key)} is not a record or key.")
 
     def load_many(
         self,

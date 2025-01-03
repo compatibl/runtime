@@ -19,6 +19,7 @@ from typing import Type
 from uuid import UUID
 import uuid_utils
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.records.type_util import TypeUtil
 
 _ISO_DELIMITED_FORMAT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z-[a-f0-9]{20}$")
 """Regex for the legacy UUIDv7-based timestamp format where the datetime component uses ISO-8601 delimiters."""
@@ -207,7 +208,7 @@ class Timestamp:
         """Validate that the argument is a valid UUIDv7."""
 
         # Check type
-        if (value_type_name := type(value).__name__) != "UUID":
+        if (value_type_name := TypeUtil.name(value)) != "UUID":
             raise RuntimeError(f"An object of type '{value_type_name}' was provided while UUIDv7 was expected.")
 
         # Check version

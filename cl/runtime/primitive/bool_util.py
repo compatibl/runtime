@@ -33,7 +33,7 @@ class BoolUtil:
         if value is None:
             return None
         if type(value) is not bool:
-            raise RuntimeError(f"Argument of BoolUtil.format_or_none has type {type(value).__name__}, "
+            raise RuntimeError(f"Argument of BoolUtil.format_or_none has type {TypeUtil.name(value)}, "
                                f"only bool is accepted.")
         return "Y" if value else "N"
 

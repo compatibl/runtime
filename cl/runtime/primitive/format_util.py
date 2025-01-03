@@ -19,6 +19,7 @@ from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.type_util import TypeUtil
 
 
 class FormatUtil:
@@ -35,8 +36,8 @@ class FormatUtil:
     @classmethod
     def format_or_none(cls, value: TPrimitive | None) -> str | None:
         """Convert value of a primitive type to string (return None if argument is None)."""
-        type_name = type(value).__name__
-        match type_name:
+        # Use name because different import libraries are possible for some of the primitive types such as UUID
+        match type(value).__name__:
             case "NoneType":
                 return None
             case "str":
@@ -54,4 +55,5 @@ class FormatUtil:
                 return DatetimeUtil.to_str(value)
             case _:
                 # TODO: Add the remaining primitive types
-                raise RuntimeError(f"Type {type_name} cannot be converted to string using FormatUtil.format method.")
+                raise RuntimeError(f"Type {TypeUtil.name(value)} cannot be converted to string "
+                                   f"using FormatUtil.format method.")

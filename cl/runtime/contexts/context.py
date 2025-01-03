@@ -21,6 +21,7 @@ from typing import List
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
 
 _CONTEXT_STACK_DICT_VAR: ContextVar[DefaultDict[str, List] | None] = ContextVar("_CONTEXT_STACK_DICT_VAR", default=None)
 """
@@ -56,8 +57,8 @@ class Context(Freezable, ABC):
             return result
         else:
             raise RuntimeError(
-                f"{cls.__name__}.current() is undefined outside the outermost 'with {cls.__name__}(...)' clause.\n"
-                f"To receive None instead of an exception, use {cls.__name__}.current_or_none()\n"
+                f"{TypeUtil.name(cls)}.current() is undefined outside the outermost 'with {TypeUtil.name(cls)}(...)' clause.\n"
+                f"To receive None instead of an exception, use {TypeUtil.name(cls)}.current_or_none()\n"
             )
 
     @classmethod
@@ -101,7 +102,7 @@ class Context(Freezable, ABC):
 
         # Check if self is already the current context
         if context_stack and context_stack[-1] is self:
-            class_name = {type(self).__name__}
+            class_name = TypeUtil.name(self)
             raise RuntimeError(f"The {class_name} instance activated using 'with' operator is already current.")
 
         # Set current context on entering 'with ContextType(...)' clause
@@ -114,13 +115,13 @@ class Context(Freezable, ABC):
         # Get context stack for the current asynchronous environment
         context_stack = self.get_context_stack()
         if context_stack is None or len(context_stack) == 0:
-            class_name = type(self).__name__
+            class_name = TypeUtil.name(self)
             raise RuntimeError(f"Current {class_name} stack has been cleared inside 'with {class_name}(...)' clause.")
 
         # Restore the previous current context on exiting from 'with Context(...)' clause
         current_context = context_stack.pop()
         if current_context is not self:
-            class_name = {type(self).__name__}
+            class_name = TypeUtil.name(self)
             raise RuntimeError(f"Current {class_name} has been modified inside 'with {class_name}(...)' clause.")
 
         # Return False to propagate the exception (if any) that occurred inside the 'with' block

@@ -20,6 +20,13 @@ class TypeUtil:
     """Helper class for type checking."""
 
     @classmethod
+    def name(cls, instance_or_type: Any) -> str:
+        """Returns TypeAlias.alias if specified and type.name otherwise."""
+        # TODO: Return type.__name__ for all types until TypeAlias is supported
+        type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+        return type_.__name__
+
+    @classmethod
     def check_same_type(
         cls,
         instance_or_type: Any,

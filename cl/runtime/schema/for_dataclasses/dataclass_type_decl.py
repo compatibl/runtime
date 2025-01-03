@@ -19,6 +19,8 @@ from typing import Type
 from typing import get_type_hints
 from memoization import cached
 from typing_extensions import Self
+
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.element_decl import ElementDecl
 from cl.runtime.schema.for_dataclasses.dataclass_field_decl import DataclassFieldDecl
 from cl.runtime.schema.type_decl import TypeDecl
@@ -50,7 +52,7 @@ class DataclassTypeDecl(TypeDecl):
         """
 
         if not dataclasses.is_dataclass(record_type):
-            raise RuntimeError(f"DataclassTypeDecl used for {record_type.__name__} which is not a dataclass.")
+            raise RuntimeError(f"DataclassTypeDecl used for {TypeUtil.name(record_type)} which is not a dataclass.")
 
         # Populate using TypeDecl base
         result = TypeDecl.for_type(record_type, dependencies=dependencies, skip_fields=True)

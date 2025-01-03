@@ -31,6 +31,7 @@ from typing_extensions import Self
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.settings.context_settings import ContextSettings
@@ -44,7 +45,7 @@ def is_data_key_record_or_enum(data_type):
 
     return inspect.isclass(data_type) and (
         (
-            not data_type.__name__.endswith("Mixin")
+            not TypeUtil.name(data_type).endswith("Mixin")
             and (hasattr(data_type, "__slots__") or hasattr(data_type, "get_key_type"))
         )
         or issubclass(data_type, Enum)
@@ -73,7 +74,7 @@ class Schema:
     def add_types_to_dict_by_short_name(cls, types: Iterable[Type]) -> None:
         """Add types to the dictionary by short name (class name with optional package alias)."""
 
-        types_dict = {x.__name__: x for x in types}
+        types_dict = {TypeUtil.name(x): x for x in types}
         cls.get_type_dict().update(types_dict)
 
     @classmethod
@@ -121,8 +122,8 @@ class Schema:
 
             # Ensure names are unique
             # TODO: Support namespace aliases to resolve conflicts
-            record_names = [record_type.__name__ for record_type in record_types]
-            record_paths = [f"{record_type.__module__}.{record_type.__name__}" for record_type in record_types]
+            record_names = [TypeUtil.name(record_type) for record_type in record_types]
+            record_paths = [f"{record_type.__module__}.{TypeUtil.name(record_type)}" for record_type in record_types]
 
             # Check that there are no repeated names, report errors if there are
             if len(set(record_names)) != len(record_names):
@@ -177,8 +178,7 @@ class Schema:
         type_decl_obj = TypeDecl.for_type(record_type, dependencies=dependencies)
 
         # Sort the list of dependencies
-        # TODO: Use short name with alias
-        dependencies = sorted(dependencies, key=lambda x: x.__name__)
+        dependencies = sorted(dependencies, key=lambda x: TypeUtil.name(x))
 
         # Add to the dict by type name
         cls.add_types_to_dict_by_short_name(dependencies)

@@ -30,6 +30,7 @@ from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR
 from cl.runtime.settings.project_settings import ProjectSettings
 
@@ -128,7 +129,7 @@ class Settings(ABC):
             prefix = cls.get_prefix()
 
             # Validate prefix
-            prefix_description = f"Dynaconf settings prefix '{prefix}' returned by '{cls.__name__}.get_prefix()'"
+            prefix_description = f"Dynaconf settings prefix '{prefix}' returned by '{TypeUtil.name(cls)}.get_prefix()'"
             if prefix is None:
                 raise RuntimeError(f"{prefix_description} is None.")
             if prefix == "":
@@ -190,7 +191,7 @@ class Settings(ABC):
 
                 # Raise exception with detailed information
                 raise ValueError(
-                    f"Required settings field(s) for {cls.__name__} not found:\n{fields_error_msg_str}\n"
+                    f"Required settings field(s) for {TypeUtil.name(cls)} not found:\n{fields_error_msg_str}\n"
                     f"Settings sources searched in the order of priority:\n{settings_sources_str}"
                 )
 
@@ -242,7 +243,7 @@ class Settings(ABC):
             paths = list(field_value)
         else:
             raise RuntimeError(
-                f"Field '{field_name}' with value '{field_value}' in class '{cls.__name__}' "
+                f"Field '{field_name}' with value '{field_value}' in class '{TypeUtil.name(cls)}' "
                 f"must be a string or an iterable of strings."
             )
 
@@ -254,13 +255,13 @@ class Settings(ABC):
         """Convert to absolute path if path relative to the location of .env or Dynaconf file is specified."""
 
         if field_value is None or field_value == "":
-            raise RuntimeError(f"Field '{field_name}' in class '{cls.__name__}' has an empty element.")
+            raise RuntimeError(f"Field '{field_name}' in class '{TypeUtil.name(cls)}' has an empty element.")
         elif isinstance(field_value, str):
             # Check that 'field_value' is a string
             result = field_value
         else:
             raise RuntimeError(
-                f"Field '{field_name}' in class '{cls.__name__}' has an element "
+                f"Field '{field_name}' in class '{TypeUtil.name(cls)}' has an element "
                 f"with type {type(field_value)} which is not a string."
             )
 

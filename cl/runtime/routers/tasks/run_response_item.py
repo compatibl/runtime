@@ -19,6 +19,7 @@ from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
 from cl.runtime.schema.schema import Schema
@@ -62,9 +63,9 @@ class RunResponseItem(BaseModel):
                 # Get key type based on table in request
                 key_type = Schema.get_type_by_short_name(request.table).get_key_type()  # noqa
 
-                key_type_str = f"{key_type.__module__}.{key_type.__name__}"
+                key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
                 method_name_pascal_case = CaseUtil.snake_to_pascal_case(request.method)
-                label = f"{key_type.__name__};{serialized_key};{method_name_pascal_case}"
+                label = f"{TypeUtil.name(key_type)};{serialized_key};{method_name_pascal_case}"
                 handler_task = InstanceMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),
@@ -76,9 +77,9 @@ class RunResponseItem(BaseModel):
             else:
                 # Key is None, this is a @classmethod or @staticmethod
                 record_type = Schema.get_type_by_short_name(request.table)
-                record_type_str = f"{record_type.__module__}.{record_type.__name__}"
+                record_type_str = f"{record_type.__module__}.{TypeUtil.name(record_type)}"
                 method_name_pascal_case = CaseUtil.snake_to_pascal_case(request.method)
-                label = f"{record_type.__name__};{method_name_pascal_case}"
+                label = f"{TypeUtil.name(record_type)};{method_name_pascal_case}"
                 handler_task = StaticMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),

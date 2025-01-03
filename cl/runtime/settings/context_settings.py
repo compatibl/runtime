@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from typing import List
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
 
 
@@ -51,7 +52,7 @@ class ContextSettings(Settings):
         """Similar to __init__ but can use fields set after construction."""
 
         if self.context_id is not None and not isinstance(self.context_id, str):
-            raise RuntimeError(f"{type(self).__name__} field 'context_id' must be None or a string.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'context_id' must be None or a string.")
 
         # TODO: Move to ValidationUtil or PrimitiveUtil class
         if isinstance(self.packages, list):
@@ -63,15 +64,15 @@ class ContextSettings(Settings):
         elif hasattr(self.packages, "__iter__"):
             self.packages = list(self.packages)
         else:
-            raise RuntimeError(f"{type(self).__name__} field 'packages' must be a string or an iterable of strings.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'packages' must be a string or an iterable of strings.")
 
         if not isinstance(self.log_class, str):
             raise RuntimeError(
-                f"{type(self).__name__} field 'log_class' must be a string " f"in module.ClassName format."
+                f"{TypeUtil.name(self)} field 'log_class' must be a string " f"in module.ClassName format."
             )
         if not isinstance(self.db_class, str):
             raise RuntimeError(
-                f"{type(self).__name__} field 'db_class' must be a string " f"in module.ClassName format."
+                f"{TypeUtil.name(self)} field 'db_class' must be a string " f"in module.ClassName format."
             )
 
     @classmethod

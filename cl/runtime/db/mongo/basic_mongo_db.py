@@ -31,6 +31,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -81,7 +82,7 @@ class BasicMongoDb(Db):
             if is_key_optional:
                 return None
             else:
-                raise UserError(f"Key is None when trying to load record type {record_type.__name__} from DB.")
+                raise UserError(f"Key is None when trying to load record type {TypeUtil.name(record_type)} from DB.")
 
         if is_record(record_or_key):
             # Check that record instance matches the requested type
@@ -89,7 +90,7 @@ class BasicMongoDb(Db):
                 raise RuntimeError(
                     f"Record passed to 'load_one' method instead of key has type "
                     f"{type(record_or_key).__name__} which is not a subclass of the "
-                    f"requested type {record_type.__name__}."
+                    f"requested type {TypeUtil.name(record_type)}."
                 )
             # Return record without lookup and regardless of dataset
             return cast(RecordProtocol, record_or_key)
@@ -100,7 +101,7 @@ class BasicMongoDb(Db):
 
             # Key, get collection name from key type by removing Key suffix if present
             key_type = record_or_key.get_key_type()
-            collection_name = key_type.__name__  # TODO: Decision on short alias
+            collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
             db = self._get_db()
             collection = db[collection_name]
 
@@ -114,10 +115,10 @@ class BasicMongoDb(Db):
             else:
                 # Check if returning None is allowed
                 if not is_record_optional:
-                    raise UserError(f"{record_type.__name__} record is not found for key {record_or_key}")
+                    raise UserError(f"{TypeUtil.name(record_type)} record is not found for key {record_or_key}")
                 return None
         else:
-            raise RuntimeError(f"Type {record_or_key.__class__.__name__} is not a record or key.")
+            raise RuntimeError(f"Type {TypeUtil.name(record_or_key)} is not a record or key.")
 
     def load_many(
         self,
@@ -147,14 +148,14 @@ class BasicMongoDb(Db):
     ) -> Iterable[TRecord | None] | None:
         # Confirm record_type is a record type
         if not is_record(record_type):
-            raise RuntimeError(f"Type {record_type.__name__} is not a record.")
+            raise RuntimeError(f"Type {TypeUtil.name(record_type)} is not a record.")
         # Confirm dataset is not None
         if dataset is not None:
             raise RuntimeError("BasicMongo database type does not support datasets.")
 
         # Key, get collection name from key type by removing Key suffix if present
         key_type = record_type.get_key_type()
-        collection_name = key_type.__name__  # TODO: Decision on short alias
+        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_db()
         collection = db[collection_name]
 
@@ -179,14 +180,14 @@ class BasicMongoDb(Db):
     ) -> Iterable[TRecord]:
         # Confirm record_type is a record type
         if not is_record(record_type):
-            raise RuntimeError(f"Type {record_type.__name__} is not a record.")
+            raise RuntimeError(f"Type {TypeUtil.name(record_type)} is not a record.")
         # Confirm dataset is not None
         if dataset is not None:
             raise RuntimeError("BasicMongo database type does not support datasets.")
 
         # Key, get collection name from key type by removing Key suffix if present
         key_type = record_type.get_key_type()
-        collection_name = key_type.__name__  # TODO: Decision on short alias
+        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_db()
         collection = db[collection_name]
 
@@ -228,7 +229,7 @@ class BasicMongoDb(Db):
 
         # Get collection name from key type by removing Key suffix if present
         key_type = record.get_key_type()
-        collection_name = key_type.__name__  # TODO: Decision on short alias
+        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_db()
         collection = db[collection_name]
 
@@ -266,7 +267,7 @@ class BasicMongoDb(Db):
             raise RuntimeError("BasicMongo database type does not support datasets.")
 
         # Get collection name from key type by removing Key suffix if present
-        collection_name = key_type.__name__  # TODO: Decision on short alias
+        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_db()
         collection = db[collection_name]
 

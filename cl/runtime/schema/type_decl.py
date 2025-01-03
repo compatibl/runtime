@@ -35,6 +35,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.element_decl import ElementDecl
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
@@ -92,7 +93,7 @@ def for_type_key_maker(
 ) -> str:
     """Custom key marker for 'for_type' class method."""
     # TODO: Replace by lambda if skip_fields parameter is removed
-    return f"{record_type.__module__}.{record_type.__name__}.{dependencies.__hash__}{skip_fields}{skip_handlers}"
+    return f"{record_type.__module__}.{TypeUtil.name(record_type)}.{dependencies.__hash__}{skip_fields}{skip_handlers}"
 
 
 def get_name_of_type_decl_dict(dict_: Dict[str, Dict]) -> Optional[str]:
@@ -206,15 +207,15 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         """
 
         if issubclass(record_type, Enum):
-            raise RuntimeError(f"Cannot create TypeDecl for class {record_type.__name__} because it is an enum.")
+            raise RuntimeError(f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} because it is an enum.")
         if issubclass(record_type, tuple):
-            raise RuntimeError(f"Cannot create TypeDecl for class {record_type.__name__} because it is a tuple.")
+            raise RuntimeError(f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} because it is a tuple.")
 
         # Create instance of the final type
         result = cls()
 
         result.module = ModuleDeclKey(module_name=record_type.__module__)
-        result.name = record_type.__name__
+        result.name = TypeUtil.name(record_type)
         result.label = titleize(result.name)  # TODO: Add override from settings
         result.comment = record_type.__doc__
 

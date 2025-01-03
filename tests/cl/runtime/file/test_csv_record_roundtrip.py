@@ -22,6 +22,7 @@ import pandas as pd
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.testing.pytest.pytest_fixtures import testing_db
@@ -78,7 +79,7 @@ def save_records_to_csv(records: Iterable, file_path: str) -> None:
 
 
 def save_test_records(entries: List[RecordProtocol]) -> Tuple[List[RecordProtocol], Path]:
-    file_path = Path(__file__).parent.joinpath(f"{entries[0].__class__.__name__}.csv")
+    file_path = Path(__file__).parent.joinpath(f"{TypeUtil.name(entries[0])}.csv")
     save_records_to_csv(entries, str(file_path.absolute()))
     return entries, file_path
 

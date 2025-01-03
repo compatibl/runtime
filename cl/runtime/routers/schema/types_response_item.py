@@ -17,6 +17,7 @@ from typing import List
 from inflection import titleize
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.user_request import UserRequest
 from cl.runtime.schema.schema import Schema
 
@@ -48,9 +49,9 @@ class TypesResponseItem(BaseModel):
 
         result = [
             TypesResponseItem(
-                name=record_type.__name__,
+                name=TypeUtil.name(record_type),
                 module=CaseUtil.snake_to_pascal_case(record_type.__module__),
-                label=titleize(record_type.__name__),
+                label=titleize(TypeUtil.name(record_type)),
             )
             for record_type in type_dict.values()
             if hasattr(record_type, "get_key")

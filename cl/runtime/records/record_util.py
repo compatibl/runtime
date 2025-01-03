@@ -30,6 +30,7 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record
+from cl.runtime.records.type_util import TypeUtil
 
 TObj = TypeVar("TObj")
 
@@ -74,7 +75,7 @@ class RecordUtil:
     def validate(cls, obj) -> None:
         """Validate against schema (invoked by init_all after all init methods are called)."""
         # TODO: Support other dataclass-like frameworks
-        class_name = obj.__class__.__name__
+        class_name = TypeUtil.name(obj)
         if is_dataclass(obj):
             for field in fields(obj):
                 field_value = getattr(obj, field.name)
@@ -82,12 +83,12 @@ class RecordUtil:
                     # Check that for the fields that have values, the values are of the right type
                     if not cls._is_instance(field_value, field.type):
                         field_type_name = cls._get_field_type_name(field.type)
-                        value_type_name = type(field_value).__name__
+                        value_type_name = TypeUtil.name(field_value)
                         if "member_descriptor" not in value_type_name:  # TODO(Roman): Remove when fixed
                             raise RuntimeError(
                                 f"""Type mismatch for field '{field.name}' of class {class_name}.
 Type in dataclass declaration: {field_type_name}
-Type of the value: {type(field_value).__name__}
+Type of the value: {TypeUtil.name(field_value)}
 Note: In case of containers, type mismatch may be in one of the items.
 """
                             )
@@ -128,7 +129,7 @@ Note: In case of containers, type mismatch may be in one of the items.
             if isinstance(field_type, type):
                 return isinstance(field_value, field_type)
             elif isinstance(field_type, str):
-                field_value_type_name = type(field_value).__name__
+                field_value_type_name = TypeUtil.name(field_value)
                 return field_value_type_name == field_type
             else:
                 raise RuntimeError(f"Field type {field_type} is neither a type nor a string.")

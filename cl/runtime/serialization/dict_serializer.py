@@ -35,6 +35,7 @@ from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.sentinel_type import sentinel_value
 
 # TODO: Initialize from settings
@@ -99,7 +100,7 @@ def _get_class_hierarchy_slots(data_type) -> Tuple[str]:
             duplicates = [slot for slot, count in counts.items() if count > 1]
             duplicates_str = ", ".join(duplicates)
             raise RuntimeError(
-                f"Duplicate field names found in class hierarchy " f"for {data_type.__name__}: {duplicates_str}."
+                f"Duplicate field names found in class hierarchy " f"for {TypeUtil.name(data_type)}: {duplicates_str}."
             )
 
         class_hierarchy_slots_dict[data_type] = result
@@ -350,7 +351,6 @@ class DictSerializer:
         elif data.__class__.__name__ == "datetime":
             if type_ is None:
                 return data
-
             if type_.__name__ == "datetime":
                 return data.replace(tzinfo=timezone.utc)
             elif type_.__name__ == "date":

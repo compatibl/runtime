@@ -24,6 +24,7 @@ from typing import Any
 from typing import Dict
 from typing import List
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.field_decl import primitive_types  # TODO: Move definition to a separate module
 
 
@@ -63,7 +64,7 @@ def to_record_dict(node):  # TODO: Apply type hints
     elif hasattr(node, "get_key") or is_dataclass(node):
         # Record or data
         # Creating the result dictionary starting with the "_t" field
-        result = {"_t": node.__class__.__name__}
+        result = {"_t": TypeUtil.name(node)}
         for field in fields(node):
             if (value := getattr(node, field.name)) is not None:
                 result[field.name] = to_record_dict(value)

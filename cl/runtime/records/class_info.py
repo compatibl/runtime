@@ -20,6 +20,8 @@ from typing import Tuple
 from typing import Type
 from memoization import cached  # TODO: Replace cached package by custom caching for better performance
 
+from cl.runtime.records.type_util import TypeUtil
+
 
 class ClassInfo(ABC):
     """Helper methods for Record."""
@@ -82,7 +84,7 @@ class ClassInfo(ABC):
             raise RuntimeError(f"Module {module_name} does not contain top-level class {class_name}.")
 
     @classmethod
-    @cached(custom_key_maker=lambda cls, record_type: f"{record_type.__module__}.{record_type.__name__}")
+    @cached(custom_key_maker=lambda cls, record_type: f"{record_type.__module__}.{TypeUtil.name(record_type)}")
     def get_inheritance_chain(cls, record_type: Type) -> List[str]:
         """
         Returns the list of fully qualified class names in MRO order starting from this class
@@ -100,7 +102,7 @@ class ClassInfo(ABC):
         # Make sure there is only one such class in the inheritance chain
         if len(fully_qualified_names) == 0:
             raise RuntimeError(
-                f"Class {record_type.__module__}.{record_type.__name__} does not implement get_key(self) method."
+                f"Class {record_type.__module__}.{TypeUtil.name(record_type)} does not implement get_key(self) method."
             )
 
         # TODO: Add package aliases

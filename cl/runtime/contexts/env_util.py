@@ -16,6 +16,7 @@ import inspect
 import os
 from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.type_util import TypeUtil
 
 
 class EnvUtil:
@@ -137,7 +138,7 @@ class EnvUtil:
                 module_file = frame_globals["__file__"]
                 test_name = frame_info.function
                 cls_instance = frame_info.frame.f_locals.get("self", None)
-                class_name = cast(type, cls_instance).__class__.__name__ if cls_instance else None
+                class_name = TypeUtil.name(cls_instance) if cls_instance else None
 
                 if module_file.endswith(".py"):
                     module_file_without_ext = module_file.removesuffix(".py")

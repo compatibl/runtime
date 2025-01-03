@@ -21,6 +21,7 @@ from pydantic import Field
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.select_request import SelectRequest
@@ -57,7 +58,7 @@ class SelectResponse(BaseModel):
         if not hasattr(db, "load_all"):
             raise RuntimeError(
                 f"Currently database need to implement load_all() method for select records by type. "
-                f"Database {db.__class__.__name__} doesn't have load_all()."
+                f"Database {TypeUtil.name(db)} doesn't have load_all()."
             )
 
         # load records by type

@@ -17,6 +17,7 @@ import os
 from typing import cast
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.type_util import TypeUtil
 
 
 class PytestUtil:
@@ -47,7 +48,7 @@ class PytestUtil:
         """
         module_file = str(request.path)
         test_name = request.node.name
-        class_name = request.cls.__name__ if request.cls is not None else None
+        class_name = TypeUtil.name(request.cls) if request.cls is not None else None
 
         if module_file.endswith(".py"):
             module_file_without_ext = module_file.removesuffix(".py")

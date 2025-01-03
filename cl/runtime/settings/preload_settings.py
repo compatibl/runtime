@@ -20,6 +20,7 @@ from typing_extensions import Self
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
 
 
@@ -55,7 +56,7 @@ class PreloadSettings(Settings):
         csv_files = self._get_files("csv")
         if final_record_types is not None:
             # Limit to the specified types
-            record_class_names = [record_type.__name__ for record_type in final_record_types]
+            record_class_names = [TypeUtil.name(record_type) for record_type in final_record_types]
             csv_files = [
                 csv_file for csv_file in csv_files if os.path.basename(csv_file).split(".")[0] in record_class_names
             ]

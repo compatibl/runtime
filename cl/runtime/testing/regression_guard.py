@@ -25,6 +25,7 @@ from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -158,7 +159,7 @@ class RegressionGuard:
 
         # Perform type conversion
         if isinstance(value, Exception):
-            value = f"Raises {type(value).__name__} with the message:\n{str(value)}"
+            value = f"Raises {TypeUtil.name(value)} with the message:\n{str(value)}"
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
         if self.__delegate_to is not None:

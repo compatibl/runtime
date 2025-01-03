@@ -15,6 +15,8 @@
 from dataclasses import dataclass
 from typing import List
 from typing_extensions import Self
+
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
 
 
@@ -60,7 +62,7 @@ class ApiSettings(Settings):
 
         # Validate hostname
         if self.hostname is not None and not isinstance(self.hostname, str):
-            raise RuntimeError(f"{type(self).__name__} field 'hostname' must be a string or None.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'hostname' must be a string or None.")
 
         # Convert and validate port
         if self.port is None or isinstance(self.port, int):
@@ -69,9 +71,9 @@ class ApiSettings(Settings):
             if self.port.isdigit():
                 self.port = int(self.port)
             else:
-                raise RuntimeError(f"{type(self).__name__} field 'port' includes non-digit characters.")
+                raise RuntimeError(f"{TypeUtil.name(self)} field 'port' includes non-digit characters.")
         else:
-            raise RuntimeError(f"{type(self).__name__} field 'port' must be an int or a string.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'port' must be an int or a string.")
 
         # Apply the defaults to the remaining fields when hostname is one of None, localhost or loopback IP address
         if self.hostname in [None, "localhost", "127.0.0.1"]:
@@ -91,35 +93,35 @@ class ApiSettings(Settings):
 
         # Validate the remaining settings,
         if self.allow_origins is None:
-            raise RuntimeError(f"{type(self).__name__} field 'allow_origins' is required except for localhost.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_origins' is required except for localhost.")
         elif isinstance(self.allow_origins, str) or not hasattr(self.allow_origins, "__iter__"):
-            raise RuntimeError(f"{type(self).__name__} field 'allow_origins' must be a list or None.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_origins' must be a list or None.")
 
         if self.allow_origin_regex is not None and not isinstance(self.allow_origin_regex, str):
-            raise RuntimeError(f"{type(self).__name__} field 'allow_origin_regex' must be a string or None.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_origin_regex' must be a string or None.")
 
         if self.allow_credentials is None:
-            raise RuntimeError(f"{type(self).__name__} field 'allow_credentials' is required except for localhost.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_credentials' is required except for localhost.")
         elif not isinstance(self.allow_credentials, bool):
-            raise RuntimeError(f"{type(self).__name__} field 'allow_credentials' must be a bool or None.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_credentials' must be a bool or None.")
 
         if self.allow_methods is None:
-            raise RuntimeError(f"{type(self).__name__} field 'allow_methods' is required except for localhost.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_methods' is required except for localhost.")
         elif isinstance(self.allow_methods, str) or not hasattr(self.allow_methods, "__iter__"):
-            raise RuntimeError(f"{type(self).__name__} field 'allow_methods' must be a list or None.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_methods' must be a list or None.")
 
         if self.allow_headers is None:
-            raise RuntimeError(f"{type(self).__name__} field 'allow_headers' is required except for localhost.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_headers' is required except for localhost.")
         elif isinstance(self.allow_headers, str) or not hasattr(self.allow_headers, "__iter__"):
-            raise RuntimeError(f"{type(self).__name__} field 'allow_headers' must be a list or None.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_headers' must be a list or None.")
 
         if self.expose_headers is not None and (
             isinstance(self.expose_headers, str) or not hasattr(self.expose_headers, "__iter__")
         ):
-            raise RuntimeError(f"{type(self).__name__} field 'expose_headers' must be a list or None.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'expose_headers' must be a list or None.")
 
         if self.max_age is not None and not isinstance(self.max_age, int):
-            raise RuntimeError(f"{type(self).__name__} field 'max_age' must be an int or None.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'max_age' must be an int or None.")
 
     @classmethod
     def get_prefix(cls) -> str:

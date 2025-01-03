@@ -23,6 +23,7 @@ from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.file.file_util import FileUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
@@ -93,7 +94,7 @@ class SavePermanentlyResponse(BaseModel):
         """Save records to the database on the disk."""
 
         for record_type, records in get_type_to_records_map(request).items():
-            filename = f"{record_type.__name__}.{cls._get_extension()}"
+            filename = f"{TypeUtil.name(record_type)}.{cls._get_extension()}"
             FileUtil.check_valid_filename(filename)
             file_path = cls._get_path_to_save_permanently_folder() / filename
             file_path.parent.mkdir(parents=True, exist_ok=True)
