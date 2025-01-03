@@ -20,7 +20,7 @@ class MethodUtil:
     """Utilities for working with functions and methods."""
 
     @classmethod
-    def is_implemented(cls, type_or_obj: Any, method_name: str) -> bool:
+    def is_implemented(cls, instance_or_type: Any, method_name: str) -> bool:
         """Return True if the method is implemented (present and not abstract)."""
-        method = getattr(type_or_obj, method_name, None)
+        method = getattr(instance_or_type, method_name, None)
         return method is not None and not getattr(method, "__isabstractmethod__", False)

@@ -18,27 +18,27 @@ from cl.runtime.records.type_util import TypeUtil
 from stubs.cl.runtime import StubDataclassRecord, StubDataclassDerivedRecord
 
 
-def test_check_same_type():
-    """Test for TypeCheck.check_same_type method."""
-    TypeUtil.check_same_type(int, int)
-    TypeUtil.check_same_type(StubDataclassRecord, StubDataclassRecord)
+def test_check_type():
+    """Test for TypeCheck.check_type method."""
+    TypeUtil.check_type(int, int)
+    TypeUtil.check_type(StubDataclassRecord, StubDataclassRecord)
     with pytest.raises(Exception):
-        TypeUtil.check_same_type(int, float)
+        TypeUtil.check_type(int, float)
     with pytest.raises(Exception):
-        TypeUtil.check_same_type(int, StubDataclassRecord)
+        TypeUtil.check_type(int, StubDataclassRecord)
     with pytest.raises(Exception):
-        TypeUtil.check_same_type(StubDataclassDerivedRecord, StubDataclassRecord)
+        TypeUtil.check_type(StubDataclassDerivedRecord, StubDataclassRecord)
 
 
-def test_check_subclass():
-    """Test for TypeCheck.check_subclass method."""
-    TypeUtil.check_subclass(int, int)
-    TypeUtil.check_subclass(StubDataclassRecord, StubDataclassRecord)
-    TypeUtil.check_subclass(StubDataclassDerivedRecord, StubDataclassRecord)
+def test_check_subtype():
+    """Test for TypeCheck.check_subtype method."""
+    TypeUtil.check_subtype(int, int)
+    TypeUtil.check_subtype(StubDataclassRecord, StubDataclassRecord)
+    TypeUtil.check_subtype(StubDataclassDerivedRecord, StubDataclassRecord)
     with pytest.raises(Exception):
-        TypeUtil.check_subclass(int, float)
+        TypeUtil.check_subtype(int, float)
     with pytest.raises(Exception):
-        TypeUtil.check_subclass(int, StubDataclassRecord)
+        TypeUtil.check_subtype(int, StubDataclassRecord)
 
 
 if __name__ == "__main__":

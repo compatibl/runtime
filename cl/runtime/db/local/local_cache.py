@@ -16,11 +16,11 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Iterable
 from typing import Type
-from typing import cast
 from typing_extensions import Self
+
+from cl.runtime import Db
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
-from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -35,57 +35,31 @@ _local_cache_instance = None
 
 
 @dataclass(slots=True, kw_only=True)
-class LocalCache:
+class LocalCache(Db):
     """In-memory cache for objects without serialization."""
 
-    __cache: Dict[KeyProtocol, RecordProtocol] = required(default_factory=lambda: {})
+    __cache: Dict[str, Dict[str, RecordProtocol]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
-    def load_one(
+    def _load_one_or_none(
         self,
-        record_type: Type[TRecord],
-        record_or_key: TRecord | KeyProtocol | None,
+        key: KeyProtocol,
         *,
         dataset: str | None = None,
-        is_key_optional: bool = False,
-        is_record_optional: bool = False,
-    ) -> TRecord | None:
-        # Check for an empty key
-        if record_or_key is None:
-            if is_key_optional:
-                return None
-            else:
-                typename = TypeUtil.name(record_type)
-                raise UserError(f"Key is None when trying to load record type {typename} from DB.")
-
-        if record_or_key is None or getattr(record_or_key, "get_key", None) is not None:
-            # Key instance is Record or None, return without lookup
-            return cast(RecordProtocol, record_or_key)
-
-        elif getattr(record_or_key, "get_key_type"):
-            # Key, look up the record in cache
-            key_type = record_or_key.get_key_type()
-            serialized_key = key_serializer.serialize_key(record_or_key)
-
-            # Try to retrieve dataset dictionary, insert if it does not yet exist
-            dataset_cache = self.__cache.setdefault(dataset, {})
-
-            # Try to retrieve table dictionary
-            if (table_cache := dataset_cache.setdefault(key_type, None)) is not None:
-                # Look up the record, defaults to None
-                result = table_cache.get(serialized_key, None)
-            else:
-                # Return None if not found
-                return None
-
-            # Check if the record was not found
-            if not is_record_optional and result is None:
-                typename = TypeUtil.name(record_type)
-                raise UserError(f"{typename} record is not found for key {record_or_key}")
+    ) -> RecordProtocol | None:
+        if dataset is not None:
+            raise RuntimeError("Local cache does not currently support datasets.")
+        # Serialize key in semicolon-delimited format
+        serialized_key = key_serializer.serialize_key(key)
+        # Try to retrieve table dictionary
+        key_type_name = TypeUtil.name(key)
+        if (table_cache := self.__cache.get(key_type_name, None)) is not None:
+            # Look up the record, defaults to None
+            result = table_cache.get(serialized_key, None)
             return result
-
         else:
-            raise RuntimeError(f"Type {TypeUtil.name(record_or_key)} is not a record or key.")
+            # Return None if no table cache is found for the key type
+            return None
 
     def load_many(
         self,
@@ -96,12 +70,10 @@ class LocalCache:
     ) -> Iterable[TRecord | None] | None:
         # TODO: Implement directly for better performance
         result = [
-            self.load_one(
+            self.load_one_or_none(
                 record_type,
                 x,
                 dataset=dataset,
-                is_key_optional=True,  # TODO: Keep the existing defaults for load_many
-                is_record_optional=True,  # TODO: Keep the existing defaults for load_many
             )
             for x in records_or_keys
         ]
@@ -130,16 +102,17 @@ class LocalCache:
         *,
         dataset: str | None = None,
     ) -> None:
+        if dataset is not None:
+            raise RuntimeError("Local cache does not currently support datasets.")
+
         # If record is None, do nothing
         if record is None:
             return
 
-        # Try to retrieve dataset dictionary, insert if it does not yet exist
-        dataset_cache = self.__cache.setdefault(dataset, {})
-
         # Try to retrieve table dictionary using 'key_type' as key, insert if it does not yet exist
         key_type = record.get_key_type()
-        table_cache = dataset_cache.setdefault(key_type, {})
+        key_type_name = TypeUtil.name(key_type)
+        table_cache = self.__cache.setdefault(key_type_name, {})
 
         # Serialize both key and record
         serialized_key = key_serializer.serialize_key(record)
@@ -173,6 +146,25 @@ class LocalCache:
     ) -> None:
         # Validate the dataset and if necessary convert to delimited string
         raise NotImplementedError()
+
+    def delete_all_and_drop_db(self) -> None:
+        """
+        IMPORTANT: !!! DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY
+
+        Notes:
+            This method will not run unless both db_id and database start with 'temp_db_prefix'
+            specified using Dynaconf and stored in 'DbSettings' class
+        """
+        # Check that db_id matches temp_db_prefix
+        self.error_if_not_temp_db(self.db_id)
+
+        # Create a new cache
+        __cache = {}
+
+    def close_connection(self) -> None:
+        """Close database connection to releasing resource locks."""
+        # Do nothing here, as this is an in-memory cache which does not require a connection
+        pass
 
     @classmethod
     def instance(cls) -> Self:

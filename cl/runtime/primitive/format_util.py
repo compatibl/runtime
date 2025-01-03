@@ -31,7 +31,7 @@ class FormatUtil:
         if value is not None and value != "":
             return cls.format_or_none(value)
         else:
-            raise RuntimeError("Argument to FormatUtil.format_or_none method is None or an empty string.")
+            raise RuntimeError("Argument to FormatUtil.format method is None or an empty string.")
 
     @classmethod
     def format_or_none(cls, value: TPrimitive | None) -> str | None:

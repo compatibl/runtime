@@ -25,9 +25,13 @@ from typing import TypeGuard
 from typing import TypeVar
 from typing import runtime_checkable
 from uuid import UUID
-from typing_extensions import Self
 
-TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | None
+_PRIMITIVE_TYPE_NAMES = {"str", "float", "bool", "int", "date", "time", "datetime", "UUID", "bytes"}
+
+PrimitiveType = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
+"""Supported primitive value types excluding None."""
+
+TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | None  # TODO: Deprecated
 """Supported primitive value types for serialized data in dictionary format."""
 
 TDataField = Dict[str, "TDataField"] | List["TDataField"] | TPrimitive | Enum | None
@@ -49,11 +53,14 @@ TQuery = Tuple[
 ]
 """NoSQL query data in MongoDB format."""
 
+TObj = TypeVar("TObj")
+"""Generic type parameter for any object."""
+
 TRecord = TypeVar("TRecord")
-"""Generic type parameter for the record."""
+"""Generic type parameter for a record."""
 
 TKey = TypeVar("TKey")
-"""Generic type parameter for the key."""
+"""Generic type parameter for a key."""
 
 TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
@@ -82,24 +89,37 @@ class InitProtocol:
         """Similar to __init__ but can use fields set after construction."""
 
 
-def is_record(type_or_obj: Any) -> TypeGuard[RecordProtocol]:
+def get_primitive_type_names() -> Tuple[str, ...]:
+    """Returns the list of supported primitive type names."""
+    return tuple(_PRIMITIVE_TYPE_NAMES)
+
+
+def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveType]:
+    """Returns true if one of the supported primitive types."""
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    result = type_.__name__ in _PRIMITIVE_TYPE_NAMES
+    return result
+
+
+def is_record(instance_or_type: Any) -> TypeGuard[RecordProtocol]:
     """Check if type or object is a record based on the presence of 'get_key' method."""
-    return hasattr(type_or_obj, "get_key")
+    return hasattr(instance_or_type, "get_key")
 
 
-def is_key_or_record(type_or_obj: Any) -> TypeGuard[KeyProtocol]:
-    """Check if type or object is a key or record based on the presence of 'get_key_type' method."""
-    return hasattr(type_or_obj, "get_key_type")
+def is_record_or_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
+    """Check if type or object is a record or key based on the presence of 'get_key_type' method."""
+    return hasattr(instance_or_type, "get_key_type")
 
 
-def is_key(type_or_obj: Any) -> TypeGuard[KeyProtocol]:
+def is_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
     """
     Check if type or object is a key but not a record based on the presence of 'get_key_type' method and the
-    absence of 'get_key' method. Consider using a faster alternative 'is_key_or_record' if possible.
+    absence of 'get_key' method. Consider using a faster alternative 'is_record_or_key' if possible.
     """
-    return hasattr(type_or_obj, "get_key_type") and not hasattr(type_or_obj, "get_key")
+    return hasattr(instance_or_type, "get_key_type") and not hasattr(instance_or_type, "get_key")
 
 
-def has_init(type_or_obj: Any) -> TypeGuard[InitProtocol]:
+def has_init(instance_or_type: Any) -> TypeGuard[InitProtocol]:
     """Check if type or object requires initialization (InitProtocol) based on the presence of 'init' attribute."""
-    return hasattr(type_or_obj, "init")
+    return hasattr(instance_or_type, "init")
+

@@ -28,7 +28,7 @@ from cl.runtime.db.protocols import TRecord
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol, PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
@@ -94,28 +94,14 @@ class SqliteDb(Db):
 
         return tuple(serializer.serialize_data(getattr(key, key_field)) for key in keys for key_field in key_fields)
 
-    def load_one(
+    def _load_one_or_none(
         self,
-        record_type: Type[TRecord],
-        record_or_key: TRecord | KeyProtocol | None,
+        key: KeyProtocol,
         *,
         dataset: str | None = None,
-        is_key_optional: bool = False,
-        is_record_optional: bool = False,
-    ) -> TRecord | None:
-        # Check for an empty key
-        if record_or_key is None:
-            if is_key_optional:
-                return None
-            else:
-                raise UserError(f"Key is None when trying to load record type {TypeUtil.name(record_type)} from DB.")
-
+    ) -> RecordProtocol | None:
         # Delegate to load_many
-        result = next(iter(self.load_many(record_type, [record_or_key], dataset=dataset)))
-
-        # Check if the record was not found
-        if not is_record_optional and result is None:
-            raise UserError(f"{TypeUtil.name(record_type)} record is not found for key {record_or_key}")
+        result = next(iter(self.load_many(type(key), [key], dataset=dataset)))
         return result
 
     def load_many(
@@ -129,7 +115,7 @@ class SqliteDb(Db):
         schema_manager = self._get_schema_manager()
 
         # Use itertools.groupby to preserve the original order of records_or_keys
-        # Group by key type and then by it is key or record, if records rather than keys return without lookup
+        # Group by key type and then by it is record or key, if records rather than keys return without lookup
         for key_type, records_or_keys_group in groupby(records_or_keys, lambda x: x.get_key_type() if x else None):
             # handle None records_or_keys
             if key_type is None:

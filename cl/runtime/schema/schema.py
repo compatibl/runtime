@@ -40,7 +40,7 @@ from cl.runtime.settings.context_settings import ContextSettings
 def is_data_key_record_or_enum(data_type):
     """
     Return true if the type is a data class based on presence '__slots__' attribute,
-    key or record based on the presence of 'get_key_type' method or an enum.
+    record or key based on the presence of 'get_key_type' method or an enum.
     """
 
     return inspect.isclass(data_type) and (

@@ -20,7 +20,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 
 @dataclass(slots=True, kw_only=True)
 class PlotView(View):
-    """Plot key or record."""
+    """Plot record or key."""
 
     plot: PlotKey = required()
-    """Plot key or record."""
+    """Plot record or key."""

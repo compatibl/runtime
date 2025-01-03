@@ -151,8 +151,8 @@ class RecordResponse(BaseModel):
         else:
             deserialized_key = key_serializer.deserialize_key(request.key, record_type.get_key_type())
 
-        # TODO: Review the use of is_record_optional flag here
-        record = db.load_one(record_type, deserialized_key, is_record_optional=True)
+        # TODO: Review the use of load_one_or_none here
+        record = db.load_one_or_none(record_type, deserialized_key)
         if not record and record_type == UiTypeState:
             # TODO (Yauheni): remove temporary workaround of pinning handlers for all requested types
             type_state_record_type = Schema.get_type_by_short_name(type_state_record_type_name)

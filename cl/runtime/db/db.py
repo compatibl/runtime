@@ -19,16 +19,20 @@ from dataclasses import dataclass
 from typing import ClassVar
 from typing import Iterable
 from typing import Type
+
+from cl.runtime import KeyUtil
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol, PrimitiveType, is_record, is_primitive, is_key, \
+    get_primitive_type_names
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TQuery
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.context_settings import ContextSettings
 
 
@@ -39,25 +43,96 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id)
 
-    @abstractmethod
     def load_one(
         self,
         record_type: Type[TRecord],
-        record_or_key: TRecord | KeyProtocol | tuple | str | None,
+        record_or_key: KeyProtocol | PrimitiveType,
         *,
         dataset: str | None = None,
-        is_key_optional: bool = False,
-        is_record_optional: bool = False,
-    ) -> TRecord | None:
+    ) -> TRecord:
         """
-        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup)
+        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
+        Error message if 'record_or_key' is None or the record is not found in DB.
 
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
-            record_or_key: Record (returned without lookup) or key in object, tuple or string format
+            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            is_key_optional: If True, return None when key is none found instead of an error
-            is_record_optional: If True, return None when record is not found instead of an error
+        """
+        if record_or_key is not None:
+            result = self.load_one_or_none(record_type, record_or_key, dataset=dataset)
+            if result is None:
+                raise RuntimeError(
+                    f"Record not found for key {KeyUtil.format(record_or_key)} when loading type "
+                    f"{TypeUtil.name(record_type)}.\n"
+                    f"Use 'load_one_or_none' method to return None instead of raising an error.")
+            return result
+        else:
+            raise RuntimeError(
+                f"Parameter 'record_or_key' is None for load_one method when loading type "
+                f"{TypeUtil.name(record_type)}.\n"
+                f"Use 'load_one_or_none' method to return None instead of raising an error.")
+
+    def load_one_or_none(
+        self,
+        record_type: Type[TRecord],
+        record_or_key: KeyProtocol | PrimitiveType | None,
+        *,
+        dataset: str | None = None,
+    ) -> TRecord | None:
+        """
+        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
+        Return None if 'record_or_key' is None or the record is not found in DB.
+
+        Args:
+            record_type: Record type to load, error if the result is not this type or its subclass
+            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+        """
+        if record_or_key is None:
+            # Return None if argument is None
+            return None
+        elif is_record(record_or_key):
+            # Argument is Record, return after checking type
+            TypeUtil.check_subtype(record_or_key, record_type)
+            return record_or_key  # noqa
+        else:
+            # Same as is_key but a little faster, can use here because we already know it is not a record
+            key_type = record_or_key.get_key_type()
+            if is_primitive(record_or_key):
+                # Convert to key if primitive type
+                key = key_type(record_or_key)
+            elif is_key(record_or_key):
+                # Check that key object has the right class, subclasses not permitted
+                TypeUtil.check_type(record_or_key, key_type, name="record_or_key")
+                key = record_or_key
+            else:
+                raise RuntimeError(
+                    f"Parameter 'record_or_key' has type {TypeUtil.name(record_or_key)} which is\n"
+                    f"neither a record, nor a key, nor a supported primitive type from the following list:\n"
+                    f"{', '.join(get_primitive_type_names())}")
+
+            # Try to retrieve using _load_one_or_none method implemented in derived types
+            if (result := self._load_one_or_none(key, dataset=dataset)) is not None:
+                TypeUtil.check_subtype(result, record_type)
+                return result
+            else:
+                return None
+
+    @abstractmethod
+    def _load_one_or_none(
+        self,
+        key: KeyProtocol,
+        *,
+        dataset: str | None = None,
+    ) -> RecordProtocol | None:
+        """
+        Load a single record using a key. The key is already checked not to be None and to have the correct type,
+        subclasses are not allowed. Return None if the record is not found in DB.
+
+        Args:
+            key: Key object can be expected to have the exact key type, subclasses are not allowed
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
 
     @abstractmethod

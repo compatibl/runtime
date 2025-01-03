@@ -18,9 +18,24 @@ import textwrap
 from typing import List
 from typing import Type
 
+from cl.runtime.records.protocols import KeyProtocol
+
 
 class KeyUtil:
     """Utilities for working with keys."""
+
+    @classmethod
+    def format(cls, value: KeyProtocol) -> str:
+        """Convert to semicolon-delimited string without type (error message if value is None)."""
+        if value is not None:
+            return cls.format_or_none(value)
+        else:
+            raise RuntimeError("Argument to KeyUtil.format method is None or an empty string.")
+
+    @classmethod
+    def format_or_none(cls, value: KeyProtocol | None) -> str | None:
+        """Convert to semicolon-delimited string without type (return None if argument is None)."""
+        return str(value)  # TODO: Add checks
 
     # TODO: Extract from key class instead
     @classmethod

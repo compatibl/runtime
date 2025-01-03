@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, TypeGuard
 from typing import Type
+
+from cl.runtime.records.protocols import TObj
 
 
 class TypeUtil:
@@ -27,18 +29,18 @@ class TypeUtil:
         return type_.__name__
 
     @classmethod
-    def check_same_type(
+    def check_type(
         cls,
         instance_or_type: Any,
-        expected_type: Type,
+        expected_type: Type[TObj],
         *,
         name: str | None = None,
-    ) -> None:
+    ) -> TypeGuard[TObj]:
         """
-        Raises an error if the type of 'actual_instance_or_type' is not 'expected_type', subclasses are not permitted.
+        Raises an error if the type of 'instance_or_type' is not 'expected_type', subclasses are not permitted.
 
         Notes:
-            Use 'check_subclass' method to allow subclasses to pass the check.
+            Use 'check_subtype' method to allow subclasses to pass the check.
 
         Args:
             instance_or_type: Actual object or type
@@ -53,17 +55,20 @@ class TypeUtil:
             actual = actual_type.__name__
             expected = expected_type.__name__
             raise RuntimeError(f"{what} has type {actual} where {expected} is expected (subclasses are not permitted).")
+        else:
+            # Return True if the check passes to use as TypeGuard
+            return True
 
     @classmethod
-    def check_subclass(
+    def check_subtype(
         cls,
         instance_or_type: Any,
-        expected_type: Type,
+        expected_type: Type[TObj],
         *,
         name: str | None = None,
-    ) -> None:
+    ) -> TypeGuard[TObj]:
         """
-        Raises an error if the type of 'actual_instance_or_type' is not the same type or subclass of 'expected_type'.
+        Raises an error if the type of 'instance_or_type' is not the same type or subclass of 'expected_type'.
 
         Args:
             instance_or_type: Actual object or type
@@ -78,3 +83,6 @@ class TypeUtil:
             actual = actual_type.__name__
             expected = expected_type.__name__
             raise RuntimeError(f"{what} has type {actual} where {expected} or its a subclass is expected.")
+        else:
+            # Return True if the check passes to use as TypeGuard
+            return True

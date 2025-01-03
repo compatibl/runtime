@@ -16,9 +16,8 @@ from typing import Iterable
 from typing import Protocol
 from typing import Type
 from typing import TypeVar
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol, PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TQuery
 
 TRecord = TypeVar("TRecord")  # TODO: Remove duplicate TKey definition
 TKey = TypeVar("TKey")  # TODO: Remove duplicate TKey definition
@@ -30,21 +29,35 @@ class DbProtocol(Protocol):
     def load_one(
         self,
         record_type: Type[TRecord],
-        record_or_key: TRecord | KeyProtocol | None,
+        record_or_key: KeyProtocol | PrimitiveType,
         *,
         dataset: str | None = None,
-        is_key_optional: bool = False,
-        is_record_optional: bool = False,
-    ) -> TRecord | None:
+    ) -> TRecord:
         """
-        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup)
+        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
+        Error message if 'record_or_key' is None or the record is not found in DB.
 
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
-            record_or_key: Record (returned without lookup) or key in object, tuple or string format
+            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            is_key_optional: If True, return None when key is none found instead of an error
-            is_record_optional: If True, return None when record is not found instead of an error
+        """
+
+    def load_one_or_none(
+        self,
+        record_type: Type[TRecord],
+        record_or_key: KeyProtocol | PrimitiveType | None,
+        *,
+        dataset: str | None = None,
+    ) -> TRecord | None:
+        """
+        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
+        Return None if 'record_or_key' is None or the record is not found in DB.
+
+        Args:
+            record_type: Record type to load, error if the result is not this type or its subclass
+            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
 
     def load_many(

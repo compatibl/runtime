@@ -68,57 +68,29 @@ class BasicMongoDb(Db):
     use_mongo_mock: bool = False
     """Use mongomock in-memory DB for testing instead of pymongo client."""
 
-    def load_one(
+    def _load_one_or_none(
         self,
-        record_type: Type[TRecord],
-        record_or_key: TRecord | KeyProtocol | None,
+        key: KeyProtocol,
         *,
         dataset: str | None = None,
-        is_key_optional: bool = False,
-        is_record_optional: bool = False,
-    ) -> TRecord | None:
-        # Check for an empty key
-        if record_or_key is None:
-            if is_key_optional:
-                return None
-            else:
-                raise UserError(f"Key is None when trying to load record type {TypeUtil.name(record_type)} from DB.")
+    ) -> RecordProtocol | None:
+        if dataset is not None:
+            raise RuntimeError("BasicMongo database type does not support datasets.")
 
-        if is_record(record_or_key):
-            # Check that record instance matches the requested type
-            if not isinstance(record_or_key, record_type):
-                raise RuntimeError(
-                    f"Record passed to 'load_one' method instead of key has type "
-                    f"{type(record_or_key).__name__} which is not a subclass of the "
-                    f"requested type {TypeUtil.name(record_type)}."
-                )
-            # Return record without lookup and regardless of dataset
-            return cast(RecordProtocol, record_or_key)
-        elif getattr(record_or_key, "get_key_type"):
-            # Confirm dataset is not None
-            if dataset is not None:
-                raise RuntimeError("BasicMongo database type does not support datasets.")
+        # Key, get collection name from key type
+        collection_name = TypeUtil.name(key)
+        db = self._get_db()
+        collection = db[collection_name]
 
-            # Key, get collection name from key type by removing Key suffix if present
-            key_type = record_or_key.get_key_type()
-            collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-            db = self._get_db()
-            collection = db[collection_name]
-
-            serialized_key = key_serializer.serialize_key(record_or_key)
-            serialized_record = collection.find_one({"_key": serialized_key})
-            if serialized_record is not None:
-                del serialized_record["_id"]
-                del serialized_record["_key"]
-                result = data_serializer.deserialize_data(serialized_record)
-                return result
-            else:
-                # Check if returning None is allowed
-                if not is_record_optional:
-                    raise UserError(f"{TypeUtil.name(record_type)} record is not found for key {record_or_key}")
-                return None
+        serialized_key = key_serializer.serialize_key(key)
+        serialized_record = collection.find_one({"_key": serialized_key})
+        if serialized_record is not None:
+            del serialized_record["_id"]
+            del serialized_record["_key"]
+            result = data_serializer.deserialize_data(serialized_record)
+            return result
         else:
-            raise RuntimeError(f"Type {TypeUtil.name(record_or_key)} is not a record or key.")
+            return None
 
     def load_many(
         self,
@@ -129,12 +101,10 @@ class BasicMongoDb(Db):
     ) -> Iterable[TRecord | None] | None:
         # TODO: Implement directly for better performance
         result = [
-            self.load_one(
+            self.load_one_or_none(
                 record_type,
                 x,
                 dataset=dataset,
-                is_key_optional=True,  # TODO: Keep the existing defaults for load_many
-                is_record_optional=True,  # TODO: Keep the existing defaults for load_many
             )
             for x in records_or_keys
         ]

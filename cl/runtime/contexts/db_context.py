@@ -24,7 +24,7 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.primitive.format_util import FormatUtil
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol, PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 
@@ -126,19 +126,20 @@ class DbContext(Context):
     def load_one(
         cls,
         record_type: Type[TRecord],
-        record_or_key: KeyProtocol,
+        record_or_key: KeyProtocol | PrimitiveType,
         *,
         dataset: str | None = None,
     ) -> TRecord:
         """
-        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup)
+        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
+        Error message if 'record_or_key' is None or the record is not found in DB.
 
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
-            record_or_key: Record (returned without lookup) or key in object, tuple or string format
+            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls.get_db().load_one(  # noqa
+        return cls.get_db().load_one(
             record_type,
             record_or_key,
             dataset=dataset,
@@ -148,25 +149,23 @@ class DbContext(Context):
     def load_one_or_none(
         cls,
         record_type: Type[TRecord],
-        record_or_key: KeyProtocol | None,
+        record_or_key: KeyProtocol | PrimitiveType | None,
         *,
         dataset: str | None = None,
     ) -> TRecord | None:
         """
-        Load a single record from DB using a key. If a record is passed instead of a key, it is returned without
-        DB lookup. Return None if the key or record argument is None, or if the record is not found in DB.
+        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
+        Return None if 'record_or_key' is None or the record is not found in DB.
 
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
-            record_or_key: Record (returned without lookup) or key in object, tuple or string format
+            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls.get_db().load_one(  # noqa
+        return cls.get_db().load_one_or_none(
             record_type,
             record_or_key,
             dataset=dataset,
-            is_key_optional=True,
-            is_record_optional=True,
         )
 
     @classmethod
