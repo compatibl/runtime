@@ -20,5 +20,3 @@ from dataclasses import dataclass
 @dataclass(slots=True, kw_only=True)
 class StubDataclassDoNotImport:
     """This class is for checking dynamic import. It must not be included in import statements."""
-
-    pass
