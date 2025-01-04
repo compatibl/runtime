@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.plots.group_bar_plot import GroupBarPlot
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
 def test_single_group(pytest_work_dir):

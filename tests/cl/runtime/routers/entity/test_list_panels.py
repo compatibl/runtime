@@ -19,7 +19,7 @@ from typing import Type
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataViewers
 

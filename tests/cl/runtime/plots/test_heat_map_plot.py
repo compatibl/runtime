@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.plots.heat_map_plot import HeatMapPlot
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 expected_values = [
     85.5,

@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.routers.storage.record_response import RecordResponse
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.testing.regression_guard import RegressionGuard
 from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataclassRecord

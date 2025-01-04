@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.tasks.static_method_task import StaticMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
 from stubs.cl.runtime import StubHandlers
 
 

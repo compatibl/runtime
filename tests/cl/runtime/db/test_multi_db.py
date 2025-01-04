@@ -17,7 +17,7 @@ from typing import Any
 from typing import Iterable
 from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_multi_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

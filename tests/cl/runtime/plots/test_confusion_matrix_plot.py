@@ -18,7 +18,7 @@ from pathlib import Path
 import pandas as pd
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.plots.confusion_matrix_plot import ConfusionMatrixPlot
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
 def test_smoke(pytest_work_dir):

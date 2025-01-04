@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecordKey

@@ -17,7 +17,7 @@ import os
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.file.csv_file_reader import CsvFileReader
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassNestedFields
