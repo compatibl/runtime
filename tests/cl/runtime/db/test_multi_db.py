@@ -20,7 +20,7 @@ from cl.runtime import Db
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.db.sql.sqlite_db import SqliteDb
-from cl.runtime.testing.pytest.pytest_fixtures import testing_multi_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_multi_db
 from stubs.cl.runtime import StubDataclassComposite, StubHandlers
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -57,7 +57,7 @@ def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iter
 
     return True
 
-def test_record_or_key(testing_multi_db):
+def test_record_or_key(pytest_multi_db):
     """Test passing record instead of a key."""
     # Create test record and populate with sample data
     record = StubDataclassRecord()
@@ -76,7 +76,7 @@ def test_record_or_key(testing_multi_db):
     assert DbContext.load_one(StubDataclassRecord, key) == record  # Not the same object but equal
 
 
-def test_complex_records(testing_multi_db):
+def test_complex_records(pytest_multi_db):
     """Test 'save_many' method for various types."""
     samples = [
         StubDataclassRecord(id="abc1"),
@@ -106,7 +106,7 @@ def test_complex_records(testing_multi_db):
     assert loaded_records == samples
 
 
-def test_basic_operations(testing_multi_db):
+def test_basic_operations(pytest_multi_db):
     """Test save/load/delete methods for various types."""
     samples = [
         StubDataclassRecord(id="abc1"),
@@ -152,7 +152,7 @@ def test_basic_operations(testing_multi_db):
     assert loaded_records == [None] * len(samples)
 
 
-def test_record_upsert(testing_multi_db):
+def test_record_upsert(pytest_multi_db):
     """Check that an existing entry is overridden when a new entry with the same key is saved."""
     # Create sample and save
     sample = StubDataclassRecord()
@@ -172,7 +172,7 @@ def test_record_upsert(testing_multi_db):
     assert loaded_record == override_sample
 
 
-def test_load_all(testing_multi_db):
+def test_load_all(pytest_multi_db):
     """Test 'load_all' method."""
     base_samples = [
         StubDataclassRecord(id="base1"),
@@ -200,7 +200,7 @@ def test_load_all(testing_multi_db):
     assert _assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
-def test_singleton(testing_multi_db):
+def test_singleton(pytest_multi_db):
     """Test singleton type saving."""
     singleton_sample = StubDataclassSingleton()
     DbContext.save_one(singleton_sample)
@@ -214,7 +214,7 @@ def test_singleton(testing_multi_db):
     assert all_records[0] == other_singleton_sample
 
 
-def test_abstract_key(testing_multi_db):
+def test_abstract_key(pytest_multi_db):
     """Test final record for which some of the fields are in base record."""
     final_record = StubDataclassFinalRecord(id="a")
     DbContext.save_one(final_record)
@@ -235,7 +235,7 @@ def test_abstract_key(testing_multi_db):
     assert load_using_key == nested_record  # Not the same object but equal
 
 
-def test_load_filter(testing_multi_db):
+def test_load_filter(pytest_multi_db):
     """Test 'load_filter' method."""
     # Create test record and populate with sample data
     offset = 0
@@ -250,7 +250,7 @@ def test_load_filter(testing_multi_db):
     assert all(x.derived_str_field == filter_obj.derived_str_field for x in loaded_records)
 
 
-def test_repeated(testing_multi_db):
+def test_repeated(pytest_multi_db):
     """Test including the same object twice in save many."""
     record = StubDataclassRecord()
     DbContext.save_many([record, record])

@@ -99,7 +99,7 @@ class DbContext(Context):
         else:
             if ProcessContext.is_testing():
                 raise RuntimeError(
-                    "To use DB in a test, specify testing_db or similar pytest fixture or "
+                    "To use DB in a test, specify pytest_default_db or similar pytest fixture or "
                     "use 'with DbContext(...)' clause if not using pytest."
                 )
             else:

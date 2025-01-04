@@ -15,7 +15,7 @@
 import pytest
 import os
 from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.testing.pytest.pytest_fixtures import testing_work_dir
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir
 
 
 def _test_working_dir(*, actual: str, expected: str):
@@ -30,43 +30,43 @@ def _test_working_dir(*, actual: str, expected: str):
 class TestPytestFixtures:
     """Stub pytest class."""
 
-    def test_pytest_fixtures(self, testing_work_dir):
+    def test_pytest_fixtures(self, pytest_work_dir):
         """All three names match, one-token path."""
-        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures")
+        _test_working_dir(actual=pytest_work_dir, expected="test_pytest_fixtures")
 
-    def test_in_instance_method(self, testing_work_dir):
+    def test_in_instance_method(self, pytest_work_dir):
         """Method name does not match, two-token path"""
-        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_in_instance_method")
+        _test_working_dir(actual=pytest_work_dir, expected="test_pytest_fixtures.test_in_instance_method")
 
-    def test_in_class_method(self, testing_work_dir):
+    def test_in_class_method(self, pytest_work_dir):
         """Method name does not match, two-token path"""
-        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_in_class_method")
+        _test_working_dir(actual=pytest_work_dir, expected="test_pytest_fixtures.test_in_class_method")
 
 
 class TestClass:
     """Stub pytest class."""
 
-    def test_pytest_fixtures(self, testing_work_dir):
+    def test_pytest_fixtures(self, pytest_work_dir):
         """Method name matches module name, still three-token path as they are not next to each other."""
-        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_class.test_pytest_fixtures")
+        _test_working_dir(actual=pytest_work_dir, expected="test_pytest_fixtures.test_class.test_pytest_fixtures")
 
-    def test_in_instance_method(self, testing_work_dir):
+    def test_in_instance_method(self, pytest_work_dir):
         """Method name does not match class name or module name, three-token path."""
-        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_class.test_in_instance_method")
+        _test_working_dir(actual=pytest_work_dir, expected="test_pytest_fixtures.test_class.test_in_instance_method")
 
-    def test_in_class_method(self, testing_work_dir):
+    def test_in_class_method(self, pytest_work_dir):
         """Method name does not match class name or module name, three-token path."""
-        _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_class.test_in_class_method")
+        _test_working_dir(actual=pytest_work_dir, expected="test_pytest_fixtures.test_class.test_in_class_method")
 
 
-def test_pytest_fixtures(testing_work_dir):
+def test_pytest_fixtures(pytest_work_dir):
     """Function name matches, one-token path."""
-    _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures")
+    _test_working_dir(actual=pytest_work_dir, expected="test_pytest_fixtures")
 
 
-def test_in_function(testing_work_dir):
+def test_in_function(pytest_work_dir):
     """Function name does not match, two-token path."""
-    _test_working_dir(actual=testing_work_dir, expected="test_pytest_fixtures.test_in_function")
+    _test_working_dir(actual=pytest_work_dir, expected="test_pytest_fixtures.test_in_function")
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ from cl.runtime.testing.pytest.pytest_util import PytestUtil
 
 
 @pytest.fixture(scope="function")
-def testing_work_dir(request: FixtureRequest) -> Iterator[str]:
+def pytest_work_dir(request: FixtureRequest) -> Iterator[str]:
     """Pytest module fixture to make test module directory the local directory during test execution."""
 
     work_dir = PytestUtil.get_env_dir(request)
@@ -46,8 +46,8 @@ def testing_work_dir(request: FixtureRequest) -> Iterator[str]:
     os.chdir(request.config.invocation_dir)  # noqa
 
 
-def _testing_db(request: FixtureRequest, *, db_type: Type | None = None) -> Iterator[Db]:
-    """Setup and teardown a temporary test DB of the specified type."""
+def _pytest_db(request: FixtureRequest, *, db_type: Type | None = None) -> Iterator[Db]:
+    """Setup and teardown a temporary databases in DB of the specified type."""
 
     # Get test DB identifier
     env_name = PytestUtil.get_env_name(request)
@@ -68,21 +68,33 @@ def _testing_db(request: FixtureRequest, *, db_type: Type | None = None) -> Iter
 
 
 @pytest.fixture(scope="function")
-def testing_db(request: FixtureRequest) -> Iterator[Db]:
-    """Pytest module fixture to setup and teardown a temporary test DB of the default type specified in settings."""
-    yield from _testing_db(request)
+def pytest_default_db(request: FixtureRequest) -> Iterator[Db]:
+    """Pytest module fixture to setup and teardown temporary databases using default DB."""
+    yield from _pytest_db(request)
 
 
 @pytest.fixture(scope="function")
-def testing_sqlite_db(request: FixtureRequest) -> Iterator[Db]:
-    """Pytest module fixture to setup and teardown a temporary test SqliteDB."""
-    yield from _testing_db(request, db_type=BasicMongoMockDb)
+def pytest_sqlite_db(request: FixtureRequest) -> Iterator[Db]:
+    """Pytest module fixture to setup and teardown temporary databases using SqliteDB."""
+    yield from _pytest_db(request, db_type=BasicMongoMockDb)
 
 
 @pytest.fixture(scope="function")
-def testing_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
-    """Pytest module fixture to setup and teardown a temporary test BasicMongoMockDb."""
-    yield from _testing_db(request, db_type=BasicMongoMockDb)
+def pytest_basic_mongo_db(request: FixtureRequest) -> Iterator[Db]:
+    """
+    Pytest module fixture to setup and teardown temporary databases using BasicMongoDb.
+    
+    Notes:
+        This requires a running MongoDB server with DB create and drop permissions.
+        If this is not available, use pytest_basic_mongo_mock_db instead.
+    """
+    yield from _pytest_db(request, db_type=BasicMongoDb)
+
+
+@pytest.fixture(scope="function")
+def pytest_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
+    """Pytest module fixture to setup and teardown temporary databases using BasicMongoMockDb."""
+    yield from _pytest_db(request, db_type=BasicMongoMockDb)
 
 
 @pytest.fixture(scope="function", params=[
@@ -90,13 +102,16 @@ def testing_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
     BasicMongoDb,
     BasicMongoMockDb
 ])
-def testing_multi_db(request) -> Iterator[Db]:
-    """Pytest module fixture to setup and teardown temporary test DBs of all supported types."""
-    yield from _testing_db(request, db_type=request.param)
+def pytest_multi_db(request) -> Iterator[Db]:
+    """
+    Pytest module fixture to setup and teardown temporary databases of all types 
+    that do not require a running server.
+    """
+    yield from _pytest_db(request, db_type=request.param)
 
 
 @pytest.fixture(scope="session")  # TODO: Use a named celery queue for each test
-def testing_celery_queue():
+def pytest_celery_queue():
     """Pytest session fixture to start Celery test queue for test execution."""
     print("Starting celery workers, will delete the existing tasks.")
     celery_delete_existing_tasks()

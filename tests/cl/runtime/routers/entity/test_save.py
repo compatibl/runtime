@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
-from cl.runtime.testing.pytest.pytest_fixtures import testing_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
 from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecordKey
@@ -31,7 +31,7 @@ update_record_payload = {
 }
 
 
-def test_method(testing_db):
+def test_method(pytest_default_db):
     """Test coroutine for /entity/save route."""
 
     # Test saving new record
@@ -70,7 +70,7 @@ def test_method(testing_db):
     assert records_count == 2
 
 
-def test_api(testing_db):
+def test_api(pytest_default_db):
     """Test REST API for /entity/save route."""
     with TestingClient() as test_client:
         # Test saving new record

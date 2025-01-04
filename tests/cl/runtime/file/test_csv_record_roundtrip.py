@@ -25,7 +25,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
-from cl.runtime.testing.pytest.pytest_fixtures import testing_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -89,7 +89,7 @@ def read_records_from_csv(file_path: Path, entry_type: Type[RecordProtocol]):
     loader.read_and_save()
 
 
-def test_roundtrip(testing_db):
+def test_roundtrip(pytest_default_db):
     for test_entries in (*stub_entries,):
         file_path = None
         try:

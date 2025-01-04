@@ -19,7 +19,7 @@ from typing import Type
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
-from cl.runtime.testing.pytest.pytest_fixtures import testing_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
 from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataViewers
 
@@ -43,7 +43,7 @@ requests = [
 ]
 
 
-def test_method(testing_db):
+def test_method(pytest_default_db):
     """Test coroutine for /entity/list_panels route."""
 
     for request in requests:
@@ -63,7 +63,7 @@ def test_method(testing_db):
         assert panel_names_set == expected_panel_names_set
 
 
-def test_api(testing_db):
+def test_api(pytest_default_db):
     """Test REST API for /entity/list_panels route."""
     with TestingClient() as test_client:
         for request in requests:

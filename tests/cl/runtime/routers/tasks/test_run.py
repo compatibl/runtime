@@ -20,7 +20,7 @@ from cl.runtime.routers.tasks.run_response_item import RunResponseItem
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
-from cl.runtime.testing.pytest.pytest_fixtures import testing_celery_queue
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_celery_queue
 from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubHandlers
@@ -58,7 +58,7 @@ expected_records_in_db = [[StubDataclassRecord(id="saved_from_handler")]]
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_method(testing_celery_queue):
+def test_method(pytest_celery_queue):
     """Test coroutine for /tasks/run route."""
 
     DbContext.save_one(stub_handlers)
@@ -88,7 +88,7 @@ def test_method(testing_celery_queue):
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_api(testing_celery_queue):
+def test_api(pytest_celery_queue):
     """Test REST API for /tasks/run route."""
 
     DbContext.save_one(stub_handlers)

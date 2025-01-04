@@ -19,10 +19,10 @@ from typing import Optional
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.patches import Rectangle
-from cl.runtime.testing.pytest.pytest_fixtures import testing_work_dir
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir
 
 
-def test_smoke(testing_work_dir):
+def test_smoke(pytest_work_dir):
 
     @dataclass
     class Node:

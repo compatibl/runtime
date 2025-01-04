@@ -17,12 +17,12 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity import entity_router
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse
-from cl.runtime.testing.pytest.pytest_fixtures import testing_db
+from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db
 from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataclassDerivedRecord
 
 
-def test_method(testing_db):
+def test_method(pytest_default_db):
     """Test coroutine for /entity/delete_many route."""
 
     existing_records = [
@@ -48,7 +48,7 @@ def test_method(testing_db):
         assert non_deleted_record.derived_str_field == record_in_db.derived_str_field
 
 
-def test_api(testing_db):
+def test_api(pytest_default_db):
     """Test REST API for /entity/delete_many route."""
     with TestingClient() as test_client:
         existing_records = [
