@@ -15,20 +15,8 @@
 import pytest
 from cl.runtime import ClassInfo
 from stubs.cl.runtime import StubDataclassData
-from stubs.cl.runtime import StubDataclassDerivedData
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedData
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
-from stubs.cl.runtime import StubDataclassDictFields
-from stubs.cl.runtime import StubDataclassDictListFields
-from stubs.cl.runtime import StubDataclassListDictFields
-from stubs.cl.runtime import StubDataclassListFields
-from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
-from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime import StubDataclassRecordKey
-from stubs.cl.runtime import StubDataclassSingleton
 
 
 def test_get_class_path():

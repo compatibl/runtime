@@ -15,7 +15,6 @@
 import re
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any
 from typing import Dict
 from inflection import underscore
 from cl.runtime.primitive.case_util import CaseUtil

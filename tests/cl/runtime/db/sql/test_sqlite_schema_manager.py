@@ -13,8 +13,6 @@
 # limitations under the License.
 
 import pytest
-import sqlite3
-from cl.runtime.db.sql.sqlite_db import dict_factory
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.schema.schema import Schema
 from cl.runtime.testing.regression_guard import RegressionGuard

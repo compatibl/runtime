@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from typing import Any
 from typing import ClassVar
-from typing import Dict
 from typing import Type
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict

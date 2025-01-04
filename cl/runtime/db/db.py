@@ -16,7 +16,6 @@ from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import ClassVar
 from typing import Iterable
 from typing import Type
 from cl.runtime import KeyUtil
@@ -28,7 +27,6 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
-from cl.runtime.records.protocols import TQuery
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import get_primitive_type_names
 from cl.runtime.records.protocols import is_key

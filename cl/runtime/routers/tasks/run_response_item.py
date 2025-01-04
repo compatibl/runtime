@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-import traceback
 from typing import List
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext

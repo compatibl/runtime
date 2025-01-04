@@ -19,10 +19,8 @@ from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.views.stub_viewers import StubViewers
-from stubs.cl.runtime.views.stub_viewers_key import StubViewersKey
 
 nested_fields_key = StubDataclassRecordKey(id="nested_1")
 """Key returned by the viewer."""

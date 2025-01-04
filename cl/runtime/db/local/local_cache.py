@@ -163,7 +163,6 @@ class LocalCache(Db):
     def close_connection(self) -> None:
         """Close database connection to releasing resource locks."""
         # Do nothing here, as this is an in-memory cache which does not require a connection
-        pass
 
     @classmethod
     def check_db_id(cls, db_id: str) -> None:

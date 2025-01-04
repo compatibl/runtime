@@ -17,16 +17,13 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Iterable
 from typing import Type
-from typing import cast
 from mongomock import MongoClient as MongoClientMock
 from pymongo import MongoClient
 from pymongo.database import Database
-from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
-from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record

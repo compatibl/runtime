@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime import LocalCache
 from cl.runtime.settings.aliases.package_alias import PackageAlias
 
 

@@ -22,7 +22,6 @@ from typing import Any
 from typing import Iterable
 from typing import List
 from typing import Type
-from typing import TypeVar
 from typing import Union
 from typing import get_args
 from typing import get_origin

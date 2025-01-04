@@ -14,7 +14,6 @@
 
 import inspect
 import os
-from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 

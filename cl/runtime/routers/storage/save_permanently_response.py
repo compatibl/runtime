@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import DefaultDict
 from typing import Iterable
 from typing import Type
-from urllib import parse
 import pandas as pd
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext

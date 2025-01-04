@@ -13,13 +13,7 @@
 # limitations under the License.
 
 import pytest
-import importlib
-import inspect
-import pkgutil
-from typing import List
-import attrs
 from cl.runtime.prebuild.import_util import ImportUtil
-from cl.runtime.settings.context_settings import ContextSettings
 
 
 def test_import():

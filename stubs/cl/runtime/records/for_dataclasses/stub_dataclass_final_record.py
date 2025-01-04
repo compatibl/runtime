@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
-from typing import Any
 from typing import Type
 from cl.runtime.records.empty_mixin import EmptyMixin
 from cl.runtime.records.record_mixin import RecordMixin

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import Any
-from typing import List
 
 
 class MethodUtil:

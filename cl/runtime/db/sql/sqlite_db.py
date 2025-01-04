@@ -27,13 +27,9 @@ from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.file.file_util import FileUtil
-from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.record_util import RecordUtil
-from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -380,7 +376,6 @@ class SqliteDb(Db):
             # Remove from dictionary so connection can be reopened on next access
             del _connection_dict[self.db_id]
             del _schema_manager_dict[self.db_id]
-            pass
 
     def _get_connection(self) -> sqlite3.Connection:
         """Get PyMongo database object."""

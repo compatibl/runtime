@@ -16,7 +16,6 @@ import os
 from dataclasses import dataclass
 from typing import List
 from typing import Type
-from typing_extensions import Self
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader

@@ -15,10 +15,7 @@
 import pytest
 from abc import ABC
 from abc import abstractmethod
-from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.method_util import MethodUtil
-from cl.runtime.schema.module_decl import ModuleDecl
-from cl.runtime.schema.type_decl import TypeDecl
 
 
 class AbstractClass(ABC):

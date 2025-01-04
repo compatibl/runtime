@@ -201,11 +201,11 @@ class FieldDecl:
                     # TODO: Do we need this if we are processing dependencies?
                     # TODO: Should a list of dependencies be added to TypeDecl object directly
                     if issubclass(field_type_obj, Enum):
-                        from cl.runtime.schema.enum_decl import EnumDecl
+                        from cl.runtime.schema.enum_decl import EnumDecl  # noqa
 
                         # TODO: Restore call when implemented EnumDecl.for_type(field_type_obj, dependencies=dependencies)
                     else:
-                        from cl.runtime.schema.type_decl import TypeDecl
+                        from cl.runtime.schema.type_decl import TypeDecl  # noqa
 
                         TypeDecl.for_type(field_type_obj, dependencies=dependencies)
 

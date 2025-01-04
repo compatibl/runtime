@@ -15,7 +15,6 @@
 import pytest
 import os
 from cl.runtime.settings.preload_settings import PreloadSettings
-from cl.runtime.testing.regression_guard import RegressionGuard
 
 
 def test_preload_settings():

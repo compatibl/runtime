@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.routers.entity import entity_router
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse
 from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa

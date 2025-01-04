@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from datetime import timezone
 from enum import Enum
 from types import UnionType
-from typing import Any
 from typing import Dict
 from typing import List
 from typing import Tuple

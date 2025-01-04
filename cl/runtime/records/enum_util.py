@@ -14,7 +14,6 @@
 
 from enum import Enum
 from typing import Type
-from typing import TypeVar
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.string_util import StringUtil

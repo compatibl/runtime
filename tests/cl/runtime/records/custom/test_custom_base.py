@@ -14,7 +14,6 @@
 
 import pytest
 from stubs.cl.runtime.records.custom.stub_custom_base import StubCustomBase
-from stubs.cl.runtime.records.custom.stub_custom_base_key import StubCustomBaseKey
 
 
 def test_smoke():

@@ -14,7 +14,6 @@
 
 import inspect
 from dataclasses import dataclass
-from inspect import Parameter
 from types import FunctionType
 from types import MethodType
 from typing import Iterable

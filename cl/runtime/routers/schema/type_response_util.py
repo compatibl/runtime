@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 from typing import Dict
-from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.schema import Schema
 

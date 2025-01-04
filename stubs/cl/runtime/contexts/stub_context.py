@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.contexts.context import Context
 

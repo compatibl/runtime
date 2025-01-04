@@ -13,10 +13,8 @@
 # limitations under the License.
 
 import pytest
-import datetime as dt
 from typing import List
 from typing import Tuple
-from zoneinfo import ZoneInfo
 from cl.runtime.primitive.date_util import DateUtil
 
 

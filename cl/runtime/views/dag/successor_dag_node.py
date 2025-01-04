@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from typing import List
 from typing import Optional
-from typing_extensions import Self
 from cl.runtime import RecordMixin
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError

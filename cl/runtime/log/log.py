@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from typing import ClassVar
 from typing import Iterable
 from typing_extensions import Self
-from cl.runtime.log.log_filter import LogFilter
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.record_mixin import RecordMixin

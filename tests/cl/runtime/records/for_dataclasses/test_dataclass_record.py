@@ -37,21 +37,18 @@ def test_with_primitive_fields():
     # TODO: Complete
     record = StubDataclassPrimitiveFields()
     record = StubDataclassListFields()
-    pass
 
 
 def test_with_lists():
     """Test for a record with primitive fields."""
 
     record = StubDataclassListFields()
-    pass
 
 
 def test_with_dicts():
     """Test for a record with primitive fields."""
 
     record = StubDataclassDictFields()
-    pass
 
 
 if __name__ == "__main__":

@@ -15,7 +15,6 @@
 import datetime as dt
 import time
 from dataclasses import dataclass
-from typing_extensions import Self
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.tasks.task import Task

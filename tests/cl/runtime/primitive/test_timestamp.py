@@ -15,7 +15,6 @@
 import pytest
 import datetime as dt
 from typing import Iterable
-from uuid import UUID
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.testing.regression_guard import RegressionGuard
