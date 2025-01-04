@@ -437,3 +437,8 @@ class SqliteDb(Db):
                 return False
 
         return True
+
+    @classmethod
+    def check_db_id(cls, db_id: str) -> None:
+        """Check that db_id follows the database name restrictions, error message otherwise."""
+        pass # TODO: Implement validation

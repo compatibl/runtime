@@ -21,7 +21,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.db.sql.sqlite_db import SqliteDb
 from cl.runtime.testing.pytest.pytest_fixtures import testing_multi_db
-from stubs.cl.runtime import StubDataclassComposite
+from stubs.cl.runtime import StubDataclassComposite, StubHandlers
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassDictFields
@@ -37,6 +37,9 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
 
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
@@ -54,15 +57,23 @@ def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iter
 
     return True
 
-
-def test_smoke(testing_multi_db):
-    """Smoke test."""
+def test_record_or_key(testing_multi_db):
+    """Test passing record instead of a key."""
+    # Create test record and populate with sample data
     record = StubDataclassRecord()
-    DbContext.save_many([record, record])
+    key = record.get_key()
 
-    loaded_records = list(DbContext.load_many(StubDataclassRecord, [record.get_key()]))
-    assert len(loaded_records) == 1
-    assert loaded_records[0] == record
+    # Save a single record
+    DbContext.save_many([record])
+
+    # Load using record or key
+    loaded_records = tuple(DbContext.load_many(StubDataclassRecord, [record, key, None]))
+    assert loaded_records[0] is record  # Same object is returned without lookup
+    assert loaded_records[1] == record  # Not the same object but equal
+    assert loaded_records[2] is None
+
+    assert DbContext.load_one(StubDataclassRecord, record) is record  # Same object is returned without lookup
+    assert DbContext.load_one(StubDataclassRecord, key) == record  # Not the same object but equal
 
 
 def test_complex_records(testing_multi_db):
@@ -81,6 +92,10 @@ def test_complex_records(testing_multi_db):
         StubDataclassListDictFields(id="abc10"),
         StubDataclassPrimitiveFields(key_str_field="abc11"),
         StubDataclassSingleton(),
+        StubDataclassAliasedRecord(id="abc12", a=123),
+        StubHandlers(stub_id="abc13"),
+        StubDataclassRecord(id="abc14"),
+        StubDataclassVersionedRecord(id="abc15"),
     ]
 
     DbContext.save_many(samples)
@@ -106,6 +121,11 @@ def test_basic_operations(testing_multi_db):
         StubDataclassDictListFields(id="abc9"),
         StubDataclassListDictFields(id="abc10"),
         StubDataclassPrimitiveFields(key_str_field="abc11"),
+        StubDataclassSingleton(),
+        StubDataclassAliasedRecord(id="abc12", a=123),
+        StubHandlers(stub_id="abc13"),
+        StubDataclassRecord(id="abc14"),
+        StubDataclassVersionedRecord(id="abc15"),
     ]
 
     sample_keys = [x.get_key() for x in samples]
@@ -180,38 +200,6 @@ def test_load_all(testing_multi_db):
     assert _assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
-@pytest.mark.skip("Performance test.")
-def test_performance(testing_multi_db):
-    """Test performance of save/load methods."""
-    n = 1000
-    samples = [StubDataclassPrimitiveFields(key_str_field=f"key{i}") for i in range(n)]
-    sample_keys = [sample.get_key() for sample in samples]
-
-    print(f">>> Test stub type: {StubDataclassPrimitiveFields.__name__}, {n=}.")
-    start_time = time.time()
-    DbContext.save_many(samples)
-    end_time = time.time()
-
-    print(f"Save many bulk: {end_time - start_time}s.")
-
-    start_time = time.time()
-    for sample in samples:
-        DbContext.save_one(sample)
-    end_time = time.time()
-    print(f"Save many one by one: {end_time - start_time}s.")
-
-    start_time = time.time()
-    list(DbContext.load_many(sample_keys))
-    end_time = time.time()
-    print(f"Load many bulk: {end_time - start_time}s.")
-
-    start_time = time.time()
-    for key in sample_keys:
-        DbContext.load_one(type(key), key)
-    end_time = time.time()
-    print(f"Load many one by one: {end_time - start_time}s.")
-
-
 def test_singleton(testing_multi_db):
     """Test singleton type saving."""
     singleton_sample = StubDataclassSingleton()
@@ -245,6 +233,31 @@ def test_abstract_key(testing_multi_db):
     load_using_key = DbContext.load_one(type(nested_record), nested_key)
     assert load_using_record is nested_record  # Same object is returned without lookup
     assert load_using_key == nested_record  # Not the same object but equal
+
+
+def test_load_filter(testing_multi_db):
+    """Test 'load_filter' method."""
+    # Create test record and populate with sample data
+    offset = 0
+    matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="a") for i in range(2)]
+    offset = len(matching_records)
+    non_matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="b") for i in range(2)]
+    DbContext.save_many(matching_records + non_matching_records)
+
+    filter_obj = StubDataclassDerivedRecord(id=None, derived_str_field="a")
+    loaded_records = DbContext.load_filter(StubDataclassDerivedRecord, filter_obj)
+    assert len(loaded_records) == len(matching_records)
+    assert all(x.derived_str_field == filter_obj.derived_str_field for x in loaded_records)
+
+
+def test_repeated(testing_multi_db):
+    """Test including the same object twice in save many."""
+    record = StubDataclassRecord()
+    DbContext.save_many([record, record])
+
+    loaded_records = list(DbContext.load_many(StubDataclassRecord, [record.get_key()]))
+    assert len(loaded_records) == 1
+    assert loaded_records[0] == record
 
 
 if __name__ == "__main__":

@@ -262,6 +262,11 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         """Close database connection to releasing resource locks."""
 
     @classmethod
+    @abstractmethod
+    def check_db_id(cls, db_id: str) -> None:
+        """Check that db_id follows MongoDB database name restrictions, error message otherwise."""
+
+    @classmethod
     def _get_test_db_name(cls) -> str:  # TODO: Use fixture instead
         """Get SQLite database with name based on test namespace."""
         if ProcessContext.is_testing():

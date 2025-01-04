@@ -175,7 +175,7 @@ class DbContext(Context):
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
-    ) -> Tuple[TRecord | None] | None:
+    ) -> Iterable[TRecord | None] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
         the result must have the same order as 'records_or_keys'.
@@ -185,12 +185,11 @@ class DbContext(Context):
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        result = cls.get_db().load_many(  # noqa
+        return cls.get_db().load_many(
             record_type,
             records_or_keys,
             dataset=dataset,
         )
-        return tuple(result)
 
     @classmethod
     def load_all(
