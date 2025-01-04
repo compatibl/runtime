@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from typing import List
-
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from stubs.cl.runtime import StubDataclassData
@@ -34,8 +34,10 @@ class StubDataclassComplexFreezable(Freezable):
     non_freezable_obj: StubDataclassData = required(default_factory=lambda: StubDataclassData())
     """Embedded non-freezable object, will be frozen."""
 
-    non_freezable_list: List[StubDataclassSimpleFreezable] = required(default_factory=lambda: [
-        StubDataclassSimpleFreezable(),
-        StubDataclassSimpleFreezable(),
-    ])
+    non_freezable_list: List[StubDataclassSimpleFreezable] = required(
+        default_factory=lambda: [
+            StubDataclassSimpleFreezable(),
+            StubDataclassSimpleFreezable(),
+        ]
+    )
     """Embedded non-freezable list of freezable objects, list items will not be frozen."""

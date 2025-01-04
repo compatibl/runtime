@@ -16,6 +16,7 @@ import pytest
 from typing import Callable
 from cl.runtime.primitive.format_util import BoolUtil
 
+
 def _test_format(*, method: Callable, allow_none: bool) -> None:
     """Test the specified callable."""
     if allow_none:
@@ -28,6 +29,7 @@ def _test_format(*, method: Callable, allow_none: bool) -> None:
     with pytest.raises(Exception):
         # Another type
         method(0)
+
 
 def _test_parse(*, method: Callable, allow_none: bool) -> None:
     """Test the specified callable."""

@@ -28,7 +28,8 @@ from cl.runtime.db.protocols import TRecord
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.records.protocols import KeyProtocol, PrimitiveType
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
@@ -441,4 +442,4 @@ class SqliteDb(Db):
     @classmethod
     def check_db_id(cls, db_id: str) -> None:
         """Check that db_id follows the database name restrictions, error message otherwise."""
-        pass # TODO: Implement validation
+        pass  # TODO: Implement validation

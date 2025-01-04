@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
@@ -32,6 +31,7 @@ def test_freezable_util():
     non_freezable_record = StubDataclassRecord()
     FreezableUtil.try_freeze(non_freezable_record)
     assert not FreezableUtil.is_frozen(non_freezable_record)
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

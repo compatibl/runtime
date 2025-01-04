@@ -40,7 +40,7 @@ _digit_without_space_re: Pattern = re.compile(r"(?<! )\d")
 
 class CaseUtil:
     """Utilities for case conversion and other operations on string."""
-    
+
     @classmethod
     def is_empty(cls, value: str | None) -> bool:
         """Returns true if the string is None or ''."""

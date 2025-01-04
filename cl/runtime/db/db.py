@@ -19,18 +19,21 @@ from dataclasses import dataclass
 from typing import ClassVar
 from typing import Iterable
 from typing import Type
-
 from cl.runtime import KeyUtil
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.protocols import KeyProtocol, PrimitiveType, is_record, is_primitive, is_key, \
-    get_primitive_type_names
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TQuery
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.protocols import get_primitive_type_names
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.context_settings import ContextSettings
@@ -65,13 +68,15 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
                 raise RuntimeError(
                     f"Record not found for key {KeyUtil.format(record_or_key)} when loading type "
                     f"{TypeUtil.name(record_type)}.\n"
-                    f"Use 'load_one_or_none' method to return None instead of raising an error.")
+                    f"Use 'load_one_or_none' method to return None instead of raising an error."
+                )
             return result
         else:
             raise RuntimeError(
                 f"Parameter 'record_or_key' is None for load_one method when loading type "
                 f"{TypeUtil.name(record_type)}.\n"
-                f"Use 'load_one_or_none' method to return None instead of raising an error.")
+                f"Use 'load_one_or_none' method to return None instead of raising an error."
+            )
 
     def load_one_or_none(
         self,
@@ -110,7 +115,8 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
                 raise RuntimeError(
                     f"Parameter 'record_or_key' has type {TypeUtil.name(record_or_key)} which is\n"
                     f"neither a record, nor a key, nor a supported primitive type from the following list:\n"
-                    f"{', '.join(get_primitive_type_names())}")
+                    f"{', '.join(get_primitive_type_names())}"
+                )
 
             # Try to retrieve using _load_one_or_none method implemented in derived types
             if (result := self._load_one_or_none(key, dataset=dataset)) is not None:

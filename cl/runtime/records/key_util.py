@@ -17,7 +17,6 @@ import inspect
 import textwrap
 from typing import List
 from typing import Type
-
 from cl.runtime.records.protocols import KeyProtocol
 
 

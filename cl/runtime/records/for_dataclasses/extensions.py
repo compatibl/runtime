@@ -94,7 +94,7 @@ def optional(
         "label": label,
         "subtype": subtype,
         "formatter": formatter,  # TODO: switch to formatter in other places as format causes Python warnings
-        "optional": True
+        "optional": True,
     }
     metadata = {key: value for key, value in args.items() if value is not None}
 

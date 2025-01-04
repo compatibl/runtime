@@ -15,11 +15,10 @@
 import pytest
 from typing import Any
 from typing import Iterable
-
 from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.testing.pytest.pytest_fixtures import pytest_multi_db
-from stubs.cl.runtime import StubDataclassComposite, StubHandlers
+from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassDictFields
@@ -32,10 +31,11 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime import StubHandlers
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import StubDataclassTupleFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
 
@@ -75,6 +75,7 @@ def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iter
             raise ValueError(f"Item {item} contains only in first iterable.")
 
     return True
+
 
 def test_record_or_key(pytest_multi_db):
     """Test passing record instead of a key."""

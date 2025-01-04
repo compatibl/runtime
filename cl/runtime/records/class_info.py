@@ -19,7 +19,6 @@ from typing import List
 from typing import Tuple
 from typing import Type
 from memoization import cached  # TODO: Replace cached package by custom caching for better performance
-
 from cl.runtime.records.type_util import TypeUtil
 
 

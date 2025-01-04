@@ -16,7 +16,8 @@ from typing import Iterable
 from typing import Protocol
 from typing import Type
 from typing import TypeVar
-from cl.runtime.records.protocols import KeyProtocol, PrimitiveType
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
 
 TRecord = TypeVar("TRecord")  # TODO: Remove duplicate TKey definition

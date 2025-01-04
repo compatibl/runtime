@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import Iterable
-
 from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
@@ -55,5 +54,6 @@ class FormatUtil:
                 return DatetimeUtil.to_str(value)
             case _:
                 # TODO: Add the remaining primitive types
-                raise RuntimeError(f"Type {TypeUtil.name(value)} cannot be converted to string "
-                                   f"using FormatUtil.format method.")
+                raise RuntimeError(
+                    f"Type {TypeUtil.name(value)} cannot be converted to string " f"using FormatUtil.format method."
+                )

@@ -50,7 +50,7 @@ _FLAGGED_CHARS_REGEX = f"[{''.join(_FLAGGED_CHARS)}]"
 
 class CharUtil:
     """Utilities for working with single characters."""
-    
+
     @classmethod
     def is_empty(cls, value: str | None) -> bool:
         """Returns true if the string is None or ''."""

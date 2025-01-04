@@ -17,8 +17,8 @@ import os
 from typing import Iterator
 from typing import Type
 from _pytest.fixtures import FixtureRequest
-from cl.runtime import SqliteDb
 from cl.runtime import Db
+from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
@@ -82,7 +82,7 @@ def pytest_sqlite_db(request: FixtureRequest) -> Iterator[Db]:
 def pytest_basic_mongo_db(request: FixtureRequest) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases using BasicMongoDb.
-    
+
     Notes:
         This requires a running MongoDB server with DB create and drop permissions.
         If this is not available, use pytest_basic_mongo_mock_db instead.
@@ -96,14 +96,10 @@ def pytest_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
     yield from _pytest_db(request, db_type=BasicMongoMockDb)
 
 
-@pytest.fixture(scope="function", params=[
-    SqliteDb,
-    BasicMongoDb,
-    BasicMongoMockDb
-])
+@pytest.fixture(scope="function", params=[SqliteDb, BasicMongoDb, BasicMongoMockDb])
 def pytest_multi_db(request) -> Iterator[Db]:
     """
-    Pytest module fixture to setup and teardown temporary databases of all types 
+    Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.
     """
     yield from _pytest_db(request, db_type=request.param)

@@ -28,7 +28,8 @@ from typing import get_args
 from typing import get_origin
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from cl.runtime.records.protocols import RecordProtocol, TObj
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 

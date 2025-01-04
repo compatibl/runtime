@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Callable
-
 import pytest
 import datetime as dt
+from typing import Callable
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.format_util import FormatUtil
+
 
 def _test_format(*, method: Callable):
     """Test the specified callable."""
@@ -30,12 +30,13 @@ def _test_format(*, method: Callable):
     assert method(1.0) == "1."
     assert method(-1.23) == "-1.23"
     # Date
-    assert method(dt.date(2023,4,21)) == "2023-04-21"
+    assert method(dt.date(2023, 4, 21)) == "2023-04-21"
     # Datetime
-    value = DatetimeUtil.from_fields(2023,4,21, 11, 10, 0)
+    value = DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0)
     assert method(value) == "2023-04-21T11:10:00.000Z"
-    value = DatetimeUtil.from_fields(2023,4,21, 11, 10, 0, millisecond=123)
+    value = DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0, millisecond=123)
     assert method(value) == "2023-04-21T11:10:00.123Z"
+
 
 def test_format():
     """Test for FormatUtil.format."""
@@ -46,6 +47,7 @@ def test_format():
         FormatUtil.format("")
     # Other values
     _test_format(method=FormatUtil.format)
+
 
 def test_format_or_none():
     """Test for FormatUtil.format."""

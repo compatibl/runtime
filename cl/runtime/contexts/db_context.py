@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Iterable, Tuple
+from typing import Iterable
+from typing import Tuple
 from typing import Type
 from typing_extensions import Self
 from cl.runtime import Db
@@ -24,7 +25,8 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.primitive.format_util import FormatUtil
-from cl.runtime.records.protocols import KeyProtocol, PrimitiveType
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import PrimitiveType
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 
@@ -71,10 +73,9 @@ class DbContext(Context):
         # Get previous dataset value from the latest context in context stack that has the same DB
         reversed_stack = reversed(self.get_context_stack())
         # Set to root dataset if no previous contexts with the same DB are found in context stack
-        previous_dataset = next((
-            context.dataset for context in reversed_stack
-            if context.db.db_id == self.db.db_id
-        ), DatasetUtil.root())
+        previous_dataset = next(
+            (context.dataset for context in reversed_stack if context.db.db_id == self.db.db_id), DatasetUtil.root()
+        )
 
         if self.dataset:
             # If specified for this instance, combine with previous using backslash separator

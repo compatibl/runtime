@@ -19,7 +19,6 @@ from typing import Type
 from typing import get_type_hints
 from memoization import cached
 from typing_extensions import Self
-
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.element_decl import ElementDecl
 from cl.runtime.schema.for_dataclasses.dataclass_field_decl import DataclassFieldDecl

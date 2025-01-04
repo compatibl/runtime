@@ -17,7 +17,8 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import List
 from typing_extensions import Self
-from cl.runtime.contexts.context import Context, _CONTEXT_STACK_DICT_VAR
+from cl.runtime.contexts.context import _CONTEXT_STACK_DICT_VAR
+from cl.runtime.contexts.context import Context
 from cl.runtime.serialization.dict_serializer import DictSerializer
 
 _DICT_SERIALIZER = DictSerializer()
@@ -115,7 +116,7 @@ class ContextManager:
 
         # Return False to propagate the exception (if any) that occurred inside the 'with' block
         return False
-    
+
     @classmethod
     def save_and_clear_state(cls) -> Token:
         """Save state for all context stacks into a token, then clear state."""

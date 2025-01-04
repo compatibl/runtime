@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from abc import ABC
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
+from dataclasses import fields
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 
@@ -50,7 +51,8 @@ class Freezable(ABC):
 
         # Recursively call freeze on those field types that implement it
         tuple(
-            field_freeze() for field_obj in fields(self)  # noqa
+            field_freeze()
+            for field_obj in fields(self)  # noqa
             if (field_value := getattr(self, field_obj.name, None)) is not None
             and (field_freeze := getattr(field_value, "freeze", None)) is not None
         )

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.records.type_util import TypeUtil
-from stubs.cl.runtime import StubDataclassRecord, StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassRecord
 
 
 def test_check_type():

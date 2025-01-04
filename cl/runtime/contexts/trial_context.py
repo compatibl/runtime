@@ -63,8 +63,10 @@ class TrialContext(Context):
         if (result := cls.get_trial_or_none()) is not None:
             return result
         else:
-            raise RuntimeError("Trial was not specified in TrialContext(...) or method invoked "
-                               "outside the outermost 'with TrialContext(...)' clause.")
+            raise RuntimeError(
+                "Trial was not specified in TrialContext(...) or method invoked "
+                "outside the outermost 'with TrialContext(...)' clause."
+            )
 
     @classmethod
     def get_trial_or_none(cls) -> str | None:

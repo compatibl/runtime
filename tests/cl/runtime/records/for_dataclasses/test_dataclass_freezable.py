@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime import StubDataclassRecordKey, StubDataclassData
+from stubs.cl.runtime import StubDataclassData
+from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_complex_freezable import StubDataclassComplexFreezable
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import StubDataclassDictFields
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import StubDataclassListFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 
 
 def test_simple_freezable():
@@ -35,6 +36,7 @@ def test_simple_freezable():
     # Attempt to modify field after freezing
     with pytest.raises(AttributeError):
         record.value = "xyz"
+
 
 def test_complex_freezable():
     """Test for Freezable."""
@@ -64,6 +66,7 @@ def test_complex_freezable():
     record.non_freezable_obj.str_field = "xyz"
     record.non_freezable_list.append(StubDataclassSimpleFreezable())
 
+
 def test_try_freeze():
     """Test for FreezableUtil.."""
     record = StubDataclassSimpleFreezable()
@@ -74,6 +77,7 @@ def test_try_freeze():
     # Attempt to modify field after freezing
     with pytest.raises(AttributeError):
         record.value = "xyz"
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

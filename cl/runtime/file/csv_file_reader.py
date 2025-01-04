@@ -83,9 +83,7 @@ class CsvFileReader(Reader):
         record_type = Schema.get_type_by_short_name(filename_without_extension)
 
         # Normalize chars and set None for empty strings
-        row_dict = {
-            CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()
-        }
+        row_dict = {CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()}
         row_dict["_type"] = TypeUtil.name(record_type)
 
         return serializer.deserialize_data(row_dict)

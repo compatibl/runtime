@@ -17,7 +17,6 @@ from typing import Dict
 from typing import Iterable
 from typing import Type
 from typing_extensions import Self
-
 from cl.runtime import Db
 from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
@@ -169,7 +168,7 @@ class LocalCache(Db):
     @classmethod
     def check_db_id(cls, db_id: str) -> None:
         """Check that db_id follows the database name restrictions, error message otherwise."""
-        pass # TODO: Implement validation
+        pass  # TODO: Implement validation
 
     @classmethod
     def instance(cls) -> Self:

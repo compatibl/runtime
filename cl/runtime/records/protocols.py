@@ -122,4 +122,3 @@ def is_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
 def has_init(instance_or_type: Any) -> TypeGuard[InitProtocol]:
     """Check if type or object requires initialization (InitProtocol) based on the presence of 'init' attribute."""
     return hasattr(instance_or_type, "init")
-
