@@ -65,9 +65,6 @@ class BasicMongoDb(Db):
     client_uri: str = "mongodb://localhost:27017/"
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
 
-    use_mongo_mock: bool = False
-    """Use mongomock in-memory DB for testing instead of pymongo client."""
-
     def _load_one_or_none(
         self,
         key: KeyProtocol,
@@ -276,8 +273,12 @@ class BasicMongoDb(Db):
     def _get_client(self) -> MongoClient:
         """Get PyMongo client object."""
         if (client := _client_dict.get(self.client_uri, None)) is None:
-            # Create if it does not exist
-            client_type = MongoClient if not self.use_mongo_mock else MongoClientMock
+            # Determine regular or mock client type based on the presence of 'Mock' substring in class name
+            if "Mock" in TypeUtil.name(self):
+                client_type = MongoClientMock
+            else:
+                client_type = MongoClient
+            # Create client
             client = client_type(
                 self.client_uri,
                 uuidRepresentation="standard",
