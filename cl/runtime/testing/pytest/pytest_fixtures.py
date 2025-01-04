@@ -14,15 +14,14 @@
 
 import pytest
 import os
-from typing import Iterator, Iterable
+from typing import Iterator
 from typing import Type
 from _pytest.fixtures import FixtureRequest
-from cl.runtime import ClassInfo, SqliteDb
+from cl.runtime import SqliteDb
 from cl.runtime import Db
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
-from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 from cl.runtime.testing.pytest.pytest_util import PytestUtil

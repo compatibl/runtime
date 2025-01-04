@@ -58,7 +58,7 @@ class FlatDictSerializer(DictSerializer):
             # All other types try to serialize as JSON string
             json_data = super().serialize_data(data)
 
-            if not isinstance(json_data, (dict, list)):
+            if not isinstance(json_data, (list, tuple, dict)):
                 raise RuntimeError(
                     f"Received value is not serializable to json. Value: {json_data}, input value: {data}."
                 )

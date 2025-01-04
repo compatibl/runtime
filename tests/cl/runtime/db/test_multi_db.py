@@ -13,13 +13,11 @@
 # limitations under the License.
 
 import pytest
-import time
 from typing import Any
 from typing import Iterable
-from cl.runtime import Db
+
+from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.db.sql.sqlite_db import SqliteDb
 from cl.runtime.testing.pytest.pytest_fixtures import pytest_multi_db
 from stubs.cl.runtime import StubDataclassComposite, StubHandlers
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -38,8 +36,29 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import St
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import StubDataclassTupleFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
+
+_SAMPLES = [
+    StubDataclassRecord(id="abc1"),
+    StubDataclassNestedFields(id="abc2"),
+    StubDataclassComposite(),
+    StubDataclassDerivedRecord(id="abc3"),
+    StubDataclassDerivedFromDerivedRecord(id="abc4"),
+    StubDataclassOtherDerivedRecord(id="abc5"),
+    StubDataclassListFields(id="abc6"),
+    # TODO: Add StubDataclassTupleFields(id="abc6tuple"),
+    StubDataclassOptionalFields(id="abc7"),
+    StubDataclassDictFields(id="abc8"),
+    StubDataclassDictListFields(id="abc9"),
+    StubDataclassListDictFields(id="abc10"),
+    StubDataclassPrimitiveFields(key_str_field="abc11"),
+    StubDataclassSingleton(),
+    StubDataclassAliasedRecord(id="abc12", a=123),
+    StubHandlers(stub_id="abc13"),
+    StubDataclassRecord(id="abc14"),
+    StubDataclassVersionedRecord(id="abc15"),
+]
 
 
 def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
@@ -78,78 +97,38 @@ def test_record_or_key(pytest_multi_db):
 
 def test_complex_records(pytest_multi_db):
     """Test 'save_many' method for various types."""
-    samples = [
-        StubDataclassRecord(id="abc1"),
-        StubDataclassNestedFields(id="abc2"),
-        StubDataclassComposite(),
-        StubDataclassDerivedRecord(id="abc3"),
-        StubDataclassDerivedFromDerivedRecord(id="abc4"),
-        StubDataclassOtherDerivedRecord(id="abc5"),
-        StubDataclassListFields(id="abc6"),
-        StubDataclassOptionalFields(id="abc7"),
-        StubDataclassDictFields(id="abc8"),
-        StubDataclassDictListFields(id="abc9"),
-        StubDataclassListDictFields(id="abc10"),
-        StubDataclassPrimitiveFields(key_str_field="abc11"),
-        StubDataclassSingleton(),
-        StubDataclassAliasedRecord(id="abc12", a=123),
-        StubHandlers(stub_id="abc13"),
-        StubDataclassRecord(id="abc14"),
-        StubDataclassVersionedRecord(id="abc15"),
-    ]
+    DbContext.save_many(_SAMPLES)
 
-    DbContext.save_many(samples)
-
-    sample_keys = [sample.get_key() for sample in samples]
+    sample_keys = [sample.get_key() for sample in _SAMPLES]
     loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
 
-    assert loaded_records == samples
+    assert loaded_records == _SAMPLES
 
 
 def test_basic_operations(pytest_multi_db):
     """Test save/load/delete methods for various types."""
-    samples = [
-        StubDataclassRecord(id="abc1"),
-        StubDataclassNestedFields(id="abc2"),
-        StubDataclassComposite(),
-        StubDataclassDerivedRecord(id="abc3"),
-        StubDataclassDerivedFromDerivedRecord(id="abc4"),
-        StubDataclassOtherDerivedRecord(id="abc5"),
-        StubDataclassListFields(id="abc6"),
-        StubDataclassOptionalFields(id="abc7"),
-        StubDataclassDictFields(id="abc8"),
-        StubDataclassDictListFields(id="abc9"),
-        StubDataclassListDictFields(id="abc10"),
-        StubDataclassPrimitiveFields(key_str_field="abc11"),
-        StubDataclassSingleton(),
-        StubDataclassAliasedRecord(id="abc12", a=123),
-        StubHandlers(stub_id="abc13"),
-        StubDataclassRecord(id="abc14"),
-        StubDataclassVersionedRecord(id="abc15"),
-    ]
-
-    sample_keys = [x.get_key() for x in samples]
+    sample_keys = [x.get_key() for x in _SAMPLES]
 
     # Load from empty tables
     loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
-    assert loaded_records == [None] * len(samples)
+    assert loaded_records == [None] * len(_SAMPLES)
 
     # Populate tables
-    DbContext.save_many(samples)
+    DbContext.save_many(_SAMPLES)
 
     # Load one by one for all keys because each type is different
     loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
-    assert loaded_records == samples
+    assert loaded_records == _SAMPLES
 
     # Delete first and last record
     DbContext.delete_many([sample_keys[0], sample_keys[-1]])
     loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
-    assert loaded_records == [None, *samples[1:-1], None]
+    assert loaded_records == [None, *_SAMPLES[1:-1], None]
 
     # Delete all records
     DbContext.delete_many(sample_keys)
     loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
-    assert loaded_records == [None] * len(samples)
+    assert loaded_records == [None] * len(_SAMPLES)
 
 
 def test_record_upsert(pytest_multi_db):
@@ -237,6 +216,10 @@ def test_abstract_key(pytest_multi_db):
 
 def test_load_filter(pytest_multi_db):
     """Test 'load_filter' method."""
+
+    if isinstance(pytest_multi_db, SqliteDb):
+        pytest.skip("Sqlite does not support load_filter method.")
+
     # Create test record and populate with sample data
     offset = 0
     matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="a") for i in range(2)]

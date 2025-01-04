@@ -29,6 +29,7 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import StubDataclassTupleFields
 
 
 # TODO (Roman): move to Schema tests
@@ -43,6 +44,7 @@ def test_get_subtypes_in_hierarchy():
         StubDataclassDictListFields,
         StubDataclassListDictFields,
         StubDataclassListFields,
+        StubDataclassTupleFields,
         StubDataclassOtherDerivedRecord,
         StubDataclassNestedFields,
         StubDataclassNestedFinalRecord,
