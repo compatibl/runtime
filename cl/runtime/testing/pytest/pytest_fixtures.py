@@ -14,27 +14,18 @@
 
 import pytest
 import os
-from typing import Iterator
+from typing import Iterator, Iterable
 from typing import Type
 from _pytest.fixtures import FixtureRequest
-from cl.runtime import ClassInfo
+from cl.runtime import ClassInfo, SqliteDb
 from cl.runtime import Db
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
+from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 from cl.runtime.testing.pytest.pytest_util import PytestUtil
-
-
-def _create_db(request: FixtureRequest, *, db_type: Type | None = None):
-    """Create DB of the specified type, or use DB type from context settings if not specified."""
-
-    # Get test DB identifier
-    env_name = PytestUtil.get_env_name(request)
-    db_id = "temp;" + env_name.replace(".", ";")
-
-    # Create and return a new DB instance
-    return Db.create(db_type=db_type, db_id=db_id)
 
 
 @pytest.fixture(scope="function")
@@ -52,15 +43,18 @@ def testing_work_dir(request: FixtureRequest) -> Iterator[str]:
     yield work_dir
 
     # Change directory back before exiting the text
-    os.chdir(request.config.invocation_dir)
+    os.chdir(request.config.invocation_dir)  # noqa
 
 
-@pytest.fixture(scope="function")
-def testing_db(request) -> Iterator[Db]:
-    """Pytest module fixture to setup and teardown a temporary test DB."""
+def _testing_db(request: FixtureRequest, *, db_type: Type | None = None) -> Iterator[Db]:
+    """Setup and teardown a temporary test DB of the specified type."""
 
-    # Create test DB
-    db = _create_db(request)
+    # Get test DB identifier
+    env_name = PytestUtil.get_env_name(request)
+    db_id = "temp;" + env_name.replace(".", ";")
+
+    # Create a new DB instance of the specified type (use the type from settings if None)
+    db = Db.create(db_type=db_type, db_id=db_id)
 
     # Delete all existing records in test DB before the test in case it was not performed by the preceding run
     db.delete_all_and_drop_db()
@@ -71,6 +65,34 @@ def testing_db(request) -> Iterator[Db]:
 
     # Delete all existing records in test DB after the test
     db.delete_all_and_drop_db()
+
+
+@pytest.fixture(scope="function")
+def testing_db(request: FixtureRequest) -> Iterator[Db]:
+    """Pytest module fixture to setup and teardown a temporary test DB of the default type specified in settings."""
+    yield from _testing_db(request)
+
+
+@pytest.fixture(scope="function")
+def testing_sqlite_db(request: FixtureRequest) -> Iterator[Db]:
+    """Pytest module fixture to setup and teardown a temporary test SqliteDB."""
+    yield from _testing_db(request, db_type=BasicMongoMockDb)
+
+
+@pytest.fixture(scope="function")
+def testing_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
+    """Pytest module fixture to setup and teardown a temporary test BasicMongoMockDb."""
+    yield from _testing_db(request, db_type=BasicMongoMockDb)
+
+
+@pytest.fixture(scope="function", params=[
+    SqliteDb,
+    BasicMongoDb,
+    BasicMongoMockDb
+])
+def testing_multi_db(request) -> Iterator[Db]:
+    """Pytest module fixture to setup and teardown temporary test DBs of all supported types."""
+    yield from _testing_db(request, db_type=request.param)
 
 
 @pytest.fixture(scope="session")  # TODO: Use a named celery queue for each test
