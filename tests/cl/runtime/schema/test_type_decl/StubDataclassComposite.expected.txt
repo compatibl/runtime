@@ -1,0 +1,72 @@
+module:
+  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite
+name: StubDataclassComposite
+label: Stub Dataclass Composite
+comment: Stub for a composite key that contains other key fields.
+kind: null
+display_kind: Basic
+inherit: null
+declare: null
+elements:
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: Primitive
+  label: null
+  comment: String key element.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data: null
+  key_:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  query: null
+  condition: null
+  name: Embedded1
+  label: null
+  comment: Embedded key 1.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data: null
+  key_:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  query: null
+  condition: null
+  name: Embedded2
+  label: null
+  comment: Embedded key 2.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+keys:
+- Primitive
+- Embedded1
+- Embedded2
+immutable: null
+permanent: null
+

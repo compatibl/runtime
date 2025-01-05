@@ -1,0 +1,172 @@
+module:
+  module_name: cl.runtime.backend.core.ui_app_state
+name: UiAppState
+label: Ui App State
+comment: UiAppState.
+kind: null
+display_kind: Basic
+inherit: null
+declare: null
+elements:
+- value: null
+  enum: null
+  data: null
+  key_:
+    module:
+      module_name: cl.runtime.backend.core.user_key
+    name: UserKey
+  query: null
+  condition: null
+  name: User
+  label: null
+  comment: A user the app state is applied for.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: cl.runtime.backend.core.tab_info
+    name: TabInfo
+  key_: null
+  query: null
+  condition: null
+  name: OpenedTabs
+  label: null
+  comment: Information about opened tabs.
+  vector: true
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Int
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ActiveTabIndex
+  label: null
+  comment: Index of active opened tab.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: BackendVersion
+  label: null
+  comment: DEPRECATED. Use versions instead.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Dict
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: Versions
+  label: null
+  comment: Component versions.
+  vector: null
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ApplicationName
+  label: null
+  comment: Application name.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Bool
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ReadOnly
+  label: null
+  comment: Flag indicating that UI is read-only.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ApplicationTheme
+  label: null
+  comment: Application theme (dark, light, etc.).
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: UserSecretIdentifiers
+  label: null
+  comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
+  vector: true
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+keys:
+- User
+immutable: null
+permanent: null
+

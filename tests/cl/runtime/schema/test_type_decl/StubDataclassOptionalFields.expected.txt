@@ -1,0 +1,305 @@
+module:
+  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields
+name: StubDataclassOptionalFields
+label: Stub Dataclass Optional Fields
+comment: Stub derived class.
+kind: null
+display_kind: Basic
+inherit: null
+declare: null
+elements:
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: Id
+  label: null
+  comment: Unique identifier.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: OptionalStr
+  label: null
+  comment: Optional string.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: RequiredListOfOptionalStr
+  label: null
+  comment: Required list of optional strings.
+  vector: true
+  optional: false
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: OptionalListOfOptionalStr
+  label: null
+  comment: Optional list of optional strings.
+  vector: true
+  optional: true
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Double
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: OptionalFloat
+  label: null
+  comment: Optional float.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Double
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: RequiredListOfOptionalFloat
+  label: null
+  comment: Required list of optional floats.
+  vector: true
+  optional: false
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Double
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: OptionalListOfOptionalFloat
+  label: null
+  comment: Optional list of optional floats.
+  vector: true
+  optional: true
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+    name: StubDataclassData
+  key_: null
+  query: null
+  condition: null
+  name: OptionalData
+  label: null
+  comment: Optional data.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+    name: StubDataclassData
+  key_: null
+  query: null
+  condition: null
+  name: RequiredListOfOptionalData
+  label: null
+  comment: Required list of optional data.
+  vector: true
+  optional: false
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+    name: StubDataclassData
+  key_: null
+  query: null
+  condition: null
+  name: OptionalListOfOptionalData
+  label: null
+  comment: Optional list of optional data.
+  vector: true
+  optional: true
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data: null
+  key_:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  query: null
+  condition: null
+  name: OptionalKey
+  label: null
+  comment: Optional key.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data: null
+  key_:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  query: null
+  condition: null
+  name: RequiredListOfOptionalKey
+  label: null
+  comment: Required list of optional key.
+  vector: true
+  optional: false
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data: null
+  key_:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  query: null
+  condition: null
+  name: OptionalListOfOptionalKey
+  label: null
+  comment: Optional list of optional key.
+  vector: true
+  optional: true
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+    name: StubDataclassRecord
+  key_: null
+  query: null
+  condition: null
+  name: OptionalRecord
+  label: null
+  comment: Optional record.
+  vector: false
+  optional: true
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+    name: StubDataclassRecord
+  key_: null
+  query: null
+  condition: null
+  name: RequiredListOfOptionalRecord
+  label: null
+  comment: Required list of optional record.
+  vector: true
+  optional: false
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+    name: StubDataclassRecord
+  key_: null
+  query: null
+  condition: null
+  name: OptionalListOfOptionalRecord
+  label: null
+  comment: Optional list of optional record.
+  vector: true
+  optional: true
+  optional_vector_element: true
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+keys:
+- Id
+immutable: null
+permanent: null
+

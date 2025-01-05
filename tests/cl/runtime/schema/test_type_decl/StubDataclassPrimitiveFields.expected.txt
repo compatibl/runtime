@@ -1,0 +1,403 @@
+module:
+  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields
+name: StubDataclassPrimitiveFields
+label: Stub Dataclass Primitive Fields
+comment: Stub record whose elements are primitive types.
+kind: null
+display_kind: Basic
+inherit: null
+declare: null
+elements:
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyStrField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Double
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyFloatField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Bool
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyBoolField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Int
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyIntField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Int
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyLongField
+  label: null
+  comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Date
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyDateField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Time
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyTimeField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: DateTime
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyDateTimeField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: UUID
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyUuidField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Binary
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyBytesField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum:
+    module:
+      module_name: stubs.cl.runtime.records.enum.stub_int_enum
+    name: StubIntEnum
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: KeyEnumField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjStrField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Double
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjFloatField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Bool
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjBoolField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Int
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjIntField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Int
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjLongField
+  label: null
+  comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Date
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjDateField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Time
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjTimeField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: DateTime
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjDateTimeField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: UUID
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjUuidField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Binary
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjBytesField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum:
+    module:
+      module_name: stubs.cl.runtime.records.enum.stub_int_enum
+    name: StubIntEnum
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjEnumField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+keys:
+- KeyStrField
+- KeyFloatField
+- KeyBoolField
+- KeyIntField
+- KeyLongField
+- KeyDateField
+- KeyTimeField
+- KeyDateTimeField
+- KeyUuidField
+- KeyBytesField
+- KeyEnumField
+immutable: null
+permanent: null
+

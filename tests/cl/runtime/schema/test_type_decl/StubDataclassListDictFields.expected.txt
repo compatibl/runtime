@@ -1,0 +1,103 @@
+module:
+  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_dict_fields
+name: StubDataclassListDictFields
+label: Stub Dataclass List Dict Fields
+comment: Stub record whose elements are dictionaries.
+kind: null
+display_kind: Basic
+inherit:
+  module:
+    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+  name: StubDataclassRecord
+declare: null
+elements:
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: Id
+  label: null
+  comment: null
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Dict
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: FloatListDict
+  label: null
+  comment: Stub field.
+  vector: null
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Dict
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: DateListDict
+  label: null
+  comment: Stub field.
+  vector: null
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Dict
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: RecordListDict
+  label: null
+  comment: Stub field.
+  vector: null
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Dict
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: DerivedRecordListDict
+  label: null
+  comment: Stub field.
+  vector: null
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+keys:
+- Id
+immutable: null
+permanent: null
+

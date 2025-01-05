@@ -1,0 +1,162 @@
+module:
+  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields
+name: StubDataclassListFields
+label: Stub Dataclass List Fields
+comment: Stub record whose elements are lists.
+kind: null
+display_kind: Basic
+inherit:
+  module:
+    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+  name: StubDataclassRecord
+declare: null
+elements:
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: Id
+  label: null
+  comment: null
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: StrList
+  label: null
+  comment: Stub field.
+  vector: true
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Double
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: FloatList
+  label: null
+  comment: Stub field.
+  vector: true
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: Date
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: DateList
+  label: null
+  comment: Stub field.
+  vector: true
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+    name: StubDataclassData
+  key_: null
+  query: null
+  condition: null
+  name: DataList
+  label: null
+  comment: Stub field.
+  vector: true
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data: null
+  key_:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  query: null
+  condition: null
+  name: KeyList
+  label: null
+  comment: Stub field.
+  vector: true
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+    name: StubDataclassRecord
+  key_: null
+  query: null
+  condition: null
+  name: RecordList
+  label: null
+  comment: Stub field.
+  vector: true
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value: null
+  enum: null
+  data:
+    module:
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record
+    name: StubDataclassDerivedRecord
+  key_: null
+  query: null
+  condition: null
+  name: DerivedRecordList
+  label: null
+  comment: Stub field.
+  vector: true
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+keys:
+- Id
+immutable: null
+permanent: null
+

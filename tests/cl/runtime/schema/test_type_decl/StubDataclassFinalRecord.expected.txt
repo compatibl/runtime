@@ -1,0 +1,69 @@
+module:
+  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record
+name: StubDataclassFinalRecord
+label: Stub Dataclass Final Record
+comment: Some of the fields are in base record.
+kind: null
+display_kind: Basic
+inherit:
+  module:
+    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_abstract_record
+  name: StubDataclassAbstractRecord
+declare: null
+elements:
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: Id
+  label: null
+  comment: null
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: BaseField
+  label: null
+  comment: null
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: FinalField
+  label: null
+  comment: Field in base record.
+  vector: false
+  optional: false
+  optional_vector_element: false
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+keys:
+- Id
+immutable: null
+permanent: null
+
