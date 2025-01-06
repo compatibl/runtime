@@ -51,7 +51,7 @@ _SAMPLE_TYPES = [
     StubDataclassDerivedFromDerivedRecord,
     StubDataclassOtherDerivedRecord,
     StubDataclassListFields,
-    # TODO: Fix StubDataclassTupleFields,
+    StubDataclassTupleFields,
     StubDataclassOptionalFields,
     # TODO: StubDataclassDictFields,
     # TODO: StubDataclassDictListFields,

@@ -24,6 +24,7 @@ from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.field_kind import FieldKind
 
 primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
@@ -101,13 +102,18 @@ class FieldDecl:
         field_origin = typing.get_origin(field_type)
         field_args = typing.get_args(field_type)
 
-        # Note two possible forms of origin for optional, typing.Union and types.UnionType
-        is_union = field_origin is typing.Union or field_origin is types.UnionType
-        is_optional = is_union and type(None) in field_args
+        # There are two possible forms of origin for optional, typing.Union and types.UnionType
+        if field_origin is typing.Union or field_origin is types.UnionType:
+            # Union with None is the only permitted Union type
+            if len(field_args) != 2 or field_args[1] is not type(None):
+                raise RuntimeError(
+                    f"Union type hint '{field_type}' for field '{field_name}'\n"
+                    f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                    f"because it is not an optional value using the syntax 'Type | None',\n"
+                    f"where None is placed second per the standard convention.\n"
+                    f"It cannot be used to specify a choice between two types.\n")
 
-        # Strip optional from field_type
-        if is_optional:
-            # Indicate that field can be None
+            # Set optional flag in result
             result.optional_field = True
 
             # Get type information without None
@@ -115,50 +121,86 @@ class FieldDecl:
             field_origin = typing.get_origin(field_type)
             field_args = typing.get_args(field_type)
         else:
-            # Indicate that field cannot be None
+            # Set optional flag in result
             result.optional_field = False
 
         # Check for one of the supported container types
-        if field_origin in [list, dict]:
-            if field_origin.__module__ == "builtins":
-                result.container_type = field_origin.__name__
+        supported_container_types = [list, tuple, dict]
+        if field_origin in supported_container_types:
+            container_type_name = TypeUtil.name(field_origin)
+            if field_origin is list:
+                # Perform additional checks for list
+                if len(field_args) != 1:
+                    raise RuntimeError(
+                        f"List type hint '{field_type}' for field '{field_name}'\n"
+                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                        f"because it is not a list of elements using the syntax 'List[Type]'.\n"
+                        f"Other list type hint formats are not supported.\n")
+            elif field_origin is tuple:
+                # Perform additional checks for tuple
+                if len(field_args) == 1 or (len(field_args) > 1 and field_args[1] is not Ellipsis):
+                    raise RuntimeError(
+                        f"Tuple type hint '{field_type}' for field '{field_name}'\n"
+                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                        f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]',\n"
+                        f"where ellipsis '...' is placed second per the standard convention.\n"
+                        f"It cannot be used to specify a fixed size tuple or a tuple with\n"
+                        f"different element types.\n")
+            elif field_origin is dict:
+                # Perform additional checks for dict
+                if len(field_args) != 2 and field_args[0] is not str:
+                    raise RuntimeError(
+                        f"Dict type hint '{field_type}' for field '{field_name}'\n"
+                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                        f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'.\n"
+                        f"It cannot be used to specify a dictionary with keys of a different type.\n")
+                # TODO: Support Dict[str, List[x]]
             else:
-                result.container_type = f"{field_origin.__module__}.{field_origin.__name__}"
+                supported_container_type_names = ", ".join([TypeUtil.name(x) for x in supported_container_types])
+                raise RuntimeError(f"Type {container_type_name} is not one of the supported container types "
+                                   f"{supported_container_type_names}.")
+
+            # Assign type name
+            result.container_type = container_type_name
 
             # Strip container information from field_type to get the type of value inside the container
             field_type = field_args[0]
             field_origin = typing.get_origin(field_type)
             field_args = typing.get_args(field_type)
+
+            # There are two possible forms of origin for optional, typing.Union and types.UnionType
+            if field_origin is typing.Union or field_origin is types.UnionType:
+                # Union with None is the only permitted Union type
+                if len(field_args) != 2 or field_args[1] is not type(None):
+                    raise RuntimeError(
+                        f"Union type hint '{field_type}' for an element of\n"
+                        f"{result.container_type} field '{field_name}'\n"
+                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                        f"because it is not an optional value using the syntax 'Type | None',\n"
+                        f"where None is placed second per the standard convention.\n"
+                        f"It cannot be used to specify a choice between two types.\n")
+
+                # Indicate that container elements can be None
+                result.optional_values = True
+
+                # Get type information without None
+                field_type = field_args[0]
+                field_origin = typing.get_origin(field_type)
+                field_args = typing.get_args(field_type)  # TODO: Add a check
+            else:
+                # Indicate that values cannot be None
+                result.optional_values = False
         else:
             # No container
             result.container_type = None
-
-        # Strip optional again from the inner type
-        is_union = field_origin is typing.Union or field_origin is types.UnionType
-        is_optional = is_union and type(None) in field_args
-        if is_optional:
-            # Indicate that values can be None
-            result.optional_values = True
-
-            # Get type information without None
-            field_type = field_args[0]
-            field_origin = typing.get_origin(field_type)
-            field_args = typing.get_args(field_type)
-        else:
-            # Indicate that values cannot be None
-            result.optional_values = False
 
         # Parse the value itself
         if field_origin is Literal:
             # List of literal strings
             result.field_kind = "primitive"
             result.field_type = str.__name__
-
-        elif field_origin is tuple:
-            # Generic key
-            result.field_kind = "primitive"
-            result.field_type = "key"
-
+        elif field_origin in supported_container_types:
+            raise RuntimeError("Containers within containers are not supported when building database schema.")
         elif field_origin is None:
             # Assign element kind
             if field_type in primitive_types:
@@ -173,7 +215,6 @@ class FieldDecl:
             else:
                 # Indicate that field is a user-defined data or record
                 result.field_kind = "data"
-
             if field_type.__module__ in primitive_modules:
                 # Primitive type, specify type name
                 result.field_type = field_type.__name__
@@ -212,10 +253,7 @@ class FieldDecl:
                 # Add to dependencies
                 if dependencies is not None:
                     dependencies.add(field_type_obj)
-
-                # Add to Schema
-
         else:
-            raise RuntimeError(f"Complex type {field_type} is not recognized when building database schema.")
+            raise RuntimeError(f"Complex type {field_type} is not supported when building database schema.")
 
         return result

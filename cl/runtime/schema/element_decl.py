@@ -90,14 +90,16 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
             else:
                 raise RuntimeError(f"Unsupported field kind {field_decl.field_kind} for field {field_decl.name}.")
 
-        if field_decl.container_type is None:
-            result.vector = False
-        elif field_decl.container_type == "list":
-            result.vector = True
-        elif field_decl.container_type == "dict":
-            # TODO (Roman): Use another way to define the dict field. This is currently legacy format.
-            result.value = ValueDecl(type_="Dict")
-        else:
-            raise RuntimeError(f"Unsupported container type {field_decl.container_type} for field {field_decl.name}.")
-
+        match field_decl.container_type:
+            case None:
+                result.vector = False
+            case "list":
+                result.vector = True
+            case "tuple":
+                result.vector = True
+            case "dict":
+                # TODO (Roman): This is legacy format, use another way to define the dict field
+                result.value = ValueDecl(type_="Dict")
+            case _:
+                raise RuntimeError(f"Unsupported container type {field_decl.container_type} for field {field_decl.name}.")
         return result
