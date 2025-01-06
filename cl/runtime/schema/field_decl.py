@@ -111,7 +111,8 @@ class FieldDecl:
                     f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
                     f"because it is not an optional value using the syntax 'Type | None',\n"
                     f"where None is placed second per the standard convention.\n"
-                    f"It cannot be used to specify a choice between two types.\n")
+                    f"It cannot be used to specify a choice between two types.\n"
+                )
 
             # Set optional flag in result
             result.optional_field = True
@@ -135,7 +136,8 @@ class FieldDecl:
                         f"List type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
                         f"because it is not a list of elements using the syntax 'List[Type]'.\n"
-                        f"Other list type hint formats are not supported.\n")
+                        f"Other list type hint formats are not supported.\n"
+                    )
             elif field_origin is tuple:
                 # Perform additional checks for tuple
                 if len(field_args) == 1 or (len(field_args) > 1 and field_args[1] is not Ellipsis):
@@ -145,7 +147,8 @@ class FieldDecl:
                         f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]',\n"
                         f"where ellipsis '...' is placed second per the standard convention.\n"
                         f"It cannot be used to specify a fixed size tuple or a tuple with\n"
-                        f"different element types.\n")
+                        f"different element types.\n"
+                    )
             elif field_origin is dict:
                 # Perform additional checks for dict
                 if len(field_args) != 2 and field_args[0] is not str:
@@ -153,12 +156,15 @@ class FieldDecl:
                         f"Dict type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
                         f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'.\n"
-                        f"It cannot be used to specify a dictionary with keys of a different type.\n")
+                        f"It cannot be used to specify a dictionary with keys of a different type.\n"
+                    )
                 # TODO: Support Dict[str, List[x]]
             else:
                 supported_container_type_names = ", ".join([TypeUtil.name(x) for x in supported_container_types])
-                raise RuntimeError(f"Type {container_type_name} is not one of the supported container types "
-                                   f"{supported_container_type_names}.")
+                raise RuntimeError(
+                    f"Type {container_type_name} is not one of the supported container types "
+                    f"{supported_container_type_names}."
+                )
 
             # Assign type name
             result.container_type = container_type_name
@@ -178,7 +184,8 @@ class FieldDecl:
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
                         f"because it is not an optional value using the syntax 'Type | None',\n"
                         f"where None is placed second per the standard convention.\n"
-                        f"It cannot be used to specify a choice between two types.\n")
+                        f"It cannot be used to specify a choice between two types.\n"
+                    )
 
                 # Indicate that container elements can be None
                 result.optional_values = True

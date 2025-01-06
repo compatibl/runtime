@@ -101,5 +101,7 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
                 # TODO (Roman): This is legacy format, use another way to define the dict field
                 result.value = ValueDecl(type_="Dict")
             case _:
-                raise RuntimeError(f"Unsupported container type {field_decl.container_type} for field {field_decl.name}.")
+                raise RuntimeError(
+                    f"Unsupported container type {field_decl.container_type} for field {field_decl.name}."
+                )
         return result
