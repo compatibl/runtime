@@ -18,23 +18,24 @@ from collections import Counter
 from dataclasses import dataclass
 from datetime import timezone
 from enum import Enum
-from types import UnionType
+from typing import Any
 from typing import Dict
-from typing import List
 from typing import Tuple
 from typing import Type
-from typing import TypeVar
-from typing import Union
 from typing import cast
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serialization.annotations_util import AnnotationsUtil
 from cl.runtime.serialization.sentinel_type import sentinel_value
 
 # TODO: Initialize from settings
@@ -48,14 +49,8 @@ _type_dict: Dict[str, Type] | None = None
 class_hierarchy_slots_dict: Dict[Type, Tuple] = dict()
 """Dictionary of slots in class hierarchy in the order of declaration from base to derived."""
 
-class_hierarchy_annotations_dict: Dict[Type, Dict[str, Type]] = dict()
-"""Dictionary of annotations in class hierarchy."""
-
 collect_slots = sys.version_info.major > 3 or sys.version_info.major == 3 and sys.version_info.minor >= 11
 """For Python 3.11 and later, __slots__ includes fields for this class only, use MRO to include base class slots."""
-
-# TypeVar for any data type
-T = TypeVar("T")
 
 
 # TODO: Should classes not included packages be supported? If not do not update type dict in serializer.
@@ -106,49 +101,6 @@ def _get_class_hierarchy_slots(data_type) -> Tuple[str]:
         return cast(Tuple[str], result)
 
 
-def _get_class_hierarchy_annotations(data_type) -> Dict[str, Type]:
-    """
-    Return combined annotations dict for all classes in data_type hierarchy.
-    Checks type of fields with the same name and raises RuntimeError if there is a conflict.
-    """
-    if (result := class_hierarchy_annotations_dict.get(data_type, None)) is not None:
-        # Use cached value
-        return result
-    else:
-        # Collect all annotations in hierarchy
-
-        # Combined annotations for all types in hierarchy {field_name: field_type}
-        hierarchy_annots: Dict[str, Type] = {}
-
-        for base in reversed(data_type.__mro__):
-            if annot := getattr(base, "__annotations__", None):
-                for name_, type_ in annot.items():
-                    # TODO (Roman): Implement a robust type conflict checking function
-                    hierarchy_annots[name_] = type_
-
-        return hierarchy_annots
-
-
-def handle_optional_annot(type_):
-    """Extract inner type if 'type_' is Optional[...], otherwise return unchanged."""
-
-    if type_ is None:
-        return None
-
-    # Check if type_ is a UnionType or Union and process if only one argument is not None.
-    if (type_.__class__ is UnionType or getattr(type_, "__origin__", None) is Union) and (
-        union_args := getattr(type_, "__args__", None)
-    ):
-        not_none_union_args: List[int] = [arg for arg in union_args if arg is not type(None)]
-        if len(not_none_union_args) == 1:
-            return not_none_union_args[0]
-        else:
-            raise RuntimeError(f"Can not process Union: {type_}.")
-
-    # Return type_ if it is not Union
-    return type_
-
-
 # TODO: Add checks for to_node, from_node implementation for custom override of default serializer
 @dataclass(slots=True, kw_only=True)
 class DictSerializer:
@@ -157,18 +109,19 @@ class DictSerializer:
     pascalize_keys: bool = False
     """If true, pascalize keys during serialization."""
 
-    primitive_type_names = [
+    primitive_type_names = {
         "NoneType",
         "str",
         "float",
-        "int",
         "bool",
         "bytes",
         "UUID",
-    ]
+    }
     """Detect primitive type by checking if class name is in this list."""
 
-    def serialize_data(self, data):  # TODO: Check if None should be supported
+    def serialize_data(
+        self, data: TRecord, type_: Type | None = None
+    ) -> dict[str, Any]:  # TODO: Check if None should be supported
         """
         Serialize to dictionary containing primitive types, dictionaries, or iterables.
 
@@ -178,8 +131,10 @@ class DictSerializer:
 
         Args:
             data: Object to serialize
+            type_: Annotation type
         """
 
+        type_ = AnnotationsUtil.handle_optional_annot(type_)
         if getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
 
@@ -188,10 +143,13 @@ class DictSerializer:
 
             # Get slots from this class and its bases in the order of declaration from base to derived
             all_slots = _get_class_hierarchy_slots(data.__class__)
+            annots = AnnotationsUtil.get_class_hierarchy_annotations(data.__class__)
             # Serialize slot values in the order of declaration except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case_keep_trailing_underscore(k)): (
-                    v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v)
+                    v
+                    if (v_annot := annots.get(k)) is not Any and v.__class__.__name__ in self.primitive_type_names
+                    else self.serialize_data(v, v_annot)
                 )
                 for k in all_slots
                 if (v := getattr(data, k)) is not None
@@ -205,32 +163,50 @@ class DictSerializer:
             result["_type"] = short_name
             return result
         elif data.__class__.__name__ == "date":
-            return dt.datetime.combine(data, dt.datetime.min.time())
+            return dt.datetime.combine(data, dt.datetime.min.time()).replace(tzinfo=dt.timezone.utc)
         elif data.__class__.__name__ == "time":
-            return dt.datetime.combine(dt.date.today(), data)
+            return TimeUtil.to_iso_int(TimeUtil.round(data))
         elif data.__class__.__name__ == "datetime":
+            return DatetimeUtil.round(data)
+        # 'int' is not a primitive because it could be dt.time on deserialization
+        elif data.__class__.__name__ in self.primitive_type_names or data.__class__.__name__ == "int":
             return data
         elif isinstance(data, dict):
+            dict_value_annot_type = AnnotationsUtil.extract_dict_value_annot_type(type_)
             # Dictionary, return with serialized values
             result = {
-                k: (v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v))
+                k: (
+                    v
+                    if v.__class__.__name__ in self.primitive_type_names and dict_value_annot_type is not Any
+                    else self.serialize_data(v, dict_value_annot_type)
+                )
                 for k, v in data.items()
             }
             return result
         elif hasattr(data, "__iter__"):
             # Get the first item without iterating over the entire sequence
             first_item = next(iter(data), sentinel_value)
+            list_value_annot_type = AnnotationsUtil.extract_list_value_annot_type(type_)
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
-            elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names:
+            elif (
+                first_item is not None
+                and first_item.__class__.__name__ in self.primitive_type_names
+                and list_value_annot_type is not Any
+            ):
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
                 return data
             else:
                 # Serialize each element of the iterable
-                return [
-                    (v if v.__class__.__name__ in self.primitive_type_names else self.serialize_data(v)) for v in data
+                return [  # type: ignore
+                    (
+                        v
+                        if list_value_annot_type is not Any and v.__class__.__name__ in self.primitive_type_names
+                        else self.serialize_data(v, list_value_annot_type)
+                    )
+                    for v in data
                 ]
         elif isinstance(data, Enum):
             # Serialize enum as a dict using enum class short name and item name (rather than item value)
@@ -244,9 +220,7 @@ class DictSerializer:
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def deserialize_data(
-        self, data: TDataField, type_: Type[T] | None = None
-    ):  # TODO: Check if None should be supported
+    def deserialize_data(self, data: TDataField, type_: Type | None = None):  # TODO: Check if None should be supported
         """
         Deserialize object from data, invoke init_all after deserialization.
 
@@ -255,7 +229,7 @@ class DictSerializer:
         """
 
         # Extract inner type if type_ is Optional[...]
-        type_ = handle_optional_annot(type_)
+        type_ = AnnotationsUtil.handle_optional_annot(type_)
 
         if isinstance(data, dict):
             # Determine if the dictionary is a serialized dataclass or a dictionary
@@ -285,7 +259,7 @@ class DictSerializer:
                             f"and there are no descendant records that can."
                         )
 
-                annots = _get_class_hierarchy_annotations(deserialized_type)
+                annots = AnnotationsUtil.get_class_hierarchy_annotations(deserialized_type)
                 deserialized_fields = {
                     (CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k): (
                         v
@@ -327,15 +301,7 @@ class DictSerializer:
                 return result
             else:
 
-                # Extract generic type arguments from dict annotation type, e.g. Dict[str, int] -> int
-                if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
-                    dict_value_annot_type = None
-                else:
-                    if len(type_args) == 2:
-                        # Take second argument as value type
-                        dict_value_annot_type = type_args[1]
-                    else:
-                        raise RuntimeError(f"Can not extract value annotation type of dict from '{type_}'.")
+                dict_value_annot_type = AnnotationsUtil.extract_dict_value_annot_type(type_)
 
                 # Otherwise return a dictionary with recursively deserialized values
                 result = {
@@ -350,12 +316,18 @@ class DictSerializer:
         elif data.__class__.__name__ == "datetime":
             if type_ is None:
                 return data
+
             if type_.__name__ == "datetime":
-                return data.replace(tzinfo=timezone.utc)
+                return DatetimeUtil.round(data.replace(tzinfo=dt.timezone.utc))
             elif type_.__name__ == "date":
                 return data.date()
-            elif type_.__name__ == "time":
-                return data.time()
+            else:
+                return data
+        elif data.__class__.__name__ == "int":
+            if type_ is not None and type_.__name__ == "float":
+                return float(data)
+            elif type_ is not None and type_.__name__ == "time":
+                return TimeUtil.from_iso_int(data)
             else:
                 return data
         elif data.__class__.__name__ == "Int64":
@@ -363,24 +335,19 @@ class DictSerializer:
         elif hasattr(data, "__iter__"):
             # Get the first item without iterating over the entire sequence
             first_item = next(iter(data), sentinel_value)
+            list_value_annot_type = AnnotationsUtil.extract_list_value_annot_type(type_)
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
-            elif first_item is not None and first_item.__class__.__name__ in self.primitive_type_names:
+            elif (
+                list_value_annot_type is not Any
+                and first_item is not None
+                and first_item.__class__.__name__ in self.primitive_type_names
+            ):
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
                 return data
             else:
-                # Extract generic type arguments from annotation type, e.g. List[int] -> int
-                if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
-                    list_value_annot_type = None
-                else:
-                    if len(type_args) == 1:
-                        # Take first argument as value type
-                        list_value_annot_type = type_args[0]
-                    else:
-                        raise RuntimeError(f"Can not extract value annotation type of iterable from '{type_}'.")
-
                 # Deserialize each element of the iterable
                 return [
                     (
@@ -395,29 +362,3 @@ class DictSerializer:
             return data
         else:
             raise RuntimeError(f"Cannot deserialize data of type '{type(data)}'.")
-
-    @classmethod
-    def _serialize_primitive(cls, value: TPrimitive, class_name: str) -> TPrimitive:
-        """Serialize primitive value applying the applicable conversion rules."""
-        # TODO: Use switch statement
-        if class_name == "bool":
-            return "Y" if value else "N"
-        else:
-            return value
-
-    @classmethod
-    def _deserialize_primitive(cls, value: TPrimitive, class_name: str) -> TPrimitive:
-        """Deserialize primitive value applying the applicable conversion rules."""
-        # TODO: Use switch statement
-        if class_name == "bool":
-            # TODO: Use switch statement
-            if isinstance(value, bool):
-                return value
-            elif value == "Y":
-                return True
-            elif value == "N":
-                return False
-            else:
-                raise RuntimeError(f"Serialized boolean field has value {value} but only Y or N are allowed.")
-        else:
-            return value

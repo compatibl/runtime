@@ -26,10 +26,9 @@ from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serialization.annotations_util import AnnotationsUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.dict_serializer import T
 from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
-from cl.runtime.serialization.dict_serializer import handle_optional_annot
 from cl.runtime.serialization.string_serializer import StringSerializer
 
 key_serializer = StringSerializer()
@@ -45,14 +44,13 @@ class UiDictSerializer(DictSerializer):
     primitive_type_names = [
         "NoneType",
         "float",
-        "int",
         "bool",
         "bytes",
         "UUID",
     ]
     """Override primitive fields. In particular, str is not a primitive in ui format."""
 
-    def serialize_data(self, data):
+    def serialize_data(self, data, type_: Type | None = None):
 
         if not self.pascalize_keys:
             raise RuntimeError("UI serialization format only supports pascalize_keys=True mode.")
@@ -64,7 +62,7 @@ class UiDictSerializer(DictSerializer):
             return data
         elif isinstance(data, Enum):
             # Serialize enum as its name
-            serialized_enum = super(UiDictSerializer, self).serialize_data(data)
+            serialized_enum = super(UiDictSerializer, self).serialize_data(data, type_)
             pascal_case_value = serialized_enum.get("_name")
             return pascal_case_value
         elif is_key(data):
@@ -73,7 +71,7 @@ class UiDictSerializer(DictSerializer):
         elif isinstance(data, dict):
             # Serialize dict as list of dicts in format [{"key": [key], "value": [value_as_legacy_variant]}]
             serialized_dict_items = []
-            for k, v in super(UiDictSerializer, self).serialize_data(data).items():
+            for k, v in super(UiDictSerializer, self).serialize_data(data, type_).items():
                 # TODO (Roman): support more value types in dict
 
                 # Apply custom format for None in dict
@@ -81,16 +79,22 @@ class UiDictSerializer(DictSerializer):
                     serialized_dict_items.append({"key": k, "value": {"Empty": None}})
                     continue
 
+                value_type = None
                 if isinstance(v, str):
                     value_type = "String"
                 elif isinstance(v, int):
                     value_type = "Int"
                 elif isinstance(v, float):
                     value_type = "Double"
+                elif isinstance(v, list):
+                    serialized_dict_items.append([self.serialize_data(x) for x in v])
+                elif isinstance(v, dict) and "_t" in v:
+                    value_type = "Data"
                 else:
                     raise ValueError(f"Value of type {type(v)} is not supported in dict ui serialization. Value: {v}.")
 
-                serialized_dict_items.append({"key": k, "value": {value_type: v}})
+                if value_type is not None:
+                    serialized_dict_items.append({"key": k, "value": {value_type: v}})
 
             return serialized_dict_items
         elif getattr(data, "__slots__", None) is not None:
@@ -98,18 +102,18 @@ class UiDictSerializer(DictSerializer):
             # Invoke 'init' for each class in class hierarchy that implements it, in the order from base to derived
             RecordUtil.init_all(data)
 
-            serialized_data = super(UiDictSerializer, self).serialize_data(data)
+            serialized_data = super(UiDictSerializer, self).serialize_data(data, type_)
 
             # Replace "_type" with "_t"
             if "_type" in serialized_data:
-                serialized_data["_t"] = TypeUtil.name(data)
+                serialized_data["_t"] = data.__class__.__name__
                 del serialized_data["_type"]
 
             serialized_data = {k: v for k, v in serialized_data.items()}
 
             return serialized_data
         else:
-            return super(UiDictSerializer, self).serialize_data(data)
+            return super(UiDictSerializer, self).serialize_data(data, type_)
 
     def serialize_record_for_table(self, record: RecordProtocol) -> Dict[str, Any]:
         """
@@ -120,8 +124,8 @@ class UiDictSerializer(DictSerializer):
         all_slots = _get_class_hierarchy_slots(record.__class__)
 
         # Get subset of slots which supported in table format
-        table_slots = {
-            slot: slot_v
+        table_fields = {
+            CaseUtil.snake_to_pascal_case_keep_trailing_underscore(slot)
             for slot in all_slots
             if (slot_v := getattr(record, slot))
             and (
@@ -133,10 +137,8 @@ class UiDictSerializer(DictSerializer):
             )
         }
 
-        table_record = type(record)(**table_slots)  # noqa
-
-        # Serialize record to ui format using table_slots
-        table_dict: Dict[str, Any] = self.serialize_data(table_record)
+        # Serialize record to ui format and filter table fields
+        table_dict = {k: v for k, v in self.serialize_data(record).items() if k in table_fields}
 
         # Add "_t" and "_key" attributes
         table_dict["_t"] = TypeUtil.name(record)
@@ -155,18 +157,18 @@ class UiDictSerializer(DictSerializer):
         """
 
         if short_type_name == "BinaryContent":
-            data["_t"] = FileData.__name__
-            if content_value := data.pop("Content"):  # type: str
+            data["_type"] = FileData.__name__
+            if content_value := data.pop("Content", None):  # type: str
                 attr_name = CaseUtil.snake_to_pascal_case(FileData.file_bytes.__name__)
                 data[attr_name] = base64.b64decode(content_value.encode())
 
-    def deserialize_data(self, data: TDataField, type_: Type[T] | None = None):
+    def deserialize_data(self, data: TDataField, type_: Type | None = None):
 
         if not self.pascalize_keys:
             raise RuntimeError("UI serialization format only supports pascalize_keys=True mode.")
 
         # Extract inner type if type_ is Optional[...]
-        type_ = handle_optional_annot(type_)
+        type_ = AnnotationsUtil.handle_optional_annot(type_)
 
         if isinstance(data, dict):
             # Copying data to ensure input dictionary is immutable
@@ -177,12 +179,14 @@ class UiDictSerializer(DictSerializer):
                 # Apply additional conversion for BinaryContent
                 self._check_patch_binary_content(data, short_type_name)
 
-                data["_type"] = short_type_name
+                if data.get("_type") is None:
+                    data["_type"] = short_type_name
                 return super(UiDictSerializer, self).deserialize_data(data, type_)
         elif isinstance(data, str):
-            # TODO (Roman): Remove check for Any when no longer supported.
             if type_ is None or type_.__name__ == "str" or type_ is Any:
                 return data
+            elif type_.__name__ in ("datetime", "date", "time"):
+                return key_serializer.deserialize_primitive(data, type_)
             elif is_key(type_):
                 # Deserialize key from string
                 return key_serializer.deserialize_key(data, type_)  # noqa

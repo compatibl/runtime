@@ -42,6 +42,7 @@ def test_data_serialization():
         # StubDataclassListDictFields,
         StubDataclassPrimitiveFields,
         StubDataclassSingleton,
+        # StubDataclassAnyFields,  TODO (Roman): Uncomment when supported consistent Any ui serialization.
     ]
 
     serializer = UiDictSerializer()

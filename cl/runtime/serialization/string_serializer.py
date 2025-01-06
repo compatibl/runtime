@@ -21,6 +21,9 @@ from typing import Tuple
 from typing import Type
 from typing import get_type_hints
 from uuid import UUID
+from cl.runtime.primitive.date_util import DateUtil
+from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_key
@@ -30,7 +33,9 @@ from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
 from cl.runtime.serialization.dict_serializer import alias_dict
 from cl.runtime.serialization.dict_serializer import get_type_dict
 
-primitive_type_names = ["NoneType", "str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"]
+primitive_type_names = frozenset(
+    {"NoneType", "str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"}
+)
 """Detect primitive type by checking if class name is in this list."""
 
 
@@ -47,7 +52,13 @@ class StringSerializer:
             return value
         elif value.__class__.__name__ in ("date", "datetime", "time"):
             # Serialize date types to iso string
-            return value.isoformat()
+            if value.__class__.__name__ == "datetime":
+                datetime_obj = DatetimeUtil.round(value)
+                return DatetimeUtil.to_str(datetime_obj)
+            elif value.__class__.__name__ == "date":
+                return DateUtil.to_str(value)
+            elif value.__class__.__name__ == "time":
+                return TimeUtil.to_str(value)
         elif value.__class__.__name__ in ("UUID", "int", "float"):
             # Serialize UUID to string
             return str(value)
@@ -73,13 +84,14 @@ class StringSerializer:
             return str_value
         elif type_.__name__ == "datetime":
             # Deserialize datetime from iso string
-            return dt.datetime.fromisoformat(str_value)
+            datetime_value = DatetimeUtil.from_str(str_value)
+            return DatetimeUtil.round(datetime_value.replace(tzinfo=dt.timezone.utc))
         elif type_.__name__ == "date":
             # Deserialize date from iso string
-            return dt.date.fromisoformat(str_value)
+            return DateUtil.from_str(str_value)
         elif type_.__name__ == "time":
             # Deserialize time from iso string
-            return dt.time.fromisoformat(str_value)
+            return TimeUtil.from_str(str_value)
         elif type_.__name__ == "bool":
             # Deserialize bool from string
             if (bool_value := True if str_value == "Y" else False if str_value == "N" else None) is not None:
@@ -160,7 +172,7 @@ class StringSerializer:
             else:
                 yield key, slot, slot_type
 
-    def serialize_key(self, data):
+    def serialize_key(self, data) -> str:
         """Serialize key to string, flattening for composite keys."""
 
         key_slots = data.get_key_type().__slots__

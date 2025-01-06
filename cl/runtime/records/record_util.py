@@ -123,6 +123,10 @@ Note: In case of containers, type mismatch may be in one of the items.
         args = get_args(field_type)
 
         if origin is None:
+            # If field_type is Any no need to check value
+            if field_type is Any:
+                return True
+
             # Not a generic type, consider the possible use of annotation
             if isinstance(field_type, type):
                 return isinstance(field_value, field_type)

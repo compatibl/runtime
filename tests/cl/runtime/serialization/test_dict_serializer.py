@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.serialization.dict_serializer import DictSerializer
+from stubs.cl.runtime import StubDataclassAnyFields
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -46,6 +47,7 @@ def test_data_serialization():
         StubDataclassListDictFields,
         StubDataclassPrimitiveFields,
         StubDataclassSingleton,
+        StubDataclassAnyFields,
         # TODO: Support serialization of classes with cyclic references
     ]
 

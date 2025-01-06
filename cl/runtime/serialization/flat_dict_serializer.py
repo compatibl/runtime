@@ -14,12 +14,17 @@
 
 import json
 from typing import Any
+from typing import Dict
+from typing import Tuple
 from typing import Type
 from typing import cast
 from cl.runtime.records.protocols import TDataDict
+from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_record
+from cl.runtime.serialization.annotations_util import AnnotationsUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.dict_serializer import handle_optional_annot
+from cl.runtime.serialization.dict_serializer import get_type_dict
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.serialization.string_serializer import primitive_type_names as str_primitive_type_names
 
@@ -41,7 +46,40 @@ class FlatDictSerializer(DictSerializer):
         """A quick check that a string is most likely JSON."""
         return value.startswith("{") and value.endswith("}")
 
-    def serialize_data(self, data, *, is_root: bool = False):
+    @classmethod
+    def _assemble_any(cls, data: TDataField) -> Dict[str, TDataField]:
+        """
+        Create dict representation of value annotated with 'Any' to keep information about the type after serialization.
+        """
+
+        if is_key(data) or is_record(data):
+            return {"_value": data, "_rec_or_key": data.__class__.__name__}
+        elif data.__class__.__name__ in str_primitive_type_names:
+            return {"_value": data, "_prim": data.__class__.__name__}
+        else:
+            return {"_value": data}
+
+    @classmethod
+    def _disassemble_any(cls, data: Dict[str, TDataField]) -> Tuple[TDataField, Type | None]:
+        """Extract value and type from dict representation of 'Any' value."""
+
+        value = data.get("_value")
+        if type_name := data.get("_rec_or_key"):
+            type_dict = get_type_dict()
+            type_ = type_dict.get(type_name)
+            return value, type_
+        elif primitive_type := data.get("_prim"):
+            return value, eval(primitive_type)
+        else:
+            return value, None
+
+    def serialize_data(self, data, type_: Type | None = None, *, is_root: bool = False):
+
+        type_ = AnnotationsUtil.handle_optional_annot(type_)
+
+        if type_ is Any:
+            # If field is annotated with 'Any' serialize value to special dict format
+            return self.serialize_data(self._assemble_any(data), None, is_root=is_root)
 
         if data.__class__.__name__ in self.primitive_type_names:
             return data
@@ -56,7 +94,7 @@ class FlatDictSerializer(DictSerializer):
             return key_str
         else:
             # All other types try to serialize as JSON string
-            json_data = super().serialize_data(data)
+            json_data = super().serialize_data(data, type_)
 
             if not isinstance(json_data, (list, tuple, dict)):
                 raise RuntimeError(
@@ -72,16 +110,25 @@ class FlatDictSerializer(DictSerializer):
     def deserialize_data(self, data: TDataDict, type_: Type | None = None):
 
         # Extract inner type if type_ is Optional[...]
-        type_ = handle_optional_annot(type_)
+        type_ = AnnotationsUtil.handle_optional_annot(type_)
+
+        if type_ is Any:
+            # Expect 'data' is a special dict representation of the 'Any' value
+            # Deserialize 'Any' dict
+            deserialized_any = self.deserialize_data(data, dict)
+
+            # Extract value and type of serialized 'Any' value
+            any_value, any_type = self._disassemble_any(deserialized_any)
+
+            # Deserialize using extracted properties
+            return self.deserialize_data(any_value, any_type)
 
         if data.__class__.__name__ == "str":
             data = cast(str, data)
 
             if type_ is None:
-                # TODO: Error message should include class and field name
-                raise RuntimeError("Field specified in data but is not in schema.")
-            elif type_ is Any:
-                # TODO (Roman): Remove check for Any when it is no longer supported.
+                # "type_" is optional for serialization, for example, the type annotation "dict" is valid even without
+                # type arguments. If the value is a string and "type_" is None, the value is considered a string.
                 return data
             elif type_.__name__ in str_primitive_type_names:
                 return StringSerializer.deserialize_primitive(data, type_)
