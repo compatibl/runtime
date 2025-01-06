@@ -143,7 +143,11 @@ Note: In case of containers, type mismatch may be in one of the items.
         elif cls._is_instance(field_value, origin):
             # If the generic has type parameters, check them
             if args:
-                if isinstance(field_value, list) and origin is list:
+                if (
+                    (isinstance(field_value, list) and origin is list)
+                    or isinstance(field_value, tuple)
+                    and origin is tuple
+                ):
                     return all(cls._is_instance(item, args[0]) for item in field_value)
                 elif isinstance(field_value, dict) and origin is dict:
                     return all(

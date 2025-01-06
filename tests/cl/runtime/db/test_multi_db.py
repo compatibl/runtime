@@ -31,6 +31,7 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
@@ -46,7 +47,7 @@ _SAMPLES = [
     StubDataclassDerivedFromDerivedRecord(id="abc4"),
     StubDataclassOtherDerivedRecord(id="abc5"),
     StubDataclassListFields(id="abc6"),
-    # TODO: Add StubDataclassTupleFields(id="abc6tuple"),
+    StubDataclassTupleFields(id="abc6tuple"),
     StubDataclassOptionalFields(id="abc7"),
     StubDataclassDictFields(id="abc8"),
     StubDataclassDictListFields(id="abc9"),

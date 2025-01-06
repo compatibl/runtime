@@ -15,6 +15,7 @@
 from types import UnionType
 from typing import Dict
 from typing import List
+from typing import Tuple
 from typing import Type
 from typing import Union
 
@@ -70,6 +71,23 @@ class AnnotationsUtil:
         return type_
 
     @classmethod
+    def extract_origin_type(cls, type_):
+        """Extract origin, e.g. List[int] -> list, Tuple[int, ...] -> tuple."""
+
+        if type_ is None:
+            return None
+
+        if origin := getattr(type_, "__origin__", None):
+            if origin is List or origin is list:
+                return list
+            elif origin is Dict or origin is dict:
+                return dict
+            elif origin is Tuple or origin is tuple:
+                return tuple
+            else:
+                raise RuntimeError(f"Unsupported origin type: {origin}.")
+
+    @classmethod
     def extract_list_value_annot_type(cls, type_):
         """Extract generic type arguments from list annotation type, e.g. List[int] -> int"""
 
@@ -111,3 +129,23 @@ class AnnotationsUtil:
                 return type_args[1]
             else:
                 raise RuntimeError(f"Can not extract dict value annotation type from '{type_}'.")
+
+    @classmethod
+    def extract_iterable_origin_and_args(cls, type_):
+        """Extract origin type and then parse its args."""
+
+        origin_type = AnnotationsUtil.extract_origin_type(type_)
+
+        # Set default origin type for iterable to list
+        if origin_type is None:
+            origin_type = list
+
+        # Extract value type of iterable
+        if origin_type is list:
+            iter_value_annot_type = AnnotationsUtil.extract_list_value_annot_type(type_)
+        elif origin_type is tuple:
+            iter_value_annot_type = AnnotationsUtil.extract_tuple_value_annot_type(type_)
+        else:
+            raise RuntimeError(f"Invalid origin type for iterable value: {origin_type}")
+
+        return origin_type, iter_value_annot_type

@@ -186,14 +186,17 @@ class DictSerializer:
         elif hasattr(data, "__iter__"):
             # Get the first item without iterating over the entire sequence
             first_item = next(iter(data), sentinel_value)
-            list_value_annot_type = AnnotationsUtil.extract_list_value_annot_type(type_)
+
+            # Get origin type and its args
+            _, iter_value_annot_type = AnnotationsUtil.extract_iterable_origin_and_args(type_)
+
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
             elif (
                 first_item is not None
                 and first_item.__class__.__name__ in self.primitive_type_names
-                and list_value_annot_type is not Any
+                and iter_value_annot_type is not Any
             ):
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
@@ -203,8 +206,8 @@ class DictSerializer:
                 return [  # type: ignore
                     (
                         v
-                        if list_value_annot_type is not Any and v.__class__.__name__ in self.primitive_type_names
-                        else self.serialize_data(v, list_value_annot_type)
+                        if iter_value_annot_type is not Any and v.__class__.__name__ in self.primitive_type_names
+                        else self.serialize_data(v, iter_value_annot_type)
                     )
                     for v in data
                 ]
@@ -335,28 +338,36 @@ class DictSerializer:
         elif hasattr(data, "__iter__"):
             # Get the first item without iterating over the entire sequence
             first_item = next(iter(data), sentinel_value)
-            list_value_annot_type = AnnotationsUtil.extract_list_value_annot_type(type_)
+
+            # Get origin type and its args
+            origin_type, iter_value_annot_type = AnnotationsUtil.extract_iterable_origin_and_args(type_)
+
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
             elif (
-                list_value_annot_type is not Any
+                iter_value_annot_type is not Any
                 and first_item is not None
                 and first_item.__class__.__name__ in self.primitive_type_names
             ):
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
-                return data
+
+                # Convert list to tuple if it is annotated with Tuple[Type, ...]
+                if isinstance(data, list) and origin_type is tuple:
+                    return tuple(x for x in data)
+                else:
+                    return data
             else:
                 # Deserialize each element of the iterable
-                return [
+                return origin_type(
                     (
                         v
                         if v.__class__.__name__ in self.primitive_type_names
-                        else self.deserialize_data(v, list_value_annot_type)
+                        else self.deserialize_data(v, iter_value_annot_type)
                     )
                     for v in data
-                ]
+                )
 
         elif is_key(data) or is_record(data):
             return data

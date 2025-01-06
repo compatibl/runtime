@@ -28,6 +28,7 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime import StubDataclassTupleFields
 
 
 def test_data_serialization():
@@ -48,6 +49,7 @@ def test_data_serialization():
         StubDataclassPrimitiveFields,
         StubDataclassSingleton,
         StubDataclassAnyFields,
+        StubDataclassTupleFields,
         # TODO: Support serialization of classes with cyclic references
     ]
 
