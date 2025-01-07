@@ -26,6 +26,8 @@ from typing import TypeVar
 from typing import runtime_checkable
 from uuid import UUID
 
+from typing_extensions import Self
+
 _PRIMITIVE_TYPE_NAMES = {"str", "float", "bool", "int", "date", "time", "datetime", "UUID", "bytes"}
 
 PrimitiveType = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
@@ -66,27 +68,55 @@ TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
 
 
+class InitProtocol(Protocol):
+    """Protocol implemented by objects that require initialization."""
+
+    def init_all(self) -> Self:
+        """
+        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
+        Return self to enable method chaining.
+        """
+        ...
+
+
 @runtime_checkable
 class KeyProtocol(Protocol):
     """Protocol implemented by keys and also required for records which are derived from keys."""
 
+    # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
+    def init_all(self) -> Self:
+        """
+        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
+        Return self to enable method chaining.
+        """
+        ...
+
     @classmethod
     def get_key_type(cls) -> Type:
         """Return key type even when called from a record."""
+        ...
 
 
-class RecordProtocol(KeyProtocol):
+class RecordProtocol(Protocol):
     """Protocol implemented by records but not keys."""
+
+    # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
+    def init_all(self) -> Self:
+        """
+        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
+        Return self to enable method chaining.
+        """
+        ...
+
+    # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
+    @classmethod
+    def get_key_type(cls) -> Type:
+        """Return key type even when called from a record."""
+        ...
 
     def get_key(self) -> KeyProtocol:
         """Return a new key object whose fields populated from self, do not return self."""
-
-
-class InitProtocol:
-    """Protocol implemented by objects that require initialization."""
-
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+        ...
 
 
 def get_primitive_type_names() -> Tuple[str, ...]:
