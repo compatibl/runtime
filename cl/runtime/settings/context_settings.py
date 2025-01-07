@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
@@ -26,7 +26,7 @@ class ContextSettings(Settings):
     context_id: str | None = None
     """Context identifier, if not specified a time-ordered UUID will be used."""
 
-    packages: List[str] = required()
+    packages: Tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
     log_class: str = "cl.runtime.log.file.file_log.FileLog"  # TODO: Deprecated, switch to class-specific fields
@@ -53,17 +53,31 @@ class ContextSettings(Settings):
         if self.context_id is not None and not isinstance(self.context_id, str):
             raise RuntimeError(f"{TypeUtil.name(self)} field 'context_id' must be None or a string.")
 
-        # TODO: Move to ValidationUtil or PrimitiveUtil class
-        if isinstance(self.packages, list):
+        # Convert to tuple
+        # TODO: Move to TupleUtil class
+        if self.packages is None:
+            raise RuntimeError(f"No packages are specified in {TypeUtil.name(self)}, specify at least one.")
+        elif isinstance(self.packages, tuple):
             pass
-        elif self.packages is None:
-            self.packages = []
-        elif isinstance(self.packages, str):
-            self.packages = [self.packages]
         elif hasattr(self.packages, "__iter__"):
-            self.packages = list(self.packages)
+            # Convert all iterable types other than tuple itself to tuple
+            self.packages = tuple(self.packages)
+        elif isinstance(self.packages, str):
+            # Convert string to tuple
+            self.packages = (self.packages,)
         else:
-            raise RuntimeError(f"{TypeUtil.name(self)} field 'packages' must be a string or an iterable of strings.")
+            raise RuntimeError(f"Field '{TypeUtil.name(self)}.packages' must be a string or an iterable of strings.")
+
+        # Check that each element is a string
+        if (package_errors := [
+            f"Element at index {index} of field '{TypeUtil.name(self)}.packages is not a string:\n"
+            f"Value: {element} Type: {TypeUtil.name(element)})\n"
+            if not isinstance(element, str) else
+            f"Element at index {index} of field '{TypeUtil.name(self)} is an empty string.\n"
+            for index, element in enumerate(self.packages)
+            if not isinstance(element, str) or element == ""
+        ]):
+            raise ValueError("".join(package_errors))
 
         if not isinstance(self.log_class, str):
             raise RuntimeError(
