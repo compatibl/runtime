@@ -68,6 +68,21 @@ TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
 
 
+class FreezableProtocol(Protocol):
+    """Protocol implemented by objects that require initialization."""
+
+    def is_frozen(self) -> bool:
+        """Check if the instance has been frozen by calling its freeze method."""
+        ...
+
+    def freeze(self) -> Self:
+        """
+        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
+        Return self to enable method chaining.
+        """
+        ...
+
+
 class InitProtocol(Protocol):
     """Protocol implemented by objects that require initialization."""
 
@@ -129,6 +144,15 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveType]:
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in _PRIMITIVE_TYPE_NAMES
     return result
+
+
+def is_freezable(instance_or_type: Any)-> TypeGuard[FreezableProtocol]:
+    """
+    Return True if the instance is freezable (implements freeze).
+    A class must not implement freeze unless all of its mutable elements also implement freeze.
+    Among other things, this means a freezable class can have tuple elements but not list elements.
+    """
+    return hasattr(instance_or_type, "freeze")
 
 
 def is_record(instance_or_type: Any) -> TypeGuard[RecordProtocol]:
