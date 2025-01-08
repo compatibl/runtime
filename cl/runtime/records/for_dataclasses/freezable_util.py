@@ -38,10 +38,13 @@ class FreezableUtil:
             return False
 
     @classmethod
-    def try_freeze(cls, possibly_freezable: Any):
+    def try_freeze(cls, possibly_freezable: Any) -> bool:
         """
-        Call freeze method if implemented, exit without error if not.
-        This method does not rely on inheritance from Freezable and is not specific to dataclasses.
+        Call freeze method and return True if implemented, exit without error and return False if not.
+        This method does not rely on inheritance from any version of Freezable and is not specific to dataclasses.
         """
         if (freeze_callable := getattr(possibly_freezable, "freeze", None)) is not None:
             freeze_callable()
+            return True
+        else:
+            return False

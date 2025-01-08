@@ -15,7 +15,9 @@
 from abc import ABC
 from dataclasses import dataclass
 from dataclasses import fields
+from typing import TypeGuard, Any
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import FreezableProtocol, _PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -26,7 +28,8 @@ class Freezable(ABC):
     Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
 
     Notes:
-        This base should be used for dataclass objects, use the appropriate base for each framework.
+        - This base should be used for dataclass objects, use the appropriate base for each framework
+        - Use tuple which is immutable instead of list when deriving from this class
     """
 
     __frozen: bool = required(default=False, init=False)
@@ -35,26 +38,38 @@ class Freezable(ABC):
     Once frozen, the instance cannot be unfrozen.
     """
 
+    @classmethod
+    def is_freezable(cls) -> TypeGuard[FreezableProtocol]:
+        """
+        Return True if the instance is freezable (implements freeze).
+        For a class derived from this base, all mutable elements must also implement freeze.
+        Among other things, this means such class can have tuple elements but not list elements.
+        """
+        return True
+
     def is_frozen(self) -> bool:
-        """Check if the instance has been frozen by calling its freeze method."""
+        """
+        Return True if the object has already been frozen. Once frozen, the instance cannot be unfrozen.
+        Non-freezable objects (objects with mutable elements that do not implement freeze) always return False.
+        """
         return self.__frozen
 
     def freeze(self) -> None:
         """
-        Freeze setting fields at root level and invoke freeze method for those field types that implement it.
-        This will not prevent in-place modification of mutable field types that do not implement freeze.
-        Once frozen, the instance cannot be unfrozen.
+        Traverse the object and call freeze for each mutable element. Once frozen, the instance cannot be unfrozen.
+        Error message for non-freezable objects (objects with mutable elements that do not implement freeze).
         """
 
         # Freeze setting fields at root level
         object.__setattr__(self, "_Freezable__frozen", True)
 
-        # Recursively call freeze on those field types that implement it
+        # Recursively call freeze on fields, except in case of tuple call freeze on tuple elements
         tuple(
-            field_freeze()
+            tuple(getattr(x, "freeze")() for x in field_value) if isinstance(field_value, tuple)
+            else getattr(field_value, "freeze")() if type(field_value).__name__ not in _PRIMITIVE_TYPE_NAMES
+            else None
             for field_obj in fields(self)  # noqa
             if (field_value := getattr(self, field_obj.name, None)) is not None
-            and (field_freeze := getattr(field_value, "freeze", None)) is not None
         )
 
     def __setattr__(self, key, value):

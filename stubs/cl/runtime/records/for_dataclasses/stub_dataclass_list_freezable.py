@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from stubs.cl.runtime import StubDataclassData
@@ -21,8 +21,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable im
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassComplexFreezable(Freezable):
-    """Freezable class stub with complex freezable field and tuple field."""
+class StubDataclassListFreezable(Freezable):
+    """Freezable class must not have a list field, should raise (only tuples are allowed)."""
 
     value: str = "abc"
     """String value."""
@@ -30,5 +30,10 @@ class StubDataclassComplexFreezable(Freezable):
     freezable_obj: StubDataclassSimpleFreezable = required(default_factory=lambda: StubDataclassSimpleFreezable())
     """Embedded freezable object, will be frozen."""
 
-    freezable_tuple: Tuple[StubDataclassSimpleFreezable, ...] = StubDataclassSimpleFreezable(), StubDataclassSimpleFreezable()
-    """Embedded tuple of freezable objects."""
+    non_freezable_list: List[StubDataclassSimpleFreezable] = required(
+        default_factory=lambda: [
+            StubDataclassSimpleFreezable(),
+            StubDataclassSimpleFreezable(),
+        ]
+    )
+    """Embedded non-freezable list of freezable objects, list items will not be frozen."""
