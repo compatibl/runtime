@@ -16,14 +16,14 @@ from typing import Any
 from typing import Protocol
 
 
-class KeySerializerProtocol(Protocol):
+class KeySerializerProtocol(Protocol):  # TODO: Currently unused, use or remove
     """Protocol for key serialization, deserialization is not required."""
 
     def serialize_key(self, key: Any) -> Any:
         """Serialize key (argument and result type depend on the serializer)."""
 
 
-class DataSerializerProtocol(Protocol):
+class DataSerializerProtocol(Protocol):  # TODO: Currently unused, use or remove
     """Protocol for data serialization and deserialization."""
 
     def serialize_data(self, data: Any) -> Any:

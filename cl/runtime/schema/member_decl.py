@@ -32,7 +32,7 @@ class MemberDecl:
     data: TypeDeclKey | None = required()
     """Data element declaration."""
 
-    key_: TypeDeclKey | None = required()
+    key_: TypeDeclKey | None = required()  # TODO: It is no longer necessary to add _ to key field
     """Key element declaration."""
 
     query: TypeDeclKey | None = required()

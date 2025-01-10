@@ -176,7 +176,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         return result
 
     @classmethod
-    def for_key(cls, key: TypeDeclKey) -> Self:
+    def for_key(cls, key: TypeDeclKey) -> Self:  # TODO: Rename for_key for clarity
         """Create or return cached object for the specified type declaration key."""
         class_path = f"{key.module.module_name}.{key.name}"
         return cls.for_class_path(class_path)
