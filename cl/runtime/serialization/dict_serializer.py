@@ -28,7 +28,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from cl.runtime.records.protocols import TDataField
+from cl.runtime.records.protocols import TDataField, is_freezable
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
@@ -85,7 +85,8 @@ def _get_class_hierarchy_slots(data_type) -> Tuple[str]:
         slots_list = [(slots,) if isinstance(slots, str) else slots for slots in slots_list]
 
         # Flatten and convert to tuple, cast relies on elements of sublist being strings
-        result = tuple(slot for sublist in slots_list for slot in sublist)
+        # Exclude private and protected fields
+        result = tuple(slot for sublist in slots_list for slot in sublist if not slot.startswith("_"))
 
         # Check for duplicates
         if len(result) > len(set(result)):
@@ -280,7 +281,7 @@ class DictSerializer:
                 result = deserialized_type(**deserialized_fields)  # noqa
 
                 # TODO: Refactor by passing event types to init method
-                if FreezableUtil.is_freezable(result):
+                if is_freezable(result):
                     # If the record is freezable, freeze and validate against the schema
                     # but do not invoke init on load because init was invoked prior to saving
                     result.freeze()

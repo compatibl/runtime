@@ -38,15 +38,6 @@ class Freezable(ABC):
     Once frozen, the instance cannot be unfrozen.
     """
 
-    @classmethod
-    def is_freezable(cls) -> TypeGuard[FreezableProtocol]:
-        """
-        Return True if the instance is freezable (implements freeze).
-        For a class derived from this base, all mutable elements must also implement freeze.
-        Among other things, this means such class can have tuple elements but not list elements.
-        """
-        return True
-
     def is_frozen(self) -> bool:
         """
         Return True if the object has already been frozen. Once frozen, the instance cannot be unfrozen.
