@@ -102,7 +102,8 @@ class SqliteSchemaManager:
         """Return field name and type of annotation based type declaration."""
         annotations = {}
         for base in reversed(type_.__mro__):
-            annotations.update(getattr(base, "__annotations__", {}))
+            base_annotations = getattr(base, "__annotations__", {})
+            annotations.update({k: v for k, v in base_annotations.items() if not k.startswith("_")})
         return annotations
 
     # TODO (Roman): make cached but only for key types
