@@ -33,7 +33,7 @@ _PRIMITIVE_TYPE_NAMES = {"str", "float", "bool", "int", "date", "time", "datetim
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Supported primitive types for serialized data."""
 
-TDataField = Dict[str, "TDataField"] | List["TDataField"] | TPrimitive | Enum | None
+TDataField = Dict[str, "TDataField"] | List["TDataField"] | TPrimitive | Enum
 """Supported field types for serialized data in dictionary format."""
 
 TDataDict = Dict[str, TDataField]
