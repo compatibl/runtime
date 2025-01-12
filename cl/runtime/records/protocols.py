@@ -30,11 +30,8 @@ from typing_extensions import Self
 
 _PRIMITIVE_TYPE_NAMES = {"str", "float", "bool", "int", "date", "time", "datetime", "UUID", "bytes"}
 
-PrimitiveType = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
-"""Supported primitive value types excluding None."""
-
-TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | None  # TODO: Deprecated
-"""Supported primitive value types for serialized data in dictionary format."""
+TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
+"""Supported primitive types for serialized data."""
 
 TDataField = Dict[str, "TDataField"] | List["TDataField"] | TPrimitive | Enum | None
 """Supported field types for serialized data in dictionary format."""
@@ -139,7 +136,7 @@ def get_primitive_type_names() -> Tuple[str, ...]:
     return tuple(_PRIMITIVE_TYPE_NAMES)
 
 
-def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveType]:
+def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     """Returns true if one of the supported primitive types."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in _PRIMITIVE_TYPE_NAMES

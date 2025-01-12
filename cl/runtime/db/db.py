@@ -24,7 +24,7 @@ from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import PrimitiveType
+from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
@@ -47,7 +47,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def load_one(
         self,
         record_type: Type[TRecord],
-        record_or_key: KeyProtocol | PrimitiveType,
+        record_or_key: KeyProtocol | TPrimitive,
         *,
         dataset: str | None = None,
     ) -> TRecord:
@@ -79,7 +79,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def load_one_or_none(
         self,
         record_type: Type[TRecord],
-        record_or_key: KeyProtocol | PrimitiveType | None,
+        record_or_key: KeyProtocol | TPrimitive | None,
         *,
         dataset: str | None = None,
     ) -> TRecord | None:

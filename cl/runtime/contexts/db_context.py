@@ -24,7 +24,7 @@ from cl.runtime.db.protocols import TKey
 from cl.runtime.db.protocols import TRecord
 from cl.runtime.primitive.format_util import FormatUtil
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import PrimitiveType
+from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 
@@ -125,7 +125,7 @@ class DbContext(Context):
     def load_one(
         cls,
         record_type: Type[TRecord],
-        record_or_key: KeyProtocol | PrimitiveType,
+        record_or_key: KeyProtocol | TPrimitive,
         *,
         dataset: str | None = None,
     ) -> TRecord:
@@ -148,7 +148,7 @@ class DbContext(Context):
     def load_one_or_none(
         cls,
         record_type: Type[TRecord],
-        record_or_key: KeyProtocol | PrimitiveType | None,
+        record_or_key: KeyProtocol | TPrimitive | None,
         *,
         dataset: str | None = None,
     ) -> TRecord | None:
