@@ -22,8 +22,8 @@ from pymongo import MongoClient
 from pymongo.database import Database
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
-from cl.runtime.db.protocols import TKey
-from cl.runtime.db.protocols import TRecord
+from cl.runtime.records.protocols import TKey
+from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record

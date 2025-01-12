@@ -18,8 +18,8 @@ from typing import Iterable
 from typing import Type
 from typing_extensions import Self
 from cl.runtime import Db
-from cl.runtime.db.protocols import TKey
-from cl.runtime.db.protocols import TRecord
+from cl.runtime.records.protocols import TKey
+from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol

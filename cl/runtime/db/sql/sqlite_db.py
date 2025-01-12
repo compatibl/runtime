@@ -23,8 +23,8 @@ from typing import Iterable
 from typing import Tuple
 from typing import Type
 from cl.runtime.db.db import Db
-from cl.runtime.db.protocols import TKey
-from cl.runtime.db.protocols import TRecord
+from cl.runtime.records.protocols import TKey
+from cl.runtime.records.protocols import TRecord
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.protocols import KeyProtocol

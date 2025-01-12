@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime import RecordMixin
-from cl.runtime.db.protocols import TKey
+from cl.runtime.records.protocols import TKey
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassRecordKey
