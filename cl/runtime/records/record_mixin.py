@@ -14,10 +14,7 @@
 
 from abc import abstractmethod
 from typing import Generic
-from typing import TypeVar
-from cl.runtime.records.protocols import KeyProtocol
-
-TKey = TypeVar("TKey", bound=KeyProtocol)  # TODO: Remove duplicate TKey definition
+from cl.runtime.records.protocols import TKey
 
 
 class RecordMixin(Generic[TKey]):
