@@ -175,7 +175,7 @@ class StringSerializer:
     def serialize_key(self, data) -> str:
         """Serialize key to string, flattening for composite keys."""
 
-        key_slots = data.get_key_type().__slots__
+        key_slots = _get_class_hierarchy_slots(data.get_key_type())
         result = ";".join(
             (
                 self._serialize_key_token(v)
