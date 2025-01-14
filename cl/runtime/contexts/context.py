@@ -94,8 +94,8 @@ class Context(Freezable, ABC):
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource disposal."""
 
-        # Initialize to populate empty values from the current context or settings
-        RecordUtil.build(self)
+        # Build on enter
+        self.build()
 
         # Get context stack for the current asynchronous environment, at least one element is guaranteed
         # because constructing_default parameter is not passed
