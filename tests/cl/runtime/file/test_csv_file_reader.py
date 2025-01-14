@@ -46,16 +46,17 @@ def test_csv_file_reader(pytest_default_db):
     # Verify
     # TODO: Check count using load_all or count method of Db when created
     for i in range(1, 3):
+        expected_record = StubDataclassDerivedRecord(
+            id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
+        ).build()
         key = StubDataclassRecordKey(id=f"derived_id_{i}")
         record = DbContext.load_one(StubDataclassRecord, key)
-        assert record == StubDataclassDerivedRecord(
-            id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
-        )
+        assert record == expected_record
 
     for i in range(1, 4):
         expected_record = StubDataclassNestedFields(
             id=f"nested_{i}",
-        )
+        ).build()
         record = DbContext.load_one(StubDataclassNestedFields, expected_record.get_key())
         assert record == expected_record
 
@@ -64,7 +65,7 @@ def test_csv_file_reader(pytest_default_db):
             primitive=f"nested_primitive_{i}",
             embedded_1=StubDataclassRecordKey(id=f"embedded_key_id_{i}a"),
             embedded_2=StubDataclassRecordKey(id=f"embedded_key_id_{i}b"),
-        )
+        ).build()
         record = DbContext.load_one(StubDataclassComposite, expected_record.get_key())
         assert record == expected_record
 
