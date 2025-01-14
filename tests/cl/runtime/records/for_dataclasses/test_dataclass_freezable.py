@@ -86,5 +86,27 @@ def test_try_freeze():
     assert FreezableUtil.try_freeze(StubDataclassComplexFreezable(), what=BuildWhatEnum.NEW)
 
 
+def test_unfreeze():
+    """Test for passing None to freeze method."""
+
+    record = StubDataclassSimpleFreezable().build()
+    with pytest.raises(Exception):
+        record.build(what=None)  # noqa
+
+    StubDataclassSimpleFreezable().build()
+    with pytest.raises(Exception):
+        StubDataclassSimpleFreezable().build(what=None)  # noqa
+
+
+def test_refreeze():
+    """Test for passing a different value of what to freeze method."""
+
+    record = StubDataclassSimpleFreezable().build(what=BuildWhatEnum.NEW)
+    with pytest.raises(Exception):
+        record.build(what=BuildWhatEnum.DESERIALIZED)
+    with pytest.raises(Exception):
+        record.build(what=BuildWhatEnum.KEY)
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

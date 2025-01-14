@@ -13,13 +13,10 @@
 # limitations under the License.
 
 from abc import ABC
-from dataclasses import dataclass, field
-from dataclasses import fields
-
+from dataclasses import dataclass
 from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.init_mixin import InitMixin
-from cl.runtime.records.protocols import FreezableProtocol, _PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -34,33 +31,37 @@ class Freezable(InitMixin, ABC):
         - Use tuple which is immutable instead of list when deriving from this class
     """
 
-    __frozen: BuildWhatEnum | None = field(default=False, init=False, repr=False)
+    _frozen: BuildWhatEnum | None = required(default=None, init=False, repr=False)
     """Indicates what kind of instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
-        return bool(self.__frozen)
+        return bool(self._frozen)
 
     def what_frozen(self) -> BuildWhatEnum:
         """Return the parameter passed to the freeze method."""
-        return self.__frozen
+        return self._frozen
 
     def freeze(self, *, what: BuildWhatEnum) -> None:
         """
         Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
         Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
         """
-        if self.__frozen:
+        if self._frozen:
             # Check that repeated freeze call has the same parameter
-            if self.__frozen != what:
-                raise RuntimeError(f"Attempting to freeze as {self.__frozen.name} when "
+            if self._frozen != what:
+                frozen_name = self._frozen.name if self._frozen else "None"
+                what_name = what.name if what else "None"
+                raise RuntimeError(f"Attempting to freeze as {self._frozen.name} when "
                                    f"the instance is already frozen as {what.name}.")
-        else:
+        elif what:
             # Freeze setting fields at root level
-            object.__setattr__(self, "_Freezable__frozen", what)
+            object.__setattr__(self, "_frozen", what)
+        else:
+            raise RuntimeError("Parameter 'what' of freeze method is None.")
 
     def __setattr__(self, key, value):
         """Raise an error if invoked for a frozen instance.."""
-        if getattr(self, "_Freezable__frozen", None):
+        if getattr(self, "_frozen", None):
             raise AttributeError(f"Cannot modify field {TypeUtil.name(self)}.{key} because the instance is frozen.")
         object.__setattr__(self, key, value)

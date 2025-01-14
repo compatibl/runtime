@@ -71,13 +71,17 @@ class FreezableProtocol(Protocol):
     """Protocol implemented by objects that require initialization."""
 
     def is_frozen(self) -> bool:
-        """Check if the instance has been frozen by calling its freeze method."""
+        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         ...
 
-    def freeze(self) -> Self:
+    def what_frozen(self) -> BuildWhatEnum:
+        """Return the parameter passed to the freeze method."""
+        ...
+
+    def freeze(self, *, what: BuildWhatEnum) -> None:
         """
-        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
-        Return self to enable method chaining.
+        Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
+        Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
         """
         ...
 
