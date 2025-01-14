@@ -18,8 +18,7 @@ from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.record_util import RecordUtil
 
 
-# TODO: Rename to BuildMixin
-class InitMixin:
+class BuildMixin:
     """Optional mixin class adding build(), code must not rely on inheritance from this class."""
 
     __slots__ = ()

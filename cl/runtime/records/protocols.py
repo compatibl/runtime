@@ -67,6 +67,21 @@ TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
 
 
+class BuildProtocol(Protocol):
+    """Protocol for objects with build method."""
+
+    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
+        """
+        First invoke this 'build' method recursively for all of the object's non-primitive fields
+        (including protected and private fields) in the order of declaration, and after this:
+        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
+        (2) invoke freeze
+        (3) validate against the type declaration
+        Return self to enable method chaining.
+        """
+        ...
+
+
 class FreezableProtocol(Protocol):
     """Protocol implemented by objects that require initialization."""
 
@@ -160,10 +175,9 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     return result
 
 
-def is_iterable(instance_or_type: Any) -> TypeGuard[Iterable[Any]]:
-    """Returns true if one of the supported primitive types."""
-    result = hasattr(instance_or_type, "__iter__")
-    return result
+def is_buildable(instance_or_type: Any)-> TypeGuard[BuildProtocol]:
+    """Return True if the instance is buildable (implements build method)."""
+    return hasattr(instance_or_type, "build")
 
 
 def is_freezable(instance_or_type: Any)-> TypeGuard[FreezableProtocol]:
