@@ -98,7 +98,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         elif is_record(record_or_key):
             # Argument is Record, return after checking type
             TypeUtil.check_subtype(record_or_key, record_type)
-            return record_or_key  # noqa
+            return record_or_key.build()  # noqa
         else:
             # Same as is_key but a little faster, can use here because we already know it is not a record
             key_type = record_or_key.get_key_type()
@@ -119,7 +119,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
             # Try to retrieve using _load_one_or_none method implemented in derived types
             if (result := self._load_one_or_none(key, dataset=dataset)) is not None:
                 TypeUtil.check_subtype(result, record_type)
-                return result
+                return result.build()
             else:
                 return None
 
