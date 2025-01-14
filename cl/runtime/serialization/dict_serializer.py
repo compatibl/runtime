@@ -16,7 +16,6 @@ import datetime as dt
 import sys
 from collections import Counter
 from dataclasses import dataclass
-from datetime import timezone
 from enum import Enum
 from typing import Any
 from typing import Dict
@@ -27,7 +26,7 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
-from cl.runtime.records.protocols import TDataField, is_freezable
+from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
@@ -277,16 +276,6 @@ class DictSerializer:
                     if k != "_type" and not k.startswith("_")
                 }
                 result = deserialized_type(**deserialized_fields)  # noqa
-
-                # TODO: Refactor by passing event types to init method
-                if is_freezable(result):
-                    # If the record is freezable, freeze and validate against the schema
-                    # but do not invoke init on load because init was invoked prior to saving
-                    result.freeze()
-                    RecordUtil.validate(result)
-                else:
-                    # Invoke init for all classes in hierarchy
-                    RecordUtil.init_all(result)
                 return result
             elif (short_name := data.get("_enum", None)) is not None:
                 # If _enum is specified, create an instance of _enum using _name
