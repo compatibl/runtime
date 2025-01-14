@@ -98,10 +98,7 @@ class UiDictSerializer(DictSerializer):
 
             return serialized_dict_items
         elif getattr(data, "__slots__", None) is not None:
-
-            # Invoke 'init' for each class in class hierarchy that implements it, in the order from base to derived
-            RecordUtil.build(data)
-
+            # Slots class, serialize as dictionary
             serialized_data = super(UiDictSerializer, self).serialize_data(data, type_)
 
             # Replace "_type" with "_t"

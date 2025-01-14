@@ -135,10 +135,6 @@ class DictSerializer:
         type_ = AnnotationsUtil.handle_optional_annot(type_)
         if getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
-
-            # Invoke 'init' for each class in class hierarchy that implements it, in the order from base to derived
-            RecordUtil.build(data)
-
             # Get slots from this class and its bases in the order of declaration from base to derived
             all_slots = _get_class_hierarchy_slots(data.__class__)
             annots = AnnotationsUtil.get_class_hierarchy_annotations(data.__class__)
