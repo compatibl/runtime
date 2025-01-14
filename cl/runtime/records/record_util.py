@@ -122,39 +122,6 @@ class RecordUtil:
 
 
     @classmethod
-    def init_all(cls, obj: TObj) -> TObj:
-        """
-        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
-        Return self to enable method chaining.
-        """
-
-        # Do nothing if already frozen
-        if FreezableUtil.is_frozen(obj):
-            # Return argument to enable method chaining
-            return obj
-
-        # Keep track of which init methods in class hierarchy were already called
-        invoked = set()
-
-        # Reverse the MRO to start from base to derived
-        for class_ in reversed(obj.__class__.__mro__):
-            class_init = getattr(class_, "init", None)
-            if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
-                # Add qualname to invoked to prevent executing the same method twice
-                invoked.add(qualname)
-                # Invoke 'init' method of superclass if it exists, otherwise do nothing
-                class_init(obj)
-
-        # After the init methods, call freeze method if implemented, continue without error if not
-        FreezableUtil.try_freeze(obj, what=BuildWhatEnum.NEW)
-
-        # Perform validation against the schema only after all init methods are called
-        cls.validate(obj)
-
-        # Return argument to enable method chaining
-        return obj
-
-    @classmethod
     def validate(cls, obj) -> None:
         """Validate against schema (invoked by init_all after all init methods are called)."""
         # TODO: Support other dataclass-like frameworks

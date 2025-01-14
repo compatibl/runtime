@@ -100,13 +100,6 @@ class InitProtocol(Protocol):
         """
         ...
 
-    def init_all(self) -> Self:
-        """
-        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
-        Return self to enable method chaining.
-        """
-        ...
-
 
 class KeyProtocol(Protocol):
     """Protocol implemented by keys and also required for records which are derived from keys."""
@@ -122,13 +115,6 @@ class KeyProtocol(Protocol):
         """
         ...
 
-    # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
-    def init_all(self) -> Self:
-        """
-        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
-        Return self to enable method chaining.
-        """
-        ...
 
     @classmethod
     def get_key_type(cls) -> Type:
@@ -150,13 +136,6 @@ class RecordProtocol(Protocol):
         """
         ...
 
-    # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
-    def init_all(self) -> Self:
-        """
-        Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
-        Return self to enable method chaining.
-        """
-        ...
 
     # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
     @classmethod
