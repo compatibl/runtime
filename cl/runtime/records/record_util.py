@@ -27,6 +27,7 @@ from typing import Union
 from typing import get_args
 from typing import get_origin
 from cl.runtime.log.exceptions.user_error import UserError
+from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import RecordProtocol, _PRIMITIVE_TYPE_NAMES, is_iterable, is_freezable
 from cl.runtime.records.protocols import TObj
@@ -38,7 +39,7 @@ class RecordUtil:
     """Utilities for working with records."""
 
     @classmethod
-    def build(cls, obj: TObj) -> TObj:
+    def build(cls, obj: TObj, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> TObj:
         """
         First invoke this 'build' method recursively for all of the object's non-primitive fields
         (including protected and private fields) in the order of declaration, and after this:
@@ -108,7 +109,7 @@ class RecordUtil:
                 class_init(obj)
 
         # After the init methods, call freeze method if implemented, continue without error if not
-        FreezableUtil.try_freeze(obj)
+        FreezableUtil.try_freeze(obj, what=what)
 
         # Perform validation against the schema only after all init methods are called
         cls.validate(obj)
@@ -142,7 +143,7 @@ class RecordUtil:
                 class_init(obj)
 
         # After the init methods, call freeze method if implemented, continue without error if not
-        FreezableUtil.try_freeze(obj)
+        FreezableUtil.try_freeze(obj, what=BuildWhatEnum.NEW)
 
         # Perform validation against the schema only after all init methods are called
         cls.validate(obj)

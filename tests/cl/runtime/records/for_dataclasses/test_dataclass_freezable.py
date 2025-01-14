@@ -14,6 +14,7 @@
 
 import pytest
 
+from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_complex_freezable import StubDataclassComplexFreezable
@@ -30,7 +31,7 @@ def test_simple_freezable():
     record.value = "def"
 
     # Freeze record
-    record.freeze()
+    record.build()
 
     # Attempt to modify field after freezing
     with pytest.raises(AttributeError):
@@ -45,7 +46,7 @@ def test_complex_freezable():
     record.value = "def"
 
     # Freeze record
-    record.freeze()
+    record.build()
 
     # Attempt to set fields after freezing
     with pytest.raises(AttributeError):
@@ -67,28 +68,22 @@ def test_incomplete_freezable():
 
     # Attempt to freeze non-freezable objects
     with pytest.raises(Exception):
-        StubDataclassData().freeze()  # noqa
+        StubDataclassData().build()  # noqa
     with pytest.raises(Exception):
-        StubDataclassPartialFreezable().freeze()
+        StubDataclassPartialFreezable().build()
     with pytest.raises(Exception):
-        StubDataclassListFreezable().freeze()
+        StubDataclassListFreezable().build()
 
 
 def test_try_freeze():
     """Test for FreezableUtil.try_freeze."""
 
     # Try freezing non-freezable objects
-    assert not FreezableUtil.try_freeze(StubDataclassData())
+    assert not FreezableUtil.try_freeze(StubDataclassData(), what=BuildWhatEnum.NEW)
 
     # Try freezing freezable objects
-    assert FreezableUtil.try_freeze(StubDataclassSimpleFreezable())
-    assert FreezableUtil.try_freeze(StubDataclassComplexFreezable())
-
-    # Should raise when called on incorrectly implemented Freezable
-    with pytest.raises(Exception):
-        FreezableUtil.try_freeze(StubDataclassPartialFreezable())
-    with pytest.raises(Exception):
-        FreezableUtil.try_freeze(StubDataclassListFreezable())
+    assert FreezableUtil.try_freeze(StubDataclassSimpleFreezable(), what=BuildWhatEnum.NEW)
+    assert FreezableUtil.try_freeze(StubDataclassComplexFreezable(), what=BuildWhatEnum.NEW)
 
 
 if __name__ == "__main__":

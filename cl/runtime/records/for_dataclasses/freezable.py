@@ -13,16 +13,18 @@
 # limitations under the License.
 
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from dataclasses import fields
-from typing import TypeGuard, Any
+
+from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.init_mixin import InitMixin
 from cl.runtime.records.protocols import FreezableProtocol, _PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class Freezable(ABC):
+class Freezable(InitMixin, ABC):
     """
     Derive a dataclass from this base to add the ability to freeze from further modifications of its fields.
     Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
@@ -32,39 +34,33 @@ class Freezable(ABC):
         - Use tuple which is immutable instead of list when deriving from this class
     """
 
-    __frozen: bool = required(default=False, init=False)
-    """
-    Indicates the instance is frozen so its fields can no longer be modified.
-    Once frozen, the instance cannot be unfrozen.
-    """
+    __frozen: BuildWhatEnum | None = field(default=False, init=False, repr=False)
+    """Indicates what kind of instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
     def is_frozen(self) -> bool:
-        """
-        Return True if the object has already been frozen. Once frozen, the instance cannot be unfrozen.
-        Non-freezable objects (objects with mutable elements that do not implement freeze) always return False.
-        """
+        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
+        return bool(self.__frozen)
+
+    def what_frozen(self) -> BuildWhatEnum:
+        """Return the parameter passed to the freeze method."""
         return self.__frozen
 
-    def freeze(self) -> None:
+    def freeze(self, *, what: BuildWhatEnum) -> None:
         """
-        Traverse the object and call freeze for each mutable element. Once frozen, the instance cannot be unfrozen.
-        Error message for non-freezable objects (objects with mutable elements that do not implement freeze).
+        Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
+        Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
         """
-
-        # Freeze setting fields at root level
-        object.__setattr__(self, "_Freezable__frozen", True)
-
-        # Recursively call freeze on fields, except in case of tuple call freeze on tuple elements
-        tuple(
-            tuple(getattr(x, "freeze")() for x in field_value) if isinstance(field_value, tuple)
-            else getattr(field_value, "freeze")() if type(field_value).__name__ not in _PRIMITIVE_TYPE_NAMES
-            else None
-            for field_obj in fields(self)  # noqa
-            if (field_value := getattr(self, field_obj.name, None)) is not None
-        )
+        if self.__frozen:
+            # Check that repeated freeze call has the same parameter
+            if self.__frozen != what:
+                raise RuntimeError(f"Attempting to freeze as {self.__frozen.name} when "
+                                   f"the instance is already frozen as {what.name}.")
+        else:
+            # Freeze setting fields at root level
+            object.__setattr__(self, "_Freezable__frozen", what)
 
     def __setattr__(self, key, value):
         """Raise an error if invoked for a frozen instance.."""
-        if getattr(self, "_Freezable__frozen", False):
-            raise AttributeError(f"Cannot modify field {TypeUtil.name(self)}.{key} because the object is frozen.")
+        if getattr(self, "_Freezable__frozen", None):
+            raise AttributeError(f"Cannot modify field {TypeUtil.name(self)}.{key} because the instance is frozen.")
         object.__setattr__(self, key, value)

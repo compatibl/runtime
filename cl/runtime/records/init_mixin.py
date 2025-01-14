@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from typing_extensions import Self
+
+from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.record_util import RecordUtil
 
 
@@ -22,7 +24,7 @@ class InitMixin:
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
 
-    def build(self) -> Self:
+    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
         """
         First invoke this 'build' method recursively for all of the object's non-primitive fields
         (including protected and private fields) in the order of declaration, and after this:
@@ -31,7 +33,7 @@ class InitMixin:
         (3) validate against the type declaration
         Return self to enable method chaining.
         """
-        return RecordUtil.build(self)
+        return RecordUtil.build(self, what=what)
 
     def init_all(self) -> Self:
         """

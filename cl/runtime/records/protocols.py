@@ -28,6 +28,8 @@ from uuid import UUID
 
 from typing_extensions import Self
 
+from cl.runtime.records.build_what_enum import BuildWhatEnum
+
 _PRIMITIVE_TYPE_NAMES = {"str", "float", "bool", "int", "date", "time", "datetime", "UUID", "bytes"}
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
@@ -83,7 +85,7 @@ class FreezableProtocol(Protocol):
 class InitProtocol(Protocol):
     """Protocol implemented by objects that require initialization."""
 
-    def build(self) -> Self:
+    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
         """
         First invoke this 'build' method recursively for all of the object's non-primitive fields
         (including protected and private fields) in the order of declaration, and after this:
@@ -105,7 +107,7 @@ class InitProtocol(Protocol):
 class KeyProtocol(Protocol):
     """Protocol implemented by keys and also required for records which are derived from keys."""
 
-    def build(self) -> Self:
+    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
         """
         First invoke this 'build' method recursively for all of the object's non-primitive fields
         (including protected and private fields) in the order of declaration, and after this:
@@ -133,7 +135,7 @@ class KeyProtocol(Protocol):
 class RecordProtocol(Protocol):
     """Protocol implemented by records but not keys."""
 
-    def build(self) -> Self:
+    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
         """
         First invoke this 'build' method recursively for all of the object's non-primitive fields
         (including protected and private fields) in the order of declaration, and after this:

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
@@ -23,13 +25,13 @@ def test_freezable_util():
 
     # Try freezing a freezable object
     freezable_record = StubDataclassSimpleFreezable()
-    FreezableUtil.try_freeze(freezable_record)
+    FreezableUtil.try_freeze(freezable_record, what=BuildWhatEnum.NEW)
     assert FreezableUtil.is_frozen(freezable_record)
     assert freezable_record.is_frozen()
 
     # Try freezing a non-freezable object
     non_freezable_record = StubDataclassRecord()
-    FreezableUtil.try_freeze(non_freezable_record)
+    FreezableUtil.try_freeze(non_freezable_record, what=BuildWhatEnum.NEW)
     assert not FreezableUtil.is_frozen(non_freezable_record)
 
 
