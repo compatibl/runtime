@@ -14,10 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 
 
 @dataclass(slots=True, kw_only=True)
-class BaseTypeInfo:
+class BaseTypeInfo(Freezable):
     """Base type info."""
 
     name: str = required()
