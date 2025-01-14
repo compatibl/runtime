@@ -31,54 +31,6 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
 
 
-class _Base:
-    """Test class."""
-
-    def get_key(self) -> TKey:
-        raise NotImplementedError()
-
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
-        RegressionGuard().write("> _Base.init")
-
-
-class _Derived(_Base):
-    """Test class."""
-
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
-        RegressionGuard().write(">> _Derived.init")
-
-
-class _DerivedFromDerivedWithInit(_Derived):
-    """Test class."""
-
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
-        RegressionGuard().write(">>> _DerivedFromDerivedWithInit.init")
-
-
-class _DerivedFromDerivedWithoutInit(_Derived):
-    """Test class."""
-
-
-def test_init_all():
-    """Test RecordUtil.init_all method."""
-
-    guard = RegressionGuard()
-
-    guard.write("Testing _Base:")
-    RecordUtil.build(_Base())
-    guard.write("Testing _Derived:")
-    RecordUtil.build(_Derived())
-    guard.write("Testing _DerivedFromDerivedWithInit:")
-    RecordUtil.build(_DerivedFromDerivedWithInit())
-    guard.write("Testing _DerivedFromDerivedWithoutInit:")
-    RecordUtil.build(_DerivedFromDerivedWithoutInit())
-
-    RegressionGuard().verify_all()
-
-
 def test_is_instance():
     """Test RecordUtil.validate method."""
 

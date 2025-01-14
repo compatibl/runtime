@@ -51,7 +51,7 @@ class _DerivedFromDerivedWithoutInit(_Derived):
     """Test class."""
 
 
-def test_init_all():
+def test_build():
     """Test RecordUtil.init_all method."""
 
     guard = RegressionGuard()
