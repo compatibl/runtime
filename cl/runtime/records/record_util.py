@@ -61,12 +61,12 @@ class RecordUtil:
             # Recursively call 'build' on fields, except in case of tuple call 'build' on tuple elements
             tuple(
                 None if type(field_value).__name__ in _PRIMITIVE_TYPE_NAMES or isinstance(field_value, Enum)
-                else cls.build(field_value) if is_freezable(field_value)
+                else cls.build(field_value, what=what) if is_freezable(field_value)
                 else setattr(
                     obj,
                     field_obj.name,
                     tuple(
-                        cls.build(tuple_element) for tuple_element in field_value
+                        cls.build(tuple_element, what=what) for tuple_element in field_value
                         if tuple_element is not None and type(tuple_element).__name__ not in _PRIMITIVE_TYPE_NAMES)
                         )
                 if isinstance(field_value, list | tuple)
@@ -79,16 +79,16 @@ class RecordUtil:
             # TODO: Remove after transition to all freezable objects
             tuple(
                 None if type(field_value).__name__ in _PRIMITIVE_TYPE_NAMES or isinstance(field_value, Enum)
-                else cls.build(field_value) if is_dataclass(field_value)
+                else cls.build(field_value, what=what) if is_dataclass(field_value)
                 else tuple(
-                    cls.build(tuple_element) for tuple_element in field_value
+                    cls.build(tuple_element, what=what) for tuple_element in field_value
                     if tuple_element is not None
                     and type(tuple_element).__name__ not in _PRIMITIVE_TYPE_NAMES
                     and not isinstance(tuple_element, Enum)
                 )
                 if isinstance(field_value, list | tuple)
                 else tuple(
-                    cls.build(dict_value) for dict_value in field_value.values()
+                    cls.build(dict_value, what=what) for dict_value in field_value.values()
                     if dict_value is not None
                     and type(dict_value).__name__ not in _PRIMITIVE_TYPE_NAMES
                     and not isinstance(dict_value, Enum)
