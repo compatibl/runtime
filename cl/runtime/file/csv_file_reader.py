@@ -36,7 +36,7 @@ class CsvFileReader(Reader):
     file_path: str
     """Absolute path to the CSV file including extension."""
 
-    def read_and_save(self) -> None:
+    def csv_to_db(self) -> None:
         # Get current context
 
         with open(self.file_path, mode="r", encoding="utf-8") as file:

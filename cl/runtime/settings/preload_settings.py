@@ -61,7 +61,7 @@ class PreloadSettings(Settings):
             ]
 
         # Preload from CSV
-        [CsvFileReader(file_path=csv_file).read_and_save() for csv_file in csv_files]
+        [CsvFileReader(file_path=csv_file).csv_to_db() for csv_file in csv_files]
 
         # TODO: Process YAML and JSON preloads
 
