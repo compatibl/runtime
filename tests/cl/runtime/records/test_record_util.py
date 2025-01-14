@@ -68,13 +68,13 @@ def test_init_all():
     guard = RegressionGuard()
 
     guard.write("Testing _Base:")
-    RecordUtil.init_all(_Base())
+    RecordUtil.build(_Base())
     guard.write("Testing _Derived:")
-    RecordUtil.init_all(_Derived())
+    RecordUtil.build(_Derived())
     guard.write("Testing _DerivedFromDerivedWithInit:")
-    RecordUtil.init_all(_DerivedFromDerivedWithInit())
+    RecordUtil.build(_DerivedFromDerivedWithInit())
     guard.write("Testing _DerivedFromDerivedWithoutInit:")
-    RecordUtil.init_all(_DerivedFromDerivedWithoutInit())
+    RecordUtil.build(_DerivedFromDerivedWithoutInit())
 
     RegressionGuard().verify_all()
 

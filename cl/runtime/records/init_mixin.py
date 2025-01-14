@@ -40,4 +40,4 @@ class InitMixin:
         Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
         Return self to enable method chaining.
         """
-        return RecordUtil.init_all(self)
+        return RecordUtil.build(self)

@@ -95,7 +95,7 @@ class Context(Freezable, ABC):
         """Supports 'with' operator for resource disposal."""
 
         # Initialize to populate empty values from the current context or settings
-        RecordUtil.init_all(self)
+        RecordUtil.build(self)
 
         # Get context stack for the current asynchronous environment, at least one element is guaranteed
         # because constructing_default parameter is not passed

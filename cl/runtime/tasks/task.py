@@ -110,7 +110,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
             # Create log entry
             log_message = LogMessage(message=str(e))
-            log_message.init_all()
+            log_message.build()
 
             # Save log entry to the database
             DbContext.save_one(log_message)

@@ -100,7 +100,7 @@ class UiDictSerializer(DictSerializer):
         elif getattr(data, "__slots__", None) is not None:
 
             # Invoke 'init' for each class in class hierarchy that implements it, in the order from base to derived
-            RecordUtil.init_all(data)
+            RecordUtil.build(data)
 
             serialized_data = super(UiDictSerializer, self).serialize_data(data, type_)
 

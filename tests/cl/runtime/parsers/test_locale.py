@@ -28,7 +28,7 @@ def test_init():
     )
 
     for test_case in test_cases:
-        locale = Locale(locale_id=test_case[0]).init_all()
+        locale = Locale(locale_id=test_case[0]).build()
         assert locale.language == test_case[1]
         assert locale.country == test_case[2]
 

@@ -137,7 +137,7 @@ class DictSerializer:
             # Slots class, serialize as dictionary
 
             # Invoke 'init' for each class in class hierarchy that implements it, in the order from base to derived
-            RecordUtil.init_all(data)
+            RecordUtil.build(data)
 
             # Get slots from this class and its bases in the order of declaration from base to derived
             all_slots = _get_class_hierarchy_slots(data.__class__)
