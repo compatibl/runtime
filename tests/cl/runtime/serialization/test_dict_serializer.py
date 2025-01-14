@@ -56,9 +56,9 @@ def test_data_serialization():
     serializer = DictSerializer()
 
     for sample_type in sample_types:
-        obj_1 = sample_type()
+        obj_1 = sample_type().build()
         serialized_1 = serializer.serialize_data(obj_1)
-        obj_2 = serializer.deserialize_data(serialized_1)
+        obj_2 = serializer.deserialize_data(serialized_1).build()
         serialized_2 = serializer.serialize_data(obj_2)
 
         assert obj_1 == obj_2

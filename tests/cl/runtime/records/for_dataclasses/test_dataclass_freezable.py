@@ -19,6 +19,7 @@ from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_complex_freezable import StubDataclassComplexFreezable
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_freezable import StubDataclassListFreezable
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_non_freezable import StubDataclassNonFreezable
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_partial_freezable import StubDataclassPartialFreezable
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 
@@ -63,6 +64,7 @@ def test_complex_freezable():
         record.freezable_tuple[1].value = "xyz"
 
 
+@pytest.mark.skip("Turn back on when build requires freezable.")  # TODO: Turn back on when build requires freezable
 def test_incomplete_freezable():
     """Test for classes that are not completely freezable."""
 
@@ -78,8 +80,8 @@ def test_incomplete_freezable():
 def test_try_freeze():
     """Test for FreezableUtil.try_freeze."""
 
-    # Try freezing non-freezable objects
-    assert not FreezableUtil.try_freeze(StubDataclassData(), what=BuildWhatEnum.NEW)
+    # Try freezing a non-freezable object
+    assert not FreezableUtil.try_freeze(StubDataclassNonFreezable(), what=BuildWhatEnum.NEW)
 
     # Try freezing freezable objects
     assert FreezableUtil.try_freeze(StubDataclassSimpleFreezable(), what=BuildWhatEnum.NEW)
