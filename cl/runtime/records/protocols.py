@@ -14,7 +14,7 @@
 
 import datetime as dt
 from enum import Enum
-from typing import Any
+from typing import Any, Iterable
 from typing import Dict
 from typing import List
 from typing import Literal
@@ -83,6 +83,17 @@ class FreezableProtocol(Protocol):
 class InitProtocol(Protocol):
     """Protocol implemented by objects that require initialization."""
 
+    def build(self) -> Self:
+        """
+        First invoke this 'build' method recursively for all of the object's non-primitive fields
+        (including protected and private fields) in the order of declaration, and after this:
+        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
+        (2) invoke freeze
+        (3) validate against the type declaration
+        Return self to enable method chaining.
+        """
+        ...
+
     def init_all(self) -> Self:
         """
         Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
@@ -91,9 +102,19 @@ class InitProtocol(Protocol):
         ...
 
 
-@runtime_checkable
 class KeyProtocol(Protocol):
     """Protocol implemented by keys and also required for records which are derived from keys."""
+
+    def build(self) -> Self:
+        """
+        First invoke this 'build' method recursively for all of the object's non-primitive fields
+        (including protected and private fields) in the order of declaration, and after this:
+        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
+        (2) invoke freeze
+        (3) validate against the type declaration
+        Return self to enable method chaining.
+        """
+        ...
 
     # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
     def init_all(self) -> Self:
@@ -111,6 +132,17 @@ class KeyProtocol(Protocol):
 
 class RecordProtocol(Protocol):
     """Protocol implemented by records but not keys."""
+
+    def build(self) -> Self:
+        """
+        First invoke this 'build' method recursively for all of the object's non-primitive fields
+        (including protected and private fields) in the order of declaration, and after this:
+        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
+        (2) invoke freeze
+        (3) validate against the type declaration
+        Return self to enable method chaining.
+        """
+        ...
 
     # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
     def init_all(self) -> Self:
@@ -140,6 +172,12 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     """Returns true if one of the supported primitive types."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in _PRIMITIVE_TYPE_NAMES
+    return result
+
+
+def is_iterable(instance_or_type: Any) -> TypeGuard[Iterable[Any]]:
+    """Returns true if one of the supported primitive types."""
+    result = hasattr(instance_or_type, "__iter__")
     return result
 
 

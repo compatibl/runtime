@@ -16,6 +16,7 @@ import inspect
 from dataclasses import MISSING
 from dataclasses import fields
 from dataclasses import is_dataclass
+from enum import Enum
 from types import NoneType
 from types import UnionType
 from typing import Any
@@ -27,7 +28,7 @@ from typing import get_args
 from typing import get_origin
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import RecordProtocol, _PRIMITIVE_TYPE_NAMES, is_iterable, is_freezable
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
@@ -35,6 +36,86 @@ from cl.runtime.records.type_util import TypeUtil
 
 class RecordUtil:
     """Utilities for working with records."""
+
+    @classmethod
+    def build(cls, obj: TObj) -> TObj:
+        """
+        First invoke this 'build' method recursively for all of the object's non-primitive fields
+        (including protected and private fields) in the order of declaration, and after this:
+        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
+        (2) invoke freeze
+        (3) validate against the type declaration
+        Return self to enable method chaining.
+        """
+
+        # Do nothing if already frozen
+        if FreezableUtil.is_frozen(obj):
+            # Return argument to enable method chaining
+            return obj
+
+        if is_freezable(obj):
+            # Recursively call 'build' on fields, except in case of tuple call 'build' on tuple elements
+            tuple(
+                None if type(field_value).__name__ in _PRIMITIVE_TYPE_NAMES or isinstance(field_value, Enum)
+                else cls.build(field_value) if is_freezable(field_value)
+                else setattr(
+                    obj,
+                    field_obj.name,
+                    tuple(
+                        cls.build(tuple_element) for tuple_element in field_value
+                        if tuple_element is not None and type(tuple_element).__name__ not in _PRIMITIVE_TYPE_NAMES)
+                        )
+                if isinstance(field_value, list | tuple)
+                else cls._unsupported_type_error(obj, field_obj.name, field_value)
+                for field_obj in fields(obj)  # noqa
+                if (field_value := getattr(obj, field_obj.name, None)) is not None
+            )
+        else:
+            # Recursively call 'init_all' on fields, except in case of tuple call 'init_all' on tuple elements
+            # TODO: Remove after transition to all freezable objects
+            tuple(
+                None if type(field_value).__name__ in _PRIMITIVE_TYPE_NAMES or isinstance(field_value, Enum)
+                else cls.init_all(field_value) if is_dataclass(field_value)
+                else tuple(
+                    cls.init_all(tuple_element) for tuple_element in field_value
+                    if tuple_element is not None
+                    and type(tuple_element).__name__ not in _PRIMITIVE_TYPE_NAMES
+                    and not isinstance(tuple_element, Enum)
+                )
+                if isinstance(field_value, list | tuple)
+                else tuple(
+                    cls.init_all(dict_value) for dict_value in field_value.values()
+                    if dict_value is not None
+                    and type(dict_value).__name__ not in _PRIMITIVE_TYPE_NAMES
+                    and not isinstance(dict_value, Enum)
+                )
+                if isinstance(field_value, dict)
+                else cls._unsupported_type_error(obj, field_obj.name, field_value)
+                for field_obj in fields(obj)  # noqa
+                if (field_value := getattr(obj, field_obj.name, None)) is not None
+            )
+
+        # Invoke 'init' in the order from base to derived
+        # Keep track of which init methods in class hierarchy were already called
+        invoked = set()
+        # Reverse the MRO to start from base to derived
+        for class_ in reversed(obj.__class__.__mro__):
+            class_init = getattr(class_, "init", None)
+            if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
+                # Add qualname to invoked to prevent executing the same method twice
+                invoked.add(qualname)
+                # Invoke 'init' method of superclass if it exists, otherwise do nothing
+                class_init(obj)
+
+        # After the init methods, call freeze method if implemented, continue without error if not
+        FreezableUtil.try_freeze(obj)
+
+        # Perform validation against the schema only after all init methods are called
+        cls.validate(obj)
+
+        # Return argument to enable method chaining
+        return obj
+
 
     @classmethod
     def init_all(cls, obj: TObj) -> TObj:
@@ -191,3 +272,13 @@ Note: In case of containers, type mismatch may be in one of the items.
             sort_records.append((sort_key, record))
 
         return [record for _, record in sorted(sort_records, key=lambda x: x[0])]
+
+    @classmethod
+    def _unsupported_type_error(cls, obj: Any, field_name: str, field_value: Any) -> None:
+        obj_type_name = TypeUtil.name(obj)
+        field_type_name = TypeUtil.name(field_value)
+        raise RuntimeError(
+            f"Field {field_name} in class {obj_type_name} has type {field_type_name}\n"
+            f"that is not supported for Runtime records and their fields.\n"
+            f"Supported types include objects that implement 'freeze' method, tuples, and\n"
+            f"primitive types from the following list: {', '.join(_PRIMITIVE_TYPE_NAMES)}")

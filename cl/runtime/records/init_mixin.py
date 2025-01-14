@@ -22,6 +22,17 @@ class InitMixin:
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
 
+    def build(self) -> Self:
+        """
+        First invoke this 'build' method recursively for all of the object's non-primitive fields
+        (including protected and private fields) in the order of declaration, and after this:
+        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
+        (2) invoke freeze
+        (3) validate against the type declaration
+        Return self to enable method chaining.
+        """
+        return RecordUtil.build(self)
+
     def init_all(self) -> Self:
         """
         Invoke 'init' for each class in the order from base to derived, freeze if freezable, then validate the schema.
