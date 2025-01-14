@@ -179,6 +179,9 @@ class BasicMongoDb(Db):
         if record is None:
             return
 
+        # Build on save
+        record.build()
+
         # Confirm record_type is a record type
         if not is_record(record):
             raise RuntimeError(f"Attempting to save {type(record).__name__} which is not a record.")

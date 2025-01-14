@@ -108,6 +108,9 @@ class LocalCache(Db):
         if record is None:
             return
 
+        # Build on save
+        record.build()
+
         # Try to retrieve table dictionary using 'key_type' as key, insert if it does not yet exist
         key_type = record.get_key_type()
         key_type_name = TypeUtil.name(key_type)
