@@ -170,7 +170,10 @@ class SqliteDb(Db):
 
                 # yield records according to input keys order
                 for key in keys_group:
-                    yield result.get(str(key)).build(BuildWhatEnum.DESERIALIZED)
+                    record = result.get(str(key))
+                    if record:
+                        record.build(what=BuildWhatEnum.DESERIALIZED)
+                    yield record
 
     def load_all(
         self,
