@@ -14,14 +14,15 @@
 
 from abc import ABC
 from dataclasses import dataclass
+
+from cl.runtime.records.build_mixin import BuildMixin
 from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.init_mixin import InitMixin
 from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class Freezable(InitMixin, ABC):
+class Freezable(BuildMixin, ABC):
     """
     Derive a dataclass from this base to add the ability to freeze from further modifications of its fields.
     Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.

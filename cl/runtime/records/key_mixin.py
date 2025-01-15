@@ -15,10 +15,10 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import Type
-from cl.runtime.records.init_mixin import InitMixin
+from cl.runtime.records.build_mixin import BuildMixin
 
 
-class KeyMixin(InitMixin, ABC):
+class KeyMixin(BuildMixin, ABC):
     """
     Optional mixin class for a primary key object, code must not rely on inheritance from this class
     as long as all of its methods are implemented.
