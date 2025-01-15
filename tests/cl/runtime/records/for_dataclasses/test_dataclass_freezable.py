@@ -91,23 +91,26 @@ def test_try_freeze():
 def test_unfreeze():
     """Test for passing None to freeze method."""
 
-    record = StubDataclassSimpleFreezable().build()
+    # Error when passing what=None when already frozen, but the object remains frozen
+    record = StubDataclassSimpleFreezable()
     with pytest.raises(Exception):
         record.build(what=None)  # noqa
 
-    StubDataclassSimpleFreezable().build()
+    # Error when passing what=None when unfrozen
+    record = StubDataclassSimpleFreezable()
     with pytest.raises(Exception):
-        StubDataclassSimpleFreezable().build(what=None)  # noqa
+        record.build(what=None)  # noqa
 
 
 def test_refreeze():
     """Test for passing a different value of what to freeze method."""
 
+    # No error when trying to refreeze, but the value of what_frozen remains the same
     record = StubDataclassSimpleFreezable().build(what=BuildWhatEnum.NEW)
-    with pytest.raises(Exception):
-        record.build(what=BuildWhatEnum.DESERIALIZED)
-    with pytest.raises(Exception):
-        record.build(what=BuildWhatEnum.KEY)
+    record.build(what=BuildWhatEnum.DESERIALIZED)
+    assert record.what_frozen() == BuildWhatEnum.NEW
+    record.build(what=BuildWhatEnum.KEY)
+    assert record.what_frozen() == BuildWhatEnum.NEW
 
 
 if __name__ == "__main__":

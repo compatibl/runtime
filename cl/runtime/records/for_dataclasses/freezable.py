@@ -47,18 +47,13 @@ class Freezable(InitMixin, ABC):
         Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
         Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
         """
-        if self._frozen:
-            # Check that repeated freeze call has the same parameter
-            if self._frozen != what:
-                frozen_name = self._frozen.name if self._frozen else "None"
-                what_name = what.name if what else "None"
-                raise RuntimeError(f"Attempting to freeze as {self._frozen.name} when "
-                                   f"the instance is already frozen as {what.name}.")
-        elif what:
-            # Freeze setting fields at root level
-            object.__setattr__(self, "_frozen", what)
+        if what:
+            # Preserve the original value of self._frozen if freeze is called when the object is already frozen
+            if not self._frozen:
+                # Freeze setting fields at root level
+                object.__setattr__(self, "_frozen", what)
         else:
-            raise RuntimeError("Parameter 'what' of freeze method is None.")
+            raise RuntimeError("Parameter 'what' of freeze method must be one of BuildWhatEnum values.")
 
     def __setattr__(self, key, value):
         """Raise an error if invoked for a frozen instance.."""
