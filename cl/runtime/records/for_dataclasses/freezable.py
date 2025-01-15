@@ -31,7 +31,7 @@ class Freezable(InitMixin, ABC):
         - Use tuple which is immutable instead of list when deriving from this class
     """
 
-    _frozen: BuildWhatEnum | None = required(default=None, init=False, repr=False)
+    _frozen: BuildWhatEnum | None = required(default=None, init=False, repr=False, compare=False)
     """Indicates what kind of instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
     def is_frozen(self) -> bool:
