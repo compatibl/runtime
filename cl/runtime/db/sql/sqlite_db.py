@@ -23,6 +23,7 @@ from typing import Iterable
 from typing import Tuple
 from typing import Type
 from cl.runtime.db.db import Db
+from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
@@ -169,7 +170,7 @@ class SqliteDb(Db):
 
                 # yield records according to input keys order
                 for key in keys_group:
-                    yield result.get(str(key))
+                    yield result.get(str(key)).build(BuildWhatEnum.DESERIALIZED)
 
     def load_all(
         self,
