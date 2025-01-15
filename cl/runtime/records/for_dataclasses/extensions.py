@@ -26,6 +26,7 @@ def required(
     default_factory: TDefaultFactory | None = None,
     init: bool = True,
     repr: bool = True,  # noqa
+    compare: bool = True,
     name: str | None = None,  # TODO: Review use when trailing _ is removed automatically
     label: str | None = None,
     subtype: str | None = None,
@@ -39,6 +40,7 @@ def required(
         default_factory: Factory to generate default value for mutable types
         init: True by default, if False the field is omitted from __init__ params
         repr: True by default, if False the field is omitted from debugger representation
+        compare: True by default, if False the field is omitted from comparison functions
         name: Override field name in REST (label will be titleized version of this parameter unless set directly)
         label: Override titleized name in UI
         subtype: Subtype within the Python type, for example 'long' for int Python type
@@ -54,9 +56,9 @@ def required(
     metadata = {key: value for key, value in args.items() if value is not None} if args else None
 
     if default_factory is None:
-        return dataclasses.field(default=default, init=init, repr=repr, metadata=metadata)
+        return dataclasses.field(default=default, init=init, repr=repr,  compare=compare, metadata=metadata,)
     elif default is None:
-        return dataclasses.field(default_factory=default_factory, init=init, repr=repr, metadata=metadata)
+        return dataclasses.field(default_factory=default_factory, init=init, repr=repr, compare=compare,metadata=metadata,)
     else:
         raise RuntimeError(
             f"Params default={default} and default_factory={default_factory} "
@@ -70,6 +72,7 @@ def optional(
     default_factory: TDefaultFactory | None = None,
     init: bool = True,
     repr: bool = True,  # noqa
+    compare: bool = True,
     name: str | None = None,  # TODO: Review use when trailing _ is removed automatically
     label: str | None = None,
     subtype: str | None = None,
@@ -87,6 +90,7 @@ def optional(
         default_factory: Factory to generate default value for mutable types
         init: True by default, if False the field is omitted from __init__ params
         repr: True by default, if False the field is omitted from debugger representation
+        compare: True by default, if False the field is omitted from comparison functions
         name: Override field name in REST (label will be titleized version of this parameter unless set directly)
         label: Override titleized name in UI
         subtype: Subtype within the Python type, for example 'long' for int Python type
@@ -103,9 +107,9 @@ def optional(
     metadata = {key: value for key, value in args.items() if value is not None}
 
     if default_factory is None:
-        return dataclasses.field(default=default, init=init, repr=repr, metadata=metadata)
+        return dataclasses.field(default=default, init=init, repr=repr, compare=compare, metadata=metadata,)
     elif default is None:
-        return dataclasses.field(default_factory=default_factory, init=init, repr=repr, metadata=metadata)
+        return dataclasses.field(default_factory=default_factory, init=init, repr=repr, compare=compare, metadata=metadata,)
     else:
         raise RuntimeError(
             f"Params default={default} and default_factory={default_factory} "
