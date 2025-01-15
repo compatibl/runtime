@@ -67,8 +67,6 @@ class RecordUtil:
         elif is_buildable(obj):
 
             if FreezableUtil.is_frozen(obj):
-                # Call freeze despite being already frozen to ensure 'what' parameter matches
-                obj.freeze(what=what)
                 # Stop further processing as frozen state indicates build method has already been invoked
                 return obj
             else:
