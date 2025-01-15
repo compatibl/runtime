@@ -64,7 +64,7 @@ def test_context_manager():
     _perform_manager_test([])
 
     # Create StubContext() but do not use 'with' clause
-    context_external = StubContext()
+    context_external = StubContext().build()
     _perform_manager_test([context_external])
 
     # Inside a single 'with StubContext()' clause
