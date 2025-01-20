@@ -19,7 +19,6 @@ from typing import List
 from typing_extensions import Self
 from cl.runtime.contexts.context import _CONTEXT_STACK_DICT_VAR
 from cl.runtime.contexts.context import Context
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.serialization.dict_serializer import DictSerializer
 
 _DICT_SERIALIZER = DictSerializer()
@@ -60,9 +59,8 @@ class ContextManager:
                         f"Context {type(context).__name__} cannot be activated by ContextManager "
                         f"because it is not derived from {Context.__name__}."
                     )
-                # Build as deserialized record, init implementations will use this parameter
-                # to avoid overriding deserialized public fields
-                context.build(what=BuildWhatEnum.DESERIALIZED)
+                # Freeze the deserialized record without invoking build
+                context.freeze()
 
     def __enter__(self) -> Self:
         """Invoke __enter__ for each item in the 'contexts' field."""
