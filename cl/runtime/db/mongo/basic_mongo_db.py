@@ -22,6 +22,7 @@ from pymongo import MongoClient
 from pymongo.database import Database
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
+from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import KeyProtocol
@@ -68,9 +69,6 @@ class BasicMongoDb(Db):
         *,
         dataset: str | None = None,
     ) -> RecordProtocol | None:
-        if dataset is not None:
-            raise RuntimeError("BasicMongo database type does not support datasets.")
-
         # Key, get collection name from key type
         collection_name = TypeUtil.name(key)
         db = self._get_db()
@@ -113,9 +111,6 @@ class BasicMongoDb(Db):
         # Confirm record_type is a record type
         if not is_record(record_type):
             raise RuntimeError(f"Type {TypeUtil.name(record_type)} is not a record.")
-        # Confirm dataset is not None
-        if dataset is not None:
-            raise RuntimeError("BasicMongo database type does not support datasets.")
 
         # Key, get collection name from key type by removing Key suffix if present
         key_type = record_type.get_key_type()
@@ -145,9 +140,6 @@ class BasicMongoDb(Db):
         # Confirm record_type is a record type
         if not is_record(record_type):
             raise RuntimeError(f"Type {TypeUtil.name(record_type)} is not a record.")
-        # Confirm dataset is not None
-        if dataset is not None:
-            raise RuntimeError("BasicMongo database type does not support datasets.")
 
         # Key, get collection name from key type by removing Key suffix if present
         key_type = record_type.get_key_type()
@@ -171,29 +163,10 @@ class BasicMongoDb(Db):
 
     def save_one(
         self,
-        record: RecordProtocol | None,
+        record: RecordProtocol,
         *,
         dataset: str | None = None,
     ) -> None:
-        # If record is None, do nothing  # TODO: Review if this should raise an exception instead
-        if record is None:
-            return
-
-        # Build on save
-        record.build()
-
-        # Confirm record_type is a record type
-        if not is_record(record):
-            raise RuntimeError(f"Attempting to save {type(record).__name__} which is not a record.")
-
-        # Confirm dataset is not None
-        if dataset is not None:
-            raise RuntimeError("BasicMongo database type does not support datasets.")
-
-        # Call on_save if defined
-        if hasattr(record, "on_save"):
-            record.on_save()  # TODO: Refactor on_save
-
         # Get collection name from key type by removing Key suffix if present
         key_type = record.get_key_type()
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
@@ -218,9 +191,8 @@ class BasicMongoDb(Db):
         *,
         dataset: str | None = None,
     ) -> None:
-        # TODO: Temporary, replace by independent implementation
+        # TODO: Provide a separate implementation for save_many
         [self.save_one(x, dataset=dataset) for x in records]
-        return
 
     def delete_one(
         self,
@@ -229,10 +201,6 @@ class BasicMongoDb(Db):
         *,
         dataset: str | None = None,
     ) -> None:
-        # Confirm dataset is not None
-        if dataset is not None:
-            raise RuntimeError("BasicMongo database type does not support datasets.")
-
         # Get collection name from key type by removing Key suffix if present
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_db()

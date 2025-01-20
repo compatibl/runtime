@@ -23,7 +23,6 @@ from typing import Iterable
 from typing import Tuple
 from typing import Type
 from cl.runtime.db.db import Db
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
@@ -172,7 +171,7 @@ class SqliteDb(Db):
                 for key in keys_group:
                     record = result.get(str(key))
                     if record:
-                        record.build(what=BuildWhatEnum.DESERIALIZED)
+                        record.build()
                     yield record
 
     def load_all(
@@ -229,7 +228,7 @@ class SqliteDb(Db):
 
     def save_one(
         self,
-        record: RecordProtocol | None,
+        record: RecordProtocol,
         *,
         dataset: str | None = None,
     ) -> None:
@@ -241,10 +240,6 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
     ) -> None:
-
-        # Build on save
-        tuple(record.build() for record in records)
-
         serializer = FlatDictSerializer()
         schema_manager = self._get_schema_manager()
 

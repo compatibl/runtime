@@ -20,13 +20,15 @@ from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
-from cl.runtime.records.protocols import TKey
+from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
+from cl.runtime.records.protocols import TKey, is_record, is_freezable
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.primitive.format_util import FormatUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
+from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
@@ -105,14 +107,11 @@ class DbContext(Context):
                 raise RuntimeError("Attempting to access DB outside the outermost 'with DbContext(...)' clause.")
 
     @classmethod
-    def get_dataset(cls) -> str | None:
+    def get_dataset(cls, dataset: str | None = None) -> str | None:
         """
         Unique dataset in backslash-delimited format obtained by concatenating identifiers from the DbContext stack
         for the same DB as the current context in the order entered, or None outside 'with DbContext(...)' clause.
-
-        Notes:
-          - If dataset field is None for any dataset in the stack, it is is disregarded
-          - If dataset field is None for the entire the DbContext stack, this method returns root dataset
+        The result is combined with dataset. If the overall result is None, root dataset is used.
         """
         if (context := cls.current_or_none()) is not None:
             # Use the value from the current context if not None
@@ -141,7 +140,7 @@ class DbContext(Context):
         return cls.get_db().load_one(
             record_type,
             record_or_key,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
 
     @classmethod
@@ -164,7 +163,7 @@ class DbContext(Context):
         return cls.get_db().load_one_or_none(
             record_type,
             record_or_key,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
 
     @classmethod
@@ -187,7 +186,7 @@ class DbContext(Context):
         return cls.get_db().load_many(
             record_type,
             records_or_keys,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
 
     @classmethod
@@ -206,7 +205,7 @@ class DbContext(Context):
         """
         return cls.get_db().load_all(  # noqa
             record_type,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
 
     @classmethod
@@ -228,13 +227,13 @@ class DbContext(Context):
         return cls.get_db().load_filter(  # noqa
             record_type,
             filter_obj,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
 
     @classmethod
     def save_one(
         cls,
-        record: RecordProtocol | None,
+        record: RecordProtocol,
         *,
         dataset: str | None = None,
     ) -> None:
@@ -245,9 +244,13 @@ class DbContext(Context):
             record: Record or None.
             dataset: Target dataset as a delimited string, list of levels, or None
         """
+        # Perform pre-save check
+        cls._pre_save_check(record)
+
+        # Invoke DB method with combined dataset
         cls.get_db().save_one(  # noqa
             record,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
 
     @classmethod
@@ -264,9 +267,13 @@ class DbContext(Context):
             records: Iterable of records.
             dataset: Target dataset as a delimited string, list of levels, or None
         """
+        # Perform pre-save check
+        [cls._pre_save_check(record) for record in records]
+
+        # Invoke DB method with combined dataset
         cls.get_db().save_many(  # noqa
             records,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
 
     @classmethod
@@ -288,7 +295,7 @@ class DbContext(Context):
         cls.get_db().delete_one(  # noqa
             key_type,
             key,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
 
     @classmethod
@@ -307,5 +314,17 @@ class DbContext(Context):
         """
         cls.get_db().delete_many(  # noqa
             keys,
-            dataset=dataset,
+            dataset=cls.get_dataset(dataset),
         )
+
+    @classmethod
+    def _pre_save_check(cls, record: RecordProtocol) -> None:
+        if record is None:
+            # Confirm argument is not None
+            raise RuntimeError("Attempting to save an object with the value of None.")
+        elif not is_record(record):
+            # Confirm the argument is a record
+            raise RuntimeError(f"Attempting to save {type(record).__name__} which is not a record.")
+        elif is_freezable(record) and not FreezableUtil.is_frozen(record):  # TODO: Do not allow non-freezable
+                raise RuntimeError(f"Record of type {TypeUtil.name(record)} with key {record.get_key()}\n"
+                                   f"is not frozen before saving, call 'build' or 'freeze' first.")

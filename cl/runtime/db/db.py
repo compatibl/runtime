@@ -22,8 +22,8 @@ from cl.runtime import KeyUtil
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.class_info import ClassInfo
+from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import RecordProtocol
@@ -97,10 +97,11 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
             # Return None if argument is None
             return None
         elif is_record(record_or_key):
-            # Argument is Record, return after checking type
+            # Ensure the final type is subtype of the requested type
             TypeUtil.check_subtype(record_or_key, record_type)
-            # Use BuildWhatEnum.NEW for a records passed instead of a key
-            return record_or_key.build(what=BuildWhatEnum.NEW)  # noqa
+            # Try freezing without calling build, no error if not freezable
+            FreezableUtil.try_freeze(record_or_key)
+            return record_or_key
         else:
             # Same as is_key but a little faster, can use here because we already know it is not a record
             key_type = record_or_key.get_key_type()
@@ -120,9 +121,11 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
             # Try to retrieve using _load_one_or_none method implemented in derived types
             if (result := self._load_one_or_none(key, dataset=dataset)) is not None:
+                # Ensure the final type is subtype of the requested type
                 TypeUtil.check_subtype(result, record_type)
-                # Use BuildWhatEnum.DESERIALIZED for a records loaded from DB
-                return result.build(what=BuildWhatEnum.DESERIALIZED)
+                # Try freezing without calling build, no error if not freezable
+                FreezableUtil.try_freeze(result)
+                return result
             else:
                 return None
 
@@ -195,7 +198,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def save_one(
         self,
-        record: RecordProtocol | None,
+        record: RecordProtocol,
         *,
         dataset: str | None = None,
     ) -> None:
@@ -204,7 +207,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
         Args:
             record: Record or None.
-            dataset: Target dataset as a delimited string, list of levels, or None
+            dataset: Dataset as backslash-delimited string
         """
 
     @abstractmethod
@@ -219,7 +222,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
         Args:
             records: Iterable of records.
-            dataset: Target dataset as a delimited string, list of levels, or None
+            dataset: Dataset as backslash-delimited string
         """
 
     @abstractmethod

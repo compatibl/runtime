@@ -46,8 +46,6 @@ class LocalCache(Db):
         *,
         dataset: str | None = None,
     ) -> RecordProtocol | None:
-        if dataset is not None:
-            raise RuntimeError("Local cache does not currently support datasets.")
         # Serialize key in semicolon-delimited format
         serialized_key = key_serializer.serialize_key(key)
         # Try to retrieve table dictionary
@@ -97,20 +95,10 @@ class LocalCache(Db):
 
     def save_one(
         self,
-        record: RecordProtocol | None,
+        record: RecordProtocol,
         *,
         dataset: str | None = None,
     ) -> None:
-        if dataset is not None:
-            raise RuntimeError("Local cache does not currently support datasets.")
-
-        # If record is None, do nothing
-        if record is None:
-            return
-
-        # Build on save
-        record.build()
-
         # Try to retrieve table dictionary using 'key_type' as key, insert if it does not yet exist
         key_type = record.get_key_type()
         key_type_name = TypeUtil.name(key_type)
@@ -128,8 +116,8 @@ class LocalCache(Db):
         *,
         dataset: str | None = None,
     ) -> None:
-        # TODO: Review performance compared to a custom implementation for save_many
-        [self.save_one(x) for x in records]
+        # TODO: Provide a separate implementation for save_many
+        [self.save_one(x, dataset=dataset) for x in records]
 
     def delete_one(
         self,
