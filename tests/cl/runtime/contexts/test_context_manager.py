@@ -68,21 +68,21 @@ def test_context_manager():
     _perform_manager_test([context_external])
 
     # Inside a single 'with StubContext()' clause
-    with StubContext() as context_1:
+    with StubContext().build() as context_1:
         _perform_serialization_test([context_1])
     # Recreate using ContextManager
     _perform_manager_test([context_1])
 
     # Inside two nested 'with' clauses for the same key type StubContext
-    with StubContext() as context_1:
-        with StubContext(stub_context_id="modified_stub_context_id") as context_2:
+    with StubContext().build() as context_1:
+        with StubContext(stub_context_id="modified_stub_context_id").build() as context_2:
             _perform_serialization_test([context_2])
     # Recreate using ContextManager
     _perform_manager_test([context_2])
 
     # Inside two nested 'with' clauses for different same key types
-    with StubContext() as context_1:
-        with TrialContext(trial_id="modified_trial_id") as context_2:
+    with StubContext().build() as context_1:
+        with TrialContext(trial_id="modified_trial_id").build() as context_2:
             _perform_serialization_test([context_1, context_2])
     # Recreate using ContextManager
     _perform_manager_test([context_1, context_2])

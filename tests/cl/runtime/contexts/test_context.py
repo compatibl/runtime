@@ -56,13 +56,13 @@ def _perform_testing(
         # Ensure that current context is not leaked outside the 'with clause' before the test
         StubContext.current()
 
-    stub_context_1 = StubContext(stub_context_id="stub_context_1")
+    stub_context_1 = StubContext(stub_context_id="stub_context_1").build()
     with stub_context_1:
 
         _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
         assert StubContext.current() is stub_context_1
 
-        stub_context_2 = StubDerivedContext(derived_field="stub_context_2")
+        stub_context_2 = StubDerivedContext(derived_field="stub_context_2").build()
         with stub_context_2:
             _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
             assert StubContext.current() is stub_context_2
@@ -99,13 +99,13 @@ async def _perform_testing_async(
         # Ensure that current context is not leaked outside the 'with clause' before the test
         StubContext.current()
 
-    stub_context_1 = StubContext(stub_context_id="stub_context_1")
+    stub_context_1 = StubContext(stub_context_id="stub_context_1").build()
     with stub_context_1:
 
         await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
         assert StubContext.current() is stub_context_1
 
-        stub_context_2 = StubDerivedContext(derived_field="stub_context_2")
+        stub_context_2 = StubDerivedContext(derived_field="stub_context_2").build()
         with stub_context_2:
             await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
             assert StubContext.current() is stub_context_2
@@ -136,8 +136,8 @@ async def _gather(rnd: Random):
 def test_error_handling():
     """Test error handling in specifying extensions."""
 
-    stub_context_1 = StubContext(stub_context_id="stub_context_1")
-    stub_context_2 = StubDerivedContext(stub_context_id="stub_context_2")
+    stub_context_1 = StubContext(stub_context_id="stub_context_1").build()
+    stub_context_2 = StubDerivedContext(stub_context_id="stub_context_2").build()
 
     # Outer context all of the fields of the inner context, ok
     assert StubContext.current_or_none() is None

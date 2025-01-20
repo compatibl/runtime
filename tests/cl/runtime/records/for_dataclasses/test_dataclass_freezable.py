@@ -14,7 +14,6 @@
 
 import pytest
 
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_complex_freezable import StubDataclassComplexFreezable
@@ -81,36 +80,26 @@ def test_try_freeze():
     """Test for FreezableUtil.try_freeze."""
 
     # Try freezing a non-freezable object
-    assert not FreezableUtil.try_freeze(StubDataclassNonFreezable(), what=BuildWhatEnum.NEW)
+    assert not FreezableUtil.try_freeze(StubDataclassNonFreezable())
 
     # Try freezing freezable objects
-    assert FreezableUtil.try_freeze(StubDataclassSimpleFreezable(), what=BuildWhatEnum.NEW)
-    assert FreezableUtil.try_freeze(StubDataclassComplexFreezable(), what=BuildWhatEnum.NEW)
-
-
-def test_unfreeze():
-    """Test for passing None to freeze method."""
-
-    # Error when passing what=None when already frozen, but the object remains frozen
-    record = StubDataclassSimpleFreezable()
-    with pytest.raises(Exception):
-        record.build(what=None)  # noqa
-
-    # Error when passing what=None when unfrozen
-    record = StubDataclassSimpleFreezable()
-    with pytest.raises(Exception):
-        record.build(what=None)  # noqa
+    assert FreezableUtil.try_freeze(StubDataclassSimpleFreezable())
+    assert FreezableUtil.try_freeze(StubDataclassComplexFreezable())
 
 
 def test_refreeze():
     """Test for passing a different value of what to freeze method."""
 
-    # No error when trying to refreeze, but the value of what_frozen remains the same
-    record = StubDataclassSimpleFreezable().build(what=BuildWhatEnum.NEW)
-    record.build(what=BuildWhatEnum.DESERIALIZED)
-    assert record.what_frozen() == BuildWhatEnum.NEW
-    record.build(what=BuildWhatEnum.KEY)
-    assert record.what_frozen() == BuildWhatEnum.NEW
+    # Error when calling build twice
+    record = StubDataclassSimpleFreezable().build()
+    with pytest.raises(Exception):
+        record.build()
+
+    # Error when calling build when the object is frozen
+    record = StubDataclassSimpleFreezable()
+    record.freeze()
+    with pytest.raises(Exception):
+        record.build()
 
 
 if __name__ == "__main__":

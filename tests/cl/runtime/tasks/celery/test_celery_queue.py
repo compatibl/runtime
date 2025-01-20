@@ -33,7 +33,7 @@ def _create_task(queue: TaskQueueKey) -> TaskKey:
     """Create a test task."""
 
     method_callable = StubHandlers.run_static_method_1a
-    task = StaticMethodTask.create(queue=queue, record_type=StubHandlers, method_callable=method_callable)
+    task = StaticMethodTask.create(queue=queue, record_type=StubHandlers, method_callable=method_callable).build()
     DbContext.save_one(task)
     return task.get_key()
 

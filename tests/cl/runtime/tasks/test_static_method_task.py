@@ -31,7 +31,7 @@ def test_create(pytest_default_db):
         method_callable = sample_input[1]
         task = StaticMethodTask.create(
             queue=TaskQueueKey(queue_id="Sample Queue"), record_type=record_type, method_callable=method_callable
-        )
+        ).build()
         task.run_task()
 
 

@@ -35,7 +35,7 @@ class TestingClient(TestClient):
         ServerUtil.include_routers(rest_app)
 
         # Create process context and store it in an instance field
-        self.process_context = ProcessContext()
+        self.process_context = ProcessContext().build()
 
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource disposal."""

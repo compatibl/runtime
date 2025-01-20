@@ -36,7 +36,7 @@ def _save_tasks_and_get_requests() -> List[Dict]:
             queue=queue_key,
             record_or_key=StubHandlersKey(stub_id=f"{i}"),
             method_callable=StubHandlers.run_instance_method_1a,
-        )
+        ).build()
         for i in range(2)
     ]
     DbContext.save_many(tasks)

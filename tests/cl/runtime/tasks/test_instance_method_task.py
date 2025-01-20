@@ -50,7 +50,7 @@ def test_smoke(pytest_default_db):
             queue=TaskQueueKey(queue_id="Sample Queue"),
             record_or_key=record_or_key,
             method_callable=method_callable,
-        )
+        ).build()
         task.run_task()
 
 
