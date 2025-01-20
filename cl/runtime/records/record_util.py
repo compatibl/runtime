@@ -30,9 +30,9 @@ from typing import get_origin
 from typing_extensions import Self
 
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from cl.runtime.records.protocols import RecordProtocol, _PRIMITIVE_TYPE_NAMES, is_freezable, is_buildable
+from cl.runtime.records.protocols import RecordProtocol, _PRIMITIVE_TYPE_NAMES, is_primitive, is_record_or_key, is_key, \
+    is_freezable
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 
@@ -41,63 +41,63 @@ class RecordUtil:
     """Utilities for working with records."""
 
     @classmethod
-    def build(cls, obj: Any, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
+    def build(cls, obj: Any) -> Self:
         """
-        First invoke this 'build' method recursively for all of the object's non-primitive fields
-        (including protected and private fields) in the order of declaration, and after this:
-        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
-        (2) invoke freeze
-        (3) validate against the type declaration
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
         """
 
         if isinstance(obj, tuple | list):  # TODO: Exclude list after converting records to tuple
             # Recursively invoke on tuple elements in-place, skip primitive types or enums
             tuple(
-                cls.build(x, what=what) for x in obj
-                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
+                cls.build(x) for x in obj
+                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
             )
             return obj
         elif isinstance(obj, dict):  # TODO: Switch to frozendict and Map
             # Recursively invoke on dict elements in-place, skip primitive types or enums
             tuple(
-                cls.build(x, what=what) for x in obj.values()
-                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
+                cls.build(x) for x in obj.values()
+                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
             )
             return obj
-        elif is_buildable(obj):
+        elif is_record_or_key(obj) or is_freezable(obj):  # TODO: Do not allow non-freezable
 
             if FreezableUtil.is_frozen(obj):
-                # Stop further processing as frozen state indicates build method has already been invoked
-                return obj
-            else:
-                # Recursively call 'build' on fields
-                tuple(
-                    None if type(x).__name__ in _PRIMITIVE_TYPE_NAMES or isinstance(x, Enum)
-                    else cls.build(x, what=what) if is_buildable(x) or isinstance(x, tuple | list | dict)  # TODO: Remove list
-                    else cls._unsupported_field_error(obj, field_name=field.name, field_value=x)
-                    for field in fields(obj)  # noqa
-                    if (x := getattr(obj, field.name, None)) is not None
-                )
+                key = obj.get_key() if is_record(obj) else obj  # noqa
+                raise RuntimeError(f"Build has already been invoked, or the object has already been frozen\n"
+                                   f"without build for instance {key} of type {TypeUtil.name(obj)}.")
 
-                # Invoke 'init' in the order from base to derived
-                # Keep track of which init methods in class hierarchy were already called
-                invoked = set()
-                # Reverse the MRO to start from base to derived
-                for class_ in reversed(obj.__class__.__mro__):
-                    class_init = getattr(class_, "init", None)
-                    if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
-                        # Add qualname to invoked to prevent executing the same method twice
-                        invoked.add(qualname)
-                        # Invoke 'init' method of superclass if it exists, otherwise do nothing
-                        class_init(obj)
+            # Recursively call 'build' on fields except those that are None, primitive or Enum
+            tuple(
+                cls.build(x) for field in fields(obj)  # noqa
+                if (x := getattr(obj, field.name, None)) is not None
+                and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
+                and not isinstance(x, Enum)
+            )
 
-                # After the init methods, call freeze method if implemented, continue without error if not
-                FreezableUtil.try_freeze(obj, what=what)
+            # Invoke 'init' in the order from base to derived
+            # Keep track of which init methods in class hierarchy were already called
+            invoked = set()
+            # Reverse the MRO to start from base to derived
+            for class_ in reversed(obj.__class__.__mro__):
+                class_init = getattr(class_, "init", None)
+                if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
+                    # Add qualname to invoked to prevent executing the same method twice
+                    invoked.add(qualname)
+                    # Invoke 'init' method of superclass if it exists, otherwise do nothing
+                    class_init(obj)
 
-                # Perform validation against the schema only after all init methods are called
-                cls.validate(obj)
-                return obj
-        else:
+            # After the init methods, call freeze method if implemented, continue without error if not
+            FreezableUtil.try_freeze(obj)
+
+            # Perform validation against the schema only after all init methods are called
+            cls.validate(obj)
+            return obj
+        elif obj is not None and type(obj).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(obj, Enum):
             cls._unsupported_object_error(obj)
 
     @classmethod
