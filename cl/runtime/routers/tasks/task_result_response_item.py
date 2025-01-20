@@ -48,7 +48,6 @@ class TaskResultResponseItem(BaseModel):
 
         task_keys = [TaskKey(task_id=x) for x in request.task_run_ids]
         tasks = cast(Iterable[Task], DbContext.load_many(Task, task_keys))
-        DbContext.save_many(tasks)
 
         response_items = []
         for task in tasks:
