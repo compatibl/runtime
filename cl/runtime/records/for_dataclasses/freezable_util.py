@@ -14,7 +14,6 @@
 
 from typing import Any
 
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 
 
 class FreezableUtil:
@@ -32,13 +31,13 @@ class FreezableUtil:
             return False
 
     @classmethod
-    def try_freeze(cls, possibly_freezable: Any, *, what: BuildWhatEnum) -> bool:
+    def try_freeze(cls, possibly_freezable: Any) -> bool:
         """
         Call freeze method and return True if implemented, exit without error and return False if not.
         This method does not rely on inheritance from any version of Freezable and is not specific to dataclasses.
         """
         if (freeze_callable := getattr(possibly_freezable, "freeze", None)) is not None:
-            freeze_callable(what=what)
+            freeze_callable()
             return True
         else:
             return False

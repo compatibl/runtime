@@ -16,7 +16,6 @@ from abc import ABC
 from dataclasses import dataclass
 
 from cl.runtime.records.build_mixin import BuildMixin
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 
@@ -32,29 +31,24 @@ class Freezable(BuildMixin, ABC):
         - Use tuple which is immutable instead of list when deriving from this class
     """
 
-    _frozen: BuildWhatEnum | None = required(default=None, init=False, repr=False, compare=False)
-    """Indicates what kind of instance has been frozen. Once frozen, the instance cannot be unfrozen."""
+    _frozen: bool = required(default=False, init=False, repr=False, compare=False)
+    """True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
-        return bool(self._frozen)
-
-    def what_frozen(self) -> BuildWhatEnum:
-        """Return the parameter passed to the freeze method."""
         return self._frozen
 
-    def freeze(self, *, what: BuildWhatEnum) -> None:
+    def freeze(self) -> None:
         """
         Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
         Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
         """
-        if what:
-            # Preserve the original value of self._frozen if freeze is called when the object is already frozen
-            if not self._frozen:
-                # Freeze setting fields at root level
-                object.__setattr__(self, "_frozen", what)
+        if not self._frozen:
+            # Prevent setting new field values at root level
+            object.__setattr__(self, "_frozen", True)
         else:
-            raise RuntimeError("Parameter 'what' of freeze method must be one of BuildWhatEnum values.")
+            # Error if already frozen
+            raise RuntimeError("Method 'build' or 'freeze' is invoked on an object that is already frozen.")
 
     def __setattr__(self, key, value):
         """Raise an error if invoked for a frozen instance.."""

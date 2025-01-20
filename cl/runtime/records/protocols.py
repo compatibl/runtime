@@ -28,7 +28,6 @@ from uuid import UUID
 
 from typing_extensions import Self
 
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 
 _PRIMITIVE_TYPE_NAMES = {"str", "float", "bool", "int", "date", "time", "datetime", "UUID", "bytes"}
 
@@ -70,14 +69,13 @@ TEnum = TypeVar("TEnum", bound=Enum)
 class BuildProtocol(Protocol):
     """Protocol for objects with build method."""
 
-    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
+    def build(self) -> Self:
         """
-        First invoke this 'build' method recursively for all of the object's non-primitive fields
-        (including protected and private fields) in the order of declaration, and after this:
-        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
-        (2) invoke freeze
-        (3) validate against the type declaration
-        Return self to enable method chaining.
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
         """
         ...
 
@@ -89,11 +87,7 @@ class FreezableProtocol(Protocol):
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         ...
 
-    def what_frozen(self) -> BuildWhatEnum:
-        """Return the parameter passed to the freeze method."""
-        ...
-
-    def freeze(self, *, what: BuildWhatEnum) -> None:
+    def freeze(self) -> None:
         """
         Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
         Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
@@ -104,14 +98,13 @@ class FreezableProtocol(Protocol):
 class InitProtocol(Protocol):
     """Protocol implemented by objects that require initialization."""
 
-    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
+    def build(self) -> Self:
         """
-        First invoke this 'build' method recursively for all of the object's non-primitive fields
-        (including protected and private fields) in the order of declaration, and after this:
-        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
-        (2) invoke freeze
-        (3) validate against the type declaration
-        Return self to enable method chaining.
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
         """
         ...
 
@@ -119,14 +112,13 @@ class InitProtocol(Protocol):
 class KeyProtocol(Protocol):
     """Protocol implemented by keys and also required for records which are derived from keys."""
 
-    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
+    def build(self) -> Self:
         """
-        First invoke this 'build' method recursively for all of the object's non-primitive fields
-        (including protected and private fields) in the order of declaration, and after this:
-        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
-        (2) invoke freeze
-        (3) validate against the type declaration
-        Return self to enable method chaining.
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
         """
         ...
 
@@ -140,14 +132,13 @@ class KeyProtocol(Protocol):
 class RecordProtocol(Protocol):
     """Protocol implemented by records but not keys."""
 
-    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
+    def build(self) -> Self:
         """
-        First invoke this 'build' method recursively for all of the object's non-primitive fields
-        (including protected and private fields) in the order of declaration, and after this:
-        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
-        (2) invoke freeze
-        (3) validate against the type declaration
-        Return self to enable method chaining.
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
         """
         ...
 
@@ -173,11 +164,6 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in _PRIMITIVE_TYPE_NAMES
     return result
-
-
-def is_buildable(instance_or_type: Any)-> TypeGuard[BuildProtocol]:
-    """Return True if the instance is buildable (implements build method)."""
-    return hasattr(instance_or_type, "build")
 
 
 def is_freezable(instance_or_type: Any)-> TypeGuard[FreezableProtocol]:

@@ -14,7 +14,6 @@
 
 from typing_extensions import Self
 
-from cl.runtime.records.build_what_enum import BuildWhatEnum
 from cl.runtime.records.record_util import RecordUtil
 
 
@@ -24,13 +23,12 @@ class BuildMixin:
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
 
-    def build(self, *, what: BuildWhatEnum = BuildWhatEnum.NEW) -> Self:
+    def build(self) -> Self:
         """
-        First invoke this 'build' method recursively for all of the object's non-primitive fields
-        (including protected and private fields) in the order of declaration, and after this:
-        (1) invoke 'init' method of this class and its ancestors in the order from base to derived
-        (2) invoke freeze
-        (3) validate against the type declaration
-        Return self to enable method chaining.
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
         """
-        return RecordUtil.build(self, what=what)
+        return RecordUtil.build(self)
