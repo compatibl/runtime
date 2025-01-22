@@ -90,8 +90,8 @@ class StubRuntimeConfig(Config):
             *stub_handlers_records,
         ]
 
-        # save stubs to db
-        DbContext.save_many(all_records)
+        # Build and save to DB
+        DbContext.save_many(record.build() for record in all_records)
 
     def run_configure_plots(self) -> None:
         """Configure plots."""

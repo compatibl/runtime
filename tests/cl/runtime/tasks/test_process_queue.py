@@ -32,7 +32,7 @@ def test_process_queue(pytest_default_db):
 
     # Create and save tasks
     task_count = 2
-    tasks = [StubTask(label=f"{i}", queue=queue_key) for i in range(task_count)]
+    tasks = [StubTask(label=f"{i}", queue=queue_key).build() for i in range(task_count)]
     DbContext.save_many(tasks)
 
     # Start queue
