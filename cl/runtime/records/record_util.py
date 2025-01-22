@@ -50,26 +50,12 @@ class RecordUtil:
         Returns self to enable method chaining.
         """
 
-        if isinstance(obj, tuple | list):  # TODO: Exclude list after converting records to tuple
-            # Recursively invoke on tuple elements in-place, skip primitive types or enums
-            tuple(
-                cls.build(x) for x in obj
-                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
-            )
-            return obj
-        elif isinstance(obj, dict):  # TODO: Switch to frozendict and Map
-            # Recursively invoke on dict elements in-place, skip primitive types or enums
-            tuple(
-                cls.build(x) for x in obj.values()
-                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
-            )
-            return obj
-        elif is_record_or_key(obj) or is_freezable(obj):  # TODO: Do not allow non-freezable
+        if is_record_or_key(obj) or is_freezable(obj):  # TODO: Do not allow non-freezable
 
+            # Stop further processing if the object has been frozen to
+            # prevent repeat initialization of shared instances
             if FreezableUtil.is_frozen(obj):
-                key = obj.get_key() if is_record(obj) else obj  # noqa
-                raise RuntimeError(f"Build has already been invoked, or the object has already been frozen\n"
-                                   f"without build for instance {key} of type {TypeUtil.name(obj)}.")
+                return
 
             # Recursively call 'build' on fields except those that are None, primitive or Enum
             tuple(
@@ -96,6 +82,20 @@ class RecordUtil:
 
             # Perform validation against the schema only after all init methods are called
             cls.validate(obj)
+            return obj
+        elif isinstance(obj, tuple | list):  # TODO: Exclude list after converting records to tuple
+            # Recursively invoke on tuple elements in-place, skip primitive types or enums
+            tuple(
+                cls.build(x) for x in obj
+                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
+            )
+            return obj
+        elif isinstance(obj, dict):  # TODO: Switch to frozendict and Map
+            # Recursively invoke on dict elements in-place, skip primitive types or enums
+            tuple(
+                cls.build(x) for x in obj.values()
+                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
+            )
             return obj
         elif obj is not None and type(obj).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(obj, Enum):
             cls._unsupported_object_error(obj)

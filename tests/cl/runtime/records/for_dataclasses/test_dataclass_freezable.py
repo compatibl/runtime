@@ -88,18 +88,16 @@ def test_try_freeze():
 
 
 def test_refreeze():
-    """Test for passing a different value of what to freeze method."""
+    """Test calling build or freeze more than once."""
 
-    # Error when calling build twice
+    # Call build twice
     record = StubDataclassSimpleFreezable().build()
-    with pytest.raises(Exception):
-        record.build()
+    record.build()
 
-    # Error when calling build when the object is frozen
+    # Call freeze twice
     record = StubDataclassSimpleFreezable()
     record.freeze()
-    with pytest.raises(Exception):
-        record.build()
+    record.build()
 
 
 if __name__ == "__main__":

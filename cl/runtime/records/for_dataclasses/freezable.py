@@ -15,6 +15,8 @@
 from abc import ABC
 from dataclasses import dataclass
 
+from typing_extensions import Self
+
 from cl.runtime.records.build_mixin import BuildMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
@@ -38,17 +40,14 @@ class Freezable(BuildMixin, ABC):
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         return self._frozen
 
-    def freeze(self) -> None:
+    def freeze(self) -> Self:
         """
         Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
         Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
+        Return self for method chaining.
         """
-        if not self._frozen:
-            # Prevent setting new field values at root level
-            object.__setattr__(self, "_frozen", True)
-        else:
-            # Error if already frozen
-            raise RuntimeError("Method 'build' or 'freeze' is invoked on an object that is already frozen.")
+        object.__setattr__(self, "_frozen", True)
+        return self
 
     def __setattr__(self, key, value):
         """Raise an error if invoked for a frozen instance.."""
