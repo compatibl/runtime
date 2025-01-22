@@ -106,6 +106,8 @@ class LocalCache(Db):
 
         # Serialize both key and record
         serialized_key = key_serializer.serialize_key(record)
+        if not serialized_key:
+            raise RuntimeError("Attempting to save a record with empty key.")
 
         # Add record to cache, overwriting an existing record if present
         table_cache[serialized_key] = record

@@ -15,6 +15,9 @@
 from dataclasses import dataclass
 from typing import Iterable
 from typing import Type
+
+import yaml
+
 from cl.runtime import Db
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
@@ -29,6 +32,14 @@ from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serialization.dict_serializer import DictSerializer
+from cl.runtime.serialization.string_serializer import StringSerializer
+
+key_serializer = StringSerializer()
+"""Serializer for keys."""
+
+data_serializer = DictSerializer()
+"""Serializer for records."""
 
 
 @dataclass(slots=True, kw_only=True)
@@ -326,5 +337,12 @@ class DbContext(Context):
             # Confirm the argument is a record
             raise RuntimeError(f"Attempting to save {type(record).__name__} which is not a record.")
         elif is_freezable(record) and not FreezableUtil.is_frozen(record):  # TODO: Do not allow non-freezable
-                raise RuntimeError(f"Record of type {TypeUtil.name(record)} with key {record.get_key()}\n"
-                                   f"is not frozen before saving, call 'build' or 'freeze' first.")
+            raise RuntimeError(f"Record of type {TypeUtil.name(record)} with key {record.get_key()}\n"
+                               f"is not frozen before saving, call 'build' or 'freeze' first.")
+        else:
+            # TODO: To prevent calling get_key more than once, pass to DB save method
+            if not key_serializer.serialize_key(record):
+                record_data = data_serializer.serialize_data(record)
+                record_data_str = yaml.dump(record_data, default_flow_style=False, sort_keys=False, allow_unicode=True)
+                raise RuntimeError(f"Attempting to save a record with empty key, invoke build before saving.\n"
+                                   f"Values of other fields:\n{record_data_str}")
