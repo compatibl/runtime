@@ -193,6 +193,14 @@ def is_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
     return hasattr(instance_or_type, "get_key_type") and not hasattr(instance_or_type, "get_key")
 
 
+def is_singleton_key(instance_or_type: Any):
+    """Check if this is a singleton key (has no key fields), error if the object is not a key or has no slots."""
+    if not is_key(instance_or_type):
+        raise RuntimeError("Function 'is_singleton_key' is called on an object that is not a key.")
+    if not hasattr(instance_or_type, '__slots__'):
+        raise RuntimeError("Function 'is_singleton' is called on an object that has no __slots__ attribute.")
+    return all(name.startswith('_') for name in instance_or_type.__slots__)
+
 def has_init(instance_or_type: Any) -> TypeGuard[InitProtocol]:
     """Check if type or object requires initialization (InitProtocol) based on the presence of 'init' attribute."""
     return hasattr(instance_or_type, "init")

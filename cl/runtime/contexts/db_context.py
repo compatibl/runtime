@@ -24,7 +24,7 @@ from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from cl.runtime.records.protocols import TKey, is_record, is_freezable
+from cl.runtime.records.protocols import TKey, is_record, is_freezable, is_singleton_key
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.primitive.format_util import FormatUtil
 from cl.runtime.records.protocols import KeyProtocol
@@ -341,8 +341,10 @@ class DbContext(Context):
                                f"is not frozen before saving, call 'build' or 'freeze' first.")
         else:
             # TODO: To prevent calling get_key more than once, pass to DB save method
-            if not key_serializer.serialize_key(record.get_key()):
-                record_data = data_serializer.serialize_data(record)
-                record_data_str = yaml.dump(record_data, default_flow_style=False, sort_keys=False, allow_unicode=True)
-                raise RuntimeError(f"Attempting to save a record with empty key, invoke build before saving.\n"
-                                   f"Values of other fields:\n{record_data_str}")
+            if not key_serializer.serialize_key(key := record.get_key()):
+                # Error only if not a singleton
+                if not is_singleton_key(key):
+                    record_data = data_serializer.serialize_data(record)
+                    record_data_str = yaml.dump(record_data, default_flow_style=False, sort_keys=False, allow_unicode=True)
+                    raise RuntimeError(f"Attempting to save a record with empty key, invoke build before saving.\n"
+                                       f"Values of other fields:\n{record_data_str}")

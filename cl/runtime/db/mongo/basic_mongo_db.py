@@ -179,8 +179,6 @@ class BasicMongoDb(Db):
         # Serialize key
         # TODO: Consider getting the key first instead of serializing the entire record
         serialized_key = key_serializer.serialize_key(record.get_key())
-        if not serialized_key:
-            raise RuntimeError("Attempting to save a record with empty key.")
 
         # Use update_one with upsert=True to insert if not present or update if present
         # TODO (Roman): update_one does not affect fields not presented in record. Changed to replace_one
