@@ -87,6 +87,5 @@ class CsvFileReader(Reader):
         row_dict = {CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()}
         row_dict["_type"] = TypeUtil.name(record_type)
 
-        result = serializer.deserialize_data(row_dict)
-        FreezableUtil.try_freeze(result)
+        result = serializer.deserialize_data(row_dict).build()
         return result
