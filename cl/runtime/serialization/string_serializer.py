@@ -175,6 +175,9 @@ class StringSerializer:
     def serialize_key(self, data) -> str:
         """Serialize key to string, flattening for composite keys."""
 
+        if not is_key(data):
+            raise RuntimeError(f"Argument of serialize_key is not a key: {data}")
+
         key_slots = _get_class_hierarchy_slots(data.get_key_type())
         result = ";".join(
             (

@@ -20,7 +20,7 @@ from cl.runtime import ClassInfo
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol, is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -87,7 +87,8 @@ class InstanceMethodTask(MethodTask):
         # Get key type and key
         key_type = record_or_key.get_key_type()
         result.key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
-        result.key_str = key_serializer.serialize_key(record_or_key)
+        key = record_or_key.get_key() if is_record(record_or_key) else record_or_key
+        result.key_str = key_serializer.serialize_key(key)
 
         # Two tokens because the callable is bound to a class or its instance
         method_tokens = method_callable.__qualname__.split(".")

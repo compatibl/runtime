@@ -178,7 +178,7 @@ class BasicMongoDb(Db):
 
         # Serialize key
         # TODO: Consider getting the key first instead of serializing the entire record
-        serialized_key = key_serializer.serialize_key(record)
+        serialized_key = key_serializer.serialize_key(record.get_key())
         if not serialized_key:
             raise RuntimeError("Attempting to save a record with empty key.")
 

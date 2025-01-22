@@ -341,7 +341,7 @@ class DbContext(Context):
                                f"is not frozen before saving, call 'build' or 'freeze' first.")
         else:
             # TODO: To prevent calling get_key more than once, pass to DB save method
-            if not key_serializer.serialize_key(record):
+            if not key_serializer.serialize_key(record.get_key()):
                 record_data = data_serializer.serialize_data(record)
                 record_data_str = yaml.dump(record_data, default_flow_style=False, sort_keys=False, allow_unicode=True)
                 raise RuntimeError(f"Attempting to save a record with empty key, invoke build before saving.\n"
