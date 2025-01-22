@@ -35,7 +35,6 @@ class Dag(DagKey, RecordMixin[DagKey]):
     """List of DAG edges."""
 
     def get_key(self) -> DagKey:
-        """Return primary key of this instance in semicolon-delimited string format."""
         return DagKey(name=self.name)
 
     @staticmethod

@@ -23,5 +23,4 @@ class View(ViewKey, RecordMixin, ABC):
     """This type is returned from a viewer method as object or key."""
 
     def get_key(self) -> ViewKey:
-        """Return primary key of this instance in semicolon-delimited string format."""
         return ViewKey(view_for=self.view_for, view_name=self.view_name)
