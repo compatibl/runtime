@@ -72,7 +72,7 @@ class RunResponseItem(BaseModel):
                     key_str=serialized_key,
                     method_name=request.method,
                     method_params=request.arguments_,
-                )
+                ).build()
             else:
                 # Key is None, this is a @classmethod or @staticmethod
                 record_type = Schema.get_type_by_short_name(request.table)
@@ -85,7 +85,7 @@ class RunResponseItem(BaseModel):
                     type_str=record_type_str,
                     method_name=request.method,
                     method_params=request.arguments_,
-                )
+                ).build()
 
             # Save and submit task
             DbContext.save_one(handler_task)

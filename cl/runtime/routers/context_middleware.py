@@ -33,8 +33,8 @@ class ContextMiddleware:
         # Set ContextVar=None before async task execution, get a token for restoring its previous state
         token = ContextManager.save_and_clear_state()
         try:
-            with ProcessContext():
-                with DbContext(db=Db.create()):
+            with ProcessContext().build():
+                with DbContext(db=Db.create()).build():
                     # TODO: Create a test setting to enable this other than by uncommenting
                     # await asyncio.sleep(duration)
                     await self.app(scope, receive, send)

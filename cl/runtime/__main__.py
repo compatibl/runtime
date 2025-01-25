@@ -103,8 +103,8 @@ server_app.add_middleware(ContextMiddleware)
 ServerUtil.include_routers(server_app)
 
 if __name__ == "__main__":
-    with ProcessContext():
-        with DbContext(db=Db.create()):
+    with ProcessContext().build():
+        with DbContext(db=Db.create()).build():
             # TODO: This only works for the Mongo celery backend
             celery_delete_existing_tasks()
 
