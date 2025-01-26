@@ -30,7 +30,7 @@ class TypeResponseUtil:
         handler_args_elements = dict()
         result = Schema.for_type(record_type)
 
-        # TODO: Experimental patch to exclude entry_id field from top grid and editor but not the record picker
+        # TODO: Experimental patch to exclude generated fields from top grid and editor but not the record picker
         # This patch is activated in three cases:
         # - Top grid
         # - When a new record is created and the editor is opened
@@ -41,7 +41,7 @@ class TypeResponseUtil:
                 elements = type_dict.get("Elements", None)
                 if elements is not None:
                     for index, element in enumerate(elements):
-                        if element.get("Name", None) in ["EntryId", "CompletionId"]:
+                        if element.get("Name", None) in ["EntryId", "CompletionId"]: # TODO: Replace by preloads
                             elements.pop(index)
                             break
 
