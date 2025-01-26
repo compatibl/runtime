@@ -26,7 +26,6 @@ from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import StubDataclassTupleFields
 
 
@@ -45,7 +44,6 @@ def test_get_subtypes_in_hierarchy():
         StubDataclassTupleFields,
         StubDataclassOtherDerivedRecord,
         StubDataclassNestedFields,
-        StubDataclassNestedFinalRecord,
     }
 
     assert len(types_in_hierarchy) == len(expected_types)

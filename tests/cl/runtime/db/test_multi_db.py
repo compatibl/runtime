@@ -34,9 +34,6 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_key import StubDataclassFinalKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_final_record import StubDataclassFinalRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_final_record import StubDataclassNestedFinalRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
 
 _SAMPLES = [
@@ -192,27 +189,6 @@ def test_singleton(pytest_multi_db):
     all_records = list(DbContext.load_all(other_singleton_sample.__class__))
     assert len(all_records) == 1
     assert all_records[0] == other_singleton_sample
-
-
-def test_abstract_key(pytest_multi_db):
-    """Test final record for which some of the fields are in base record."""
-    final_record = StubDataclassFinalRecord(id="a")
-    DbContext.save_one(final_record)
-    final_key = final_record.get_key()
-    load_using_record = DbContext.load_one(type(final_record), final_record)
-    load_using_key = DbContext.load_one(type(final_record), final_key)
-    assert load_using_record is final_record  # Same object is returned without lookup
-    assert load_using_key == final_record  # Not the same object but equal
-
-    nested_record = StubDataclassNestedFinalRecord(id="b")
-    nested_record.final_key = StubDataclassFinalKey(id="c")
-    nested_record.final_record = StubDataclassFinalRecord(id="d")
-    DbContext.save_one(nested_record)
-    nested_key = nested_record.get_key()
-    load_using_record = DbContext.load_one(type(nested_record), nested_record)
-    load_using_key = DbContext.load_one(type(nested_record), nested_key)
-    assert load_using_record is nested_record  # Same object is returned without lookup
-    assert load_using_key == nested_record  # Not the same object but equal
 
 
 def test_load_filter(pytest_multi_db):

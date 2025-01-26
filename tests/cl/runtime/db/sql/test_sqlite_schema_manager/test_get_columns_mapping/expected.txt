@@ -30,6 +30,4 @@ key=polymorphic_field value=StubDataclassNestedFields.polymorphic_field
 key=polymorphic_derived_field value=StubDataclassNestedFields.polymorphic_derived_field
 key=key_field value=StubDataclassNestedFields.key_field
 key=record_as_key_field value=StubDataclassNestedFields.record_as_key_field
-key=final_key value=StubDataclassNestedFinalRecord.final_key
-key=final_record value=StubDataclassNestedFinalRecord.final_record
 key=other_derived value=StubDataclassOtherDerivedRecord.other_derived
