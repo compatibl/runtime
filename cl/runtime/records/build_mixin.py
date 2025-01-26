@@ -18,7 +18,7 @@ from cl.runtime.records.record_util import RecordUtil
 
 
 class BuildMixin:
-    """Optional mixin class adding build(), code must not rely on inheritance from this class."""
+    """Mixin adding 'build' method to the class."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""

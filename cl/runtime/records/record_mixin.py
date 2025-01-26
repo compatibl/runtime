@@ -19,7 +19,7 @@ from cl.runtime.records.protocols import TKey
 
 class RecordMixin(Generic[TKey]):
     """
-    Optional mixin class for a record, code must not rely on inheritance from this class.
+    Optional generic mixin for a record parameterized by its key.
     Derive MyRecord from both MyKey and RecordMixin[MyKey] as in MyRecord(MyKey, RecordMixin[MyKey]).
     """
 

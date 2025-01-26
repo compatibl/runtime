@@ -16,7 +16,7 @@ from abc import ABC
 
 
 class EmptyMixin(ABC):
-    """Empty (no-op) mixin for static type checking logic, code must not rely on inheritance from this class."""
+    """Empty (no-op) mixin for static type checking logic."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
