@@ -40,17 +40,23 @@ class Freezable(BuildMixin, ABC):
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         return self._frozen
 
+    def check_frozen(self, action_str: str | None = None) -> None:
+        """Error message if the instance is not frozen."""
+        if not self._frozen:
+            action_str = action_str if action_str else "using or performing setup"
+            raise RuntimeError(f"Freeze {TypeUtil.name(self)} before {action_str}.")
+
     def freeze(self) -> Self:
         """
-        Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
-        Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
-        Return self for method chaining.
+        Freeze the instance without recursively calling freeze on its fields. Return self for method chaining.
+        Once frozen, the instance cannot be unfrozen.
         """
         object.__setattr__(self, "_frozen", True)
         return self
 
     def __setattr__(self, key, value):
-        """Raise an error if invoked for a frozen instance.."""
-        if getattr(self, "_frozen", None):
-            raise AttributeError(f"Cannot modify field {TypeUtil.name(self)}.{key} because the instance is frozen.")
+        """Raise an error on attempt to modify a public field for a frozen instance."""
+        if getattr(self, "_frozen", False) and not key.startswith("_"):
+            raise RuntimeError(f"Cannot modify public field {TypeUtil.name(self)}.{key} "
+                               f"because the instance is frozen.")
         object.__setattr__(self, key, value)
