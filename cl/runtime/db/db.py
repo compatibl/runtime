@@ -112,6 +112,12 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
                 # Check that key object has the right class, subclasses not permitted
                 TypeUtil.check_type(record_or_key, key_type, name="record_or_key")
                 key = record_or_key
+                # Check that the key is frozen
+                if not FreezableUtil.is_frozen(key):
+                    raise RuntimeError(
+                        f"Key {record_or_key} of type {TypeUtil.name(record_or_key)} is not frozen\n"
+                        f"before it is used in DbContext.load_one method, invoke 'build' method first."
+                    )
             else:
                 raise RuntimeError(
                     f"Parameter 'record_or_key' has type {TypeUtil.name(record_or_key)} which is\n"
