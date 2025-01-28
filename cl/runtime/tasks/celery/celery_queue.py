@@ -66,7 +66,7 @@ def execute_task(
     with ContextManager(context_manager_data):
 
         # Load and run the task
-        task_key = TaskKey(task_id=task_id)
+        task_key = TaskKey(task_id=task_id).build()
         task = DbContext.load_one(Task, task_key)
         task.run_task()
 

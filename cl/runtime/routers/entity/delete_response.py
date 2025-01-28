@@ -33,7 +33,8 @@ class DeleteResponse(BaseModel):
 
         record_key_dicts = [key.model_dump() for key in request.record_keys]
         deserialized_record_keys = [
-            key_serializer.deserialize_key(key["_key"], type_dict[key["_t"]].get_key_type()) for key in record_key_dicts
+            key_serializer.deserialize_key(key["_key"], type_dict[key["_t"]].get_key_type()).build()
+            for key in record_key_dicts
         ]
         DbContext.delete_many(deserialized_record_keys, dataset=request.dataset)
 

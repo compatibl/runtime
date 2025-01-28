@@ -46,11 +46,8 @@ class InstanceMethodTask(MethodTask):
     def _execute(self) -> None:
         """Invoke the specified instance method."""
 
-        # Save self to ensure the worker process loads the same record
-        DbContext.save_one(self)
-
         key_type = ClassInfo.get_class_type(self.key_type_str)
-        key = key_serializer.deserialize_key(self.key_str, key_type)
+        key = key_serializer.deserialize_key(self.key_str, key_type).build()
 
         # Load record from storage
         record = DbContext.load_one(key_type, key)  # TODO: Require record type?

@@ -57,7 +57,7 @@ class SaveResponse(BaseModel):
             return SaveResponse(key=None)
 
         # Deserialize record
-        record = data_serializer.deserialize_data(ui_record).freeze()
+        record = data_serializer.deserialize_data(ui_record).build()
 
         if request.old_record_key is None:
             existing_record = DbContext.load_one_or_none(
@@ -71,7 +71,7 @@ class SaveResponse(BaseModel):
         if request.old_record_key is not None and request.old_record_key != key_serializer.serialize_key(
             record.get_key()
         ):
-            old_record_key_obj = key_serializer.deserialize_key(request.old_record_key, type(record.get_key()))
+            old_record_key_obj = key_serializer.deserialize_key(request.old_record_key, type(record.get_key())).build()
             DbContext.delete_one(key_type=type(record.get_key()), key=old_record_key_obj, dataset=request.dataset)
         DbContext.save_one(record, dataset=request.dataset)
 

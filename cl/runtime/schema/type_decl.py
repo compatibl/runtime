@@ -214,7 +214,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         # Create instance of the final type
         result = cls()
 
-        result.module = ModuleDeclKey(module_name=record_type.__module__)
+        result.module = ModuleDeclKey(module_name=record_type.__module__).build()
         result.name = TypeUtil.name(record_type)
         result.label = titleize(result.name)  # TODO: Add override from settings
         result.comment = record_type.__doc__

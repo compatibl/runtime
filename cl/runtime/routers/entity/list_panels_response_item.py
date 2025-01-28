@@ -49,7 +49,7 @@ class ListPanelsResponseItem(BaseModel):
             key_serializer = StringSerializer()
 
             # Deserialize ui key
-            key = key_serializer.deserialize_key(request.key, request_type.get_key_type())
+            key = key_serializer.deserialize_key(request.key, request_type.get_key_type()).build()
 
             # If the record is not found, display panel tabs for the base type
             record = DbContext.load_one_or_none(request_type, key)

@@ -135,7 +135,7 @@ class RecordResponse(BaseModel):
         # TODO (Roman): UiAppState record request from FE should have key in proper format where user is embedded key
         if record_type == UiAppState and "KEY" not in request.key:
             # TODO: Ensure user is specified in all deployment scenarios instead of using default value
-            deserialized_key = UiAppStateKey(user=UserKey(username=request.key or "root"))
+            deserialized_key = UiAppStateKey(user=UserKey(username=request.key or "root")).build()
         elif record_type == UiTypeState and "KEY" not in request.key:
             # Construct the UiTypeStateKey by parsing the key value
             splitted_key = request.key.split(";")
@@ -147,9 +147,9 @@ class RecordResponse(BaseModel):
                 type_=TypeDeclKey(
                     name=type_state_record_type_name, module=ModuleDeclKey(module_name=type_state_record_module)
                 ),
-            )
+            ).build()
         else:
-            deserialized_key = key_serializer.deserialize_key(request.key, record_type.get_key_type()).freeze()
+            deserialized_key = key_serializer.deserialize_key(request.key, record_type.get_key_type()).build()
 
         # TODO: Review the use of load_one_or_none here
         record = db.load_one_or_none(record_type, deserialized_key)

@@ -41,7 +41,7 @@ def test_key_serialization():
         obj_1_key = obj_1.get_key()
         serialized = key_serializer.serialize_key(obj_1_key)
 
-        deserialized_key = key_serializer.deserialize_key(serialized, sample_type.get_key_type())
+        deserialized_key = key_serializer.deserialize_key(serialized, sample_type.get_key_type()).build()
         assert obj_1_key == deserialized_key
 
 

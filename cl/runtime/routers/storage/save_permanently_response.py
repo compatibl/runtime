@@ -35,7 +35,7 @@ def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[Type
     request_type = Schema.get_type_by_short_name(request.type)
     key_serializer = StringSerializer()
 
-    key_objs = [key_serializer.deserialize_key(key, request_type.get_key_type()) for key in request.keys]
+    key_objs = [key_serializer.deserialize_key(key, request_type.get_key_type()).build() for key in request.keys]
     records = DbContext.load_many(key_objs, ignore_not_found=True)
 
     # TODO (Bohdan): Implement with_dependencies logic.

@@ -91,14 +91,15 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
 
-        result = DataUtil.shallow_copy(type(self), self)
         try:
             # Set status to Running and save
+            result = DataUtil.shallow_copy(type(self), self)
             result.status = TaskStatusEnum.RUNNING
-            DbContext.save_one(self)
+            result.build()
+            DbContext.save_one(result)
 
-            # Run the payload
-            result._execute()
+            # Invoke out-of-process execution of payload
+            self._execute()
 
         except Exception as e:  # noqa
             traceback.print_exception(e)  # TODO: Add full stack trade to the log message as well
@@ -122,24 +123,26 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             logger.debug("Stack trace:\n%s", traceback.format_exc())
 
             # Update task run record to report task failure
+            result = DataUtil.shallow_copy(type(self), self)
             result.status = TaskStatusEnum.FAILED
             result.progress_pct = 100.0
             result.elapsed_sec = 0.0  # TODO: Implement
             result.remaining_sec = 0.0
             result.error_message = str(e)
             result.build()
-            DbContext.save_one(self)
+            DbContext.save_one(result)
         else:
             # Record the end time
             end_time = DatetimeUtil.now()
 
             # Update task run record to report task completion
+            result = DataUtil.shallow_copy(type(self), self)
             result.status = TaskStatusEnum.COMPLETED
             result.progress_pct = 100.0
             result.elapsed_sec = 0.0  # TODO: Implement
             result.remaining_sec = 0.0
             result.build()
-            DbContext.save_one(self)
+            DbContext.save_one(result)
 
     @classmethod
     def wait_for_completion(cls, task_key: TaskKey, timeout_sec: int = 10) -> None:  # TODO: Rename or move

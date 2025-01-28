@@ -79,14 +79,14 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
             module_name, type_name = field_decl.field_type.rsplit(".", 1)
 
             if field_decl.field_kind == "enum":
-                module_key = ModuleDeclKey(module_name=module_name)
-                result.enum = EnumDeclKey(module=module_key, name=type_name)
+                module_key = ModuleDeclKey(module_name=module_name).build()
+                result.enum = EnumDeclKey(module=module_key, name=type_name).build()
             elif field_decl.field_kind == "key":
-                module_key = ModuleDeclKey(module_name=module_name)
-                result.key_ = TypeDeclKey(module=module_key, name=type_name)
+                module_key = ModuleDeclKey(module_name=module_name).build()
+                result.key_ = TypeDeclKey(module=module_key, name=type_name).build()
             elif field_decl.field_kind == "data":
-                module_key = ModuleDeclKey(module_name=module_name)
-                result.data = TypeDeclKey(module=module_key, name=type_name)
+                module_key = ModuleDeclKey(module_name=module_name).build()
+                result.data = TypeDeclKey(module=module_key, name=type_name).build()
             else:
                 raise RuntimeError(f"Unsupported field kind {field_decl.field_kind} for field {field_decl.name}.")
 
