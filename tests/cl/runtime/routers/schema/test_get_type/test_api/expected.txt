@@ -70,10 +70,6 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
   Comment: Base type info.
   Kind: Element
   DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl.runtime.records.for_dataclasses.freezable
-    Name: Freezable
   Elements:
   - Value:
       Type: String
@@ -87,16 +83,6 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
       Type: String
     Name: Label
     Comment: Label of type.
-cl.runtime.records.for_dataclasses.freezable.Freezable:
-  _t: Freezable
-  Module:
-    ModuleName: cl.runtime.records.for_dataclasses.freezable
-  Name: Freezable
-  Label: Freezable
-  Comment: "\n    Derive a dataclass from this base to add the ability to freeze from further modifications of its fields.\n    Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.\n\n    Notes:\n        - This base should be used for dataclass objects, use the appropriate base for each framework\n        - Use tuple which is immutable instead of list when deriving from this class\n    "
-  Kind: Element
-  DisplayKind: Basic
-  Elements: []
 cl.runtime.backend.core.tab_info.TabInfo:
   _t: TabInfo
   Module:
@@ -106,10 +92,6 @@ cl.runtime.backend.core.tab_info.TabInfo:
   Comment: Tab info.
   Kind: Element
   DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl.runtime.records.for_dataclasses.freezable
-    Name: Freezable
   Elements:
   - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
     Data:
@@ -205,10 +187,6 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
   Comment: Base type info.
   Kind: Element
   DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl.runtime.records.for_dataclasses.freezable
-    Name: Freezable
   Elements:
   - Value:
       Type: String
@@ -222,16 +200,6 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
       Type: String
     Name: Label
     Comment: Label of type.
-cl.runtime.records.for_dataclasses.freezable.Freezable:
-  _t: Freezable
-  Module:
-    ModuleName: cl.runtime.records.for_dataclasses.freezable
-  Name: Freezable
-  Label: Freezable
-  Comment: "\n    Derive a dataclass from this base to add the ability to freeze from further modifications of its fields.\n    Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.\n\n    Notes:\n        - This base should be used for dataclass objects, use the appropriate base for each framework\n        - Use tuple which is immutable instead of list when deriving from this class\n    "
-  Kind: Element
-  DisplayKind: Basic
-  Elements: []
 cl.runtime.backend.core.tab_info.TabInfo:
   _t: TabInfo
   Module:
@@ -241,10 +209,6 @@ cl.runtime.backend.core.tab_info.TabInfo:
   Comment: Tab info.
   Kind: Element
   DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl.runtime.records.for_dataclasses.freezable
-    Name: Freezable
   Elements:
   - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
     Data:
