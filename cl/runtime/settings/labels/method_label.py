@@ -32,4 +32,4 @@ class MethodLabel(MethodLabelKey, RecordMixin[MethodLabelKey]):
     """Custom method label overrides the standard 'method_name' -> 'Method Name' transformation."""
 
     def get_key(self) -> MethodLabelKey:
-        return MethodLabelKey(method_name=self.method_name)
+        return MethodLabelKey(method_name=self.method_name).build()

@@ -24,7 +24,7 @@ class Plot(PlotKey, RecordMixin[PlotKey], ABC):
     """Base class for plot objects."""
 
     def get_key(self) -> PlotKey:
-        return PlotKey(plot_id=self.plot_id)
+        return PlotKey(plot_id=self.plot_id).build()
 
     @abstractmethod
     def get_view(self) -> None:

@@ -26,4 +26,4 @@ class StubDataclassComposite(StubDataclassCompositeKey, RecordMixin[StubDataclas
             primitive=self.primitive,
             embedded_1=self.embedded_1,
             embedded_2=self.embedded_2,
-        )
+        ).build()

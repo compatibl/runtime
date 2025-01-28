@@ -38,7 +38,7 @@ class PackageAlias(PackageAliasKey, RecordMixin[PackageAliasKey]):
     """When specified, alias.ClassName is used in storage and REST API, otherwise ClassName is used without a prefix."""
 
     def get_key(self) -> PackageAliasKey:
-        return PackageAliasKey(package_pattern=self.package_pattern)
+        return PackageAliasKey(package_pattern=self.package_pattern).build()
 
     @classmethod
     def get_alias(cls, module: str) -> str | None:

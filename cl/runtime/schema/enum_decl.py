@@ -34,4 +34,4 @@ class EnumDecl(EnumDeclKey, RecordMixin[EnumDeclKey]):
     """Array of enum items."""
 
     def get_key(self) -> EnumDeclKey:
-        return EnumDeclKey(module=self.module, name=self.name)
+        return EnumDeclKey(module=self.module, name=self.name).build()

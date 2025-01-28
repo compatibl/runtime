@@ -76,7 +76,7 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
             )
 
     def get_key(self) -> SuccessorDagNodeKey:
-        return SuccessorDagNodeKey(node_id=self.node_id)
+        return SuccessorDagNodeKey(node_id=self.node_id).build()
 
     def view_dag(self) -> Dag:
         """DAG view for the node."""

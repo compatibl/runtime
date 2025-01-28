@@ -32,4 +32,4 @@ class PackageLabel(PackageLabelKey, RecordMixin[PackageLabelKey]):
     """Custom package label overrides the standard 'package_alias' -> 'Package Alias' transformation."""
 
     def get_key(self) -> PackageLabelKey:
-        return PackageLabelKey(package_alias=self.package_alias)
+        return PackageLabelKey(package_alias=self.package_alias).build()

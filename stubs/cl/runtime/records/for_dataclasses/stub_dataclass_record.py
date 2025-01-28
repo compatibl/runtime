@@ -22,4 +22,4 @@ class StubDataclassRecord(StubDataclassRecordKey, RecordMixin[StubDataclassRecor
     """Stub record base class."""
 
     def get_key(self) -> StubDataclassRecordKey:
-        return StubDataclassRecordKey(id=self.id)
+        return StubDataclassRecordKey(id=self.id).build()

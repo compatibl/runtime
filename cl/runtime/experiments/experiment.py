@@ -23,4 +23,4 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
     """Run and analyze the results of multiple trials."""
 
     def get_key(self) -> ExperimentKey:
-        return ExperimentKey(experiment_id=self.experiment_id)
+        return ExperimentKey(experiment_id=self.experiment_id).build()

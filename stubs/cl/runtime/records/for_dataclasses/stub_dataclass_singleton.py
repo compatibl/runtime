@@ -25,4 +25,4 @@ class StubDataclassSingleton(StubDataclassSingletonKey, RecordMixin[StubDataclas
     """Stub field."""
 
     def get_key(self) -> StubDataclassSingletonKey:
-        return StubDataclassSingletonKey()
+        return StubDataclassSingletonKey().build()

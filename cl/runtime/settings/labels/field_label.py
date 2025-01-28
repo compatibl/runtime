@@ -32,4 +32,4 @@ class FieldLabel(FieldLabelKey, RecordMixin[FieldLabelKey]):
     """Custom field label overrides the standard 'field_name' -> 'Field Name' transformation."""
 
     def get_key(self) -> FieldLabelKey:
-        return FieldLabelKey(field_name=self.field_name)
+        return FieldLabelKey(field_name=self.field_name).build()

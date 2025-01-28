@@ -80,4 +80,4 @@ class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin[St
     """Optional list of optional record."""
 
     def get_key(self) -> StubDataclassOptionalFieldsKey:
-        return StubDataclassOptionalFieldsKey(id=self.id)
+        return StubDataclassOptionalFieldsKey(id=self.id).build()

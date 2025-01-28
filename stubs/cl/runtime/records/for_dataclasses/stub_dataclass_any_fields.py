@@ -41,4 +41,4 @@ class StubDataclassAnyFields(StubDataclassAnyFieldsKey, RecordMixin[StubDataclas
     """List of any values."""
 
     def get_key(self) -> TKey:
-        return StubDataclassAnyFieldsKey(id=self.id)
+        return StubDataclassAnyFieldsKey(id=self.id).build()

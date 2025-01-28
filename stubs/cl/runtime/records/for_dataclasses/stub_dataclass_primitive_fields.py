@@ -74,4 +74,4 @@ class StubDataclassPrimitiveFields(StubDataclassPrimitiveFieldsKey, RecordMixin[
             key_uuid_field=self.key_uuid_field,
             key_bytes_field=self.key_bytes_field,
             key_enum_field=self.key_enum_field,
-        )
+        ).build()

@@ -36,4 +36,4 @@ class WorkflowPhase(WorkflowPhaseKey, RecordMixin[WorkflowPhaseKey]):
     """Workflow will wait until all prerequisite phases are completed before running tasks in this phase."""
 
     def get_key(self) -> WorkflowPhaseKey:
-        return WorkflowPhaseKey(phase_id=self.phase_id)
+        return WorkflowPhaseKey(phase_id=self.phase_id).build()

@@ -35,7 +35,7 @@ class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
     """A descriptive message providing details about the logging event."""
 
     def get_key(self) -> LogMessageKey:
-        return LogMessageKey(timestamp=self.timestamp)
+        return LogMessageKey(timestamp=self.timestamp).build()
 
     def init(self) -> None:
         """Similar to __init__ but can use fields set after construction."""

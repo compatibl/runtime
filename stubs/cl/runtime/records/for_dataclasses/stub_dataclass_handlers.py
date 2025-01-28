@@ -53,7 +53,7 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
     """Stub record base class."""
 
     def get_key(self) -> StubHandlersKey:
-        return StubHandlersKey(stub_id=self.stub_id)
+        return StubHandlersKey(stub_id=self.stub_id).build()
 
     def run_instance_method_1a(self) -> None:
         """Stub handler."""

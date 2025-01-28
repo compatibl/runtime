@@ -47,7 +47,7 @@ class KeyUtil:
             instance fields it accesses in the order of access, for example if 'get_key' source is:
 
             def get_key(self) -> MyKey:
-                return MyKey(key_field_1=self.key_field_1, key_field_2=self.key_field_2)
+                return MyKey(key_field_1=self.key_field_1, key_field_2=self.key_field_2).build()
 
             this method will return:
 

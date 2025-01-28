@@ -32,4 +32,4 @@ class ClassLabel(ClassLabelKey, RecordMixin[ClassLabelKey]):
     """Custom class label overrides the standard 'ClassName' -> 'Class Label' transformation."""
 
     def get_key(self) -> ClassLabelKey:
-        return ClassLabelKey(class_name=self.class_name)
+        return ClassLabelKey(class_name=self.class_name).build()

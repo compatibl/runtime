@@ -24,7 +24,7 @@ class Reader(ReaderKey, RecordMixin[ReaderKey], ABC):
     """Read records from the specified files or directories and save them to the current context."""
 
     def get_key(self) -> ReaderKey:
-        return ReaderKey(loader_id=self.loader_id)
+        return ReaderKey(loader_id=self.loader_id).build().build()
 
     @abstractmethod
     def csv_to_db(self) -> None:

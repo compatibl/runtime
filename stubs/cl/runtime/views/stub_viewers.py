@@ -23,4 +23,4 @@ class StubViewers(StubViewersKey, RecordMixin[StubViewersKey], ABC):
     """Common base to stub classes for testing viewers."""
 
     def get_key(self) -> StubViewersKey:
-        return StubViewersKey(stub_id=self.stub_id)
+        return StubViewersKey(stub_id=self.stub_id).build()

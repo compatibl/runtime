@@ -40,4 +40,4 @@ class StubCustomBase(StubCustomBaseKey, RecordMixin[StubCustomBaseKey]):
         }
 
     def get_key(self) -> StubCustomBaseKey:
-        return StubCustomBaseKey(str_field=self.str_field, int_field=self.int_field)
+        return StubCustomBaseKey(str_field=self.str_field, int_field=self.int_field).build()

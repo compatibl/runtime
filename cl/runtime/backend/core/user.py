@@ -32,4 +32,4 @@ class User(UserKey, RecordMixin[UserKey]):
     """Email of the user."""
 
     def get_key(self) -> UserKey:
-        return UserKey(username=self.username)
+        return UserKey(username=self.username).build()

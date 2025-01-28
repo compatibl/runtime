@@ -43,7 +43,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     """Polymorphic data storage with dataset isolation."""
 
     def get_key(self) -> DbKey:
-        return DbKey(db_id=self.db_id)
+        return DbKey(db_id=self.db_id).build()
 
     def load_one(
         self,

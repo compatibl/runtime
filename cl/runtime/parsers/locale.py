@@ -37,7 +37,7 @@ class Locale(LocaleKey, RecordMixin[LocaleKey], ABC):
     """
 
     def get_key(self) -> LocaleKey:
-        return LocaleKey(locale_id=self.locale_id)
+        return LocaleKey(locale_id=self.locale_id).build()
 
     def init(self) -> None:
         """Similar to __init__ but can use fields set after construction."""

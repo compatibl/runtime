@@ -33,7 +33,7 @@ class SuccessorDag(SuccessorDagKey, RecordMixin[SuccessorDagKey]):
     """Root node of the DAG."""
 
     def get_key(self) -> SuccessorDagKey:
-        return SuccessorDagKey(dag_id=self.dag_id)
+        return SuccessorDagKey(dag_id=self.dag_id).build()
 
     def view_dag(self) -> Dag | None:
         """DAG view."""

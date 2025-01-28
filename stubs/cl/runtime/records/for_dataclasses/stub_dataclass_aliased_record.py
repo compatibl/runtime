@@ -27,4 +27,4 @@ class StubDataclassAliasedRecord(
     a: int = required()
 
     def get_key(self) -> StubDataclassAliasedRecordKey:
-        return StubDataclassAliasedRecordKey(id=self.id)
+        return StubDataclassAliasedRecordKey(id=self.id).build()

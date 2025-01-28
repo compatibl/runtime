@@ -32,4 +32,4 @@ class EnumItemLabel(EnumItemLabelKey, RecordMixin[EnumItemLabelKey]):
     """Custom enum item label overrides the standard 'ITEM_NAME' -> 'Item Name' transformation."""
 
     def get_key(self) -> EnumItemLabelKey:
-        return EnumItemLabelKey(enum_item_name=self.enum_item_name)
+        return EnumItemLabelKey(enum_item_name=self.enum_item_name).build()

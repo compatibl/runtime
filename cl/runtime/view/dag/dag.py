@@ -35,7 +35,7 @@ class Dag(DagKey, RecordMixin[DagKey]):
     """List of DAG edges."""
 
     def get_key(self) -> DagKey:
-        return DagKey(name=self.name)
+        return DagKey(name=self.name).build()
 
     @staticmethod
     def auto_layout_dag(

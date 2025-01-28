@@ -67,7 +67,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     """Error message for Failed status if available."""
 
     def get_key(self) -> TaskKey:
-        return TaskKey(task_id=self.task_id)
+        return TaskKey(task_id=self.task_id).build()
 
     def init(self) -> None:
         # Set or validate task_id

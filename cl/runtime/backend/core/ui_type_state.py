@@ -39,4 +39,4 @@ class UiTypeState(UiTypeStateKey, RecordMixin[UiTypeStateKey]):
     """List of names of the handlers pinned for the type"""
 
     def get_key(self) -> UiTypeStateKey:
-        return UiTypeStateKey(type_=self.type_, user=self.user)
+        return UiTypeStateKey(type_=self.type_, user=self.user).build()

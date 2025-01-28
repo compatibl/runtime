@@ -23,4 +23,4 @@ class View(ViewKey, RecordMixin, ABC):
     """This type is returned from a viewer method as object or key."""
 
     def get_key(self) -> ViewKey:
-        return ViewKey(view_for=self.view_for, view_name=self.view_name)
+        return ViewKey(view_for=self.view_for, view_name=self.view_name).build()

@@ -25,4 +25,4 @@ class StubDataclassVersionedRecord(StubDataclassVersionedRecordKey, RecordMixin[
     """Stub version field."""
 
     def get_key(self) -> StubDataclassVersionedRecordKey:
-        return StubDataclassVersionedRecordKey(id=self.id)
+        return StubDataclassVersionedRecordKey(id=self.id).build()

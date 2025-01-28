@@ -37,7 +37,7 @@ class Log(LogKey, RecordMixin[LogKey], ABC):
     """Log level using logging module conventions (lower, upper or mixed case can be used)."""
 
     def get_key(self) -> LogKey:
-        return LogKey(log_id=self.log_id)
+        return LogKey(log_id=self.log_id).build()
 
     @classmethod
     def default(cls) -> Self:

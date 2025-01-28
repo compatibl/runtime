@@ -35,7 +35,7 @@ class TaskQueue(TaskQueueKey, ABC):
     """Optional timeout in seconds, queue will stop after reaching this timeout."""
 
     def get_key(self) -> TaskQueueKey:
-        return TaskQueueKey(queue_id=self.queue_id)
+        return TaskQueueKey(queue_id=self.queue_id).build()
 
     @abstractmethod
     def run_start_queue(self) -> None:
