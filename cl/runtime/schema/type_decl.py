@@ -233,10 +233,12 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         # Set parent class as the first class in MRO that is not self and does not have Mixin suffix
         for parent_type in record_type.__mro__:
             # TODO: Refactor to make it work not only for dataclasses
+            parent_type_name = TypeUtil.name(parent_type)
             if (
                 parent_type is not record_type
-                and not parent_type.__name__.endswith("Mixin")
-                and not parent_type.__name__.endswith("Key")
+                and not parent_type_name.endswith("Mixin")
+                and not parent_type_name.endswith("Key")
+                and not parent_type_name.endswith("Freezable")
                 and dataclasses.is_dataclass(parent_type)
             ):
                 parent_type_decl = cls.for_type(parent_type, dependencies=dependencies)
