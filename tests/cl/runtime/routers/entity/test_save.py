@@ -42,7 +42,8 @@ def test_method(pytest_default_db):
     save_new_record_request_obj = SaveRequest(record_dict=create_record_payload)
 
     save_new_record_result = SaveResponse.save_entity(save_new_record_request_obj)
-    new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, StubDataclassRecordKey(id="new_record"))
+    new_record_key = StubDataclassRecordKey(id="new_record").build()
+    new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, new_record_key)
     records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
 
     # Check if the result is a SaveResponse instance
@@ -60,7 +61,8 @@ def test_method(pytest_default_db):
     update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
 
     update_record_result = SaveResponse.save_entity(update_record_request_obj)
-    updated_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, StubDataclassRecordKey(id="existing_record"))
+    existing_record_key = StubDataclassRecordKey(id="existing_record").build()
+    updated_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, existing_record_key)
     records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
 
     # Check if the result is a SaveResponse instance
@@ -89,7 +91,8 @@ def test_api(pytest_default_db):
             params=request_params,
         )
         save_new_record_json = save_new_record_response.json()
-        new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, StubDataclassRecordKey(id="new_record"))
+        new_record_key = StubDataclassRecordKey(id="new_record").build()
+        new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, new_record_key)
         records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
 
         assert save_new_record_response.status_code == 200

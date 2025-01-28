@@ -49,7 +49,7 @@ def test_csv_file_reader(pytest_default_db):
         expected_record = StubDataclassDerivedRecord(
             id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
         ).build()
-        key = StubDataclassRecordKey(id=f"derived_id_{i}")
+        key = StubDataclassRecordKey(id=f"derived_id_{i}").build()
         record = DbContext.load_one(StubDataclassRecord, key)
         assert record == expected_record
 
