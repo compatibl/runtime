@@ -57,7 +57,7 @@ class SaveResponse(BaseModel):
             return SaveResponse(key=None)
 
         # Deserialize record
-        record = data_serializer.deserialize_data(ui_record)
+        record = data_serializer.deserialize_data(ui_record).freeze()
 
         if request.old_record_key is None:
             existing_record = DbContext.load_one_or_none(
@@ -65,7 +65,7 @@ class SaveResponse(BaseModel):
                 record_or_key=record.get_key(),
                 dataset=request.dataset,
             )
-            if existing_record is not None:
+            if existing_record is not None:  # TODO: Review performance implications of this check
                 raise UserError(f"Record with key {str(record)} already exists.")
 
         if request.old_record_key is not None and request.old_record_key != key_serializer.serialize_key(

@@ -22,7 +22,11 @@ from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 
 # Test save record payloads
-create_record_payload = {"Id": "new_record", "DerivedStrField": "test", "_t": "StubDataclassDerivedRecord"}
+create_record_payload = {
+    "Id": "new_record",
+    "DerivedStrField": "test",
+    "_t": "StubDataclassDerivedRecord"
+}
 
 update_record_payload = {
     "Id": "existing_record",
@@ -51,7 +55,7 @@ def test_method(pytest_default_db):
     assert records_count == 1
 
     # Test updating existing record
-    existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value")
+    existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value").build()
     DbContext.save_one(existing_record)
     update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
 
@@ -99,7 +103,7 @@ def test_api(pytest_default_db):
         assert records_count == 1
 
         # Test updating existing record
-        existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value")
+        existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value").build()
         DbContext.save_one(existing_record)
         update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
         request_params = {
