@@ -25,7 +25,8 @@ def test_method(pytest_default_db):
     """Test coroutine for /entity/delete_many route."""
 
     existing_records = [
-        StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}") for i in range(5)
+        StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build()
+        for i in range(5)
     ]
     DbContext.save_many(existing_records)
 
@@ -51,7 +52,8 @@ def test_api(pytest_default_db):
     """Test REST API for /entity/delete_many route."""
     with TestingClient() as test_client:
         existing_records = [
-            StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}") for i in range(5)
+            StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build()
+            for i in range(5)
         ]
         DbContext.save_many(existing_records)
 

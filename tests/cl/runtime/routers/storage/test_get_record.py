@@ -26,7 +26,7 @@ def test_method(pytest_default_db):
     """Test coroutine for /storage/record route."""
 
     # Save test record
-    record = StubDataclassRecord(id=__name__)
+    record = StubDataclassRecord(id=__name__).build()
     DbContext.save_one(record)
 
     # Run the coroutine wrapper added by the FastAPI decorator and get the result
@@ -49,7 +49,7 @@ def test_api(pytest_default_db):
     """Test REST API for /storage/record route."""
     with TestingClient() as test_client:
         # Save test record
-        record = StubDataclassRecord(id=__name__)
+        record = StubDataclassRecord(id=__name__).build()
         DbContext.save_one(record)
 
         # Request parameters

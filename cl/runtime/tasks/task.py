@@ -24,6 +24,7 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.tasks.task_key import TaskKey
@@ -90,13 +91,14 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
 
+        result = DataUtil.shallow_copy(type(self), self)
         try:
             # Set status to Running and save
-            self.status = TaskStatusEnum.RUNNING
+            result.status = TaskStatusEnum.RUNNING
             DbContext.save_one(self)
 
             # Run the payload
-            self._execute()
+            result._execute()
 
         except Exception as e:  # noqa
             traceback.print_exception(e)  # TODO: Add full stack trade to the log message as well
@@ -120,21 +122,23 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             logger.debug("Stack trace:\n%s", traceback.format_exc())
 
             # Update task run record to report task failure
-            self.status = TaskStatusEnum.FAILED
-            self.progress_pct = 100.0
-            self.elapsed_sec = 0.0  # TODO: Implement
-            self.remaining_sec = 0.0
-            self.error_message = str(e)
+            result.status = TaskStatusEnum.FAILED
+            result.progress_pct = 100.0
+            result.elapsed_sec = 0.0  # TODO: Implement
+            result.remaining_sec = 0.0
+            result.error_message = str(e)
+            result.build()
             DbContext.save_one(self)
         else:
             # Record the end time
             end_time = DatetimeUtil.now()
 
             # Update task run record to report task completion
-            self.status = TaskStatusEnum.COMPLETED
-            self.progress_pct = 100.0
-            self.elapsed_sec = 0.0  # TODO: Implement
-            self.remaining_sec = 0.0
+            result.status = TaskStatusEnum.COMPLETED
+            result.progress_pct = 100.0
+            result.elapsed_sec = 0.0  # TODO: Implement
+            result.remaining_sec = 0.0
+            result.build()
             DbContext.save_one(self)
 
     @classmethod
