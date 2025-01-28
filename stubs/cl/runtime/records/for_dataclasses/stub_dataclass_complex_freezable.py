@@ -13,10 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import Tuple
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
-from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 
 
@@ -30,5 +29,8 @@ class StubDataclassComplexFreezable(Freezable):
     freezable_obj: StubDataclassSimpleFreezable = required(default_factory=lambda: StubDataclassSimpleFreezable())
     """Embedded freezable object, will be frozen."""
 
-    freezable_tuple: Tuple[StubDataclassSimpleFreezable, ...] = StubDataclassSimpleFreezable(), StubDataclassSimpleFreezable()
+    freezable_tuple: Tuple[StubDataclassSimpleFreezable, ...] = (
+        StubDataclassSimpleFreezable(),
+        StubDataclassSimpleFreezable(),
+    )
     """Embedded tuple of freezable objects."""

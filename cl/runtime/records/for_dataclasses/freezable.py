@@ -14,9 +14,7 @@
 
 from abc import ABC
 from dataclasses import dataclass
-
 from typing_extensions import Self
-
 from cl.runtime.records.build_mixin import BuildMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
@@ -57,6 +55,7 @@ class Freezable(BuildMixin, ABC):
     def __setattr__(self, key, value):
         """Raise an error on attempt to modify a public field for a frozen instance."""
         if getattr(self, "_frozen", False) and not key.startswith("_"):
-            raise RuntimeError(f"Cannot modify public field {TypeUtil.name(self)}.{key} "
-                               f"because the instance is frozen.")
+            raise RuntimeError(
+                f"Cannot modify public field {TypeUtil.name(self)}.{key} " f"because the instance is frozen."
+            )
         object.__setattr__(self, key, value)

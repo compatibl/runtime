@@ -25,9 +25,9 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
+from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import get_primitive_type_names
 from cl.runtime.records.protocols import is_key

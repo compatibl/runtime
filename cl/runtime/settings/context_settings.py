@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import Tuple
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
@@ -69,14 +69,16 @@ class ContextSettings(Settings):
             raise RuntimeError(f"Field '{TypeUtil.name(self)}.packages' must be a string or an iterable of strings.")
 
         # Check that each element is a string
-        if (package_errors := [
-            f"Element at index {index} of field '{TypeUtil.name(self)}.packages is not a string:\n"
-            f"Value: {element} Type: {TypeUtil.name(element)})\n"
-            if not isinstance(element, str) else
-            f"Element at index {index} of field '{TypeUtil.name(self)} is an empty string.\n"
+        if package_errors := [
+            (
+                f"Element at index {index} of field '{TypeUtil.name(self)}.packages is not a string:\n"
+                f"Value: {element} Type: {TypeUtil.name(element)})\n"
+                if not isinstance(element, str)
+                else f"Element at index {index} of field '{TypeUtil.name(self)} is an empty string.\n"
+            )
             for index, element in enumerate(self.packages)
             if not isinstance(element, str) or element == ""
-        ]):
+        ]:
             raise ValueError("".join(package_errors))
 
         if not isinstance(self.log_class, str):

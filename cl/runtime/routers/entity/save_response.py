@@ -68,7 +68,9 @@ class SaveResponse(BaseModel):
             if existing_record is not None:
                 raise UserError(f"Record with key {str(record)} already exists.")
 
-        if request.old_record_key is not None and request.old_record_key != key_serializer.serialize_key(record.get_key()):
+        if request.old_record_key is not None and request.old_record_key != key_serializer.serialize_key(
+            record.get_key()
+        ):
             old_record_key_obj = key_serializer.deserialize_key(request.old_record_key, type(record.get_key()))
             DbContext.delete_one(key_type=type(record.get_key()), key=old_record_key_obj, dataset=request.dataset)
         DbContext.save_one(record, dataset=request.dataset)

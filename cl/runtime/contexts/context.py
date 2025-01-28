@@ -22,7 +22,6 @@ from typing import List
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 
 _CONTEXT_STACK_DICT_VAR: ContextVar[DefaultDict[str, List] | None] = ContextVar("_CONTEXT_STACK_DICT_VAR", default=None)
@@ -97,8 +96,10 @@ class Context(Freezable, ABC):
 
         # Error if not frozen
         if not FreezableUtil.is_frozen(self):
-            raise RuntimeError(f"Context instance of type {TypeUtil.name(self)} must be frozen before\n"
-                               f"entering 'with' clause. Invoke 'build' or 'freeze' first.")
+            raise RuntimeError(
+                f"Context instance of type {TypeUtil.name(self)} must be frozen before\n"
+                f"entering 'with' clause. Invoke 'build' or 'freeze' first."
+            )
 
         # Get context stack for the current asynchronous environment, at least one element is guaranteed
         # because constructing_default parameter is not passed

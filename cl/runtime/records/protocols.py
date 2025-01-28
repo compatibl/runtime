@@ -14,7 +14,7 @@
 
 import datetime as dt
 from enum import Enum
-from typing import Any, Iterable
+from typing import Any
 from typing import Dict
 from typing import List
 from typing import Literal
@@ -23,11 +23,8 @@ from typing import Tuple
 from typing import Type
 from typing import TypeGuard
 from typing import TypeVar
-from typing import runtime_checkable
 from uuid import UUID
-
 from typing_extensions import Self
-
 
 _PRIMITIVE_TYPE_NAMES = {"str", "float", "bool", "int", "date", "time", "datetime", "UUID", "bytes"}
 
@@ -122,7 +119,6 @@ class KeyProtocol(Protocol):
         """
         ...
 
-
     @classmethod
     def get_key_type(cls) -> Type:
         """Return key type even when called from a record."""
@@ -141,7 +137,6 @@ class RecordProtocol(Protocol):
         Returns self to enable method chaining.
         """
         ...
-
 
     # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
     @classmethod
@@ -166,7 +161,7 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     return result
 
 
-def is_freezable(instance_or_type: Any)-> TypeGuard[FreezableProtocol]:
+def is_freezable(instance_or_type: Any) -> TypeGuard[FreezableProtocol]:
     """
     Return True if the instance is freezable (implements freeze).
     A class must not implement freeze unless all of its mutable elements also implement freeze.
@@ -197,9 +192,10 @@ def is_singleton_key(instance_or_type: Any):
     """Check if this is a singleton key (has no key fields), error if the object is not a key or has no slots."""
     if not is_key(instance_or_type):
         raise RuntimeError("Function 'is_singleton_key' is called on an object that is not a key.")
-    if not hasattr(instance_or_type, '__slots__'):
+    if not hasattr(instance_or_type, "__slots__"):
         raise RuntimeError("Function 'is_singleton' is called on an object that has no __slots__ attribute.")
-    return all(name.startswith('_') for name in instance_or_type.__slots__)
+    return all(name.startswith("_") for name in instance_or_type.__slots__)
+
 
 def has_init(instance_or_type: Any) -> TypeGuard[InitProtocol]:
     """Check if type or object requires initialization (InitProtocol) based on the presence of 'init' attribute."""

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing_extensions import Self
-
 from cl.runtime.records.record_util import RecordUtil
 
 

@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, TypeVar
+from typing import Any
 from typing import Type
+from typing import TypeVar
 from cl.runtime.records.type_util import TypeUtil
 
 T = TypeVar("T")
@@ -26,14 +27,16 @@ class DataUtil:
     def shallow_copy(cls, target_type: Type[T], source: Any) -> T:
         """
         Create an instance of target_type with shallow copy of all public fields from source.
-        
+
         Notes:
           - The method does not copy protected or private fields (fields starting with '_')
           - Error message if target_type is missing some of the public fields of source
           - DataUtil helper works only with slots-based classes
         """
         if not (source_slots := getattr((source_type := type(source)), "__slots__", None)):
-            raise RuntimeError(f"An object with type {TypeUtil.name(source_type)} used as\n"
-                               f"source in 'DataUtil.shallow_copy' method has no slots.\n"
-                               f"DataUtil helper works only with slots-based classes.")
+            raise RuntimeError(
+                f"An object with type {TypeUtil.name(source_type)} used as\n"
+                f"source in 'DataUtil.shallow_copy' method has no slots.\n"
+                f"DataUtil helper works only with slots-based classes."
+            )
         return target_type(**{slot: getattr(source, slot) for slot in source_slots if not slot.startswith("_")})

@@ -56,9 +56,21 @@ def required(
     metadata = {key: value for key, value in args.items() if value is not None} if args else None
 
     if default_factory is None:
-        return dataclasses.field(default=default, init=init, repr=repr,  compare=compare, metadata=metadata,)
+        return dataclasses.field(
+            default=default,
+            init=init,
+            repr=repr,
+            compare=compare,
+            metadata=metadata,
+        )
     elif default is None:
-        return dataclasses.field(default_factory=default_factory, init=init, repr=repr, compare=compare,metadata=metadata,)
+        return dataclasses.field(
+            default_factory=default_factory,
+            init=init,
+            repr=repr,
+            compare=compare,
+            metadata=metadata,
+        )
     else:
         raise RuntimeError(
             f"Params default={default} and default_factory={default_factory} "
@@ -107,9 +119,21 @@ def optional(
     metadata = {key: value for key, value in args.items() if value is not None}
 
     if default_factory is None:
-        return dataclasses.field(default=default, init=init, repr=repr, compare=compare, metadata=metadata,)
+        return dataclasses.field(
+            default=default,
+            init=init,
+            repr=repr,
+            compare=compare,
+            metadata=metadata,
+        )
     elif default is None:
-        return dataclasses.field(default_factory=default_factory, init=init, repr=repr, compare=compare, metadata=metadata,)
+        return dataclasses.field(
+            default_factory=default_factory,
+            init=init,
+            repr=repr,
+            compare=compare,
+            metadata=metadata,
+        )
     else:
         raise RuntimeError(
             f"Params default={default} and default_factory={default_factory} "

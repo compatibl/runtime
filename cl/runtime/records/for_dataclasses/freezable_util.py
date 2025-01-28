@@ -15,7 +15,6 @@
 from typing import Any
 
 
-
 class FreezableUtil:
     """Helper methods for any implementation of Freezable, not specific to dataclasses."""
 

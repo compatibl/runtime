@@ -13,9 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.protocols import TKey
 from cl.runtime.records.record_util import RecordUtil
-from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

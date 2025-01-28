@@ -26,14 +26,14 @@ from typing import Type
 from typing import Union
 from typing import get_args
 from typing import get_origin
-
 from typing_extensions import Self
-
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from cl.runtime.records.protocols import RecordProtocol, _PRIMITIVE_TYPE_NAMES, is_primitive, is_record_or_key, is_key, \
-    is_freezable
+from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import is_freezable
 from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_record_or_key
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -59,7 +59,8 @@ class RecordUtil:
 
             # Recursively call 'build' on fields except those that are None, primitive or Enum
             tuple(
-                cls.build(x) for field in fields(obj)  # noqa
+                cls.build(x)
+                for field in fields(obj)  # noqa
                 if (x := getattr(obj, field.name, None)) is not None
                 and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
                 and not isinstance(x, Enum)
@@ -86,14 +87,16 @@ class RecordUtil:
         elif isinstance(obj, tuple | list):  # TODO: Exclude list after converting records to tuple
             # Recursively invoke on tuple elements in-place, skip primitive types or enums
             tuple(
-                cls.build(x) for x in obj
+                cls.build(x)
+                for x in obj
                 if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
             )
             return obj
         elif isinstance(obj, dict):  # TODO: Switch to frozendict and Map
             # Recursively invoke on dict elements in-place, skip primitive types or enums
             tuple(
-                cls.build(x) for x in obj.values()
+                cls.build(x)
+                for x in obj.values()
                 if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
             )
             return obj
@@ -232,7 +235,8 @@ Note: In case of containers, type mismatch may be in one of the items.
             f"  1. Slotted classes with fields that are other slotted classes;\n"
             f"  2. Tuples with supported values;\n"
             f"  3. Dictionaries with string keys with supported values; and\n"
-            f"  4. Primitive types from the following list: {', '.join(_PRIMITIVE_TYPE_NAMES)}")
+            f"  4. Primitive types from the following list: {', '.join(_PRIMITIVE_TYPE_NAMES)}"
+        )
 
     @classmethod
     def _unsupported_field_error(cls, obj: Any, *, field_name: str, field_value: Any) -> None:
@@ -245,4 +249,5 @@ Note: In case of containers, type mismatch may be in one of the items.
             f"  1. Slotted classes with fields that are other slotted classes;\n"
             f"  2. Tuples with supported values;\n"
             f"  3. Dictionaries with string keys with supported values; and\n"
-            f"  4. Primitive types from the following list: {', '.join(_PRIMITIVE_TYPE_NAMES)}")
+            f"  4. Primitive types from the following list: {', '.join(_PRIMITIVE_TYPE_NAMES)}"
+        )

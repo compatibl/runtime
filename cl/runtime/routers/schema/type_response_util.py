@@ -41,7 +41,7 @@ class TypeResponseUtil:
                 elements = type_dict.get("Elements", None)
                 if elements is not None:
                     for index, element in enumerate(elements):
-                        if element.get("Name", None) in ["EntryId", "CompletionId"]: # TODO: Replace by preloads
+                        if element.get("Name", None) in ["EntryId", "CompletionId"]:  # TODO: Replace by preloads
                             elements.pop(index)
                             break
 
