@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from typing import Type
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassSingletonKey(KeyMixin):
+class StubDataclassSingletonKey(Freezable, KeyMixin):
     """Singleton record has no key fields."""
 
     @classmethod

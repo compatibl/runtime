@@ -15,11 +15,12 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class DagKey(KeyMixin):
+class DagKey(Freezable, KeyMixin):
     """Structure and visual representation of a directed acyclic graph (DAG)."""
 
     name: str = required()

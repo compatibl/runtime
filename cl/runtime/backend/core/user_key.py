@@ -15,11 +15,12 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class UserKey(KeyMixin):
+class UserKey(Freezable, KeyMixin):
     """User which is allowed to log in."""
 
     username: str = required()  # TODO: Consider renaming to user_id, requires matching UI and auth changes

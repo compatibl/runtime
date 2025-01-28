@@ -15,12 +15,13 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 
 
 @dataclass(slots=True)
-class EnumDeclKey(KeyMixin):
+class EnumDeclKey(Freezable, KeyMixin):
     """Enum declaration."""
 
     module: ModuleDeclKey = required()  # TODO: Merge with name

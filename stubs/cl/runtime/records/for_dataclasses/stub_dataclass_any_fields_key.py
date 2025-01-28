@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from typing import Type
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassAnyFieldsKey(KeyMixin):
+class StubDataclassAnyFieldsKey(Freezable, KeyMixin):
 
     id: str = "id"
     """Unique identifier."""

@@ -15,11 +15,12 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class FieldLabelKey(KeyMixin):
+class FieldLabelKey(Freezable, KeyMixin):
     """
     Custom field label overrides the standard 'field_name' -> 'Field Name' transformation.
 

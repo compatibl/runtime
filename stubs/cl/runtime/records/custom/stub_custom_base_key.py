@@ -14,11 +14,12 @@
 
 from typing import Dict
 from typing import Type
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import TDataField
 
 
-class StubCustomBaseKey(KeyMixin):
+class StubCustomBaseKey(Freezable, KeyMixin):
     """Stub record used in tests."""
 
     str_field: str | None

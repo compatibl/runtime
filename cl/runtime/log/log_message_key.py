@@ -15,11 +15,12 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class LogMessageKey(KeyMixin):
+class LogMessageKey(Freezable, KeyMixin):
     """A target for log messages."""
 
     timestamp: str = required()
