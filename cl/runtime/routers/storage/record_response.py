@@ -149,7 +149,7 @@ class RecordResponse(BaseModel):
                 ),
             )
         else:
-            deserialized_key = key_serializer.deserialize_key(request.key, record_type.get_key_type())
+            deserialized_key = key_serializer.deserialize_key(request.key, record_type.get_key_type()).freeze()
 
         # TODO: Review the use of load_one_or_none here
         record = db.load_one_or_none(record_type, deserialized_key)
