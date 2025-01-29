@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_non_freezable import StubDataclassNonFreezable
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 

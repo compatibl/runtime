@@ -31,16 +31,16 @@ class Freezable(BuildMixin, ABC):
         - Use tuple which is immutable instead of list when deriving from this class
     """
 
-    _frozen: bool = required(default=False, init=False, repr=False, compare=False)
+    __frozen: bool = required(default=False, init=False, repr=False, compare=False)
     """True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
-        return self._frozen
+        return self.__frozen
 
     def check_frozen(self, action_str: str | None = None) -> None:
         """Error message if the instance is not frozen."""
-        if not self._frozen:
+        if not self.__frozen:
             action_str = action_str if action_str else "using or performing setup"
             raise RuntimeError(f"Freeze {TypeUtil.name(self)} before {action_str}.")
 
@@ -49,12 +49,12 @@ class Freezable(BuildMixin, ABC):
         Freeze the instance without recursively calling freeze on its fields. Return self for method chaining.
         Once frozen, the instance cannot be unfrozen.
         """
-        object.__setattr__(self, "_frozen", True)
+        object.__setattr__(self, "_Freezable__frozen", True)
         return self
 
     def __setattr__(self, key, value):
         """Raise an error on attempt to modify a public field for a frozen instance."""
-        if getattr(self, "_frozen", False) and not key.startswith("_"):
+        if getattr(self, "_Freezable__frozen", False) and not key.startswith("_"):
             raise RuntimeError(
                 f"Cannot modify public field {TypeUtil.name(self)}.{key} " f"because the instance is frozen."
             )
