@@ -1,4 +1,6 @@
+_Freezable__frozen: false
 module:
+  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields
 name: StubDataclassPrimitiveFields
 label: Stub Dataclass Primitive Fields
@@ -180,7 +182,9 @@ elements:
   alternate_of: null
 - value: null
   enum:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.enum.stub_int_enum
     name: StubIntEnum
   data: null
@@ -369,7 +373,9 @@ elements:
   alternate_of: null
 - value: null
   enum:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.enum.stub_int_enum
     name: StubIntEnum
   data: null

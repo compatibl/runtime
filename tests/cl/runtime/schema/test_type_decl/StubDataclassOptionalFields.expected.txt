@@ -1,4 +1,6 @@
+_Freezable__frozen: false
 module:
+  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields
 name: StubDataclassOptionalFields
 label: Stub Dataclass Optional Fields
@@ -130,7 +132,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
   key_: null
@@ -149,7 +153,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
   key_: null
@@ -168,7 +174,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
   key_: null
@@ -188,7 +196,9 @@ elements:
   enum: null
   data: null
   key_:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
   query: null
@@ -207,7 +217,9 @@ elements:
   enum: null
   data: null
   key_:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
   query: null
@@ -226,7 +238,9 @@ elements:
   enum: null
   data: null
   key_:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
   query: null
@@ -244,7 +258,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
   key_: null
@@ -263,7 +279,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
   key_: null
@@ -282,7 +300,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
   key_: null

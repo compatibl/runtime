@@ -1,4 +1,6 @@
+_Freezable__frozen: false
 module:
+  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields
 name: StubDataclassTupleFields
 label: Stub Dataclass Tuple Fields
@@ -6,7 +8,9 @@ comment: Stub record whose elements are tuples.
 kind: null
 display_kind: Basic
 inherit:
+  _Freezable__frozen: true
   module:
+    _Freezable__frozen: true
     module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
   name: StubDataclassRecord
 declare: null
@@ -82,7 +86,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
   key_: null
@@ -102,7 +108,9 @@ elements:
   enum: null
   data: null
   key_:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
   query: null
@@ -120,7 +128,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
   key_: null
@@ -139,7 +149,9 @@ elements:
 - value: null
   enum: null
   data:
+    _Freezable__frozen: true
     module:
+      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record
     name: StubDataclassDerivedRecord
   key_: null
