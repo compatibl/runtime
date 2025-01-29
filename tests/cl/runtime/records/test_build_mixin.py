@@ -14,11 +14,11 @@
 
 import pytest
 from dataclasses import dataclass
-from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 
 
 @dataclass(slots=True, kw_only=True)
-class Base:
+class Base(Freezable):
     _protected_base_field: str | None = None
     public_base_field_1: str | None = None
     public_base_field_2: str | None = None
@@ -29,22 +29,36 @@ class Derived(Base):
     public_derived_field: str | None = None
 
 
-def test_shallow_copy():
-    """Test DataUtil.shallow_copy method."""
+def test_clone():
+    """Test BuildMixin.clone method."""
 
-    # Create derived from base
-    base = Base(public_base_field_1="public_base_field_1")
-    derived = DataUtil.shallow_copy(Derived, base)
+    # Create target from source
+    source = Base(public_base_field_1="public_base_field_1")
+    target = source.clone()
 
-    # Public fields in base, only one is set
-    assert derived.public_base_field_1 == base.public_base_field_1
-    assert derived.public_base_field_2 is None
+    # Public fields in source, only one is set
+    assert target.public_base_field_1 == source.public_base_field_1
+    assert target.public_base_field_2 is None
 
-    # Protected fields in base, not set
-    assert derived._protected_base_field is None
+    # Protected fields in source, not set
+    assert target._protected_base_field is None
+
+def test_clone_as():
+    """Test BuildMixin.clone_as method."""
+
+    # Create target from source
+    source = Base(public_base_field_1="public_base_field_1")
+    target = source.clone_as(Derived)
+
+    # Public fields in source, only one is set
+    assert target.public_base_field_1 == source.public_base_field_1
+    assert target.public_base_field_2 is None
+
+    # Protected fields in source, not set
+    assert target._protected_base_field is None
 
     # Public fields in derived, not set
-    assert derived.public_derived_field is None
+    assert target.public_derived_field is None
 
 
 if __name__ == "__main__":
