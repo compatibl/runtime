@@ -60,9 +60,10 @@ def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict
             result["_t"] = _t
         result.update(
             {
-                (CaseUtil.snake_to_pascal_case(k.removesuffix("_")) if k != "_t" else k): to_type_decl_dict(v)
+                CaseUtil.snake_to_pascal_case(k.removesuffix("_")): to_type_decl_dict(v)
                 for k, v in node.items()
-                if v not in [None, False]
+                if not k.startswith("_")
+                and v not in [None, False]
             }
         )
         return result
