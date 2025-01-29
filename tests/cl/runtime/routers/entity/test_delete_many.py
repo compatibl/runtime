@@ -25,8 +25,7 @@ def test_method(pytest_default_db):
     """Test coroutine for /entity/delete_many route."""
 
     existing_records = [
-        StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build()
-        for i in range(5)
+        StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build() for i in range(5)
     ]
     DbContext.save_many(existing_records)
 

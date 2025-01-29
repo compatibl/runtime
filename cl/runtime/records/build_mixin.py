@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Type, TypeVar
+from typing import Type
+from typing import TypeVar
 from typing_extensions import Self
 from cl.runtime.records.record_util import RecordUtil
 
 T = TypeVar("T")
+
 
 class BuildMixin:
     """Mixin adding 'build' method to the class."""
@@ -38,7 +40,7 @@ class BuildMixin:
         """Return an unfrozen object of the same type populated by shallow copies of public fields."""
         result = type(self)()
         for attr in self.__slots__:
-            if not attr.startswith('_'):  # Skip private fields
+            if not attr.startswith("_"):  # Skip private fields
                 setattr(result, attr, getattr(self, attr))
         return result
 
@@ -46,6 +48,6 @@ class BuildMixin:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
         result = result_type()
         for attr in self.__slots__:
-            if not attr.startswith('_'):  # Skip private fields
+            if not attr.startswith("_"):  # Skip private fields
                 setattr(result, attr, getattr(self, attr))
         return result

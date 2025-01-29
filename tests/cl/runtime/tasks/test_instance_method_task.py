@@ -23,8 +23,8 @@ from stubs.cl.runtime import StubHandlers
 def test_smoke(pytest_default_db):
     """Smoke test."""
     records = [
-        sample.build() for sample in
-            [
+        sample.build()
+        for sample in [
             StubHandlers(stub_id="abc"),
         ]
     ]

@@ -18,7 +18,6 @@ import traceback
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.log.exceptions.user_error import UserError
@@ -121,10 +120,10 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             # Save with Failed status and execution info
             update = self.clone()
             update.status = TaskStatusEnum.FAILED
-            update.progress_pct=100.0
-            update.elapsed_sec=0.0  # TODO: Implement
-            update.remaining_sec=0.0
-            update.error_message=str(e)
+            update.progress_pct = 100.0
+            update.elapsed_sec = 0.0  # TODO: Implement
+            update.remaining_sec = 0.0
+            update.error_message = str(e)
             DbContext.save_one(update.build())
         else:
             # Record the end time
@@ -134,9 +133,9 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             # Save with Failed status and execution info
             update = self.clone()
             update.status = TaskStatusEnum.COMPLETED
-            update.progress_pct=100.0
-            update.elapsed_sec=0.0  # TODO: Implement
-            update.remaining_sec=0.0
+            update.progress_pct = 100.0
+            update.elapsed_sec = 0.0  # TODO: Implement
+            update.remaining_sec = 0.0
             DbContext.save_one(update.build())
 
     @classmethod

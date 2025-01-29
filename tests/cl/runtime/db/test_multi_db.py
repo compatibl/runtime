@@ -37,8 +37,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record impo
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
 
 _SAMPLES = [
-    sample.build() for sample in
-    [
+    sample.build()
+    for sample in [
         StubDataclassRecord(id="abc1"),
         StubDataclassNestedFields(id="abc2"),
         StubDataclassComposite(),
@@ -155,8 +155,8 @@ def test_record_upsert(pytest_multi_db):
 def test_load_all(pytest_multi_db):
     """Test 'load_all' method."""
     base_samples = [
-        sample.build() for sample in
-        [
+        sample.build()
+        for sample in [
             StubDataclassRecord(id="base1"),
             StubDataclassRecord(id="base2"),
             StubDataclassRecord(id="base3"),
@@ -164,16 +164,16 @@ def test_load_all(pytest_multi_db):
     ]
 
     derived_samples = [
-        sample.build() for sample in
-        [
+        sample.build()
+        for sample in [
             StubDataclassDerivedRecord(id="derived1"),
             StubDataclassDerivedFromDerivedRecord(id="derived2"),
         ]
     ]
 
     other_derived_samples = [
-        sample.build() for sample in
-        [
+        sample.build()
+        for sample in [
             StubDataclassOtherDerivedRecord(id="derived3"),
         ]
     ]
@@ -211,14 +211,10 @@ def test_load_filter(pytest_multi_db):
 
     # Create test record and populate with sample data
     offset = 0
-    matching_records = [
-        StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="a").build()
-        for i in range(2)
-    ]
+    matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="a").build() for i in range(2)]
     offset = len(matching_records)
     non_matching_records = [
-        StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="b").build()
-        for i in range(2)
+        StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="b").build() for i in range(2)
     ]
     DbContext.save_many(matching_records + non_matching_records)
 

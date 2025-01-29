@@ -22,11 +22,7 @@ from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 
 # Test save record payloads
-create_record_payload = {
-    "Id": "new_record",
-    "DerivedStrField": "test",
-    "_t": "StubDataclassDerivedRecord"
-}
+create_record_payload = {"Id": "new_record", "DerivedStrField": "test", "_t": "StubDataclassDerivedRecord"}
 
 update_record_payload = {
     "Id": "existing_record",

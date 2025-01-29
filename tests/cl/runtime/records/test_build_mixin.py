@@ -43,6 +43,7 @@ def test_clone():
     # Protected fields in source, not set
     assert target._protected_base_field is None
 
+
 def test_clone_as():
     """Test BuildMixin.clone_as method."""
 
