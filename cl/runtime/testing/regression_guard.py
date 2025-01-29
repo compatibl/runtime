@@ -279,8 +279,8 @@ class RegressionGuard:
             with open(expected_path, "r") as expected_file:
                 expected_lines = list(expected_file.readlines())
 
-            # Expected file exists, ensure all lines match
-            if all(x == y for x, y in zip(received_lines, expected_lines)):
+            # Expected file exists, ensure there is the same number of lines and all lines match
+            if len(received_lines) == len(expected_lines) and all(x == y for x, y in zip(received_lines, expected_lines)):
                 # All received and expected lines match, delete the received file and diff file
                 os.remove(received_path)
                 if os.path.exists(diff_path):
