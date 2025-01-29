@@ -46,6 +46,10 @@ from cl.runtime.schema.type_kind import TypeKind
 DisplayKindLiteral = Literal["Basic", "Singleton", "Dashboard"]  # TODO: Review
 
 
+def dict_public_fields_factory(x):
+    """Factory for a dictionary with only public fields."""
+    return {k: v for (k, v) in x if not k.startswith("_")}
+
 # TODO: Move this and other functions to helper class
 def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict[str, Any] | List[Dict[str, Any]] | str:
     """Recursively apply type declaration dictionary conventions to the argument dictionary."""
@@ -170,7 +174,8 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         """Convert to dictionary using type declaration conventions."""
 
         # Convert to standard dictionary format
-        standard_dict = asdict(self)
+        # TODO (Roman): Consider selecting target fields based on metadata.
+        standard_dict = asdict(self, dict_factory=dict_public_fields_factory)
 
         # Apply type declaration dictionary conventions
         result = to_type_decl_dict(standard_dict)
