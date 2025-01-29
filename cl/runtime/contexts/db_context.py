@@ -279,10 +279,15 @@ class DbContext(Context):
             records: Iterable of records.
             dataset: Target dataset as a delimited string, list of levels, or None
         """
-        # Perform pre-save check
+
+        # Convert to list, this must be done first to ensure single traversal of generator
+        # TODO: Do this incrementally for a large number of records
+        records = list(records)
+
+        # Perform pre-save check for each record
         [cls._pre_save_check(record) for record in records]
 
-        # Invoke DB method with combined dataset
+        # Invoke save_many method of DB implementation
         cls.get_db().save_many(  # noqa
             records,
             dataset=cls.get_dataset(dataset),
