@@ -50,6 +50,7 @@ def dict_public_fields_factory(x):
     """Factory for a dictionary with only public fields."""
     return {k: v for (k, v) in x if not k.startswith("_")}
 
+
 # TODO: Move this and other functions to helper class
 def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict[str, Any] | List[Dict[str, Any]] | str:
     """Recursively apply type declaration dictionary conventions to the argument dictionary."""
@@ -66,8 +67,7 @@ def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict
             {
                 CaseUtil.snake_to_pascal_case(k.removesuffix("_")): to_type_decl_dict(v)
                 for k, v in node.items()
-                if not k.startswith("_")
-                and v not in [None, False]
+                if not k.startswith("_") and v not in [None, False]
             }
         )
         return result
