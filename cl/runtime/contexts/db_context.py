@@ -338,14 +338,19 @@ class DbContext(Context):
     def _pre_save_check(cls, record: RecordProtocol) -> None:
         if record is None:
             # Confirm argument is not None
-            raise RuntimeError("Attempting to save an object with the value of None.")
+            raise RuntimeError("Record passed to DB save method is None.")
         elif not is_record(record):
             # Confirm the argument is a record
-            raise RuntimeError(f"Attempting to save {type(record).__name__} which is not a record.")
-        elif is_freezable(record) and not FreezableUtil.is_frozen(record):  # TODO: Do not allow non-freezable
+            raise RuntimeError(f"Attempting to an object of {type(record).__name__} which is not a record.")
+        elif not is_freezable(record):
             raise RuntimeError(
                 f"Record of type {TypeUtil.name(record)} with key {record.get_key()}\n"
-                f"is not frozen before saving, call 'build' or 'freeze' first."
+                f"does not implement 'freeze' method. Only freezable records can be stored in DB."
+            )
+        elif not FreezableUtil.is_frozen(record):
+            raise RuntimeError(
+                f"Build method not invoked before saving for an record of type\n"
+                f"{TypeUtil.name(record)} with key {record.get_key()}\n"
             )
         else:
             # TODO: To prevent calling get_key more than once, pass to DB save method
