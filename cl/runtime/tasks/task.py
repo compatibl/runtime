@@ -17,7 +17,7 @@ import time
 import traceback
 from abc import ABC
 from abc import abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.log.exceptions.user_error import UserError
@@ -92,11 +92,8 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
         """Invoke execute with task status updates and exception handling."""
 
         try:
-            # Set status to Running and save
-            result = DataUtil.shallow_copy(type(self), self)
-            result.status = TaskStatusEnum.RUNNING
-            result.build()
-            DbContext.save_one(result)
+            # Save with Running status
+            DbContext.save_one(replace(self, status = TaskStatusEnum.RUNNING).build())
 
             # Invoke out-of-process execution of payload
             self._execute()
@@ -111,38 +108,35 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
                 # TODO: Perform additional processing
                 pass
 
-            # Create log entry
-            log_message = LogMessage(message=str(e))
-            log_message.build()
-
             # Save log entry to the database
+            log_message = LogMessage(message=str(e)).build()
             DbContext.save_one(log_message)
 
             logger = LogContext.get_logger(module_name=__name__)
             logger.debug("An error occurred: %s", e)
             logger.debug("Stack trace:\n%s", traceback.format_exc())
 
-            # Update task run record to report task failure
-            result = DataUtil.shallow_copy(type(self), self)
-            result.status = TaskStatusEnum.FAILED
-            result.progress_pct = 100.0
-            result.elapsed_sec = 0.0  # TODO: Implement
-            result.remaining_sec = 0.0
-            result.error_message = str(e)
-            result.build()
-            DbContext.save_one(result)
+            # Save with Failed status and execution info
+            DbContext.save_one(replace(
+                self,
+                status = TaskStatusEnum.FAILED,
+                progress_pct=100.0,
+                elapsed_sec=0.0,  # TODO: Implement
+                remaining_sec=0.0,
+                error_message=str(e),
+            ).build())
         else:
             # Record the end time
             end_time = DatetimeUtil.now()
 
-            # Update task run record to report task completion
-            result = DataUtil.shallow_copy(type(self), self)
-            result.status = TaskStatusEnum.COMPLETED
-            result.progress_pct = 100.0
-            result.elapsed_sec = 0.0  # TODO: Implement
-            result.remaining_sec = 0.0
-            result.build()
-            DbContext.save_one(result)
+            # Save with Completed status and execution info
+            DbContext.save_one(replace(
+                self,
+                status = TaskStatusEnum.COMPLETED,
+                progress_pct=100.0,
+                elapsed_sec=0.0,  # TODO: Implement
+                remaining_sec=0.0,
+            ).build())
 
     @classmethod
     def wait_for_completion(cls, task_key: TaskKey, timeout_sec: int = 10) -> None:  # TODO: Rename or move
