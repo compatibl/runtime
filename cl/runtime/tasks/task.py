@@ -17,14 +17,14 @@ import time
 import traceback
 from abc import ABC
 from abc import abstractmethod
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
+
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
-from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.tasks.task_key import TaskKey
@@ -93,7 +93,9 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
         try:
             # Save with Running status
-            DbContext.save_one(replace(self, status = TaskStatusEnum.RUNNING).build())
+            update = self.clone()
+            update.status = TaskStatusEnum.RUNNING
+            DbContext.save_one(update.build())
 
             # Invoke out-of-process execution of payload
             self._execute()
@@ -117,26 +119,25 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             logger.debug("Stack trace:\n%s", traceback.format_exc())
 
             # Save with Failed status and execution info
-            DbContext.save_one(replace(
-                self,
-                status = TaskStatusEnum.FAILED,
-                progress_pct=100.0,
-                elapsed_sec=0.0,  # TODO: Implement
-                remaining_sec=0.0,
-                error_message=str(e),
-            ).build())
+            update = self.clone()
+            update.status = TaskStatusEnum.FAILED
+            update.progress_pct=100.0
+            update.elapsed_sec=0.0  # TODO: Implement
+            update.remaining_sec=0.0
+            update.error_message=str(e)
+            DbContext.save_one(update.build())
         else:
             # Record the end time
             end_time = DatetimeUtil.now()
 
             # Save with Completed status and execution info
-            DbContext.save_one(replace(
-                self,
-                status = TaskStatusEnum.COMPLETED,
-                progress_pct=100.0,
-                elapsed_sec=0.0,  # TODO: Implement
-                remaining_sec=0.0,
-            ).build())
+            # Save with Failed status and execution info
+            update = self.clone()
+            update.status = TaskStatusEnum.COMPLETED
+            update.progress_pct=100.0
+            update.elapsed_sec=0.0  # TODO: Implement
+            update.remaining_sec=0.0
+            DbContext.save_one(update.build())
 
     @classmethod
     def wait_for_completion(cls, task_key: TaskKey, timeout_sec: int = 10) -> None:  # TODO: Rename or move
