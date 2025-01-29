@@ -46,7 +46,7 @@ class TaskResultResponseItem(BaseModel):
     def get_task_results(cls, request: TaskResultRequest) -> List[TaskResultResponseItem]:
         """Get results for tasks in request."""
 
-        task_keys = [TaskKey(task_id=x) for x in request.task_run_ids]
+        task_keys = [TaskKey(task_id=x).build() for x in request.task_run_ids]
         tasks = cast(Iterable[Task], DbContext.load_many(Task, task_keys))
 
         response_items = []
