@@ -67,7 +67,8 @@ def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict
             {
                 CaseUtil.snake_to_pascal_case(k.removesuffix("_")): to_type_decl_dict(v)
                 for k, v in node.items()
-                if (k == "_t" or not k.startswith("_")) and v not in [None, False]  # TODO: Review the exclusion of False
+                if (k == "_t" or not k.startswith("_"))
+                and v not in [None, False]  # TODO: Review the exclusion of False
             }
         )
         return result

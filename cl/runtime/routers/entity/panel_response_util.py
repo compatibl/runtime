@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import base64
-import dataclasses
 from typing import Any
 from typing import Dict
 from typing import List
@@ -22,8 +21,6 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.plots.plot_key import PlotKey
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
-from cl.runtime.routers.response_util import to_legacy_dict
-from cl.runtime.routers.response_util import to_record_dict
 from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.string_serializer import StringSerializer
