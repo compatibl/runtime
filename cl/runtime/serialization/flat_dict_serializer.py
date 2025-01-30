@@ -94,18 +94,21 @@ class FlatDictSerializer(DictSerializer):
             return key_str
         else:
             # All other types try to serialize as JSON string
+
+            # Serialize data with super
             json_data = super().serialize_data(data, type_)
 
+            # Don't wrap to JSON if it is root or value is None after super serialization
+            if is_root or json_data is None:
+                return json_data
+
+            # Expect only certain types to be passed
             if not isinstance(json_data, (list, tuple, dict)):
                 raise RuntimeError(
                     f"Received value is not serializable to json. Value: {json_data}, input value: {data}."
                 )
 
-            # If it is root, don't serialize to json string
-            if is_root:
-                return json_data
-            else:
-                return json.dumps(json_data)
+            return json.dumps(json_data)
 
     def deserialize_data(self, data: TDataDict, type_: Type | None = None):
 
