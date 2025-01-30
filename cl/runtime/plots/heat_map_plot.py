@@ -35,10 +35,10 @@ class HeatMapPlot(MatplotlibPlot):
     col_labels: List[str] = required()
     """Column label for each cell in the same order of cells as other fields."""
 
-    received_values: List[str] = required()
+    received_values: List[float] = required()
     """Received value for each cell in the same order of cells as other fields."""
 
-    expected_values: List[str] = required()
+    expected_values: List[float] = required()
     """Expected (correct) value for each cell in the same order of cells as other fields."""
 
     x_label: str = required()
