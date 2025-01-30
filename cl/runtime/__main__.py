@@ -59,15 +59,14 @@ async def handle_exception(request, exc):
         # TODO: Perform additional processing
         pass
 
-    # TODO (Roman): save all logs to db
-    # Save log entry to the database
+    # TODO (Sasha): Use different types of log entry for user-displayed error vs. all other
     log_type = LogMessage if isinstance(exc, UserError) else LogMessage
-    entry = LogMessage(message=str(exc))
-    entry.build()
-    DbContext.save_one(entry)
+    # Save log entry to the database
+    log_message = LogMessage(message=str(exc)).build()
+    DbContext.save_one(log_message)
 
-    # Determine if the message should be  displayed for user
-    user_message = str(exc) if entry.priority >= 40 else None  # TODO: Configure the threshold in settings
+    # Determine if the message should be displayed for the user
+    user_message = str(exc) if log_message.priority >= 40 else None  # TODO: Configure the threshold in settings
 
     # Return 500 response to avoid exception handler multiple calls
     # IMPORTANT:

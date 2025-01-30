@@ -43,7 +43,7 @@ async def tasks_run(request: Request, payload: RunRequest):
         payload.headers = headers
         return RunResponseItem.run_tasks(payload)
     except Exception as e:
-        DbContext.save_one(LogMessage(message=str(e)))
+        DbContext.save_one(LogMessage(message=str(e)).build())
         raise e
 
 
@@ -69,5 +69,5 @@ async def tasks_result(payload: TaskResultRequest):
     try:
         return TaskResultResponseItem.get_task_results(request=payload)
     except Exception as e:
-        DbContext.save_one(LogMessage(message=str(e)))
+        DbContext.save_one(LogMessage(message=str(e)).build())
         raise e

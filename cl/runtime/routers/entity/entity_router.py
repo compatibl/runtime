@@ -60,7 +60,7 @@ async def get_panel(
         """Return panel content by its displayed name."""
         return PanelResponseUtil.get_content(PanelRequest(type=type, panel_id=panel_id, key=key, dataset=dataset))
     except Exception as e:
-        DbContext.save_one(LogMessage(message=str(e)))
+        DbContext.save_one(LogMessage(message=str(e)).build())
         error_view = {  # TODO: Refactor
             "_t": "Script",
             "Name": None,
@@ -90,7 +90,7 @@ async def save(
             ),
         )
     except Exception as e:
-        DbContext.save_one(LogMessage(message=str(e)))
+        DbContext.save_one(LogMessage(message=str(e)).build())
         raise e
 
 
