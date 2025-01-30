@@ -153,7 +153,7 @@ class PanelResponseUtil(BaseModel):
             return view_dict
         elif isinstance(view, Script):
             # Return script
-            view_dict: dict = to_legacy_dict(to_record_dict(view))
+            view_dict: dict = ui_serializer.serialize_data(view)
             view_dict["Language"] = view_dict.pop("Language").capitalize()
             return view_dict
         elif isinstance(view, Dict):
@@ -162,9 +162,6 @@ class PanelResponseUtil(BaseModel):
         else:
             # TODO (Ina): Do not use a method from dataclasses
             result_type = type(view)
-            if result_type.__name__.endswith("Key"):
-                view_dict = to_legacy_dict(dataclasses.asdict(view))
-                view_dict["_t"] = result_type.__name__
-                return view_dict
-            else:
-                return to_legacy_dict(to_record_dict(view))
+            view_dict = ui_serializer.serialize_data(view)
+            view_dict["_t"] = result_type.__name__
+            return view_dict
