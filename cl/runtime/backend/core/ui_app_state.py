@@ -66,7 +66,7 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
     def get_current_user_app_theme(cls) -> AppTheme | None:
         """Get current user app theme."""
 
-        default_app_state_key = UiAppStateKey(user=UserKey(username="root"))  # TODO: Review the use of root default
+        default_app_state_key = UiAppStateKey(user=UserKey(username="root")).build()  # TODO: Review the use of root default
 
         default_app_state = DbContext.load_one_or_none(UiAppStateKey, default_app_state_key)
         if default_app_state is not None and default_app_state.application_theme is not None:
