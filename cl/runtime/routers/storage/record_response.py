@@ -85,7 +85,7 @@ def to_legacy_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict[st
         result = {
             CaseUtil.snake_to_pascal_case(k.removesuffix("_")): to_legacy_dict(v)
             for k, v in node.items()
-            if v is not None
+            if (k == "_t" or not k.startswith("_")) and v is not None
         }
         return result
     elif isinstance(node, list):

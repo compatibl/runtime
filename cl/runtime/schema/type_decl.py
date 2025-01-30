@@ -58,7 +58,7 @@ def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict
     if isinstance(node, dict):
         # For type declarations only, skip nodes that have the value of None or False
         # Remove suffix _ from field names if present
-        # pascalized_values = {k: (CaseUtil.snake_to_pascal_case(v) if k in ['module_name', 'name'] else v) for k, v in node.items()}
+        # pascalized_values = {k: (CaseUtil.snake_to_pascal_case(v) if k in ['module_name', 'name'] else v) for k, v in node.items() if (k == "_t" or not k.startswith("_")) and v is not None}
         # Searching for the name of given type declaration
         result: Dict[str, Any] = {}
         if (_t := get_name_of_type_decl_dict(node)) is not None:
@@ -67,7 +67,7 @@ def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict
             {
                 CaseUtil.snake_to_pascal_case(k.removesuffix("_")): to_type_decl_dict(v)
                 for k, v in node.items()
-                if not k.startswith("_") and v not in [None, False]
+                if (k == "_t" or not k.startswith("_")) and v not in [None, False]  # TODO: Review the exclusion of False
             }
         )
         return result

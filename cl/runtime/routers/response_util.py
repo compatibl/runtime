@@ -53,7 +53,7 @@ def to_record_dict(node):  # TODO: Apply type hints
     elif node_type is dict:
         # TODO: Decision on short name alias
         # Tuple key, table name is class name
-        result = {k: to_record_dict(v) for k, v in node.items()}
+        result = {k: to_record_dict(v) for k, v in node.items() if (k == "_t" or not k.startswith("_")) and v is not None}
         return result
     elif node_type.__name__.endswith("Key"):
         # Key type, use semicolon-delimited serialization
@@ -86,7 +86,7 @@ def to_legacy_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict[st
                 CaseUtil.snake_to_pascal_case(k.removesuffix("_")) if not k in special_fields else special_fields[k]
             ): to_legacy_dict(v)
             for k, v in node.items()
-            if v is not None
+            if (k == "_t" or not k.startswith("_")) and v is not None
         }
         return result
     elif isinstance(node, list):
