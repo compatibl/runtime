@@ -20,7 +20,7 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 
 
-class _Base(RecordMixin[StubDataclassRecord], StubDataclassRecordKey):
+class Base(RecordMixin[StubDataclassRecord], StubDataclassRecordKey):
     """Test class."""
 
     def get_key(self) -> TKey:
@@ -28,41 +28,67 @@ class _Base(RecordMixin[StubDataclassRecord], StubDataclassRecordKey):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        RegressionGuard().write("> _Base.init")
+        RegressionGuard().write("> Base.init")
 
 
-class _Derived(_Base):
+class Derived(Base):
     """Test class."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        RegressionGuard().write(">> _Derived.init")
+        RegressionGuard().write(">> Derived.init")
 
 
-class _DerivedFromDerivedWithInit(_Derived):
+class DerivedFromDerivedWithInit(Derived):
     """Test class."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        RegressionGuard().write(">>> _DerivedFromDerivedWithInit.init")
+        RegressionGuard().write(">>> DerivedFromDerivedWithInit.init")
 
 
-class _DerivedFromDerivedWithoutInit(_Derived):
+class DerivedFromDerivedWithoutInit(Derived):
     """Test class."""
+
+
+class _OneLeadingUnderscore(RecordMixin[StubDataclassRecord], StubDataclassRecordKey):
+    """Test class."""
+
+    def get_key(self) -> TKey:
+        raise NotImplementedError()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        RegressionGuard().write("> _OneLeadingUnderscore.init")
+
+
+class __TwoLeadingUnderscores(RecordMixin[StubDataclassRecord], StubDataclassRecordKey):
+    """Test class."""
+
+    def get_key(self) -> TKey:
+        raise NotImplementedError()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        RegressionGuard().write("> __TwoLeadingUnderscores.init")
 
 
 def test_build():
     """Test RecordUtil.init_all method."""
 
     guard = RegressionGuard()
-    guard.write("Testing _Base:")
-    _Base().build()
-    guard.write("Testing _Derived:")
-    _Derived().build()
-    guard.write("Testing _DerivedFromDerivedWithInit:")
-    _DerivedFromDerivedWithInit().build()
-    guard.write("Testing _DerivedFromDerivedWithoutInit:")
-    _DerivedFromDerivedWithoutInit().build()
+    guard.write("Testing Base:")
+    Base().build()
+    guard.write("Testing Derived:")
+    Derived().build()
+    guard.write("Testing DerivedFromDerivedWithInit:")
+    DerivedFromDerivedWithInit().build()
+    guard.write("Testing DerivedFromDerivedWithoutInit:")
+    DerivedFromDerivedWithoutInit().build()
+    guard.write("Testing _OneLeadingUnderscore:")
+    _OneLeadingUnderscore().build()
+    guard.write("Testing __TwoLeadingUnderscores:")
+    __TwoLeadingUnderscores().build()
     RegressionGuard().verify_all()
 
 
