@@ -123,10 +123,6 @@ class DictSerializer:
         """
         Serialize to dictionary containing primitive types, dictionaries, or iterables.
 
-        Notes:
-            Before serialization, invoke 'init' for each class in class hierarchy that implements it,
-            in the order from base to derived.
-
         Args:
             data: Object to serialize
             type_: Annotation type

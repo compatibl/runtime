@@ -28,7 +28,7 @@ class StubContext(Context):
     """If True, an error will be raised inside '__post_init__' method for testing purposes."""
 
     error_on_init: bool = False
-    """If True, an error will be raised inside 'init' method (not __init__) for testing purposes."""
+    """If True, an error will be raised inside '__init' method (not __init__) for testing purposes."""
 
     error_on_enter: bool = False
     """If True, an error will be raised inside __enter__ method for testing purposes."""

@@ -45,7 +45,7 @@ class RecordUtil:
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (2) Invokes 'freeze' method of this class
         Returns self to enable method chaining.
         """
@@ -66,16 +66,16 @@ class RecordUtil:
                 and not isinstance(x, Enum)
             )
 
-            # Invoke 'init' in the order from base to derived
+            # Invoke '__init' in the order from base to derived
             # Keep track of which init methods in class hierarchy were already called
             invoked = set()
             # Reverse the MRO to start from base to derived
             for class_ in reversed(obj.__class__.__mro__):
-                class_init = getattr(class_, "init", None)
+                class_init = getattr(class_, f"_{class_.__name__}__init", None)
                 if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
                     # Add qualname to invoked to prevent executing the same method twice
                     invoked.add(qualname)
-                    # Invoke 'init' method of superclass if it exists, otherwise do nothing
+                    # Invoke '__init' method of superclass if it exists, otherwise do nothing
                     class_init(obj)
 
             # After the init methods, call freeze method if implemented, continue without error if not

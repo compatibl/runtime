@@ -70,7 +70,7 @@ class BuildProtocol(Protocol):
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (2) Invokes 'freeze' method of this class
         Returns self to enable method chaining.
         """
@@ -99,7 +99,7 @@ class InitProtocol(Protocol):
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (2) Invokes 'freeze' method of this class
         Returns self to enable method chaining.
         """
@@ -113,7 +113,7 @@ class KeyProtocol(Protocol):
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (2) Invokes 'freeze' method of this class
         Returns self to enable method chaining.
         """
@@ -132,7 +132,7 @@ class RecordProtocol(Protocol):
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (2) Invokes 'freeze' method of this class
         Returns self to enable method chaining.
         """
@@ -198,5 +198,5 @@ def is_singleton_key(instance_or_type: Any):
 
 
 def has_init(instance_or_type: Any) -> TypeGuard[InitProtocol]:
-    """Check if type or object requires initialization (InitProtocol) based on the presence of 'init' attribute."""
+    """Check if type or object requires initialization (InitProtocol) based on the presence of '__init' attribute."""
     return hasattr(instance_or_type, "init")

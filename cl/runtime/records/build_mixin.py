@@ -30,7 +30,7 @@ class BuildMixin:
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes 'init' method of this class and its ancestors in the order from base to derived
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (2) Invokes 'freeze' method of this class
         Returns self to enable method chaining.
         """
