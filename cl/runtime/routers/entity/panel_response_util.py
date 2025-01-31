@@ -21,6 +21,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.plots.plot_key import PlotKey
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
+from cl.runtime.routers.legacy_format_util import LegacyFormatUtil
 from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -86,79 +87,9 @@ class PanelResponseUtil(BaseModel):
         # Apply legacy dict conventions
         # TODO (Ina): Optimize speed using dacite or similar library
         if isinstance(result_view, list):
-            view_dict = [PanelResponseUtil._get_view_dict(item) for item in result_view]
+            view_dict = [LegacyFormatUtil.get_legacy_format_view(item) for item in result_view]
         else:
-            view_dict = PanelResponseUtil._get_view_dict(result_view)
+            view_dict = LegacyFormatUtil.get_legacy_format_view(result_view)
 
         return {"ViewOf": view_dict}
 
-    @classmethod
-    def _get_view_dict(cls, view: Any) -> Dict[str, Any] | None:
-        """Convert value to dict format."""
-
-        # Return None if view is None
-        if view is None:
-            return None
-
-        if isinstance(view, PlotView):
-            # Load plot for view if it is key
-            plot = DbContext.load_one(PlotKey, view.plot)
-            if plot is None:
-                raise RuntimeError(f"Not found plot for key {view.plot}.")
-
-            # Get view for plot and transform to ui format dict
-            return cls._get_view_dict(plot.get_view())
-
-        elif isinstance(view, KeyView):
-            # Load record for view
-            record = DbContext.load_one(type(view.key), view.key)
-            if record is None:
-                raise RuntimeError(f"Not found record for key {view.key}.")
-
-            # Return ui format dict dict of record
-            return cls._get_view_dict(record)
-
-        elif isinstance(view, PngView):
-            # Return ui format dict of binary data
-            return {
-                "Content": base64.b64encode(view.png_bytes).decode(),
-                "ContentType": "Png",
-                "_t": "BinaryContent",
-            }
-        elif isinstance(view, HtmlView):
-            # Return ui format dict of binary data
-            return {
-                "Content": base64.b64encode(view.html_bytes).decode(),
-                "ContentType": "Html",
-                "_t": "BinaryContent",
-            }
-        elif isinstance(view, PdfView):
-            # Return ui format dict of binary PDF view data
-            return {
-                "Content": base64.b64encode(view.pdf_bytes).decode(),
-                "ContentType": "Pdf",
-                "_t": "BinaryContent",
-            }
-        elif isinstance(view, Dag):
-            # Serialize Dag using ui serialization
-            view_dict = ui_serializer.serialize_data(view)
-
-            # Set _t with legacy Dag type name
-            view_dict["_t"] = "DAG"
-
-            # Return Dag view
-            return view_dict
-        elif isinstance(view, Script):
-            # Return script
-            view_dict: dict = ui_serializer.serialize_data(view)
-            view_dict["Language"] = view_dict.pop("Language").capitalize()
-            return view_dict
-        elif isinstance(view, Dict):
-            # Return if is already dict
-            return view
-        else:
-            # TODO (Ina): Do not use a method from dataclasses
-            result_type = type(view)
-            view_dict = ui_serializer.serialize_data(view)
-            view_dict["_t"] = result_type.__name__
-            return view_dict

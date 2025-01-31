@@ -29,6 +29,7 @@ from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
+from cl.runtime.routers.legacy_format_util import LegacyFormatUtil
 
 ListPanelsResponse = List[ListPanelsResponseItem]
 PanelResponseDataItem = Dict[str, Any]
@@ -68,7 +69,7 @@ async def get_panel(
             "Body": ["## The following error occurred during the rendering of this view:\n", f"{str(e)}"],
             "WordWrap": True,
         }
-        error_view_dict = PanelResponseUtil._get_view_dict(error_view)
+        error_view_dict = LegacyFormatUtil.get_legacy_format_view(error_view)
         return {"ViewOf": error_view_dict}
 
 
