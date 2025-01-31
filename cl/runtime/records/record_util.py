@@ -71,7 +71,8 @@ class RecordUtil:
             invoked = set()
             # Reverse the MRO to start from base to derived
             for class_ in reversed(obj.__class__.__mro__):
-                class_init = getattr(class_, f"_{class_.__name__}__init", None)
+                # Remove leading underscores from the class name when generating mangling for __init
+                class_init = getattr(class_, f"_{class_.__name__.lstrip('_')}__init", None)
                 if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
                     # Add qualname to invoked to prevent executing the same method twice
                     invoked.add(qualname)
