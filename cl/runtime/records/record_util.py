@@ -19,7 +19,7 @@ from dataclasses import is_dataclass
 from enum import Enum
 from types import NoneType
 from types import UnionType
-from typing import Any
+from typing import Any, TypeVar
 from typing import Iterable
 from typing import List
 from typing import Type
@@ -36,12 +36,13 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_record_or_key
 from cl.runtime.records.type_util import TypeUtil
 
+T = TypeVar("T")
 
 class RecordUtil:
     """Utilities for working with records."""
 
     @classmethod
-    def build(cls, obj: Any) -> Self:
+    def build(cls, obj: T) -> T:
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
@@ -50,18 +51,18 @@ class RecordUtil:
         Returns self to enable method chaining.
         """
 
-        if is_record_or_key(obj) or is_freezable(obj):  # TODO: Do not allow non-freezable
+        if (slots := getattr(obj, "__slots__", None)) is not None:
+            # Has slots, process as data, key or record
+            if obj.is_frozen():
+                # Stop further processing and return if the object has been frozen to
+                # prevent repeat initialization of shared instances
+                return obj
 
-            # Stop further processing if the object has been frozen to
-            # prevent repeat initialization of shared instances
-            if FreezableUtil.is_frozen(obj):
-                return
-
-            # Recursively call 'build' on fields except those that are None, primitive or Enum
+            # Recursively call 'build' on public fields except those that are None, primitive or Enum
             tuple(
                 cls.build(x)
-                for field in fields(obj)  # noqa
-                if (x := getattr(obj, field.name, None)) is not None
+                for slot in slots
+                if not slot.startswith("_") and (x := getattr(obj, slot, None)) is not None
                 and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
                 and not isinstance(x, Enum)
             )
@@ -76,13 +77,13 @@ class RecordUtil:
                 if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
                     # Add qualname to invoked to prevent executing the same method twice
                     invoked.add(qualname)
-                    # Invoke '__init' method of superclass if it exists, otherwise do nothing
+                    # Invoke '__init' method if it exists, otherwise do nothing
                     class_init(obj)
 
             # After the init methods, call freeze method if implemented, continue without error if not
-            FreezableUtil.try_freeze(obj)
+            obj.freeze()
 
-            # Perform validation against the schema only after all init methods are called
+            # Perform validation against the schema after the object is frozen and return
             cls.validate(obj)
             return obj
         elif isinstance(obj, tuple | list):  # TODO: Exclude list after converting records to tuple
@@ -231,24 +232,9 @@ Note: In case of containers, type mismatch may be in one of the items.
     def _unsupported_object_error(cls, obj: Any) -> None:
         obj_type_name = TypeUtil.name(obj)
         raise RuntimeError(
-            f"Class {obj_type_name} is not supported as a record.\n"
-            f"Supported types include:\n"
-            f"  1. Slotted classes with fields that are other slotted classes;\n"
-            f"  2. Tuples with supported values;\n"
-            f"  3. Dictionaries with string keys with supported values; and\n"
-            f"  4. Primitive types from the following list: {', '.join(_PRIMITIVE_TYPE_NAMES)}"
-        )
-
-    @classmethod
-    def _unsupported_field_error(cls, obj: Any, *, field_name: str, field_value: Any) -> None:
-        obj_type_name = TypeUtil.name(obj)
-        field_type_name = TypeUtil.name(field_value)
-        raise RuntimeError(
-            f"Field {field_name} in class {obj_type_name} has type {field_type_name}\n"
-            f"that is not supported for record fields.\n"
-            f"Supported types include:\n"
-            f"  1. Slotted classes with fields that are other slotted classes;\n"
-            f"  2. Tuples with supported values;\n"
-            f"  3. Dictionaries with string keys with supported values; and\n"
+            f"Class {obj_type_name} cannot be a record or its field. Supported types include:\n"
+            f"  1. Slotted classes where all public fields are supported types;\n"
+            f"  2. Tuples where all values are supported types;\n"
+            f"  3. Dictionaries with string keys where all values are supported types; and\n"
             f"  4. Primitive types from the following list: {', '.join(_PRIMITIVE_TYPE_NAMES)}"
         )
