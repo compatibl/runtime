@@ -196,7 +196,3 @@ def is_singleton_key(instance_or_type: Any):
         raise RuntimeError("Function 'is_singleton' is called on an object that has no __slots__ attribute.")
     return all(name.startswith("_") for name in instance_or_type.__slots__)
 
-
-def has_init(instance_or_type: Any) -> TypeGuard[InitProtocol]:
-    """Check if type or object requires initialization (InitProtocol) based on the presence of '__init' attribute."""
-    return hasattr(instance_or_type, "init")

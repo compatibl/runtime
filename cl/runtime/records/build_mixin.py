@@ -15,7 +15,7 @@
 from typing import Type
 from typing import TypeVar
 from typing_extensions import Self
-from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.build_util import BuildUtil
 
 T = TypeVar("T")
 
@@ -34,7 +34,7 @@ class BuildMixin:
         (2) Invokes 'freeze' method of this class
         Returns self to enable method chaining.
         """
-        return RecordUtil.build(self)
+        return BuildUtil.build(self)
 
     def clone(self: Self) -> Self:
         """Return an unfrozen object of the same type populated by shallow copies of public fields."""

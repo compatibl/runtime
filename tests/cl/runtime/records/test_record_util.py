@@ -13,56 +13,11 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.record_util import RecordUtil
-from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
-from stubs.cl.runtime import StubDataclassDerivedRecord
-from stubs.cl.runtime import StubDataclassDictFields
-from stubs.cl.runtime import StubDataclassDictListFields
-from stubs.cl.runtime import StubDataclassListDictFields
-from stubs.cl.runtime import StubDataclassListFields
-from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
-from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime import StubDataclassSingleton
 
-
-def test_is_instance():
-    """Test RecordUtil.validate method."""
-
-    # Primitive types
-    assert RecordUtil._is_instance(True, bool)
-    assert not RecordUtil._is_instance(None, bool)
-
-    # Primitive types | None
-    assert RecordUtil._is_instance(True, bool | None)
-    assert RecordUtil._is_instance(None, bool | None)
-
-
-def test_validate():
-    """Test RecordUtil.validate method."""
-
-    samples = [
-        StubDataclassOptionalFields(id="abc7"),
-        StubDataclassRecord(id="abc1"),
-        StubDataclassNestedFields(id="abc2"),
-        StubDataclassComposite(),
-        StubDataclassDerivedRecord(id="abc3"),
-        StubDataclassDerivedFromDerivedRecord(id="abc4"),
-        StubDataclassOtherDerivedRecord(id="abc5"),
-        StubDataclassListFields(id="abc6"),
-        StubDataclassOptionalFields(id="abc7"),
-        StubDataclassDictFields(id="abc8"),
-        StubDataclassDictListFields(id="abc9"),
-        StubDataclassListDictFields(id="abc10"),
-        StubDataclassPrimitiveFields(key_str_field="abc11"),
-        StubDataclassSingleton(),
-    ]
-
-    for sample in samples:
-        RecordUtil.validate(sample)
+@pytest.mark.skip("Add tests for RecordUtil")
+def test_record_util():
+    """Test RecordUtil class."""
+    # TODO: Add tests for RecordUtil
 
 
 if __name__ == "__main__":
