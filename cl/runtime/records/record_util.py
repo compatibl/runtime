@@ -13,10 +13,11 @@
 # limitations under the License.
 
 import inspect
-from typing import Any, TypeVar
+from typing import Any
 from typing import Iterable
 from typing import List
 from typing import Type
+from typing import TypeVar
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record
 

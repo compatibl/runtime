@@ -195,4 +195,3 @@ def is_singleton_key(instance_or_type: Any):
     if not hasattr(instance_or_type, "__slots__"):
         raise RuntimeError("Function 'is_singleton' is called on an object that has no __slots__ attribute.")
     return all(name.startswith("_") for name in instance_or_type.__slots__)
-

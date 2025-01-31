@@ -14,6 +14,7 @@
 
 import pytest
 
+
 @pytest.mark.skip("Add tests for RecordUtil")
 def test_record_util():
     """Test RecordUtil class."""

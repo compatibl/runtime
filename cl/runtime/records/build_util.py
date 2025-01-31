@@ -12,17 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import inspect
 from dataclasses import MISSING
 from dataclasses import fields
 from dataclasses import is_dataclass
 from enum import Enum
 from types import NoneType
 from types import UnionType
-from typing import Any, TypeVar
-from typing import Iterable
-from typing import List
-from typing import Type
+from typing import Any
+from typing import TypeVar
 from typing import Union
 from typing import get_args
 from typing import get_origin
@@ -57,7 +54,8 @@ class BuildUtil:
             tuple(
                 cls.build(x)
                 for slot in slots
-                if not slot.startswith("_") and (x := getattr(obj, slot, None)) is not None
+                if not slot.startswith("_")
+                and (x := getattr(obj, slot, None)) is not None
                 and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
                 and not isinstance(x, Enum)
             )

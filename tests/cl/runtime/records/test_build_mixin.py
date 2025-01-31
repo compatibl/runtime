@@ -23,6 +23,7 @@ class Base(Freezable):
     _protected_base_field: str | None = None
     public_base_field_1: str | None = None
     public_base_field_2: str | None = None
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         RegressionGuard().write("> Base.init")
@@ -31,6 +32,7 @@ class Base(Freezable):
 @dataclass(slots=True, kw_only=True)
 class Derived(Base):
     public_derived_field: str | None = None
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         RegressionGuard().write(">> Derived.init")
