@@ -33,23 +33,16 @@ class MatplotlibUtil:
         col_labels: List[str],
         ax=None,
         **kwargs,
-    ):  # TODO: Review the use of kwargs
+    ):
         """
         Create a heatmap from a numpy array and two lists of labels.
 
-        Parameters
-        ----------
-        data
-            A 2D numpy array of shape (M, N).
-        row_labels
-            A list or array of length M with the labels for the rows.
-        col_labels
-            A list or array of length N with the labels for the columns.
-        ax
-            A `matplotlib.axes.Axes` instance to which the heatmap is plotted.  If
-            not provided, use current Axes or create a new one.  Optional.
-        **kwargs
-            All other arguments are forwarded to `imshow`.
+        Args:
+            data: A 2D numpy array of shape (M, N).
+            row_labels: A list or array of length M with the labels for the rows.
+            col_labels: A list or array of length N with the labels for the columns.
+            ax: A `matplotlib.axes.Axes` instance to which the heatmap is plotted (optional)
+            kwargs: All other arguments are forwarded to `ax.imshow` (optional)
         """
 
         if ax is None:
@@ -83,29 +76,20 @@ class MatplotlibUtil:
         cls,
         im: AxesImage,
         labels: List[List[str]],
-        textcolors: Union[str, Tuple[str]] = ("black", "white"),
+        text_colors: Union[str, Tuple[str]] = ("black", "white"),
         threshold: Optional[float] = None,
-        **textkw,  # TODO: Review the use of kwargs
+        **kwargs,
     ):
         """
-        A function to annotate a heatmap.
+        Annotate a heatmap.
 
-        Parameters
-        ----------
-        im
-            The AxesImage to be labeled.
-        labels:
-            Label for each cell
-        textcolors:
-            One color or a pair of colors.  The first is used for values below a threshold,
-            the second for those above.  Optional.
-        threshold
-            Value in data units according to which the colors from textcolors are
-            applied.  If None (the default) uses the middle of the colormap as
-            separation.  Optional.
-        **textkw
-            All other arguments are forwarded to each call to `text` used to create
-            the text labels.
+        Args:
+            im: The AxesImage to be labeled.
+            labels: Label for each cell
+            text_colors: One or two colors, if two are provided the first is used for values below a threshold and
+                    the second for those above, optional
+            threshold: Value in data units according to which the colors from text_colors are applied (optional)
+            kwargs: All other arguments are forwarded to `im.axes.text` to create the text labels (optional)
         """
 
         data = im.get_array()
@@ -115,9 +99,9 @@ class MatplotlibUtil:
             threshold = im.norm(threshold)
 
         # Set default alignment to center, but allow it to be
-        # overwritten by textkw.
+        # overwritten by kwargs.
         kw = dict(horizontalalignment="center", verticalalignment="center")
-        kw.update(textkw)
+        kw.update(kwargs)
 
         # Loop over the data and create a `Text` for each "pixel".
         # Change the text's color depending on the data.
@@ -126,9 +110,9 @@ class MatplotlibUtil:
             for j in range(data.shape[1]):
                 kw.update(
                     color=(
-                        textcolors[int(im.norm(data[i, j]) < threshold)]
-                        if isinstance(textcolors, tuple)
-                        else textcolors
+                        text_colors[int(im.norm(data[i, j]) < threshold)]
+                        if isinstance(text_colors, tuple)
+                        else text_colors
                     ),
                 )
                 text = im.axes.text(j, i, labels[i][j], **kw)

@@ -45,25 +45,15 @@ class Dag(DagKey, RecordMixin[DagKey]):
         base_scale: int = 100,
     ) -> "Dag":
         """
-        Set positions automatically for the passed DAG.
+        Set positions automatically for the passed DAG, returns the modified dag with adjusted node positions.
 
-        Parameters
-        ----------
-            dag : Dag
-                Dag to create layout for.
-            layout_mode : DagLayoutEnum
-                Graph layout to use.
-            offset_x : int
-                Offset on x-axis to use between multiple Dags. Won't affect the resulting autolayout of a single Dag.
-            base_scale : int
-                Base scale to use while calculating the final Dag scale.
-                The final scale is calculated for each subgraph separately based on the number of nodes in
-                it using the following formula: base_scale * number_of_nodes^0.5.
-
-        Returns
-        -------
-            Dag
-                A modified Dag object with adjusted positions of nodes.
+        Args:
+            dag: Dag to create layout for.
+            layout_mode: Graph layout to use.
+            offset_x: Offset on x-axis to use between multiple dags
+            base_scale: Base scale to use while calculating the final Dag scale.
+                        The final scale is calculated for each subgraph separately based on the number of nodes in
+                        it using the following formula: base_scale * number_of_nodes^0.5.
         """
 
         subgraphs = dag._build_disconnected_graphs()
