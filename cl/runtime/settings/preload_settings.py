@@ -38,8 +38,8 @@ class PreloadSettings(Settings):
         - For JSON, the data is in json/ClassName/.../KeyToken1;KeyToken2.json where ... is optional dataset
     """
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.dirs = self.normalize_paths("dirs", self.dirs)

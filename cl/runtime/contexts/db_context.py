@@ -73,8 +73,8 @@ class DbContext(Context):
         """
         return "Db"
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Initialize from the current context
         if self.db is None:

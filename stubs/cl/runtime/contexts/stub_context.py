@@ -53,8 +53,8 @@ class StubContext(Context):
         if self.error_on_post_init:
             raise RuntimeError("StubContext.error_on_post_init is set.")
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         if self.error_on_init:
             raise RuntimeError("StubContext.error_on_init is set.")

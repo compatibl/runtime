@@ -55,8 +55,8 @@ class ApiSettings(Settings):
     max_age: int | None = None
     """Maximum time in seconds for browsers to cache the CORS response."""
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Validate hostname
         if self.hostname is not None and not isinstance(self.hostname, str):

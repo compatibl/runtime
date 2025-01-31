@@ -41,8 +41,8 @@ class TrialContext(Context):
         """
         return "TrialContext"
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert the specified value to string using FormatUtil
         self.trial_id = FormatUtil.format_or_none(self.trial_id)

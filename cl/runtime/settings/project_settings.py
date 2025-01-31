@@ -51,8 +51,8 @@ class ProjectSettings:
     __instance: ClassVar[ProjectSettings] = None
     """Singleton instance."""
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.project_levels != 1 and self.project_levels != 2:
             raise RuntimeError(f"Field 'ProjectSettings.project_levels' must be 1 or 2.")
 

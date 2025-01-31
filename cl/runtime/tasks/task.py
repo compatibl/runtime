@@ -68,7 +68,8 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     def get_key(self) -> TaskKey:
         return TaskKey(task_id=self.task_id).build()
 
-    def init(self) -> None:
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         # Set or validate task_id
         if self.task_id is None:
             # Automatically generate time-ordered unique task run identifier in UUIDv7 format if not specified

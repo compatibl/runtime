@@ -47,8 +47,8 @@ class ContextSettings(Settings):
     trial: str | None = None
     """String identifier of the running trial."""
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         if self.context_id is not None and not isinstance(self.context_id, str):
             raise RuntimeError(f"{TypeUtil.name(self)} field 'context_id' must be None or a string.")

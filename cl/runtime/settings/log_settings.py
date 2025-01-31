@@ -38,8 +38,8 @@ class LogSettings(Settings):
     level: str = "info"
     """Log level using logging module conventions (lower, upper or mixed case can be used)."""
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert logging level to uppercase and validate its values
         self.level = self.level.upper()

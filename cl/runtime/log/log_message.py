@@ -37,8 +37,8 @@ class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
     def get_key(self) -> LogMessageKey:
         return LogMessageKey(timestamp=self.timestamp).build()
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Set timestamp
         if self.timestamp is None:

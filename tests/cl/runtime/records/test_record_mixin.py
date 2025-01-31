@@ -26,24 +26,24 @@ class _Base(RecordMixin[StubDataclassRecord], StubDataclassRecordKey):
     def get_key(self) -> TKey:
         raise NotImplementedError()
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         RegressionGuard().write("> _Base.init")
 
 
 class _Derived(_Base):
     """Test class."""
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         RegressionGuard().write(">> _Derived.init")
 
 
 class _DerivedFromDerivedWithInit(_Derived):
     """Test class."""
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         RegressionGuard().write(">>> _DerivedFromDerivedWithInit.init")
 
 

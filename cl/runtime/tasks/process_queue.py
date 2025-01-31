@@ -26,7 +26,8 @@ from cl.runtime.tasks.task_status_enum import TaskStatusEnum
 class ProcessQueue(TaskQueue):
     """Execute tasks sequentially within the queue process."""
 
-    def init(self) -> None:
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         # Set default queue timeout with no tasks to 10 min
         if self.timeout_sec is None:
             self.timeout_sec = 10

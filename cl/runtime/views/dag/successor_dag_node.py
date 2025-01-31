@@ -48,7 +48,9 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
     successor_edges: List[str] | None = None
     """List of successor edge names in the same order as successor_nodes (must have the same size if not None)."""
 
-    def init(self) -> None:
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
         # Generate from dag_id and node_name fields
         self.node_id = f"{self.dag.dag_id}: {self.dag_node_id}"
 

@@ -39,8 +39,8 @@ class Locale(LocaleKey, RecordMixin[LocaleKey], ABC):
     def get_key(self) -> LocaleKey:
         return LocaleKey(locale_id=self.locale_id).build()
 
-    def init(self) -> None:
-        """Similar to __init__ but can use fields set after construction."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)
         locale_tokens = self.locale_id.split("-")
