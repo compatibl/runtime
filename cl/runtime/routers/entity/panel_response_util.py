@@ -21,7 +21,6 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.plots.plot_key import PlotKey
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
-from cl.runtime.routers.legacy_format_util import LegacyFormatUtil
 from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serialization.string_serializer import StringSerializer
@@ -43,9 +42,6 @@ ui_serializer = UiDictSerializer()
 
 class PanelResponseUtil(BaseModel):
     """Response util for the /entity/panel route."""
-
-    view_of: PanelResponseData
-    """Response data type for the /entity/panel route."""
 
     @classmethod
     def get_content(cls, request: PanelRequest) -> Dict[str, PanelResponseData]:
@@ -82,14 +78,4 @@ class PanelResponseUtil(BaseModel):
 
         # Call the viewer and get the result
         viewer = getattr(record, viewer_name)
-        result_view = viewer()
-
-        # Apply legacy dict conventions
-        # TODO (Ina): Optimize speed using dacite or similar library
-        if isinstance(result_view, list):
-            view_dict = [LegacyFormatUtil.get_legacy_format_view(item) for item in result_view]
-        else:
-            view_dict = LegacyFormatUtil.get_legacy_format_view(result_view)
-
-        return {"ViewOf": view_dict}
-
+        return viewer()
