@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict
-
+from typing import Any
+from typing import Dict
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.routers.entity.panel_response_util import PanelResponse
 
@@ -29,11 +29,7 @@ class LegacyResponseUtil:
             return data_dict
 
         if _t == "PngView":
-            return {
-                "Content": data_dict.get("PngBytes"),
-                "ContentType": "Png",
-                "_t": "BinaryContent"
-            }
+            return {"Content": data_dict.get("PngBytes"), "ContentType": "Png", "_t": "BinaryContent"}
         elif _t == "HtmlView":
             return {
                 "Content": data_dict.get("HtmlBytes"),
@@ -72,6 +68,3 @@ class LegacyResponseUtil:
 
         r = {"ViewOf": cls._format_data(panel_response)}
         return r
-
-
-

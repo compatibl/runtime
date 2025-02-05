@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
 from typing import Dict
 from typing import List
 from fastapi import APIRouter
@@ -25,10 +24,10 @@ from cl.runtime.routers.entity.delete_response import DeleteResponse
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
 from cl.runtime.routers.entity.panel_request import PanelRequest
-from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil, PanelResponse
+from cl.runtime.routers.entity.panel_response_util import PanelResponse
+from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
-
 
 router = APIRouter()
 

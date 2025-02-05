@@ -31,6 +31,7 @@ PanelResponse = Dict[str, PanelResponseDataItem | List[PanelResponseDataItem] | 
 ui_serializer = UiDictSerializer()
 key_serializer = StringSerializer()
 
+
 class PanelResponseUtil:
     """Response util for the /entity/panel route."""
 
@@ -59,9 +60,8 @@ class PanelResponseUtil:
         # Get handlers from TypeDecl
         handlers = declare.handlers if (declare := TypeDecl.for_type(type(record)).declare) is not None else None
 
-        if (
-            not handlers
-            or not (viewer_name := next((h.name for h in handlers if h.label == request.panel_id and h.type_ == "Viewer"), None))
+        if not handlers or not (
+            viewer_name := next((h.name for h in handlers if h.label == request.panel_id and h.type_ == "Viewer"), None)
         ):
             raise RuntimeError(f"Type {TypeUtil.name(record)} has no view named '{request.panel_id}'.")
 

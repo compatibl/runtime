@@ -12,5 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 class LegacyRequestUtil:
     """Util class to convert request data in legacy format."""
