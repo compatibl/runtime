@@ -18,9 +18,9 @@ from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
-from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serialization.string_serializer import StringSerializer
 
 
@@ -38,7 +38,7 @@ class ListPanelsResponseItem(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def list_panels(cls, request: ListPanelsRequest) -> List[ListPanelsResponseItem]:
+    def get_response(cls, request: ListPanelsRequest) -> List[ListPanelsResponseItem]:
         """Implements /entity/list_panels route."""
 
         # TODO: Return saved view names
@@ -57,7 +57,8 @@ class ListPanelsResponseItem(BaseModel):
         else:
             actual_type = request_type
 
-        handlers_block = HandlerDeclareBlockDecl.get_type_methods(actual_type, inherit=True).handlers
+        # Get handlers from TypeDecl
+        handlers_block = TypeDecl.for_type(actual_type).declare.handlers
 
         if handlers_block is not None and handlers_block:
             return [

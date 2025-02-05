@@ -49,7 +49,7 @@ def test_method(pytest_default_db):
     for request in requests:
         # Run the coroutine wrapper added by the FastAPI decorator and get the result
         request_obj = ListPanelsRequest(**request)
-        result = ListPanelsResponseItem.list_panels(request_obj)
+        result = ListPanelsResponseItem.get_response(request_obj)
 
         # Check if the result is a list
         assert isinstance(result, list)

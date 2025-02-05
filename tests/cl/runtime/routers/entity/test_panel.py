@@ -55,7 +55,7 @@ def test_method():
 
     for request, expected_result in zip(requests, expected_results):
         request_object = PanelRequest(**request)
-        result = PanelResponseUtil.get_content(request_object)
+        result = PanelResponseUtil.get_response(request_object)
 
         assert isinstance(result, dict)
         assert result == expected_result

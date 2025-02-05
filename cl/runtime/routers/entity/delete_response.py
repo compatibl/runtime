@@ -26,8 +26,8 @@ key_serializer = StringSerializer()
 class DeleteResponse(BaseModel):
     """Data type for the /entity/delete_many response."""
 
-    @staticmethod
-    def delete_many(request: DeleteRequest) -> "DeleteResponse":
+    @classmethod
+    def get_response(cls, request: DeleteRequest) -> "DeleteResponse":
         """Delete entities."""
         type_dict = get_type_dict()
 

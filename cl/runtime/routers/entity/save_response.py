@@ -15,11 +15,12 @@
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
+from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 
-data_serializer = UiDictSerializer()
+ui_serializer = UiDictSerializer()
 key_serializer = StringSerializer()
 
 
@@ -32,11 +33,12 @@ class SaveResponse(BaseModel):
     class Config:
         populate_by_name = True
 
-    @staticmethod
-    def save_entity(request: SaveRequest) -> "SaveResponse":
+    @classmethod
+    def _save_entity(cls, request: SaveRequest) -> "SaveResponse":
         """Save entity."""
+
         # Get ui record and apply ui conversion
-        ui_record = request.record_dict.model_dump()
+        ui_record = request.record_dict
 
         # TODO (Roman): fix on ui
         # Workaround for UiAppState request. Ui send OpenedTabs without _t
@@ -57,22 +59,33 @@ class SaveResponse(BaseModel):
             return SaveResponse(key=None)
 
         # Deserialize record
-        record = data_serializer.deserialize_data(ui_record).build()
+        record = ui_serializer.deserialize_data(ui_record).build()
+        record_key = record.get_key()
+        record_key_str = key_serializer.serialize_key(record_key)
 
         if request.old_record_key is None:
+            # Requested save new record - check if record already exists
             existing_record = DbContext.load_one_or_none(
                 record_type=type(record),
-                record_or_key=record.get_key(),
+                record_or_key=record_key,
                 dataset=request.dataset,
             )
             if existing_record is not None:  # TODO: Review performance implications of this check
-                raise UserError(f"Record with key {str(record)} already exists.")
+                raise UserError(f"Record with key {record_key_str} already exists.")
+        elif request.old_record_key != record_key_str:
+            # Requested update record with new key - delete old record
+            deserialized_old_record = key_serializer.deserialize_key(request.old_record_key, type(record_key)).build()
+            DbContext.delete_one(key_type=type(record_key), key=deserialized_old_record, dataset=request.dataset)
 
-        if request.old_record_key is not None and request.old_record_key != key_serializer.serialize_key(
-            record.get_key()
-        ):
-            old_record_key_obj = key_serializer.deserialize_key(request.old_record_key, type(record.get_key())).build()
-            DbContext.delete_one(key_type=type(record.get_key()), key=old_record_key_obj, dataset=request.dataset)
         DbContext.save_one(record, dataset=request.dataset)
 
-        return SaveResponse(key=key_serializer.serialize_key(record.get_key()))
+        return SaveResponse(key=record_key_str)
+
+    @classmethod
+    def get_response(cls, request: SaveRequest) -> "SaveResponse":
+        try:
+            return cls._save_entity(request)
+        except Exception as e:
+            # TODO (Roman): Improve main error handler
+            DbContext.save_one(LogMessage(message=str(e)).build())
+            raise e

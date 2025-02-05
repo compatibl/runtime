@@ -37,7 +37,7 @@ def test_method(pytest_default_db):
     # Test saving new record
     save_new_record_request_obj = SaveRequest(record_dict=create_record_payload)
 
-    save_new_record_result = SaveResponse.save_entity(save_new_record_request_obj)
+    save_new_record_result = SaveResponse.get_response(save_new_record_request_obj)
     new_record_key = StubDataclassRecordKey(id="new_record").build()
     new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, new_record_key)
     records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
@@ -56,7 +56,7 @@ def test_method(pytest_default_db):
     DbContext.save_one(existing_record)
     update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
 
-    update_record_result = SaveResponse.save_entity(update_record_request_obj)
+    update_record_result = SaveResponse.get_response(update_record_request_obj)
     existing_record_key = StubDataclassRecordKey(id="existing_record").build()
     updated_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, existing_record_key)
     records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
@@ -83,7 +83,7 @@ def test_api(pytest_default_db):
 
         save_new_record_response = test_client.post(
             "/entity/save",
-            json=save_new_record_request_obj.record_dict.model_dump(),
+            json=save_new_record_request_obj.record_dict,
             params=request_params,
         )
         save_new_record_json = save_new_record_response.json()
@@ -111,7 +111,7 @@ def test_api(pytest_default_db):
 
         update_record_response = test_client.post(
             "/entity/save",
-            json=update_record_request_obj.record_dict.model_dump(),
+            json=update_record_request_obj.record_dict,
             params=request_params,
         )
         update_record_json = update_record_response.json()

@@ -29,12 +29,12 @@ def test_method(pytest_default_db):
     ]
     DbContext.save_many(existing_records)
 
-    delete_records_payload = [
-        {"_key": record.id, "_t": "StubDataclassDerivedRecord"} for record in existing_records[:3]
-    ]
-    delete_records_request_obj = DeleteRequest(record_keys=delete_records_payload)
+    delete_records_payload = {
+        "record_keys": {"_key": record.id, "_t": "StubDataclassDerivedRecord"} for record in existing_records[:3]
+    }
+    delete_records_request_obj = DeleteRequest(**delete_records_payload)
 
-    delete_records_result = DeleteResponse.delete_many(delete_records_request_obj)
+    delete_records_result = DeleteResponse.get_response(delete_records_request_obj)
     records_in_db = sorted(DbContext.load_all(StubDataclassDerivedRecord), key=lambda x: x.id)
 
     # Check if the result is a DeleteResponse instance
@@ -59,11 +59,10 @@ def test_api(pytest_default_db):
         delete_records_payload = [
             {"_key": record.id, "_t": "StubDataclassDerivedRecord"} for record in existing_records[:3]
         ]
-        delete_records_request_obj = DeleteRequest(record_keys=delete_records_payload)
 
         delete_records_response = test_client.post(
             "/entity/delete_many",
-            json=[key.model_dump() for key in delete_records_request_obj.record_keys],
+            json=delete_records_payload,
         )
         delete_records_json = delete_records_response.json()
         records_in_db = sorted(DbContext.load_all(StubDataclassDerivedRecord), key=lambda x: x.id)

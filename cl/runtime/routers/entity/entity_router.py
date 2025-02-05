@@ -19,35 +19,30 @@ from fastapi import APIRouter
 from fastapi import Body
 from fastapi import Header
 from fastapi import Query
-from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.log.log_message import LogMessage
+from cl.runtime.legacy.legacy_response_util import LegacyResponseUtil
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
 from cl.runtime.routers.entity.panel_request import PanelRequest
-from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
+from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil, PanelResponse
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
-from cl.runtime.routers.legacy_format_util import LegacyFormatUtil
 
-ListPanelsResponse = List[ListPanelsResponseItem]
-PanelResponseDataItem = Dict[str, Any]
-PanelResponse = Dict[str, PanelResponseDataItem | List[PanelResponseDataItem] | None]
 
 router = APIRouter()
 
 
 # TODO: Consider changing to /panels for consistency
-@router.get("/list_panels", response_model=ListPanelsResponse)
+@router.get("/list_panels", response_model=List[ListPanelsResponseItem])
 async def get_list_panels(
     type: str = Query(..., description="Class name"),  # noqa Suppress report about shadowed built-in type
     key: str = Query(None, description="Primary key fields in semicolon-delimited format"),
     dataset: str = Query(None, description="Dataset string"),
     user: str = Header(None, description="User identifier or identity token"),
-) -> ListPanelsResponse:
+) -> List[ListPanelsResponseItem]:
     """List of panels for the specified record."""
-    return ListPanelsResponseItem.list_panels(ListPanelsRequest(type=type, key=key, dataset=dataset, user=user))
+    return ListPanelsResponseItem.get_response(ListPanelsRequest(type=type, key=key, dataset=dataset, user=user))
 
 
 @router.get("/panel", response_model=PanelResponse)
@@ -56,21 +51,10 @@ async def get_panel(
     panel_id: str = Query(..., description="View name"),
     key: str = Query(None, description="Primary key fields in semicolon-delimited format"),
     dataset: str = Query(None, description="Dataset string"),
-):
-    try:
-        """Return panel content by its displayed name."""
-        return PanelResponseUtil.get_content(PanelRequest(type=type, panel_id=panel_id, key=key, dataset=dataset))
-    except Exception as e:
-        DbContext.save_one(LogMessage(message=str(e)).build())
-        error_view = {  # TODO: Refactor
-            "_t": "Script",
-            "Name": None,
-            "Language": "Markdown",
-            "Body": ["## The following error occurred during the rendering of this view:\n", f"{str(e)}"],
-            "WordWrap": True,
-        }
-        error_view_dict = LegacyFormatUtil.get_legacy_format_view(error_view)
-        return {"ViewOf": error_view_dict}
+) -> PanelResponse:
+    """Return panel content by its displayed name."""
+    response = PanelResponseUtil.get_response(PanelRequest(type=type, panel_id=panel_id, key=key, dataset=dataset))
+    return LegacyResponseUtil.format_panel_response(response)
 
 
 @router.post("/save", response_model=SaveResponse)
@@ -81,18 +65,14 @@ async def save(
     user: str = Header(None, description="User identifier or identity token"),
 ) -> SaveResponse:
     """Save panel content."""
-    try:
-        return SaveResponse.save_entity(
-            SaveRequest(
-                record_dict=record_in_dict,
-                old_record_key=old_record_key,
-                dataset=dataset,
-                user=user,
-            ),
-        )
-    except Exception as e:
-        DbContext.save_one(LogMessage(message=str(e)).build())
-        raise e
+    return SaveResponse.get_response(
+        SaveRequest(
+            record_dict=record_in_dict,
+            old_record_key=old_record_key,
+            dataset=dataset,
+            user=user,
+        ),
+    )
 
 
 @router.post("/delete_many", response_model=DeleteResponse)
@@ -105,7 +85,7 @@ async def delete_many(
 
     return DeleteResponse.delete_many(
         DeleteRequest(
-            record_keys=record_keys,
+            record_keys=record_keys,  # noqa
             dataset=dataset,
             user=user,
         ),

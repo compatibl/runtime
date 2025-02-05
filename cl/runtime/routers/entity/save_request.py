@@ -11,24 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from typing import Dict, Any
 
 from pydantic import BaseModel
-
-
-class RecordDict(BaseModel):
-    """Dict representation of the record."""
-
-    _t: str
-    """Type name."""
-
-    class Config:
-        extra = "allow"
 
 
 class SaveRequest(BaseModel):
     """Request data type for the /entity/save route."""
 
-    record_dict: RecordDict
+    record_dict: Dict[str, Any]
     """Dict representation of the record to be saved/updated."""
 
     old_record_key: str | None = None

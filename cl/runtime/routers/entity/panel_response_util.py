@@ -12,70 +12,72 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import base64
 from typing import Any
 from typing import Dict
 from typing import List
-from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.plots.plot_key import PlotKey
+from cl.runtime.log.log_message import LogMessage
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
-from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
-from cl.runtime.view.dag.dag import Dag
-from cl.runtime.views.html_view import HtmlView
-from cl.runtime.views.key_view import KeyView
-from cl.runtime.views.pdf_view import PdfView
-from cl.runtime.views.plot_view import PlotView
-from cl.runtime.views.png_view import PngView
-from cl.runtime.views.script import Script
 
-PanelResponseData = Dict[str, Any] | List[Dict[str, Any]] | None
+PanelResponseDataItem = Dict[str, Any]
+PanelResponse = Dict[str, PanelResponseDataItem | List[PanelResponseDataItem] | None]
 
-
+# Create serializers
 ui_serializer = UiDictSerializer()
-"""Ui serializer."""
+key_serializer = StringSerializer()
 
-
-class PanelResponseUtil(BaseModel):
+class PanelResponseUtil:
     """Response util for the /entity/panel route."""
 
     @classmethod
-    def get_content(cls, request: PanelRequest) -> Dict[str, PanelResponseData]:
+    def _get_content(cls, request: PanelRequest) -> PanelResponse:
         """Implements /entity/panel route."""
 
         # Get type of the record
         type_ = Schema.get_type_by_short_name(request.type)
 
         # Deserialize key from string to object
-        serializer = StringSerializer()
-        key_obj = serializer.deserialize_key(request.key, type_.get_key_type()).build()
+        key_obj = key_serializer.deserialize_key(request.key, type_.get_key_type()).build()
 
         # Get database from the current context
         db = DbContext.get_db()
 
         # Load record from the database
         record = db.load_one(type_, key_obj, dataset=request.dataset)
-        record_type = type(record)
         if record is None:
             raise RuntimeError(
                 f"Record with type {request.type} and key {request.key} is not found in dataset {request.dataset}."
             )
 
         # Check if the selected type has the needed viewer and get its name (only viewer's label is provided)
-        handlers = HandlerDeclareBlockDecl.get_type_methods(record_type, inherit=True).handlers
+        handlers = TypeDecl.for_type(type(record)).declare.handlers
         if (
-            handlers is not None
-            and handlers
-            and (found_viewers := [h.name for h in handlers if h.label == request.panel_id and h.type_ == "Viewer"])
+            not handlers
+            or not (viewer_name := next((h.name for h in handlers if h.label == request.panel_id and h.type_ == "Viewer"), None))
         ):
-            viewer_name: str = found_viewers[0]
-        else:
-            raise Exception(f"Type {TypeUtil.name(record_type)} has no view with the name {request.panel_id}.")
+            raise RuntimeError(f"Type {TypeUtil.name(record)} has no view named '{request.panel_id}'.")
 
         # Call the viewer and get the result
         viewer = getattr(record, viewer_name)
         return viewer()
+
+    @classmethod
+    def get_response(cls, request: PanelRequest) -> PanelResponse:
+
+        try:
+            return cls._get_content(request)
+        except Exception as e:
+            # TODO (Roman): Improve main error handler
+            DbContext.save_one(LogMessage(message=str(e)).build())
+            return {  # TODO: Refactor
+                "_t": "Script",
+                "Name": None,
+                "Language": "Markdown",
+                "Body": ["## The following error occurred during the rendering of this view:\n", f"{str(e)}"],
+                "WordWrap": True,
+            }

@@ -36,7 +36,6 @@ class HandlerDeclareBlockDecl:
     """Handler declaration data."""
 
     @classmethod
-    @cached
     def get_type_methods(cls, record_type: type, inherit: bool = False) -> "HandlerDeclareBlockDecl":
         """Extract class public methods."""
 

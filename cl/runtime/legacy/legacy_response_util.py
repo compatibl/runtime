@@ -14,7 +14,7 @@
 
 from typing import Any, Dict
 
-from cl.runtime.routers.entity.panel_response_util import PanelResponseData
+from cl.runtime.routers.entity.panel_response_util import PanelResponse
 
 
 class LegacyResponseUtil:
@@ -64,10 +64,10 @@ class LegacyResponseUtil:
             return data
 
     @classmethod
-    def format_panel_response(cls, panel_response: Dict[str, PanelResponseData]) -> Dict[str, PanelResponseData]:
+    def format_panel_response(cls, panel_response: PanelResponse) -> PanelResponse:
         """Format /get_panel response to legacy format."""
 
-        return {k: {"ViewOf": cls._format_data(v)} for k, v in panel_response.items()}
+        return {"ViewOf": cls._format_data(panel_response)}
 
 
 
