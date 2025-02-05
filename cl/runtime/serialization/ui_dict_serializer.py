@@ -29,6 +29,7 @@ from cl.runtime.serialization.annotations_util import AnnotationsUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
 from cl.runtime.serialization.string_serializer import StringSerializer
+from cl.runtime.serialization.string_serializer import primitive_type_names as str_primitive_type_names
 
 key_serializer = StringSerializer()
 
@@ -44,8 +45,6 @@ class UiDictSerializer(DictSerializer):
         "NoneType",
         "float",
         "bool",
-        "bytes",
-        "UUID",
     ]
     """Override primitive fields. In particular, str is not a primitive in ui format."""
 
@@ -57,8 +56,10 @@ class UiDictSerializer(DictSerializer):
         if data is None:
             return None
 
-        if data.__class__.__name__ == "str":
+        if data.__class__.__name__ in self.primitive_type_names:
             return data
+        elif data.__class__.__name__ in str_primitive_type_names:
+            return StringSerializer.serialize_primitive(data)
         elif isinstance(data, Enum):
             # Serialize enum as its name
             serialized_enum = super(UiDictSerializer, self).serialize_data(data, type_)
@@ -179,8 +180,10 @@ class UiDictSerializer(DictSerializer):
                     data["_type"] = short_type_name
                 return super(UiDictSerializer, self).deserialize_data(data, type_)
         elif isinstance(data, str):
-            if type_ is None or type_.__name__ == "str" or type_ is Any:
+            if type_ is None or type_ is Any:
                 return data
+            elif type_.__name__ in str_primitive_type_names:
+                return StringSerializer.deserialize_primitive(data, type_)
             elif type_.__name__ in ("datetime", "date", "time"):
                 return key_serializer.deserialize_primitive(data, type_)
             elif is_key(type_):

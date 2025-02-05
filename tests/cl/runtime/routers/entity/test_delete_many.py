@@ -30,7 +30,7 @@ def test_method(pytest_default_db):
     DbContext.save_many(existing_records)
 
     delete_records_payload = {
-        "record_keys": {"_key": record.id, "_t": "StubDataclassDerivedRecord"} for record in existing_records[:3]
+        "record_keys": [{"_key": record.id, "_t": "StubDataclassDerivedRecord"} for record in existing_records[:3]]
     }
     delete_records_request_obj = DeleteRequest(**delete_records_payload)
 

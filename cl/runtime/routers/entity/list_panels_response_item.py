@@ -58,12 +58,12 @@ class ListPanelsResponseItem(BaseModel):
             actual_type = request_type
 
         # Get handlers from TypeDecl
-        handlers_block = TypeDecl.for_type(actual_type).declare.handlers
+        handlers = declare.handlers if (declare := TypeDecl.for_type(actual_type).declare) is not None else None
 
-        if handlers_block is not None and handlers_block:
+        if handlers is not None and handlers:
             return [
                 ListPanelsResponseItem(name=handler.label, type=cls.get_type(handler))
-                for handler in handlers_block
+                for handler in handlers
                 if handler.type_ == "Viewer"
             ]
         return []

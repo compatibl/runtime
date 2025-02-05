@@ -83,7 +83,7 @@ async def delete_many(
 ) -> DeleteResponse:
     """Delete entities."""
 
-    return DeleteResponse.delete_many(
+    return DeleteResponse.get_response(
         DeleteRequest(
             record_keys=record_keys,  # noqa
             dataset=dataset,

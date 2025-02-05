@@ -55,7 +55,10 @@ class PanelResponseUtil:
             )
 
         # Check if the selected type has the needed viewer and get its name (only viewer's label is provided)
-        handlers = TypeDecl.for_type(type(record)).declare.handlers
+
+        # Get handlers from TypeDecl
+        handlers = declare.handlers if (declare := TypeDecl.for_type(type(record)).declare) is not None else None
+
         if (
             not handlers
             or not (viewer_name := next((h.name for h in handlers if h.label == request.panel_id and h.type_ == "Viewer"), None))
@@ -64,7 +67,9 @@ class PanelResponseUtil:
 
         # Call the viewer and get the result
         viewer = getattr(record, viewer_name)
-        return viewer()
+        view = viewer()
+
+        return ui_serializer.serialize_data(view)
 
     @classmethod
     def get_response(cls, request: PanelRequest) -> PanelResponse:

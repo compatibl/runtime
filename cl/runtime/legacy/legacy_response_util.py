@@ -14,6 +14,7 @@
 
 from typing import Any, Dict
 
+from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.routers.entity.panel_response_util import PanelResponse
 
 
@@ -56,9 +57,11 @@ class LegacyResponseUtil:
     def _format_data(cls, data):
         """Format data object to legacy format."""
 
-        if isinstance(data, dict):
+        if PrimitiveUtil.is_primitive(type(data)):
+            return data
+        elif isinstance(data, dict):
             return {k: cls._format_data(v) for k, v in cls._replace_with_legacy_model(data).items()}
-        if hasattr(data, "__iter__"):
+        elif hasattr(data, "__iter__"):
             return type(data)(cls._format_data(x) for x in data)
         else:
             return data
@@ -67,7 +70,8 @@ class LegacyResponseUtil:
     def format_panel_response(cls, panel_response: PanelResponse) -> PanelResponse:
         """Format /get_panel response to legacy format."""
 
-        return {"ViewOf": cls._format_data(panel_response)}
+        r = {"ViewOf": cls._format_data(panel_response)}
+        return r
 
 
 
