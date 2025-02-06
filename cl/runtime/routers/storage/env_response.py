@@ -19,7 +19,7 @@ from pydantic import Field
 from cl.runtime.routers.user_request import UserRequest
 
 
-class EnvResponse(BaseModel):
+class EnvResponseItem(BaseModel):
     """Response data type for the /storage/get_envs route."""
 
     name: str = Field(..., alias="Name")
@@ -29,7 +29,7 @@ class EnvResponse(BaseModel):
     """Name of the parent environment."""
 
     @classmethod
-    def get_envs(cls, request: UserRequest) -> List[EnvResponse]:
+    def get_envs(cls, request: UserRequest) -> List[EnvResponseItem]:
         """Implements /storage/get_envs route."""
 
         # Default response when running locally without authorization
@@ -38,4 +38,4 @@ class EnvResponse(BaseModel):
             "Parent": "",  # TODO: Check if None is also accepted
         }
 
-        return [EnvResponse(**result_dict)]
+        return [EnvResponseItem(**result_dict)]

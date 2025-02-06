@@ -53,7 +53,7 @@ class TypeResponseUtil:
             if not (handlers_block := declare_block.get("Handlers")):
                 continue
 
-            # TODO (Roman): skip abstract methods
+            # TODO (Roman): Skip abstract methods
             implement_block = [{"Name": handler_decl.get("Name")} for handler_decl in handlers_block]
             result[decl_name]["Implement"] = {"Handlers": implement_block}
 

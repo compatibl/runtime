@@ -25,37 +25,32 @@ from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
 from cl.runtime.routers.user_request import UserRequest
 
-# TODO: Prefix type aliases with T
-TypesResponse = List[TypesResponseItem]
-TypeResponse = Dict[str, Dict]
-TypeHierarchyResponse = List[TypeHierarchyResponseItem]
-
 router = APIRouter()
 
 
-@router.get("/types", response_model=TypesResponse)
-async def get_types(user: str = Header(None, description="User identifier or identity token")) -> TypesResponse:
+@router.get("/types", response_model=List[TypesResponseItem])
+async def get_types(user: str = Header(None, description="User identifier or identity token")) -> List[TypesResponseItem]:
     """Information about the record types."""
     return TypesResponseItem.get_types(UserRequest(user=user))
 
 
-@router.get("/typeV2", response_model=TypeResponse)
+@router.get("/typeV2", response_model=Dict[str, Dict])
 async def get_type(
     name: str = Query(..., description="Class name"),  # noqa Suppress report about shadowed built-in type
     module: str = Query(None, description="Dot-delimited module string"),
     user: str = Header(None, description="User identifier or identity token"),
-) -> TypeResponse:
+) -> Dict[str, Dict]:
     """Schema for the specified type and its dependencies."""
     return TypeResponseUtil.get_type(TypeRequest(name=name, module=module, user=user))
 
 
-@router.get("/type-hierarchy", response_model=TypeHierarchyResponse)
+@router.get("/type-hierarchy", response_model=List[TypeHierarchyResponseItem])
 async def get_type_hierarchy(
     request: Request,
     name: str = Query(..., description="Class name"),  # noqa Suppress report about shadowed built-in type
     return_ancestors: bool = Query(
         False, description="If true, type ancestors will be returned with the specified type."
     ),
-) -> TypeHierarchyResponse:
+) -> List[TypeHierarchyResponseItem]:
     """Return type class hierarchy."""
     return TypeHierarchyResponseItem.get_types(TypeHierarchyRequest(name=name, return_ancestors=return_ancestors))

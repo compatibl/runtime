@@ -28,7 +28,7 @@ class UiTypeStateKey(Freezable, KeyMixin):
     type_: TypeDeclKey = required()
     """Type reference."""
 
-    user: UserKey | None = required()
+    user: UserKey = required()
     """A user the app state is applied for."""
 
     @classmethod

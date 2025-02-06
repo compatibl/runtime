@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.routers.storage.env_response import EnvResponse
+from cl.runtime.routers.storage.env_response import EnvResponseItem
 from cl.runtime.routers.user_request import UserRequest
 from cl.runtime.testing.testing_client import TestingClient
 
@@ -33,16 +33,16 @@ def test_method():
     for request in requests:
         # Run the coroutine wrapper added by the FastAPI decorator and get the result
         request_obj = UserRequest(**request)
-        result = EnvResponse.get_envs(request_obj)
+        result = EnvResponseItem.get_envs(request_obj)
 
         # Check if the result is a list
         assert isinstance(result, list)
 
-        # Check if each item in the result is a EnvResponse instance
-        assert all(isinstance(x, EnvResponse) for x in result)
+        # Check if each item in the result is a EnvResponseItem instance
+        assert all(isinstance(x, EnvResponseItem) for x in result)
 
-        # Check if each item in the result is a valid EnvResponse instance
-        assert result == [EnvResponse(**x) for x in expected_result]
+        # Check if each item in the result is a valid EnvResponseItem instance
+        assert result == [EnvResponseItem(**x) for x in expected_result]
 
 
 def test_api():

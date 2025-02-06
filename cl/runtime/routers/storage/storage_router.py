@@ -20,9 +20,9 @@ from fastapi import Header
 from fastapi import Query
 from fastapi.responses import ORJSONResponse
 from starlette.requests import Request
-from cl.runtime.routers.storage.dataset_response import DatasetResponse
+from cl.runtime.routers.storage.dataset_response import DatasetResponseItem
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
-from cl.runtime.routers.storage.env_response import EnvResponse
+from cl.runtime.routers.storage.env_response import EnvResponseItem
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.routers.storage.record_response import RecordResponse
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
@@ -31,28 +31,26 @@ from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.routers.storage.select_response import SelectResponse
 from cl.runtime.routers.user_request import UserRequest
 
-EnvsResponse = List[EnvResponse]
-DatasetsResponse = List[DatasetResponse]
 
 router = APIRouter()
 
 
 # TODO: Consider changing to /envs for consistency
-@router.get("/get_envs", response_model=EnvsResponse)
-async def get_envs(user: str = Header(None, description="User identifier or identity token")) -> EnvsResponse:
+@router.get("/get_envs", response_model=List[EnvResponseItem])
+async def get_envs(user: str = Header(None, description="User identifier or identity token")) -> List[EnvResponseItem]:
     """Information about the environments."""
-    return EnvResponse.get_envs(UserRequest(user=user))
+    return EnvResponseItem.get_envs(UserRequest(user=user))
 
 
 # TODO: Consider changing to /datasets for consistency
-@router.get("/get_datasets", response_model=DatasetsResponse)
+@router.get("/get_datasets", response_model=List[DatasetResponseItem])
 async def get_datasets(
     type: str = Query(..., description="Class name"),  # noqa Suppress report about shadowed built-in type
     module: str = Query(None, description="Dot-delimited module string"),
     user: str = Header(None, description="User identifier or identity token"),
-) -> DatasetsResponse:
+) -> List[DatasetResponseItem]:
     """Information about the environments."""
-    return DatasetResponse.get_datasets(DatasetsRequest(type=type, module=module, user=user))
+    return DatasetResponseItem.get_datasets(DatasetsRequest(type=type, module=module, user=user))
 
 
 @router.get("/record", response_model=RecordResponse)

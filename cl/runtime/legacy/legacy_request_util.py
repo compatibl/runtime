@@ -20,7 +20,7 @@ class LegacyRequestUtil:
 
     @classmethod
     def format_save_request(cls, save_request: SaveRequest) -> SaveRequest:
-        # TODO (Roman): fix on ui
+        # TODO (Roman): Fix on UI
 
         record_dict = {k: v for k, v in save_request.record_dict.items()}
 

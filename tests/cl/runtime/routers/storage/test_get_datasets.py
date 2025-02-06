@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.routers.storage.dataset_response import DatasetResponse
+from cl.runtime.routers.storage.dataset_response import DatasetResponseItem
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
 from cl.runtime.testing.testing_client import TestingClient
 
@@ -33,16 +33,16 @@ def test_method():
     for request in requests:
         # Run the coroutine wrapper added by the FastAPI decorator and get the result
         request_obj = DatasetsRequest(**request)
-        result = DatasetResponse.get_datasets(request_obj)
+        result = DatasetResponseItem.get_datasets(request_obj)
 
         # Check if the result is a list
         assert isinstance(result, list)
 
-        # Check if each item in the result is a DatasetResponse instance
-        assert all(isinstance(x, DatasetResponse) for x in result)
+        # Check if each item in the result is a DatasetResponseItem instance
+        assert all(isinstance(x, DatasetResponseItem) for x in result)
 
-        # Check if each item in the result is a valid DatasetResponse instance
-        assert result == [DatasetResponse(**x) for x in expected_result]
+        # Check if each item in the result is a valid DatasetResponseItem instance
+        assert result == [DatasetResponseItem(**x) for x in expected_result]
 
 
 def test_api():
