@@ -66,5 +66,4 @@ class LegacyResponseUtil:
     def format_panel_response(cls, panel_response: PanelResponse) -> PanelResponse:
         """Format /get_panel response to legacy format."""
 
-        r = {"ViewOf": cls._format_data(panel_response)}
-        return r
+        return {"ViewOf": cls._format_data(panel_response)}

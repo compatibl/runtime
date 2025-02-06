@@ -40,19 +40,6 @@ class SaveResponse(BaseModel):
         # Get ui record and apply ui conversion
         ui_record = request.record_dict
 
-        # TODO (Roman): fix on ui
-        # Workaround for UiAppState request. Ui send OpenedTabs without _t
-        if ui_record.get("_t") == "UiAppState" and (opened_tabs := ui_record.get("OpenedTabs")) is not None:
-            # Add _t to each TabInfo in list
-            ui_record["OpenedTabs"] = [
-                {
-                    **{k: v for k, v in item.items() if k != "Type"},
-                    "Type": {**item["Type"], "_t": "BaseTypeInfo"},
-                    "_t": "TabInfo",
-                }
-                for item in opened_tabs
-            ]
-
         # TODO (Roman): align UiTypeState data model and UiTypeState dict from ui
         # Skip saving UiTypeState object
         if ui_record.get("_t") == "UiTypeState":

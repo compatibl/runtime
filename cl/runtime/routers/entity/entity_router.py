@@ -18,6 +18,7 @@ from fastapi import APIRouter
 from fastapi import Body
 from fastapi import Header
 from fastapi import Query
+from cl.runtime.legacy.legacy_request_util import LegacyRequestUtil
 from cl.runtime.legacy.legacy_response_util import LegacyResponseUtil
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse
@@ -64,14 +65,16 @@ async def save(
     user: str = Header(None, description="User identifier or identity token"),
 ) -> SaveResponse:
     """Save panel content."""
-    return SaveResponse.get_response(
-        SaveRequest(
-            record_dict=record_in_dict,
-            old_record_key=old_record_key,
-            dataset=dataset,
-            user=user,
-        ),
+
+    save_request = SaveRequest(
+        record_dict=record_in_dict,
+        old_record_key=old_record_key,
+        dataset=dataset,
+        user=user,
     )
+
+    save_request = LegacyRequestUtil.format_save_request(save_request)
+    return SaveResponse.get_response(save_request)
 
 
 @router.post("/delete_many", response_model=DeleteResponse)
