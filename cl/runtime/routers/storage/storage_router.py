@@ -18,7 +18,6 @@ from fastapi import APIRouter
 from fastapi import Body
 from fastapi import Header
 from fastapi import Query
-from fastapi.responses import ORJSONResponse
 from starlette.requests import Request
 from cl.runtime.routers.storage.dataset_response import DatasetResponseItem
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
@@ -72,7 +71,7 @@ async def get_record(
     )
 
 
-@router.post(path="/select", response_class=ORJSONResponse)
+@router.post(path="/select", response_model=SelectResponse)
 async def storage_select(
     request: Request,
     type_: str = Query(..., alias="type", description="The type of records."),

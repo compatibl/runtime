@@ -20,55 +20,36 @@ from pydantic import BaseModel
 from pydantic import Field
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 
-SelectResponseSchema = Dict[str, Any]
-SelectResponseData = List[Dict[str, Any]]
+ui_serializer = UiDictSerializer()
 
 
 class SelectResponse(BaseModel):
     """Response data type for the /storage/select route."""
 
-    schema_: SelectResponseSchema = Field(..., alias="schema")
+    schema_: Dict[str, Any] = Field(..., alias="schema")
     """Schema field of the response data type for the /storage/select route."""
 
-    data: SelectResponseData
+    data: List[Dict[str, Any]]
     """Data field of the response data type for the /storage/select route."""
 
     @classmethod
     def get_records(cls, request: SelectRequest) -> SelectResponse:
         """Implements /storage/select route."""
 
-        # Default response when running locally without authorization
+        record_type = ClassInfo.get_class_type(f"{request.module}.{request.type_}")
+
+        # Load records for type
+        records = DbContext.get_db().load_all(record_type)  # noqa
+
+        # Serialize records for table
+        serialized_records = [ui_serializer.serialize_record_for_table(record) for record in records]
+
+        # Get schema dict for type
         type_decl_dict = TypeResponseUtil.get_type(TypeRequest(name=request.type_, module=request.module, user="root"))
 
-        record_module = request.module
-        record_class = request.type_
-        record_type = ClassInfo.get_class_type(f"{record_module}.{record_class}")
-
-        # Get database from the current context
-        db = DbContext.get_db()
-
-        # TODO (Roman): replace temporary load_all to load_filter
-        if not hasattr(db, "load_all"):
-            raise RuntimeError(
-                f"Currently database need to implement load_all() method for select records by type. "
-                f"Database {TypeUtil.name(db)} doesn't have load_all()."
-            )
-
-        # load records by type
-        records = db.load_all(record_type)
-        records = list(records)
-
-        # TODO: Refactor the code below
-
-        ui_serializer = UiDictSerializer()
-
-        # TODO (Roman): check if we are calling /select somewhere other than the main grid.
-        serialized_records = tuple(ui_serializer.serialize_record_for_table(record) for record in records)
-
-        return SelectResponse(schema=type_decl_dict, data=serialized_records).dict(by_alias=True)
+        return SelectResponse(schema=type_decl_dict, data=serialized_records)

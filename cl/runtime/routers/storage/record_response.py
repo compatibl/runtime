@@ -38,6 +38,7 @@ from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
 
 key_serializer = StringSerializer()
+ui_serializer = UiDictSerializer()
 
 
 class RecordResponse(BaseModel):
@@ -58,6 +59,8 @@ class RecordResponse(BaseModel):
 
         # TODO: Review the use of load_one_or_none here
         record = DbContext.get_db().load_one_or_none(record_type, deserialized_key)
+
+        # Pin all handlers by default
         if not record and record_type == UiTypeState:
             # TODO (Yauheni): remove temporary workaround of pinning handlers for all requested types
             deserialized_key = cast(UiTypeStateKey, deserialized_key)
@@ -79,11 +82,9 @@ class RecordResponse(BaseModel):
 
         # Serialize record to ui format
         # TODO: Optimize speed
-        ui_serializer = UiDictSerializer()
-        record_dict_in_legacy_format = ui_serializer.serialize_data(record)
+        record_dict = ui_serializer.serialize_data(record)
 
-        # TODO: Update to return record_dict after legacy dict format is removed
-        return RecordResponse(schema=type_decl_dict, data=record_dict_in_legacy_format)
+        return RecordResponse(schema=type_decl_dict, data=record_dict)
 
     @classmethod
     def _get_default_ui_type_state(cls, ui_type_state_requested_key: UiTypeStateKey) -> UiTypeState:
