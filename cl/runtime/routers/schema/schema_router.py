@@ -29,7 +29,9 @@ router = APIRouter()
 
 
 @router.get("/types", response_model=List[TypesResponseItem])
-async def get_types(user: str = Header(None, description="User identifier or identity token")) -> List[TypesResponseItem]:
+async def get_types(
+    user: str = Header(None, description="User identifier or identity token")
+) -> List[TypesResponseItem]:
     """Information about the record types."""
     return TypesResponseItem.get_types(UserRequest(user=user))
 

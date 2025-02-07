@@ -14,9 +14,10 @@
 
 from __future__ import annotations
 import dataclasses
-from typing import Any, cast
+from typing import Any
 from typing import Dict
 from typing import List
+from typing import cast
 from pydantic import BaseModel
 from pydantic import Field
 from cl.runtime.backend.core.ui_app_state import UiAppState
@@ -65,7 +66,6 @@ class RecordResponse(BaseModel):
             # TODO (Yauheni): remove temporary workaround of pinning handlers for all requested types
             deserialized_key = cast(UiTypeStateKey, deserialized_key)
             record = cls._get_default_ui_type_state(deserialized_key)
-
 
         # Get type declarations based on the actual record type
         type_decl_dict = (

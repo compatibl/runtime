@@ -19,7 +19,6 @@ from cl.runtime.routers.auth.auth_types_response import AuthTypesResponseItem
 from cl.runtime.routers.auth.me_response import MeResponse
 from cl.runtime.routers.user_request import UserRequest
 
-AuthTypesResponse = List[AuthTypesResponseItem]
 router = APIRouter()
 
 
@@ -29,7 +28,9 @@ async def get_me(user: str = Header(None, description="User identifier or identi
     return MeResponse.get_me(UserRequest(user=user))
 
 
-@router.get("/types", response_model=AuthTypesResponse)
-async def get_types(user: str = Header(None, description="Get available authentication types.")) -> AuthTypesResponse:
+@router.get("/types", response_model=List[AuthTypesResponseItem])
+async def get_types(
+    user: str = Header(None, description="Get available authentication types.")
+) -> List[AuthTypesResponseItem]:
     """Get available authentication types."""
     return AuthTypesResponseItem.get_types(UserRequest(user=user))

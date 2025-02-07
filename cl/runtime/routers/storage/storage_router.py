@@ -30,7 +30,6 @@ from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.routers.storage.select_response import SelectResponse
 from cl.runtime.routers.user_request import UserRequest
 
-
 router = APIRouter()
 
 
