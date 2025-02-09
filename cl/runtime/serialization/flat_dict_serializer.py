@@ -140,7 +140,10 @@ class FlatDictSerializer(DictSerializer):
                 return key_serializer.deserialize_key(data, type_)
             else:
                 # All other types try to deserialize from JSON string
-                json_data = json.loads(data)
+                try:
+                    json_data = json.loads(data)
+                except:
+                    raise RuntimeError(f"Failed to deserialize data from JSON string: {data}.")
                 return super().deserialize_data(json_data, type_)
         elif data.__class__.__name__ in super().primitive_type_names:
             # Return primitive types unchanged
