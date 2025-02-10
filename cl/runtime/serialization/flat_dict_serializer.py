@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import json
+from enum import Enum
 from typing import Any
 from typing import Dict
 from typing import Tuple
 from typing import Type
 from typing import cast
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import is_key
@@ -92,6 +94,9 @@ class FlatDictSerializer(DictSerializer):
                 raise RuntimeError(f"Key str must not match json condition, key_str value: {key_str}.")
 
             return key_str
+        elif isinstance(data, Enum):
+            # Serialize enum value as str name
+            return CaseUtil.upper_to_pascal_case(data.name)
         else:
             # All other types try to serialize as JSON string
 
@@ -138,6 +143,10 @@ class FlatDictSerializer(DictSerializer):
             elif is_key(type_) and not self._is_json_str(data):
                 # Deserialize key as string if it is declared as key and is not a JSON string
                 return key_serializer.deserialize_key(data, type_)
+            elif (mro := getattr(type_, "__mro__", None)) and Enum in mro:
+                # Deserialize enum value using upper case value
+                upper_case_value = CaseUtil.pascal_to_upper_case(data)
+                return type_[upper_case_value]
             else:
                 # All other types try to deserialize from JSON string
                 try:
