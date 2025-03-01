@@ -23,8 +23,8 @@ class EnumItemDecl:
     name: str = required()
     """Item name."""
 
-    label: str | None = required()
+    label: str | None = None
     """Item label (if not specified, titleized name is used instead)."""
 
-    comment: str | None = required()
+    comment: str | None = None
     """Item additional information."""

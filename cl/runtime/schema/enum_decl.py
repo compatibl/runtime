@@ -24,10 +24,10 @@ from cl.runtime.schema.enum_item_decl import EnumItemDecl
 class EnumDecl(EnumDeclKey, RecordMixin[EnumDeclKey]):
     """Enum declaration."""
 
-    label: str | None = required()
+    label: str | None = None
     """Enum label."""
 
-    comment: str | None = required()
+    comment: str | None = None
     """Enum comment."""
 
     items: List[EnumItemDecl] = required()

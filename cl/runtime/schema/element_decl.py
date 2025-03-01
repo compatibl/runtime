@@ -30,31 +30,31 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
     name: str = required()
     """Element name."""
 
-    label: str | None = required()
+    label: str | None = None
     """Element label. If not specified, name is used instead."""
 
-    comment: str | None = required()
+    comment: str | None = None
     """Element comment. Contains addition information."""
 
-    vector: bool | None = required()  # TODO: Replace by container field with enum values vector/array, dict, DF
+    vector: bool | None = None  # TODO: Replace by container field with enum values vector/array, dict, DF
     """Flag indicating variable size array (vector) container."""
 
-    optional: bool | None = required()
+    optional: bool | None = None
     """Flag indicating optional element."""
 
-    optional_vector_element: bool | None = required()  # TODO: Rename to optional_element or optional_field
+    optional_vector_element: bool | None = None  # TODO: Rename to optional_element or optional_field
     """Flag indicating optional vector item element."""
 
     read_only: bool | None = None
     """Flag indicating readonly element."""
 
-    additive: bool | None = required()
+    additive: bool | None = None
     """Optional flag indicating if the element is additive and that the total column can be shown in the UI."""
 
-    format_: str | None = required()  # TODO: Use Python interpolated string format
+    format_: str | None = None  # TODO: Use Python interpolated string format
     """Specifies UI Format for the element."""
 
-    alternate_of: str | None = required()
+    alternate_of: str | None = None
     """Link current element to AlternateOf element. In the editor these elements will be treated as a choice."""
 
     @classmethod

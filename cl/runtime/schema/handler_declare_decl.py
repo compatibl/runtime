@@ -27,20 +27,20 @@ class HandlerDeclareDecl:
     name: str = required()
     """Handler name."""
 
-    label: str | None = required()
+    label: str | None = None
     """Handler label."""
 
-    comment: str | None = required()
+    comment: str | None = None
     """Handler comment."""
 
     type_: HandlerType = required()
     """Handler type."""
 
-    params: List[HandlerParamDecl] | None = required()
+    params: List[HandlerParamDecl] | None = None
     """Handler parameters."""
 
-    return_: HandlerVariableDecl | None = required()
+    return_: HandlerVariableDecl | None = None
     """Handler return value."""
 
-    static: bool | None = required()
+    static: bool | None = None
     """If set as true, handler will be static, otherwise non-static."""

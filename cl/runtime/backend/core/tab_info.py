@@ -25,5 +25,5 @@ class TabInfo(Freezable):  # TODO: Review usage of TabInfo class
     type: BaseTypeInfo = required()
     """Type."""
 
-    # key: Tuple | None = required()  # TODO: Add generic key support
+    # key: Tuple | None = None  # TODO: Add generic key support
     """Key."""

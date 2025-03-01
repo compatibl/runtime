@@ -20,22 +20,22 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class RunErrorResponseItem(BaseModel):
     """Data type for a single item in the response list for the /tasks/run route in case of an error."""
 
-    task_run_id: str | None = required()
+    task_run_id: str | None = None
     """Task run id."""
 
-    key: str | None = required()
+    key: str | None = None
     """Key of the record."""
 
-    name: str | None = required()
+    name: str | None = None
     """Name of the exception."""
 
-    status_code: int | None = required()
+    status_code: int | None = None
     """Status code of the task."""
 
-    message: str | None = required()
+    message: str | None = None
     """Message of the exception."""
 
-    stack_trace: str | None = required()
+    stack_trace: str | None = None
     """Stack trace of the exception."""
 
     class Config:

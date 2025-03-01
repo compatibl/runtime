@@ -22,7 +22,7 @@ from cl.runtime.schema.index_decl import IndexDecl
 class TypeIndexDecl:
     """Type index declaration."""
 
-    name: str | None = required()
+    name: str | None = None
     """Index name."""
 
     elements: List[IndexDecl] = required()

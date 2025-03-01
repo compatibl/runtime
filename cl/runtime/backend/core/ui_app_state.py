@@ -29,28 +29,28 @@ from cl.runtime.records.record_mixin import RecordMixin
 class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
     """UiAppState."""
 
-    opened_tabs: List[TabInfo] | None = required()
+    opened_tabs: List[TabInfo] | None = None
     """Information about opened tabs."""
 
-    active_tab_index: int | None = required()
+    active_tab_index: int | None = None
     """Index of active opened tab."""
 
-    backend_version: str | None = required()
+    backend_version: str | None = None
     """DEPRECATED. Use versions instead."""
 
-    versions: Optional[Dict[str, str]] | None = required()
+    versions: Optional[Dict[str, str]] | None = None
     """Component versions."""
 
-    application_name: str | None = required()
+    application_name: str | None = None
     """Application name."""
 
-    read_only: bool | None = required()
+    read_only: bool | None = None
     """Flag indicating that UI is read-only."""
 
-    application_theme: str | None = required()  # TODO: Replace by AppTheme
+    application_theme: str | None = None  # TODO: Replace by AppTheme
     """Application theme (dark, light, etc.)."""
 
-    user_secret_identifiers: List[str] | None = required()
+    user_secret_identifiers: List[str] | None = None
     """
     Suggested key names in My Keys section of the head and shoulders dialog.
 

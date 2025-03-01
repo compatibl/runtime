@@ -25,11 +25,11 @@ class Script:
     name: str = required()
     """Script name."""
 
-    language: ScriptLanguageEnum | None = required()
+    language: ScriptLanguageEnum | None = None
     """Script Language."""
 
     body: List[str] = required()
     """Body"""
 
-    word_wrap: bool | None = required()
+    word_wrap: bool | None = None
     """Automatically wrap text to the next line when it reaches the end of a line or a specified margin."""

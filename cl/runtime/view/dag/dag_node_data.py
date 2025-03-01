@@ -26,8 +26,8 @@ class DagNodeData:
     label: str = required()
     """Node label."""
 
-    node_data: Dict[str, TPrimitive] | None = required()
+    node_data: Dict[str, TPrimitive] | None = None
     """Optional node data."""
 
-    node_data_reference: KeyProtocol | None = required()
+    node_data_reference: KeyProtocol | None = None
     """Optional node data reference."""

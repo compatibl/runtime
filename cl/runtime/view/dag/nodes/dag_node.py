@@ -27,7 +27,7 @@ class DagNode:
     id_: str = required()
     """Node unique identifier."""
 
-    position: DagNodePosition | None = required()
+    position: DagNodePosition | None = None
     """Node UI position."""
 
     data: DagNodeData = required()

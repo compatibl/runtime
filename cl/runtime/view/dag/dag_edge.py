@@ -25,7 +25,7 @@ class DagEdge:
     id_: str = required()
     """Unique edge identifier."""
 
-    label: str | None = required()
+    label: str | None = None
     """Optional edge label."""
 
     source: str = required()

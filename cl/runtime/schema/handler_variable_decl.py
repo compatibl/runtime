@@ -31,16 +31,16 @@ from cl.runtime.schema.value_decl import ValueDecl
 class HandlerVariableDecl(MemberDecl):
     """Handler parameter or return variable declaration."""
 
-    vector: bool | None = required()  # TODO: Similar change to vector in element decl
+    vector: bool | None = None  # TODO: Similar change to vector in element decl
     """Flag indicating variable size array (vector) container."""
 
-    optional: bool | None = required()
+    optional: bool | None = None
     """Flag indicating optional element."""
 
-    label: str | None = required()
+    label: str | None = None
     """Parameter label."""
 
-    comment: str | None = required()
+    comment: str | None = None
     """Parameter comment. Contains addition information about handler parameter."""
 
     @classmethod

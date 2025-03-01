@@ -23,20 +23,20 @@ from cl.runtime.schema.value_decl import ValueDecl
 class MemberDecl:
     """Type member declaration."""
 
-    value: ValueDecl | None = required()  # TODO: Flatten value and other types to a single field
+    value: ValueDecl | None = None  # TODO: Flatten value and other types to a single field
     """Value or primitive element declaration."""
 
-    enum: EnumDeclKey | None = required()
+    enum: EnumDeclKey | None = None
     """Enumeration element declaration."""
 
-    data: TypeDeclKey | None = required()
+    data: TypeDeclKey | None = None
     """Data element declaration."""
 
-    key_: TypeDeclKey | None = required()  # TODO: It is no longer necessary to add _ to key field
+    key_: TypeDeclKey | None = None  # TODO: It is no longer necessary to add _ to key field
     """Key element declaration."""
 
-    query: TypeDeclKey | None = required()
+    query: TypeDeclKey | None = None
     """Query element declaration."""
 
-    condition: TypeDeclKey | None = required()
+    condition: TypeDeclKey | None = None
     """Condition element declaration."""

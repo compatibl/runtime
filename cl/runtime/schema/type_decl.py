@@ -134,38 +134,38 @@ def get_name_of_type_decl_dict(dict_: Dict[str, Dict]) -> Optional[str]:
 class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     """Provides information about a class, its fields, and its methods."""
 
-    label: str | None = required()
+    label: str | None = None
     """Type label."""
 
-    comment: str | None = required()
+    comment: str | None = None
     """Type comment. Contains additional information."""
 
-    kind: TypeKind | None = required()
+    kind: TypeKind | None = None
     """Type kind."""
 
     display_kind: DisplayKindLiteral = required()  # TODO: Make optional, treat None as Basic
     """Display kind."""
 
-    inherit: TypeDeclKey | None = required()
+    inherit: TypeDeclKey | None = None
     """Parent type reference."""
 
-    declare: HandlerDeclareBlockDecl | None = required()  # TODO: Flatten or use block for abstract flag
+    declare: HandlerDeclareBlockDecl | None = None  # TODO: Flatten or use block for abstract flag
     """Handler declaration block."""
 
-    elements: List[ElementDecl] | None = required()  # TODO: Consider renaming to fields
+    elements: List[ElementDecl] | None = None  # TODO: Consider renaming to fields
     """Element declaration block."""
 
-    keys: List[str] | None = required()
+    keys: List[str] | None = None
     """Array of key element names (specify in base class only)."""
 
     # TODO: Consider moving to Table class
-    # indexes: List[TypeIndexDecl] | None = required()
+    # indexes: List[TypeIndexDecl] | None = None
     """Defines indexes for the type."""
 
-    immutable: bool | None = required()
+    immutable: bool | None = None
     """Immutable flag."""
 
-    permanent: bool | None = required()
+    permanent: bool | None = None
     """When the record is saved, also save it permanently."""
 
     def get_key(self) -> TypeDeclKey:

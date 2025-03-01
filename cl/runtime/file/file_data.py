@@ -21,11 +21,11 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class FileData:
     """Display the specified embedded binary content."""
 
-    name: str | None = required()
+    name: str | None = None
     """Content name."""
 
     file_bytes: bytes = required()
     """Embedded binary content to be displayed as the current view."""
 
-    file_type: FileTypeEnum | None = required()
+    file_type: FileTypeEnum | None = None
     """Embedded binary content type."""

@@ -36,7 +36,7 @@ class RunResponseItem(BaseModel):
     task_run_id: str
     """Task run id."""
 
-    key: str | None = required()
+    key: str | None = None
     """Key of the record."""
 
     class Config:

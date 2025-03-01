@@ -42,10 +42,10 @@ class FieldDecl:
     name: str = required()
     """Field name."""
 
-    label: str | None = required()
+    label: str | None = None
     """Field label (if not specified, titleized name is used instead)."""
 
-    comment: str | None = required()
+    comment: str | None = None
     """Field comment."""
 
     field_kind: FieldKind = required()
