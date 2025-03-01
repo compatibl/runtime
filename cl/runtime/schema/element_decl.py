@@ -17,6 +17,7 @@ from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.enum_decl_key import EnumDeclKey
 from cl.runtime.schema.field_decl import FieldDecl
+from cl.runtime.schema.field_kind_enum import FieldKindEnum
 from cl.runtime.schema.member_decl import MemberDecl
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
@@ -71,24 +72,24 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
         result.format_ = field_decl.formatter
         result.alternate_of = None  # TODO: Support in metadata
 
-        if field_decl.field_kind == "primitive":
+        if field_decl.field_kind == FieldKindEnum.PRIMITIVE:
             # Primitive type
             result.value = ValueDecl.create(field_decl.field_type)
         else:
             # Complex type
             module_name, type_name = field_decl.field_type.rsplit(".", 1)
 
-            if field_decl.field_kind == "enum":
+            if field_decl.field_kind == FieldKindEnum.ENUM:
                 module_key = ModuleDeclKey(module_name=module_name).build()
                 result.enum = EnumDeclKey(module=module_key, name=type_name).build()
-            elif field_decl.field_kind == "key":
+            elif field_decl.field_kind == FieldKindEnum.KEY:
                 module_key = ModuleDeclKey(module_name=module_name).build()
                 result.key_ = TypeDeclKey(module=module_key, name=type_name).build()
-            elif field_decl.field_kind == "data":
+            elif field_decl.field_kind == FieldKindEnum.DATA:
                 module_key = ModuleDeclKey(module_name=module_name).build()
                 result.data = TypeDeclKey(module=module_key, name=type_name).build()
             else:
-                raise RuntimeError(f"Unsupported field kind {field_decl.field_kind} for field {field_decl.name}.")
+                raise RuntimeError(f"Unsupported field kind {field_decl.field_kind.name} for field {field_decl.name}.")
 
         match field_decl.container_type:
             case None:

@@ -26,7 +26,7 @@ from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
-from cl.runtime.schema.field_kind import FieldKind
+from cl.runtime.schema.field_kind_enum import FieldKindEnum
 
 primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
 """Tuple of primitive types."""
@@ -48,8 +48,8 @@ class FieldDecl:
     comment: str | None = None
     """Field comment."""
 
-    field_kind: FieldKind = required()
-    """Kind of the element within the container if the field is a container, otherwise kind of the field itself."""
+    field_kind: FieldKindEnum = required()
+    """Kind of the element inside the innermost container if the field is a container, otherwise kind of the field."""
 
     field_type: str = required()
     """Field type name for builtins and uuid modules and module.ClassName for all other types."""
@@ -208,7 +208,7 @@ class FieldDecl:
         # Parse the value itself
         if field_origin is Literal:
             # List of literal strings
-            result.field_kind = "primitive"
+            result.field_kind = FieldKindEnum.PRIMITIVE
             result.field_type = str.__name__
         elif field_origin in supported_container_types:
             raise RuntimeError("Containers within containers are not supported when building database schema.")
@@ -216,16 +216,16 @@ class FieldDecl:
             # Assign element kind
             if field_type in primitive_types:
                 # Indicate that field is one of the supported primitive types
-                result.field_kind = "primitive"
+                result.field_kind = FieldKindEnum.PRIMITIVE
             elif issubclass(field_type, Enum):
                 # Indicate that field is an enum
-                result.field_kind = "enum"
+                result.field_kind = FieldKindEnum.ENUM
             elif field_type.__name__.endswith("Key"):
                 # Indicate that field is a key
-                result.field_kind = "key"
+                result.field_kind = FieldKindEnum.KEY
             else:
                 # Indicate that field is a user-defined data or record
-                result.field_kind = "data"
+                result.field_kind = FieldKindEnum.DATA
             if field_type.__module__ in primitive_modules:
                 # Primitive type, specify type name
                 result.field_type = field_type.__name__
@@ -234,7 +234,7 @@ class FieldDecl:
                 field_class_path = f"{field_type.__module__}.{field_type.__name__}"
 
                 # For keys, remove suffix
-                if result.field_kind == "key":
+                if result.field_kind == FieldKindEnum.KEY:
                     if field_class_path.endswith("Key"):
                         field_class_module = field_type.__module__
                         field_class_name = field_type.__name__
