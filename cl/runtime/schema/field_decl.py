@@ -25,6 +25,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.field_kind import FieldKind
 
 primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
@@ -53,8 +54,11 @@ class FieldDecl:
     field_type: str = required()
     """Field type name for builtins and uuid modules and module.ClassName for all other types."""
 
-    container_type: str | None = None
-    """Container type name for builtins module and module.ClassName for other types."""
+    container_type: str | None = None  # TODO: Deprecated, use container instead
+    """DEPRECATED: Container type name for builtins module and module.ClassName for other types."""
+
+    container: ContainerDecl | None = None
+    """Container declaration if the value is inside a container."""
 
     optional_field: bool = False
     """Indicates if the entire field can be None."""
