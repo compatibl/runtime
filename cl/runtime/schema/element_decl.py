@@ -68,7 +68,10 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
         result.label = field_decl.label
         result.comment = field_decl.comment
         result.optional = field_decl.optional_field
-        result.optional_vector_element = field_decl.optional_values
+        if field_decl.container is not None:
+            result.optional_vector_element = field_decl.container.optional_items
+        else:
+            result.optional_vector_element = None
         result.additive = None  # TODO: Support in metadata
         result.format_ = field_decl.formatter
         result.alternate_of = None  # TODO: Support in metadata

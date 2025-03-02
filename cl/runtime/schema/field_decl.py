@@ -61,9 +61,6 @@ class FieldDecl:
     optional_field: bool = False
     """Indicates if the entire field can be None."""
 
-    optional_values: bool = False  # TODO: DEPRECATED, use container.optional_items instead
-    """DEPRECATED, use container.optional_items instead."""
-
     additive: bool | None = None
     """Optional flag indicating if the element is additive (i.e., its sum across records has meaning)."""
 
@@ -179,10 +176,9 @@ class FieldDecl:
             if field_origin is typing.Union or field_origin is types.UnionType:
                 # Union with None is the only permitted Union type
                 if len(field_args) != 2 or field_args[1] is not type(None):
-                    container_name = result.container.container_kind.name + " " if result.container is not None else ""
                     raise RuntimeError(
                         f"Union type hint '{field_type}' for an element of\n"
-                        f"the {container_name}field '{field_name}'\n"
+                        f"the {result.container.container_kind.name}field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
                         f"because it is not an optional value using the syntax 'Type | None',\n"
                         f"where None is placed second per the standard convention.\n"
@@ -190,18 +186,12 @@ class FieldDecl:
                     )
 
                 # Indicate that container elements can be None
-                result.optional_values = True
+                result.container.optional_items = True
 
                 # Get type information without None
                 field_type = field_args[0]
                 field_origin = typing.get_origin(field_type)
                 field_args = typing.get_args(field_type)  # TODO: Add a check
-            else:
-                # Indicate that values cannot be None
-                result.optional_values = False
-        else:
-            # No container
-            result.container = None
 
         # Parse the value itself
         if field_origin is Literal:
