@@ -42,6 +42,7 @@ from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.type_kind import TypeKind
+from cl.runtime.schema.type_kind_enum import TypeKindEnum
 
 DisplayKindLiteral = Literal["Basic", "Singleton", "Dashboard"]  # TODO: Review
 
@@ -140,8 +141,11 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     comment: str | None = None
     """Type comment. Contains additional information."""
 
-    kind: TypeKind | None = None
+    type_kind: TypeKindEnum = required()
     """Type kind."""
+
+    kind: TypeKind | None = None  # TODO: DEPRECATED, use type_kind instead
+    """DEPRECATED, use type_kind instead."""
 
     display_kind: DisplayKindLiteral = required()  # TODO: Make optional, treat None as Basic
     """Display kind."""
@@ -161,6 +165,9 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     # TODO: Consider moving to Table class
     # indexes: List[TypeIndexDecl] | None = None
     """Defines indexes for the type."""
+
+    abstract: bool | None = None
+    """True if the class is abstract."""
 
     immutable: bool | None = None
     """Immutable flag."""
@@ -229,10 +236,13 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         # Set type kind by detecting the presence of 'get_key' method to indicate a record vs. an element
         is_record = hasattr(record_type, "get_key")
         is_abstract = hasattr(record_type, "__abstractmethods__") and bool(record_type.__abstractmethods__)
+        result.abstract = is_abstract
         if is_record:
-            result.kind = "abstract" if is_abstract else None
+            result.type_kind = TypeKindEnum.RECORD
+            result.kind = "abstract" if is_abstract else None  # TODO: DEPRECATED
         else:
-            result.kind = "abstract_element" if is_abstract else "Element"
+            result.type_kind = TypeKindEnum.DATA
+            result.kind = "abstract_element" if is_abstract else "Element"  # TODO: DEPRECATED
 
         # Set display kind
         result.display_kind = "Basic"  # TODO: Remove Basic after display_kind is made optional
