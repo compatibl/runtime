@@ -144,9 +144,6 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     type_kind: TypeKindEnum = required()
     """Type kind."""
 
-    kind: TypeKind | None = None  # TODO: DEPRECATED, use type_kind instead
-    """DEPRECATED, use type_kind instead."""
-
     display_kind: DisplayKindLiteral = required()  # TODO: Make optional, treat None as Basic
     """Display kind."""
 
@@ -235,14 +232,11 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
         # Set type kind by detecting the presence of 'get_key' method to indicate a record vs. an element
         is_record = hasattr(record_type, "get_key")
+        result.type_kind = TypeKindEnum.RECORD if is_record else TypeKindEnum.DATA
+
+        # Set abstract flag
         is_abstract = hasattr(record_type, "__abstractmethods__") and bool(record_type.__abstractmethods__)
         result.abstract = is_abstract
-        if is_record:
-            result.type_kind = TypeKindEnum.RECORD
-            result.kind = "abstract" if is_abstract else None  # TODO: DEPRECATED
-        else:
-            result.type_kind = TypeKindEnum.DATA
-            result.kind = "abstract_element" if is_abstract else "Element"  # TODO: DEPRECATED
 
         # Set display kind
         result.display_kind = "Basic"  # TODO: Remove Basic after display_kind is made optional
