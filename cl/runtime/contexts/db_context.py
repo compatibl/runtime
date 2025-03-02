@@ -358,7 +358,7 @@ class DbContext(Context):
                 # Error only if not a singleton
                 if not is_singleton_key(key):
                     record_data = data_serializer.serialize_data(record)
-                    record_data_str = yaml.dump(
+                    record_data_str = yaml.safe_dump(
                         record_data, default_flow_style=False, sort_keys=False, allow_unicode=True
                     )
                     raise RuntimeError(
