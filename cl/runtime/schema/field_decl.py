@@ -26,6 +26,7 @@ from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
+from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 from cl.runtime.schema.field_kind_enum import FieldKindEnum
 
 primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
@@ -54,19 +55,16 @@ class FieldDecl:
     field_type: str = required()
     """Field type name for builtins and uuid modules and module.ClassName for all other types."""
 
-    container_type: str | None = None  # TODO: Deprecated, use container instead
-    """DEPRECATED: Container type name for builtins module and module.ClassName for other types."""
-
     container: ContainerDecl | None = None
     """Container declaration if the value is inside a container."""
 
     optional_field: bool = False
     """Indicates if the entire field can be None."""
 
-    optional_values: bool = False
-    """Indicates if values within the container can be None if the field is a container, otherwise None."""
+    optional_values: bool = False  # TODO: DEPRECATED, use container.optional_items instead
+    """DEPRECATED, use container.optional_items instead."""
 
-    additive: bool = False
+    additive: bool | None = None
     """Optional flag indicating if the element is additive (i.e., its sum across records has meaning)."""
 
     formatter: str | None = None
@@ -130,10 +128,10 @@ class FieldDecl:
             result.optional_field = False
 
         # Check for one of the supported container types
-        supported_container_types = [list, tuple, dict]
-        if field_origin in supported_container_types:
-            container_type_name = TypeUtil.name(field_origin)
+        supported_containers = [list, tuple, dict]
+        if field_origin in supported_containers:
             if field_origin is list:
+                result.container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
                 # Perform additional checks for list
                 if len(field_args) != 1:
                     raise RuntimeError(
@@ -143,6 +141,7 @@ class FieldDecl:
                         f"Other list type hint formats are not supported.\n"
                     )
             elif field_origin is tuple:
+                result.container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
                 # Perform additional checks for tuple
                 if len(field_args) == 1 or (len(field_args) > 1 and field_args[1] is not Ellipsis):
                     raise RuntimeError(
@@ -154,6 +153,7 @@ class FieldDecl:
                         f"different element types.\n"
                     )
             elif field_origin is dict:
+                result.container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
                 # Perform additional checks for dict
                 if len(field_args) != 2 and field_args[0] is not str:
                     raise RuntimeError(
@@ -164,14 +164,11 @@ class FieldDecl:
                     )
                 # TODO: Support Dict[str, List[x]]
             else:
-                supported_container_type_names = ", ".join([TypeUtil.name(x) for x in supported_container_types])
+                supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
                 raise RuntimeError(
-                    f"Type {container_type_name} is not one of the supported container types "
-                    f"{supported_container_type_names}."
+                    f"Type {field_origin.__name__} is not one of the supported container types "
+                    f"{supported_container_names}."
                 )
-
-            # Assign type name
-            result.container_type = container_type_name
 
             # Strip container information from field_type to get the type of value inside the container
             field_type = field_args[0]
@@ -182,9 +179,10 @@ class FieldDecl:
             if field_origin is typing.Union or field_origin is types.UnionType:
                 # Union with None is the only permitted Union type
                 if len(field_args) != 2 or field_args[1] is not type(None):
+                    container_name = result.container.container_kind.name + " " if result.container is not None else ""
                     raise RuntimeError(
                         f"Union type hint '{field_type}' for an element of\n"
-                        f"{result.container_type} field '{field_name}'\n"
+                        f"the {container_name}field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
                         f"because it is not an optional value using the syntax 'Type | None',\n"
                         f"where None is placed second per the standard convention.\n"
@@ -203,14 +201,14 @@ class FieldDecl:
                 result.optional_values = False
         else:
             # No container
-            result.container_type = None
+            result.container = None
 
         # Parse the value itself
         if field_origin is Literal:
             # List of literal strings
             result.field_kind = FieldKindEnum.PRIMITIVE
             result.field_type = str.__name__
-        elif field_origin in supported_container_types:
+        elif field_origin in supported_containers:
             raise RuntimeError("Containers within containers are not supported when building database schema.")
         elif field_origin is None:
             # Assign element kind

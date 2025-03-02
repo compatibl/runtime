@@ -20,13 +20,13 @@ from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 
 @dataclass(slots=True, kw_only=True)
 class ContainerDecl:
-    """Container declaration, specifies inner containers if present but not the value type."""
+    """Container where values are stored for this field."""
 
-    kind: ContainerKindEnum = required()
+    container_kind: ContainerKindEnum = required()
     """Container kind."""
 
     inner: ContainerKindEnum | None = None
-    """Inner container if present."""
+    """For nested containers, kind of the inner container."""
 
-    optional: bool | None = None
-    """Indicates whether the entire container is optional (not the items inside the container)."""
+    optional_items: bool | None = None
+    """Indicates that items in this container can be None."""

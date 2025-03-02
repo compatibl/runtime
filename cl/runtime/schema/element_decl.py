@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 from cl.runtime.schema.enum_decl_key import EnumDeclKey
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.field_kind_enum import FieldKindEnum
@@ -91,18 +92,17 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
             else:
                 raise RuntimeError(f"Unsupported field kind {field_decl.field_kind.name} for field {field_decl.name}.")
 
-        match field_decl.container_type:
-            case None:
-                result.vector = False
-            case "list":
-                result.vector = True
-            case "tuple":
-                result.vector = True
-            case "dict":
-                # TODO (Roman): This is legacy format, use another way to define the dict field
-                result.value = ValueDecl(type_="Dict")
-            case _:
-                raise RuntimeError(
-                    f"Unsupported container type {field_decl.container_type} for field {field_decl.name}."
-                )
+        if field_decl.container is not None:
+            match field_decl.container.container_kind:
+                case ContainerKindEnum.LIST:
+                    result.vector = True
+                case ContainerKindEnum.DICT:
+                    # TODO (Roman): This is legacy format, use another way to define the dict field
+                    result.value = ValueDecl(type_="Dict")
+                case _:
+                    raise RuntimeError(f"Unsupported container kind {field_decl.container.container_kind.name} "
+                                       f"for field {field_decl.name}.")
+        else:
+            result.vector = False
+
         return result
