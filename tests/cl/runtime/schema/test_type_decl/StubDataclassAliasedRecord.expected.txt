@@ -5,7 +5,7 @@ module:
 name: StubDataclassAliasedRecord
 label: Stub Dataclass Aliased Record
 comment: Stub record class with typename alias.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
@@ -22,7 +22,7 @@ elements:
   comment: null
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -39,13 +39,14 @@ elements:
   comment: null
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys:
 - Id
+abstract: null
 immutable: null
 permanent: null
 

@@ -5,7 +5,7 @@ module:
 name: StubDataclassOtherDerivedRecord
 label: Stub Dataclass Other Derived Record
 comment: Another type derived from StubDataclassRecord.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit:
   _Freezable__frozen: true
@@ -27,7 +27,7 @@ elements:
   comment: null
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -44,13 +44,14 @@ elements:
   comment: Stub field for other derived class.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys:
 - Id
+abstract: null
 immutable: null
 permanent: null
 

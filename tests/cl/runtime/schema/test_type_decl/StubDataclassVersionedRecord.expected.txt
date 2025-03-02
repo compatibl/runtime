@@ -5,7 +5,7 @@ module:
 name: StubDataclassVersionedRecord
 label: Stub Dataclass Versioned Record
 comment: Stub record base class.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
@@ -22,7 +22,7 @@ elements:
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -39,13 +39,14 @@ elements:
   comment: Stub version field.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys:
 - Id
+abstract: null
 immutable: null
 permanent: null
 

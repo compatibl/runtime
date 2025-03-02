@@ -5,7 +5,7 @@ module:
 name: StubDataclassSingleton
 label: Stub Dataclass Singleton
 comment: Singleton record has no key fields.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
@@ -22,12 +22,13 @@ elements:
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys: []
+abstract: null
 immutable: null
 permanent: null
 

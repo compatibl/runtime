@@ -4,6 +4,7 @@ Module:
 Name: StubDataclassComposite
 Label: Stub Dataclass Composite
 Comment: Stub for a composite key that contains other key fields.
+TypeKind: Record
 DisplayKind: Basic
 Elements:
 - Value:

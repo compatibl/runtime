@@ -5,7 +5,7 @@ module:
 name: StubDataclassNestedFields
 label: Stub Dataclass Nested Fields
 comment: Stub derived class.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit:
   _Freezable__frozen: true
@@ -27,7 +27,7 @@ elements:
   comment: null
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -48,7 +48,7 @@ elements:
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -69,7 +69,7 @@ elements:
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -90,7 +90,7 @@ elements:
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -111,7 +111,7 @@ elements:
   comment: Declared StubDataclassData but provided an instance of StubDataclassDerivedData.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -132,7 +132,7 @@ elements:
   comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -153,7 +153,7 @@ elements:
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -174,13 +174,14 @@ elements:
   comment: Stub field with key type initialized to record type instance.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys:
 - Id
+abstract: null
 immutable: null
 permanent: null
 

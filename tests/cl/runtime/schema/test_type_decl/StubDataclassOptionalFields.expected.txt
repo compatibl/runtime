@@ -5,7 +5,7 @@ module:
 name: StubDataclassOptionalFields
 label: Stub Dataclass Optional Fields
 comment: Stub derived class.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
@@ -22,7 +22,7 @@ elements:
   comment: Unique identifier.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -39,7 +39,7 @@ elements:
   comment: Optional string.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -90,7 +90,7 @@ elements:
   comment: Optional float.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -145,7 +145,7 @@ elements:
   comment: Optional data.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -208,7 +208,7 @@ elements:
   comment: Optional key.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -271,7 +271,7 @@ elements:
   comment: Optional record.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -320,6 +320,7 @@ elements:
   alternate_of: null
 keys:
 - Id
+abstract: null
 immutable: null
 permanent: null
 

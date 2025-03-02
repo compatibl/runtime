@@ -5,7 +5,7 @@ module:
 name: StubDataclassRecord
 label: Stub Dataclass Record
 comment: Stub record base class.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
@@ -22,13 +22,14 @@ elements:
   comment: Unique identifier.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys:
 - Id
+abstract: null
 immutable: null
 permanent: null
 
@@ -39,7 +40,7 @@ module:
 name: StubDataclassRecord
 label: Stub Dataclass Record
 comment: Stub record base class.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
@@ -56,13 +57,14 @@ elements:
   comment: Unique identifier.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys:
 - Id
+abstract: null
 immutable: null
 permanent: null
 

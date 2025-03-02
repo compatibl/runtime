@@ -5,7 +5,7 @@ module:
 name: StubDataclassComposite
 label: Stub Dataclass Composite
 comment: Stub for a composite key that contains other key fields.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
@@ -22,7 +22,7 @@ elements:
   comment: String key element.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -43,7 +43,7 @@ elements:
   comment: Embedded key 1.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -64,7 +64,7 @@ elements:
   comment: Embedded key 2.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -73,6 +73,7 @@ keys:
 - Primitive
 - Embedded1
 - Embedded2
+abstract: null
 immutable: null
 permanent: null
 

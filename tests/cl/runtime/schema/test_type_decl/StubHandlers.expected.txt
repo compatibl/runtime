@@ -5,7 +5,7 @@ module:
 name: StubHandlers
 label: Stub Handlers
 comment: Stub record base class.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare:
@@ -163,7 +163,7 @@ declare:
         name: FileData
         label: File Data
         comment: Display the specified embedded binary content.
-        kind: Element
+        type_kind: Data
         display_kind: Basic
         inherit: null
         declare: null
@@ -180,7 +180,7 @@ declare:
           comment: Content name.
           vector: false
           optional: true
-          optional_vector_element: false
+          optional_vector_element: null
           read_only: null
           additive: null
           format_: null
@@ -197,7 +197,7 @@ declare:
           comment: Embedded binary content to be displayed as the current view.
           vector: false
           optional: false
-          optional_vector_element: false
+          optional_vector_element: null
           read_only: null
           additive: null
           format_: null
@@ -218,12 +218,13 @@ declare:
           comment: Embedded binary content type.
           vector: false
           optional: true
-          optional_vector_element: false
+          optional_vector_element: null
           read_only: null
           additive: null
           format_: null
           alternate_of: null
         keys: null
+        abstract: null
         immutable: null
         permanent: null
       key_: null
@@ -523,7 +524,7 @@ declare:
         name: FileData
         label: File Data
         comment: Display the specified embedded binary content.
-        kind: Element
+        type_kind: Data
         display_kind: Basic
         inherit: null
         declare: null
@@ -540,7 +541,7 @@ declare:
           comment: Content name.
           vector: false
           optional: true
-          optional_vector_element: false
+          optional_vector_element: null
           read_only: null
           additive: null
           format_: null
@@ -557,7 +558,7 @@ declare:
           comment: Embedded binary content to be displayed as the current view.
           vector: false
           optional: false
-          optional_vector_element: false
+          optional_vector_element: null
           read_only: null
           additive: null
           format_: null
@@ -578,12 +579,13 @@ declare:
           comment: Embedded binary content type.
           vector: false
           optional: true
-          optional_vector_element: false
+          optional_vector_element: null
           read_only: null
           additive: null
           format_: null
           alternate_of: null
         keys: null
+        abstract: null
         immutable: null
         permanent: null
       key_: null
@@ -869,13 +871,14 @@ elements:
   comment: Stub identifier.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys:
 - StubId
+abstract: null
 immutable: null
 permanent: null
 

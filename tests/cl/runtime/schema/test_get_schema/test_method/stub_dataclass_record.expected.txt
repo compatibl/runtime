@@ -4,6 +4,7 @@ Module:
 Name: StubDataclassRecord
 Label: Stub Dataclass Record
 Comment: Stub record base class.
+TypeKind: Record
 DisplayKind: Basic
 Elements:
 - Value:

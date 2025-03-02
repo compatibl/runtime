@@ -5,7 +5,7 @@ module:
 name: UiAppState
 label: Ui App State
 comment: UiAppState.
-kind: null
+type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
@@ -26,7 +26,7 @@ elements:
   comment: A user the app state is applied for.
   vector: false
   optional: false
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -47,7 +47,7 @@ elements:
   comment: Information about opened tabs.
   vector: true
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -64,7 +64,7 @@ elements:
   comment: Index of active opened tab.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -81,7 +81,7 @@ elements:
   comment: DEPRECATED. Use versions instead.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -98,7 +98,7 @@ elements:
   comment: Component versions.
   vector: null
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -115,7 +115,7 @@ elements:
   comment: Application name.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -132,7 +132,7 @@ elements:
   comment: Flag indicating that UI is read-only.
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -149,7 +149,7 @@ elements:
   comment: Application theme (dark, light, etc.).
   vector: false
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
@@ -166,13 +166,14 @@ elements:
   comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
   vector: true
   optional: true
-  optional_vector_element: false
+  optional_vector_element: null
   read_only: null
   additive: null
   format_: null
   alternate_of: null
 keys:
 - User
+abstract: null
 immutable: null
 permanent: null
 

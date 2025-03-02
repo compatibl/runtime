@@ -4,6 +4,7 @@ Module:
 Name: StubDataclassListFields
 Label: Stub Dataclass List Fields
 Comment: Stub record whose elements are lists.
+TypeKind: Record
 DisplayKind: Basic
 Inherit:
   Module:
