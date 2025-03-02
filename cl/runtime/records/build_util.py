@@ -23,6 +23,9 @@ from typing import TypeVar
 from typing import Union
 from typing import get_args
 from typing import get_origin
+
+from frozendict import frozendict
+
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
@@ -50,16 +53,6 @@ class BuildUtil:
                 # prevent repeat initialization of shared instances
                 return obj
 
-            # Recursively call 'build' on public fields except those that are None, primitive or Enum
-            tuple(
-                cls.build(x)
-                for slot in slots
-                if not slot.startswith("_")
-                and (x := getattr(obj, slot, None)) is not None
-                and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
-                and not isinstance(x, Enum)
-            )
-
             # Invoke '__init' in the order from base to derived
             # Keep track of which init methods in class hierarchy were already called
             invoked = set()
@@ -73,28 +66,50 @@ class BuildUtil:
                     # Invoke '__init' method if it exists, otherwise do nothing
                     class_init(obj)
 
+            # Recursively call 'build' on public fields except those that are None, primitive or Enum
+            # and assign the result of build back to the field
+            tuple(
+                setattr(obj, slot, cls.build(x))
+                for slot in slots
+                if not slot.startswith("_")
+                and (x := getattr(obj, slot, None)) is not None
+                and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
+                and not isinstance(x, Enum)
+            )
+
             # After the init methods, call freeze method if implemented, continue without error if not
             obj.freeze()
 
             # Perform validation against the schema after the object is frozen and return
             cls.validate(obj)
             return obj
-        elif isinstance(obj, tuple | list):  # TODO: Exclude list after converting records to tuple
+        elif isinstance(obj, list):
             # Recursively invoke on tuple elements in-place, skip primitive types or enums
-            tuple(
-                cls.build(x)
-                for x in obj
-                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
+            return [
+                cls.build(v) if v is not None
+                and type(v).__name__ not in _PRIMITIVE_TYPE_NAMES
+                and not isinstance(v, Enum)
+                else v
+                for v in obj
+            ]
+        elif isinstance(obj, tuple):
+            # Recursively invoke on tuple elements in-place, skip primitive types or enums
+            return tuple(
+                cls.build(v) if v is not None
+                and type(v).__name__ not in _PRIMITIVE_TYPE_NAMES
+                and not isinstance(v, Enum)
+                else v
+                for v in obj
             )
-            return obj
         elif isinstance(obj, dict):  # TODO: Switch to frozendict and Map
             # Recursively invoke on dict elements in-place, skip primitive types or enums
-            tuple(
-                cls.build(x)
-                for x in obj.values()
-                if x is not None and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(x, Enum)
-            )
-            return obj
+            return dict({
+                k: cls.build(v) if v is not None
+                and type(v).__name__ not in _PRIMITIVE_TYPE_NAMES
+                and not isinstance(v, Enum)
+                else v
+                for k, v in obj.items()
+            })
         elif obj is not None and type(obj).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(obj, Enum):
             cls._unsupported_object_error(obj)
 
@@ -156,8 +171,7 @@ Note: In case of containers, type mismatch may be in one of the items.
             if args:
                 if (
                     (isinstance(field_value, list) and origin is list)
-                    or isinstance(field_value, tuple)
-                    and origin is tuple
+                    or (isinstance(field_value, tuple) and origin is tuple)
                 ):
                     return all(cls._is_instance(item, args[0]) for item in field_value)
                 elif isinstance(field_value, dict) and origin is dict:
