@@ -390,7 +390,7 @@ class RegressionGuard:
                 + "\n"
             )
         elif issubclass(value_type, Enum):
-            return str(value)
+            return str(value.name)
         elif hasattr(value_type, "__iter__"):
             return "\n".join(map(self._format_txt, value)) + "\n"
         else:
