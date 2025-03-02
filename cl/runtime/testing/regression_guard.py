@@ -23,6 +23,7 @@ from typing import Literal
 import yaml
 from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
@@ -41,12 +42,21 @@ data_serializer = DictSerializer()
 
 
 # Custom Dumper to ensure proper block style for multi-line strings
-class NoExtraLineBreakDumper(yaml.Dumper):
+class NoExtraLineBreakDumper(yaml.SafeDumper):
     def represent_scalar(self, tag, value, style=None):
         """Use block style (|) for multiline strings."""
         if "\n" in value:
             style = "|"
         return super().represent_scalar(tag, value, style)
+
+
+# Custom YAML representer for Enum
+def enum_representer(dumper, data):
+    item_name = CaseUtil.upper_to_pascal_case(data.name)
+    return dumper.represent_scalar('tag:yaml.org,2002:str', item_name)  # Dumps the name instead of value
+
+# Add the custom representer to NoExtraLineBreakDumper
+yaml.add_multi_representer(Enum, enum_representer, Dumper=NoExtraLineBreakDumper)
 
 
 def _error_extension_not_supported(ext: str) -> Any:
