@@ -13,15 +13,11 @@
 # limitations under the License.
 
 import datetime as dt
-import sys
-from collections import Counter
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from typing import Dict
-from typing import Tuple
 from typing import Type
-from typing import cast
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
@@ -34,23 +30,14 @@ from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.annotations_util import AnnotationsUtil
 from cl.runtime.serialization.sentinel_type import sentinel_value
-
-# TODO: Initialize from settings
-alias_dict: Dict[Type, str] = dict()
-"""Dictionary of class name aliases using type as key (includes classes and enums with aliases only)."""
+from cl.runtime.serialization.slots_util import SlotsUtil
 
 # TODO: Initialize from settings
 _type_dict: Dict[str, Type] | None = None
 """Dictionary of types using class name or alias as key (includes all classes and enums)."""
 
-class_hierarchy_slots_dict: Dict[Type, Tuple] = dict()
-"""Dictionary of slots in class hierarchy in the order of declaration from base to derived."""
 
-collect_slots = sys.version_info.major > 3 or sys.version_info.major == 3 and sys.version_info.minor >= 11
-"""For Python 3.11 and later, __slots__ includes fields for this class only, use MRO to include base class slots."""
-
-
-# TODO: Should classes not included packages be supported? If not do not update type dict in serializer.
+# TODO: Move to a separate helper class
 def get_type_dict() -> Dict[str, Type]:
     """Load type dictionary from schema if not present."""
     global _type_dict
@@ -60,43 +47,6 @@ def get_type_dict() -> Dict[str, Type]:
         _type_dict = Schema.get_type_dict()
 
     return _type_dict
-
-
-def _get_class_hierarchy_slots(data_type) -> Tuple[str]:
-    """Tuple of slots in class hierarchy in the order of declaration from base to derived."""
-    if (result := class_hierarchy_slots_dict.get(data_type, None)) is not None:
-        # Use cached value
-        return result
-    else:
-        # Traverse the class hierarchy from base to derived (reverse MRO order) collecting slots as specified
-        if collect_slots:
-            # For v3.11 and later, __slots__ includes fields for this class only, use MRO to collect base class slots
-            # Exclude None or empty __slots__ (both are falsy)
-            slots_list = [slots for base in reversed(data_type.__mro__) if (slots := getattr(base, "__slots__", None))]
-        else:
-            # Otherwise get slots from this type only
-            # Exclude None or empty __slots__ (both are falsy)
-            slots_list = [slots if (slots := getattr(data_type, "__slots__", None)) else tuple()]
-
-        # Exclude empty tuples and convert slots specified as a single string into tuple of size one
-        slots_list = [(slots,) if isinstance(slots, str) else slots for slots in slots_list]
-
-        # Flatten and convert to tuple, cast relies on elements of sublist being strings
-        # Exclude private and protected fields
-        result = tuple(slot for sublist in slots_list for slot in sublist if not slot.startswith("_"))
-
-        # Check for duplicates
-        if len(result) > len(set(result)):
-            # Error message if duplicates are found
-            counts = Counter(result)
-            duplicates = [slot for slot, count in counts.items() if count > 1]
-            duplicates_str = ", ".join(duplicates)
-            raise RuntimeError(
-                f"Duplicate field names found in class hierarchy " f"for {TypeUtil.name(data_type)}: {duplicates_str}."
-            )
-
-        class_hierarchy_slots_dict[data_type] = result
-        return cast(Tuple[str], result)
 
 
 # TODO: Add checks for to_node, from_node implementation for custom override of default serializer
@@ -132,7 +82,7 @@ class DictSerializer:
         if getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
             # Get slots from this class and its bases in the order of declaration from base to derived
-            all_slots = _get_class_hierarchy_slots(data.__class__)
+            all_slots = SlotsUtil.get_slots(data.__class__)
             annots = AnnotationsUtil.get_class_hierarchy_annotations(data.__class__)
             # Serialize slot values in the order of declaration except those that are None
             result = {
@@ -145,7 +95,7 @@ class DictSerializer:
                 if (v := getattr(data, k)) is not None
             }
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
-            short_name = alias_dict[type_] if (type_ := data.__class__) in alias_dict else type_.__name__
+            short_name = TypeUtil.name(type_)
             # Cache type for subsequent reverse lookup
             type_dict = get_type_dict()
             type_dict[short_name] = type_
@@ -204,7 +154,7 @@ class DictSerializer:
         elif isinstance(data, Enum):
             # Serialize enum as a dict using enum class short name and item name (rather than item value)
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
-            short_name = alias_dict[type_] if (type_ := type(data)) in alias_dict else type_.__name__
+            short_name = TypeUtil.name(type_)
             # Cache type for subsequent reverse lookup
             type_dict = get_type_dict()
             type_dict[short_name] = type_

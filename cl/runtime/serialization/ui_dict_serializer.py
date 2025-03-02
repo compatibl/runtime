@@ -27,7 +27,7 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serialization.annotations_util import AnnotationsUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
+from cl.runtime.serialization.slots_util import SlotsUtil
 from cl.runtime.serialization.string_serializer import StringSerializer
 from cl.runtime.serialization.string_serializer import primitive_type_names as str_primitive_type_names
 
@@ -36,7 +36,7 @@ key_serializer = StringSerializer()
 
 @dataclass(slots=True, kw_only=True)
 class UiDictSerializer(DictSerializer):
-    """Serialization for slot-based classes to ui format dict (legacy format)."""
+    """Serialization for slots-based classes to ui format dict (legacy format)."""
 
     pascalize_keys: bool = True
     """pascalize_keys is True by default."""
@@ -118,7 +118,7 @@ class UiDictSerializer(DictSerializer):
         Contains only fields of supported types, _key and _t will be added based on record.
         """
 
-        all_slots = _get_class_hierarchy_slots(record.__class__)
+        all_slots = SlotsUtil.get_slots(record.__class__)
 
         # Get subset of slots which supported in table format
         table_fields = {

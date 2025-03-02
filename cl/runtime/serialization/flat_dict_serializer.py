@@ -36,7 +36,7 @@ key_serializer = StringSerializer()
 
 class FlatDictSerializer(DictSerializer):
     """
-    Serialization for slot-based classes to flat dict (without nested fields).
+    Serialization for slots-based classes to flat dict (without nested fields).
     Complex types serialize as a json string.
     """
 

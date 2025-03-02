@@ -18,7 +18,7 @@ from typing import ClassVar
 from typing import Type
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
-from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots  # TODO: Move to ClassInfo
+from cl.runtime.serialization.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)
@@ -35,7 +35,7 @@ class MongoFilterSerializer:
         """Serialize record for use as a MongoDB query filter."""
 
         # Get slots from this class and its bases in the order of declaration from base to derived
-        all_slots = _get_class_hierarchy_slots(data.__class__)
+        all_slots = SlotsUtil.get_slots(data.__class__)
         # Serialize slot values in the order of declaration except those that are None
         result = {
             k: v if v.__class__.__name__ in self.primitive_type_names else self._not_primitive_field_error(data, k, v)

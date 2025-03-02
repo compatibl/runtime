@@ -27,11 +27,11 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_key
+from cl.runtime.records.type_util import TypeUtil
 
 # TODO (Roman): remove dependency from dict_serializer
-from cl.runtime.serialization.dict_serializer import _get_class_hierarchy_slots
-from cl.runtime.serialization.dict_serializer import alias_dict
 from cl.runtime.serialization.dict_serializer import get_type_dict
+from cl.runtime.serialization.slots_util import SlotsUtil
 
 primitive_type_names = frozenset(
     {"NoneType", "str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"}
@@ -123,7 +123,7 @@ class StringSerializer:
 
         if isinstance(data, Enum):
             # Get enum short name and cache to type_dict
-            short_name = alias_dict[type_] if (type_ := type(data)) in alias_dict else type_.__name__
+            short_name = TypeUtil.name(data.__class__)
             type_dict = get_type_dict()
             type_dict[short_name] = type_
 
@@ -158,7 +158,7 @@ class StringSerializer:
         If slot type is key - create embedded key object and yield its slots.
         """
 
-        key_slots = _get_class_hierarchy_slots(key.__class__)
+        key_slots = SlotsUtil.get_slots(key.__class__)
         key_hints = get_type_hints(key.__class__)
 
         for slot in key_slots:
@@ -178,7 +178,7 @@ class StringSerializer:
         if not is_key(data):
             raise RuntimeError(f"Argument of serialize_key is not a key: {data}")
 
-        key_slots = _get_class_hierarchy_slots(data.get_key_type())
+        key_slots = SlotsUtil.get_slots(data.get_key_type())
         result = ";".join(
             (
                 self._serialize_key_token(v)

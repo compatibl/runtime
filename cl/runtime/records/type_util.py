@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, Dict
 from typing import Type
 from typing import TypeGuard
 from cl.runtime.records.protocols import TObj
@@ -21,12 +21,13 @@ from cl.runtime.records.protocols import TObj
 class TypeUtil:
     """Helper class for type checking."""
 
+    # TODO: Cache output (convert to use type only, not instance). Consider eliminating instance_or_type.
     @classmethod
     def name(cls, instance_or_type: Any) -> str:
         """Returns TypeAlias.alias if specified and type.name otherwise."""
-        # TODO: Return type.__name__ for all types until TypeAlias is supported
         type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-        return type_.__name__
+        result = cls._get_alias_dict().get(type_, type_.__name__)
+        return result
 
     @classmethod
     def check_type(
@@ -86,3 +87,9 @@ class TypeUtil:
         else:
             # Return True if the check passes to use as TypeGuard
             return True
+
+    @classmethod
+    def _get_alias_dict(cls) -> Dict[Type, str]:
+        """Get or create a dict of type aliases."""
+        # TODO: Implement type aliases
+        return {}
