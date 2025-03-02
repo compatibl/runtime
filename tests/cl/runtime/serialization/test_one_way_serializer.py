@@ -16,7 +16,7 @@ import pytest
 
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.one_way_serializer import OneWaySerializer
+from cl.runtime.serialization.one_way_serializer import OneWaySerializer, orjson_default
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassAnyFields
 from stubs.cl.runtime import StubDataclassComposite
@@ -52,27 +52,26 @@ _SAMPLE_TYPES = [
 ]
 
 
-def orjson_default(obj):
-    """Handler for unsupported types in orjson."""
-    if isinstance(obj, bytes):
-        return obj.hex()  # Convert bytes to string using hex encoding
-    raise RuntimeError(f"Object of type {obj.__class__.__name__} is not JSON serializable.")
-
-
 def test_to_dict():
     """Test OneWaySerializer.to_dict method serialize_primitive flag."""
 
+    # Create the serializer
     serializer = OneWaySerializer()
 
     for sample_type in _SAMPLE_TYPES:
+
+        # Serialize to dict
         obj = sample_type().build()
         obj_dict = serializer.to_dict(obj)
+
+        # Convert to JSON using orjson
         obj_dict_str = orjson.dumps(
             obj_dict,
             option=orjson.OPT_INDENT_2 | orjson.OPT_OMIT_MICROSECONDS,
             default=orjson_default,
         ).decode()
 
+        # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(obj_dict_str)
@@ -83,13 +82,16 @@ def test_to_dict():
 def test_to_dict_serialize_primitive():
     """Test OneWaySerializer.to_dict method with serialize_primitive flag."""
 
-    serializer = OneWaySerializer(serialize_primitive=True)
+    # Create the serializer
+    serializer = OneWaySerializer()
 
     for sample_type in _SAMPLE_TYPES:
-        obj = sample_type().build()
-        obj_dict = serializer.to_dict(obj)
-        obj_dict_str = orjson.dumps(obj_dict, option=orjson.OPT_INDENT_2).decode()
 
+        # Serialize to JSON
+        obj = sample_type().build()
+        obj_dict_str = serializer.to_json(obj)
+
+        # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(obj_dict_str)
@@ -100,13 +102,15 @@ def test_to_dict_serialize_primitive():
 def test_to_dict_pascalize_keys():
     """Test OneWaySerializer.to_dict method with pascalize_keys flag."""
 
-    serializer = OneWaySerializer(serialize_primitive=True, pascalize_keys=True)
+    # Create the serializer with pascalize_keys flag set
+    serializer = OneWaySerializer(pascalize_keys=True)
 
     for sample_type in _SAMPLE_TYPES:
+        # Serialize to JSON
         obj = sample_type().build()
-        obj_dict = serializer.to_dict(obj)
-        obj_dict_str = orjson.dumps(obj_dict, option=orjson.OPT_INDENT_2).decode()
+        obj_dict_str = serializer.to_json(obj)
 
+        # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(obj_dict_str)
