@@ -11,14 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import orjson
 import pytest
-
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.serialization.dict_serializer import DictSerializer
 from cl.runtime.serialization.one_way_serializer import OneWaySerializer, orjson_default
 from cl.runtime.testing.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubDataclassAnyFields
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -53,7 +51,7 @@ _SAMPLE_TYPES = [
 
 
 def test_to_dict():
-    """Test OneWaySerializer.to_dict method serialize_primitive flag."""
+    """Test OneWaySerializer.to_dict method."""
 
     # Create the serializer
     serializer = OneWaySerializer()
@@ -79,8 +77,8 @@ def test_to_dict():
     RegressionGuard().verify_all()
 
 
-def test_to_dict_serialize_primitive():
-    """Test OneWaySerializer.to_dict method with serialize_primitive flag."""
+def test_to_json():
+    """Test OneWaySerializer.to_json method."""
 
     # Create the serializer
     serializer = OneWaySerializer()
@@ -99,8 +97,8 @@ def test_to_dict_serialize_primitive():
     RegressionGuard().verify_all()
 
 
-def test_to_dict_pascalize_keys():
-    """Test OneWaySerializer.to_dict method with pascalize_keys flag."""
+def test_to_json_pascalize_keys():
+    """Test OneWaySerializer.to_json method with pascalize_keys flag."""
 
     # Create the serializer with pascalize_keys flag set
     serializer = OneWaySerializer(pascalize_keys=True)
@@ -116,6 +114,7 @@ def test_to_dict_pascalize_keys():
         guard.write(obj_dict_str)
 
     RegressionGuard().verify_all()
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
