@@ -1,0 +1,19 @@
+{
+  "Id": "abc",
+  "FloatDictList": [
+    "None",
+    "None"
+  ],
+  "DateDictList": [
+    "None",
+    "None"
+  ],
+  "RecordDictList": [
+    "None",
+    "None"
+  ],
+  "DerivedRecordDictList": [
+    "None",
+    "None"
+  ]
+}

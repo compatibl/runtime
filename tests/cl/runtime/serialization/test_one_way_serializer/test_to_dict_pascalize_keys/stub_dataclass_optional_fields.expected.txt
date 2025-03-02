@@ -1,0 +1,25 @@
+{
+  "Id": "abc",
+  "OptionalStr": "xyz",
+  "RequiredListOfOptionalStr": [
+    "abc",
+    "None"
+  ],
+  "OptionalFloat": "1.23",
+  "RequiredListOfOptionalFloat": [
+    "1.23",
+    "None"
+  ],
+  "RequiredListOfOptionalData": [
+    "None",
+    "None"
+  ],
+  "RequiredListOfOptionalKey": [
+    "None",
+    "None"
+  ],
+  "RequiredListOfOptionalRecord": [
+    "None",
+    "None"
+  ]
+}

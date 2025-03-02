@@ -1,0 +1,9 @@
+{
+  "Primitive": "abc",
+  "Embedded1": {
+    "Id": "def"
+  },
+  "Embedded2": {
+    "Id": "xyz"
+  }
+}

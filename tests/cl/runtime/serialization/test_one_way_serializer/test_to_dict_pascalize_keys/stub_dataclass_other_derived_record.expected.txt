@@ -1,0 +1,4 @@
+{
+  "Id": "abc",
+  "OtherDerived": "other_derived"
+}

@@ -178,7 +178,7 @@ class Timestamp:
         return result
 
     @classmethod
-    def validate(
+    def validate(  # TODO: Rename to validate_str
         cls,
         timestamp: str,
         *,
@@ -204,13 +204,20 @@ class Timestamp:
         )
 
     @classmethod
-    def validate_uuid7(cls, value: UUID) -> None:
-        """Validate that the argument is a valid UUIDv7."""
+    def is_uuid7(cls, value: UUID) -> bool:
+        """Return true if the argument is a valid UUIDv7."""
 
-        # Check type
+        # Check type using name as UUID class may come from different packages
         if (value_type_name := TypeUtil.name(value)) != "UUID":
             raise RuntimeError(f"An object of type '{value_type_name}' was provided while UUIDv7 was expected.")
 
-        # Check version
-        if value.version != 7:
+        # Check that version is UUIDv7
+        result = value.version == 7
+        return result
+
+    @classmethod
+    def validate_uuid7(cls, value: UUID) -> None:
+        """Validate that the argument is a valid UUIDv7."""
+
+        if not cls.is_uuid7(value):
             raise RuntimeError(f"UUID v{value.version} was provided while v7 was expected.")

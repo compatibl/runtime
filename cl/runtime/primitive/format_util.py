@@ -16,6 +16,8 @@ from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.float_util import FloatUtil
+from cl.runtime.primitive.time_util import TimeUtil
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
 
@@ -49,10 +51,20 @@ class FormatUtil:
                 return str(value)  # TODO: Use IntUtil
             case "date":
                 return DateUtil.to_str(value)
+            case "time":
+                return TimeUtil.to_str(value)
             case "datetime":
                 return DatetimeUtil.to_str(value)
+            case "UUID":
+                if Timestamp.is_uuid7(value):
+                    # Use a format with readable timestamp for UUIDv7 based Timestamp
+                    return Timestamp.from_uuid7(value)
+                else:
+                    # Use conventional serialization for other UUID versions
+                    return str(value)
+            case "bytes":
+                return value.hex()
             case _:
-                # TODO: Add the remaining primitive types
                 raise RuntimeError(
                     f"Type {TypeUtil.name(value)} cannot be converted to string " f"using FormatUtil.format method."
                 )

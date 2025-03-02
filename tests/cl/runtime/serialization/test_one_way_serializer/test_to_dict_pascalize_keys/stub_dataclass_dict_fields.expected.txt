@@ -1,0 +1,59 @@
+{
+  "Id": "abc",
+  "StrDict": {
+    "A": "abc",
+    "B": "def"
+  },
+  "FloatDict": {
+    "A": "0.0000123457",
+    "B": "0.0001234568",
+    "C": "0.0012345679",
+    "D": "0.0123456789",
+    "E": "0.123456789",
+    "F": "1.23456789",
+    "G": "12.3456789",
+    "H": "123.456789",
+    "I": "1234.56789",
+    "J": "12345.6789"
+  },
+  "DateDict": {
+    "A": "2003-04-21",
+    "B": "2003-05-01"
+  },
+  "DataDict": {
+    "A": {
+      "StrField": "A",
+      "IntField": "1"
+    },
+    "B": {
+      "StrField": "B",
+      "IntField": "2"
+    }
+  },
+  "KeyDict": {
+    "A": {
+      "Id": "A"
+    },
+    "B": {
+      "Id": "B"
+    }
+  },
+  "RecordDict": {
+    "A": {
+      "Id": "A"
+    },
+    "B": {
+      "Id": "B"
+    }
+  },
+  "DerivedRecordDict": {
+    "A": {
+      "Id": "A",
+      "DerivedStrField": "derived"
+    },
+    "B": {
+      "Id": "B",
+      "DerivedStrField": "derived"
+    }
+  }
+}

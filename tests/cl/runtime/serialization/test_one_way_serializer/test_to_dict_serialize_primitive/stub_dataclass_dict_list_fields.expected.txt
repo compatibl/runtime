@@ -1,0 +1,19 @@
+{
+  "id": "abc",
+  "float_dict_list": [
+    "None",
+    "None"
+  ],
+  "date_dict_list": [
+    "None",
+    "None"
+  ],
+  "record_dict_list": [
+    "None",
+    "None"
+  ],
+  "derived_record_dict_list": [
+    "None",
+    "None"
+  ]
+}
