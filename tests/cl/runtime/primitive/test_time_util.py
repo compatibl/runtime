@@ -22,7 +22,7 @@ from cl.runtime.primitive.time_util import TimeUtil
 
 def get_valid_samples() -> List[Tuple[int, str]]:
     """Return a list of valid sample date strings in (iso_int, str) format."""
-    return [(101530000, "10:15:30.000"), (101530500, "10:15:30.500")]
+    return [(101530000, "10:15:30.000Z"), (101530500, "10:15:30.500Z")]
 
 
 def get_invalid_time_samples() -> List[dt.time]:
@@ -42,7 +42,7 @@ def get_invalid_string_samples() -> List[str]:
     return [
         "10:15Z",  # No seconds
         "10:15:30Z",  # No milliseconds
-        "10:15:30.000Z",  # Specifies timezone
+        "10:15:30.000",  # Does not specify timezone
     ]
 
 
