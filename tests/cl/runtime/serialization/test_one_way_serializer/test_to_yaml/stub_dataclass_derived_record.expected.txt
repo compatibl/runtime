@@ -1,0 +1,3 @@
+id: abc
+derived_str_field: derived
+

@@ -63,7 +63,7 @@ def test_to_dict():
         obj_dict = serializer.to_dict(obj)
 
         # Convert to JSON using orjson
-        obj_dict_str = orjson.dumps(
+        result_str = orjson.dumps(
             obj_dict,
             option=orjson.OPT_INDENT_2 | orjson.OPT_OMIT_MICROSECONDS,
             default=orjson_default,
@@ -72,7 +72,7 @@ def test_to_dict():
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
-        guard.write(obj_dict_str)
+        guard.write(result_str)
 
     RegressionGuard().verify_all()
 
@@ -87,12 +87,12 @@ def test_to_json():
 
         # Serialize to JSON
         obj = sample_type().build()
-        obj_dict_str = serializer.to_json(obj)
+        result_str = serializer.to_json(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
-        guard.write(obj_dict_str)
+        guard.write(result_str)
 
     RegressionGuard().verify_all()
 
@@ -106,12 +106,32 @@ def test_to_json_pascalize_keys():
     for sample_type in _SAMPLE_TYPES:
         # Serialize to JSON
         obj = sample_type().build()
-        obj_dict_str = serializer.to_json(obj)
+        result_str = serializer.to_json(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
-        guard.write(obj_dict_str)
+        guard.write(result_str)
+
+    RegressionGuard().verify_all()
+
+
+def test_to_yaml():
+    """Test OneWaySerializer.to_yaml method."""
+
+    # Create the serializer
+    serializer = OneWaySerializer()
+
+    for sample_type in _SAMPLE_TYPES:
+
+        # Serialize to JSON
+        obj = sample_type().build()
+        result_str = serializer.to_yaml(obj)
+
+        # Write to regression guard
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
+        guard = RegressionGuard(channel=snake_case_type_name)
+        guard.write(result_str)
 
     RegressionGuard().verify_all()
 
