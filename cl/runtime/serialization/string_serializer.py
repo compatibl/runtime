@@ -125,7 +125,7 @@ class StringSerializer:
             # Get enum short name and cache to type_dict
             short_name = TypeUtil.name(data.__class__)
             type_dict = get_type_dict()
-            type_dict[short_name] = type_
+            type_dict[short_name] = data.__class__
 
             return f"{short_name}.{data.name}"
         else:
