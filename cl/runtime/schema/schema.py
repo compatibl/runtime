@@ -30,7 +30,7 @@ from memoization import cached
 from typing_extensions import Self
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol, is_record_or_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_decl_key import TypeDeclKey
@@ -279,4 +279,7 @@ class Schema:
         """Returns a set of successors."""
 
         # TODO)Major): Use ClassInfo.get_inheritance_chain and record base classes in DB so unknow types can also be returned
-        return set(schema_type for schema_type in Schema.get_types() if record_type in schema_type.__mro__)
+        return set(  # noqa
+            schema_type for schema_type in Schema.get_types()
+            if is_record_or_key(schema_type) and record_type in schema_type.__mro__
+        )
