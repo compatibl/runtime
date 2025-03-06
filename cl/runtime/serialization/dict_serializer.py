@@ -82,8 +82,9 @@ class DictSerializer:
         if getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
             # Get slots from this class and its bases in the order of declaration from base to derived
-            all_slots = SlotsUtil.get_slots(data.__class__)
-            annots = AnnotationsUtil.get_class_hierarchy_annotations(data.__class__)
+            data_type = data.__class__
+            all_slots = SlotsUtil.get_slots(data_type)
+            annots = AnnotationsUtil.get_class_hierarchy_annotations(data_type)
             # Serialize slot values in the order of declaration except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case_keep_trailing_underscore(k)): (
@@ -95,10 +96,10 @@ class DictSerializer:
                 if (v := getattr(data, k)) is not None
             }
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
-            short_name = TypeUtil.name(annot_type)
+            short_name = TypeUtil.name(data_type)
             # Cache type for subsequent reverse lookup
             type_dict = get_type_dict()
-            type_dict[short_name] = annot_type
+            type_dict[short_name] = data_type
             # Add to result
             result["_type"] = short_name
             return result
@@ -154,10 +155,11 @@ class DictSerializer:
         elif isinstance(data, Enum):
             # Serialize enum as a dict using enum class short name and item name (rather than item value)
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
-            short_name = TypeUtil.name(annot_type)
+            enum_type = data.__class__
+            short_name = TypeUtil.name(enum_type)
             # Cache type for subsequent reverse lookup
             type_dict = get_type_dict()
-            type_dict[short_name] = annot_type
+            type_dict[short_name] = enum_type
             pascal_case_value = CaseUtil.upper_to_pascal_case(data.name)
             return {"_enum": short_name, "_name": pascal_case_value}
         else:
