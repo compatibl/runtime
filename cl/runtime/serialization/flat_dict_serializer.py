@@ -75,11 +75,11 @@ class FlatDictSerializer(DictSerializer):
         else:
             return value, None
 
-    def serialize_data(self, data, type_: Type | None = None, *, is_root: bool = False):
+    def serialize_data(self, data, annot_type: Type | None = None, *, is_root: bool = False):
 
-        type_ = AnnotationsUtil.handle_optional_annot(type_)
+        annot_type = AnnotationsUtil.handle_optional_annot(annot_type)
 
-        if type_ is Any:
+        if annot_type is Any:
             # If field is annotated with 'Any' serialize value to special dict format
             return self.serialize_data(self._assemble_any(data), None, is_root=is_root)
 
@@ -101,7 +101,7 @@ class FlatDictSerializer(DictSerializer):
             # All other types try to serialize as JSON string
 
             # Serialize data with super
-            json_data = super().serialize_data(data, type_)
+            json_data = super().serialize_data(data, annot_type)
 
             # Don't wrap to JSON if it is root or value is None after super serialization
             if is_root or json_data is None:

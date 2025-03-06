@@ -68,17 +68,17 @@ class DictSerializer:
     """Detect primitive type by checking if class name is in this list."""
 
     def serialize_data(
-        self, data: TRecord, type_: Type | None = None
+        self, data: TRecord, annot_type: Type | None = None
     ) -> dict[str, Any]:  # TODO: Check if None should be supported
         """
         Serialize to dictionary containing primitive types, dictionaries, or iterables.
 
         Args:
             data: Object to serialize
-            type_: Annotation type
+            annot_type: Annotation type
         """
 
-        type_ = AnnotationsUtil.handle_optional_annot(type_)
+        annot_type = AnnotationsUtil.handle_optional_annot(annot_type)
         if getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
             # Get slots from this class and its bases in the order of declaration from base to derived
@@ -95,10 +95,10 @@ class DictSerializer:
                 if (v := getattr(data, k)) is not None
             }
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
-            short_name = TypeUtil.name(type_)
+            short_name = TypeUtil.name(annot_type)
             # Cache type for subsequent reverse lookup
             type_dict = get_type_dict()
-            type_dict[short_name] = type_
+            type_dict[short_name] = annot_type
             # Add to result
             result["_type"] = short_name
             return result
@@ -112,7 +112,7 @@ class DictSerializer:
         elif data.__class__.__name__ in self.primitive_type_names or data.__class__.__name__ == "int":
             return data
         elif isinstance(data, dict):
-            dict_value_annot_type = AnnotationsUtil.extract_dict_value_annot_type(type_)
+            dict_value_annot_type = AnnotationsUtil.extract_dict_value_annot_type(annot_type)
             # Dictionary, return with serialized values
             result = {
                 k: (
@@ -128,7 +128,7 @@ class DictSerializer:
             first_item = next(iter(data), sentinel_value)
 
             # Get origin type and its args
-            _, iter_value_annot_type = AnnotationsUtil.extract_iterable_origin_and_args(type_)
+            _, iter_value_annot_type = AnnotationsUtil.extract_iterable_origin_and_args(annot_type)
 
             if first_item == sentinel_value:
                 # Empty iterable, return None
@@ -154,10 +154,10 @@ class DictSerializer:
         elif isinstance(data, Enum):
             # Serialize enum as a dict using enum class short name and item name (rather than item value)
             # To find short name, use 'in' which is faster than 'get' when most types do not have aliases
-            short_name = TypeUtil.name(type_)
+            short_name = TypeUtil.name(annot_type)
             # Cache type for subsequent reverse lookup
             type_dict = get_type_dict()
-            type_dict[short_name] = type_
+            type_dict[short_name] = annot_type
             pascal_case_value = CaseUtil.upper_to_pascal_case(data.name)
             return {"_enum": short_name, "_name": pascal_case_value}
         else:
@@ -167,7 +167,7 @@ class DictSerializer:
         """
         Deserialize object from data, invoke init_all after deserialization.
 
-        The optional "type_" parameter will be passed recursively for fields that aren't primitives and aren't
+        The optional "annot_type" parameter will be passed recursively for fields that aren't primitives and aren't
         serialized dataclasses. For a serialized dataclasses, the type is specified in the "_type" attribute.
         """
 

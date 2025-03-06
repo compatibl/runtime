@@ -48,7 +48,7 @@ class UiDictSerializer(DictSerializer):
     ]
     """Override primitive fields. In particular, str is not a primitive in ui format."""
 
-    def serialize_data(self, data, type_: Type | None = None):
+    def serialize_data(self, data, annot_type: Type | None = None):
 
         if not self.pascalize_keys:
             raise RuntimeError("UI serialization format only supports pascalize_keys=True mode.")
@@ -62,7 +62,7 @@ class UiDictSerializer(DictSerializer):
             return StringSerializer.serialize_primitive(data)
         elif isinstance(data, Enum):
             # Serialize enum as its name
-            serialized_enum = super(UiDictSerializer, self).serialize_data(data, type_)
+            serialized_enum = super(UiDictSerializer, self).serialize_data(data, annot_type)
             pascal_case_value = serialized_enum.get("_name")
             return pascal_case_value
         elif is_key(data):
@@ -71,7 +71,7 @@ class UiDictSerializer(DictSerializer):
         elif isinstance(data, dict):
             # Serialize dict as list of dicts in format [{"key": [key], "value": [value_as_legacy_variant]}]
             serialized_dict_items = []
-            for k, v in super(UiDictSerializer, self).serialize_data(data, type_).items():
+            for k, v in super(UiDictSerializer, self).serialize_data(data, annot_type).items():
                 # TODO (Roman): support more value types in dict
 
                 # Apply custom format for None in dict
@@ -99,7 +99,7 @@ class UiDictSerializer(DictSerializer):
             return serialized_dict_items
         elif getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
-            serialized_data = super(UiDictSerializer, self).serialize_data(data, type_)
+            serialized_data = super(UiDictSerializer, self).serialize_data(data, annot_type)
 
             # Replace "_type" with "_t"
             if "_type" in serialized_data:
@@ -110,7 +110,7 @@ class UiDictSerializer(DictSerializer):
 
             return serialized_data
         else:
-            return super(UiDictSerializer, self).serialize_data(data, type_)
+            return super(UiDictSerializer, self).serialize_data(data, annot_type)
 
     def serialize_record_for_table(self, record: RecordProtocol) -> Dict[str, Any]:
         """
