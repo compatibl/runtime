@@ -22,7 +22,7 @@ from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 class ContainerDecl:
     """Container where values are stored for this field."""
 
-    container_kind: ContainerKindEnum = required()
+    container_kind: ContainerKindEnum = required()  # TODO: Or ContainerKey, is Container a version of TypeDecl
     """Container kind."""
 
     inner: ContainerKindEnum | None = None

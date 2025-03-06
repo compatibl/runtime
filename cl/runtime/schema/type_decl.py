@@ -141,7 +141,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     comment: str | None = None
     """Type comment. Contains additional information."""
 
-    type_kind: TypeKindEnum = required()
+    type_kind: TypeKindEnum = required()  # TODO: ObjectKind or inherit
     """Type kind."""
 
     display_kind: DisplayKindLiteral = required()  # TODO: Make optional, treat None as Basic
