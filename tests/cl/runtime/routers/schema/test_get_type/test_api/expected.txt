@@ -5,7 +5,7 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   Name: UiAppState
   Label: Ui App State
   Comment: UiAppState.
-  TypeKind: 5
+  TypeKind: Record
   DisplayKind: Basic
   Elements:
   - _t: cl.runtime.backend.core.user_key.UserKey
@@ -69,7 +69,7 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
   Name: BaseTypeInfo
   Label: Base Type Info
   Comment: Base type info.
-  TypeKind: 3
+  TypeKind: Data
   DisplayKind: Basic
   Elements:
   - Value:
@@ -91,7 +91,7 @@ cl.runtime.backend.core.tab_info.TabInfo:
   Name: TabInfo
   Label: Tab Info
   Comment: Tab info.
-  TypeKind: 3
+  TypeKind: Data
   DisplayKind: Basic
   Elements:
   - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
@@ -108,7 +108,7 @@ cl.runtime.backend.core.user_key.UserKey:
   Name: UserKey
   Label: User Key
   Comment: User which is allowed to log in.
-  TypeKind: 3
+  TypeKind: Data
   DisplayKind: Basic
   Elements:
   - Value:
@@ -123,7 +123,7 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   Name: UiAppState
   Label: Ui App State
   Comment: UiAppState.
-  TypeKind: 5
+  TypeKind: Record
   DisplayKind: Basic
   Elements:
   - _t: cl.runtime.backend.core.user_key.UserKey
@@ -187,7 +187,7 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
   Name: BaseTypeInfo
   Label: Base Type Info
   Comment: Base type info.
-  TypeKind: 3
+  TypeKind: Data
   DisplayKind: Basic
   Elements:
   - Value:
@@ -209,7 +209,7 @@ cl.runtime.backend.core.tab_info.TabInfo:
   Name: TabInfo
   Label: Tab Info
   Comment: Tab info.
-  TypeKind: 3
+  TypeKind: Data
   DisplayKind: Basic
   Elements:
   - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
@@ -226,7 +226,7 @@ cl.runtime.backend.core.user_key.UserKey:
   Name: UserKey
   Label: User Key
   Comment: User which is allowed to log in.
-  TypeKind: 3
+  TypeKind: Data
   DisplayKind: Basic
   Elements:
   - Value:

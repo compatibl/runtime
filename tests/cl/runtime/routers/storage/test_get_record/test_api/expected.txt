@@ -6,7 +6,7 @@ schema:
     Name: StubDataclassRecord
     Label: Stub Dataclass Record
     Comment: Stub record base class.
-    TypeKind: 5
+    TypeKind: Record
     DisplayKind: Basic
     Elements:
     - Value:
