@@ -52,6 +52,7 @@ def dict_public_fields_factory(x):
     return {k: v for (k, v) in x if not k.startswith("_")}
 
 
+# TODO (Roman): Replace this function with a serializer
 # TODO: Move this and other functions to helper class
 def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict[str, Any] | List[Dict[str, Any]] | str:
     """Recursively apply type declaration dictionary conventions to the argument dictionary."""
@@ -84,6 +85,9 @@ def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict
         return {
             CaseUtil.snake_to_pascal_case(k.removesuffix("_")): v for k, v in zip(key_field_names, key_field_values)
         }
+    elif isinstance(node, Enum):
+        # Process Enum value by converting to value name
+        return CaseUtil.upper_to_pascal_case(node.name)
     elif isinstance(node, str):
         return node
     else:
