@@ -17,7 +17,7 @@ import re
 from typing import Tuple
 
 # Compile the regex pattern for time in ISO-8601 format hh:mm:ss.fff without timezone
-time_pattern = re.compile(r"^\d{2}:\d{2}:\d{2}\.\d{3}Z$")
+time_pattern = re.compile(r"^\d{2}:\d{2}:\d{2}\.\d{3}$")
 
 
 class TimeUtil:
@@ -65,7 +65,7 @@ class TimeUtil:
         millisecond = value.microsecond // 1000
 
         # Convert to string
-        result = f"{value.hour:02}:{value.minute:02}:{value.second:02}.{millisecond:03}Z"
+        result = f"{value.hour:02}:{value.minute:02}:{value.second:02}.{millisecond:03}"
         return result
 
     @classmethod
