@@ -7,7 +7,8 @@ key_date_field: 2003-05-01
 key_time_field: 10:15:30.000Z
 key_date_time_field: 2003-05-01T10:15:00.000Z
 key_uuid_field: 1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a
-key_bytes_field: 646e78
+key_bytes_field: |
+  ZG54
 key_enum_field: ENUM_VALUE_2
 obj_str_field: abc
 obj_float_field: 1.23
@@ -18,6 +19,7 @@ obj_date_field: 2003-05-01
 obj_time_field: 10:15:30.000Z
 obj_date_time_field: 2003-05-01T10:15:00.000Z
 obj_uuid_field: 1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a
-obj_bytes_field: 646e78
+obj_bytes_field: |
+  ZG54
 obj_enum_field: ENUM_VALUE_1
 

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
+
 from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
@@ -63,7 +65,8 @@ class FormatUtil:
                     # Use conventional serialization for other UUID versions
                     return str(value)
             case "bytes":
-                return value.hex()
+                # Use Base64 encoding for bytes
+                return base64.encodebytes(value).decode('utf-8')
             case _:
                 raise RuntimeError(
                     f"Type {TypeUtil.name(value)} cannot be converted to string " f"using FormatUtil.format method."
