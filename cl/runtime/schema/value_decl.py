@@ -19,6 +19,8 @@ from typing_extensions import Self
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 
+# TODO: Deprecated, will be removed
+# TODO: Should not have Dict
 PrimitiveTypeLiteral = Literal[
     "String", "Double", "Bool", "Int", "Long", "Date", "Time", "DateTime", "UUID", "Binary", "Dict"
 ]
