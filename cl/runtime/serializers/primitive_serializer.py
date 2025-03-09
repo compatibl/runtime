@@ -20,11 +20,12 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
 
 
-class PrimitiveSerializer:
+class PrimitiveSerializer(Freezable):
     """Helper class for formatting and concatenating supported types into a string."""
 
     @classmethod
@@ -61,5 +62,5 @@ class PrimitiveSerializer:
                 return base64.encodebytes(value).decode('utf-8').rstrip("\n")
             case _:
                 raise RuntimeError(
-                    f"Type {TypeUtil.name(value)} cannot be converted to string " f"using PrimitiveSerializer.format method."
+                    f"Type {TypeUtil.name(value)} cannot be serialized using PrimitiveSerializer."
                 )

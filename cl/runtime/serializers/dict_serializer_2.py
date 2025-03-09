@@ -17,6 +17,7 @@ from enum import Enum
 from typing import Any
 from frozendict import frozendict
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -27,8 +28,17 @@ from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
 class DictSerializer2(Freezable):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
+    primitive_serializer: PrimitiveSerializer = required()
+    """Pascalize keys during serialization if set."""
+
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        # Use primitive serializer with default settings if not specified
+        if self.primitive_serializer is None:
+            self.primitive_serializer = PrimitiveSerializer()
 
     def to_dict(self, data: Any, *, serialize_primitive: bool | None = None) -> Any:
         """
@@ -46,7 +56,7 @@ class DictSerializer2(Freezable):
             # Serialize slot values in the order of declaration except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (PrimitiveSerializer.serialize(v) if serialize_primitive else v)
+                    (self.primitive_serializer.serialize(v) if serialize_primitive else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
                     else self.to_dict(v, serialize_primitive=serialize_primitive)
@@ -63,7 +73,7 @@ class DictSerializer2(Freezable):
                 if serialize_primitive:
                     return [
                         "None" if v is None
-                        else PrimitiveSerializer.serialize(v)
+                        else self.primitive_serializer.serialize(v)
                         for v in data
                     ]
                 else:
@@ -72,7 +82,7 @@ class DictSerializer2(Freezable):
                 # Not a primitive collection, serialize complex elements or enums
                 result = [
                     "None" if serialize_primitive else None if v is None
-                    else (PrimitiveSerializer.serialize(v) if serialize_primitive else v)
+                    else (self.primitive_serializer.serialize(v) if serialize_primitive else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
                     else self.to_dict(v, serialize_primitive=serialize_primitive)
@@ -83,7 +93,7 @@ class DictSerializer2(Freezable):
             # Dictionary, return with serialized values except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (PrimitiveSerializer.serialize(v) if serialize_primitive else v)
+                    (self.primitive_serializer.serialize(v) if serialize_primitive else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
                     else self.to_dict(v, serialize_primitive=serialize_primitive)

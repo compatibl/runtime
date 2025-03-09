@@ -80,8 +80,6 @@ class DbContext(Context):
         if self.db is None:
             self.db = self.get_db()
 
-        # Convert the specified value to string using PrimitiveSerializer
-        self.dataset = PrimitiveSerializer.serialize(self.dataset)
         # Get previous dataset value from the latest context in context stack that has the same DB
         reversed_stack = reversed(self.get_context_stack())
         # Set to root dataset if no previous contexts with the same DB are found in context stack

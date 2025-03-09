@@ -14,7 +14,6 @@
 
 import pytest
 import datetime as dt
-from typing import Callable
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
@@ -22,9 +21,9 @@ from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
 def test_serialize():
-    """Test PrimitiveSerializer.serialize method."""
+    """Test serialize method."""
 
-    serializer = PrimitiveSerializer()
+    serializer = PrimitiveSerializer().build()
 
     # None
     assert serializer.serialize(None) is None

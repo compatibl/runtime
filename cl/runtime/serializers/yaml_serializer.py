@@ -21,28 +21,30 @@ from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
+# Serializer used by YAML representers to convert primitive types to YAML value string
+representation_serializer = PrimitiveSerializer().build()
 
 def float_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = PrimitiveSerializer.serialize(data)
+    data_str = representation_serializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:float', data_str, style=None)
 
 
 def datetime_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = PrimitiveSerializer.serialize(data)
+    data_str = representation_serializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:timestamp', data_str, style=None)
 
 
 def time_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = PrimitiveSerializer.serialize(data)
+    data_str = representation_serializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str)
 
 
 def str_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = PrimitiveSerializer.serialize(data)
+    data_str = representation_serializer.serialize(data)
     style = "|" if "\n" in data_str else None
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str, style=style)
 
