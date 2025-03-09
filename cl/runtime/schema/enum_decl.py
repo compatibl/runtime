@@ -15,23 +15,13 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.schema.enum_decl_key import EnumDeclKey
 from cl.runtime.schema.enum_item_decl import EnumItemDecl
+from cl.runtime.schema.type_decl import TypeDecl
 
 
 @dataclass(slots=True, kw_only=True)
-class EnumDecl(EnumDeclKey, RecordMixin[EnumDeclKey]):
+class EnumDecl(TypeDecl):
     """Enum declaration."""
-
-    label: str | None = None
-    """Enum label."""
-
-    comment: str | None = None
-    """Enum comment."""
 
     items: List[EnumItemDecl] = required()
     """Array of enum items."""
-
-    def get_key(self) -> EnumDeclKey:
-        return EnumDeclKey(module=self.module, name=self.name).build()

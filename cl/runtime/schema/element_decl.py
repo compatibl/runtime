@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
-from cl.runtime.schema.enum_decl_key import EnumDeclKey
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.field_kind_enum import FieldKindEnum
 from cl.runtime.schema.member_decl import MemberDecl
@@ -85,7 +84,7 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
 
             if field_decl.field_kind == FieldKindEnum.ENUM:
                 module_key = ModuleDeclKey(module_name=module_name).build()
-                result.enum = EnumDeclKey(module=module_key, name=type_name).build()
+                result.enum = TypeDeclKey(module=module_key, name=type_name).build()
             elif field_decl.field_kind == FieldKindEnum.KEY:
                 module_key = ModuleDeclKey(module_name=module_name).build()
                 result.key_ = TypeDeclKey(module=module_key, name=type_name).build()

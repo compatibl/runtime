@@ -17,5 +17,5 @@ from cl.runtime.schema.type_decl import TypeDecl
 
 
 @dataclass(slots=True, kw_only=True)
-class KeyDecl(TypeDecl):
+class DataDecl(TypeDecl):
     """Type declaration for a data class that is not a key or record."""
