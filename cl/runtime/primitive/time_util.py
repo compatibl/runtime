@@ -76,7 +76,7 @@ class TimeUtil:
         cls.validate_str(value)
 
         # Convert assuming rounding to milliseconds is already done
-        time_from_str: dt.time = dt.time.fromisoformat(value.rstrip("Z"))
+        time_from_str: dt.time = dt.time.fromisoformat(value)
         result = cls.from_fields(
             time_from_str.hour,
             time_from_str.minute,
