@@ -13,6 +13,7 @@
   "obj_str_field": "abc",
   "obj_str_with_eol_field": "abc\ndef",
   "obj_str_with_trailing_eol_field": "abc\ndef\n",
+  "obj_str_timestamp_field": "2023-05-01T10:15:30.000Z-1a1a1a1a1a1a1a1a1a1a",
   "obj_float_field": 1.23,
   "obj_bool_field": true,
   "obj_int_field": 123,

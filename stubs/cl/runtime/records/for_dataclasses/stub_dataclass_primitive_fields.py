@@ -37,6 +37,9 @@ class StubDataclassPrimitiveFields(StubDataclassPrimitiveFieldsKey, RecordMixin[
     obj_str_with_trailing_eol_field: str = "abc\ndef\n"
     """Stub field."""
 
+    obj_str_timestamp_field: str = "2023-05-01T10:15:30.000Z-1a1a1a1a1a1a1a1a1a1a"
+    """Stub field."""
+
     obj_float_field: float = 1.23
     """Stub field."""
 

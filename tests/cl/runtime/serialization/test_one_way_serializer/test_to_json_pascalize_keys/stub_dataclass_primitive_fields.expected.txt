@@ -13,6 +13,7 @@
   "ObjStrField": "abc",
   "ObjStrWithEolField": "abc\ndef",
   "ObjStrWithTrailingEolField": "abc\ndef\n",
+  "ObjStrTimestampField": "2023-05-01T10:15:30.000Z-1a1a1a1a1a1a1a1a1a1a",
   "ObjFloatField": "1.23",
   "ObjBoolField": "Y",
   "ObjIntField": "123",
