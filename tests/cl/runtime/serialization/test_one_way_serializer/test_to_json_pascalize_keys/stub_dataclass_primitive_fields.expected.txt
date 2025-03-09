@@ -8,7 +8,7 @@
   "KeyTimeField": "10:15:30.000",
   "KeyDateTimeField": "2003-05-01T10:15:00.000Z",
   "KeyUuidField": "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",
-  "KeyBytesField": "ZG54\n",
+  "KeyBytesField": "ZG54",
   "KeyEnumField": "ENUM_VALUE_2",
   "ObjStrField": "abc",
   "ObjFloatField": "1.23",
@@ -19,6 +19,6 @@
   "ObjTimeField": "10:15:30.000",
   "ObjDateTimeField": "2003-05-01T10:15:00.000Z",
   "ObjUuidField": "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",
-  "ObjBytesField": "ZG54\n",
+  "ObjBytesField": "ZG54",
   "ObjEnumField": "ENUM_VALUE_1"
 }

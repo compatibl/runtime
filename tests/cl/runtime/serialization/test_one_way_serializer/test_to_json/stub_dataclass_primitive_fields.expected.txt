@@ -8,7 +8,7 @@
   "key_time_field": "10:15:30.000",
   "key_date_time_field": "2003-05-01T10:15:00.000Z",
   "key_uuid_field": "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",
-  "key_bytes_field": "ZG54\n",
+  "key_bytes_field": "ZG54",
   "key_enum_field": "ENUM_VALUE_2",
   "obj_str_field": "abc",
   "obj_float_field": "1.23",
@@ -19,6 +19,6 @@
   "obj_time_field": "10:15:30.000",
   "obj_date_time_field": "2003-05-01T10:15:00.000Z",
   "obj_uuid_field": "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",
-  "obj_bytes_field": "ZG54\n",
+  "obj_bytes_field": "ZG54",
   "obj_enum_field": "ENUM_VALUE_1"
 }

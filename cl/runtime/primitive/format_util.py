@@ -65,8 +65,8 @@ class FormatUtil:
                     # Use conventional serialization for other UUID versions
                     return str(value)
             case "bytes":
-                # Use Base64 encoding for bytes
-                return base64.encodebytes(value).decode('utf-8')
+                # Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL
+                return base64.encodebytes(value).decode('utf-8').rstrip("\n")
             case _:
                 raise RuntimeError(
                     f"Type {TypeUtil.name(value)} cannot be converted to string " f"using FormatUtil.format method."
