@@ -24,11 +24,11 @@ from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TDataField
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
-from cl.runtime.serialization.annotations_util import AnnotationsUtil
-from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.dict_serializer import get_type_dict
-from cl.runtime.serialization.string_serializer import StringSerializer
-from cl.runtime.serialization.string_serializer import primitive_type_names as str_primitive_type_names
+from cl.runtime.serializers.annotations_util import AnnotationsUtil
+from cl.runtime.serializers.dict_serializer import DictSerializer
+from cl.runtime.serializers.dict_serializer import get_type_dict
+from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names
 
 key_serializer = StringSerializer()
 """Serializer for key to string conversion."""

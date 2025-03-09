@@ -21,7 +21,7 @@ from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.serialization.string_serializer import StringSerializer
+from cl.runtime.serializers.string_serializer import StringSerializer
 
 
 class ListPanelsResponseItem(BaseModel):

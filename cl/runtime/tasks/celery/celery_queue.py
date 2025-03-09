@@ -22,7 +22,7 @@ from cl.runtime.contexts.context_manager import ContextManager
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.records.protocols import TDataDict
-from cl.runtime.serialization.dict_serializer import DictSerializer
+from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.tasks.task import Task

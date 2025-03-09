@@ -19,7 +19,7 @@ from uuid import UUID
 from ruamel.yaml import YAML, StringIO
 from cl.runtime.primitive.format_util import FormatUtil
 from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.serialization.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 
 def float_representer(dumper, data):

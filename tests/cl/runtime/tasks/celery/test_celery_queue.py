@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.contexts.context_manager import ContextManager
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.serialization.dict_serializer import DictSerializer
+from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import execute_task
 from cl.runtime.tasks.static_method_task import StaticMethodTask

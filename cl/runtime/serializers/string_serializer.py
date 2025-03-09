@@ -30,8 +30,8 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 
 # TODO (Roman): remove dependency from dict_serializer
-from cl.runtime.serialization.dict_serializer import get_type_dict
-from cl.runtime.serialization.slots_util import SlotsUtil
+from cl.runtime.serializers.dict_serializer import get_type_dict
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 primitive_type_names = frozenset(
     {"NoneType", "str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"}

@@ -17,7 +17,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
 from cl.runtime.routers.tasks.run_response_item import RunResponseItem
-from cl.runtime.serialization.string_serializer import StringSerializer
+from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.testing.pytest.pytest_fixtures import pytest_celery_queue  # noqa

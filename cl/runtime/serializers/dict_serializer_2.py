@@ -19,7 +19,7 @@ from frozendict import frozendict
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.format_util import FormatUtil
 from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.serialization.slots_util import SlotsUtil
+from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
 
 

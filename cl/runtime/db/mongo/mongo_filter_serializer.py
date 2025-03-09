@@ -18,7 +18,7 @@ from typing import ClassVar
 from typing import Type
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
-from cl.runtime.serialization.slots_util import SlotsUtil
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)

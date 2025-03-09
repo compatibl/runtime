@@ -14,7 +14,7 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
+from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 from cl.runtime.tasks.task import Task
 
 data_serializer = UiDictSerializer()

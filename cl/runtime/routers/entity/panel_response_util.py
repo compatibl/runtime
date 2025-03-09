@@ -21,8 +21,8 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.serialization.string_serializer import StringSerializer
-from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
+from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 PanelResponseDataItem = Dict[str, Any]
 PanelResponse = Dict[str, PanelResponseDataItem | List[PanelResponseDataItem] | None]

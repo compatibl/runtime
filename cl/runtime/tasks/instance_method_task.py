@@ -23,8 +23,8 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.serialization.dict_serializer import DictSerializer
-from cl.runtime.serialization.string_serializer import StringSerializer
+from cl.runtime.serializers.dict_serializer import DictSerializer
+from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 

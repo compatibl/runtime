@@ -19,7 +19,7 @@ from typing import List
 from typing_extensions import Self
 from cl.runtime.contexts.context import _CONTEXT_STACK_DICT_VAR
 from cl.runtime.contexts.context import Context
-from cl.runtime.serialization.dict_serializer import DictSerializer
+from cl.runtime.serializers.dict_serializer import DictSerializer
 
 _DICT_SERIALIZER = DictSerializer()
 """Serializer used to serialize and deserialize contexts."""

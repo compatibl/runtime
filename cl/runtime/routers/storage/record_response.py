@@ -26,8 +26,8 @@ from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.schema.field_decl import primitive_types  # TODO: Move definition to a separate module
 from cl.runtime.schema.schema import Schema
-from cl.runtime.serialization.string_serializer import StringSerializer
-from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
+from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 key_serializer = StringSerializer()
 ui_serializer = UiDictSerializer()

@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.serialization.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 
 def orjson_default(obj):

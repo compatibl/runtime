@@ -23,7 +23,7 @@ from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.select_request import SelectRequest
-from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
+from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 ui_serializer = UiDictSerializer()
 

@@ -15,9 +15,9 @@
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.delete_request import DeleteRequest
-from cl.runtime.serialization.dict_serializer import get_type_dict
-from cl.runtime.serialization.string_serializer import StringSerializer
-from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
+from cl.runtime.serializers.dict_serializer import get_type_dict
+from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 data_serializer = UiDictSerializer()
 key_serializer = StringSerializer()

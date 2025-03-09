@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
-from cl.runtime.serialization.string_serializer import StringSerializer
+from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.testing.testing_client import TestingClient
 from stubs.cl.runtime import StubDataViewers
 

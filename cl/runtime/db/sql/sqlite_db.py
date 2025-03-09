@@ -31,7 +31,7 @@ from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.schema.schema import Schema
-from cl.runtime.serialization.flat_dict_serializer import FlatDictSerializer
+from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.settings.project_settings import ProjectSettings
 
 _connection_dict: Dict[str, sqlite3.Connection] = {}

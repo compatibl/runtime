@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.serialization.yaml_serializer import YamlSerializer
+from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord

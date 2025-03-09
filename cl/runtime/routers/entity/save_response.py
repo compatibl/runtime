@@ -17,8 +17,8 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.save_request import SaveRequest
-from cl.runtime.serialization.string_serializer import StringSerializer
-from cl.runtime.serialization.ui_dict_serializer import UiDictSerializer
+from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 ui_serializer = UiDictSerializer()
 key_serializer = StringSerializer()
