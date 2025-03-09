@@ -58,6 +58,18 @@ Elements:
   Name: ObjStrField
   Comment: Stub field.
 - Value:
+    Type: String
+  Name: ObjStrWithEolField
+  Comment: Stub field.
+- Value:
+    Type: String
+  Name: ObjStrWithTrailingEolField
+  Comment: Stub field.
+- Value:
+    Type: String
+  Name: ObjStrTimestampField
+  Comment: Stub field.
+- Value:
     Type: Double
   Name: ObjFloatField
   Comment: Stub field.
@@ -93,11 +105,15 @@ Elements:
     Type: Binary
   Name: ObjBytesField
   Comment: Stub field.
+- Value:
+    Type: Binary
+  Name: ObjBytesLargeField
+  Comment: Stub field.
 - Enum:
     Module:
       ModuleName: stubs.cl.runtime.records.enum.stub_int_enum
     Name: StubIntEnum
-  Name: ObjEnumField
+  Name: ObjIntEnumField
   Comment: Stub field.
 Keys:
 - KeyStrField

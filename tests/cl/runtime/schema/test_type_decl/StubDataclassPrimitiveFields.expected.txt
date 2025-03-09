@@ -219,6 +219,57 @@ elements:
   format_: null
   alternate_of: null
 - value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjStrWithEolField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: null
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjStrWithTrailingEolField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: null
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
+    type_: String
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjStrTimestampField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: null
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
+- value:
     type_: Double
   enum: null
   data: null
@@ -371,6 +422,23 @@ elements:
   additive: null
   format_: null
   alternate_of: null
+- value:
+    type_: Binary
+  enum: null
+  data: null
+  key_: null
+  query: null
+  condition: null
+  name: ObjBytesLargeField
+  label: null
+  comment: Stub field.
+  vector: false
+  optional: false
+  optional_vector_element: null
+  read_only: null
+  additive: null
+  format_: null
+  alternate_of: null
 - value: null
   enum:
     _Freezable__frozen: true
@@ -382,7 +450,7 @@ elements:
   key_: null
   query: null
   condition: null
-  name: ObjEnumField
+  name: ObjIntEnumField
   label: null
   comment: Stub field.
   vector: false
