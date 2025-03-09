@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import orjson
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.serialization.dict_serializer_2 import DictSerializer2
-from cl.runtime.serialization.json_serializer import orjson_default
+from cl.runtime.serialization.json_serializer import JsonSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -50,25 +49,36 @@ _SAMPLE_TYPES = [
     StubDataclassTupleFields,
 ]
 
-
-def test_to_dict():
-    """Test DictSerializer2.to_dict method."""
+def test_to_json():
+    """Test DictSerializer2.to_json method."""
 
     # Create the serializer
     serializer = DictSerializer2()
 
     for sample_type in _SAMPLE_TYPES:
 
-        # Serialize to dict
+        # Serialize to JSON
         obj = sample_type().build()
-        obj_dict = serializer.to_dict(obj)
+        result_str = serializer.to_json(obj)
 
-        # Convert to JSON using orjson
-        result_str = orjson.dumps(
-            obj_dict,
-            option=orjson.OPT_INDENT_2 | orjson.OPT_OMIT_MICROSECONDS,
-            default=orjson_default,
-        ).decode()
+        # Write to regression guard
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
+        guard = RegressionGuard(channel=snake_case_type_name)
+        guard.write(result_str)
+
+    RegressionGuard().verify_all()
+
+
+def test_to_json_pascalize_keys():
+    """Test DictSerializer2.to_json method with pascalize_keys flag."""
+
+    # Create the serializer with pascalize_keys flag set
+    serializer = JsonSerializer(pascalize_keys=True)
+
+    for sample_type in _SAMPLE_TYPES:
+        # Serialize to JSON
+        obj = sample_type().build()
+        result_str = serializer.to_json(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)

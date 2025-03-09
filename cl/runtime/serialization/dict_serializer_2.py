@@ -12,98 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime as dt
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
-from uuid import UUID
-
-import orjson
 from frozendict import frozendict
-from ruamel.yaml import YAML, StringIO
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.format_util import FormatUtil
 from cl.runtime.serialization.slots_util import SlotsUtil
 from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
 
 
-def orjson_default(obj):
-    """Handler for unsupported types in orjson."""
-    if isinstance(obj, bytes):
-        return obj.hex()  # Convert bytes to string using hex encoding
-    raise RuntimeError(f"Object of type {obj.__class__.__name__} is not JSON serializable.")
-
-
-def float_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = FormatUtil.format(data)
-    return dumper.represent_scalar('tag:yaml.org,2002:float', data_str, style=None)
-
-
-def datetime_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = FormatUtil.format(data)
-    return dumper.represent_scalar('tag:yaml.org,2002:timestamp', data_str, style=None)
-
-
-def time_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = FormatUtil.format(data)
-    return dumper.represent_scalar('tag:yaml.org,2002:str', data_str)
-
-
-def str_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = FormatUtil.format(data)
-    style = "|" if "\n" in data_str else None
-    return dumper.represent_scalar('tag:yaml.org,2002:str', data_str, style=style)
-
-
-# Use roundtrip style YAML to follow formatting instructions
-yaml = YAML(typ='rt')
-
-# Add representers for the primitive types where default format does not match our conventions
-yaml.representer.add_representer(str, str_representer)
-yaml.representer.add_representer(float, float_representer)
-yaml.representer.add_representer(dt.datetime, datetime_representer)
-yaml.representer.add_representer(dt.time, time_representer)
-yaml.representer.add_representer(UUID, str_representer)
-yaml.representer.add_representer(bytes, str_representer)
-
-
-@dataclass(slots=True, kw_only=True)
-class OneWaySerializer:
+@dataclass(slots=True, kw_only=True, frozen=True)
+class DictSerializer2:
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
-
-    def to_json(self, data: Any) -> str:
-        """
-        Serialize a slots-based object to a JSON string without using the schema or retaining type information,
-        not suitable for deserialization.
-        """
-        # Convert to dict with serialize_primitive flag set
-        data_dict = self.to_dict(data, serialize_primitive=True)
-
-        # Use orjson to serialize the dictionary to JSON in pretty-print format
-        result = orjson.dumps(data_dict, option=orjson.OPT_INDENT_2).decode()
-        return result
-
-    def to_yaml(self, data: Any) -> str:
-        """
-        Serialize a slots-based object to a YAML string without using the schema or retaining type information,
-        not suitable for deserialization.
-        """
-        # Convert to dict with serialize_primitive flag set
-        data_dict = self.to_dict(data)
-
-        # Use pyyaml with custom dumper to serialize the dictionary to YAML in pretty-print format
-        output = StringIO()
-        yaml.dump(data_dict, output)
-        result = output.getvalue()
-        return result
 
     def to_dict(self, data: Any, *, serialize_primitive: bool | None = None) -> Any:
         """
