@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.contexts.context import Context
-from cl.runtime.primitive.format_util import FormatUtil
+from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
 @dataclass(slots=True, kw_only=True)
@@ -44,8 +44,8 @@ class TrialContext(Context):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-        # Convert the specified value to string using FormatUtil
-        self.trial_id = FormatUtil.format_or_none(self.trial_id)
+        # Convert the specified value to string using PrimitiveSerializer
+        self.trial_id = PrimitiveSerializer.format_or_none(self.trial_id)
         # Get value from the current context
         previous = context.trial_id if (context := self.current_or_none()) is not None else None
         if self.trial_id and previous:

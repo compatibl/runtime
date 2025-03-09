@@ -17,32 +17,32 @@ from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
 from ruamel.yaml import YAML, StringIO
-from cl.runtime.primitive.format_util import FormatUtil
+from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 
 def float_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = FormatUtil.format(data)
+    data_str = PrimitiveSerializer.format(data)
     return dumper.represent_scalar('tag:yaml.org,2002:float', data_str, style=None)
 
 
 def datetime_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = FormatUtil.format(data)
+    data_str = PrimitiveSerializer.format(data)
     return dumper.represent_scalar('tag:yaml.org,2002:timestamp', data_str, style=None)
 
 
 def time_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = FormatUtil.format(data)
+    data_str = PrimitiveSerializer.format(data)
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str)
 
 
 def str_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = FormatUtil.format(data)
+    data_str = PrimitiveSerializer.format(data)
     style = "|" if "\n" in data_str else None
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str, style=style)
 

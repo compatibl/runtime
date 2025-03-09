@@ -16,7 +16,7 @@ import pytest
 import datetime as dt
 from typing import Callable
 from cl.runtime.primitive.datetime_util import DatetimeUtil
-from cl.runtime.primitive.format_util import FormatUtil
+from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
 def _test_format(*, method: Callable):
@@ -39,23 +39,23 @@ def _test_format(*, method: Callable):
 
 
 def test_format():
-    """Test for FormatUtil.format."""
+    """Test for PrimitiveSerializer.format."""
     # None or empty string
     with pytest.raises(Exception):
-        FormatUtil.format(None)
+        PrimitiveSerializer.format(None)
     with pytest.raises(Exception):
-        FormatUtil.format("")
+        PrimitiveSerializer.format("")
     # Other values
-    _test_format(method=FormatUtil.format)
+    _test_format(method=PrimitiveSerializer.format)
 
 
 def test_format_or_none():
-    """Test for FormatUtil.format."""
+    """Test for PrimitiveSerializer.format."""
     # None or empty string
-    assert FormatUtil.format_or_none(None) is None
-    assert FormatUtil.format_or_none("") is None
+    assert PrimitiveSerializer.format_or_none(None) is None
+    assert PrimitiveSerializer.format_or_none("") is None
     # Other values
-    _test_format(method=FormatUtil.format_or_none)
+    _test_format(method=PrimitiveSerializer.format_or_none)
 
 
 if __name__ == "__main__":

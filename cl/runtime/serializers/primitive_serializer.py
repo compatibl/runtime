@@ -24,7 +24,7 @@ from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
 
 
-class FormatUtil:
+class PrimitiveSerializer:
     """Helper class for formatting and concatenating supported types into a string."""
 
     @classmethod
@@ -33,7 +33,7 @@ class FormatUtil:
         if value is not None and value != "":
             return cls.format_or_none(value)
         else:
-            raise RuntimeError("Argument to FormatUtil.format method is None or an empty string.")
+            raise RuntimeError("Argument to PrimitiveSerializer.format method is None or an empty string.")
 
     @classmethod
     def format_or_none(cls, value: TPrimitive | None) -> str | None:
@@ -69,5 +69,5 @@ class FormatUtil:
                 return base64.encodebytes(value).decode('utf-8').rstrip("\n")
             case _:
                 raise RuntimeError(
-                    f"Type {TypeUtil.name(value)} cannot be converted to string " f"using FormatUtil.format method."
+                    f"Type {TypeUtil.name(value)} cannot be converted to string " f"using PrimitiveSerializer.format method."
                 )

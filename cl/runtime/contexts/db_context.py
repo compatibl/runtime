@@ -21,7 +21,7 @@ from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
-from cl.runtime.primitive.format_util import FormatUtil
+from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -80,8 +80,8 @@ class DbContext(Context):
         if self.db is None:
             self.db = self.get_db()
 
-        # Convert the specified value to string using FormatUtil
-        self.dataset = FormatUtil.format_or_none(self.dataset)
+        # Convert the specified value to string using PrimitiveSerializer
+        self.dataset = PrimitiveSerializer.format_or_none(self.dataset)
         # Get previous dataset value from the latest context in context stack that has the same DB
         reversed_stack = reversed(self.get_context_stack())
         # Set to root dataset if no previous contexts with the same DB are found in context stack
