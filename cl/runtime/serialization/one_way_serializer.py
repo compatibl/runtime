@@ -14,13 +14,13 @@
 
 import datetime as dt
 from dataclasses import dataclass
-from enum import Enum, IntEnum
+from enum import Enum
 from typing import Any
 from uuid import UUID
 
 import orjson
 from frozendict import frozendict
-from ruamel.yaml import YAML, SafeDumper, StringIO
+from ruamel.yaml import YAML, StringIO
 
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.format_util import FormatUtil
@@ -60,12 +60,6 @@ def str_representer(dumper, data):
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str, style=style)
 
 
-def enum_representer(dumper, data):
-    """Use standard conversion to string for enums."""
-    item_name = CaseUtil.upper_to_pascal_case(data.name)  # Use FormatUtil
-    return dumper.represent_scalar('tag:yaml.org,2002:str', item_name, style=None)
-
-
 # Use roundtrip style YAML to follow formatting instructions
 yaml = YAML(typ='rt')
 
@@ -76,9 +70,6 @@ yaml.representer.add_representer(dt.datetime, datetime_representer)
 yaml.representer.add_representer(dt.time, time_representer)
 yaml.representer.add_representer(UUID, str_representer)
 yaml.representer.add_representer(bytes, str_representer)
-
-# Add enum representer to MultiLineStringDumper
-yaml.representer.add_multi_representer(Enum, enum_representer)
 
 
 @dataclass(slots=True, kw_only=True)
@@ -106,7 +97,7 @@ class OneWaySerializer:
         not suitable for deserialization.
         """
         # Convert to dict with serialize_primitive flag set
-        data_dict = self.to_dict(data) # , serialize_primitive=True)
+        data_dict = self.to_dict(data)
 
         # Use pyyaml with custom dumper to serialize the dictionary to YAML in pretty-print format
         output = StringIO()
