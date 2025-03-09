@@ -9,8 +9,10 @@
   "KeyDateTimeField": "2003-05-01T10:15:00.000Z",
   "KeyUuidField": "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",
   "KeyBytesField": "ZG54",
-  "KeyEnumField": "ENUM_VALUE_2",
+  "KeyIntEnumField": "ENUM_VALUE_2",
   "ObjStrField": "abc",
+  "ObjStrWithEolField": "abc\ndef",
+  "ObjStrWithTrailingEolField": "abc\ndef\n",
   "ObjFloatField": "1.23",
   "ObjBoolField": "Y",
   "ObjIntField": "123",
@@ -20,5 +22,6 @@
   "ObjDateTimeField": "2003-05-01T10:15:00.000Z",
   "ObjUuidField": "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",
   "ObjBytesField": "ZG54",
-  "ObjEnumField": "ENUM_VALUE_1"
+  "ObjBytesLargeField": "ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\nZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\nZG54ZG54",
+  "ObjIntEnumField": "ENUM_VALUE_1"
 }

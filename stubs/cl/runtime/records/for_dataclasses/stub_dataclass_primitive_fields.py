@@ -31,6 +31,12 @@ class StubDataclassPrimitiveFields(StubDataclassPrimitiveFieldsKey, RecordMixin[
     obj_str_field: str = "abc"
     """Stub field."""
 
+    obj_str_with_eol_field: str = "abc\ndef"
+    """Stub field."""
+
+    obj_str_with_trailing_eol_field: str = "abc\ndef\n"
+    """Stub field."""
+
     obj_float_field: float = 1.23
     """Stub field."""
 
@@ -58,7 +64,10 @@ class StubDataclassPrimitiveFields(StubDataclassPrimitiveFieldsKey, RecordMixin[
     obj_bytes_field: bytes = bytes([100, 110, 120])
     """Stub field."""
 
-    obj_enum_field: StubIntEnum = StubIntEnum.ENUM_VALUE_1
+    obj_bytes_large_field: bytes = bytes(40 * [100, 110, 120])
+    """Stub field."""
+
+    obj_int_enum_field: StubIntEnum = StubIntEnum.ENUM_VALUE_1
     """Stub field."""
 
     def get_key(self) -> StubDataclassPrimitiveFieldsKey:
@@ -73,5 +82,5 @@ class StubDataclassPrimitiveFields(StubDataclassPrimitiveFieldsKey, RecordMixin[
             key_date_time_field=self.key_date_time_field,
             key_uuid_field=self.key_uuid_field,
             key_bytes_field=self.key_bytes_field,
-            key_enum_field=self.key_enum_field,
+            key_int_enum_field=self.key_int_enum_field,
         ).build()
