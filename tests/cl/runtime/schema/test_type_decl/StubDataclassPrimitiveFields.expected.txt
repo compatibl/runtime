@@ -191,7 +191,7 @@ elements:
   key_: null
   query: null
   condition: null
-  name: KeyEnumField
+  name: KeyIntEnumField
   label: null
   comment: Stub field.
   vector: false
@@ -403,7 +403,7 @@ keys:
 - KeyDateTimeField
 - KeyUuidField
 - KeyBytesField
-- KeyEnumField
+- KeyIntEnumField
 abstract: null
 immutable: null
 permanent: null

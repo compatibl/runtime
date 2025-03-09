@@ -51,7 +51,7 @@ Elements:
     Module:
       ModuleName: stubs.cl.runtime.records.enum.stub_int_enum
     Name: StubIntEnum
-  Name: KeyEnumField
+  Name: KeyIntEnumField
   Comment: Stub field.
 - Value:
     Type: String
@@ -110,5 +110,5 @@ Keys:
 - KeyDateTimeField
 - KeyUuidField
 - KeyBytesField
-- KeyEnumField
+- KeyIntEnumField
 
