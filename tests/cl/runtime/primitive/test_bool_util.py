@@ -59,9 +59,9 @@ def test_format():
     _test_format(method=BoolUtil.format, allow_none=False)
 
 
-def test_format_or_none():
-    """Test for BoolUtil.format_or_none."""
-    _test_format(method=BoolUtil.format_or_none, allow_none=True)
+def test_serialize():
+    """Test for BoolUtil.serialize."""
+    _test_format(method=BoolUtil.serialize, allow_none=True)
 
 
 def test_parse():
@@ -70,7 +70,7 @@ def test_parse():
 
 
 def test_parse_or_none():
-    """Test for BoolUtil.format_or_none."""
+    """Test for BoolUtil.serialize."""
     _test_parse(method=BoolUtil.parse_or_none, allow_none=True)
 
 

@@ -27,12 +27,12 @@ class KeyUtil:
     def format(cls, value: KeyProtocol) -> str:
         """Convert to semicolon-delimited string without type (error message if value is None)."""
         if value is not None:
-            return cls.format_or_none(value)
+            return cls.serialize(value)
         else:
             raise RuntimeError("Argument to KeyUtil.format method is None or an empty string.")
 
     @classmethod
-    def format_or_none(cls, value: KeyProtocol | None) -> str | None:
+    def serialize(cls, value: KeyProtocol | None) -> str | None:
         """Convert to semicolon-delimited string without type (return None if argument is None)."""
         return str(value)  # TODO: Add checks
 

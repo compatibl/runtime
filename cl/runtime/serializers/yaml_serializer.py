@@ -24,25 +24,25 @@ from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 def float_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = PrimitiveSerializer.format(data)
+    data_str = PrimitiveSerializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:float', data_str, style=None)
 
 
 def datetime_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = PrimitiveSerializer.format(data)
+    data_str = PrimitiveSerializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:timestamp', data_str, style=None)
 
 
 def time_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = PrimitiveSerializer.format(data)
+    data_str = PrimitiveSerializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str)
 
 
 def str_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = PrimitiveSerializer.format(data)
+    data_str = PrimitiveSerializer.serialize(data)
     style = "|" if "\n" in data_str else None
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str, style=style)
 

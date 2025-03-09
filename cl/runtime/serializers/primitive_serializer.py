@@ -28,15 +28,7 @@ class PrimitiveSerializer:
     """Helper class for formatting and concatenating supported types into a string."""
 
     @classmethod
-    def format(cls, value: TPrimitive) -> str:
-        """Convert value of a primitive type to string (error message if argument is None)."""
-        if value is not None and value != "":
-            return cls.format_or_none(value)
-        else:
-            raise RuntimeError("Argument to PrimitiveSerializer.format method is None or an empty string.")
-
-    @classmethod
-    def format_or_none(cls, value: TPrimitive | None) -> str | None:
+    def serialize(cls, value: TPrimitive | None) -> TPrimitive | None:
         """Convert value of a primitive type to string (return None if argument is None)."""
         # Use name because different import libraries are possible for some of the primitive types such as UUID
         match type(value).__name__:

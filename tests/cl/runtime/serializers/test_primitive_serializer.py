@@ -19,43 +19,35 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
-def _test_format(*, method: Callable):
-    """Test the specified callable."""
+
+def test_serialize():
+    """Test PrimitiveSerializer.serialize method."""
+
+    serializer = PrimitiveSerializer()
+
+    # None
+    assert serializer.serialize(None) is None
+
     # String
-    assert method("abc") == "abc"
+    assert serializer.serialize("") is None  # Empty string is serialized as None
+    assert serializer.serialize("abc") == "abc"
+
     # Int
-    assert method(123) == "123"
-    assert method(-123) == "-123"
+    assert serializer.serialize(123) == "123"
+    assert serializer.serialize(-123) == "-123"
+
     # Float
-    assert method(1.0) == "1."
-    assert method(-1.23) == "-1.23"
+    assert serializer.serialize(1.0) == "1."
+    assert serializer.serialize(-1.23) == "-1.23"
+
     # Date
-    assert method(dt.date(2023, 4, 21)) == "2023-04-21"
+    assert serializer.serialize(dt.date(2023, 4, 21)) == "2023-04-21"
+
     # Datetime
     value = DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0)
-    assert method(value) == "2023-04-21T11:10:00.000Z"
+    assert serializer.serialize(value) == "2023-04-21T11:10:00.000Z"
     value = DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0, millisecond=123)
-    assert method(value) == "2023-04-21T11:10:00.123Z"
-
-
-def test_format():
-    """Test for PrimitiveSerializer.format."""
-    # None or empty string
-    with pytest.raises(Exception):
-        PrimitiveSerializer.format(None)
-    with pytest.raises(Exception):
-        PrimitiveSerializer.format("")
-    # Other values
-    _test_format(method=PrimitiveSerializer.format)
-
-
-def test_format_or_none():
-    """Test for PrimitiveSerializer.format."""
-    # None or empty string
-    assert PrimitiveSerializer.format_or_none(None) is None
-    assert PrimitiveSerializer.format_or_none("") is None
-    # Other values
-    _test_format(method=PrimitiveSerializer.format_or_none)
+    assert serializer.serialize(value) == "2023-04-21T11:10:00.123Z"
 
 
 if __name__ == "__main__":

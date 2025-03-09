@@ -22,19 +22,19 @@ class BoolUtil:
     @classmethod
     def format(cls, value: bool) -> str:
         """Serialize True as uppercase 'Y' and False as uppercase 'N', error if argument is None."""
-        result = cls.format_or_none(value)
+        result = cls.serialize(value)
         if result is None:
-            raise RuntimeError("Argument of BoolUtil.format is None, use format_or_none to accept.")
+            raise RuntimeError("Argument of BoolUtil.format is None, use serialize to accept.")
         return result
 
     @classmethod
-    def format_or_none(cls, value: bool | None) -> str | None:
+    def serialize(cls, value: bool | None) -> str | None:
         """Serialize True as uppercase 'Y' and False as uppercase 'N', return None if argument is None."""
         if value is None:
             return None
         if type(value) is not bool:
             raise RuntimeError(
-                f"Argument of BoolUtil.format_or_none has type {TypeUtil.name(value)}, " f"only bool is accepted."
+                f"Argument of BoolUtil.serialize has type {TypeUtil.name(value)}, " f"only bool is accepted."
             )
         return "Y" if value else "N"
 

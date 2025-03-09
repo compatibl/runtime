@@ -46,7 +46,7 @@ class DictSerializer2(Freezable):
             # Serialize slot values in the order of declaration except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (PrimitiveSerializer.format(v) if serialize_primitive else v)
+                    (PrimitiveSerializer.serialize(v) if serialize_primitive else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
                     else self.to_dict(v, serialize_primitive=serialize_primitive)
@@ -63,7 +63,7 @@ class DictSerializer2(Freezable):
                 if serialize_primitive:
                     return [
                         "None" if v is None
-                        else PrimitiveSerializer.format(v)
+                        else PrimitiveSerializer.serialize(v)
                         for v in data
                     ]
                 else:
@@ -72,7 +72,7 @@ class DictSerializer2(Freezable):
                 # Not a primitive collection, serialize complex elements or enums
                 result = [
                     "None" if serialize_primitive else None if v is None
-                    else (PrimitiveSerializer.format(v) if serialize_primitive else v)
+                    else (PrimitiveSerializer.serialize(v) if serialize_primitive else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
                     else self.to_dict(v, serialize_primitive=serialize_primitive)
@@ -83,7 +83,7 @@ class DictSerializer2(Freezable):
             # Dictionary, return with serialized values except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (PrimitiveSerializer.format(v) if serialize_primitive else v)
+                    (PrimitiveSerializer.serialize(v) if serialize_primitive else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
                     else self.to_dict(v, serialize_primitive=serialize_primitive)
