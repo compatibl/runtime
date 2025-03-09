@@ -15,6 +15,8 @@
 import orjson
 from dataclasses import dataclass
 from typing import Any
+
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serialization.dict_serializer_2 import DictSerializer2
 
 
@@ -25,8 +27,8 @@ def orjson_default(obj):
     raise RuntimeError(f"Object of type {obj.__class__.__name__} is not JSON serializable.")
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
-class JsonSerializer:
+@dataclass(slots=True, kw_only=True)
+class JsonSerializer(Freezable):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
     pascalize_keys: bool | None = None
@@ -35,9 +37,9 @@ class JsonSerializer:
     _dict_serializer: DictSerializer2 = None
     """Serializes data into dictionary from which it is serialized into JSON."""
 
-    def __post_init__(self):
-        """Perform setup."""
-        _dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys)
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        self._dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
 
     def to_json(self, data: Any) -> str:
         """

@@ -53,7 +53,7 @@ def test_to_yaml():
     """Test DictSerializer2.to_yaml method."""
 
     # Create the serializer
-    serializer = YamlSerializer()
+    serializer = YamlSerializer().build()
 
     for sample_type in _SAMPLE_TYPES:
 

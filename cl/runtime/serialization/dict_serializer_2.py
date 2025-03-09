@@ -18,12 +18,13 @@ from typing import Any
 from frozendict import frozendict
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.format_util import FormatUtil
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serialization.slots_util import SlotsUtil
 from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
-class DictSerializer2:
+@dataclass(slots=True, kw_only=True)
+class DictSerializer2(Freezable):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
     pascalize_keys: bool | None = None

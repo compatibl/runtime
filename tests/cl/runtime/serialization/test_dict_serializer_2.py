@@ -55,7 +55,7 @@ def test_to_dict():
     """Test DictSerializer2.to_dict method."""
 
     # Create the serializer
-    serializer = DictSerializer2()
+    serializer = DictSerializer2().build()
 
     for sample_type in _SAMPLE_TYPES:
 

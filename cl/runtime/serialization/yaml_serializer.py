@@ -18,6 +18,7 @@ from typing import Any
 from uuid import UUID
 from ruamel.yaml import YAML, StringIO
 from cl.runtime.primitive.format_util import FormatUtil
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serialization.dict_serializer_2 import DictSerializer2
 
 
@@ -58,8 +59,8 @@ yaml.representer.add_representer(UUID, str_representer)
 yaml.representer.add_representer(bytes, str_representer)
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
-class YamlSerializer:
+@dataclass(slots=True, kw_only=True)
+class YamlSerializer(Freezable):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
     pascalize_keys: bool | None = None
@@ -68,9 +69,9 @@ class YamlSerializer:
     _dict_serializer: DictSerializer2 = None
     """Serializes data into dictionary from which it is serialized into YAML."""
 
-    def __post_init__(self):
-        """Perform setup."""
-        _dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys)
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        self._dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
 
     def to_yaml(self, data: Any) -> str:
         """
