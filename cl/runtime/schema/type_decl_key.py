@@ -14,6 +14,9 @@
 
 from dataclasses import dataclass
 from typing import Type
+
+from typing_extensions import Self
+
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.key_mixin import KeyMixin
@@ -33,3 +36,8 @@ class TypeDeclKey(Freezable, KeyMixin):
     @classmethod
     def get_key_type(cls) -> Type:
         return TypeDeclKey
+
+    @classmethod
+    def from_type(cls, type_: Type) -> Self:
+        """Create primitive type declaration from Python type."""
+        return TypeDeclKey(module=ModuleDeclKey(module_name=type_.__module__), name=type_.__name__).build()

@@ -34,6 +34,7 @@ from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.element_decl import ElementDecl
@@ -281,7 +282,10 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
             type_hints = get_type_hints(record_type)
 
             # Dictionary of member comments (docstrings), currently requires source parsing due Python limitations
-            member_comments = cls.get_member_comments(record_type)
+            if not is_primitive(record_type):
+                member_comments = cls.get_member_comments(record_type)
+            else:
+                member_comments = f"Primitive type {record_type.__name__}"
 
             # Add an element for each type hint
             result.elements = []

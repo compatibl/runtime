@@ -13,30 +13,42 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Literal
-from typing import Type
+from typing import Type, Dict
 from typing_extensions import Self
-from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 
-# TODO: Deprecated, will be removed
-# TODO: Should not have Dict
-PrimitiveTypeLiteral = Literal[
-    "String", "Double", "Bool", "Int", "Long", "Date", "Time", "DateTime", "UUID", "Binary", "Dict"
-]
+_VALUE_DECL_NAME_MAP: Dict[str, str] = {
+    "str": "String",
+    "float": "Double",
+    "bool": "Bool",
+    "int": "Int",
+    "long": "Long",
+    "date": "Date",
+    "time": "Time",
+    "datetime": "DateTime",
+    "UUID": "UUID",  # TODO: Check for support in ElementDecl
+    "bytes": "Binary",
+}
+"""Map from Python class name to ValueDecl name."""
 
 
 @dataclass(slots=True, kw_only=True)
 class ValueDecl:
     """Value or atomic element declaration."""
 
-    type_: PrimitiveTypeLiteral = required()
+    type_: str = required()
     """Primitive type name."""
 
     @classmethod
-    def create(cls, record_type: Type | str) -> Self:
-        """Create an instance based on specified type."""
+    def from_type(cls, record_type: Type | str) -> Self:
+        """Create an instance from the specified type."""
+        return cls.from_name(record_type.__name__)
+    
+    @classmethod
+    def from_name(cls, type_name: str) -> Self:
+        """Create an instance from the specified type name."""
 
-        if not PrimitiveUtil.is_primitive(record_type):
-            raise RuntimeError(f"Primitive field type {record_type} is not supported.")
-        return ValueDecl(type_=PrimitiveUtil.get_runtime_name(record_type))  # noqa
+        runtime_name = _VALUE_DECL_NAME_MAP.get(type_name, None)
+        if not runtime_name:
+            raise RuntimeError(f"Primitive field type {type_name} is not supported.")
+        return ValueDecl(type_=runtime_name)

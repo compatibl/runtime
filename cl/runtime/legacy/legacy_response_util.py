@@ -14,7 +14,7 @@
 
 from typing import Any
 from typing import Dict
-from cl.runtime.primitive.primitive_util import PrimitiveUtil
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.routers.entity.panel_response_util import PanelResponse
 
 
@@ -53,7 +53,7 @@ class LegacyResponseUtil:
     def _format_data(cls, data):
         """Format data object to legacy format."""
 
-        if PrimitiveUtil.is_primitive(type(data)):
+        if is_primitive(data):
             return data
         elif isinstance(data, dict):
             return {k: cls._format_data(v) for k, v in cls._replace_with_legacy_model(data).items()}

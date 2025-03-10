@@ -21,8 +21,7 @@ from typing import get_args
 from typing import get_origin
 from memoization import cached
 from typing_extensions import Self
-from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.schema.member_decl import MemberDecl
 from cl.runtime.schema.value_decl import ValueDecl
 
@@ -93,8 +92,8 @@ class HandlerVariableDecl(MemberDecl):
 
         # Handle primitive types
         # TODO (Ina): Add Enum and Dict supporting, handle unexpected types
-        if PrimitiveUtil.is_primitive(value_type_):
-            result.value = ValueDecl.create(value_type_)
+        if is_primitive(value_type_):
+            result.value = ValueDecl.from_type(value_type_)
         elif value_type_.__name__.endswith("Key"):
             result.key_ = TypeDecl.for_type(value_type_, skip_handlers=True)
         elif inspect.isclass(value_type_):
