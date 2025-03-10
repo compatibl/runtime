@@ -219,18 +219,15 @@ class FieldDecl:
             elif is_key(field_type):
                 # Indicate that field is a key
                 result.field_kind = FieldKindEnum.KEY
-            elif is_record(field_type):
-                # Indicate that field is a record
-                result.field_kind = FieldKindEnum.RECORD
             elif hasattr(field_type, "__slots__"):
                 # Indicate that field is a user-defined data with slots
-                result.field_kind = FieldKindEnum.DATA
+                result.field_kind = FieldKindEnum.RECORD_OR_DATA
             else:
-                raise RuntimeError("Field type '{field_type}' for field '{field_name}'\n"
-                                   "is not a primitive type, enum, key, record or data.")
+                raise RuntimeError("Field type '{field_type}' for field '{field_name}' is not\n"
+                                   "a primitive type, enum, key, record or a class with slots.")
 
             # Add to dependencies
-            if dependencies:
+            if dependencies and result.field_kind != FieldKindEnum.PRIMITIVE:
                 dependencies.add(field_type)
         else:
             raise RuntimeError(f"Complex type {field_type} is not supported when building database schema.")

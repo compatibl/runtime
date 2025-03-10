@@ -24,12 +24,8 @@ class FieldKindEnum(IntEnum):
     ENUM = auto()
     """Enum type (must be derived from IntEnum)."""
 
-    DATA = auto()
-    """Data type other than key or record."""
-
     KEY = auto()
     """Key type."""
 
-    RECORD = auto()
-    """Record type."""
-
+    RECORD_OR_DATA = auto()
+    """Record or data other than key."""

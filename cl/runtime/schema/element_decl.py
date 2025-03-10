@@ -74,23 +74,19 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
         result.format_ = field_decl.formatter
         result.alternate_of = None  # TODO: Support in metadata
 
-        if field_decl.field_kind == FieldKindEnum.PRIMITIVE:
-            # Primitive type
-            result.value = ValueDecl.from_name(field_decl.field_type.name)
-        else:
-            # Complex type
-            match field_decl.field_kind:
-                case FieldKindEnum.ENUM:
-                    result.enum = field_decl.field_type
-                case FieldKindEnum.KEY:
-                    result.key_ = TypeDeclKey(
-                        module=field_decl.field_type.module,
-                        name=field_decl.field_type.name  # .rstrip("Key")  # TODO: Check if Key suffix should be removed
-                    ).build()
-                case FieldKindEnum.DATA | FieldKindEnum.RECORD:
-                    result.data = field_decl.field_type
-                case _:
-                    raise RuntimeError(f"Unsupported field kind {field_decl.field_kind.name} for field {field_decl.name}.")
+        # Complex type
+        match field_decl.field_kind:
+            case FieldKindEnum.PRIMITIVE:
+                # Primitive type, create declaration from name
+                result.value = ValueDecl.from_name(field_decl.field_type.name)
+            case FieldKindEnum.ENUM:
+                result.enum = field_decl.field_type
+            case FieldKindEnum.KEY:
+                result.key_ = field_decl.field_type
+            case FieldKindEnum.RECORD_OR_DATA:
+                result.data = field_decl.field_type
+            case _:
+                raise RuntimeError(f"Unsupported field kind {field_decl.field_kind.name} for field {field_decl.name}.")
 
         if field_decl.container is not None:
             match field_decl.container.container_kind:
