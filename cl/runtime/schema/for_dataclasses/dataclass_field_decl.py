@@ -53,10 +53,10 @@ class DataclassFieldDecl(FieldDecl):
             result.formatter = formatter
         if (subtype := metadata.pop("subtype", None)) is not None:
             if subtype == "long":
-                if result.field_type == PrimitiveDeclKeys.INT:
-                    result.field_type = PrimitiveDeclKeys.LONG
+                if result.field_type_decl == PrimitiveDeclKeys.INT:
+                    result.field_type_decl = PrimitiveDeclKeys.LONG
                 else:
-                    raise RuntimeError(f"Subtype 'long' is not valid for field type {result.field_type.name}")
+                    raise RuntimeError(f"Subtype 'long' is not valid for field type {result.field_type_decl.name}")
             else:
                 raise RuntimeError(f"Subtype {subtype} is not recognized.")
 

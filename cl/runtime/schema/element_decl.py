@@ -78,13 +78,13 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
         match field_decl.field_kind:
             case FieldKindEnum.PRIMITIVE:
                 # Primitive type, create declaration from name
-                result.value = ValueDecl.from_name(field_decl.field_type.name)
+                result.value = ValueDecl.from_name(field_decl.field_type_decl.name)
             case FieldKindEnum.ENUM:
-                result.enum = field_decl.field_type
+                result.enum = field_decl.field_type_decl
             case FieldKindEnum.KEY:
-                result.key_ = field_decl.field_type
+                result.key_ = field_decl.field_type_decl
             case FieldKindEnum.RECORD_OR_DATA:
-                result.data = field_decl.field_type
+                result.data = field_decl.field_type_decl
             case _:
                 raise RuntimeError(f"Unsupported field kind {field_decl.field_kind.name} for field {field_decl.name}.")
 

@@ -57,7 +57,7 @@ class FieldDecl:
     field_kind: FieldKindEnum = required()
     """Kind of the element inside the innermost container if the field is a container, otherwise kind of the field."""
 
-    field_type: TypeDeclKey = required()
+    field_type_decl: TypeDeclKey = required()
     """Declaration for the field type."""
 
     container: ContainerDecl | None = None
@@ -202,12 +202,12 @@ class FieldDecl:
         if field_origin is Literal:
             # List of literal strings
             result.field_kind = FieldKindEnum.PRIMITIVE
-            result.field_type = PrimitiveDeclKeys.STR
+            result.field_type_decl = PrimitiveDeclKeys.STR
         elif field_origin in supported_containers:
             raise RuntimeError("Containers within containers are not supported when building database schema.")
         elif field_origin is None:
             # Assign type declaration key
-            result.field_type = TypeDeclKey.from_type(field_type)
+            result.field_type_decl = TypeDeclKey.from_type(field_type)
 
             # Assign field kind
             if field_type in primitive_types:
