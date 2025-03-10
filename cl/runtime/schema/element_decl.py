@@ -19,7 +19,6 @@ from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.field_kind_enum import FieldKindEnum
 from cl.runtime.schema.member_decl import MemberDecl
-from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.value_decl import ValueDecl
 
@@ -77,22 +76,21 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
 
         if field_decl.field_kind == FieldKindEnum.PRIMITIVE:
             # Primitive type
-            result.value = ValueDecl.create(field_decl.field_type)
+            result.value = ValueDecl.from_name(field_decl.field_type.name)
         else:
             # Complex type
-            module_name, type_name = field_decl.field_type.rsplit(".", 1)
-
-            if field_decl.field_kind == FieldKindEnum.ENUM:
-                module_key = ModuleDeclKey(module_name=module_name).build()
-                result.enum = TypeDeclKey(module=module_key, name=type_name).build()
-            elif field_decl.field_kind == FieldKindEnum.KEY:
-                module_key = ModuleDeclKey(module_name=module_name).build()
-                result.key_ = TypeDeclKey(module=module_key, name=type_name).build()
-            elif field_decl.field_kind == FieldKindEnum.DATA:
-                module_key = ModuleDeclKey(module_name=module_name).build()
-                result.data = TypeDeclKey(module=module_key, name=type_name).build()
-            else:
-                raise RuntimeError(f"Unsupported field kind {field_decl.field_kind.name} for field {field_decl.name}.")
+            match field_decl.field_kind:
+                case FieldKindEnum.ENUM:
+                    result.enum = field_decl.field_type
+                case FieldKindEnum.KEY:
+                    result.key_ = TypeDeclKey(
+                        module=field_decl.field_type.module,
+                        name=field_decl.field_type.name  # .rstrip("Key")  # TODO: Check if Key suffix should be removed
+                    ).build()
+                case FieldKindEnum.DATA | FieldKindEnum.RECORD:
+                    result.data = field_decl.field_type
+                case _:
+                    raise RuntimeError(f"Unsupported field kind {field_decl.field_kind.name} for field {field_decl.name}.")
 
         if field_decl.container is not None:
             match field_decl.container.container_kind:

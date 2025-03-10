@@ -261,7 +261,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
                 result.inherit = parent_type_decl.get_key()
 
                 # Add to dependencies
-                if dependencies is not None:
+                if dependencies:
                     dependencies.add(parent_type)
 
         # Get type public methods

@@ -20,14 +20,19 @@ from enum import Enum
 from typing import Literal
 from typing import Type
 from uuid import UUID
+
+from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import is_key, is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 from cl.runtime.schema.field_kind_enum import FieldKindEnum
+from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
+from cl.runtime.schema.type_decl_key import TypeDeclKey
 
 primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
 """Tuple of primitive types."""
@@ -52,8 +57,8 @@ class FieldDecl:
     field_kind: FieldKindEnum = required()
     """Kind of the element inside the innermost container if the field is a container, otherwise kind of the field."""
 
-    field_type: str = required()
-    """Field type name for builtins and uuid modules and module.ClassName for all other types."""
+    field_type: TypeDeclKey = required()
+    """Declaration for the field type."""
 
     container: ContainerDecl | None = None
     """Container declaration if the value is inside a container."""
@@ -197,61 +202,36 @@ class FieldDecl:
         if field_origin is Literal:
             # List of literal strings
             result.field_kind = FieldKindEnum.PRIMITIVE
-            result.field_type = str.__name__
+            result.field_type = PrimitiveDeclKeys.STR
         elif field_origin in supported_containers:
             raise RuntimeError("Containers within containers are not supported when building database schema.")
         elif field_origin is None:
-            # Assign element kind
+            # Assign type declaration key
+            result.field_type = TypeDeclKey.from_type(field_type)
+
+            # Assign field kind
             if field_type in primitive_types:
                 # Indicate that field is one of the supported primitive types
                 result.field_kind = FieldKindEnum.PRIMITIVE
             elif issubclass(field_type, Enum):
                 # Indicate that field is an enum
                 result.field_kind = FieldKindEnum.ENUM
-            elif field_type.__name__.endswith("Key"):
+            elif is_key(field_type):
                 # Indicate that field is a key
                 result.field_kind = FieldKindEnum.KEY
-            else:
-                # Indicate that field is a user-defined data or record
+            elif is_record(field_type):
+                # Indicate that field is a record
+                result.field_kind = FieldKindEnum.RECORD
+            elif hasattr(field_type, "__slots__"):
+                # Indicate that field is a user-defined data with slots
                 result.field_kind = FieldKindEnum.DATA
-            if field_type.__module__ in primitive_modules:
-                # Primitive type, specify type name
-                result.field_type = field_type.__name__
             else:
-                # Complex type, specify full class path
-                field_class_path = f"{field_type.__module__}.{field_type.__name__}"
+                raise RuntimeError("Field type '{field_type}' for field '{field_name}'\n"
+                                   "is not a primitive type, enum, key, record or data.")
 
-                # For keys, remove suffix
-                if result.field_kind == FieldKindEnum.KEY:
-                    if field_class_path.endswith("Key"):
-                        field_class_module = field_type.__module__
-                        field_class_name = field_type.__name__
-                        field_class_path = f"{field_class_module}.{field_class_name}"
-                    else:
-                        raise RuntimeError("Field has TypeKind=key but class name does not end in 'Key'.")
-
-                result.field_type = field_class_path
-                field_type_obj = ClassInfo.get_class_type(field_class_path)
-
-                if (
-                    dependencies is not None
-                    and field_type_obj is not record_type
-                    and field_type_obj not in dependencies
-                ):
-                    # TODO: Do we need this if we are processing dependencies?
-                    # TODO: Should a list of dependencies be added to TypeDecl object directly
-                    if issubclass(field_type_obj, Enum):
-                        from cl.runtime.schema.enum_decl import EnumDecl  # noqa
-
-                        # TODO: Restore call when implemented EnumDecl.for_type(field_type_obj, dependencies=dependencies)
-                    else:
-                        from cl.runtime.schema.type_decl import TypeDecl  # noqa
-
-                        TypeDecl.for_type(field_type_obj, dependencies=dependencies)
-
-                # Add to dependencies
-                if dependencies is not None:
-                    dependencies.add(field_type_obj)
+            # Add to dependencies
+            if dependencies:
+                dependencies.add(field_type)
         else:
             raise RuntimeError(f"Complex type {field_type} is not supported when building database schema.")
 
