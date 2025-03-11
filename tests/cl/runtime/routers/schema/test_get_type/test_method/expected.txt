@@ -7,6 +7,84 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   Comment: UiAppState.
   TypeKind: Record
   DisplayKind: Basic
+  Fields:
+  - Name: User
+    Comment: A user the app state is applied for.
+    FieldKind: Key
+    FieldTypeDecl:
+      Module:
+        ModuleName: cl.runtime.backend.core.user_key
+      Name: UserKey
+  - Name: OpenedTabs
+    Comment: Information about opened tabs.
+    FieldKind: RecordOrData
+    FieldTypeDecl:
+      Module:
+        ModuleName: cl.runtime.backend.core.tab_info
+      Name: TabInfo
+    Container:
+      ContainerKind: List
+    OptionalField: true
+  - Name: ActiveTabIndex
+    Comment: Index of active opened tab.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: int
+    OptionalField: true
+  - Name: BackendVersion
+    Comment: DEPRECATED. Use versions instead.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    OptionalField: true
+  - Name: Versions
+    Comment: Component versions.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    Container:
+      ContainerKind: Dict
+    OptionalField: true
+  - Name: ApplicationName
+    Comment: Application name.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    OptionalField: true
+  - Name: ReadOnly
+    Comment: Flag indicating that UI is read-only.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: bool
+    OptionalField: true
+  - Name: ApplicationTheme
+    Comment: Application theme (dark, light, etc.).
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    OptionalField: true
+  - Name: UserSecretIdentifiers
+    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    Container:
+      ContainerKind: List
+    OptionalField: true
   Elements:
   - _t: cl.runtime.backend.core.user_key.UserKey
     Key:
@@ -71,6 +149,28 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
   Comment: Base type info.
   TypeKind: Data
   DisplayKind: Basic
+  Fields:
+  - Name: Name
+    Comment: Name of type.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+  - Name: Module
+    Comment: Module of type.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+  - Name: Label
+    Comment: Label of type.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
   Elements:
   - Value:
       Type: String
@@ -93,6 +193,14 @@ cl.runtime.backend.core.tab_info.TabInfo:
   Comment: Tab info.
   TypeKind: Data
   DisplayKind: Basic
+  Fields:
+  - Name: Type
+    Comment: Type.
+    FieldKind: RecordOrData
+    FieldTypeDecl:
+      Module:
+        ModuleName: cl.runtime.backend.core.base_type_info
+      Name: BaseTypeInfo
   Elements:
   - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
     Data:
@@ -110,6 +218,14 @@ cl.runtime.backend.core.user_key.UserKey:
   Comment: User which is allowed to log in.
   TypeKind: Data
   DisplayKind: Basic
+  Fields:
+  - Name: Username
+    Comment: Unique user identifier.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
   Elements:
   - Value:
       Type: String
@@ -125,6 +241,84 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   Comment: UiAppState.
   TypeKind: Record
   DisplayKind: Basic
+  Fields:
+  - Name: User
+    Comment: A user the app state is applied for.
+    FieldKind: Key
+    FieldTypeDecl:
+      Module:
+        ModuleName: cl.runtime.backend.core.user_key
+      Name: UserKey
+  - Name: OpenedTabs
+    Comment: Information about opened tabs.
+    FieldKind: RecordOrData
+    FieldTypeDecl:
+      Module:
+        ModuleName: cl.runtime.backend.core.tab_info
+      Name: TabInfo
+    Container:
+      ContainerKind: List
+    OptionalField: true
+  - Name: ActiveTabIndex
+    Comment: Index of active opened tab.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: int
+    OptionalField: true
+  - Name: BackendVersion
+    Comment: DEPRECATED. Use versions instead.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    OptionalField: true
+  - Name: Versions
+    Comment: Component versions.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    Container:
+      ContainerKind: Dict
+    OptionalField: true
+  - Name: ApplicationName
+    Comment: Application name.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    OptionalField: true
+  - Name: ReadOnly
+    Comment: Flag indicating that UI is read-only.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: bool
+    OptionalField: true
+  - Name: ApplicationTheme
+    Comment: Application theme (dark, light, etc.).
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    OptionalField: true
+  - Name: UserSecretIdentifiers
+    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+    Container:
+      ContainerKind: List
+    OptionalField: true
   Elements:
   - _t: cl.runtime.backend.core.user_key.UserKey
     Key:
@@ -189,6 +383,28 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
   Comment: Base type info.
   TypeKind: Data
   DisplayKind: Basic
+  Fields:
+  - Name: Name
+    Comment: Name of type.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+  - Name: Module
+    Comment: Module of type.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+  - Name: Label
+    Comment: Label of type.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
   Elements:
   - Value:
       Type: String
@@ -211,6 +427,14 @@ cl.runtime.backend.core.tab_info.TabInfo:
   Comment: Tab info.
   TypeKind: Data
   DisplayKind: Basic
+  Fields:
+  - Name: Type
+    Comment: Type.
+    FieldKind: RecordOrData
+    FieldTypeDecl:
+      Module:
+        ModuleName: cl.runtime.backend.core.base_type_info
+      Name: BaseTypeInfo
   Elements:
   - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
     Data:
@@ -228,6 +452,14 @@ cl.runtime.backend.core.user_key.UserKey:
   Comment: User which is allowed to log in.
   TypeKind: Data
   DisplayKind: Basic
+  Fields:
+  - Name: Username
+    Comment: Unique user identifier.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
   Elements:
   - Value:
       Type: String
