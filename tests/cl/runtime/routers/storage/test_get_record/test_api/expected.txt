@@ -9,7 +9,7 @@ schema:
     TypeKind: Record
     DisplayKind: Basic
     Fields:
-    - Name: Id
+    - Name: id
       Comment: Unique identifier.
       FieldKind: Primitive
       FieldTypeDecl:
