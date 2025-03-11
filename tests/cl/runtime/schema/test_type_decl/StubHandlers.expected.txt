@@ -167,6 +167,52 @@ declare:
         display_kind: Basic
         inherit: null
         declare: null
+        fields:
+        - name: name
+          label: null
+          comment: Content name.
+          field_kind: Primitive
+          field_type_decl:
+            _Freezable__frozen: true
+            module:
+              _Freezable__frozen: true
+              module_name: builtins
+            name: str
+          container: null
+          optional_field: true
+          additive: null
+          formatter: null
+          alternate_of: null
+        - name: file_bytes
+          label: null
+          comment: Embedded binary content to be displayed as the current view.
+          field_kind: Primitive
+          field_type_decl:
+            _Freezable__frozen: true
+            module:
+              _Freezable__frozen: true
+              module_name: builtins
+            name: bytes
+          container: null
+          optional_field: false
+          additive: null
+          formatter: null
+          alternate_of: null
+        - name: file_type
+          label: null
+          comment: Embedded binary content type.
+          field_kind: Enum
+          field_type_decl:
+            _Freezable__frozen: true
+            module:
+              _Freezable__frozen: true
+              module_name: cl.runtime.file.file_type_enum
+            name: FileTypeEnum
+          container: null
+          optional_field: true
+          additive: null
+          formatter: null
+          alternate_of: null
         elements:
         - value:
             type_: String
@@ -528,6 +574,52 @@ declare:
         display_kind: Basic
         inherit: null
         declare: null
+        fields:
+        - name: name
+          label: null
+          comment: Content name.
+          field_kind: Primitive
+          field_type_decl:
+            _Freezable__frozen: true
+            module:
+              _Freezable__frozen: true
+              module_name: builtins
+            name: str
+          container: null
+          optional_field: true
+          additive: null
+          formatter: null
+          alternate_of: null
+        - name: file_bytes
+          label: null
+          comment: Embedded binary content to be displayed as the current view.
+          field_kind: Primitive
+          field_type_decl:
+            _Freezable__frozen: true
+            module:
+              _Freezable__frozen: true
+              module_name: builtins
+            name: bytes
+          container: null
+          optional_field: false
+          additive: null
+          formatter: null
+          alternate_of: null
+        - name: file_type
+          label: null
+          comment: Embedded binary content type.
+          field_kind: Enum
+          field_type_decl:
+            _Freezable__frozen: true
+            module:
+              _Freezable__frozen: true
+              module_name: cl.runtime.file.file_type_enum
+            name: FileTypeEnum
+          container: null
+          optional_field: true
+          additive: null
+          formatter: null
+          alternate_of: null
         elements:
         - value:
             type_: String
@@ -858,6 +950,22 @@ declare:
     params: null
     return_: null
     static: false
+fields:
+- name: stub_id
+  label: null
+  comment: Stub identifier.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
 elements:
 - value:
     type_: String

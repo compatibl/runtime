@@ -14,6 +14,148 @@ inherit:
     module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
   name: StubDataclassRecord
 declare: null
+fields:
+- name: id
+  label: null
+  comment: null
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: str_list
+  label: null
+  comment: Stub field.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: float_list
+  label: null
+  comment: Stub field.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: float
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: date_list
+  label: null
+  comment: Stub field.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: datetime
+    name: date
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: data_list
+  label: null
+  comment: Stub field.
+  field_kind: RecordOrData
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+    name: StubDataclassData
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: key_list
+  label: null
+  comment: Stub field.
+  field_kind: Key
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: record_list
+  label: null
+  comment: Stub field.
+  field_kind: RecordOrData
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+    name: StubDataclassRecord
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: derived_record_list
+  label: null
+  comment: Stub field.
+  field_kind: RecordOrData
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record
+    name: StubDataclassDerivedRecord
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
 elements:
 - value:
     type_: String

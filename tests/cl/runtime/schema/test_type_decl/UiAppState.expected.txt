@@ -9,6 +9,151 @@ type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
+fields:
+- name: user
+  label: null
+  comment: A user the app state is applied for.
+  field_kind: Key
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: cl.runtime.backend.core.user_key
+    name: UserKey
+  container: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: opened_tabs
+  label: null
+  comment: Information about opened tabs.
+  field_kind: RecordOrData
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: cl.runtime.backend.core.tab_info
+    name: TabInfo
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: true
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: active_tab_index
+  label: null
+  comment: Index of active opened tab.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: int
+  container: null
+  optional_field: true
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: backend_version
+  label: null
+  comment: DEPRECATED. Use versions instead.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container: null
+  optional_field: true
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: versions
+  label: null
+  comment: Component versions.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container:
+    container_kind: Dict
+    inner: null
+    optional_items: null
+  optional_field: true
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: application_name
+  label: null
+  comment: Application name.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container: null
+  optional_field: true
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: read_only
+  label: null
+  comment: Flag indicating that UI is read-only.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: bool
+  container: null
+  optional_field: true
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: application_theme
+  label: null
+  comment: Application theme (dark, light, etc.).
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container: null
+  optional_field: true
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: user_secret_identifiers
+  label: null
+  comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container:
+    container_kind: List
+    inner: null
+    optional_items: null
+  optional_field: true
+  additive: null
+  formatter: null
+  alternate_of: null
 elements:
 - value: null
   enum: null

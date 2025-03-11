@@ -9,6 +9,22 @@ type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
+fields:
+- name: id
+  label: null
+  comment: Unique identifier.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
 elements:
 - value:
     type_: String
@@ -44,6 +60,22 @@ type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
+fields:
+- name: id
+  label: null
+  comment: Unique identifier.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
 elements:
 - value:
     type_: String

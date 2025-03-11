@@ -9,6 +9,52 @@ type_kind: Record
 display_kind: Basic
 inherit: null
 declare: null
+fields:
+- name: primitive
+  label: null
+  comment: String key element.
+  field_kind: Primitive
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: builtins
+    name: str
+  container: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: embedded_1
+  label: null
+  comment: Embedded key 1.
+  field_kind: Key
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  container: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
+- name: embedded_2
+  label: null
+  comment: Embedded key 2.
+  field_kind: Key
+  field_type_decl:
+    _Freezable__frozen: true
+    module:
+      _Freezable__frozen: true
+      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    name: StubDataclassRecordKey
+  container: null
+  optional_field: false
+  additive: null
+  formatter: null
+  alternate_of: null
 elements:
 - value:
     type_: String
