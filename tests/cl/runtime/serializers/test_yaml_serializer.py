@@ -57,7 +57,7 @@ def test_to_yaml():
 
     for sample_type in _SAMPLE_TYPES:
 
-        # Serialize to JSON
+        # Create and serialize to YAML
         obj = sample_type().build()
         result_str = serializer.to_yaml(obj)
 
@@ -68,6 +68,30 @@ def test_to_yaml():
 
     RegressionGuard().verify_all()
 
+def test_from_yaml():
+    """Test DictSerializer2.to_yaml method."""
+
+    # Create the serializer
+    serializer = YamlSerializer().build()
+
+    for sample_type in _SAMPLE_TYPES:
+
+        # Create and serialize to YAML
+        obj = sample_type().build()
+        yaml_str = serializer.to_yaml(obj)
+
+        # Deserialize from YAML with all primitive types read as string
+        yaml_dict = serializer.from_yaml(yaml_str)
+
+        # Serialize again, this time all values will be strings
+        result_str = serializer.to_yaml(yaml_dict)
+
+        # Write to regression guard
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
+        guard = RegressionGuard(channel=snake_case_type_name)
+        guard.write(result_str)
+
+    RegressionGuard().verify_all()
 
 if __name__ == "__main__":
     pytest.main([__file__])

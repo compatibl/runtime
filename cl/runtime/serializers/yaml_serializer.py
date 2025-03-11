@@ -27,16 +27,21 @@ from io import StringIO
 # Serializer used by YAML representers to convert primitive types to YAML value string
 representation_serializer = PrimitiveSerializer().build()
 
+
+def str_representer(dumper, data):
+    """Use standard conversion to string for primitive types."""
+    data_str = representation_serializer.serialize(data)
+    if data_str:
+        style = "|" if data_str and "\n" in data_str else None
+        return dumper.represent_scalar('tag:yaml.org,2002:str', data_str, style=style)
+    else:
+        return dumper.represent_scalar('tag:yaml.org,2002:null', None, style=None)
+
+
 def float_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
     data_str = representation_serializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:float', data_str, style=None)
-
-
-def datetime_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = representation_serializer.serialize(data)
-    return dumper.represent_scalar('tag:yaml.org,2002:timestamp', data_str, style=None)
 
 
 def time_representer(dumper, data):
@@ -45,23 +50,23 @@ def time_representer(dumper, data):
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str)
 
 
-def str_representer(dumper, data):
+def datetime_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
     data_str = representation_serializer.serialize(data)
-    style = "|" if data_str and "\n" in data_str else None
-    return dumper.represent_scalar('tag:yaml.org,2002:str', data_str, style=style)
+    return dumper.represent_scalar('tag:yaml.org,2002:timestamp', data_str, style=None)
+
 
 class StringOnlyConstructor(SafeConstructor):
     """Custom constructor for reading that ensures all values are read as strings."""
 
     def construct_object(self, node, deep=False):
         if isinstance(node, ScalarNode):  # Scalars (numbers, bools, strings)
-            return str(super().construct_scalar(node))
+            return str(super().construct_scalar(node) if node.value else None)
         elif isinstance(node, SequenceNode):  # Lists
-            return [self.construct_object(child, deep) for child in node.value]
+            return [self.construct_object(v, deep) if v.value else None for v in node.value]
         elif isinstance(node, MappingNode):  # Dictionaries
-            return {str(self.construct_object(k, deep)): self.construct_object(v, deep) for k, v in node.value}
-        return super().construct_object(node, deep)
+            return {str(self.construct_object(k, deep)): self.construct_object(v, deep) for k, v in node.value if v.value}
+        return super().construct_object(node, deep) if node.value else None
 
 # Use roundtrip style YAML to follow formatting instructions
 yaml = YAML(typ='rt')
