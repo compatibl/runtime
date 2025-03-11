@@ -260,8 +260,8 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
                 parent_type_decl = cls.for_type(parent_type, dependencies=dependencies)
                 result.inherit = parent_type_decl.get_key()
 
-                # Add to dependencies
-                if dependencies:
+                # Add parent type to dependencies, do not use if dependencies to prevent from skipping on first item added
+                if dependencies is not None:
                     dependencies.add(parent_type)
 
         # Get type public methods
@@ -306,6 +306,12 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
                 # Convert to element and add
                 element_decl = ElementDecl.create(field_decl)
                 result.elements.append(element_decl)
+
+        # Call for_type to generate type declarations for all dependencies recursively
+        if dependencies is not None and len(dependencies) > 0:
+            for dep in dependencies:
+                if dep != record_type and not is_primitive(dep):
+                    cls.for_type(dep, dependencies=None, skip_fields=skip_fields, skip_handlers=skip_handlers)
 
         return result
 

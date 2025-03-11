@@ -62,6 +62,37 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
     Optional: true
   Keys:
   - User
+cl.runtime.backend.core.tab_info.TabInfo:
+  _t: TabInfo
+  Module:
+    ModuleName: cl.runtime.backend.core.tab_info
+  Name: TabInfo
+  Label: Tab Info
+  Comment: Tab info.
+  TypeKind: Data
+  DisplayKind: Basic
+  Elements:
+  - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
+    Data:
+      Module:
+        ModuleName: cl.runtime.backend.core.base_type_info
+      Name: BaseTypeInfo
+    Name: Type
+    Comment: Type.
+cl.runtime.backend.core.user_key.UserKey:
+  _t: UserKey
+  Module:
+    ModuleName: cl.runtime.backend.core.user_key
+  Name: UserKey
+  Label: User Key
+  Comment: User which is allowed to log in.
+  TypeKind: Data
+  DisplayKind: Basic
+  Elements:
+  - Value:
+      Type: String
+    Name: Username
+    Comment: Unique user identifier.
 
 cl.runtime.backend.core.ui_app_state.UiAppState:
   _t: UiAppState
@@ -127,4 +158,35 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
     Optional: true
   Keys:
   - User
+cl.runtime.backend.core.tab_info.TabInfo:
+  _t: TabInfo
+  Module:
+    ModuleName: cl.runtime.backend.core.tab_info
+  Name: TabInfo
+  Label: Tab Info
+  Comment: Tab info.
+  TypeKind: Data
+  DisplayKind: Basic
+  Elements:
+  - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
+    Data:
+      Module:
+        ModuleName: cl.runtime.backend.core.base_type_info
+      Name: BaseTypeInfo
+    Name: Type
+    Comment: Type.
+cl.runtime.backend.core.user_key.UserKey:
+  _t: UserKey
+  Module:
+    ModuleName: cl.runtime.backend.core.user_key
+  Name: UserKey
+  Label: User Key
+  Comment: User which is allowed to log in.
+  TypeKind: Data
+  DisplayKind: Basic
+  Elements:
+  - Value:
+      Type: String
+    Name: Username
+    Comment: Unique user identifier.
 

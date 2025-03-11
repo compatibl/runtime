@@ -26,7 +26,7 @@ from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_key, is_record
+from cl.runtime.records.protocols import is_key, is_record, is_primitive
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
@@ -206,8 +206,13 @@ class FieldDecl:
         elif field_origin in supported_containers:
             raise RuntimeError("Containers within containers are not supported when building database schema.")
         elif field_origin is None:
+
             # Assign type declaration key
             result.field_type_decl = TypeDeclKey.from_type(field_type)
+
+            # Add field type to dependencies, do not use if dependencies to prevent from skipping on first item added
+            if dependencies is not None and not is_primitive(field_type):
+                dependencies.add(field_type)
 
             # Assign field kind
             if field_type in primitive_types:
