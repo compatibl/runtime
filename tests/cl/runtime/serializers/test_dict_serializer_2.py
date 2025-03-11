@@ -78,5 +78,32 @@ def test_to_dict():
     RegressionGuard().verify_all()
 
 
+def test_to_dict_omit_type():
+    """Test DictSerializer2.to_dict method with omit_type=True."""
+
+    # Create the serializer
+    serializer = DictSerializer2(omit_type=True).build()
+
+    for sample_type in _SAMPLE_TYPES:
+
+        # Serialize to dict
+        obj = sample_type().build()
+        obj_dict = serializer.to_dict(obj)
+
+        # Convert to JSON using orjson
+        result_str = orjson.dumps(
+            obj_dict,
+            option=orjson.OPT_INDENT_2 | orjson.OPT_OMIT_MICROSECONDS,
+            default=orjson_default,
+        ).decode()
+
+        # Write to regression guard
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
+        guard = RegressionGuard(channel=snake_case_type_name)
+        guard.write(result_str)
+
+    RegressionGuard().verify_all()
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
