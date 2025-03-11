@@ -298,20 +298,28 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
                 # Field comment (docstring)
                 field_comment = member_comments.get(field_name, None)
 
-                # Get the rest of the data from the field itself
+                # Use a separate set to keep track of dependencies added during this call
+                added_dependencies = set()
+
+                # Create field declaration
                 field_decl = FieldDecl.create(
-                    record_type, field_name, field_type, field_comment, dependencies=dependencies
+                    record_type, field_name, field_type, field_comment, dependencies=added_dependencies
                 )
+
+                if dependencies is not None:
+                    # Iterate over only the added dependencies
+                    for dep in added_dependencies:
+                        # Call recursively on all added dependencies unless already in dependencies or primitive
+                        if not is_primitive(dep) and dep not in dependencies:
+                            cls.for_type(
+                                dep, dependencies=dependencies, skip_fields=skip_fields, skip_handlers=skip_handlers
+                            )
+                    # Update dependencies with added dependencies
+                    dependencies.update(added_dependencies)
 
                 # Convert to element and add
                 element_decl = ElementDecl.create(field_decl)
                 result.elements.append(element_decl)
-
-        # Call for_type to generate type declarations for all dependencies recursively
-        if dependencies is not None and len(dependencies) > 0:
-            for dep in dependencies:
-                if dep != record_type and not is_primitive(dep):
-                    cls.for_type(dep, dependencies=None, skip_fields=skip_fields, skip_handlers=skip_handlers)
 
         return result
 

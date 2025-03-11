@@ -230,10 +230,6 @@ class FieldDecl:
             else:
                 raise RuntimeError("Field type '{field_type}' for field '{field_name}' is not\n"
                                    "a primitive type, enum, key, record or a class with slots.")
-
-            # Add to dependencies
-            if dependencies and result.field_kind != FieldKindEnum.PRIMITIVE:
-                dependencies.add(field_type)
         else:
             raise RuntimeError(f"Complex type {field_type} is not supported when building database schema.")
 
