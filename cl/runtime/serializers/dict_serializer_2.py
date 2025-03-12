@@ -12,21 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime as dt
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from typing import Any, Type
 from frozendict import frozendict
+from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.serializers.annotations_util import AnnotationsUtil
+from cl.runtime.serializers.dict_serializer import get_type_dict
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.serializers.slots_util import SlotsUtil
-from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
+from cl.runtime.serializers.sentinel_type import sentinel_value
+from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES, TDataField, is_primitive, is_key, is_record
 
 
 @dataclass(slots=True, kw_only=True)
 class DictSerializer2(Freezable):
-    """Serialization without using the schema or retaining type information, not suitable for deserialization."""
+    """Roundtrip serialization of object to dictionary with optional type information."""
 
     primitive_serializer: PrimitiveSerializer = required()
     """Pascalize keys during serialization if set."""
@@ -34,36 +44,66 @@ class DictSerializer2(Freezable):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
+    omit_type: bool | None = None
+    """Omit type information including the root type from serialized output."""
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         # Use primitive serializer with default settings if not specified
         if self.primitive_serializer is None:
             self.primitive_serializer = PrimitiveSerializer()
 
-    def to_dict(self, data: Any, *, serialize_primitive: bool | None = None) -> Any:
+    def to_dict(self, data: Any, type_: Type | None = None, *, serialize_primitive: bool | None = None) -> Any:
         """
-        Serialize a slots-based object to a dictionary without using the schema or retaining type information,
-        not suitable for deserialization.
+        Serialize a slots-based object to a dictionary. Type information is written only if type_ is specified.
+
+        - If type(data) is type_, no type information is written
+        - If type(data) inherits from type_, TypeUtil.name(data) is written into _type field
+        - If neither is true, an error is raised
 
         Args:
-            data: Data to serialize
+            data: Object to serialize
+            type_: Expected type of the object.
             serialize_primitive: Convert primitive types to strings during serialization if set
         """
 
         if getattr(data, "__slots__", None) is not None:
+
+            # If type is specified, ensure that data is an instance of the specified type
+            if type_ and not isinstance(data, type_):
+                obj_type_name = TypeUtil.name(data.__class__)
+                schema_type_name = TypeUtil.name(type_)
+                raise RuntimeError(f"Type {obj_type_name} is not the same or a subclass of "
+                                   f"the type {schema_type_name} specified in schema.")
+
+            # Write type information if omit_type is False and type_ is not specified or is not type(data)
+            if (not self.omit_type) and (type_ is None or type_ is data.__class__):
+                obj_type_name = TypeUtil.name(data.__class__)
+                result = {}  # {"_type": obj_type_name}
+            else:
+                result = {}
+
             # Get slots from this class and its bases in the order of declaration from base to derived
-            all_slots = SlotsUtil.get_slots(data.__class__)
+            type_decl = TypeDecl.for_type(data.__class__)
+            field_types = [
+                (
+                    field.name,
+                    Schema.get_type_by_short_name(field.field_type_decl.name),
+                )
+                for field in type_decl.fields
+            ]
+
             # Serialize slot values in the order of declaration except those that are None
-            result = {
+            result.update({
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     (self.primitive_serializer.serialize(v) if serialize_primitive else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
                     else self.to_dict(v, serialize_primitive=serialize_primitive)
                 )
-                for k in all_slots
+                for k, t in field_types
                 if (v := getattr(data, k)) is not None and (not hasattr(v, "__len__") or len(v) > 0)
-            }
+            })
             return result
         elif isinstance(data, list) or isinstance(data, tuple):
             # Assume that type of the first item is the same as for the rest of the collection
@@ -72,7 +112,7 @@ class DictSerializer2(Freezable):
                 # More efficient implementation for a primitive collection
                 if serialize_primitive:
                     return [
-                        "None" if v is None
+                        "null" if v is None
                         else self.primitive_serializer.serialize(v)
                         for v in data
                     ]
@@ -81,11 +121,13 @@ class DictSerializer2(Freezable):
             else:
                 # Not a primitive collection, serialize complex elements or enums
                 result = [
-                    "None" if serialize_primitive else None if v is None
-                    else (self.primitive_serializer.serialize(v) if serialize_primitive else v)
-                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
-                    else v.name if isinstance(v, Enum)
-                    else self.to_dict(v, serialize_primitive=serialize_primitive)
+                    ("null" if serialize_primitive else None)
+                    if v is None else
+                    (self.primitive_serializer.serialize(v) if serialize_primitive else v)
+                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES else
+                    v.name
+                    if isinstance(v, Enum) else
+                    self.to_dict(v, serialize_primitive=serialize_primitive)
                     for v in data
                 ]
             return result
@@ -104,3 +146,140 @@ class DictSerializer2(Freezable):
             return result
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
+
+    def from_dict(self, data: TDataField, type_: Type | None = None) -> Any:
+        """Deserialize a dictionary into object using _type and schema."""
+
+        # Extract inner type if type_ is Optional[...]
+        type_ = AnnotationsUtil.handle_optional_annot(type_)
+
+        if isinstance(data, dict):
+            # Determine if the dictionary is a serialized dataclass or a dictionary
+            if (short_name := data.get("_type", None)) is not None:
+                # If _type is specified, create an instance of _type after deserializing fields recursively
+                type_dict = get_type_dict()
+                deserialized_type = type_dict.get(short_name, None)  # noqa
+                if deserialized_type is None:
+                    raise RuntimeError(
+                        f"Class not found for name or alias '{short_name}' during deserialization. "
+                        f"Ensure all serialized classes are included in package import settings."
+                    )
+
+                # Check if the class is abstract
+                if RecordUtil.is_abstract(deserialized_type):
+                    descendants = RecordUtil.get_non_abstract_descendants(deserialized_type)
+                    descendant_names = sorted(set([x.__name__ for x in descendants]))
+                    if len(descendant_names) > 0:
+                        descendant_names_str = ", ".join(descendant_names)
+                        raise UserError(
+                            f"Record {deserialized_type.__name__} cannot be created directly, "
+                            f"but the following descendant records can: {descendant_names_str}"
+                        )
+                    else:
+                        raise UserError(
+                            f"Record {deserialized_type.__name__} cannot be created directly "
+                            f"and there are no descendant records that can."
+                        )
+
+                annots = AnnotationsUtil.get_class_hierarchy_annotations(deserialized_type)
+                deserialized_fields = {
+                    (CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k): (
+                        v
+                        if v is None or is_primitive(v)
+                        else self.from_dict(
+                            v,
+                            annots.get(
+                                CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k
+                            ),
+                        )
+                    )
+                    for k, v in data.items()
+                    if k != "_type" and not k.startswith("_")
+                }
+                result = deserialized_type(**deserialized_fields)  # noqa
+                return result
+            elif (short_name := data.get("_enum", None)) is not None:
+                # If _enum is specified, create an instance of _enum using _name
+                type_dict = get_type_dict()
+                deserialized_type = type_dict.get(short_name, None)  # noqa
+                if deserialized_type is None:
+                    raise RuntimeError(
+                        f"Enum not found for name or alias '{short_name}' during deserialization. "
+                        f"Ensure all serialized enums are included in package import settings."
+                    )
+                pascal_case_value = data["_name"]
+                upper_case_value = CaseUtil.pascal_to_upper_case(pascal_case_value)
+                result = deserialized_type[upper_case_value]  # noqa
+                return result
+            else:
+
+                dict_value_annot_type = AnnotationsUtil.extract_dict_value_annot_type(type_)
+
+                # Otherwise return a dictionary with recursively deserialized values
+                result = {
+                    k: (
+                        v
+                        if v is None or is_primitive(v)
+                        else self.from_dict(v, dict_value_annot_type)
+                    )
+                    for k, v in data.items()
+                }
+                return result
+        elif data.__class__.__name__ == "datetime":
+            if type_ is None:
+                return data
+
+            if type_.__name__ == "datetime":
+                return DatetimeUtil.round(data.replace(tzinfo=dt.timezone.utc))
+            elif type_.__name__ == "date":
+                return data.date()
+            else:
+                return data
+        elif data.__class__.__name__ == "int":
+            if type_ is not None and type_.__name__ == "float":
+                return float(data)
+            elif type_ is not None and type_.__name__ == "time":
+                return TimeUtil.from_iso_int(data)
+            else:
+                return data
+        elif data.__class__.__name__ == "Int64":
+            return int(data)
+        elif hasattr(data, "__iter__"):
+            # Get the first item without iterating over the entire sequence
+            first_item = next(iter(data), sentinel_value)
+
+            # Get origin type and its args
+            origin_type, iter_value_annot_type = AnnotationsUtil.extract_iterable_origin_and_args(type_)
+
+            if first_item == sentinel_value:
+                # Empty iterable, return None
+                return None
+            elif (
+                iter_value_annot_type is not Any
+                and first_item is not None
+                and is_primitive(first_item)
+            ):
+                # Performance optimization to skip deserialization for arrays of primitive types
+                # based on the type of first item (assumes that all remaining items are also primitive)
+
+                # Convert list to tuple if it is annotated with Tuple[Type, ...]
+                if isinstance(data, list) and origin_type is tuple:
+                    return tuple(x for x in data)
+                else:
+                    return data
+            else:
+                # Deserialize each element of the iterable
+                result = origin_type(
+                    (
+                        v
+                        if v is None or is_primitive(v)
+                        else self.from_dict(v, iter_value_annot_type)
+                    )
+                    for v in data
+                )
+                return result
+
+        elif is_key(data) or is_record(data):
+            return data
+        else:
+            raise RuntimeError(f"Cannot deserialize data of type '{type(data)}'.")
