@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
@@ -59,39 +60,37 @@ def test_to_yaml():
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        result_str = serializer.to_yaml(obj)
+        obj_yaml = serializer.to_yaml(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
-        guard.write(result_str)
+        guard.write(obj_yaml)
 
     RegressionGuard().verify_all()
 
 def test_from_yaml():
     """Test DictSerializer2.to_yaml method."""
 
-    # Create the serializer
-    serializer = YamlSerializer().build()
+    # Create the serializers
+    yaml_serializer = YamlSerializer().build()
+    dict_serializer = DictSerializer2().build()
 
     for sample_type in _SAMPLE_TYPES:
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        yaml_str = serializer.to_yaml(obj)
+        obj_yaml = yaml_serializer.to_yaml(obj)
 
-        # Deserialize from YAML with all primitive types read as string
-        yaml_dict = serializer.from_yaml(yaml_str)
+        # Serialize to dict using serialize_primitive flag, all primitive values are strings
+        all_string_obj_dict = dict_serializer.to_dict(obj, serialize_primitive=True)
 
-        # Serialize again, this time all values will be strings
-        result_str = serializer.to_yaml(yaml_dict)
+        # Deserialize from YAML, when schema is not used all primitive values will be strings
+        yaml_dict = yaml_serializer.from_yaml(obj_yaml)
 
-        # Write to regression guard
-        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
-        guard = RegressionGuard(channel=snake_case_type_name)
-        guard.write(result_str)
+        # Compare the two dictionaries
+        assert yaml_dict == all_string_obj_dict
 
-    RegressionGuard().verify_all()
 
 if __name__ == "__main__":
     pytest.main([__file__])

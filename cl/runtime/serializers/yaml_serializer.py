@@ -14,9 +14,13 @@
 
 import datetime as dt
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Type
 from uuid import UUID
-from ruamel.yaml import YAML, StringIO
+from ruamel.yaml import YAML, StringIO, CommentedMap, CommentedSeq
+from ruamel.yaml.scalarfloat import ScalarFloat
+from ruamel.yaml.scalarint import ScalarInt
+from ruamel.yaml.scalarstring import ScalarString
+
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
@@ -24,13 +28,13 @@ from ruamel.yaml.nodes import ScalarNode, SequenceNode, MappingNode
 from ruamel.yaml.constructor import SafeConstructor
 from io import StringIO
 
-# Serializer used by YAML representers to convert primitive types to YAML value string
-representation_serializer = PrimitiveSerializer().build()
+# Use primitive serializer with default settings to serialize all primitive types to string
+primitive_to_string_serializer = PrimitiveSerializer().build()
 
 
 def str_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = representation_serializer.serialize(data)
+    data_str = primitive_to_string_serializer.serialize(data)
     if data_str:
         style = "|" if data_str and "\n" in data_str else None
         return dumper.represent_scalar('tag:yaml.org,2002:str', data_str, style=style)
@@ -40,47 +44,57 @@ def str_representer(dumper, data):
 
 def float_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = representation_serializer.serialize(data)
+    data_str = primitive_to_string_serializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:float', data_str, style=None)
 
 
 def time_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = representation_serializer.serialize(data)
+    data_str = primitive_to_string_serializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:str', data_str)
 
 
 def datetime_representer(dumper, data):
     """Use standard conversion to string for primitive types."""
-    data_str = representation_serializer.serialize(data)
+    data_str = primitive_to_string_serializer.serialize(data)
     return dumper.represent_scalar('tag:yaml.org,2002:timestamp', data_str, style=None)
 
+# Roundtrip (typ=rt) style for the YAML writer is required to follow the formatting instructions in representers
+yaml_writer = YAML(typ='rt')
 
-class StringOnlyConstructor(SafeConstructor):
-    """Custom constructor for reading that ensures all values are read as strings."""
+# Add representers for writing the primitive types where YAML typ=rt format does not match our conventions
+yaml_writer.representer.add_representer(str, str_representer)
+yaml_writer.representer.add_representer(float, float_representer)
+yaml_writer.representer.add_representer(dt.datetime, datetime_representer)
+yaml_writer.representer.add_representer(dt.time, time_representer)
+yaml_writer.representer.add_representer(UUID, str_representer)
+yaml_writer.representer.add_representer(bytes, str_representer)
+
+class PrimitiveToStringConstructor(SafeConstructor):
+    """Custom constructor for YAML reader that ensures all primitive values are read as strings."""
 
     def construct_object(self, node, deep=False):
-        if isinstance(node, ScalarNode):  # Scalars (numbers, bools, strings)
-            return str(super().construct_scalar(node) if node.value else None)
-        elif isinstance(node, SequenceNode):  # Lists
-            return [self.construct_object(v, deep) if v.value else None for v in node.value]
-        elif isinstance(node, MappingNode):  # Dictionaries
-            return {str(self.construct_object(k, deep)): self.construct_object(v, deep) for k, v in node.value if v.value}
-        return super().construct_object(node, deep) if node.value else None
+        """Convert from YAML types to native Python types."""
+        if isinstance(node, ScalarNode):  # , ScalarString, ScalarFloat, ScalarInt)):  # Primitive types
+            value = super().construct_scalar(node)
+            if isinstance(value, (int, float, bool)):
+                # Keep native Python types for int, float, bool
+                return value
+            else:
+                # Convert everything else to string
+                return str(value) if (value is not None and value != "") else "null"
+        elif isinstance(node, SequenceNode):  # , CommentedSeq)):  # Lists
+            return [self.construct_object(v, deep) for v in node.value]
+        elif isinstance(node, MappingNode): # , CommentedMap)):  # Dictionaries
+            return {
+                self.construct_object(k, deep): self.construct_object(v, deep)
+                for k, v in node.value
+            }
+        return super().construct_object(node, deep)
 
-# Use roundtrip style YAML to follow formatting instructions
-yaml = YAML(typ='rt')
-
-# Add representers for writing the primitive types where default format does not match our conventions
-yaml.representer.add_representer(str, str_representer)
-yaml.representer.add_representer(float, float_representer)
-yaml.representer.add_representer(dt.datetime, datetime_representer)
-yaml.representer.add_representer(dt.time, time_representer)
-yaml.representer.add_representer(UUID, str_representer)
-yaml.representer.add_representer(bytes, str_representer)
-
-# Override constructor for reading all types as strings
-yaml.Constructor = StringOnlyConstructor
+# Override constructor in YAML reader for reading all types as strings
+yaml_reader = YAML(typ='safe')
+yaml_reader.Constructor = PrimitiveToStringConstructor
 
 @dataclass(slots=True, kw_only=True)
 class YamlSerializer(Freezable):
@@ -89,12 +103,12 @@ class YamlSerializer(Freezable):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    _dict_serializer: DictSerializer2 = None
+    dict_serializer: DictSerializer2 = None
     """Serializes data into dictionary from which it is serialized into YAML."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        self._dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
+        self.dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
 
     def to_yaml(self, data: Any) -> str:
         """
@@ -102,11 +116,11 @@ class YamlSerializer(Freezable):
         not suitable for deserialization.
         """
         # Convert to dict with serialize_primitive flag set
-        data_dict = self._dict_serializer.to_dict(data)
+        data_dict = self.dict_serializer.to_dict(data)
 
         # Use customized YAML object to follow the primitive type serialization conventions
         output = StringIO()
-        yaml.dump(data_dict, output)
+        yaml_writer.dump(data_dict, output)
         result = output.getvalue()
         return result
 
@@ -114,6 +128,8 @@ class YamlSerializer(Freezable):
         """Read a YAML string and return the deserialized object."""
 
         # Use customized YAML object to read all values as strings
-        yaml_dict = yaml.load(StringIO(serialized_data))
+        yaml_dict = yaml_reader.load(StringIO(serialized_data))
 
-        return yaml_dict
+        # Convert to object using self.dict_serializer
+        result = self.dict_serializer.from_dict(yaml_dict)
+        return result
