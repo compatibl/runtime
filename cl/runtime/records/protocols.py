@@ -26,19 +26,35 @@ from typing import TypeVar
 from uuid import UUID
 from typing_extensions import Self
 
-_PRIMITIVE_TYPE_NAMES = {"str", "float", "bool", "int", "date", "time", "datetime", "UUID", "bytes"}
+PRIMITIVE_PYTHON_TYPES = (
+    str,
+    float,
+    bool,
+    int,
+    dt.date,
+    dt.time,
+    dt.datetime,
+    UUID,
+    bytes
+)
+"""
+The list of Python types used to store primitive types, excludes those primitive types that do not have their own
+Pyton representation such as long (uses Python type int) and timestamp (uses Python type UUID).
+"""
+
+_PRIMITIVE_TYPE_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_PYTHON_TYPES)  # TODO: Rename
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
-"""Supported primitive types for serialized data."""
+"""Python types used to store primitive values."""
 
 TDataField = Dict[str, "TDataField"] | List["TDataField"] | TPrimitive | Enum
-"""Supported field types for serialized data in dictionary format."""
+"""Field types for serialized data in dictionary format."""
 
 TDataDict = Dict[str, TDataField]
 """Serialized data in dictionary format."""
 
 TKeyField = Dict[str, "TKeyField"] | TPrimitive | Enum
-"""Supported field types for serialized key in dictionary format."""
+"""Field types for serialized key in dictionary format."""
 
 TKeyDict = Dict[str, TKeyField]
 """Serialized key in dictionary format."""
