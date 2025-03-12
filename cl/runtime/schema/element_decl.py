@@ -14,6 +14,8 @@
 
 from dataclasses import dataclass
 from typing_extensions import Self
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 from cl.runtime.schema.field_decl import FieldDecl
@@ -62,7 +64,7 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
         """Create ElementDecl from FieldDecl."""
 
         result = ElementDecl()
-        result.name = field_decl.name
+        result.name = CaseUtil.snake_to_pascal_case(field_decl.name.removesuffix("_"))
         result.label = field_decl.label
         result.comment = field_decl.comment
         result.optional = field_decl.optional_field

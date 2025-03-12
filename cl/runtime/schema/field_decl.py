@@ -99,7 +99,7 @@ class FieldDecl:
         from cl.runtime.schema.schema import Schema  # TODO: Avoid circlular dependency
 
         result = cls()
-        result.name = CaseUtil.snake_to_pascal_case(field_name.removesuffix("_"))
+        result.name = field_name
         result.comment = field_comment
 
         # Get origin and args of the field type
@@ -130,10 +130,11 @@ class FieldDecl:
             result.optional_field = False
 
         # Check for one of the supported container types
+        outer_container = None
         supported_containers = [list, tuple, dict]
-        if field_origin in supported_containers:
+        while field_origin in supported_containers:
             if field_origin is list:
-                result.container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+                container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
                 # Perform additional checks for list
                 if len(field_args) != 1:
                     raise RuntimeError(
@@ -143,7 +144,7 @@ class FieldDecl:
                         f"Other list type hint formats are not supported.\n"
                     )
             elif field_origin is tuple:
-                result.container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+                container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
                 # Perform additional checks for tuple
                 if len(field_args) == 1 or (len(field_args) > 1 and field_args[1] is not Ellipsis):
                     raise RuntimeError(
@@ -155,7 +156,7 @@ class FieldDecl:
                         f"different element types.\n"
                     )
             elif field_origin is dict:
-                result.container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
+                container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
                 # Perform additional checks for dict
                 if len(field_args) != 2 and field_args[0] is not str:
                     raise RuntimeError(
@@ -183,7 +184,7 @@ class FieldDecl:
                 if len(field_args) != 2 or field_args[1] is not type(None):
                     raise RuntimeError(
                         f"Union type hint '{field_type}' for an element of\n"
-                        f"the {result.container.container_kind.name}field '{field_name}'\n"
+                        f"the {container.container_kind.name}field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
                         f"because it is not an optional value using the syntax 'Type | None',\n"
                         f"where None is placed second per the standard convention.\n"
@@ -191,12 +192,19 @@ class FieldDecl:
                     )
 
                 # Indicate that container elements can be None
-                result.container.optional_items = True
+                container.optional_items = True
 
                 # Get type information without None
                 field_type = field_args[0]
                 field_origin = typing.get_origin(field_type)
                 field_args = typing.get_args(field_type)  # TODO: Add a check
+
+            # Assign container to result or outer container
+            if outer_container is None:
+                result.container = container
+            else:
+                outer_container.inner = container
+            outer_container = container
 
         # Parse the value itself
         if field_origin is Literal:

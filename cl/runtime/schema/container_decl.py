@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
 from dataclasses import dataclass
 
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -25,7 +26,7 @@ class ContainerDecl:
     container_kind: ContainerKindEnum = required()  # TODO: Or ContainerKey, is Container a version of TypeDecl
     """Container kind."""
 
-    inner: ContainerKindEnum | None = None
+    inner: ContainerDecl | None = None
     """For nested containers, kind of the inner container."""
 
     optional_items: bool | None = None
