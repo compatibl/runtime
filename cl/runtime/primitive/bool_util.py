@@ -36,7 +36,7 @@ class BoolUtil:
             raise RuntimeError(
                 f"Argument of BoolUtil.serialize has type {TypeUtil.name(value)}, " f"only bool is accepted."
             )
-        return "Y" if value else "N"
+        return "true" if value else "false"
 
     @classmethod
     def parse(cls, value: str | None, *, name: str | None = None) -> bool:
