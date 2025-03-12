@@ -14,6 +14,7 @@
 
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.type_util import TypeUtil
 
 
 class BoolUtil:
@@ -21,7 +22,7 @@ class BoolUtil:
 
     @classmethod
     def format(cls, value: bool) -> str:
-        """Serialize True as uppercase 'Y' and False as uppercase 'N', error if argument is None."""
+        """Serialize True as lowercase 'true' and False as lowercase 'false', error if argument is None."""
         result = cls.serialize(value)
         if result is None:
             raise RuntimeError("Argument of BoolUtil.format is None, use serialize to accept.")
@@ -29,12 +30,12 @@ class BoolUtil:
 
     @classmethod
     def serialize(cls, value: bool | None) -> str | None:
-        """Serialize True as uppercase 'Y' and False as uppercase 'N', return None if argument is None."""
+        """Serialize True as lowercase 'true' and False as lowercase 'false', return None if argument is None."""
         if value is None:
-            return None
+            return None  # TODO: Review if it should be "null"
         if type(value) is not bool:
             raise RuntimeError(
-                f"Argument of BoolUtil.serialize has type {TypeUtil.name(value)}, " f"only bool is accepted."
+                f"Argument of BoolUtil.serialize has type {TypeUtil.name(value)} while only bool is accepted."
             )
         return "true" if value else "false"
 
@@ -44,16 +45,17 @@ class BoolUtil:
         match value:
             case None | "":
                 name = CaseUtil.snake_to_pascal_case(name)
-                for_field = f"for field {name}" if name is not None else " for a Y/N field"
-                raise UserError(f"The value {for_field} is empty. Valid values are Y or N.")
-            case "Y":
+                for_field = f"for field {name}" if name else "for a true/false field"
+                raise UserError(f"The value {for_field} is empty. Valid values are lowercase 'true' or 'false'.")
+            case "true":
                 return True
-            case "N":
+            case "false":
                 return False
             case _:
                 name = CaseUtil.snake_to_pascal_case(name)
-                for_field = f" for field {name}" if name is not None else " for a Y/N field"
-                raise UserError(f"The value {for_field} must be Y, N or an empty string.\nField value: {value}")
+                for_field = f"for field {name}" if name is not None else "for a true/false field"
+                raise UserError(f"The value {for_field} must be lowercase 'true' or 'false'.\n"
+                                f"Field value: {value}")
 
     @classmethod
     def parse_or_none(cls, value: str | None, *, name: str | None = None) -> bool | None:
@@ -61,11 +63,12 @@ class BoolUtil:
         match value:
             case None | "":
                 return None
-            case "Y":
+            case "true":
                 return True
-            case "N":
+            case "false":
                 return False
             case _:
                 name = CaseUtil.snake_to_pascal_case(name)
-                for_field = f" for field {name}" if name is not None else ""
-                raise UserError(f"The value{for_field} must be Y, N or an empty string.\nField value: {value}")
+                for_field = f"for field {name}" if name is not None else "for a true/false field"
+                raise UserError(f"The value {for_field} must be lowercase 'true', 'false', or an empty string.\n"
+                                f"Field value: {value}")

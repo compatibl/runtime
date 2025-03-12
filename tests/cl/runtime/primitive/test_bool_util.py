@@ -24,8 +24,8 @@ def _test_format(*, method: Callable, allow_none: bool) -> None:
     else:
         with pytest.raises(Exception):
             method(None)
-    assert method(True) == "Y"
-    assert method(False) == "N"
+    assert method(True) == "true"
+    assert method(False) == "false"
     with pytest.raises(Exception):
         # Another type
         method(0)
@@ -38,18 +38,18 @@ def _test_parse(*, method: Callable, allow_none: bool) -> None:
     else:
         with pytest.raises(Exception):
             method(None)
-    assert method("Y")
-    assert not method("N")
+    assert method("true")
+    assert not method("false")
     with pytest.raises(Exception):
         method("True")
     with pytest.raises(Exception):
-        method("True")
+        method("Y")
     with pytest.raises(Exception):
         method("y")
     with pytest.raises(Exception):
         method("False")
     with pytest.raises(Exception):
-        method("false")
+        method("N")
     with pytest.raises(Exception):
         method("n")
 
