@@ -3,30 +3,30 @@
   "OptionalStr": "xyz",
   "RequiredListOfOptionalStr": [
     "abc",
-    "null"
+    null
   ],
   "OptionalFloat": "1.23",
   "RequiredListOfOptionalFloat": [
     "1.23",
-    "null"
+    null
   ],
   "RequiredListOfOptionalData": [
     {
       "StrField": "abc",
       "IntField": "123"
     },
-    "null"
+    null
   ],
   "RequiredListOfOptionalKey": [
     {
       "Id": "abc"
     },
-    "null"
+    null
   ],
   "RequiredListOfOptionalRecord": [
     {
       "Id": "abc"
     },
-    "null"
+    null
   ]
 }
