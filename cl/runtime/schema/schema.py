@@ -30,7 +30,7 @@ from memoization import cached
 from typing_extensions import Self
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.protocols import KeyProtocol, is_record_or_key
+from cl.runtime.records.protocols import KeyProtocol, is_record_or_key, PRIMITIVE_PYTHON_TYPES
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_decl_key import TypeDeclKey
@@ -42,14 +42,7 @@ def is_data_key_record_or_enum(data_type):
     Return true if the type is a data class based on presence '__slots__' attribute,
     record or key based on the presence of 'get_key_type' method or an enum.
     """
-
-    return inspect.isclass(data_type) and (
-        (
-            not TypeUtil.name(data_type).endswith("Mixin")
-            and (hasattr(data_type, "__slots__") or hasattr(data_type, "get_key_type"))
-        )
-        or issubclass(data_type, Enum)
-    )
+    return inspect.isclass(data_type) and (hasattr(data_type, "build") or issubclass(data_type, Enum))
 
 
 class Schema:
@@ -120,25 +113,29 @@ class Schema:
                 for name, record_type in inspect.getmembers(module, is_data_key_record_or_enum)
             )
 
-            # Ensure names are unique
             # TODO: Support namespace aliases to resolve conflicts
+            record_types = list(PRIMITIVE_PYTHON_TYPES) + sorted(record_types, key=lambda x: x.__name__)
             record_names = [TypeUtil.name(record_type) for record_type in record_types]
-            record_paths = [f"{record_type.__module__}.{TypeUtil.name(record_type)}" for record_type in record_types]
 
             # Check that there are no repeated names, report errors if there are
             if len(set(record_names)) != len(record_names):
                 # Count the occurrences of each name in the list
                 record_name_counts = Counter(record_names)
 
-                # Find names that are repeated more than once
+                # Find names and their types that are repeated more than once
                 repeated_names = [record_name for record_name, count in record_name_counts.items() if count > 1]
 
                 # Report repeated names
-                package_names_str = ", ".join(packages)
-                repeated_names_str = ", ".join(repeated_names)
+                repeated_type_reports = "\n".join(
+                    repeated_name + ": " + ", ".join(
+                        f"{x.__module__}.{x.__name__}"
+                        for x in record_types
+                        if TypeUtil.name(x) == repeated_name
+                    )
+                    for repeated_name in repeated_names
+                )
                 raise RuntimeError(
-                    f"The following class names in the list of packages {package_names_str} "
-                    f"are repeated more than once: {repeated_names_str}"
+                    f"The following class names are not unique:\n{repeated_type_reports}\n"
                 )
 
             # Create dictionary
