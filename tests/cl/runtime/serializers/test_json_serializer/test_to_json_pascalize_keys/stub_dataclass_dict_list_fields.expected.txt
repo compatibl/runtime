@@ -1,19 +1,61 @@
 {
   "Id": "abc",
   "FloatDictList": [
-    "None",
-    "None"
+    {
+      "A": "1."
+    },
+    {
+      "B": "2."
+    }
   ],
   "DateDictList": [
-    "None",
-    "None"
+    {
+      "A": "2003-04-21",
+      "B": "2003-05-01"
+    },
+    {
+      "A": "2003-04-21",
+      "B": "2003-05-01"
+    }
   ],
   "RecordDictList": [
-    "None",
-    "None"
+    {
+      "A": {
+        "Id": "A"
+      },
+      "B": {
+        "Id": "B"
+      }
+    },
+    {
+      "A": {
+        "Id": "A"
+      },
+      "B": {
+        "Id": "B"
+      }
+    }
   ],
   "DerivedRecordDictList": [
-    "None",
-    "None"
+    {
+      "A": {
+        "Id": "A",
+        "DerivedStrField": "derived"
+      },
+      "B": {
+        "Id": "B",
+        "DerivedStrField": "derived"
+      }
+    },
+    {
+      "A": {
+        "Id": "A",
+        "DerivedStrField": "derived"
+      },
+      "B": {
+        "Id": "B",
+        "DerivedStrField": "derived"
+      }
+    }
   ]
 }

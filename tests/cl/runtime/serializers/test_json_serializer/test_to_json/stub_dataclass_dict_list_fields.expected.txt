@@ -1,19 +1,61 @@
 {
   "id": "abc",
   "float_dict_list": [
-    "None",
-    "None"
+    {
+      "a": "1."
+    },
+    {
+      "b": "2."
+    }
   ],
   "date_dict_list": [
-    "None",
-    "None"
+    {
+      "a": "2003-04-21",
+      "b": "2003-05-01"
+    },
+    {
+      "a": "2003-04-21",
+      "b": "2003-05-01"
+    }
   ],
   "record_dict_list": [
-    "None",
-    "None"
+    {
+      "a": {
+        "id": "A"
+      },
+      "b": {
+        "id": "B"
+      }
+    },
+    {
+      "a": {
+        "id": "A"
+      },
+      "b": {
+        "id": "B"
+      }
+    }
   ],
   "derived_record_dict_list": [
-    "None",
-    "None"
+    {
+      "a": {
+        "id": "A",
+        "derived_str_field": "derived"
+      },
+      "b": {
+        "id": "B",
+        "derived_str_field": "derived"
+      }
+    },
+    {
+      "a": {
+        "id": "A",
+        "derived_str_field": "derived"
+      },
+      "b": {
+        "id": "B",
+        "derived_str_field": "derived"
+      }
+    }
   ]
 }

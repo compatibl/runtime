@@ -3,23 +3,30 @@
   "optional_str": "xyz",
   "required_list_of_optional_str": [
     "abc",
-    "None"
+    "null"
   ],
   "optional_float": "1.23",
   "required_list_of_optional_float": [
     "1.23",
-    "None"
+    "null"
   ],
   "required_list_of_optional_data": [
-    "None",
-    "None"
+    {
+      "str_field": "abc",
+      "int_field": "123"
+    },
+    "null"
   ],
   "required_list_of_optional_key": [
-    "None",
-    "None"
+    {
+      "id": "abc"
+    },
+    "null"
   ],
   "required_list_of_optional_record": [
-    "None",
-    "None"
+    {
+      "id": "abc"
+    },
+    "null"
   ]
 }

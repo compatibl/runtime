@@ -21,19 +21,39 @@
     "2003-05-01"
   ],
   "DataTuple": [
-    "None",
-    "None"
+    {
+      "StrField": "A",
+      "IntField": "0"
+    },
+    {
+      "StrField": "B",
+      "IntField": "1"
+    }
   ],
   "KeyTuple": [
-    "None",
-    "None"
+    {
+      "Id": "A"
+    },
+    {
+      "Id": "B"
+    }
   ],
   "RecordTuple": [
-    "None",
-    "None"
+    {
+      "Id": "A"
+    },
+    {
+      "Id": "B"
+    }
   ],
   "DerivedRecordTuple": [
-    "None",
-    "None"
+    {
+      "Id": "A",
+      "DerivedStrField": "derived"
+    },
+    {
+      "Id": "B",
+      "DerivedStrField": "derived"
+    }
   ]
 }

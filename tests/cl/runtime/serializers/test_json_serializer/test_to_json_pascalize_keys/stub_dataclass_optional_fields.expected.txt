@@ -3,23 +3,30 @@
   "OptionalStr": "xyz",
   "RequiredListOfOptionalStr": [
     "abc",
-    "None"
+    "null"
   ],
   "OptionalFloat": "1.23",
   "RequiredListOfOptionalFloat": [
     "1.23",
-    "None"
+    "null"
   ],
   "RequiredListOfOptionalData": [
-    "None",
-    "None"
+    {
+      "StrField": "abc",
+      "IntField": "123"
+    },
+    "null"
   ],
   "RequiredListOfOptionalKey": [
-    "None",
-    "None"
+    {
+      "Id": "abc"
+    },
+    "null"
   ],
   "RequiredListOfOptionalRecord": [
-    "None",
-    "None"
+    {
+      "Id": "abc"
+    },
+    "null"
   ]
 }

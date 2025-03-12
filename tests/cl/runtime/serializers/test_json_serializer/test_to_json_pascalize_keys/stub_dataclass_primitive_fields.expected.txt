@@ -1,7 +1,7 @@
 {
   "KeyStrField": "abc",
   "KeyFloatField": "1.23",
-  "KeyBoolField": "Y",
+  "KeyBoolField": "true",
   "KeyIntField": "123",
   "KeyLongField": "9007199254740991",
   "KeyDateField": "2003-05-01",
@@ -15,7 +15,7 @@
   "ObjStrWithTrailingEolField": "abc\ndef\n",
   "ObjStrTimestampField": "2023-05-01T10:15:30.000Z-1a1a1a1a1a1a1a1a1a1a",
   "ObjFloatField": "1.23",
-  "ObjBoolField": "Y",
+  "ObjBoolField": "true",
   "ObjIntField": "123",
   "ObjLongField": "9007199254740991",
   "ObjDateField": "2003-05-01",

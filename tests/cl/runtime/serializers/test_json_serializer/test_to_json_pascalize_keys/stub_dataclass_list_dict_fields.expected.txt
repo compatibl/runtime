@@ -38,22 +38,42 @@
   },
   "RecordListDict": {
     "A": [
-      "None",
-      "None"
+      {
+        "Id": "A"
+      },
+      {
+        "Id": "B"
+      }
     ],
     "B": [
-      "None",
-      "None"
+      {
+        "Id": "A"
+      },
+      {
+        "Id": "B"
+      }
     ]
   },
   "DerivedRecordListDict": {
     "A": [
-      "None",
-      "None"
+      {
+        "Id": "A",
+        "DerivedStrField": "derived"
+      },
+      {
+        "Id": "B",
+        "DerivedStrField": "derived"
+      }
     ],
     "B": [
-      "None",
-      "None"
+      {
+        "Id": "A",
+        "DerivedStrField": "derived"
+      },
+      {
+        "Id": "B",
+        "DerivedStrField": "derived"
+      }
     ]
   }
 }

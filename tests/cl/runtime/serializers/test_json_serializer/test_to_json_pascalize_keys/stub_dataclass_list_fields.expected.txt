@@ -21,19 +21,39 @@
     "2003-05-01"
   ],
   "DataList": [
-    "None",
-    "None"
+    {
+      "StrField": "A",
+      "IntField": "0"
+    },
+    {
+      "StrField": "B",
+      "IntField": "1"
+    }
   ],
   "KeyList": [
-    "None",
-    "None"
+    {
+      "Id": "A"
+    },
+    {
+      "Id": "B"
+    }
   ],
   "RecordList": [
-    "None",
-    "None"
+    {
+      "Id": "A"
+    },
+    {
+      "Id": "B"
+    }
   ],
   "DerivedRecordList": [
-    "None",
-    "None"
+    {
+      "Id": "A",
+      "DerivedStrField": "derived"
+    },
+    {
+      "Id": "B",
+      "DerivedStrField": "derived"
+    }
   ]
 }

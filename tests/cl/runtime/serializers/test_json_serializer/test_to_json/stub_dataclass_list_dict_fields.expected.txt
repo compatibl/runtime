@@ -38,22 +38,42 @@
   },
   "record_list_dict": {
     "a": [
-      "None",
-      "None"
+      {
+        "id": "A"
+      },
+      {
+        "id": "B"
+      }
     ],
     "b": [
-      "None",
-      "None"
+      {
+        "id": "A"
+      },
+      {
+        "id": "B"
+      }
     ]
   },
   "derived_record_list_dict": {
     "a": [
-      "None",
-      "None"
+      {
+        "id": "A",
+        "derived_str_field": "derived"
+      },
+      {
+        "id": "B",
+        "derived_str_field": "derived"
+      }
     ],
     "b": [
-      "None",
-      "None"
+      {
+        "id": "A",
+        "derived_str_field": "derived"
+      },
+      {
+        "id": "B",
+        "derived_str_field": "derived"
+      }
     ]
   }
 }
