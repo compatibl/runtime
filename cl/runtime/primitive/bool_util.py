@@ -32,7 +32,7 @@ class BoolUtil:
     def serialize(cls, value: bool | None) -> str | None:
         """Serialize True as lowercase 'true' and False as lowercase 'false', return None if argument is None."""
         if value is None:
-            return None  # TODO: Review if it should be "null"
+            return None
         if type(value) is not bool:
             raise RuntimeError(
                 f"Argument of BoolUtil.serialize has type {TypeUtil.name(value)} while only bool is accepted."

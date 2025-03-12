@@ -81,8 +81,8 @@ class PrimitiveToStringConstructor(SafeConstructor):
                 # Keep native Python types for int, float, bool
                 return value
             else:
-                # Convert everything else to string
-                return str(value) if (value is not None and value != "") else "null"
+                # Convert everything except None to string, passthrough None
+                return str(value) if (value is not None and value != "") else None
         elif isinstance(node, SequenceNode):  # , CommentedSeq)):  # Lists
             return [self.construct_object(v, deep) for v in node.value]
         elif isinstance(node, MappingNode): # , CommentedMap)):  # Dictionaries

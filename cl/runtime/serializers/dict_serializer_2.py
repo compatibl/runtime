@@ -111,20 +111,14 @@ class DictSerializer2(Freezable):
             if is_primitive_collection:
                 # More efficient implementation for a primitive collection
                 if serialize_primitive:
-                    return [
-                        "null" if v is None
-                        else self.primitive_serializer.serialize(v)
-                        for v in data
-                    ]
+                    return [self.primitive_serializer.serialize(v) for v in data]
                 else:
                     return data
             else:
-                # Not a primitive collection, serialize complex elements or enums
+                # Not a primitive collection, serialize elements one by one
                 result = [
-                    ("null" if serialize_primitive else None)
-                    if v is None else
                     (self.primitive_serializer.serialize(v) if serialize_primitive else v)
-                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES else
+                    if v is None or v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES else
                     v.name
                     if isinstance(v, Enum) else
                     self.to_dict(v, serialize_primitive=serialize_primitive)
