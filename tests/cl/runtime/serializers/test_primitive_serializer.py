@@ -15,15 +15,49 @@
 import pytest
 import datetime as dt
 from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.primitive.time_util import TimeUtil
-from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
+
+def test_passthrough():
+    """Test serialize method when all primitive types are passed through."""
+
+    # Pass through all primitive types
+    serializer = PrimitiveSerializers.PASSTHROUGH
+
+    # None
+    assert serializer.serialize(None) is None
+
+    # String
+    assert serializer.serialize("") is None  # Empty string is serialized as None
+    assert serializer.serialize("abc") == "abc"
+
+    # Int
+    assert serializer.serialize(123) == 123
+
+    # Float
+    assert serializer.serialize(1.0) == 1.0
+
+    # Date
+    date_value = dt.date(2023, 4, 21)
+    assert serializer.serialize(date_value) == date_value
+
+    # Time
+    time_value = TimeUtil.from_fields(11, 10, 0)
+    assert serializer.serialize(time_value) == time_value
+
+    # Datetime
+    datetime_value = DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0)
+    assert serializer.serialize(datetime_value) == datetime_value
+
+    # TODO: Add tests for UUID and bytes
+    # TODO: Add tests for subtypes
 
 
+def test_default():
+    """Test serialize method when all primitive types except None use default serialiation to string."""
 
-def test_serialize():
-    """Test serialize method."""
-
-    serializer = PrimitiveSerializer().build()
+    # Serialize all primitive types except None to string using default format, pass through None
+    serializer = PrimitiveSerializers.DEFAULT
 
     # None
     assert serializer.serialize(None) is None
