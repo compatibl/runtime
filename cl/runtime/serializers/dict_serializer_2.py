@@ -47,7 +47,7 @@ class DictSerializer2(Freezable):
     omit_type: bool | None = None
     """Serialize without including _type in output and deserialize into dict/list even if _type is specified."""
 
-    def to_dict(self, data: Any, type_: Type | None = None) -> Any:
+    def to_dict(self, data: Any, schema_type: Type | None = None) -> Any:
         """
         Serialize a slots-based object to a dictionary. Type information is written only if omit_type is not set.
 
@@ -56,20 +56,20 @@ class DictSerializer2(Freezable):
 
         Args:
             data: Data to serialize which may be a class with build method, sequence, mapping, or a primitive type
-            type_: Type of the object specified in the schema (optional)
+            schema_type: Type of the object specified in the schema (optional)
         """
 
         if getattr(data, "__slots__", None) is not None:
 
             # If type is specified, ensure that data is an instance of the specified type
-            if type_ and not isinstance(data, type_):
+            if schema_type and not isinstance(data, schema_type):
                 obj_type_name = TypeUtil.name(data.__class__)
-                schema_type_name = TypeUtil.name(type_)
+                schema_type_name = TypeUtil.name(schema_type)
                 raise RuntimeError(f"Type {obj_type_name} is not the same or a subclass of "
                                    f"the type {schema_type_name} specified in schema.")
 
             # Write type information if omit_type is False and type_ is not specified or is not type(data)
-            if (not self.omit_type) and (type_ is None or type_ is data.__class__):
+            if (not self.omit_type) and (schema_type is None or schema_type is data.__class__):
                 obj_type_name = TypeUtil.name(data.__class__)
                 result = {}  # {"_type": obj_type_name}
             else:
@@ -133,11 +133,11 @@ class DictSerializer2(Freezable):
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def from_dict(self, data: TDataField, type_: Type | None = None) -> Any:
+    def from_dict(self, data: TDataField, schema_type: Type | None = None) -> Any:
         """Deserialize a dictionary into object using _type and schema."""
 
         # Extract inner type if type_ is Optional[...]
-        type_ = AnnotationsUtil.handle_optional_annot(type_)
+        schema_type = AnnotationsUtil.handle_optional_annot(schema_type)
 
         if isinstance(data, dict):
             # Determine if the dictionary is a serialized dataclass or a dictionary
@@ -199,7 +199,7 @@ class DictSerializer2(Freezable):
                 return result
             else:
 
-                dict_value_annot_type = AnnotationsUtil.extract_dict_value_annot_type(type_)
+                dict_value_annot_type = AnnotationsUtil.extract_dict_value_annot_type(schema_type)
 
                 # Otherwise return a dictionary with recursively deserialized values
                 result = {
@@ -212,19 +212,19 @@ class DictSerializer2(Freezable):
                 }
                 return result
         elif data.__class__.__name__ == "datetime":
-            if type_ is None:
+            if schema_type is None:
                 return data
 
-            if type_.__name__ == "datetime":
+            if schema_type.__name__ == "datetime":
                 return DatetimeUtil.round(data.replace(tzinfo=dt.timezone.utc))
-            elif type_.__name__ == "date":
+            elif schema_type.__name__ == "date":
                 return data.date()
             else:
                 return data
         elif data.__class__.__name__ == "int":
-            if type_ is not None and type_.__name__ == "float":
+            if schema_type is not None and schema_type.__name__ == "float":
                 return float(data)
-            elif type_ is not None and type_.__name__ == "time":
+            elif schema_type is not None and schema_type.__name__ == "time":
                 return TimeUtil.from_iso_int(data)
             else:
                 return data
@@ -235,7 +235,7 @@ class DictSerializer2(Freezable):
             first_item = next(iter(data), sentinel_value)
 
             # Get origin type and its args
-            origin_type, iter_value_annot_type = AnnotationsUtil.extract_iterable_origin_and_args(type_)
+            origin_type, iter_value_annot_type = AnnotationsUtil.extract_iterable_origin_and_args(schema_type)
 
             if first_item == sentinel_value:
                 # Empty iterable, return None
