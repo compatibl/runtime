@@ -14,7 +14,6 @@
 
 import base64
 from dataclasses import dataclass
-
 from cl.runtime.primitive.bool_format_enum import BoolFormatEnum
 from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.bytes_format_enum import BytesFormatEnum
@@ -160,13 +159,11 @@ class PrimitiveSerializer(Freezable):
                         return value
                     case BytesFormatEnum.DEFAULT:
                         # Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL
-                        return base64.encodebytes(value).decode('utf-8').rstrip("\n")
+                        return base64.encodebytes(value).decode("utf-8").rstrip("\n")
                     case _:
                         raise RuntimeError(f"No conversion is provided for {self.bytes_format}.")
             case _:
-                raise RuntimeError(
-                    f"Type {TypeUtil.name(value)} cannot be serialized using PrimitiveSerializer."
-                )
+                raise RuntimeError(f"Type {TypeUtil.name(value)} cannot be serialized using PrimitiveSerializer.")
 
     def deserialize(self, value: TPrimitive | None) -> TPrimitive | None:
         """Deserialize a string or another primitive type to a primitive type (return None if argument is None)."""

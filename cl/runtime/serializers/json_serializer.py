@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import orjson
 from dataclasses import dataclass
 from typing import Any
-
+import orjson
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
-from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
 def orjson_default(obj):
@@ -43,9 +41,8 @@ class JsonSerializer(Freezable):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.dict_serializer is None:
             self.dict_serializer = DictSerializer2(
-                primitive_serializer=PrimitiveSerializers.DEFAULT,
-                pascalize_keys=self.pascalize_keys
-                ).build()
+                primitive_serializer=PrimitiveSerializers.DEFAULT, pascalize_keys=self.pascalize_keys
+            ).build()
 
     def to_json(self, data: Any) -> str:
         """

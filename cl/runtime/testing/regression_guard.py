@@ -53,7 +53,8 @@ class NoExtraLineBreakDumper(yaml.SafeDumper):
 # Custom YAML representer for Enum
 def enum_representer(dumper, data):
     item_name = CaseUtil.upper_to_pascal_case(data.name)
-    return dumper.represent_scalar('tag:yaml.org,2002:str', item_name)  # Dumps the name instead of value
+    return dumper.represent_scalar("tag:yaml.org,2002:str", item_name)  # Dumps the name instead of value
+
 
 # Add the custom representer to NoExtraLineBreakDumper
 yaml.add_multi_representer(Enum, enum_representer, Dumper=NoExtraLineBreakDumper)

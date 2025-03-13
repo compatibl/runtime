@@ -42,7 +42,6 @@ from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
-from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_kind_enum import TypeKindEnum
 
 DisplayKindLiteral = Literal["Basic", "Singleton", "Dashboard"]  # TODO: Review

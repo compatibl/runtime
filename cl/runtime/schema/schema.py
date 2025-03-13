@@ -30,7 +30,9 @@ from memoization import cached
 from typing_extensions import Self
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.protocols import KeyProtocol, is_record_or_key, PRIMITIVE_PYTHON_TYPES
+from cl.runtime.records.protocols import PRIMITIVE_PYTHON_TYPES
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import is_record_or_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_decl_key import TypeDeclKey
@@ -127,16 +129,14 @@ class Schema:
 
                 # Report repeated names
                 repeated_type_reports = "\n".join(
-                    repeated_name + ": " + ", ".join(
-                        f"{x.__module__}.{x.__name__}"
-                        for x in record_types
-                        if TypeUtil.name(x) == repeated_name
+                    repeated_name
+                    + ": "
+                    + ", ".join(
+                        f"{x.__module__}.{x.__name__}" for x in record_types if TypeUtil.name(x) == repeated_name
                     )
                     for repeated_name in repeated_names
                 )
-                raise RuntimeError(
-                    f"The following class names are not unique:\n{repeated_type_reports}\n"
-                )
+                raise RuntimeError(f"The following class names are not unique:\n{repeated_type_reports}\n")
 
             # Create dictionary
             result = dict(zip(record_names, record_types))
@@ -277,6 +277,7 @@ class Schema:
 
         # TODO)Major): Use ClassInfo.get_inheritance_chain and record base classes in DB so unknow types can also be returned
         return set(  # noqa
-            schema_type for schema_type in Schema.get_types()
+            schema_type
+            for schema_type in Schema.get_types()
             if is_record_or_key(schema_type) and record_type in schema_type.__mro__
         )

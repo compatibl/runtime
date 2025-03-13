@@ -16,8 +16,6 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
-from cl.runtime.serializers.enum_serializer import EnumSerializer
-from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
@@ -71,6 +69,7 @@ def test_to_yaml():
         guard.write(obj_yaml)
 
     RegressionGuard().verify_all()
+
 
 def test_from_yaml():
     """Test DictSerializer2.to_yaml method."""

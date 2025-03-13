@@ -13,9 +13,7 @@
 # limitations under the License.
 
 import datetime as dt
-from typing import Type
 from uuid import UUID
-
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 
@@ -31,7 +29,7 @@ class PrimitiveDeclKeys:
 
     BOOL: TypeDeclKey = TypeDeclKey.from_type(bool)
     """Bool primitive type."""
-    
+
     INT: TypeDeclKey = TypeDeclKey.from_type(int)
     """Int primitive type."""
 

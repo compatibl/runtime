@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import orjson
 import pytest
+import orjson
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.json_serializer import orjson_default

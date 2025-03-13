@@ -18,6 +18,7 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.primitive.time_util import TimeUtil
 
+
 def test_passthrough():
     """Test serialize method when all primitive types are passed through."""
 

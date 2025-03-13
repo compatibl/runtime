@@ -14,14 +14,12 @@
 
 from dataclasses import dataclass
 from typing_extensions import Self
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.field_kind_enum import FieldKindEnum
 from cl.runtime.schema.member_decl import MemberDecl
-from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.value_decl import ValueDecl
 
 
@@ -98,8 +96,10 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
                     # TODO (Roman): This is legacy format, use another way to define the dict field
                     result.value = ValueDecl(type_="Dict")
                 case _:
-                    raise RuntimeError(f"Unsupported container kind {field_decl.container.container_kind.name} "
-                                       f"for field {field_decl.name}.")
+                    raise RuntimeError(
+                        f"Unsupported container kind {field_decl.container.container_kind.name} "
+                        f"for field {field_decl.name}."
+                    )
         else:
             result.vector = False
 

@@ -14,8 +14,8 @@
 
 import sys
 from collections import Counter
-from typing import Any, Type
 from typing import Tuple
+from typing import Type
 from typing import cast
 from memoization import cached
 from cl.runtime.records.type_util import TypeUtil
@@ -26,7 +26,7 @@ _COLLECT_SLOTS = sys.version_info.major > 3 or sys.version_info.major == 3 and s
 
 class SlotsUtil:
     """Helper methods for slots-based classes."""
-    
+
     @classmethod
     @cached
     def get_slots(cls, data_type: Type) -> Tuple[str]:
@@ -37,8 +37,7 @@ class SlotsUtil:
             # For v3.11 and later, __slots__ includes fields for this class only, use MRO to collect base class slots
             # Exclude None or empty __slots__ (both are falsy)
             class_hierarchy_slots = [
-                slots for base in reversed(data_type.__mro__) 
-                if (slots := getattr(base, "__slots__", None))
+                slots for base in reversed(data_type.__mro__) if (slots := getattr(base, "__slots__", None))
             ]
         else:
             # Otherwise get slots from this type only
@@ -59,8 +58,7 @@ class SlotsUtil:
             duplicates = [slot for slot, count in counts.items() if count > 1]
             duplicates_str = ", ".join(duplicates)
             raise RuntimeError(
-                f"Duplicate field names found in class hierarchy "
-                f"for {TypeUtil.name(data_type)}: {duplicates_str}."
+                f"Duplicate field names found in class hierarchy " f"for {TypeUtil.name(data_type)}: {duplicates_str}."
             )
 
         return cast(Tuple[str], result)

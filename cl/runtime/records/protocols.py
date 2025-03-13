@@ -26,17 +26,7 @@ from typing import TypeVar
 from uuid import UUID
 from typing_extensions import Self
 
-PRIMITIVE_PYTHON_TYPES = (
-    str,
-    float,
-    bool,
-    int,
-    dt.date,
-    dt.time,
-    dt.datetime,
-    UUID,
-    bytes
-)
+PRIMITIVE_PYTHON_TYPES = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
 """
 The list of Python types used to store primitive types, excludes those primitive types that do not have their own
 Pyton representation such as long (uses Python type int) and timestamp (uses Python type UUID).

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from stubs.cl.runtime import StubIntEnum
 
@@ -50,6 +49,7 @@ def test_deserialize():
         serializer.deserialize("EnumValue1")  # noqa No type
     with pytest.raises(Exception):
         serializer.deserialize("ENUM_VALUE_1")  # noqa Not PascalCase
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

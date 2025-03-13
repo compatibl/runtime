@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.json_serializer import JsonSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
@@ -48,6 +47,7 @@ _SAMPLE_TYPES = [
     StubDataclassSingleton,
     StubDataclassTupleFields,
 ]
+
 
 def test_to_json():
     """Test DictSerializer2.to_json method."""

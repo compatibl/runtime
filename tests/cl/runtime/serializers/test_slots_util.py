@@ -13,14 +13,13 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.serializers.slots_util import SlotsUtil
 from stubs.cl.runtime import StubDataclassDerivedData
 
 
 def test_get_slots():
     """Test get_slots method."""
-    assert SlotsUtil.get_slots(StubDataclassDerivedData) == ('str_field', 'int_field', 'derived_str_field')
+    assert SlotsUtil.get_slots(StubDataclassDerivedData) == ("str_field", "int_field", "derived_str_field")
 
 
 if __name__ == "__main__":

@@ -15,13 +15,19 @@
 import datetime as dt
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Type
+from typing import Any
+from typing import Type
 from frozendict import frozendict
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
-from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import TDataField
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
@@ -30,9 +36,7 @@ from cl.runtime.serializers.annotations_util import AnnotationsUtil
 from cl.runtime.serializers.dict_serializer import get_type_dict
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
-from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.sentinel_type import sentinel_value
-from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES, TDataField, is_primitive, is_key, is_record
 
 
 @dataclass(slots=True, kw_only=True)
@@ -75,8 +79,10 @@ class DictSerializer2(Freezable):
             if schema_type and not isinstance(data, schema_type):
                 obj_type_name = TypeUtil.name(data.__class__)
                 schema_type_name = TypeUtil.name(schema_type)
-                raise RuntimeError(f"Type {obj_type_name} is not the same or a subclass of "
-                                   f"the type {schema_type_name} specified in schema.")
+                raise RuntimeError(
+                    f"Type {obj_type_name} is not the same or a subclass of "
+                    f"the type {schema_type_name} specified in schema."
+                )
 
             # Write type information if omit_type is False and type_ is not specified or is not type(data)
             if (not self.omit_type) and (schema_type is None or schema_type is data.__class__):
@@ -96,17 +102,21 @@ class DictSerializer2(Freezable):
             ]
 
             # Serialize slot values in the order of declaration except those that are None
-            result.update({
-                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
-                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
-                    else (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
-                    if isinstance(v, Enum)
-                    else self.to_dict(v)
-                )
-                for k, t in field_types
-                if (v := getattr(data, k)) is not None and (not hasattr(v, "__len__") or len(v) > 0)
-            })
+            result.update(
+                {
+                    (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
+                        (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                        if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
+                        else (
+                            (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                            if isinstance(v, Enum)
+                            else self.to_dict(v)
+                        )
+                    )
+                    for k, t in field_types
+                    if (v := getattr(data, k)) is not None and (not hasattr(v, "__len__") or len(v) > 0)
+                }
+            )
             return result
         elif isinstance(data, list) or isinstance(data, tuple):
             # Assume that type of the first item is the same as for the rest of the collection
@@ -120,12 +130,19 @@ class DictSerializer2(Freezable):
             else:
                 # Not a primitive collection, serialize elements one by one
                 result = [
-                    None if v is None else
-                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
-                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
-                    else (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
-                    if isinstance(v, Enum)
-                    else self.to_dict(v)
+                    (
+                        None
+                        if v is None
+                        else (
+                            (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                            if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
+                            else (
+                                (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                                if isinstance(v, Enum)
+                                else self.to_dict(v)
+                            )
+                        )
+                    )
                     for v in data
                 ]
             return result
@@ -135,9 +152,11 @@ class DictSerializer2(Freezable):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
-                    else (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
-                    if isinstance(v, Enum)
-                    else self.to_dict(v)
+                    else (
+                        (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                        if isinstance(v, Enum)
+                        else self.to_dict(v)
+                    )
                 )
                 for k, v in data.items()
                 if v is not None and (not hasattr(v, "__len__") or len(v) > 0)
@@ -216,11 +235,7 @@ class DictSerializer2(Freezable):
 
                 # Otherwise return a dictionary with recursively deserialized values
                 result = {
-                    k: (
-                        v
-                        if v is None or is_primitive(v)
-                        else self.from_dict(v, dict_value_annot_type)
-                    )
+                    k: (v if v is None or is_primitive(v) else self.from_dict(v, dict_value_annot_type))
                     for k, v in data.items()
                 }
                 return result
@@ -253,11 +268,7 @@ class DictSerializer2(Freezable):
             if first_item == sentinel_value:
                 # Empty iterable, return None
                 return None
-            elif (
-                iter_value_annot_type is not Any
-                and first_item is not None
-                and is_primitive(first_item)
-            ):
+            elif iter_value_annot_type is not Any and first_item is not None and is_primitive(first_item):
                 # Performance optimization to skip deserialization for arrays of primitive types
                 # based on the type of first item (assumes that all remaining items are also primitive)
 
@@ -269,12 +280,7 @@ class DictSerializer2(Freezable):
             else:
                 # Deserialize each element of the iterable
                 result = origin_type(
-                    (
-                        v
-                        if v is None or is_primitive(v)
-                        else self.from_dict(v, iter_value_annot_type)
-                    )
-                    for v in data
+                    (v if v is None or is_primitive(v) else self.from_dict(v, iter_value_annot_type)) for v in data
                 )
                 return result
 

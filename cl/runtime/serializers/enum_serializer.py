@@ -20,6 +20,7 @@ from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
 
+
 @dataclass(slots=True, kw_only=True)
 class EnumSerializer(Freezable):
     """Helper class for serialization and deserialization of enum types."""

@@ -20,13 +20,10 @@ from enum import Enum
 from typing import Literal
 from typing import Type
 from uuid import UUID
-
-from frozendict import frozendict
 from typing_extensions import Self
-from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_key, is_record, is_primitive
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
@@ -236,8 +233,10 @@ class FieldDecl:
                 # Indicate that field is a user-defined data with slots
                 result.field_kind = FieldKindEnum.RECORD_OR_DATA
             else:
-                raise RuntimeError("Field type '{field_type}' for field '{field_name}' is not\n"
-                                   "a primitive type, enum, key, record or a class with slots.")
+                raise RuntimeError(
+                    "Field type '{field_type}' for field '{field_name}' is not\n"
+                    "a primitive type, enum, key, record or a class with slots."
+                )
         else:
             raise RuntimeError(f"Complex type {field_type} is not supported when building database schema.")
 

@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type, Dict
+from typing import Dict
+from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 
@@ -43,7 +44,7 @@ class ValueDecl:
     def from_type(cls, record_type: Type | str) -> Self:
         """Create an instance from the specified type."""
         return cls.from_name(record_type.__name__)
-    
+
     @classmethod
     def from_name(cls, type_name: str) -> Self:
         """Create an instance from the specified type name."""

@@ -21,7 +21,6 @@ from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
-from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
