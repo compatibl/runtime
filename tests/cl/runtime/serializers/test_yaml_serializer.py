@@ -15,6 +15,7 @@
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
@@ -76,7 +77,11 @@ def test_from_yaml():
     # Create the serializers
     yaml_serializer = YamlSerializer().build()
     all_string_primitive_serializer = PrimitiveSerializer().build()
-    all_string_dict_serializer = DictSerializer2(primitive_serializer=all_string_primitive_serializer).build()
+    enum_serializer = EnumSerializer().build()
+    all_string_dict_serializer = DictSerializer2(
+        primitive_serializer=all_string_primitive_serializer,
+        enum_serializer=enum_serializer,
+    ).build()
 
     for sample_type in _SAMPLE_TYPES:
 

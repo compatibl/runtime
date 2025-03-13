@@ -9,7 +9,7 @@
   "key_date_time_field": "2003-05-01T10:15:00+00:00",
   "key_uuid_field": "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",
   "key_bytes_field": "646e78",
-  "key_int_enum_field": "ENUM_VALUE_2",
+  "key_int_enum_field": "EnumValue2",
   "obj_str_field": "abc",
   "obj_str_with_eol_field": "abc\ndef",
   "obj_str_with_trailing_eol_field": "abc\ndef\n",
@@ -24,5 +24,5 @@
   "obj_uuid_field": "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",
   "obj_bytes_field": "646e78",
   "obj_bytes_large_field": "646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78646e78",
-  "obj_int_enum_field": "ENUM_VALUE_1"
+  "obj_int_enum_field": "EnumValue1"
 }

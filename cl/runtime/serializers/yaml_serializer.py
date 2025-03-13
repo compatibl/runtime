@@ -21,6 +21,7 @@ from ruamel.yaml.scalarfloat import ScalarFloat
 from ruamel.yaml.scalarint import ScalarInt
 from ruamel.yaml.scalarstring import ScalarString
 
+from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
@@ -103,12 +104,18 @@ class YamlSerializer(Freezable):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    dict_serializer: DictSerializer2 = None
+    dict_serializer: DictSerializer2 | None = None
     """Serializes data into dictionary from which it is serialized into YAML."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        self.dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
+        if self.dict_serializer is None:
+            # Create DictSerializer2 with enum serializer but no primitive serializer
+            enum_serializer = EnumSerializer().build()
+            self.dict_serializer = DictSerializer2(
+                enum_serializer=enum_serializer,
+                pascalize_keys=self.pascalize_keys,
+            ).build()
 
     def to_yaml(self, data: Any) -> str:
         """
