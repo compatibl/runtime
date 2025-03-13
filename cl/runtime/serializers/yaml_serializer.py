@@ -115,7 +115,7 @@ class YamlSerializer(Freezable):
         Serialize a slots-based object to a YAML string without using the schema or retaining type information,
         not suitable for deserialization.
         """
-        # Convert to dict with serialize_primitive flag set
+        # Convert to dict
         data_dict = self.dict_serializer.to_dict(data)
 
         # Use customized YAML object to follow the primitive type serialization conventions

@@ -18,6 +18,7 @@ from typing import Any
 
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
 def orjson_default(obj):
@@ -34,20 +35,25 @@ class JsonSerializer(Freezable):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    _dict_serializer: DictSerializer2 = None
+    dict_serializer: DictSerializer2 = None
     """Serializes data into dictionary from which it is serialized into JSON."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        self._dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
+        if self.dict_serializer is None:
+            primitive_serializer = PrimitiveSerializer().build()
+            self.dict_serializer = DictSerializer2(
+                primitive_serializer=primitive_serializer,
+                pascalize_keys=self.pascalize_keys
+                ).build()
 
     def to_json(self, data: Any) -> str:
         """
         Serialize a slots-based object to a JSON string without using the schema or retaining type information,
         not suitable for deserialization.
         """
-        # Convert to dict with serialize_primitive flag set
-        data_dict = self._dict_serializer.to_dict(data, serialize_primitive=True)
+        # Convert to dict first
+        data_dict = self.dict_serializer.to_dict(data)
 
         # Use orjson to serialize the dictionary to JSON in pretty-print format
         result = orjson.dumps(data_dict, option=orjson.OPT_INDENT_2).decode()

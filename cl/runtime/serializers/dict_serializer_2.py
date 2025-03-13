@@ -38,33 +38,25 @@ from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES, TDataField, is_p
 class DictSerializer2(Freezable):
     """Roundtrip serialization of object to dictionary with optional type information."""
 
-    primitive_serializer: PrimitiveSerializer = required()
-    """Pascalize keys during serialization if set."""
+    primitive_serializer: PrimitiveSerializer | None = None
+    """Use to serialize primitive types if set, otherwise leave primitive types unchanged."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
     omit_type: bool | None = None
-    """Omit type information including the root type from serialized output."""
+    """Serialize without including _type in output and deserialize into dict/list even if _type is specified."""
 
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        # Use primitive serializer with default settings if not specified
-        if self.primitive_serializer is None:
-            self.primitive_serializer = PrimitiveSerializer()
-
-    def to_dict(self, data: Any, type_: Type | None = None, *, serialize_primitive: bool | None = None) -> Any:
+    def to_dict(self, data: Any, type_: Type | None = None) -> Any:
         """
-        Serialize a slots-based object to a dictionary. Type information is written only if type_ is specified.
+        Serialize a slots-based object to a dictionary. Type information is written only if omit_type is not set.
 
-        - If type(data) is type_, no type information is written
-        - If type(data) inherits from type_, TypeUtil.name(data) is written into _type field
-        - If neither is true, an error is raised
+        - If (a) data_type is None or (b) matches type(data) or (c) omit_type is set, do not write the _type field
+        - Otherwise, check that data is an instance of data_type and write TypeUtil.name(data) to the _type field
 
         Args:
-            data: Object to serialize
-            type_: Expected type of the object.
-            serialize_primitive: Convert primitive types to strings during serialization if set
+            data: Data to serialize which may be a class with build method, sequence, mapping, or a primitive type
+            type_: Type of the object specified in the schema (optional)
         """
 
         if getattr(data, "__slots__", None) is not None:
@@ -96,10 +88,10 @@ class DictSerializer2(Freezable):
             # Serialize slot values in the order of declaration except those that are None
             result.update({
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (self.primitive_serializer.serialize(v) if serialize_primitive else v)
+                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
-                    else self.to_dict(v, serialize_primitive=serialize_primitive)
+                    else self.to_dict(v)
                 )
                 for k, t in field_types
                 if (v := getattr(data, k)) is not None and (not hasattr(v, "__len__") or len(v) > 0)
@@ -110,18 +102,18 @@ class DictSerializer2(Freezable):
             is_primitive_collection = len(data) > 0 and data[0].__class__.__name__ in _PRIMITIVE_TYPE_NAMES
             if is_primitive_collection:
                 # More efficient implementation for a primitive collection
-                if serialize_primitive:
+                if self.primitive_serializer is not None:
                     return [self.primitive_serializer.serialize(v) for v in data]
                 else:
                     return data
             else:
                 # Not a primitive collection, serialize elements one by one
                 result = [
-                    (self.primitive_serializer.serialize(v) if serialize_primitive else v)
-                    if v is None or v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES else
-                    v.name
-                    if isinstance(v, Enum) else
-                    self.to_dict(v, serialize_primitive=serialize_primitive)
+                    None if v is None else
+                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES else
+                    v.name if isinstance(v, Enum) else
+                    self.to_dict(v)
                     for v in data
                 ]
             return result
@@ -129,10 +121,10 @@ class DictSerializer2(Freezable):
             # Dictionary, return with serialized values except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (self.primitive_serializer.serialize(v) if serialize_primitive else v)
+                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
                     else v.name if isinstance(v, Enum)
-                    else self.to_dict(v, serialize_primitive=serialize_primitive)
+                    else self.to_dict(v)
                 )
                 for k, v in data.items()
                 if v is not None and (not hasattr(v, "__len__") or len(v) > 0)

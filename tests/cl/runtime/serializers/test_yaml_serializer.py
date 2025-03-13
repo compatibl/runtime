@@ -15,6 +15,7 @@
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
@@ -74,7 +75,8 @@ def test_from_yaml():
 
     # Create the serializers
     yaml_serializer = YamlSerializer().build()
-    dict_serializer = DictSerializer2().build()
+    all_string_primitive_serializer = PrimitiveSerializer().build()
+    all_string_dict_serializer = DictSerializer2(primitive_serializer=all_string_primitive_serializer).build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -82,8 +84,8 @@ def test_from_yaml():
         obj = sample_type().build()
         obj_yaml = yaml_serializer.to_yaml(obj)
 
-        # Serialize to dict using serialize_primitive flag, all primitive values are strings
-        all_string_obj_dict = dict_serializer.to_dict(obj, serialize_primitive=True)
+        # Serialize to dict using all_string_dict_serializer flag, all primitive values are strings except None
+        all_string_obj_dict = all_string_dict_serializer.to_dict(obj)
 
         # Deserialize from YAML, when schema is not used all primitive values will be strings
         yaml_dict = yaml_serializer.from_yaml(obj_yaml)
