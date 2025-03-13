@@ -28,6 +28,7 @@ from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.annotations_util import AnnotationsUtil
 from cl.runtime.serializers.dict_serializer import get_type_dict
+from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.serializers.sentinel_type import sentinel_value
@@ -40,6 +41,9 @@ class DictSerializer2(Freezable):
 
     primitive_serializer: PrimitiveSerializer | None = None
     """Use to serialize primitive types if set, otherwise leave primitive types unchanged."""
+
+    enum_serializer: EnumSerializer | None = None
+    """Use to serialize enum types if set, otherwise leave enum types unchanged."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
@@ -90,7 +94,8 @@ class DictSerializer2(Freezable):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
-                    else v.name if isinstance(v, Enum)
+                    else (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                    if isinstance(v, Enum)
                     else self.to_dict(v)
                 )
                 for k, t in field_types
@@ -111,9 +116,10 @@ class DictSerializer2(Freezable):
                 result = [
                     None if v is None else
                     (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
-                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES else
-                    v.name if isinstance(v, Enum) else
-                    self.to_dict(v)
+                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
+                    else (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                    if isinstance(v, Enum)
+                    else self.to_dict(v)
                     for v in data
                 ]
             return result
@@ -123,7 +129,8 @@ class DictSerializer2(Freezable):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
                     if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
-                    else v.name if isinstance(v, Enum)
+                    else (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                    if isinstance(v, Enum)
                     else self.to_dict(v)
                 )
                 for k, v in data.items()
