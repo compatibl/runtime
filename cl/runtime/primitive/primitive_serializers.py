@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from cl.runtime.primitive.bool_format_enum import BoolFormatEnum
 from cl.runtime.primitive.bytes_format_enum import BytesFormatEnum
 from cl.runtime.primitive.date_format_enum import DateFormatEnum

@@ -105,5 +105,20 @@ def test_to_dict_omit_type():
     RegressionGuard().verify_all()
 
 
+def test_from_dict_omit_type():
+    """Test DictSerializer2.from_dict method with omit_type flag set."""
+
+    # Create the serializer with omit_type flag
+    serializer = DictSerializer2(omit_type=True).build()
+
+    for sample_type in _SAMPLE_TYPES:
+
+        # Roundtrip serialization test
+        obj = sample_type().build()
+        obj_dict = serializer.to_dict(obj)
+        obj_from_dict = serializer.from_dict(obj_dict)
+        assert obj_dict == obj_from_dict
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

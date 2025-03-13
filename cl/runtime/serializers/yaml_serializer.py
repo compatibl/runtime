@@ -21,6 +21,7 @@ from ruamel.yaml.scalarfloat import ScalarFloat
 from ruamel.yaml.scalarint import ScalarInt
 from ruamel.yaml.scalarstring import ScalarString
 
+from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.records.for_dataclasses.freezable import Freezable
@@ -30,7 +31,7 @@ from ruamel.yaml.constructor import SafeConstructor
 from io import StringIO
 
 # Use primitive serializer with default settings to serialize all primitive types to string
-primitive_to_string_serializer = PrimitiveSerializer().build()
+primitive_to_string_serializer = PrimitiveSerializers.DEFAULT
 
 
 def str_representer(dumper, data):
@@ -82,7 +83,7 @@ class PrimitiveToStringConstructor(SafeConstructor):
                 # Keep native Python types for int, float, bool
                 return value
             else:
-                # Convert everything except None to string, passthrough None
+                # Convert everything except None to string, pass through None
                 return str(value) if (value is not None and value != "") else None
         elif isinstance(node, SequenceNode):  # , CommentedSeq)):  # Lists
             return [self.construct_object(v, deep) for v in node.value]
@@ -110,12 +111,8 @@ class YamlSerializer(Freezable):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.dict_serializer is None:
-            # Create DictSerializer2 with enum serializer but no primitive serializer
-            enum_serializer = EnumSerializer().build()
-            self.dict_serializer = DictSerializer2(
-                enum_serializer=enum_serializer,
-                pascalize_keys=self.pascalize_keys,
-            ).build()
+            # Create DictSerializer2 with pascalize_keys flag
+            self.dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
 
     def to_yaml(self, data: Any) -> str:
         """

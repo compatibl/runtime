@@ -51,6 +51,12 @@ class DictSerializer2(Freezable):
     omit_type: bool | None = None
     """Serialize without including _type in output and deserialize into dict/list even if _type is specified."""
 
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.enum_serializer is None:
+            # Create an EnumSerializer with default settings if not specified
+            self.enum_serializer = EnumSerializer().build()
+
     def to_dict(self, data: Any, schema_type: Type | None = None) -> Any:
         """
         Serialize a slots-based object to a dictionary. Type information is written only if omit_type is not set.
