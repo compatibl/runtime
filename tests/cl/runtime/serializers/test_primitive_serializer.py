@@ -13,85 +13,91 @@
 # limitations under the License.
 
 import pytest
+from uuid import UUID
 import datetime as dt
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.primitive.time_util import TimeUtil
 
 
-def test_passthrough():
-    """Test serialize method when all primitive types are passed through."""
+def test_roundtrip():
+    """Test roundtrip serialization and deserialization of primitive types."""
 
-    # Pass through all primitive types
-    serializer = PrimitiveSerializers.PASSTHROUGH
+    test_cases = [
+        # None
+        ("NoneType", None, None, "", "null"),
+        # String
+        ("str", None, None),
+        ("str", "abc", "abc"),
+        # Float
+        ("float", None, None),
+        ("float", 1.0, "1."),
+        ("float", -1.23, "-1.23"),
+        # Bool
+        ("bool", None, None),
+        ("bool", True, "true"),
+        ("bool", False, "false"),
+        # Int
+        ("int", None, None),
+        ("int", 123, "123"),
+        ("int", -123, "-123"),
+        # Date
+        ("date", None, None),
+        ("date", dt.date(2023, 4, 21), "2023-04-21"),
+        # Time
+        ("time", None, None),
+        ("time", TimeUtil.from_fields(11, 10, 0), "11:10:00.000"),
+        ("time", TimeUtil.from_fields(11, 10, 0, millisecond=123), "11:10:00.123"),
+        # Datetime
+        ("datetime", None, None),
+        (
+            "datetime",
+            DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0),
+            "2023-04-21T11:10:00.000Z",
+        ),
+        (
+            "datetime",
+            DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0, millisecond=123),
+            "2023-04-21T11:10:00.123Z",
+        ),
+        # UUID
+        ("UUID", None, None),
+        ("UUID", UUID("1A" * 16), "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a"),
+        # Timestamp
+        ("timestamp", None, None),
+        # ("timestamp", UUID("1A" * 16), "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a"),
+        # TODO: Add datetime-hex format for timestamp
+        # Bytes
+        ("bytes", bytes([100, 110, 120]), "ZG54"),
+        (
+            "bytes",
+            bytes(40 * [100, 110, 120]),
+            "ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\n"
+            "ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\n"
+            "ZG54ZG54",
+         ),
+    ]
 
-    # None
-    assert serializer.serialize(None) is None
+    for test_case in test_cases:
 
-    # String
-    assert serializer.serialize("") is None  # Empty string is serialized as None
-    assert serializer.serialize("abc") == "abc"
+        # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
+        type_name, value, serialized, *alternative_serialized_list = test_case
 
-    # Int
-    assert serializer.serialize(123) == 123
+        # Test passthrough
+        assert PrimitiveSerializers.PASSTHROUGH.serialize(value) == value
 
-    # Float
-    assert serializer.serialize(1.0) == 1.0
+        # Serialize without type_name, deserialization always requires type_name
+        assert PrimitiveSerializers.DEFAULT.serialize(value) == serialized
+        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, type_name) == value
 
-    # Date
-    date_value = dt.date(2023, 4, 21)
-    assert serializer.serialize(date_value) == date_value
+        # Serialize and deserialize with typename
+        assert PrimitiveSerializers.DEFAULT.serialize(value, type_name) == serialized
+        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, type_name) == value
 
-    # Time
-    time_value = TimeUtil.from_fields(11, 10, 0)
-    assert serializer.serialize(time_value) == time_value
-
-    # Datetime
-    datetime_value = DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0)
-    assert serializer.serialize(datetime_value) == datetime_value
-
-    # TODO: Add tests for UUID and bytes
-    # TODO: Add tests for subtypes
-
-
-def test_default():
-    """Test serialize method when all primitive types except None use default serialiation to string."""
-
-    # Serialize all primitive types except None to string using default format, pass through None
-    serializer = PrimitiveSerializers.DEFAULT
-
-    # None
-    assert serializer.serialize(None) is None
-
-    # String
-    assert serializer.serialize("") is None  # Empty string is serialized as None
-    assert serializer.serialize("abc") == "abc"
-
-    # Int
-    assert serializer.serialize(123) == "123"
-    assert serializer.serialize(-123) == "-123"
-
-    # Float
-    assert serializer.serialize(1.0) == "1."
-    assert serializer.serialize(-1.23) == "-1.23"
-
-    # Date
-    assert serializer.serialize(dt.date(2023, 4, 21)) == "2023-04-21"
-
-    # Time
-    value = TimeUtil.from_fields(11, 10, 0)
-    assert serializer.serialize(value) == "11:10:00.000"
-    value = TimeUtil.from_fields(11, 10, 0, millisecond=123)
-    assert serializer.serialize(value) == "11:10:00.123"
-
-    # Datetime
-    value = DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0)
-    assert serializer.serialize(value) == "2023-04-21T11:10:00.000Z"
-    value = DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0, millisecond=123)
-    assert serializer.serialize(value) == "2023-04-21T11:10:00.123Z"
-
-    # TODO: Add tests for UUID and bytes
-    # TODO: Add tests for subtypes
+        # Test alternative serialized forms
+        if alternative_serialized_list:
+            for alternative_serialized in alternative_serialized_list:
+                assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, type_name) == value
 
 
 if __name__ == "__main__":

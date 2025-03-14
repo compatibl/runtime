@@ -43,7 +43,7 @@ class BoolUtil:
     def parse(cls, value: str | None, *, name: str | None = None) -> bool:
         """Parse an optional boolean value, param 'name' is used for error reporting only."""
         match value:
-            case None | "":
+            case None | "" | "null":
                 name = CaseUtil.snake_to_pascal_case(name)
                 for_field = f"for field {name}" if name else "for a true/false field"
                 raise UserError(f"The value {for_field} is empty. Valid values are lowercase 'true' or 'false'.")
@@ -54,13 +54,13 @@ class BoolUtil:
             case _:
                 name = CaseUtil.snake_to_pascal_case(name)
                 for_field = f"for field {name}" if name is not None else "for a true/false field"
-                raise UserError(f"The value {for_field} must be lowercase 'true' or 'false'.\n" f"Field value: {value}")
+                raise UserError(f"The value {for_field} must be lowercase 'true' or 'false'.\nField value: {value}")
 
     @classmethod
     def parse_or_none(cls, value: str | None, *, name: str | None = None) -> bool | None:
         """Parse an optional boolean value, param 'name' is used for error reporting only."""
         match value:
-            case None | "":
+            case None | "" | "null":
                 return None
             case "true":
                 return True
@@ -70,6 +70,6 @@ class BoolUtil:
                 name = CaseUtil.snake_to_pascal_case(name)
                 for_field = f"for field {name}" if name is not None else "for a true/false field"
                 raise UserError(
-                    f"The value {for_field} must be lowercase 'true', 'false', or an empty string.\n"
+                    f"The value {for_field} must be lowercase 'true', 'false', 'null', or an empty string.\n"
                     f"Field value: {value}"
                 )
