@@ -53,12 +53,12 @@ PRIMITIVE_TYPE_NAMES = (
     "float",
     "bool",
     "int",
-    "long", # Stored in int class
+    "long",  # Stored in int class
     "date",
     "time",
     "datetime",
     "UUID",
-    "timestamp", # Stored in UUID class
+    "timestamp",  # Stored in UUID class
     "bytes",
 )
 """Names of primitive value types, excludes NoneType, includes subtypes such as long and timestamp."""

@@ -18,10 +18,10 @@ from typing import Final
 class IntUtil:
     """Helper methods for int class."""
 
-    INT32_MIN: Final[int] = -2 ** 31
+    INT32_MIN: Final[int] = -(2**31)
     """Minimum value of 32-bit signed integer."""
 
-    INT32_MAX: Final[int] = 2 ** 31 - 1
+    INT32_MAX: Final[int] = 2**31 - 1
     """Maximum value of 32-bit signed integer."""
 
     @classmethod
@@ -53,5 +53,7 @@ class IntUtil:
     def check_range(cls, value: int) -> None:
         """Error message if the value does not fit in 32-bit signed integer range."""
         if value < cls.INT32_MIN or value > cls.INT32_MAX:
-            raise RuntimeError(f"Integer {value} value does not fit in 32-bit signed integer range, "
-                               f"use long (64-bit signed integer) type instead.")
+            raise RuntimeError(
+                f"Integer {value} value does not fit in 32-bit signed integer range, "
+                f"use long (64-bit signed integer) type instead."
+            )

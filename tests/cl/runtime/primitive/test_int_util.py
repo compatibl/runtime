@@ -30,7 +30,7 @@ def test_to_str():
     with pytest.raises(Exception):
         assert IntUtil.to_str("None")  # noqa
     with pytest.raises(Exception):
-        assert IntUtil.to_str(2 ** 31) # Out of int32 range
+        assert IntUtil.to_str(2**31)  # Out of int32 range
 
 
 def test_from_str():
@@ -47,7 +47,7 @@ def test_from_str():
     with pytest.raises(Exception):
         assert IntUtil.from_str("None")  # noqa
     with pytest.raises(Exception):
-        assert IntUtil.from_str("2147483648") # Out of int32 range
+        assert IntUtil.from_str("2147483648")  # Out of int32 range
 
 
 def test_check_range():
@@ -63,7 +63,7 @@ def test_check_range():
     with pytest.raises(Exception):
         IntUtil.check_range("None")  # noqa
     with pytest.raises(Exception):
-        IntUtil.check_range(2 ** 31) # Out of int32 range
+        IntUtil.check_range(2**31)  # Out of int32 range
 
 
 if __name__ == "__main__":

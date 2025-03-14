@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 class LongUtil:
     """Helper methods for the long (64-bit signed integer) type stored in int class."""
 

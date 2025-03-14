@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from uuid import UUID
 import datetime as dt
+from uuid import UUID
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.primitive.time_util import TimeUtil
@@ -75,7 +75,7 @@ def test_roundtrip():
             "ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\n"
             "ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\n"
             "ZG54ZG54",
-         ),
+        ),
     ]
 
     for test_case in test_cases:

@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime as dt
 import base64
+import datetime as dt
 from dataclasses import dataclass
-from enum import IntEnum, Enum
+from enum import Enum
+from enum import IntEnum
 from uuid import UUID
-
 from cl.runtime.primitive.bool_format_enum import BoolFormatEnum
 from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.bytes_format_enum import BytesFormatEnum
@@ -458,6 +458,8 @@ class PrimitiveSerializer(Freezable):
         value_type_name = TypeUtil.name(type(value))
         value_format_str = f"{type_format.__class__} set to {type_format.name}"
         value_str = f"\n{value}\n" if isinstance(value, str) and "\n" in value else value
-        return RuntimeError(f"{cls.__name__} cannot deserialize to type {type_name} with {value_format_str}.\n"
-                            f"Input value type: {value_type_name}\n"
-                            f"Input value: {value_str}")
+        return RuntimeError(
+            f"{cls.__name__} cannot deserialize to type {type_name} with {value_format_str}.\n"
+            f"Input value type: {value_type_name}\n"
+            f"Input value: {value_str}"
+        )
