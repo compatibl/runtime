@@ -153,5 +153,6 @@ def test_deserialization_exceptions():
         with pytest.raises(Exception):
             PrimitiveSerializers.DEFAULT.deserialize(serialized, type_name)
 
+
 if __name__ == "__main__":
     pytest.main([__file__])

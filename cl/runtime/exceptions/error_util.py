@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from textwrap import fill, shorten, TextWrapper, indent
+from textwrap import TextWrapper
 from typing import Any
 from typing import Type
 from cl.runtime.log.exceptions.user_error import UserError
@@ -33,11 +33,11 @@ class ErrorUtil:
 
     @classmethod
     def param_none_error(
-            cls,
-            *,
-            details: str | None = None,
-            callable_name: str | None = None,
-            param_name: str | None = None,
+        cls,
+        *,
+        details: str | None = None,
+        callable_name: str | None = None,
+        param_name: str | None = None,
     ) -> Exception:
         """
         Return exception instance stating that callable does not accept parameted value None.
@@ -54,12 +54,12 @@ class ErrorUtil:
 
     @classmethod
     def param_type_error(
-            cls,
-            value: Any,
-            *,
-            details: str | None = None,
-            callable_name: str | None = None,
-            param_name: str | None = None,
+        cls,
+        value: Any,
+        *,
+        details: str | None = None,
+        callable_name: str | None = None,
+        param_name: str | None = None,
     ) -> Exception:
         """
         Return exception instance stating that callable does not accept parameter type.
@@ -74,17 +74,18 @@ class ErrorUtil:
         details_str = cls.wrap(details) if details else ""
         callable_str = f"Method {callable_name}" if "." in callable_name else f"Function {callable_name}"
         param_str = f"type {type_str} for parameter '{param_name}'" if param_name else f"parameter type {type_str}"
-        return RuntimeError(f"{callable_str} does not accept {param_str}.\n{details_str}"
-                            f"Parameter value: {cls.wrap(value)}")
+        return RuntimeError(
+            f"{callable_str} does not accept {param_str}.\n{details_str}" f"Parameter value: {cls.wrap(value)}"
+        )
 
     @classmethod
     def param_value_error(
-            cls,
-            value: Any,
-            *,
-            details: str | None = None,
-            callable_name: str | None = None,
-            param_name: str | None = None,
+        cls,
+        value: Any,
+        *,
+        details: str | None = None,
+        callable_name: str | None = None,
+        param_name: str | None = None,
     ) -> Exception:
         """
         Return exception instance stating that callable does not accept the input.
@@ -98,8 +99,9 @@ class ErrorUtil:
         details_str = cls.wrap(details) if details else ""
         callable_str = f"Method {callable_name}" if "." in callable_name else f"Function {callable_name}"
         param_str = f"parameter '{param_name}'" if param_name else "parameter"
-        return RuntimeError(f"Invalid value for {callable_str} {param_str}.\n{details_str}"
-                            f"\nParameter value: {cls.wrap(value)}")
+        return RuntimeError(
+            f"Invalid value for {callable_str} {param_str}.\n{details_str}" f"\nParameter value: {cls.wrap(value)}"
+        )
 
     @classmethod
     def value_error(

@@ -11,10 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.type_util import TypeUtil
 
 
 class BoolUtil:
@@ -78,7 +76,7 @@ class BoolUtil:
                     value,
                     callable_name="BoolUtil.from_str",
                     details=f"Valid values are lowercase 'true' for True, 'false' for False,\n"
-                            f"and None, empty string, or 'null' for None.",
+                    f"and None, empty string, or 'null' for None.",
                 )
         else:
             raise ErrorUtil.param_type_error(value, callable_name="BoolUtil.from_str")
