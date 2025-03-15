@@ -1,0 +1,5 @@
+type_name: StubIntEnum
+members:
+- member_name: EnumValue1
+- member_name: EnumValue2
+

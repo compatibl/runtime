@@ -1,0 +1,5 @@
+name: StubIntEnum
+members:
+- name: ENUM_VALUE_1
+- name: ENUM_VALUE_2
+

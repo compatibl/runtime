@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime as dt
 import types
 import typing
 from dataclasses import dataclass
 from enum import Enum
 from typing import Literal
 from typing import Type
-from uuid import UUID
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.type_util import TypeUtil
@@ -31,46 +30,22 @@ from cl.runtime.schema.field_kind_enum import FieldKindEnum
 from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 
-primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
-"""Tuple of primitive types."""
-
-primitive_modules = ["builtins", "datetime", "uuid"]
-"""List of modules for primitive types."""
-
 
 @dataclass(slots=True, kw_only=True)
-class FieldDecl:
-    """Field declaration."""
+class FieldSpec(Freezable):
+    """Provides information about a field in DataSpec."""
 
     name: str = required()
-    """Field name."""
-
-    label: str | None = None
-    """Field label (if not specified, titleized name is used instead)."""
-
-    comment: str | None = None
-    """Field comment."""
-
-    field_kind: FieldKindEnum = required()
-    """Kind of the element inside the innermost container if the field is a container, otherwise kind of the field."""
-
-    field_type_decl: TypeDeclKey = required()
-    """Declaration for the field type."""
+    """Field name (must be unique within the class)."""
+    
+    type_spec: str = required()
+    """Specification for the field type."""
 
     container: ContainerDecl | None = None
-    """Container declaration if the value is inside a container."""
+    """Container spec if the value is inside a container."""
 
-    optional_field: bool = False
-    """Indicates if the entire field can be None."""
-
-    additive: bool | None = None
-    """Optional flag indicating if the element is additive (i.e., its sum across records has meaning)."""
-
-    formatter: str | None = None
-    """Format string used to display the element using Python conventions ."""
-
-    alternate_of: str | None = None
-    """This field is an alternate of the specified field, of which only one can be specified."""
+    optional: bool | None = None
+    """Indicates if the field can be None (applies to the entire field, not to items inside the container)."""
 
     @classmethod
     def create(

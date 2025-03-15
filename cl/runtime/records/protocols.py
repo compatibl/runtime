@@ -35,7 +35,6 @@ Pyton representation such as long (uses Python type int) and timestamp (uses Pyt
 _PRIMITIVE_TYPE_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_PYTHON_TYPES)  # TODO: Rename
 
 PRIMITIVE_CLASS_NAMES = (
-    "NoneType",
     "str",
     "float",
     "bool",
@@ -46,7 +45,7 @@ PRIMITIVE_CLASS_NAMES = (
     "UUID",
     "bytes",
 )
-"""Names of classes used to store primitive values, includes NoneType, excludes subtypes such as long or timestamp."""
+"""Names of classes used to store primitive values, excludes subtypes such as long or timestamp."""
 
 PRIMITIVE_TYPE_NAMES = (
     "str",
@@ -61,7 +60,7 @@ PRIMITIVE_TYPE_NAMES = (
     "timestamp",  # Stored in UUID class
     "bytes",
 )
-"""Names of primitive value types, excludes NoneType, includes subtypes such as long and timestamp."""
+"""Names of primitive value types, includes subtypes such as long and timestamp."""
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Python types used to store primitive values."""

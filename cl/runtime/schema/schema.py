@@ -39,11 +39,8 @@ from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.settings.context_settings import ContextSettings
 
 
-def is_data_key_record_or_enum(data_type):
-    """
-    Return true if the type is a data class based on presence '__slots__' attribute,
-    record or key based on the presence of 'get_key_type' method or an enum.
-    """
+def is_schema_type(data_type) -> bool:
+    """Return true if the type should be included in schema, includes classes with build method and enums."""
     return inspect.isclass(data_type) and (hasattr(data_type, "build") or issubclass(data_type, Enum))
 
 
@@ -112,7 +109,7 @@ class Schema:
             record_types = set(
                 record_type
                 for module in modules
-                for name, record_type in inspect.getmembers(module, is_data_key_record_or_enum)
+                for name, record_type in inspect.getmembers(module, is_schema_type)
             )
 
             # TODO: Support namespace aliases to resolve conflicts
