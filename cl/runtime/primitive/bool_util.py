@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
@@ -20,56 +20,65 @@ from cl.runtime.records.type_util import TypeUtil
 class BoolUtil:
     """Helper methods for working with bool type."""
 
-    @classmethod
-    def format(cls, value: bool) -> str:
-        """Serialize True as lowercase 'true' and False as lowercase 'false', error if argument is None."""
-        result = cls.serialize(value)
-        if result is None:
-            raise RuntimeError("Argument of BoolUtil.format is None, use serialize to accept.")
-        return result
+    NONE_VALUES = (None, "", "null")
+    """Values that are considered None when deserializing."""
 
     @classmethod
-    def serialize(cls, value: bool | None) -> str | None:
-        """Serialize True as lowercase 'true' and False as lowercase 'false', return None if argument is None."""
-        if value is None:
-            return None
-        if type(value) is not bool:
-            raise RuntimeError(
-                f"Argument of BoolUtil.serialize has type {TypeUtil.name(value)} while only bool is accepted."
+    def to_str(cls, value: bool) -> str:
+        """Serialize True as lowercase 'true' and False as 'false', error if argument is None."""
+        if value.__class__ is bool:
+            return "true" if value else "false"
+        elif value is None:
+            raise ErrorUtil.param_none_error(
+                callable_name="BoolUtil.to_str",
+                details="Use BoolUtil.to_str_or_none instead.",
             )
-        return "true" if value else "false"
+        else:
+            raise ErrorUtil.param_type_error(value, callable_name="BoolUtil.to_str")
 
     @classmethod
-    def parse(cls, value: str | None, *, name: str | None = None) -> bool:
-        """Parse an optional boolean value, param 'name' is used for error reporting only."""
-        match value:
-            case None | "" | "null":
-                name = CaseUtil.snake_to_pascal_case(name)
-                for_field = f"for field {name}" if name else "for a true/false field"
-                raise UserError(f"The value {for_field} is empty. Valid values are lowercase 'true' or 'false'.")
-            case "true":
-                return True
-            case "false":
-                return False
-            case _:
-                name = CaseUtil.snake_to_pascal_case(name)
-                for_field = f"for field {name}" if name is not None else "for a true/false field"
-                raise UserError(f"The value {for_field} must be lowercase 'true' or 'false'.\nField value: {value}")
+    def to_str_or_none(cls, value: bool | None) -> str | None:
+        """Serialize True as lowercase 'true' and False as 'false', return None if argument is None."""
+        if value.__class__ is bool:
+            return "true" if value else "false"
+        elif value is None:
+            return None
+        else:
+            raise ErrorUtil.param_type_error(value, callable_name="BoolUtil.to_str")
 
     @classmethod
-    def parse_or_none(cls, value: str | None, *, name: str | None = None) -> bool | None:
-        """Parse an optional boolean value, param 'name' is used for error reporting only."""
-        match value:
-            case None | "" | "null":
-                return None
-            case "true":
+    def from_str(cls, value: str) -> bool:
+        """Deserialize lowercase 'true' as True and 'false' as False, error if argument is None."""
+        if value is None or value.__class__ is str:
+            if value == "true":
                 return True
-            case "false":
+            elif value == "false":
                 return False
-            case _:
-                name = CaseUtil.snake_to_pascal_case(name)
-                for_field = f"for field {name}" if name is not None else "for a true/false field"
-                raise UserError(
-                    f"The value {for_field} must be lowercase 'true', 'false', 'null', or an empty string.\n"
-                    f"Field value: {value}"
+            else:
+                raise ErrorUtil.param_value_error(
+                    value,
+                    callable_name="BoolUtil.from_str",
+                    details="Valid values are lowercase 'true' for True and 'false' for False.",
                 )
+        else:
+            raise ErrorUtil.param_type_error(value, callable_name="BoolUtil.from_str")
+
+    @classmethod
+    def from_str_or_none(cls, value: str | None, *, name: str | None = None) -> bool | None:
+        """Deserialize lowercase 'true' as True and 'false' as False, return None if argument in NONE_VALUES."""
+        if value is None or value.__class__ is str:
+            if value == "true":
+                return True
+            elif value == "false":
+                return False
+            elif value in cls.NONE_VALUES:
+                return None
+            else:
+                raise ErrorUtil.param_value_error(
+                    value,
+                    callable_name="BoolUtil.from_str",
+                    details=f"Valid values are lowercase 'true' for True, 'false' for False,\n"
+                            f"and None, empty string, or 'null' for None.",
+                )
+        else:
+            raise ErrorUtil.param_type_error(value, callable_name="BoolUtil.from_str")

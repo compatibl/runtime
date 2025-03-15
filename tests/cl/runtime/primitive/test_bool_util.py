@@ -56,22 +56,99 @@ def _test_parse(*, method: Callable, allow_none: bool) -> None:
 
 def test_format():
     """Test for BoolUtil.format."""
-    _test_format(method=BoolUtil.format, allow_none=False)
+    _test_format(method=BoolUtil.to_str, allow_none=False)
 
 
 def test_serialize():
     """Test for BoolUtil.serialize."""
-    _test_format(method=BoolUtil.serialize, allow_none=True)
+    _test_format(method=BoolUtil.to_str_or_none, allow_none=True)
 
 
 def test_parse():
     """Test for BoolUtil.format."""
-    _test_parse(method=BoolUtil.parse, allow_none=False)
+    _test_parse(method=BoolUtil.from_str, allow_none=False)
 
 
 def test_parse_or_none():
     """Test for BoolUtil.serialize."""
-    _test_parse(method=BoolUtil.parse_or_none, allow_none=True)
+    _test_parse(method=BoolUtil.from_str_or_none, allow_none=True)
+
+
+def test_roundtrip():
+    """Test roundtrip serialization and deserialization."""
+
+    test_cases = [
+        ("bool", None, None, "", "null"),
+        ("bool", True, "true"),
+        ("bool", False, "false"),
+    ]
+
+    for test_case in test_cases:
+
+        # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
+        type_name, value, serialized, *alternative_serialized_list = test_case
+
+        # Test roundtrip serialization and deserialization
+        if value is not None:
+            assert BoolUtil.to_str(value) == serialized
+            assert BoolUtil.from_str(serialized) == value
+        assert BoolUtil.to_str_or_none(value) == serialized
+        assert BoolUtil.from_str_or_none(serialized) == value
+
+        # Test alternative serialized forms
+        if alternative_serialized_list:
+            for alternative_serialized in alternative_serialized_list:
+                if value is not None:
+                    assert BoolUtil.from_str(alternative_serialized) == value
+                assert BoolUtil.from_str_or_none(alternative_serialized) == value
+
+
+def test_serialization_exceptions():
+    """Test roundtrip serialization and deserialization."""
+
+    test_cases = [
+        ("bool", None),
+        ("bool", 0),
+        ("bool", "None"),
+        ("bool", "Null"),
+    ]
+
+    # Check exception cases
+    for test_case in test_cases:
+        type_name, value = test_case
+        with pytest.raises(Exception):
+            BoolUtil.to_str(value)
+        if value is not None:
+            with pytest.raises(Exception):
+                BoolUtil.to_str_or_none(value)
+
+
+def test_deserialization_exceptions():
+    """Test roundtrip serialization and deserialization."""
+
+    test_cases = [
+        ("bool", None),  # Allowed for from_str_or_none
+        ("bool", ""),  # Allowed for from_str_or_none
+        ("bool", "null"),  # Allowed for from_str_or_none
+        ("bool", 0),
+        ("bool", "None"),
+        ("bool", "Null"),
+        ("bool", "True"),
+        ("bool", "False"),
+        ("bool", "Y"),
+        ("bool", "N"),
+        ("bool", "YES"),
+        ("bool", "NO"),  # Norway problem
+    ]
+
+    # Check exception cases
+    for test_case in test_cases:
+        type_name, serialized = test_case
+        with pytest.raises(Exception):
+            BoolUtil.from_str(serialized)
+        if serialized not in BoolUtil.NONE_VALUES:
+            with pytest.raises(Exception):
+                BoolUtil.from_str_or_none(serialized)
 
 
 if __name__ == "__main__":

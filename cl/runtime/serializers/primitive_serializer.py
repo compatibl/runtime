@@ -151,7 +151,7 @@ class PrimitiveSerializer(Freezable):
             if (value_format := self.bool_format) is None:
                 return value
             elif value_format == BoolFormatEnum.DEFAULT:
-                return BoolUtil.format(value)
+                return BoolUtil.to_str_or_none(value)
             else:
                 raise self._enum_error(value_format)
         elif class_name == "int":
@@ -288,7 +288,7 @@ class PrimitiveSerializer(Freezable):
                     return None
                 elif isinstance(value, str):
                     # Deserialize from string
-                    return BoolUtil.parse(value)
+                    return BoolUtil.from_str(value)
                 else:
                     raise self._deserialization_error(value, type_name, value_format)
             else:
@@ -450,7 +450,7 @@ class PrimitiveSerializer(Freezable):
         """Error message on unknown format enum."""
         enum_class_name = value_format.__class__.__name__
         enum_value_str = CaseUtil.upper_to_pascal_case(value_format.name)
-        return RuntimeError(f"{cls.__name___} does not support {enum_class_name} value of {enum_value_str}.")
+        return RuntimeError(f"{cls.__name__} does not support {enum_class_name} value of {enum_value_str}.")
 
     @classmethod
     def _deserialization_error(cls, value: TPrimitive | None, type_name: str, type_format: IntEnum) -> Exception:
