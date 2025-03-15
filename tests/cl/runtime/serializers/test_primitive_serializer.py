@@ -24,7 +24,7 @@ def test_roundtrip():
     """Test roundtrip serialization and deserialization of primitive types."""
 
     test_cases = [
-        # None
+        # NoneType
         ("NoneType", None, None, "", "null"),
         # String
         ("str", None, None),
@@ -83,8 +83,9 @@ def test_roundtrip():
         # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
         type_name, value, serialized, *alternative_serialized_list = test_case
 
-        # Test passthrough
+        # Test passthrough with and without type_name
         assert PrimitiveSerializers.PASSTHROUGH.serialize(value) == value
+        assert PrimitiveSerializers.PASSTHROUGH.serialize(value, type_name) == value
 
         # Serialize without type_name, deserialization always requires type_name
         assert PrimitiveSerializers.DEFAULT.serialize(value) == serialized
@@ -99,6 +100,58 @@ def test_roundtrip():
             for alternative_serialized in alternative_serialized_list:
                 assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, type_name) == value
 
+
+def test_serialization_exceptions():
+    """Test roundtrip serialization and deserialization."""
+
+    test_cases = [
+        # NoneType
+        ("NoneType", ""),
+        ("NoneType", "null"),
+        # Bool
+        ("bool", 0),
+        ("bool", "None"),
+        ("bool", "Null"),
+    ]
+
+    # Check exception cases with type name (without type name, the call will succeed for most values)
+    for test_case in test_cases:
+        type_name, value = test_case
+
+        # Test passthrough with type_name
+        with pytest.raises(Exception):
+            PrimitiveSerializers.PASSTHROUGH.serialize(value, type_name)
+
+        # Test default settings with type_name
+        with pytest.raises(Exception):
+            PrimitiveSerializers.DEFAULT.serialize(value, type_name)
+
+
+def test_deserialization_exceptions():
+    """Test roundtrip serialization and deserialization."""
+
+    test_cases = [
+        # NoneType
+        ("NoneType", "None"),
+        # Bool
+        ("bool", 0),
+        ("bool", "None"),
+        ("bool", "Null"),
+        ("bool", "True"),
+        ("bool", "False"),
+        ("bool", "Y"),
+        ("bool", "N"),
+        ("bool", "YES"),
+        ("bool", "NO"),  # Norway problem
+    ]
+
+    # Check exception cases
+    for test_case in test_cases:
+        type_name, serialized = test_case
+        with pytest.raises(Exception):
+            PrimitiveSerializers.PASSTHROUGH.deserialize(serialized, type_name)
+        with pytest.raises(Exception):
+            PrimitiveSerializers.DEFAULT.deserialize(serialized, type_name)
 
 if __name__ == "__main__":
     pytest.main([__file__])
