@@ -112,13 +112,13 @@ class YamlSerializer(Freezable):
             # Create DictSerializer2 with pascalize_keys flag
             self.dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
 
-    def to_yaml(self, data: Any) -> str:
+    def serialize(self, data: Any) -> str:
         """
         Serialize a slots-based object to a YAML string without using the schema or retaining type information,
         not suitable for deserialization.
         """
         # Convert to dict
-        data_dict = self.dict_serializer.to_dict(data)
+        data_dict = self.dict_serializer.serialize(data)
 
         # Use customized YAML object to follow the primitive type serialization conventions
         output = StringIO()
@@ -126,12 +126,12 @@ class YamlSerializer(Freezable):
         result = output.getvalue()
         return result
 
-    def from_yaml(self, serialized_data: str) -> Any:
+    def deserialize(self, serialized_data: str) -> Any:
         """Read a YAML string and return the deserialized object."""
 
         # Use customized YAML object to read all values as strings
         yaml_dict = yaml_reader.load(StringIO(serialized_data))
 
         # Convert to object using self.dict_serializer
-        result = self.dict_serializer.from_dict(yaml_dict)
+        result = self.dict_serializer.deserialize(yaml_dict)
         return result

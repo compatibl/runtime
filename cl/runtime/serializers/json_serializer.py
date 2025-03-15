@@ -44,13 +44,13 @@ class JsonSerializer(Freezable):
                 primitive_serializer=PrimitiveSerializers.DEFAULT, pascalize_keys=self.pascalize_keys
             ).build()
 
-    def to_json(self, data: Any) -> str:
+    def serialize(self, data: Any) -> str:
         """
         Serialize a slots-based object to a JSON string without using the schema or retaining type information,
         not suitable for deserialization.
         """
         # Convert to dict first
-        data_dict = self.dict_serializer.to_dict(data)
+        data_dict = self.dict_serializer.serialize(data)
 
         # Use orjson to serialize the dictionary to JSON in pretty-print format
         result = orjson.dumps(data_dict, option=orjson.OPT_INDENT_2).decode()

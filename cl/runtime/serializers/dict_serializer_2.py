@@ -61,15 +61,15 @@ class DictSerializer2(Freezable):
             # Create an EnumSerializer with default settings if not specified
             self.enum_serializer = EnumSerializer().build()
 
-    def to_dict(self, data: Any, schema_type: Type | None = None) -> Any:
+    def serialize(self, data: Any, schema_type: Type | None = None) -> Any:
         """
-        Serialize a slots-based object to a dictionary. Type information is written only if omit_type is not set.
+        Serialize a slots-based object to a dictionary. Type information is not written if omit_type is set.
 
         - If (a) data_type is None or (b) matches type(data) or (c) omit_type is set, do not write the _type field
         - Otherwise, check that data is an instance of data_type and write TypeUtil.name(data) to the _type field
 
         Args:
-            data: Data to serialize which may be a class with build method, sequence, mapping, or a primitive type
+            data: Data to serialize which may be a class with build method, sequence, mapping, or primitive type
             schema_type: Type of the object specified in the schema (optional)
         """
 
@@ -110,7 +110,7 @@ class DictSerializer2(Freezable):
                         else (
                             (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
                             if isinstance(v, Enum)
-                            else self.to_dict(v)
+                            else self.serialize(v)
                         )
                     )
                     for k, t in field_types
@@ -139,7 +139,7 @@ class DictSerializer2(Freezable):
                             else (
                                 (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
                                 if isinstance(v, Enum)
-                                else self.to_dict(v)
+                                else self.serialize(v)
                             )
                         )
                     )
@@ -155,7 +155,7 @@ class DictSerializer2(Freezable):
                     else (
                         (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
                         if isinstance(v, Enum)
-                        else self.to_dict(v)
+                        else self.serialize(v)
                     )
                 )
                 for k, v in data.items()
@@ -165,7 +165,7 @@ class DictSerializer2(Freezable):
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def from_dict(self, data: TDataField, schema_type: Type | None = None) -> Any:
+    def deserialize(self, data: TDataField, schema_type: Type | None = None) -> Any:
         """Deserialize a dictionary into object using _type and schema."""
 
         # Extract inner type if type_ is Optional[...]
@@ -204,7 +204,7 @@ class DictSerializer2(Freezable):
                     (CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k): (
                         v
                         if v is None or is_primitive(v)
-                        else self.from_dict(
+                        else self.deserialize(
                             v,
                             annots.get(
                                 CaseUtil.pascale_to_snake_case_keep_trailing_underscore(k) if self.pascalize_keys else k
@@ -235,7 +235,7 @@ class DictSerializer2(Freezable):
 
                 # Otherwise return a dictionary with recursively deserialized values
                 result = {
-                    k: (v if v is None or is_primitive(v) else self.from_dict(v, dict_value_annot_type))
+                    k: (v if v is None or is_primitive(v) else self.deserialize(v, dict_value_annot_type))
                     for k, v in data.items()
                 }
                 return result
@@ -280,7 +280,7 @@ class DictSerializer2(Freezable):
             else:
                 # Deserialize each element of the iterable
                 result = origin_type(
-                    (v if v is None or is_primitive(v) else self.from_dict(v, iter_value_annot_type)) for v in data
+                    (v if v is None or is_primitive(v) else self.deserialize(v, iter_value_annot_type)) for v in data
                 )
                 return result
 

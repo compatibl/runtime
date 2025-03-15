@@ -59,7 +59,7 @@ def test_to_json():
 
         # Serialize to JSON
         obj = sample_type().build()
-        result_str = serializer.to_json(obj)
+        result_str = serializer.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
@@ -78,7 +78,7 @@ def test_to_json_pascalize_keys():
     for sample_type in _SAMPLE_TYPES:
         # Serialize to JSON
         obj = sample_type().build()
-        result_str = serializer.to_json(obj)
+        result_str = serializer.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)

@@ -61,7 +61,7 @@ def test_to_dict():
 
         # Serialize to dict
         obj = sample_type().build()
-        obj_dict = serializer.to_dict(obj)
+        obj_dict = serializer.serialize(obj)
 
         # Convert to JSON using orjson
         result_str = orjson.dumps(
@@ -88,7 +88,7 @@ def test_to_dict_omit_type():
 
         # Serialize to dict
         obj = sample_type().build()
-        obj_dict = serializer.to_dict(obj)
+        obj_dict = serializer.serialize(obj)
 
         # Convert to JSON using orjson
         result_str = orjson.dumps(
@@ -104,6 +104,20 @@ def test_to_dict_omit_type():
 
     RegressionGuard().verify_all()
 
+def _test_from_dict():
+    """Test DictSerializer2.from_dict method with omit_type flag set."""
+
+    # Create the serializer with omit_type flag
+    serializer = DictSerializer2().build()
+
+    for sample_type in _SAMPLE_TYPES:
+
+        # Roundtrip serialization test
+        obj = sample_type().build()
+        serialized = serializer.serialize(obj, sample_type)
+        deserialized = serializer.deserialize(serialized, sample_type)
+        assert obj == deserialized
+
 
 def test_from_dict_omit_type():
     """Test DictSerializer2.from_dict method with omit_type flag set."""
@@ -115,8 +129,8 @@ def test_from_dict_omit_type():
 
         # Roundtrip serialization test
         obj = sample_type().build()
-        obj_dict = serializer.to_dict(obj)
-        obj_from_dict = serializer.from_dict(obj_dict)
+        obj_dict = serializer.serialize(obj)
+        obj_from_dict = serializer.deserialize(obj_dict)
         assert obj_dict == obj_from_dict
 
 

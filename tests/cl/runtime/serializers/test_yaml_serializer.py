@@ -61,7 +61,7 @@ def test_to_yaml():
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        obj_yaml = serializer.to_yaml(obj)
+        obj_yaml = serializer.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
@@ -82,13 +82,13 @@ def test_from_yaml():
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        obj_yaml = yaml_serializer.to_yaml(obj)
+        obj_yaml = yaml_serializer.serialize(obj)
 
         # Serialize to dict using all_string_dict_serializer flag, all primitive values are strings except None
-        all_string_obj_dict = all_string_dict_serializer.to_dict(obj)
+        all_string_obj_dict = all_string_dict_serializer.serialize(obj)
 
         # Deserialize from YAML, when schema is not used all primitive values will be strings
-        yaml_dict = yaml_serializer.from_yaml(obj_yaml)
+        yaml_dict = yaml_serializer.deserialize(obj_yaml)
 
         # Compare the two dictionaries
         assert yaml_dict == all_string_obj_dict
