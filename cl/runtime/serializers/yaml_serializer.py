@@ -103,6 +103,9 @@ class YamlSerializer(Freezable):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
+    omit_type: bool | None = None
+    """Serialize without including _type in output and deserialize into dict/list even if _type is specified."""
+
     dict_serializer: DictSerializer2 | None = None
     """Serializes data into dictionary from which it is serialized into YAML."""
 
@@ -110,7 +113,17 @@ class YamlSerializer(Freezable):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.dict_serializer is None:
             # Create DictSerializer2 with pascalize_keys flag
-            self.dict_serializer = DictSerializer2(pascalize_keys=self.pascalize_keys).build()
+            self.dict_serializer = DictSerializer2(
+                pascalize_keys=self.pascalize_keys,
+                omit_type=self.omit_type).build()
+        else:
+            # Check that this class does not change the settings
+            if self.pascalize_keys is not None and self.pascalize_keys != self.dict_serializer.pascalize_keys:
+                raise RuntimeError(f"{self.__class__.__name__} does not have the same pascalize_keys setting "
+                                   f"as its dict_serializer.")
+            if self.omit_type is not None and self.omit_type != self.dict_serializer.omit_type:
+                raise RuntimeError(f"{self.__class__.__name__} does not have the same omit_type setting "
+                                   f"as its dict_serializer.")
 
     def serialize(self, data: Any) -> str:
         """

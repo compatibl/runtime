@@ -46,7 +46,7 @@ _FROM_CLASS_EXCEPTION_CASES = [
     (float, "long"),
 ]
 
-yaml_serializer = YamlSerializer().build()
+yaml_serializer = YamlSerializer(omit_type=True).build()
 
 def test_from_class():
     """Test PrimitiveSpec.from_class method."""

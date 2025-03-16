@@ -27,7 +27,7 @@ _FROM_CLASS_EXCEPTION_CASES = [
     StubDataclassRecord,
 ]
 
-yaml_serializer = YamlSerializer().build()
+yaml_serializer = YamlSerializer(omit_type=True).build()
 
 def test_from_class():
     """Test EnumSpec.from_class method."""
