@@ -12,23 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
-import typing
 from dataclasses import dataclass
-from enum import Enum
-from typing import Literal
-from typing import Type
-from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.container_decl import ContainerDecl
-from cl.runtime.schema.container_kind_enum import ContainerKindEnum
-from cl.runtime.schema.field_kind_enum import FieldKindEnum
-from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
-from cl.runtime.schema.type_decl_key import TypeDeclKey
 
 
 @dataclass(slots=True, kw_only=True)

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from dataclasses import asdict
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
@@ -58,6 +57,7 @@ _SAMPLE_TYPES = [
 ]
 
 yaml_serializer = YamlSerializer(omit_type=True).build()
+
 
 def test_type_decl():
     """Test type decls generated for stub records."""

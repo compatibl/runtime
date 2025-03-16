@@ -13,13 +13,10 @@
 # limitations under the License.
 
 from __future__ import annotations
-import importlib
 import inspect
 from collections import Counter
 from collections import defaultdict
 from enum import Enum
-from pkgutil import walk_packages
-from types import ModuleType
 from typing import Dict
 from typing import Iterable
 from typing import List
@@ -36,7 +33,8 @@ from cl.runtime.records.protocols import is_record_or_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_decl_key import TypeDeclKey
-from cl.runtime.schema.type_schema import TypeSchema, is_schema_type
+from cl.runtime.schema.type_schema import TypeSchema
+from cl.runtime.schema.type_schema import is_schema_type
 from cl.runtime.settings.context_settings import ContextSettings
 
 
@@ -103,9 +101,7 @@ class Schema:
 
             # Get record types by iterating over modules
             record_types = set(
-                record_type
-                for module in modules
-                for name, record_type in inspect.getmembers(module, is_schema_type)
+                record_type for module in modules for name, record_type in inspect.getmembers(module, is_schema_type)
             )
 
             # TODO: Support namespace aliases to resolve conflicts

@@ -17,15 +17,16 @@ import datetime as dt
 import importlib
 import inspect
 from collections import Counter
-from dataclasses import is_dataclass
 from enum import Enum
 from pkgutil import walk_packages
 from types import ModuleType
-from typing import Type, List, Dict, Iterable, Tuple, Mapping
+from typing import Dict
+from typing import Iterable
+from typing import Mapping
+from typing import Tuple
+from typing import Type
 from uuid import UUID
-
 from frozendict import frozendict
-
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
@@ -33,9 +34,11 @@ from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.schema.type_spec import TypeSpec
 from cl.runtime.settings.context_settings import ContextSettings
 
+
 def is_schema_type(data_type) -> bool:
     """Return true if the type should be included in schema, includes classes with build method and enums."""
     return inspect.isclass(data_type) and (hasattr(data_type, "build") or issubclass(data_type, Enum))
+
 
 class TypeSchema:
     """
@@ -60,10 +63,10 @@ class TypeSchema:
 
     _class_dict: Mapping[str, Type] | None = None
     """Dictionary of types indexed by class name."""
-    
+
     _modules: Tuple[ModuleType, ...] | None = None
     """Modules from the packages specified in the settings."""
-    
+
     _packages: Tuple[str, ...] | None = None
     """Packages specified in the settings."""
 
@@ -95,9 +98,11 @@ class TypeSchema:
             elif dataclasses.is_dataclass(class_):
                 spec_class = DataclassSpec
             else:
-                raise RuntimeError(f"Class {class_.__name__} implements build method but does not\n"
-                                   f"use one of the supported dataclass frameworks and does not\n"
-                                   f"have a method to generate type spec.")
+                raise RuntimeError(
+                    f"Class {class_.__name__} implements build method but does not\n"
+                    f"use one of the supported dataclass frameworks and does not\n"
+                    f"have a method to generate type spec."
+                )
 
             # Create from class, add to spec dictionary and return
             result = spec_class.from_class(class_)
@@ -134,21 +139,21 @@ class TypeSchema:
         """
 
         if (result := cls._modules) is None:
-            
+
             result = []
             packages = cls._get_packages()
             for package in packages:
                 # Import root module of the package
                 root_module = importlib.import_module(package)
                 # Add the root module itself
-                result.append(root_module)  
+                result.append(root_module)
                 # Get module info for all submodules, note the trailing period added per walk_packages documentation
                 for module_info in walk_packages(root_module.__path__, root_module.__name__ + "."):
                     module_name = module_info.name
                     # Import the submodule using its full name
                     submodule = importlib.import_module(module_name)
                     result.append(submodule)
-    
+
             # Sort the result by module path
             result = tuple(sorted(result, key=lambda module: module.__name__))
             cls._modules = result
@@ -164,11 +169,7 @@ class TypeSchema:
             modules = TypeSchema._get_modules()
 
             # Get classes by iterating over modules
-            classes = set(
-                class_
-                for module in modules
-                for name, class_ in inspect.getmembers(module, is_schema_type)
-            )
+            classes = set(class_ for module in modules for name, class_ in inspect.getmembers(module, is_schema_type))
 
             # Use namespace alias to resolve conflicts
             class_names = [TypeUtil.name(record_type) for record_type in classes]
@@ -186,9 +187,7 @@ class TypeSchema:
                 repeated_type_reports = "\n".join(
                     repeated_name
                     + ": "
-                    + ", ".join(
-                        f"{x.__module__}.{x.__name__}" for x in classes if TypeUtil.name(x) == repeated_name
-                    )
+                    + ", ".join(f"{x.__module__}.{x.__name__}" for x in classes if TypeUtil.name(x) == repeated_name)
                     for repeated_name in repeated_names
                 )
                 raise RuntimeError(f"The following class names are not unique:\n{repeated_type_reports}\n")

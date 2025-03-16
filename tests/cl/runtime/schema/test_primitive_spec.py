@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from types import NoneType
-from uuid import UUID
-
 import pytest
 import datetime as dt
-
+from types import NoneType
+from uuid import UUID
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubDataclassRecord, StubIntEnum
+from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubIntEnum
 
 _FROM_CLASS_VALID_CASES = [
     str,
@@ -48,10 +47,11 @@ _FROM_CLASS_EXCEPTION_CASES = [
 
 yaml_serializer = YamlSerializer(omit_type=True).build()
 
+
 def test_from_class():
     """Test PrimitiveSpec.from_class method."""
     for test_case in _FROM_CLASS_VALID_CASES:
-        
+
         # Get sample type and subtype (if specified)
         if isinstance(test_case, tuple):
             sample_type, subtype = test_case
@@ -60,7 +60,7 @@ def test_from_class():
             subtype = None
         else:
             raise RuntimeError("Invalid test case format.")
-            
+
         # Get enum spec and serialize as YAML
         type_spec = PrimitiveSpec.from_class(sample_type, subtype)
         type_spec_str = yaml_serializer.serialize(type_spec)

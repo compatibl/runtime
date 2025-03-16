@@ -15,7 +15,6 @@
 import dataclasses
 from dataclasses import MISSING
 from dataclasses import fields
-from dataclasses import is_dataclass
 from enum import Enum
 from types import NoneType
 from types import UnionType

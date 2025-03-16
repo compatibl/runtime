@@ -13,15 +13,12 @@
 # limitations under the License.
 
 import dataclasses
-from dataclasses import dataclass, is_dataclass
+from dataclasses import dataclass
 from typing import Type
-
 from typing_extensions import Self
-
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.field_spec import FieldSpec
-from cl.runtime.schema.type_spec_key import TypeSpecKey
 
 
 @dataclass(slots=True, kw_only=True)
@@ -37,8 +34,10 @@ class DataclassSpec(DataSpec):
         if not dataclasses.is_dataclass(class_):
             raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it is not a dataclass.")
         if subtype is not None:
-            raise RuntimeError(f"Subtype {subtype} is specified for a dataclass {type_name}.\n"
-                               f"Only primitive types can have subtypes.")
+            raise RuntimeError(
+                f"Subtype {subtype} is specified for a dataclass {type_name}.\n"
+                f"Only primitive types can have subtypes."
+            )
 
         # Create the list of enum members
         fields = [
@@ -47,7 +46,7 @@ class DataclassSpec(DataSpec):
                 field_name=field.name,
                 containing_type_name=type_name,
             )
-            for field in dataclasses.fields(class_) # noqa: type=ignore, verified it is a dataclass above
+            for field in dataclasses.fields(class_)  # noqa: type=ignore, verified it is a dataclass above
             if not field.name.startswith("_")
         ]
 

@@ -104,6 +104,7 @@ def test_to_dict_omit_type():
 
     RegressionGuard().verify_all()
 
+
 def _test_from_dict():
     """Test DictSerializer2.from_dict method with omit_type flag set."""
 

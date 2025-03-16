@@ -15,17 +15,14 @@
 import types
 import typing
 from dataclasses import dataclass
-from typing import Type
 from typing import List
-
+from typing import Type
 from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.container_decl import ContainerDecl
-from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 
 
 @dataclass(slots=True, kw_only=True)
@@ -34,7 +31,7 @@ class FieldSpec(Freezable):
 
     field_name: str = required()
     """Field name (must be unique within the class)."""
-    
+
     type_hint: str = required()
     """Type hint from which the type chain was created as string."""
 
@@ -152,11 +149,13 @@ class FieldSpec(Freezable):
                         type_name = TypeUtil.name(type_hint)
                         type_chain.append(f"{type_name} | None" if is_optional else type_name)
                     else:
-                        raise RuntimeError(f"Type hint {type_hint} is not supported. Supported type hints include:\n"
-                                           f"- a union with None (optional) with one of the supported types inside\n"
-                                           f"- list, tuple, dict, frozendict with one of the supported types inside\n"
-                                           f"- a type with build method\n"
-                                           f"- {', '.join(PRIMITIVE_CLASS_NAMES)}\n")
+                        raise RuntimeError(
+                            f"Type hint {type_hint} is not supported. Supported type hints include:\n"
+                            f"- a union with None (optional) with one of the supported types inside\n"
+                            f"- list, tuple, dict, frozendict with one of the supported types inside\n"
+                            f"- a type with build method\n"
+                            f"- {', '.join(PRIMITIVE_CLASS_NAMES)}\n"
+                        )
 
                     # Create the field spec and return which ends the while True loop
                     result = cls(
@@ -170,10 +169,10 @@ class FieldSpec(Freezable):
     @classmethod
     def _serialize_type_hint(cls, alias: typing.Any) -> str:
         """Serialize a type alias without namespaces."""
-        if hasattr(alias, '__origin__'):
+        if hasattr(alias, "__origin__"):
             origin = alias.__origin__.__name__
-            args = ', '.join(cls._serialize_type_hint(arg) for arg in alias.__args__)
+            args = ", ".join(cls._serialize_type_hint(arg) for arg in alias.__args__)
             return f"{origin}[{args}]"
-        elif hasattr(alias, '__name__'):
+        elif hasattr(alias, "__name__"):
             return alias.__name__
         return str(alias)

@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from typing import Type
 from typing_extensions import Self
-
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.schema.type_spec import TypeSpec
 
@@ -34,9 +33,9 @@ class PrimitiveSpec(TypeSpec):
             return PrimitiveSpec(type_name=class_name, _class=class_)
         else:
             if (
-                    # Supported combinations only
-                    (subtype == "long" and class_name == "int") or
-                    (subtype == "timestamp" and class_name == "UUID")
+                # Supported combinations only
+                (subtype == "long" and class_name == "int")
+                or (subtype == "timestamp" and class_name == "UUID")
             ):
                 return PrimitiveSpec(type_name=subtype, _class=class_)
             else:

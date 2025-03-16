@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict, Mapping, Callable, Any
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Mapping
 from frozendict import frozendict  # noqa
 
 

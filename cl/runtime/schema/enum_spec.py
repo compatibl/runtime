@@ -14,9 +14,9 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Type, List
+from typing import List
+from typing import Type
 from typing_extensions import Self
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.schema.enum_member_spec import EnumMemberSpec
 from cl.runtime.schema.type_spec import TypeSpec
@@ -38,8 +38,10 @@ class EnumSpec(TypeSpec):
         if not issubclass(class_, Enum):
             raise RuntimeError(f"Cannot create EnumSpec for {class_name} because it is not an enum.")
         if subtype is not None:
-            raise RuntimeError(f"Subtype {subtype} is specified for enum class {class_name}.\n"
-                               f"Only primitive types can have subtypes.")
+            raise RuntimeError(
+                f"Subtype {subtype} is specified for enum class {class_name}.\n"
+                f"Only primitive types can have subtypes."
+            )
 
         # Create the list of enum members
         members = [

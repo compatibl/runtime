@@ -19,7 +19,6 @@ import base64
 import dataclasses
 from dataclasses import asdict
 from dataclasses import fields
-from dataclasses import is_dataclass
 from enum import Enum
 from typing import Any
 from typing import Dict

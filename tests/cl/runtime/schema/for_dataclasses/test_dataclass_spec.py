@@ -13,15 +13,15 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubIntEnum, StubDataclassDictFields, StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDictFields
+from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
@@ -31,6 +31,7 @@ from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubHandlers
+from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import StubDataclassTupleFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
@@ -65,6 +66,7 @@ _FROM_CLASS_EXCEPTION_CASES = [
 
 yaml_serializer = YamlSerializer(omit_type=True).build()
 
+
 def test_from_class():
     """Test EnumSpec.from_class method."""
     for test_case in _FROM_CLASS_VALID_CASES:
@@ -77,6 +79,7 @@ def test_from_class():
         guard = RegressionGuard(channel=type_spec.type_name)
         guard.write(type_spec_str)
     RegressionGuard().verify_all()
+
 
 def test_from_class_exceptions():
     """Test EnumSpec.from_class method exceptions."""

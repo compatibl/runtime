@@ -17,7 +17,6 @@ from dataclasses import dataclass
 from typing import List
 from cl.runtime.schema.field_spec import FieldSpec
 from cl.runtime.schema.type_spec import TypeSpec
-from cl.runtime.schema.type_spec_key import TypeSpecKey
 
 
 @dataclass(slots=True, kw_only=True)
