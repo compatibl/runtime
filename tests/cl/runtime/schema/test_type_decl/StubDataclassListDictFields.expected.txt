@@ -1,6 +1,4 @@
-_Freezable__frozen: false
 module:
-  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_dict_fields
 name: StubDataclassListDictFields
 label: Stub Dataclass List Dict Fields
@@ -8,189 +6,83 @@ comment: Stub record whose elements are dictionaries.
 type_kind: Record
 display_kind: Basic
 inherit:
-  _Freezable__frozen: true
   module:
-    _Freezable__frozen: true
     module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
   name: StubDataclassRecord
-declare: null
 fields:
 - name: id
-  label: null
-  comment: null
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: float_list_dict
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
   container:
     container_kind: Dict
-    inner: null
-    optional_items: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: date_list_dict
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
   container:
     container_kind: Dict
-    inner: null
-    optional_items: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: record_list_dict
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
   container:
     container_kind: Dict
-    inner: null
-    optional_items: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: derived_record_list_dict
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
   container:
     container_kind: Dict
-    inner: null
-    optional_items: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 elements:
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: Id
-  label: null
-  comment: null
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Dict
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: FloatListDict
-  label: null
   comment: Stub field.
-  vector: null
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Dict
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: DateListDict
-  label: null
   comment: Stub field.
-  vector: null
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Dict
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: RecordListDict
-  label: null
   comment: Stub field.
-  vector: null
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Dict
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: DerivedRecordListDict
-  label: null
   comment: Stub field.
-  vector: null
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 keys:
 - Id
-abstract: null
-immutable: null
-permanent: null
 

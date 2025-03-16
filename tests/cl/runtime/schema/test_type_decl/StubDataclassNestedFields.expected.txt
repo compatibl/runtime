@@ -1,6 +1,4 @@
-_Freezable__frozen: false
 module:
-  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields
 name: StubDataclassNestedFields
 label: Stub Dataclass Nested Fields
@@ -8,301 +6,137 @@ comment: Stub derived class.
 type_kind: Record
 display_kind: Basic
 inherit:
-  _Freezable__frozen: true
   module:
-    _Freezable__frozen: true
     module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
   name: StubDataclassRecord
-declare: null
 fields:
 - name: id
-  label: null
-  comment: null
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: base_field
-  label: null
   comment: Stub field.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: derived_field
-  label: null
   comment: Stub field.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data
     name: StubDataclassDerivedData
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: derived_from_derived_field
-  label: null
   comment: Stub field.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data
+      module_name: 
+        stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data
     name: StubDataclassDerivedFromDerivedData
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: polymorphic_field
-  label: null
   comment: Declared StubDataclassData but provided an instance of StubDataclassDerivedData.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: polymorphic_derived_field
-  label: null
   comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data
     name: StubDataclassDerivedData
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_field
-  label: null
   comment: Stub field.
   field_kind: Key
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: record_as_key_field
-  label: null
   comment: Stub field with key type initialized to record type instance.
   field_kind: Key
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 elements:
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: Id
-  label: null
-  comment: null
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
-  key_: null
-  query: null
-  condition: null
   name: BaseField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data
     name: StubDataclassDerivedData
-  key_: null
-  query: null
-  condition: null
   name: DerivedField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data
+      module_name: 
+        stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data
     name: StubDataclassDerivedFromDerivedData
-  key_: null
-  query: null
-  condition: null
   name: DerivedFromDerivedField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
-  key_: null
-  query: null
-  condition: null
   name: PolymorphicField
-  label: null
   comment: Declared StubDataclassData but provided an instance of StubDataclassDerivedData.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data
     name: StubDataclassDerivedData
-  key_: null
-  query: null
-  condition: null
   name: PolymorphicDerivedField
-  label: null
   comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data: null
-  key_:
-    _Freezable__frozen: true
+- key_:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  query: null
-  condition: null
   name: KeyField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data: null
-  key_:
-    _Freezable__frozen: true
+- key_:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  query: null
-  condition: null
   name: RecordAsKeyField
-  label: null
   comment: Stub field with key type initialized to record type instance.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 keys:
 - Id
-abstract: null
-immutable: null
-permanent: null
 

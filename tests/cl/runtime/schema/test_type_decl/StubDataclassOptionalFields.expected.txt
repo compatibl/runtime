@@ -1,597 +1,294 @@
-_Freezable__frozen: false
 module:
-  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields
 name: StubDataclassOptionalFields
 label: Stub Dataclass Optional Fields
 comment: Stub derived class.
 type_kind: Record
 display_kind: Basic
-inherit: null
-declare: null
 fields:
 - name: id
-  label: null
   comment: Unique identifier.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_str
-  label: null
   comment: Optional string.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: required_list_of_optional_str
-  label: null
   comment: Required list of optional strings.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_list_of_optional_str
-  label: null
   comment: Optional list of optional strings.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_float
-  label: null
   comment: Optional float.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: float
-  container: null
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: required_list_of_optional_float
-  label: null
   comment: Required list of optional floats.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: float
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_list_of_optional_float
-  label: null
   comment: Optional list of optional floats.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: float
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_data
-  label: null
   comment: Optional data.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
-  container: null
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: required_list_of_optional_data
-  label: null
   comment: Required list of optional data.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_list_of_optional_data
-  label: null
   comment: Optional list of optional data.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_key
-  label: null
   comment: Optional key.
   field_kind: Key
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  container: null
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: required_list_of_optional_key
-  label: null
   comment: Required list of optional key.
   field_kind: Key
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_list_of_optional_key
-  label: null
   comment: Optional list of optional key.
   field_kind: Key
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_record
-  label: null
   comment: Optional record.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
-  container: null
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: required_list_of_optional_record
-  label: null
   comment: Required list of optional record.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: optional_list_of_optional_record
-  label: null
   comment: Optional list of optional record.
   field_kind: RecordOrData
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
   container:
     container_kind: List
-    inner: null
     optional_items: true
   optional_field: true
-  additive: null
-  formatter: null
-  alternate_of: null
 elements:
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: Id
-  label: null
   comment: Unique identifier.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: OptionalStr
-  label: null
   comment: Optional string.
   vector: false
   optional: true
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: RequiredListOfOptionalStr
-  label: null
   comment: Required list of optional strings.
   vector: true
   optional: false
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: OptionalListOfOptionalStr
-  label: null
   comment: Optional list of optional strings.
   vector: true
   optional: true
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Double
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: OptionalFloat
-  label: null
   comment: Optional float.
   vector: false
   optional: true
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Double
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: RequiredListOfOptionalFloat
-  label: null
   comment: Required list of optional floats.
   vector: true
   optional: false
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Double
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: OptionalListOfOptionalFloat
-  label: null
   comment: Optional list of optional floats.
   vector: true
   optional: true
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
-  key_: null
-  query: null
-  condition: null
   name: OptionalData
-  label: null
   comment: Optional data.
   vector: false
   optional: true
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
-  key_: null
-  query: null
-  condition: null
   name: RequiredListOfOptionalData
-  label: null
   comment: Required list of optional data.
   vector: true
   optional: false
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
     name: StubDataclassData
-  key_: null
-  query: null
-  condition: null
   name: OptionalListOfOptionalData
-  label: null
   comment: Optional list of optional data.
   vector: true
   optional: true
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data: null
-  key_:
-    _Freezable__frozen: true
+- key_:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  query: null
-  condition: null
   name: OptionalKey
-  label: null
   comment: Optional key.
   vector: false
   optional: true
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data: null
-  key_:
-    _Freezable__frozen: true
+- key_:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  query: null
-  condition: null
   name: RequiredListOfOptionalKey
-  label: null
   comment: Required list of optional key.
   vector: true
   optional: false
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data: null
-  key_:
-    _Freezable__frozen: true
+- key_:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  query: null
-  condition: null
   name: OptionalListOfOptionalKey
-  label: null
   comment: Optional list of optional key.
   vector: true
   optional: true
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
-  key_: null
-  query: null
-  condition: null
   name: OptionalRecord
-  label: null
   comment: Optional record.
   vector: false
   optional: true
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
-  key_: null
-  query: null
-  condition: null
   name: RequiredListOfOptionalRecord
-  label: null
   comment: Required list of optional record.
   vector: true
   optional: false
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data:
-    _Freezable__frozen: true
+- data:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
     name: StubDataclassRecord
-  key_: null
-  query: null
-  condition: null
   name: OptionalListOfOptionalRecord
-  label: null
   comment: Optional list of optional record.
   vector: true
   optional: true
   optional_vector_element: true
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 keys:
 - Id
-abstract: null
-immutable: null
-permanent: null
 

@@ -1,856 +1,380 @@
-_Freezable__frozen: false
 module:
-  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields
 name: StubDataclassPrimitiveFields
 label: Stub Dataclass Primitive Fields
 comment: Stub record whose elements are primitive types.
 type_kind: Record
 display_kind: Basic
-inherit: null
-declare: null
 fields:
 - name: key_str_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_float_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: float
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_bool_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: bool
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_int_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: int
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_long_field
-  label: null
   comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: int
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_date_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: datetime
     name: date
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_time_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: datetime
     name: time
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_date_time_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: datetime
     name: datetime
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_uuid_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: uuid
     name: UUID
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_bytes_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: bytes
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: key_int_enum_field
-  label: null
   comment: Stub field.
   field_kind: Enum
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.enum.stub_int_enum
     name: StubIntEnum
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_str_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_str_with_eol_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_str_with_trailing_eol_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_str_timestamp_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_float_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: float
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_bool_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: bool
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_int_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: int
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_long_field
-  label: null
   comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: int
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_date_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: datetime
     name: date
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_time_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: datetime
     name: time
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_date_time_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: datetime
     name: datetime
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_uuid_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: uuid
     name: UUID
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_bytes_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: bytes
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_bytes_large_field
-  label: null
   comment: Stub field.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: bytes
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: obj_int_enum_field
-  label: null
   comment: Stub field.
   field_kind: Enum
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.enum.stub_int_enum
     name: StubIntEnum
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 elements:
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyStrField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Double
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyFloatField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Bool
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyBoolField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Int
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyIntField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Int
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyLongField
-  label: null
   comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Date
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyDateField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Time
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyTimeField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: DateTime
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyDateTimeField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: UUID
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyUuidField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Binary
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyBytesField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum:
-    _Freezable__frozen: true
+- enum:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.enum.stub_int_enum
     name: StubIntEnum
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: KeyIntEnumField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjStrField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjStrWithEolField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjStrWithTrailingEolField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjStrTimestampField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Double
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjFloatField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Bool
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjBoolField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Int
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjIntField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Int
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjLongField
-  label: null
   comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Date
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjDateField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Time
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjTimeField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: DateTime
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjDateTimeField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: UUID
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjUuidField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Binary
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjBytesField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 - value:
     type_: Binary
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjBytesLargeField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum:
-    _Freezable__frozen: true
+- enum:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.enum.stub_int_enum
     name: StubIntEnum
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: ObjIntEnumField
-  label: null
   comment: Stub field.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 keys:
 - KeyStrField
 - KeyFloatField
@@ -863,7 +387,4 @@ keys:
 - KeyUuidField
 - KeyBytesField
 - KeyIntEnumField
-abstract: null
-immutable: null
-permanent: null
 

@@ -17,6 +17,7 @@ from dataclasses import asdict
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -56,6 +57,7 @@ _SAMPLE_TYPES = [
     StubDataclassVersionedRecord,
 ]
 
+yaml_serializer = YamlSerializer(omit_type=True).build()
 
 def test_type_decl():
     """Test type decls generated for stub records."""
@@ -66,10 +68,12 @@ def test_type_decl():
         type_decl: TypeDecl = TypeDecl.for_type(record_type)
         assert type_decl is not None
 
-        # Use native dataclasses.asdict to ensure we do not rely on the functionality being tested for serialization
-        type_decl_dict = asdict(type_decl)  # noqa
+        # Use omit_type flag to avoid relying on the functionality being tested for serialization
+        type_decl_str = yaml_serializer.serialize(type_decl)
+
+        # Record in regression guard
         guard = RegressionGuard(channel=type_name)
-        guard.write(type_decl_dict)
+        guard.write(type_decl_str)
     RegressionGuard().verify_all()
 
 

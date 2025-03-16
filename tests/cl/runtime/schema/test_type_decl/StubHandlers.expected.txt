@@ -1,28 +1,21 @@
-_Freezable__frozen: false
 module:
-  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers
 name: StubHandlers
 label: Stub Handlers
 comment: Stub record base class.
 type_kind: Record
 display_kind: Basic
-inherit: null
 declare:
   handlers:
   - name: run_class_method_1a
     label: Class Method 1A
     comment: Stub handler.
     type_: Job
-    params: null
-    return_: null
     static: true
   - name: run_class_method_1b
     label: Class Method 1B
     comment: Stub handler.
     type_: Job
-    params: null
-    return_: null
     static: true
   - name: run_class_method_2a_with_params
     label: Class Method 2A With Params
@@ -31,29 +24,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: true
   - name: run_class_method_2b
     label: Class Method 2B
@@ -62,29 +40,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: true
   - name: run_class_method_3a
     label: Class Method 3A
@@ -93,29 +56,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: true
   - name: run_class_method_3b
     label: Class Method 3B
@@ -124,38 +72,21 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: true
   - name: run_class_method_with_binary_param
     label: Class Method With Binary Param
     comment: Stub method.
     type_: Job
     params:
-    - value: null
-      enum: null
-      data:
+    - data:
         _Freezable__frozen: false
         module:
           _Freezable__frozen: true
@@ -165,11 +96,8 @@ declare:
         comment: Display the specified embedded binary content.
         type_kind: Data
         display_kind: Basic
-        inherit: null
-        declare: null
         fields:
         - name: name
-          label: null
           comment: Content name.
           field_kind: Primitive
           field_type_decl:
@@ -178,13 +106,8 @@ declare:
               _Freezable__frozen: true
               module_name: builtins
             name: str
-          container: null
           optional_field: true
-          additive: null
-          formatter: null
-          alternate_of: null
         - name: file_bytes
-          label: null
           comment: Embedded binary content to be displayed as the current view.
           field_kind: Primitive
           field_type_decl:
@@ -193,13 +116,8 @@ declare:
               _Freezable__frozen: true
               module_name: builtins
             name: bytes
-          container: null
           optional_field: false
-          additive: null
-          formatter: null
-          alternate_of: null
         - name: file_type
-          label: null
           comment: Embedded binary content type.
           field_kind: Enum
           field_type_decl:
@@ -208,87 +126,38 @@ declare:
               _Freezable__frozen: true
               module_name: cl.runtime.file.file_type_enum
             name: FileTypeEnum
-          container: null
           optional_field: true
-          additive: null
-          formatter: null
-          alternate_of: null
         elements:
         - value:
             type_: String
-          enum: null
-          data: null
-          key_: null
-          query: null
-          condition: null
           name: Name
-          label: null
           comment: Content name.
           vector: false
           optional: true
-          optional_vector_element: null
-          read_only: null
-          additive: null
-          format_: null
-          alternate_of: null
         - value:
             type_: Binary
-          enum: null
-          data: null
-          key_: null
-          query: null
-          condition: null
           name: FileBytes
-          label: null
           comment: Embedded binary content to be displayed as the current view.
           vector: false
           optional: false
-          optional_vector_element: null
-          read_only: null
-          additive: null
-          format_: null
-          alternate_of: null
-        - value: null
-          enum:
+        - enum:
             _Freezable__frozen: true
             module:
               _Freezable__frozen: true
               module_name: cl.runtime.file.file_type_enum
             name: FileTypeEnum
-          data: null
-          key_: null
-          query: null
-          condition: null
           name: FileType
-          label: null
           comment: Embedded binary content type.
           vector: false
           optional: true
-          optional_vector_element: null
-          read_only: null
-          additive: null
-          format_: null
-          alternate_of: null
-        keys: null
-        abstract: null
-        immutable: null
-        permanent: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: PdfFile
-    return_: null
     static: true
   - name: run_instance_method_1a
     label: Instance Method 1A
     comment: Stub handler.
     type_: Job
-    params: null
-    return_: null
     static: false
   - name: run_instance_method_1a_with_int_param
     label: Instance Method 1A With Int Param
@@ -297,17 +166,9 @@ declare:
     params:
     - value:
         type_: Int
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: IntParam
-    return_: null
     static: false
   - name: run_instance_method_1a_with_primitive_params
     label: Instance Method 1A With Primitive Params
@@ -316,120 +177,54 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: StrParam
     - value:
         type_: Double
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: FloatParam
     - value:
         type_: Bool
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: BoolParam
     - value:
         type_: Int
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: IntParam
     - value:
         type_: Date
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: DateParam
     - value:
         type_: Time
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: TimeParam
     - value:
         type_: DateTime
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: DatetimeParam
     - value:
         type_: UUID
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: UuidParam
     - value:
         type_: Binary
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: BytesParam
-    return_: null
     static: false
   - name: run_instance_method_1b
     label: Instance Method 1B
     comment: Stub handler.
     type_: Job
-    params: null
-    return_: null
     static: false
   - name: run_instance_method_2a_with_params
     label: Instance Method 2A With Params
@@ -438,29 +233,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: false
   - name: run_instance_method_2b
     label: Instance Method 2B
@@ -469,29 +249,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: false
   - name: run_instance_method_3a
     label: Instance Method 3A
@@ -500,29 +265,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: false
   - name: run_instance_method_3b
     label: Instance Method 3B
@@ -531,38 +281,21 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: false
   - name: run_instance_method_with_binary_param
     label: Instance Method With Binary Param
     comment: Stub method.
     type_: Job
     params:
-    - value: null
-      enum: null
-      data:
+    - data:
         _Freezable__frozen: false
         module:
           _Freezable__frozen: true
@@ -572,11 +305,8 @@ declare:
         comment: Display the specified embedded binary content.
         type_kind: Data
         display_kind: Basic
-        inherit: null
-        declare: null
         fields:
         - name: name
-          label: null
           comment: Content name.
           field_kind: Primitive
           field_type_decl:
@@ -585,13 +315,8 @@ declare:
               _Freezable__frozen: true
               module_name: builtins
             name: str
-          container: null
           optional_field: true
-          additive: null
-          formatter: null
-          alternate_of: null
         - name: file_bytes
-          label: null
           comment: Embedded binary content to be displayed as the current view.
           field_kind: Primitive
           field_type_decl:
@@ -600,13 +325,8 @@ declare:
               _Freezable__frozen: true
               module_name: builtins
             name: bytes
-          container: null
           optional_field: false
-          additive: null
-          formatter: null
-          alternate_of: null
         - name: file_type
-          label: null
           comment: Embedded binary content type.
           field_kind: Enum
           field_type_decl:
@@ -615,106 +335,48 @@ declare:
               _Freezable__frozen: true
               module_name: cl.runtime.file.file_type_enum
             name: FileTypeEnum
-          container: null
           optional_field: true
-          additive: null
-          formatter: null
-          alternate_of: null
         elements:
         - value:
             type_: String
-          enum: null
-          data: null
-          key_: null
-          query: null
-          condition: null
           name: Name
-          label: null
           comment: Content name.
           vector: false
           optional: true
-          optional_vector_element: null
-          read_only: null
-          additive: null
-          format_: null
-          alternate_of: null
         - value:
             type_: Binary
-          enum: null
-          data: null
-          key_: null
-          query: null
-          condition: null
           name: FileBytes
-          label: null
           comment: Embedded binary content to be displayed as the current view.
           vector: false
           optional: false
-          optional_vector_element: null
-          read_only: null
-          additive: null
-          format_: null
-          alternate_of: null
-        - value: null
-          enum:
+        - enum:
             _Freezable__frozen: true
             module:
               _Freezable__frozen: true
               module_name: cl.runtime.file.file_type_enum
             name: FileTypeEnum
-          data: null
-          key_: null
-          query: null
-          condition: null
           name: FileType
-          label: null
           comment: Embedded binary content type.
           vector: false
           optional: true
-          optional_vector_element: null
-          read_only: null
-          additive: null
-          format_: null
-          alternate_of: null
-        keys: null
-        abstract: null
-        immutable: null
-        permanent: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: PdfFile
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: NoteParam
-    return_: null
     static: false
   - name: run_static_method_1a
     label: Static Method 1A
     comment: Stub handler.
     type_: Job
-    params: null
-    return_: null
     static: true
   - name: run_static_method_1b
     label: Static Method 1B
     comment: Stub handler.
     type_: Job
-    params: null
-    return_: null
     static: true
   - name: run_static_method_2a
     label: Static Method 2A
@@ -723,29 +385,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: true
   - name: run_static_method_2b
     label: Static Method 2B
@@ -754,29 +401,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: true
   - name: run_static_method_3a
     label: Static Method 3A
@@ -785,29 +417,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: true
   - name: run_static_method_3b
     label: Static Method 3B
@@ -816,29 +433,14 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Param1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Param2
-    return_: null
     static: true
   - name: run_with_args_and_optional
     label: With Args And Optional
@@ -847,59 +449,29 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Arg1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Arg2
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: true
-      label: null
-      comment: null
       name: Arg3
     return_:
       value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
     static: false
   - name: run_with_error
     label: With Error
     comment: Stub method.
     type_: Job
-    params: null
-    return_: null
     static: false
   - name: run_with_two_args
     label: With Two Args
@@ -908,85 +480,41 @@ declare:
     params:
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Arg1
     - value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
       name: Arg2
     return_:
       value:
         type_: String
-      enum: null
-      data: null
-      key_: null
-      query: null
-      condition: null
       vector: false
       optional: false
-      label: null
-      comment: null
     static: false
   - name: run_with_user_error
     label: With User Error
     comment: Stub method.
     type_: Job
-    params: null
-    return_: null
     static: false
 fields:
 - name: stub_id
-  label: null
   comment: Stub identifier.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 elements:
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: StubId
-  label: null
   comment: Stub identifier.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 keys:
 - StubId
-abstract: null
-immutable: null
-permanent: null
 

@@ -1,125 +1,60 @@
-_Freezable__frozen: false
 module:
-  _Freezable__frozen: true
   module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite
 name: StubDataclassComposite
 label: Stub Dataclass Composite
 comment: Stub for a composite key that contains other key fields.
 type_kind: Record
 display_kind: Basic
-inherit: null
-declare: null
 fields:
 - name: primitive
-  label: null
   comment: String key element.
   field_kind: Primitive
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: builtins
     name: str
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: embedded_1
-  label: null
   comment: Embedded key 1.
   field_kind: Key
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 - name: embedded_2
-  label: null
   comment: Embedded key 2.
   field_kind: Key
   field_type_decl:
-    _Freezable__frozen: true
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  container: null
   optional_field: false
-  additive: null
-  formatter: null
-  alternate_of: null
 elements:
 - value:
     type_: String
-  enum: null
-  data: null
-  key_: null
-  query: null
-  condition: null
   name: Primitive
-  label: null
   comment: String key element.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data: null
-  key_:
-    _Freezable__frozen: true
+- key_:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  query: null
-  condition: null
   name: Embedded1
-  label: null
   comment: Embedded key 1.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
-- value: null
-  enum: null
-  data: null
-  key_:
-    _Freezable__frozen: true
+- key_:
     module:
-      _Freezable__frozen: true
       module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
     name: StubDataclassRecordKey
-  query: null
-  condition: null
   name: Embedded2
-  label: null
   comment: Embedded key 2.
   vector: false
   optional: false
-  optional_vector_element: null
-  read_only: null
-  additive: null
-  format_: null
-  alternate_of: null
 keys:
 - Primitive
 - Embedded1
 - Embedded2
-abstract: null
-immutable: null
-permanent: null
 
