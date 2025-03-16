@@ -1,7 +1,11 @@
 type_name: StubDataclassVersionedRecord
 fields:
 - field_name: id
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: version
-  type_name: int
+  type_hint: int
+  type_chain:
+  - - int
 

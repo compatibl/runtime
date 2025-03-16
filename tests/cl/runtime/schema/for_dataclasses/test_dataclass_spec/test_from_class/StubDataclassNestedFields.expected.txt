@@ -1,19 +1,35 @@
 type_name: StubDataclassNestedFields
 fields:
 - field_name: id
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: base_field
-  type_name: StubDataclassData
+  type_hint: StubDataclassData
+  type_chain:
+  - - StubDataclassData
 - field_name: derived_field
-  type_name: StubDataclassDerivedData
+  type_hint: StubDataclassDerivedData
+  type_chain:
+  - - StubDataclassDerivedData
 - field_name: derived_from_derived_field
-  type_name: StubDataclassDerivedFromDerivedData
+  type_hint: StubDataclassDerivedFromDerivedData
+  type_chain:
+  - - StubDataclassDerivedFromDerivedData
 - field_name: polymorphic_field
-  type_name: StubDataclassData
+  type_hint: StubDataclassData
+  type_chain:
+  - - StubDataclassData
 - field_name: polymorphic_derived_field
-  type_name: StubDataclassDerivedData
+  type_hint: StubDataclassDerivedData
+  type_chain:
+  - - StubDataclassDerivedData
 - field_name: key_field
-  type_name: StubDataclassRecordKey
+  type_hint: StubDataclassRecordKey
+  type_chain:
+  - - StubDataclassRecordKey
 - field_name: record_as_key_field
-  type_name: StubDataclassRecordKey
+  type_hint: StubDataclassRecordKey
+  type_chain:
+  - - StubDataclassRecordKey
 

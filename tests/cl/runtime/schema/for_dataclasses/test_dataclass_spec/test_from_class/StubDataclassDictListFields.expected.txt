@@ -1,29 +1,39 @@
 type_name: StubDataclassDictListFields
 fields:
 - field_name: id
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: float_dict_list
-  type_name: float
-  container:
-    container_kind: List
-    inner:
-      container_kind: Dict
+  type_hint: list[dict[str, float]]
+  type_chain:
+  - - list
+    - tuple
+  - - dict
+    - frozendict
+  - - float
 - field_name: date_dict_list
-  type_name: date
-  container:
-    container_kind: List
-    inner:
-      container_kind: Dict
+  type_hint: list[dict[str, date]]
+  type_chain:
+  - - list
+    - tuple
+  - - dict
+    - frozendict
+  - - date
 - field_name: record_dict_list
-  type_name: StubDataclassRecord
-  container:
-    container_kind: List
-    inner:
-      container_kind: Dict
+  type_hint: list[dict[str, StubDataclassRecord]]
+  type_chain:
+  - - list
+    - tuple
+  - - dict
+    - frozendict
+  - - StubDataclassRecord
 - field_name: derived_record_dict_list
-  type_name: StubDataclassDerivedRecord
-  container:
-    container_kind: List
-    inner:
-      container_kind: Dict
+  type_hint: list[dict[str, StubDataclassDerivedRecord]]
+  type_chain:
+  - - list
+    - tuple
+  - - dict
+    - frozendict
+  - - StubDataclassDerivedRecord
 

@@ -1,33 +1,42 @@
 type_name: StubDataclassTupleFields
 fields:
 - field_name: id
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: str_tuple
-  type_name: str
-  container:
-    container_kind: List
+  type_hint: tuple[str, Ellipsis]
+  type_chain:
+  - - tuple
+  - - str
 - field_name: float_tuple
-  type_name: float
-  container:
-    container_kind: List
+  type_hint: tuple[float, Ellipsis]
+  type_chain:
+  - - tuple
+  - - float
 - field_name: date_tuple
-  type_name: date
-  container:
-    container_kind: List
+  type_hint: tuple[date, Ellipsis]
+  type_chain:
+  - - tuple
+  - - date
 - field_name: data_tuple
-  type_name: StubDataclassData
-  container:
-    container_kind: List
+  type_hint: tuple[StubDataclassData, Ellipsis]
+  type_chain:
+  - - tuple
+  - - StubDataclassData
 - field_name: key_tuple
-  type_name: StubDataclassRecordKey
-  container:
-    container_kind: List
+  type_hint: tuple[StubDataclassRecordKey, Ellipsis]
+  type_chain:
+  - - tuple
+  - - StubDataclassRecordKey
 - field_name: record_tuple
-  type_name: StubDataclassRecord
-  container:
-    container_kind: List
+  type_hint: tuple[StubDataclassRecord, Ellipsis]
+  type_chain:
+  - - tuple
+  - - StubDataclassRecord
 - field_name: derived_record_tuple
-  type_name: StubDataclassDerivedRecord
-  container:
-    container_kind: List
+  type_hint: tuple[StubDataclassDerivedRecord, Ellipsis]
+  type_chain:
+  - - tuple
+  - - StubDataclassDerivedRecord
 

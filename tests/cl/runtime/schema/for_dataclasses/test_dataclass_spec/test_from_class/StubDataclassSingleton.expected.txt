@@ -1,5 +1,7 @@
 type_name: StubDataclassSingleton
 fields:
 - field_name: str_field
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 

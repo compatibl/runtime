@@ -1,7 +1,11 @@
 type_name: StubDataclassOtherDerivedRecord
 fields:
 - field_name: id
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: other_derived
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 

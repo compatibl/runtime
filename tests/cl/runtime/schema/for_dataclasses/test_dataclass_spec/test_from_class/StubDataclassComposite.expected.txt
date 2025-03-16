@@ -1,9 +1,15 @@
 type_name: StubDataclassComposite
 fields:
 - field_name: primitive
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: embedded_1
-  type_name: StubDataclassRecordKey
+  type_hint: StubDataclassRecordKey
+  type_chain:
+  - - StubDataclassRecordKey
 - field_name: embedded_2
-  type_name: StubDataclassRecordKey
+  type_hint: StubDataclassRecordKey
+  type_chain:
+  - - StubDataclassRecordKey
 

@@ -16,9 +16,13 @@ import types
 import typing
 from dataclasses import dataclass
 from typing import Type
+from typing import List
+
+from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
@@ -31,27 +35,27 @@ class FieldSpec(Freezable):
     field_name: str = required()
     """Field name (must be unique within the class)."""
     
-    type_name: str = required()
-    """Type name (class name or alias, do not include container and optional settings here)."""
+    type_hint: str = required()
+    """Type hint from which the type chain was created as string."""
 
-    container: ContainerDecl | None = None
-    """Container spec if the value is inside a container or multiple nested containers."""
-
-    optional: bool | None = None
-    """Indicates if the field can be None (applies to the entire field, not to items inside the container)."""
+    type_chain: List[List[str]] = required()
+    """
+    Initial items in the outer list are containers and last item is the value.
+    First item in the inner list is container or value type name, and second is NoneType if optional.
+    """
 
     _class: Type
-    """Class where field type is stored (this is not the type hint as it excludes container and optional info)."""
+    """The inner data class or primitive class inside the nested containers."""
 
     def get_class(self) -> Type:
-        """Class where the type is stored."""
+        """The inner data class or primitive class inside the nested containers."""
         return self._class
 
     @classmethod
     def create(
         cls,
         *,
-        type_hint: Type,
+        type_hint: typing.TypeAlias,
         field_name: str,
         containing_type_name: str,
     ) -> Self:
@@ -66,116 +70,119 @@ class FieldSpec(Freezable):
         """
 
         # Variables to store the result of type hint parsing
-        root_container = None
-        root_optional = None
+        root_type_hint_str = cls._serialize_type_hint(type_hint)
+        type_chain = []
 
         # Get origin and args of the field type
         type_hint_origin = typing.get_origin(type_hint)
         type_hint_args = typing.get_args(type_hint)
 
         # There are two possible forms of origin for optional, typing.Union and types.UnionType
-        if type_hint_origin is typing.Union or type_hint_origin is types.UnionType:
-            # Union with None is the only permitted Union type
-            if len(type_hint_args) != 2 or type_hint_args[1] is not type(None):
-                raise RuntimeError(
-                    f"Union type hint '{type_hint}' for field '{field_name}'\n"
-                    f"in record '{containing_type_name}' is not supported\n"
-                    f"because it is not an optional value using the syntax 'Type | None'\n"
-                )
-
-            # Set optional flag in result
-            root_optional = True
-
-            # Get type information without None
-            type_hint = type_hint_args[0]
-            type_hint_origin = typing.get_origin(type_hint)
-            type_hint_args = typing.get_args(type_hint)
-
-        # Check for one of the supported container types
-        outer_container = None
-        supported_containers = [list, tuple, dict]
-        while type_hint_origin in supported_containers:
-            if type_hint_origin is list:
-                # Perform additional checks for list
-                if len(type_hint_args) != 1:
-                    raise RuntimeError(
-                        f"List type hint '{type_hint}' for field '{field_name}'\n"
-                        f"in record '{containing_type_name}' is not supported\n"
-                        f"because it is not a list of elements using the syntax 'List[Type]'\n"
-                    )
-                # Populate container data and extract the inner type_hint
-                container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
-                type_hint = type_hint_args[0]
-            elif type_hint_origin is tuple:
-                # Perform additional checks for tuple
-                if len(type_hint_args) != 2 or type_hint_args[1] is not Ellipsis:
-                    raise RuntimeError(
-                        f"Tuple type hint '{type_hint}' for field '{field_name}'\n"
-                        f"in record '{containing_type_name}' is not supported\n"
-                        f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]'\n"
-                    )
-                # Populate container data and extract the inner type_hint
-                container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
-                type_hint = type_hint_args[0]
-            elif type_hint_origin is dict:
-                # Perform additional checks for dict
-                if len(type_hint_args) != 2 or type_hint_args[0] is not str:
-                    raise RuntimeError(
-                        f"Dict type hint '{type_hint}' for field '{field_name}'\n"
-                        f"in record '{containing_type_name}' is not supported\n"
-                        f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'\n"
-                    )
-                # Populate container data and extract the inner type_hint
-                container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
-                type_hint = type_hint_args[1]
-            else:
-                supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
-                raise RuntimeError(
-                    f"Type {type_hint_origin.__name__} is not one of the supported container types "
-                    f"{supported_container_names}."
-                )
-
-            # Strip container information from type_hint to get the type of value inside the container
-            type_hint_origin = typing.get_origin(type_hint)
-            type_hint_args = typing.get_args(type_hint)
+        union_types = [types.UnionType, typing.Union]
+        supported_containers = [list, tuple, dict, frozendict]
+        while True:
+            # Add a new type chain level
+            type_chain.append([])
 
             # There are two possible forms of origin for optional, typing.Union and types.UnionType
-            if type_hint_origin is typing.Union or type_hint_origin is types.UnionType:
+            if is_optional := type_hint_origin in union_types:
                 # Union with None is the only permitted Union type
                 if len(type_hint_args) != 2 or type_hint_args[1] is not type(None):
                     raise RuntimeError(
-                        f"Union type hint '{type_hint}' for an element of\n"
-                        f"the {container.container_kind.name}field '{field_name}'\n"
-                        f"in record '{containing_type_name}' is not supported\n"
+                        f"Union type hint '{cls._serialize_type_hint(type_hint)}'\n"
+                        f"for field {field_name} in record {containing_type_name}' is not supported\n"
                         f"because it is not an optional value using the syntax 'Type | None'\n"
                     )
 
-                # Indicate that container elements can be None
-                container.optional_items = True
+                # Union with None, append a list containing NoneType
+                type_chain[-1].append("NoneType")
 
                 # Get type information without None
                 type_hint = type_hint_args[0]
                 type_hint_origin = typing.get_origin(type_hint)
                 type_hint_args = typing.get_args(type_hint)  # TODO: Add a check
 
-            # Assign container to result or outer container
-            if outer_container is None:
-                root_container = container
-            else:
-                outer_container.inner = container
-            outer_container = container
+            if is_container := type_hint_origin in supported_containers:
+                # Parse container definition and add container types to type_chain
+                if type_hint_origin is list:
+                    # Perform additional checks for list
+                    if len(type_hint_args) != 1:
+                        raise RuntimeError(
+                            f"List type hint '{cls._serialize_type_hint(type_hint)}'\n"
+                            f"for field {field_name} in record {containing_type_name}' is not supported\n"
+                            f"because it is not a list of elements using the syntax 'List[Type]'\n"
+                        )
+                    # Populate container data and extract the inner type_hint
+                    container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+                    type_hint = type_hint_args[0]
+                    type_chain[-1].extend(["list", "tuple"])
+                elif type_hint_origin is tuple:
+                    # Perform additional checks for tuple
+                    if len(type_hint_args) != 2 or type_hint_args[1] is not Ellipsis:
+                        raise RuntimeError(
+                            f"Tuple type hint '{cls._serialize_type_hint(type_hint)}'\n"
+                            f"for field {field_name} in record {containing_type_name}' is not supported\n"
+                            f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]'\n"
+                        )
+                    # Populate container data and extract the inner type_hint
+                    container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+                    type_hint = type_hint_args[0]
+                    type_chain[-1].extend(["tuple"])
+                elif type_hint_origin is dict:
+                    # Perform additional checks for dict
+                    if len(type_hint_args) != 2 or type_hint_args[0] is not str:
+                        raise RuntimeError(
+                            f"Dict type hint '{cls._serialize_type_hint(type_hint)}'\n"
+                            f"for field {field_name} in record {containing_type_name}' is not supported\n"
+                            f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'\n"
+                        )
+                    # Populate container data and extract the inner type_hint
+                    container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
+                    type_hint = type_hint_args[1]
+                    type_chain[-1].extend(["dict", "frozendict"])
+                else:
+                    supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
+                    raise RuntimeError(
+                        f"Container type {type_hint_origin.__name__} is not one of the supported container types "
+                        f"{supported_container_names}."
+                    )
 
-        # Check that type hint is completely unwrapped and only the
-        # genuine inner type remains without wrappers from typing
-        if type_hint_origin is None and not type_hint_args and isinstance(type_hint, type):
-            # Create the field spec and return
-            result = cls(
-                field_name=field_name,
-                type_name=TypeUtil.name(type_hint),
-                container=root_container,
-                optional=root_optional,
-                _class=type_hint
-            )
-            return result
-        else:
-            raise RuntimeError(f"Type hint format {type_hint} is not recognized.")
+                # Strip container information from type_hint to get the type of value inside the container
+                type_hint_origin = typing.get_origin(type_hint)
+                type_hint_args = typing.get_args(type_hint)
+
+            else:
+                # If not optional and not a container, the remaining part of the type hint
+                # must be a genuine inner type remains without wrappers from typing.
+                # Check using isinstance(type_hint, type) which will return False for a type alias.
+                if isinstance(type_hint, type):
+                    if type_hint_origin is None and not type_hint_args:
+                        # Add the ultimate inner type inside nested containers to the last type chain item
+                        type_name = TypeUtil.name(type_hint)
+                        type_chain[-1].append(type_name)
+                    else:
+                        raise RuntimeError(f"Type hint {type_hint} is not supported. Supported type hints include:\n"
+                                           f"- a union with None (optional) with one of the supported types inside\n"
+                                           f"- list, tuple, dict, frozendict with one of the supported types inside\n"
+                                           f"- a type with build method\n"
+                                           f"- {', '.join(PRIMITIVE_CLASS_NAMES)}\n")
+
+                    # Create the field spec and return which ends the while True loop
+                    result = cls(
+                        field_name=field_name,
+                        type_hint=root_type_hint_str,
+                        type_chain=type_chain,
+                        _class=type_hint,
+                    )
+                    return result
+
+    @classmethod
+    def _serialize_type_hint(cls, alias: typing.Any) -> str:
+        """Serialize a type alias without namespaces."""
+        if hasattr(alias, '__origin__'):
+            origin = alias.__origin__.__name__
+            args = ', '.join(cls._serialize_type_hint(arg) for arg in alias.__args__)
+            return f"{origin}[{args}]"
+        elif hasattr(alias, '__name__'):
+            return alias.__name__
+        return str(alias)

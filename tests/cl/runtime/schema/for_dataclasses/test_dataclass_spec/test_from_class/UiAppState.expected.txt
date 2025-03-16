@@ -1,35 +1,53 @@
 type_name: UiAppState
 fields:
 - field_name: user
-  type_name: UserKey
+  type_hint: UserKey
+  type_chain:
+  - - UserKey
 - field_name: opened_tabs
-  type_name: TabInfo
-  container:
-    container_kind: List
-  optional: true
+  type_hint: Union[list[TabInfo], NoneType]
+  type_chain:
+  - - NoneType
+    - list
+    - tuple
+  - - TabInfo
 - field_name: active_tab_index
-  type_name: int
-  optional: true
+  type_hint: int | None
+  type_chain:
+  - - NoneType
+    - int
 - field_name: backend_version
-  type_name: str
-  optional: true
+  type_hint: str | None
+  type_chain:
+  - - NoneType
+    - str
 - field_name: versions
-  type_name: str
-  container:
-    container_kind: Dict
-  optional: true
+  type_hint: Union[dict[str, str], NoneType]
+  type_chain:
+  - - NoneType
+    - dict
+    - frozendict
+  - - str
 - field_name: application_name
-  type_name: str
-  optional: true
+  type_hint: str | None
+  type_chain:
+  - - NoneType
+    - str
 - field_name: read_only
-  type_name: bool
-  optional: true
+  type_hint: bool | None
+  type_chain:
+  - - NoneType
+    - bool
 - field_name: application_theme
-  type_name: str
-  optional: true
+  type_hint: str | None
+  type_chain:
+  - - NoneType
+    - str
 - field_name: user_secret_identifiers
-  type_name: str
-  container:
-    container_kind: List
-  optional: true
+  type_hint: Union[list[str], NoneType]
+  type_chain:
+  - - NoneType
+    - list
+    - tuple
+  - - str
 

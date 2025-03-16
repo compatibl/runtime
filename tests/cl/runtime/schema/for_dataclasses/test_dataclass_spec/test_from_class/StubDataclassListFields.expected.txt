@@ -1,33 +1,49 @@
 type_name: StubDataclassListFields
 fields:
 - field_name: id
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: str_list
-  type_name: str
-  container:
-    container_kind: List
+  type_hint: list[str]
+  type_chain:
+  - - list
+    - tuple
+  - - str
 - field_name: float_list
-  type_name: float
-  container:
-    container_kind: List
+  type_hint: list[float]
+  type_chain:
+  - - list
+    - tuple
+  - - float
 - field_name: date_list
-  type_name: date
-  container:
-    container_kind: List
+  type_hint: list[date]
+  type_chain:
+  - - list
+    - tuple
+  - - date
 - field_name: data_list
-  type_name: StubDataclassData
-  container:
-    container_kind: List
+  type_hint: list[StubDataclassData]
+  type_chain:
+  - - list
+    - tuple
+  - - StubDataclassData
 - field_name: key_list
-  type_name: StubDataclassRecordKey
-  container:
-    container_kind: List
+  type_hint: list[StubDataclassRecordKey]
+  type_chain:
+  - - list
+    - tuple
+  - - StubDataclassRecordKey
 - field_name: record_list
-  type_name: StubDataclassRecord
-  container:
-    container_kind: List
+  type_hint: list[StubDataclassRecord]
+  type_chain:
+  - - list
+    - tuple
+  - - StubDataclassRecord
 - field_name: derived_record_list
-  type_name: StubDataclassDerivedRecord
-  container:
-    container_kind: List
+  type_hint: list[StubDataclassDerivedRecord]
+  type_chain:
+  - - list
+    - tuple
+  - - StubDataclassDerivedRecord
 

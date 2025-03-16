@@ -1,55 +1,107 @@
 type_name: StubDataclassPrimitiveFields
 fields:
 - field_name: key_str_field
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: key_float_field
-  type_name: float
+  type_hint: float
+  type_chain:
+  - - float
 - field_name: key_bool_field
-  type_name: bool
+  type_hint: bool
+  type_chain:
+  - - bool
 - field_name: key_int_field
-  type_name: int
+  type_hint: int
+  type_chain:
+  - - int
 - field_name: key_long_field
-  type_name: int
+  type_hint: int
+  type_chain:
+  - - int
 - field_name: key_date_field
-  type_name: date
+  type_hint: date
+  type_chain:
+  - - date
 - field_name: key_time_field
-  type_name: time
+  type_hint: time
+  type_chain:
+  - - time
 - field_name: key_date_time_field
-  type_name: datetime
+  type_hint: datetime
+  type_chain:
+  - - datetime
 - field_name: key_uuid_field
-  type_name: UUID
+  type_hint: UUID
+  type_chain:
+  - - UUID
 - field_name: key_bytes_field
-  type_name: bytes
+  type_hint: bytes
+  type_chain:
+  - - bytes
 - field_name: key_int_enum_field
-  type_name: StubIntEnum
+  type_hint: StubIntEnum
+  type_chain:
+  - - StubIntEnum
 - field_name: obj_str_field
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: obj_str_with_eol_field
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: obj_str_with_trailing_eol_field
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: obj_str_timestamp_field
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: obj_float_field
-  type_name: float
+  type_hint: float
+  type_chain:
+  - - float
 - field_name: obj_bool_field
-  type_name: bool
+  type_hint: bool
+  type_chain:
+  - - bool
 - field_name: obj_int_field
-  type_name: int
+  type_hint: int
+  type_chain:
+  - - int
 - field_name: obj_long_field
-  type_name: int
+  type_hint: int
+  type_chain:
+  - - int
 - field_name: obj_date_field
-  type_name: date
+  type_hint: date
+  type_chain:
+  - - date
 - field_name: obj_time_field
-  type_name: time
+  type_hint: time
+  type_chain:
+  - - time
 - field_name: obj_date_time_field
-  type_name: datetime
+  type_hint: datetime
+  type_chain:
+  - - datetime
 - field_name: obj_uuid_field
-  type_name: UUID
+  type_hint: UUID
+  type_chain:
+  - - UUID
 - field_name: obj_bytes_field
-  type_name: bytes
+  type_hint: bytes
+  type_chain:
+  - - bytes
 - field_name: obj_bytes_large_field
-  type_name: bytes
+  type_hint: bytes
+  type_chain:
+  - - bytes
 - field_name: obj_int_enum_field
-  type_name: StubIntEnum
+  type_hint: StubIntEnum
+  type_chain:
+  - - StubIntEnum
 

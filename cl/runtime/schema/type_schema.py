@@ -68,15 +68,24 @@ class TypeSchema:
     """Packages specified in the settings."""
 
     @classmethod
-    def get_type_spec(cls, type_name: str) -> TypeSpec:
+    def for_type_name(cls, type_name: str) -> TypeSpec:
         """Get or create type spec for the specified type name."""
-
         if (result := cls._spec_dict.get(type_name, None)) is not None:
-
             # Already created, return from spec dictionary
             return result
         else:
+            # Get class for the specified type name and use it to get type spec
+            class_ = cls.get_class(type_name)
+            return cls.for_class(class_)
 
+    @classmethod
+    def for_class(cls, class_: Type) -> TypeSpec:
+        """Get or create type spec for the specified class."""
+        type_name = TypeUtil.name(class_)
+        if (result := cls._spec_dict.get(type_name, None)) is not None:
+            # Already created, return from spec dictionary
+            return result
+        else:
             # Get class for the specified type name
             class_ = cls.get_class(type_name)
 

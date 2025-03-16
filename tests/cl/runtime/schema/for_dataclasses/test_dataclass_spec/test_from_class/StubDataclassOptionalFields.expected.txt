@@ -1,75 +1,124 @@
 type_name: StubDataclassOptionalFields
 fields:
 - field_name: id
-  type_name: str
+  type_hint: str
+  type_chain:
+  - - str
 - field_name: optional_str
-  type_name: str
-  optional: true
+  type_hint: str | None
+  type_chain:
+  - - NoneType
+    - str
 - field_name: required_list_of_optional_str
-  type_name: str
-  container:
-    container_kind: List
-    optional_items: true
+  type_hint: list[str | None]
+  type_chain:
+  - - list
+    - tuple
+  - - NoneType
+    - str
 - field_name: optional_list_of_optional_str
-  type_name: str
-  container:
-    container_kind: List
-    optional_items: true
-  optional: true
+  type_hint: Union[list[str | None], NoneType]
+  type_chain:
+  - - NoneType
+    - list
+    - tuple
+  - - NoneType
+    - str
 - field_name: optional_float
-  type_name: float
-  optional: true
+  type_hint: float | None
+  type_chain:
+  - - NoneType
+    - float
 - field_name: required_list_of_optional_float
-  type_name: float
-  container:
-    container_kind: List
-    optional_items: true
+  type_hint: list[float | None]
+  type_chain:
+  - - list
+    - tuple
+  - - NoneType
+    - float
 - field_name: optional_list_of_optional_float
-  type_name: float
-  container:
-    container_kind: List
-    optional_items: true
-  optional: true
+  type_hint: Union[list[float | None], NoneType]
+  type_chain:
+  - - NoneType
+    - list
+    - tuple
+  - - NoneType
+    - float
 - field_name: optional_data
-  type_name: StubDataclassData
-  optional: true
+  type_hint: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
+    | None
+  type_chain:
+  - - NoneType
+    - StubDataclassData
 - field_name: required_list_of_optional_data
-  type_name: StubDataclassData
-  container:
-    container_kind: List
-    optional_items: true
+  type_hint: 
+    list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
+    | None]
+  type_chain:
+  - - list
+    - tuple
+  - - NoneType
+    - StubDataclassData
 - field_name: optional_list_of_optional_data
-  type_name: StubDataclassData
-  container:
-    container_kind: List
-    optional_items: true
-  optional: true
+  type_hint: 
+    Union[list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
+    | None], NoneType]
+  type_chain:
+  - - NoneType
+    - list
+    - tuple
+  - - NoneType
+    - StubDataclassData
 - field_name: optional_key
-  type_name: StubDataclassRecordKey
-  optional: true
+  type_hint: 
+    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
+    | None
+  type_chain:
+  - - NoneType
+    - StubDataclassRecordKey
 - field_name: required_list_of_optional_key
-  type_name: StubDataclassRecordKey
-  container:
-    container_kind: List
-    optional_items: true
+  type_hint: 
+    list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
+    | None]
+  type_chain:
+  - - list
+    - tuple
+  - - NoneType
+    - StubDataclassRecordKey
 - field_name: optional_list_of_optional_key
-  type_name: StubDataclassRecordKey
-  container:
-    container_kind: List
-    optional_items: true
-  optional: true
+  type_hint: 
+    Union[list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
+    | None], NoneType]
+  type_chain:
+  - - NoneType
+    - list
+    - tuple
+  - - NoneType
+    - StubDataclassRecordKey
 - field_name: optional_record
-  type_name: StubDataclassRecord
-  optional: true
+  type_hint: 
+    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
+    | None
+  type_chain:
+  - - NoneType
+    - StubDataclassRecord
 - field_name: required_list_of_optional_record
-  type_name: StubDataclassRecord
-  container:
-    container_kind: List
-    optional_items: true
+  type_hint: 
+    list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
+    | None]
+  type_chain:
+  - - list
+    - tuple
+  - - NoneType
+    - StubDataclassRecord
 - field_name: optional_list_of_optional_record
-  type_name: StubDataclassRecord
-  container:
-    container_kind: List
-    optional_items: true
-  optional: true
+  type_hint: 
+    Union[list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
+    | None], NoneType]
+  type_chain:
+  - - NoneType
+    - list
+    - tuple
+  - - NoneType
+    - StubDataclassRecord
 
