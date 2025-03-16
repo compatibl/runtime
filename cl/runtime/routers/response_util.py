@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 import base64
+import dataclasses
 from dataclasses import asdict
 from dataclasses import fields
 from dataclasses import is_dataclass
@@ -63,7 +64,7 @@ def to_record_dict(node):  # TODO: Apply type hints
         node_dict = asdict(node)
         result = ";".join(node_dict.keys())
         return result
-    elif hasattr(node, "get_key") or is_dataclass(node):
+    elif hasattr(node, "get_key") or dataclasses.is_dataclass(node):
         # Record or data
         # Creating the result dictionary starting with the "_t" field
         result = {"_t": TypeUtil.name(node)}

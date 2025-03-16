@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import dataclasses
 from dataclasses import MISSING
 from dataclasses import fields
 from dataclasses import is_dataclass
@@ -120,7 +121,7 @@ class BuildUtil:
         """Validate against schema (invoked by init_all after all init methods are called)."""
         # TODO: Support other dataclass-like frameworks
         class_name = TypeUtil.name(obj)
-        if is_dataclass(obj):
+        if dataclasses.is_dataclass(obj):
             for field in fields(obj):
                 field_value = getattr(obj, field.name)
                 if field_value is not None:
