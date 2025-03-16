@@ -30,13 +30,12 @@ from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.schema import Schema
-from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.annotations_util import AnnotationsUtil
 from cl.runtime.serializers.dict_serializer import get_type_dict
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.sentinel_type import sentinel_value
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)
@@ -84,22 +83,15 @@ class DictSerializer2(Freezable):
                     f"the type {schema_type_name} specified in schema."
                 )
 
-            # Write type information if omit_type is False and type_ is not specified or is not type(data)
-            if (not self.omit_type) and (schema_type is None or schema_type is data.__class__):
-                obj_type_name = TypeUtil.name(data.__class__)
+            # Write type information if omit_type is False and type_ is not specified or not the same as type of data
+            if (not self.omit_type) and (schema_type is None or schema_type is not data.__class__):
+                type_name = TypeUtil.name(data.__class__)
                 result = {}  # {"_type": obj_type_name}
             else:
                 result = {}
 
             # Get slots from this class and its bases in the order of declaration from base to derived
-            type_decl = TypeDecl.for_type(data.__class__)
-            field_types = [
-                (
-                    field.name,
-                    Schema.get_type_by_short_name(field.field_type_decl.name),
-                )
-                for field in type_decl.fields
-            ]
+            slots = SlotsUtil.get_slots(data.__class__)
 
             # Serialize slot values in the order of declaration except those that are None
             result.update(
@@ -113,7 +105,7 @@ class DictSerializer2(Freezable):
                             else self.serialize(v)
                         )
                     )
-                    for k, t in field_types
+                    for k in slots
                     if (v := getattr(data, k)) is not None and (not hasattr(v, "__len__") or len(v) > 0)
                 }
             )
