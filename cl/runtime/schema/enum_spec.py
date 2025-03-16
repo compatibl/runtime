@@ -36,7 +36,7 @@ class EnumSpec(TypeSpec):
         # Perform checks
         class_name = class_.__name__
         if not issubclass(class_, Enum):
-            raise RuntimeError(f"Cannot create EnumSpec from {class_name} because it is not an enum.")
+            raise RuntimeError(f"Cannot create EnumSpec for {class_name} because it is not an enum.")
         if subtype is not None:
             raise RuntimeError(f"Subtype {subtype} is specified for enum class {class_name}.\n"
                                f"Only primitive types can have subtypes.")

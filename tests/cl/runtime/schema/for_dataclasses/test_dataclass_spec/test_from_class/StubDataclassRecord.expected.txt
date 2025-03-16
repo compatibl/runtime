@@ -1,0 +1,5 @@
+type_name: StubDataclassRecord
+fields:
+- field_name: id
+  type_name: str
+

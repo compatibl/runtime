@@ -29,17 +29,18 @@ from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 from cl.runtime.schema.field_kind_enum import FieldKindEnum
 from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
 from cl.runtime.schema.type_decl_key import TypeDeclKey
+from cl.runtime.schema.type_spec_key import TypeSpecKey
 
 
 @dataclass(slots=True, kw_only=True)
 class FieldSpec(Freezable):
     """Provides information about a field in DataSpec."""
 
-    name: str = required()
+    field_name: str = required()
     """Field name (must be unique within the class)."""
     
-    type_spec: str = required()
-    """Specification for the field type."""
+    type_name: str = required()
+    """Type name (class name or alias, do not include container and optional settings here)."""
 
     container: ContainerDecl | None = None
     """Container spec if the value is inside a container."""

@@ -36,12 +36,8 @@ from cl.runtime.records.protocols import is_record_or_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_decl_key import TypeDeclKey
+from cl.runtime.schema.type_schema import TypeSchema, is_schema_type
 from cl.runtime.settings.context_settings import ContextSettings
-
-
-def is_schema_type(data_type) -> bool:
-    """Return true if the type should be included in schema, includes classes with build method and enums."""
-    return inspect.isclass(data_type) and (hasattr(data_type, "build") or issubclass(data_type, Enum))
 
 
 class Schema:
@@ -103,7 +99,7 @@ class Schema:
             packages = context_settings.packages
 
             # Get modules for the specified packages
-            modules = cls._get_modules(packages)
+            modules = TypeSchema._get_modules()
 
             # Get record types by iterating over modules
             record_types = set(
@@ -188,32 +184,6 @@ class Schema:
             f"{type_decl.module.module_name}.{type_decl.name}": type_decl.to_type_decl_dict()
             for type_decl in type_decl_list
         }
-        return result
-
-    @classmethod
-    @cached
-    def _get_modules(cls, packages: List[str]) -> List[ModuleType]:
-        """
-        Get a list of ModuleType objects for submodules at all levels of the specified packages or root modules
-        in the alphabetical order of dot-delimited module name.
-
-        Args:
-            packages: List of packages or root module strings in dot-delimited format, for example ['cl.runtime']
-        """
-        result = []
-        for package in packages:
-            # Import root module of the package
-            root_module = importlib.import_module(package)
-            result.append(root_module)  # Add the root module itself
-            # Get module info for all submodules, note the trailing period added as per walk_packages documentation
-            for module_info in walk_packages(root_module.__path__, root_module.__name__ + "."):
-                module_name = module_info.name
-                # Import the submodule using its full name
-                submodule = importlib.import_module(module_name)
-                result.append(submodule)
-
-        # Sort the result by module path
-        result = sorted(result, key=lambda module: module.__name__)
         return result
 
     @classmethod

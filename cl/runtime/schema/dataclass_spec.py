@@ -12,10 +12,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
+import dataclasses
+from dataclasses import dataclass, is_dataclass
+from typing import Type
+
+from typing_extensions import Self
+
 from cl.runtime.schema.data_spec import DataSpec
+from cl.runtime.schema.field_spec import FieldSpec
+from cl.runtime.schema.type_spec_key import TypeSpecKey
 
 
 @dataclass(slots=True, kw_only=True)
 class DataclassSpec(DataSpec):
     """Provides information about a dataclass."""
+
+    @classmethod
+    def from_class(cls, class_: Type, subtype: str | None = None) -> Self:
+        """Create spec from class, subtype is not permitted."""
+
+        # Perform checks
+        class_name = class_.__name__
+        if not dataclasses.is_dataclass(class_):
+            raise RuntimeError(f"Cannot create {cls.__name__} for {class_name} because it is not a dataclass.")
+        if subtype is not None:
+            raise RuntimeError(f"Subtype {subtype} is specified for a dataclass {class_name}.\n"
+                               f"Only primitive types can have subtypes.")
+
+        # Create the list of enum members
+        fields = [
+            FieldSpec(
+                field_name=field.name,
+                type_name=field.type.__name__,
+            )
+            for field in dataclasses.fields(class_) # noqa: type=ignore, verified it is a dataclass above
+            if not field.name.startswith("_")
+        ]
+
+        # Create the enum spec
+        result = DataclassSpec(type_name=class_name, _class=class_, fields=fields)
+        return result
