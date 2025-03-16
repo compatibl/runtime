@@ -30,7 +30,7 @@ class TypeSpec(TypeSpecKey, RecordMixin[TypeSpecKey], ABC):
     """
 
     _class: Type
-    """Class where the type is stored."""
+    """Class where the type is stored (this is not the type hint as it excludes container and optional info)."""
 
     def get_key(self) -> TypeSpecKey:
         return TypeSpecKey(type_name=self.type_name).build()

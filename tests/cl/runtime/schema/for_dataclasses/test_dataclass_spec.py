@@ -14,13 +14,48 @@
 
 import pytest
 
+from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubIntEnum, StubDataclassRecord
+from stubs.cl.runtime import StubIntEnum, StubDataclassDictFields, StubDataclassDictListFields
+from stubs.cl.runtime import StubDataclassComposite
+from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
+from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassListDictFields
+from stubs.cl.runtime import StubDataclassListFields
+from stubs.cl.runtime import StubDataclassNestedFields
+from stubs.cl.runtime import StubDataclassOptionalFields
+from stubs.cl.runtime import StubDataclassOtherDerivedRecord
+from stubs.cl.runtime import StubDataclassPrimitiveFields
+from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime import StubHandlers
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import StubDataclassTupleFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
+from stubs.cl.runtime.views.stub_viewers import StubViewers
 
 _FROM_CLASS_VALID_CASES = [
     StubDataclassRecord,
+    StubDataclassNestedFields,
+    StubDataclassComposite,
+    StubDataclassDerivedRecord,
+    StubDataclassDerivedFromDerivedRecord,
+    StubDataclassOtherDerivedRecord,
+    StubDataclassListFields,
+    StubDataclassTupleFields,
+    StubDataclassOptionalFields,
+    StubDataclassDictFields,
+    StubDataclassDictListFields,
+    StubDataclassListDictFields,
+    StubDataclassPrimitiveFields,
+    StubDataclassSingleton,
+    StubDataclassAliasedRecord,
+    StubHandlers,
+    StubViewers,
+    StubDataclassVersionedRecord,
+    UiAppState,
 ]
 
 _FROM_CLASS_EXCEPTION_CASES = [

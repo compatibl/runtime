@@ -18,6 +18,7 @@ from typing import Type
 
 from typing_extensions import Self
 
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.field_spec import FieldSpec
 from cl.runtime.schema.type_spec_key import TypeSpecKey
@@ -32,23 +33,24 @@ class DataclassSpec(DataSpec):
         """Create spec from class, subtype is not permitted."""
 
         # Perform checks
-        class_name = class_.__name__
+        type_name = TypeUtil.name(class_)
         if not dataclasses.is_dataclass(class_):
-            raise RuntimeError(f"Cannot create {cls.__name__} for {class_name} because it is not a dataclass.")
+            raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it is not a dataclass.")
         if subtype is not None:
-            raise RuntimeError(f"Subtype {subtype} is specified for a dataclass {class_name}.\n"
+            raise RuntimeError(f"Subtype {subtype} is specified for a dataclass {type_name}.\n"
                                f"Only primitive types can have subtypes.")
 
         # Create the list of enum members
         fields = [
-            FieldSpec(
+            FieldSpec.create(
+                type_hint=field.type,
                 field_name=field.name,
-                type_name=field.type.__name__,
+                containing_type_name=type_name,
             )
             for field in dataclasses.fields(class_) # noqa: type=ignore, verified it is a dataclass above
             if not field.name.startswith("_")
         ]
 
         # Create the enum spec
-        result = DataclassSpec(type_name=class_name, _class=class_, fields=fields)
+        result = DataclassSpec(type_name=type_name, _class=class_, fields=fields)
         return result

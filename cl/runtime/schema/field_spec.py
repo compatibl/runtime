@@ -15,21 +15,13 @@
 import types
 import typing
 from dataclasses import dataclass
-from enum import Enum
-from typing import Literal
 from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
-from cl.runtime.schema.field_kind_enum import FieldKindEnum
-from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
-from cl.runtime.schema.type_decl_key import TypeDeclKey
-from cl.runtime.schema.type_spec_key import TypeSpecKey
 
 
 @dataclass(slots=True, kw_only=True)
@@ -43,177 +35,147 @@ class FieldSpec(Freezable):
     """Type name (class name or alias, do not include container and optional settings here)."""
 
     container: ContainerDecl | None = None
-    """Container spec if the value is inside a container."""
+    """Container spec if the value is inside a container or multiple nested containers."""
 
     optional: bool | None = None
     """Indicates if the field can be None (applies to the entire field, not to items inside the container)."""
 
+    _class: Type
+    """Class where field type is stored (this is not the type hint as it excludes container and optional info)."""
+
+    def get_class(self) -> Type:
+        """Class where the type is stored."""
+        return self._class
+
     @classmethod
     def create(
         cls,
-        record_type: Type,
-        field_name: str,
-        field_type: Type,
-        field_comment: str,
         *,
-        dependencies: typing.Set[Type] | None = None,
+        type_hint: Type,
+        field_name: str,
+        containing_type_name: str,
     ) -> Self:
         """
-        Create from field name and type.
+        Create type spec by parsing the type hint.
 
         Args:
-            record_type: Type of the record for which the field is defined
-            field_name: Name of the field
-            field_type: Type of the field obtained from get_type_hints where ForwardRefs are resolved
-            field_comment: Field comment (docstring), currently requires source parsing due Python limitations
-            dependencies: Set of types used in field or methods of the specified type, populated only if not None
+            type_hint: Type of the field obtained from get_type_hints where ForwardRefs are resolved
+            field_name: Name of the field, used for error messages only and recorded into the output
+            containing_type_name: Name of the class that contains the field, used for error messages only
+                                  and recorded into the output
         """
 
-        from cl.runtime.schema.schema import Schema  # TODO: Avoid circular dependency
-
-        result = cls()
-        result.name = field_name
-        result.comment = field_comment
+        # Variables to store the result of type hint parsing
+        root_container = None
+        root_optional = None
 
         # Get origin and args of the field type
-        field_origin = typing.get_origin(field_type)
-        field_args = typing.get_args(field_type)
+        type_hint_origin = typing.get_origin(type_hint)
+        type_hint_args = typing.get_args(type_hint)
 
         # There are two possible forms of origin for optional, typing.Union and types.UnionType
-        if field_origin is typing.Union or field_origin is types.UnionType:
+        if type_hint_origin is typing.Union or type_hint_origin is types.UnionType:
             # Union with None is the only permitted Union type
-            if len(field_args) != 2 or field_args[1] is not type(None):
+            if len(type_hint_args) != 2 or type_hint_args[1] is not type(None):
                 raise RuntimeError(
-                    f"Union type hint '{field_type}' for field '{field_name}'\n"
-                    f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                    f"because it is not an optional value using the syntax 'Type | None',\n"
-                    f"where None is placed second per the standard convention.\n"
-                    f"It cannot be used to specify a choice between two types.\n"
+                    f"Union type hint '{type_hint}' for field '{field_name}'\n"
+                    f"in record '{containing_type_name}' is not supported\n"
+                    f"because it is not an optional value using the syntax 'Type | None'\n"
                 )
 
             # Set optional flag in result
-            result.optional_field = True
+            root_optional = True
 
             # Get type information without None
-            field_type = field_args[0]
-            field_origin = typing.get_origin(field_type)
-            field_args = typing.get_args(field_type)
-        else:
-            # Set optional flag in result
-            result.optional_field = False
+            type_hint = type_hint_args[0]
+            type_hint_origin = typing.get_origin(type_hint)
+            type_hint_args = typing.get_args(type_hint)
 
         # Check for one of the supported container types
         outer_container = None
         supported_containers = [list, tuple, dict]
-        while field_origin in supported_containers:
-            if field_origin is list:
-                container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+        while type_hint_origin in supported_containers:
+            if type_hint_origin is list:
                 # Perform additional checks for list
-                if len(field_args) != 1:
+                if len(type_hint_args) != 1:
                     raise RuntimeError(
-                        f"List type hint '{field_type}' for field '{field_name}'\n"
-                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a list of elements using the syntax 'List[Type]'.\n"
-                        f"Other list type hint formats are not supported.\n"
+                        f"List type hint '{type_hint}' for field '{field_name}'\n"
+                        f"in record '{containing_type_name}' is not supported\n"
+                        f"because it is not a list of elements using the syntax 'List[Type]'\n"
                     )
-            elif field_origin is tuple:
+                # Populate container data and extract the inner type_hint
                 container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+                type_hint = type_hint_args[0]
+            elif type_hint_origin is tuple:
                 # Perform additional checks for tuple
-                if len(field_args) == 1 or (len(field_args) > 1 and field_args[1] is not Ellipsis):
+                if len(type_hint_args) != 2 or type_hint_args[1] is not Ellipsis:
                     raise RuntimeError(
-                        f"Tuple type hint '{field_type}' for field '{field_name}'\n"
-                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]',\n"
-                        f"where ellipsis '...' is placed second per the standard convention.\n"
-                        f"It cannot be used to specify a fixed size tuple or a tuple with\n"
-                        f"different element types.\n"
+                        f"Tuple type hint '{type_hint}' for field '{field_name}'\n"
+                        f"in record '{containing_type_name}' is not supported\n"
+                        f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]'\n"
                     )
-            elif field_origin is dict:
-                container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
+                # Populate container data and extract the inner type_hint
+                container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+                type_hint = type_hint_args[0]
+            elif type_hint_origin is dict:
                 # Perform additional checks for dict
-                if len(field_args) != 2 and field_args[0] is not str:
+                if len(type_hint_args) != 2 or type_hint_args[0] is not str:
                     raise RuntimeError(
-                        f"Dict type hint '{field_type}' for field '{field_name}'\n"
-                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'.\n"
-                        f"It cannot be used to specify a dictionary with keys of a different type.\n"
+                        f"Dict type hint '{type_hint}' for field '{field_name}'\n"
+                        f"in record '{containing_type_name}' is not supported\n"
+                        f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'\n"
                     )
-                # TODO: Support Dict[str, List[x]]
+                # Populate container data and extract the inner type_hint
+                container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
+                type_hint = type_hint_args[1]
             else:
                 supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
                 raise RuntimeError(
-                    f"Type {field_origin.__name__} is not one of the supported container types "
+                    f"Type {type_hint_origin.__name__} is not one of the supported container types "
                     f"{supported_container_names}."
                 )
 
-            # Strip container information from field_type to get the type of value inside the container
-            field_type = field_args[0]
-            field_origin = typing.get_origin(field_type)
-            field_args = typing.get_args(field_type)
+            # Strip container information from type_hint to get the type of value inside the container
+            type_hint_origin = typing.get_origin(type_hint)
+            type_hint_args = typing.get_args(type_hint)
 
             # There are two possible forms of origin for optional, typing.Union and types.UnionType
-            if field_origin is typing.Union or field_origin is types.UnionType:
+            if type_hint_origin is typing.Union or type_hint_origin is types.UnionType:
                 # Union with None is the only permitted Union type
-                if len(field_args) != 2 or field_args[1] is not type(None):
+                if len(type_hint_args) != 2 or type_hint_args[1] is not type(None):
                     raise RuntimeError(
-                        f"Union type hint '{field_type}' for an element of\n"
+                        f"Union type hint '{type_hint}' for an element of\n"
                         f"the {container.container_kind.name}field '{field_name}'\n"
-                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not an optional value using the syntax 'Type | None',\n"
-                        f"where None is placed second per the standard convention.\n"
-                        f"It cannot be used to specify a choice between two types.\n"
+                        f"in record '{containing_type_name}' is not supported\n"
+                        f"because it is not an optional value using the syntax 'Type | None'\n"
                     )
 
                 # Indicate that container elements can be None
                 container.optional_items = True
 
                 # Get type information without None
-                field_type = field_args[0]
-                field_origin = typing.get_origin(field_type)
-                field_args = typing.get_args(field_type)  # TODO: Add a check
+                type_hint = type_hint_args[0]
+                type_hint_origin = typing.get_origin(type_hint)
+                type_hint_args = typing.get_args(type_hint)  # TODO: Add a check
 
             # Assign container to result or outer container
             if outer_container is None:
-                result.container = container
+                root_container = container
             else:
                 outer_container.inner = container
             outer_container = container
 
-        # Parse the value itself
-        if field_origin is Literal:
-            # List of literal strings
-            result.field_kind = FieldKindEnum.PRIMITIVE
-            result.field_type_decl = PrimitiveDeclKeys.STR
-        elif field_origin in supported_containers:
-            raise RuntimeError("Containers within containers are not supported when building database schema.")
-        elif field_origin is None:
-
-            # Assign type declaration key
-            result.field_type_decl = TypeDeclKey.from_type(field_type)
-
-            # Add field type to dependencies, do not use if dependencies to prevent from skipping on first item added
-            if dependencies is not None and not is_primitive(field_type):
-                dependencies.add(field_type)
-
-            # Assign field kind
-            if field_type in primitive_types:
-                # Indicate that field is one of the supported primitive types
-                result.field_kind = FieldKindEnum.PRIMITIVE
-            elif issubclass(field_type, Enum):
-                # Indicate that field is an enum
-                result.field_kind = FieldKindEnum.ENUM
-            elif is_key(field_type):
-                # Indicate that field is a key
-                result.field_kind = FieldKindEnum.KEY
-            elif hasattr(field_type, "__slots__"):
-                # Indicate that field is a user-defined data with slots
-                result.field_kind = FieldKindEnum.RECORD_OR_DATA
-            else:
-                raise RuntimeError(
-                    "Field type '{field_type}' for field '{field_name}' is not\n"
-                    "a primitive type, enum, key, record or a class with slots."
-                )
+        # Check that type hint is completely unwrapped and only the
+        # genuine inner type remains without wrappers from typing
+        if type_hint_origin is None and not type_hint_args and isinstance(type_hint, type):
+            # Create the field spec and return
+            result = cls(
+                field_name=field_name,
+                type_name=TypeUtil.name(type_hint),
+                container=root_container,
+                optional=root_optional,
+                _class=type_hint
+            )
+            return result
         else:
-            raise RuntimeError(f"Complex type {field_type} is not supported when building database schema.")
-
-        return result
+            raise RuntimeError(f"Type hint format {type_hint} is not recognized.")
