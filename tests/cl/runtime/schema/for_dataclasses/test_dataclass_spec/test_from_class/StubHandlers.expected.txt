@@ -1,0 +1,5 @@
+type_name: StubHandlers
+fields:
+- field_name: stub_id
+  type_name: str
+

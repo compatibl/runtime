@@ -1,0 +1,7 @@
+type_name: StubDataclassVersionedRecord
+fields:
+- field_name: id
+  type_name: str
+- field_name: version
+  type_name: int
+

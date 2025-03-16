@@ -1,0 +1,7 @@
+type_name: StubDataclassOtherDerivedRecord
+fields:
+- field_name: id
+  type_name: str
+- field_name: other_derived
+  type_name: str
+

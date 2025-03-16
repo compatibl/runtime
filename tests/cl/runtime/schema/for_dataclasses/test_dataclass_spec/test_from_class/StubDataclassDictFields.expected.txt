@@ -1,0 +1,33 @@
+type_name: StubDataclassDictFields
+fields:
+- field_name: id
+  type_name: str
+- field_name: str_dict
+  type_name: str
+  container:
+    container_kind: Dict
+- field_name: float_dict
+  type_name: float
+  container:
+    container_kind: Dict
+- field_name: date_dict
+  type_name: date
+  container:
+    container_kind: Dict
+- field_name: data_dict
+  type_name: StubDataclassData
+  container:
+    container_kind: Dict
+- field_name: key_dict
+  type_name: StubDataclassRecordKey
+  container:
+    container_kind: Dict
+- field_name: record_dict
+  type_name: StubDataclassRecord
+  container:
+    container_kind: Dict
+- field_name: derived_record_dict
+  type_name: StubDataclassDerivedRecord
+  container:
+    container_kind: Dict
+

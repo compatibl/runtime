@@ -1,0 +1,9 @@
+type_name: StubDataclassComposite
+fields:
+- field_name: primitive
+  type_name: str
+- field_name: embedded_1
+  type_name: StubDataclassRecordKey
+- field_name: embedded_2
+  type_name: StubDataclassRecordKey
+

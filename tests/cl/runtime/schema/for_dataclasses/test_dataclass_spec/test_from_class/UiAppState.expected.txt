@@ -1,0 +1,35 @@
+type_name: UiAppState
+fields:
+- field_name: user
+  type_name: UserKey
+- field_name: opened_tabs
+  type_name: TabInfo
+  container:
+    container_kind: List
+  optional: true
+- field_name: active_tab_index
+  type_name: int
+  optional: true
+- field_name: backend_version
+  type_name: str
+  optional: true
+- field_name: versions
+  type_name: str
+  container:
+    container_kind: Dict
+  optional: true
+- field_name: application_name
+  type_name: str
+  optional: true
+- field_name: read_only
+  type_name: bool
+  optional: true
+- field_name: application_theme
+  type_name: str
+  optional: true
+- field_name: user_secret_identifiers
+  type_name: str
+  container:
+    container_kind: List
+  optional: true
+

@@ -1,0 +1,7 @@
+type_name: StubDataclassAliasedRecord
+fields:
+- field_name: id
+  type_name: str
+- field_name: a
+  type_name: int
+

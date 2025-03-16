@@ -1,0 +1,5 @@
+type_name: StubViewers
+fields:
+- field_name: stub_id
+  type_name: str
+

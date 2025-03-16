@@ -1,0 +1,75 @@
+type_name: StubDataclassOptionalFields
+fields:
+- field_name: id
+  type_name: str
+- field_name: optional_str
+  type_name: str
+  optional: true
+- field_name: required_list_of_optional_str
+  type_name: str
+  container:
+    container_kind: List
+    optional_items: true
+- field_name: optional_list_of_optional_str
+  type_name: str
+  container:
+    container_kind: List
+    optional_items: true
+  optional: true
+- field_name: optional_float
+  type_name: float
+  optional: true
+- field_name: required_list_of_optional_float
+  type_name: float
+  container:
+    container_kind: List
+    optional_items: true
+- field_name: optional_list_of_optional_float
+  type_name: float
+  container:
+    container_kind: List
+    optional_items: true
+  optional: true
+- field_name: optional_data
+  type_name: StubDataclassData
+  optional: true
+- field_name: required_list_of_optional_data
+  type_name: StubDataclassData
+  container:
+    container_kind: List
+    optional_items: true
+- field_name: optional_list_of_optional_data
+  type_name: StubDataclassData
+  container:
+    container_kind: List
+    optional_items: true
+  optional: true
+- field_name: optional_key
+  type_name: StubDataclassRecordKey
+  optional: true
+- field_name: required_list_of_optional_key
+  type_name: StubDataclassRecordKey
+  container:
+    container_kind: List
+    optional_items: true
+- field_name: optional_list_of_optional_key
+  type_name: StubDataclassRecordKey
+  container:
+    container_kind: List
+    optional_items: true
+  optional: true
+- field_name: optional_record
+  type_name: StubDataclassRecord
+  optional: true
+- field_name: required_list_of_optional_record
+  type_name: StubDataclassRecord
+  container:
+    container_kind: List
+    optional_items: true
+- field_name: optional_list_of_optional_record
+  type_name: StubDataclassRecord
+  container:
+    container_kind: List
+    optional_items: true
+  optional: true
+

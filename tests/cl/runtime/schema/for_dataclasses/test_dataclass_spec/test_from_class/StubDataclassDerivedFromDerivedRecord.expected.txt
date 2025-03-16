@@ -1,0 +1,9 @@
+type_name: StubDataclassDerivedFromDerivedRecord
+fields:
+- field_name: id
+  type_name: str
+- field_name: derived_str_field
+  type_name: str
+- field_name: derived_from_derived_str_field
+  type_name: str
+
