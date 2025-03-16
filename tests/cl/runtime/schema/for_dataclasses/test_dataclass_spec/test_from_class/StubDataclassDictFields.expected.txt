@@ -3,47 +3,40 @@ fields:
 - field_name: id
   type_hint: str
   type_chain:
-  - - str
+  - str
 - field_name: str_dict
   type_hint: dict[str, str]
   type_chain:
-  - - dict
-    - frozendict
-  - - str
+  - dict
+  - str
 - field_name: float_dict
   type_hint: dict[str, float]
   type_chain:
-  - - dict
-    - frozendict
-  - - float
+  - dict
+  - float
 - field_name: date_dict
   type_hint: dict[str, date]
   type_chain:
-  - - dict
-    - frozendict
-  - - date
+  - dict
+  - date
 - field_name: data_dict
   type_hint: dict[str, StubDataclassData]
   type_chain:
-  - - dict
-    - frozendict
-  - - StubDataclassData
+  - dict
+  - StubDataclassData
 - field_name: key_dict
   type_hint: dict[str, StubDataclassRecordKey]
   type_chain:
-  - - dict
-    - frozendict
-  - - StubDataclassRecordKey
+  - dict
+  - StubDataclassRecordKey
 - field_name: record_dict
   type_hint: dict[str, StubDataclassRecord]
   type_chain:
-  - - dict
-    - frozendict
-  - - StubDataclassRecord
+  - dict
+  - StubDataclassRecord
 - field_name: derived_record_dict
   type_hint: dict[str, StubDataclassDerivedRecord]
   type_chain:
-  - - dict
-    - frozendict
-  - - StubDataclassDerivedRecord
+  - dict
+  - StubDataclassDerivedRecord
 

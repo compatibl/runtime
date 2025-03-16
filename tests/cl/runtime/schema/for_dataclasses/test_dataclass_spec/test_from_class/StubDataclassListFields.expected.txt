@@ -3,47 +3,40 @@ fields:
 - field_name: id
   type_hint: str
   type_chain:
-  - - str
+  - str
 - field_name: str_list
   type_hint: list[str]
   type_chain:
-  - - list
-    - tuple
-  - - str
+  - list
+  - str
 - field_name: float_list
   type_hint: list[float]
   type_chain:
-  - - list
-    - tuple
-  - - float
+  - list
+  - float
 - field_name: date_list
   type_hint: list[date]
   type_chain:
-  - - list
-    - tuple
-  - - date
+  - list
+  - date
 - field_name: data_list
   type_hint: list[StubDataclassData]
   type_chain:
-  - - list
-    - tuple
-  - - StubDataclassData
+  - list
+  - StubDataclassData
 - field_name: key_list
   type_hint: list[StubDataclassRecordKey]
   type_chain:
-  - - list
-    - tuple
-  - - StubDataclassRecordKey
+  - list
+  - StubDataclassRecordKey
 - field_name: record_list
   type_hint: list[StubDataclassRecord]
   type_chain:
-  - - list
-    - tuple
-  - - StubDataclassRecord
+  - list
+  - StubDataclassRecord
 - field_name: derived_record_list
   type_hint: list[StubDataclassDerivedRecord]
   type_chain:
-  - - list
-    - tuple
-  - - StubDataclassDerivedRecord
+  - list
+  - StubDataclassDerivedRecord
 

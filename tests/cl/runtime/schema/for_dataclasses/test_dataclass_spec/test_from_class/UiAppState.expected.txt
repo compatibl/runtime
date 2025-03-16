@@ -3,51 +3,40 @@ fields:
 - field_name: user
   type_hint: UserKey
   type_chain:
-  - - UserKey
+  - UserKey
 - field_name: opened_tabs
   type_hint: Union[list[TabInfo], NoneType]
   type_chain:
-  - - NoneType
-    - list
-    - tuple
-  - - TabInfo
+  - list | None
+  - TabInfo
 - field_name: active_tab_index
   type_hint: int | None
   type_chain:
-  - - NoneType
-    - int
+  - int | None
 - field_name: backend_version
   type_hint: str | None
   type_chain:
-  - - NoneType
-    - str
+  - str | None
 - field_name: versions
   type_hint: Union[dict[str, str], NoneType]
   type_chain:
-  - - NoneType
-    - dict
-    - frozendict
-  - - str
+  - dict | None
+  - str
 - field_name: application_name
   type_hint: str | None
   type_chain:
-  - - NoneType
-    - str
+  - str | None
 - field_name: read_only
   type_hint: bool | None
   type_chain:
-  - - NoneType
-    - bool
+  - bool | None
 - field_name: application_theme
   type_hint: str | None
   type_chain:
-  - - NoneType
-    - str
+  - str | None
 - field_name: user_secret_identifiers
   type_hint: Union[list[str], NoneType]
   type_chain:
-  - - NoneType
-    - list
-    - tuple
-  - - str
+  - list | None
+  - str
 

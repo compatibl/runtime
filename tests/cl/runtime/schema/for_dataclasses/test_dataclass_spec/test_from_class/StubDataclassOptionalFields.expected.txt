@@ -3,122 +3,92 @@ fields:
 - field_name: id
   type_hint: str
   type_chain:
-  - - str
+  - str
 - field_name: optional_str
   type_hint: str | None
   type_chain:
-  - - NoneType
-    - str
+  - str | None
 - field_name: required_list_of_optional_str
   type_hint: list[str | None]
   type_chain:
-  - - list
-    - tuple
-  - - NoneType
-    - str
+  - list
+  - str | None
 - field_name: optional_list_of_optional_str
   type_hint: Union[list[str | None], NoneType]
   type_chain:
-  - - NoneType
-    - list
-    - tuple
-  - - NoneType
-    - str
+  - list | None
+  - str | None
 - field_name: optional_float
   type_hint: float | None
   type_chain:
-  - - NoneType
-    - float
+  - float | None
 - field_name: required_list_of_optional_float
   type_hint: list[float | None]
   type_chain:
-  - - list
-    - tuple
-  - - NoneType
-    - float
+  - list
+  - float | None
 - field_name: optional_list_of_optional_float
   type_hint: Union[list[float | None], NoneType]
   type_chain:
-  - - NoneType
-    - list
-    - tuple
-  - - NoneType
-    - float
+  - list | None
+  - float | None
 - field_name: optional_data
   type_hint: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
     | None
   type_chain:
-  - - NoneType
-    - StubDataclassData
+  - StubDataclassData | None
 - field_name: required_list_of_optional_data
   type_hint: 
     list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
     | None]
   type_chain:
-  - - list
-    - tuple
-  - - NoneType
-    - StubDataclassData
+  - list
+  - StubDataclassData | None
 - field_name: optional_list_of_optional_data
   type_hint: 
     Union[list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
     | None], NoneType]
   type_chain:
-  - - NoneType
-    - list
-    - tuple
-  - - NoneType
-    - StubDataclassData
+  - list | None
+  - StubDataclassData | None
 - field_name: optional_key
   type_hint: 
     stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
     | None
   type_chain:
-  - - NoneType
-    - StubDataclassRecordKey
+  - StubDataclassRecordKey | None
 - field_name: required_list_of_optional_key
   type_hint: 
     list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
     | None]
   type_chain:
-  - - list
-    - tuple
-  - - NoneType
-    - StubDataclassRecordKey
+  - list
+  - StubDataclassRecordKey | None
 - field_name: optional_list_of_optional_key
   type_hint: 
     Union[list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
     | None], NoneType]
   type_chain:
-  - - NoneType
-    - list
-    - tuple
-  - - NoneType
-    - StubDataclassRecordKey
+  - list | None
+  - StubDataclassRecordKey | None
 - field_name: optional_record
   type_hint: 
     stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
     | None
   type_chain:
-  - - NoneType
-    - StubDataclassRecord
+  - StubDataclassRecord | None
 - field_name: required_list_of_optional_record
   type_hint: 
     list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
     | None]
   type_chain:
-  - - list
-    - tuple
-  - - NoneType
-    - StubDataclassRecord
+  - list
+  - StubDataclassRecord | None
 - field_name: optional_list_of_optional_record
   type_hint: 
     Union[list[stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
     | None], NoneType]
   type_chain:
-  - - NoneType
-    - list
-    - tuple
-  - - NoneType
-    - StubDataclassRecord
+  - list | None
+  - StubDataclassRecord | None
 

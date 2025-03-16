@@ -38,10 +38,10 @@ class FieldSpec(Freezable):
     type_hint: str = required()
     """Type hint from which the type chain was created as string."""
 
-    type_chain: List[List[str]] = required()
+    type_chain: List[str] = required()
     """
-    Initial items in the outer list are containers and last item is the value.
-    First item in the inner list is container or value type name, and second is NoneType if optional.
+    Chain of nested type hints, each item has format 'type_name' or 'type_name | None'
+    where type_name may refer to a container, slotted type, or primitive type.
     """
 
     _class: Type
@@ -81,9 +81,6 @@ class FieldSpec(Freezable):
         union_types = [types.UnionType, typing.Union]
         supported_containers = [list, tuple, dict, frozendict]
         while True:
-            # Add a new type chain level
-            type_chain.append([])
-
             # There are two possible forms of origin for optional, typing.Union and types.UnionType
             if is_optional := type_hint_origin in union_types:
                 # Union with None is the only permitted Union type
@@ -93,9 +90,6 @@ class FieldSpec(Freezable):
                         f"for field {field_name} in record {containing_type_name}' is not supported\n"
                         f"because it is not an optional value using the syntax 'Type | None'\n"
                     )
-
-                # Union with None, append a list containing NoneType
-                type_chain[-1].append("NoneType")
 
                 # Get type information without None
                 type_hint = type_hint_args[0]
@@ -113,9 +107,8 @@ class FieldSpec(Freezable):
                             f"because it is not a list of elements using the syntax 'List[Type]'\n"
                         )
                     # Populate container data and extract the inner type_hint
-                    container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
                     type_hint = type_hint_args[0]
-                    type_chain[-1].extend(["list", "tuple"])
+                    type_chain.append("list | None" if is_optional else "list")
                 elif type_hint_origin is tuple:
                     # Perform additional checks for tuple
                     if len(type_hint_args) != 2 or type_hint_args[1] is not Ellipsis:
@@ -125,9 +118,8 @@ class FieldSpec(Freezable):
                             f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]'\n"
                         )
                     # Populate container data and extract the inner type_hint
-                    container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
                     type_hint = type_hint_args[0]
-                    type_chain[-1].extend(["tuple"])
+                    type_chain.append("tuple | None" if is_optional else "tuple")
                 elif type_hint_origin is dict:
                     # Perform additional checks for dict
                     if len(type_hint_args) != 2 or type_hint_args[0] is not str:
@@ -137,9 +129,8 @@ class FieldSpec(Freezable):
                             f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'\n"
                         )
                     # Populate container data and extract the inner type_hint
-                    container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
                     type_hint = type_hint_args[1]
-                    type_chain[-1].extend(["dict", "frozendict"])
+                    type_chain.append("dict | None" if is_optional else "dict")
                 else:
                     supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
                     raise RuntimeError(
@@ -159,7 +150,7 @@ class FieldSpec(Freezable):
                     if type_hint_origin is None and not type_hint_args:
                         # Add the ultimate inner type inside nested containers to the last type chain item
                         type_name = TypeUtil.name(type_hint)
-                        type_chain[-1].append(type_name)
+                        type_chain.append(f"{type_name} | None" if is_optional else type_name)
                     else:
                         raise RuntimeError(f"Type hint {type_hint} is not supported. Supported type hints include:\n"
                                            f"- a union with None (optional) with one of the supported types inside\n"

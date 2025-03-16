@@ -3,13 +3,13 @@ fields:
 - field_name: primitive
   type_hint: str
   type_chain:
-  - - str
+  - str
 - field_name: embedded_1
   type_hint: StubDataclassRecordKey
   type_chain:
-  - - StubDataclassRecordKey
+  - StubDataclassRecordKey
 - field_name: embedded_2
   type_hint: StubDataclassRecordKey
   type_chain:
-  - - StubDataclassRecordKey
+  - StubDataclassRecordKey
 

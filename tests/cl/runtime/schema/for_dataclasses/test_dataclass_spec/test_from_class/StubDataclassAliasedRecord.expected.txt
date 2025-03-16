@@ -3,9 +3,9 @@ fields:
 - field_name: id
   type_hint: str
   type_chain:
-  - - str
+  - str
 - field_name: a
   type_hint: int
   type_chain:
-  - - int
+  - int
 
