@@ -69,6 +69,10 @@ class DictSerializer2(Freezable):
             schema_type: Type of the object specified in the schema (optional)
         """
 
+        if not self.bidirectional:
+            # Use untyped method for unidirectional serialization
+            return self._untyped_serialize(data)
+
         if getattr(data, "__slots__", None) is not None:
 
             # If type is specified, ensure that data is an instance of the specified type
@@ -277,3 +281,66 @@ class DictSerializer2(Freezable):
             return data
         else:
             raise RuntimeError(f"Cannot deserialize data of type '{type(data)}'.")
+
+    def _untyped_serialize(self, data: Any) -> Any:
+        """
+        Serialize slotted classes, primitive types, and supported dict- and list-like containers
+        without using the schema or including _type in output.
+        """
+
+        if getattr(data, "__slots__", None) is not None:
+            # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
+            slots = SlotsUtil.get_slots(data.__class__)
+            # Serialize slot values in the order of declaration except those that are None
+            result = {
+                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
+                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
+                    else (
+                        (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                        if isinstance(v, Enum)
+                        else self.serialize(v)
+                    )
+                )
+                for k in slots
+                if (v := getattr(data, k)) is not None and (not hasattr(v, "__len__") or len(v) > 0)
+            }
+            return result
+        elif isinstance(data, list) or isinstance(data, tuple):
+            # Sequence container, including items that are None in output to preserve item positions
+            result = [
+                (
+                    None
+                    if v is None
+                    else (
+                        (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                        if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
+                        else (
+                            (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                            if isinstance(v, Enum)
+                            else self.serialize(v)
+                        )
+                    )
+                )
+                for v in data
+            ]
+            return result
+        elif isinstance(data, dict) or isinstance(data, frozendict):
+            # Mapping container, do not include values that are None
+            result = {
+                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
+                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                    if v.__class__.__name__ in _PRIMITIVE_TYPE_NAMES
+                    else (
+                        (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                        if isinstance(v, Enum)
+                        else self.serialize(v)
+                    )
+                )
+                for k, v in data.items()
+                if v is not None and (not hasattr(v, "__len__") or len(v) > 0)
+            }
+            return result
+        else:
+            # Did not match a supported data type
+            raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
