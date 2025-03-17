@@ -51,11 +51,11 @@ _SAMPLE_TYPES = [
 ]
 
 
-def test_to_dict():
-    """Test DictSerializer2.to_dict method."""
+def test_bidirectional():
+    """Test DictSerializer2.serialize method with bidirectional=True."""
 
     # Create the serializer
-    serializer = DictSerializer2().build()
+    serializer = DictSerializer2(bidirectional=True).build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -78,11 +78,11 @@ def test_to_dict():
     RegressionGuard().verify_all()
 
 
-def test_to_dict_omit_type():
-    """Test DictSerializer2.to_dict method with omit_type=True."""
+def test_unidirectional():
+    """Test DictSerializer2.serialize method with bidirectional=None."""
 
     # Create the serializer
-    serializer = DictSerializer2(omit_type=True).build()
+    serializer = DictSerializer2().build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -106,10 +106,10 @@ def test_to_dict_omit_type():
 
 
 def _test_from_dict():
-    """Test DictSerializer2.from_dict method with omit_type flag set."""
+    """Test DictSerializer2.from_dict method."""
 
-    # Create the serializer with omit_type flag
-    serializer = DictSerializer2().build()
+    # Create the serializer with bidirectional flag
+    serializer = DictSerializer2(bidirectional=True).build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -118,21 +118,6 @@ def _test_from_dict():
         serialized = serializer.serialize(obj, sample_type)
         deserialized = serializer.deserialize(serialized, sample_type)
         assert obj == deserialized
-
-
-def test_from_dict_omit_type():
-    """Test DictSerializer2.from_dict method with omit_type flag set."""
-
-    # Create the serializer with omit_type flag
-    serializer = DictSerializer2(omit_type=True).build()
-
-    for sample_type in _SAMPLE_TYPES:
-
-        # Roundtrip serialization test
-        obj = sample_type().build()
-        obj_dict = serializer.serialize(obj)
-        obj_from_dict = serializer.deserialize(obj_dict)
-        assert obj_dict == obj_from_dict
 
 
 if __name__ == "__main__":

@@ -51,8 +51,8 @@ class DictSerializer2(Freezable):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    omit_type: bool | None = None
-    """Serialize without including _type in output and deserialize into dict/list even if _type is specified."""
+    bidirectional: bool | None = None
+    """Use schema to validate and include _type in output to support both serialization and deserialization."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
@@ -62,10 +62,7 @@ class DictSerializer2(Freezable):
 
     def serialize(self, data: Any, schema_type: Type | None = None) -> Any:
         """
-        Serialize a slots-based object to a dictionary. Type information is not written if omit_type is set.
-
-        - If (a) data_type is None or (b) matches type(data) or (c) omit_type is set, do not write the _type field
-        - Otherwise, check that data is an instance of data_type and write TypeUtil.name(data) to the _type field
+        Serialize a slots-based object to a dictionary.
 
         Args:
             data: Data to serialize which may be a class with build method, sequence, mapping, or primitive type
@@ -83,8 +80,8 @@ class DictSerializer2(Freezable):
                     f"the type {schema_type_name} specified in schema."
                 )
 
-            # Write type information if omit_type is False and type_ is not specified or not the same as type of data
-            if (not self.omit_type) and (schema_type is None or schema_type is not data.__class__):
+            # Write type information if type_ is not specified or not the same as type of data
+            if schema_type is None or schema_type is not data.__class__:
                 type_name = TypeUtil.name(data.__class__)
                 result = {}  # {"_type": obj_type_name}
             else:

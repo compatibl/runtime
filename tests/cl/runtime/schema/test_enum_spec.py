@@ -28,7 +28,7 @@ _FROM_CLASS_EXCEPTION_CASES = [
     StubDataclassRecord,
 ]
 
-yaml_serializer = YamlSerializer(omit_type=True).build()
+yaml_serializer = YamlSerializer().build()
 
 
 def test_from_class():

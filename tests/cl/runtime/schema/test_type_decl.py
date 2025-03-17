@@ -56,7 +56,7 @@ _SAMPLE_TYPES = [
     StubDataclassVersionedRecord,
 ]
 
-yaml_serializer = YamlSerializer(omit_type=True).build()
+yaml_serializer = YamlSerializer().build()
 
 
 def test_type_decl():
@@ -68,7 +68,7 @@ def test_type_decl():
         type_decl: TypeDecl = TypeDecl.for_type(record_type)
         assert type_decl is not None
 
-        # Use omit_type flag to avoid relying on the functionality being tested for serialization
+        # Create YAML string for the declaration
         type_decl_str = yaml_serializer.serialize(type_decl)
 
         # Record in regression guard

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+from unicodedata import bidirectional
+
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
@@ -55,7 +57,7 @@ def test_to_yaml():
     """Test DictSerializer2.to_yaml method."""
 
     # Create the serializer
-    serializer = YamlSerializer().build()
+    serializer = YamlSerializer(bidirectional=True).build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -75,7 +77,7 @@ def test_from_yaml():
     """Test DictSerializer2.to_yaml method."""
 
     # Create the serializers
-    yaml_serializer = YamlSerializer().build()
+    yaml_serializer = YamlSerializer(bidirectional=True).build()
     all_string_dict_serializer = DictSerializer2(primitive_serializer=PrimitiveSerializers.DEFAULT).build()
 
     for sample_type in _SAMPLE_TYPES:
