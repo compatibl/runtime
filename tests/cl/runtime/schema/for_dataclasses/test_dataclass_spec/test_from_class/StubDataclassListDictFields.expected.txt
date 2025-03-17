@@ -10,6 +10,24 @@ fields:
   - dict
   - list
   - float
+- field_name: float_or_none_list_dict
+  type_hint: dict[str, list[float | None]]
+  type_chain:
+  - dict
+  - list
+  - float | None
+- field_name: float_list_or_none_dict
+  type_hint: dict[str, Union[list[float], NoneType]]
+  type_chain:
+  - dict
+  - list | None
+  - float
+- field_name: float_list_dict_or_none
+  type_hint: Union[dict[str, list[float]], NoneType]
+  type_chain:
+  - dict | None
+  - list
+  - float
 - field_name: date_list_dict
   type_hint: dict[str, list[date]]
   type_chain:

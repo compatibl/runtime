@@ -16,10 +16,11 @@ import datetime as dt
 from dataclasses import dataclass
 from typing import Dict
 from typing import List
-from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.extensions import required, optional
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import stub_dataclass_data_list_factory
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import stub_dataclass_data_list_factory, \
+    stub_dataclass_float_or_none_list_factory
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import stub_dataclass_date_list_factory
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import (
     stub_dataclass_derived_record_list_factory,
@@ -47,6 +48,20 @@ def stub_dataclass_float_list_dict_factory() -> Dict[str, List[float]]:
         "b": stub_dataclass_float_list_factory(),
     }
 
+def stub_dataclass_float_list_or_none_dict_factory() -> Dict[str, List[float] | None]:
+    """Create stub values."""
+    return {
+        "a": None,
+        "b": stub_dataclass_float_list_factory(),
+        "c": None,
+    }
+
+def stub_dataclass_float_or_none_list_dict_factory() -> Dict[str, List[float | None]]:
+    """Create stub values."""
+    return {
+        "a": stub_dataclass_float_or_none_list_factory(),
+        "b": stub_dataclass_float_or_none_list_factory(),
+    }
 
 def stub_dataclass_date_list_dict_factory() -> Dict[str, List[dt.date]]:
     """Create stub values."""
@@ -95,15 +110,30 @@ class StubDataclassListDictFields(StubDataclassRecord):
     float_list_dict: Dict[str, List[float]] = required(default_factory=stub_dataclass_float_list_dict_factory)
     """Stub field."""
 
+    float_or_none_list_dict: Dict[str, List[float | None]] = required(
+        default_factory=stub_dataclass_float_or_none_list_dict_factory,
+    )
+    """Stub field."""
+
+    float_list_or_none_dict: Dict[str, List[float] | None] = required(
+        default_factory=stub_dataclass_float_list_or_none_dict_factory,
+    )
+    """Stub field."""
+
+    float_list_dict_or_none: Dict[str, List[float]] | None = optional(
+        default_factory=stub_dataclass_float_list_dict_factory,
+    )
+    """Stub field."""
+
     date_list_dict: Dict[str, List[dt.date]] = required(default_factory=stub_dataclass_date_list_dict_factory)
     """Stub field."""
 
     record_list_dict: Dict[str, List[StubDataclassRecord]] = required(
-        default_factory=stub_dataclass_record_list_dict_factory
+        default_factory=stub_dataclass_record_list_dict_factory,
     )
     """Stub field."""
 
     derived_record_list_dict: Dict[str, List[StubDataclassDerivedRecord]] = required(
-        default_factory=stub_dataclass_derived_record_list_dict_factory
+        default_factory=stub_dataclass_derived_record_list_dict_factory,
     )
     """Stub field."""

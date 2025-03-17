@@ -27,6 +27,36 @@ fields:
   container:
     container_kind: Dict
   optional_field: false
+- name: float_or_none_list_dict
+  comment: Stub field.
+  field_kind: Primitive
+  field_type_decl:
+    module:
+      module_name: builtins
+    name: str
+  container:
+    container_kind: Dict
+  optional_field: false
+- name: float_list_or_none_dict
+  comment: Stub field.
+  field_kind: Primitive
+  field_type_decl:
+    module:
+      module_name: builtins
+    name: str
+  container:
+    container_kind: Dict
+  optional_field: false
+- name: float_list_dict_or_none
+  comment: Stub field.
+  field_kind: Primitive
+  field_type_decl:
+    module:
+      module_name: builtins
+    name: str
+  container:
+    container_kind: Dict
+  optional_field: true
 - name: date_list_dict
   comment: Stub field.
   field_kind: Primitive
@@ -68,6 +98,21 @@ elements:
   name: FloatListDict
   comment: Stub field.
   optional: false
+- value:
+    type_: Dict
+  name: FloatOrNoneListDict
+  comment: Stub field.
+  optional: false
+- value:
+    type_: Dict
+  name: FloatListOrNoneDict
+  comment: Stub field.
+  optional: false
+- value:
+    type_: Dict
+  name: FloatListDictOrNone
+  comment: Stub field.
+  optional: true
 - value:
     type_: Dict
   name: DateListDict
