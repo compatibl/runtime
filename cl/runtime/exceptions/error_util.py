@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from textwrap import TextWrapper
-from typing import Any
+from typing import Any, List
 from typing import Type
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
@@ -101,6 +101,29 @@ class ErrorUtil:
         param_str = f"parameter '{param_name}'" if param_name else "parameter"
         return RuntimeError(
             f"Invalid value for {callable_str} {param_str}.\n{details_str}" f"\nParameter value: {cls.wrap(value)}"
+        )
+
+    @classmethod
+    def mutually_exclusive_fields_error(
+        cls,
+        fields: List[str],
+        *,
+        class_name: str,
+        details: str | None = None,
+    ) -> Exception:
+        """
+        Return exception instance stating that the specified fields are mutually exclusive
+        for the specified type.
+
+        Args:
+            fields: List of field names that are mutually exclusive
+            details: Further details about the error in single- or multi-line sentence format (optional)
+            class_name: Class name for which the error is reported
+        """
+        fields_str = ", ".join(fields)
+        details_str = cls.wrap(details) if details else ""
+        return RuntimeError(
+            f"Fields {fields_str} are mutually exclusive for type {class_name}.\n{details_str}"
         )
 
     @classmethod

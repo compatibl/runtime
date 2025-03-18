@@ -23,8 +23,11 @@ from ruamel.yaml.constructor import SafeConstructor
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
+
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 # Use primitive serializer with default settings to serialize all primitive types to string
@@ -118,16 +121,18 @@ class YamlSerializer(Freezable):
                 bidirectional=self.bidirectional,
             ).build()
         else:
-            # Check that this class does not change the settings
-            if self.pascalize_keys is not None and self.pascalize_keys != self.dict_serializer.pascalize_keys:
-                raise RuntimeError(
-                    f"{self.__class__.__name__} does not have the same value of 'pascalize_keys' field "
-                    f"as its dict_serializer."
+            # Check for mutually exclusive fields
+            if self.pascalize_keys is not None:
+                raise ErrorUtil.mutually_exclusive_fields_error(
+                    ["pascalize_keys", "dict_serializer"],
+                    class_name=TypeUtil.name(self),
+                    details="When 'dict_serializer' field is set, its own 'pascalize_keys' setting will apply",
                 )
-            if self.bidirectional is not None and self.bidirectional != self.dict_serializer.bidirectional:
-                raise RuntimeError(
-                    f"{self.__class__.__name__} does not have the same value of 'bidirectional' field "
-                    f"as its dict_serializer."
+            if self.bidirectional is not None:
+                raise ErrorUtil.mutually_exclusive_fields_error(
+                    ["bidirectional", "dict_serializer"],
+                    class_name=TypeUtil.name(self),
+                    details="When 'dict_serializer' field is set, its own 'bidirectional' setting will apply",
                 )
 
     def serialize(self, data: Any) -> str:
