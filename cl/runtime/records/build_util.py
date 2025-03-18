@@ -123,26 +123,27 @@ class BuildUtil:
         if dataclasses.is_dataclass(obj):
             for field in fields(obj):
                 field_value = getattr(obj, field.name)
-                if field_value is not None:
-                    # Check that for the fields that have values, the values are of the right type
-                    if not cls._is_instance(field_value, field.type):
-                        field_type_name = cls._get_field_type_name(field.type)
-                        value_type_name = TypeUtil.name(field_value)
-                        if "member_descriptor" not in value_type_name:  # TODO(Roman): Remove when fixed
-                            raise RuntimeError(
-                                f"""Type mismatch for field '{field.name}' of class {class_name}.
-Type in dataclass declaration: {field_type_name}
-Type of the value: {TypeUtil.name(field_value)}
-Note: In case of containers, type mismatch may be in one of the items.
-"""
-                            )
-                else:
-                    default_is_none = field.default is None
-                    default_factory_is_missing = field.default_factory is MISSING
-                    default_value_not_set = default_is_none and default_factory_is_missing
-                    if default_value_not_set and not cls._is_optional(field.type):
-                        # Error if a field is None but declared as required
-                        raise UserError(f"Field '{field.name}' in class '{class_name}' is required but not set.")
+                if not field.name.startswith("_"):  # Exclude private and protected fields
+                    if field_value is not None:
+                        # Check that for the fields that have values, the values are of the right type
+                        if not cls._is_instance(field_value, field.type):
+                            field_type_name = cls._get_field_type_name(field.type)
+                            value_type_name = TypeUtil.name(field_value)
+                            if "member_descriptor" not in value_type_name:  # TODO(Roman): Remove when fixed
+                                raise RuntimeError(
+                                    f"""Type mismatch for field '{field.name}' of class {class_name}.
+    Type in dataclass declaration: {field_type_name}
+    Type of the value: {TypeUtil.name(field_value)}
+    Note: In case of containers, type mismatch may be in one of the items.
+    """
+                                )
+                    else:
+                        default_is_none = field.default is None
+                        default_factory_is_missing = field.default_factory is MISSING
+                        default_value_not_set = default_is_none and default_factory_is_missing
+                        if default_value_not_set and not cls._is_optional(field.type):
+                            # Error if a field is None but declared as required
+                            raise UserError(f"Field '{field.name}' in class '{class_name}' is required but not set.")
 
     @classmethod
     def _is_instance(cls, field_value, field_type) -> bool:
