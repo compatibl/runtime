@@ -1,3 +1,4 @@
+_type: StubDataclassListDictFields
 id: abc
 float_list_dict:
   a:
@@ -32,6 +33,7 @@ float_or_none_list_dict:
   - 12345.6789
   - 
 float_list_or_none_dict:
+  a:
   b:
   - 0.0000123457
   - 0.0001234568
@@ -43,6 +45,7 @@ float_list_or_none_dict:
   - 123.456789
   - 1234.56789
   - 12345.6789
+  c:
 float_list_dict_or_none:
   a:
   - 0.0000123457

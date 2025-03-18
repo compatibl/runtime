@@ -1,3 +1,4 @@
+_type: StubDataclassListFields
 id: abc
 str_list:
 - abc

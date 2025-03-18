@@ -84,16 +84,16 @@ def test_from_yaml():
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        obj_yaml = yaml_serializer.serialize(obj)
+        serialized = yaml_serializer.serialize(obj)
 
         # Serialize to dict using all_string_dict_serializer flag, all primitive values are strings except None
-        all_string_obj_dict = all_string_dict_serializer.serialize(obj)
+        # all_string_obj_dict = all_string_dict_serializer.serialize(obj)
 
         # Deserialize from YAML, when schema is not used all primitive values will be strings
-        yaml_dict = yaml_serializer.deserialize(obj_yaml)
+        deserialized = yaml_serializer.deserialize(serialized)
 
         # Compare the two dictionaries
-        assert yaml_dict == all_string_obj_dict
+        assert obj == deserialized
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+_type: StubDataclassDictListFields
 id: abc
 float_dict_list:
 - a: 1.

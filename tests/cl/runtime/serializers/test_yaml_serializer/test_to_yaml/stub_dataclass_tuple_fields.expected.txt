@@ -1,3 +1,4 @@
+_type: StubDataclassTupleFields
 id: abc
 str_tuple:
 - abc
