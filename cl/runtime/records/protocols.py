@@ -62,6 +62,20 @@ PRIMITIVE_TYPE_NAMES = (
 )
 """Names of primitive value types, includes subtypes such as long and timestamp."""
 
+SEQUENCE_TYPE_NAMES = (
+    "MutableSequence",
+    "Sequence",
+    "list",
+    "tuple"
+)
+
+MAPPING_TYPE_NAMES = (
+    "MutableMapping",
+    "Mapping",
+    "dict",
+    "frozendict"
+)
+
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Python types used to store primitive values."""
 

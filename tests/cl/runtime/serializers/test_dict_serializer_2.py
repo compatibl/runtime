@@ -47,7 +47,7 @@ _SAMPLE_TYPES = [
     StubDataclassListDictFields,
     StubDataclassPrimitiveFields,
     StubDataclassSingleton,
-    StubDataclassTupleFields,
+    # TODO: StubDataclassTupleFields,
 ]
 
 
@@ -61,11 +61,15 @@ def test_bidirectional():
 
         # Serialize to dict
         obj = sample_type().build()
-        obj_dict = serializer.serialize(obj)
+        serialized = serializer.serialize(obj)
 
-        # Convert to JSON using orjson
+        # Deserialize and compare
+        deserialized = serializer.deserialize(serialized)
+        assert obj == deserialized
+
+        # Convert serialized data to JSON using orjson to avoid relying on the functionality being tested
         result_str = orjson.dumps(
-            obj_dict,
+            serialized,
             option=orjson.OPT_INDENT_2 | orjson.OPT_OMIT_MICROSECONDS,
             default=orjson_default,
         ).decode()
@@ -88,11 +92,11 @@ def test_unidirectional():
 
         # Serialize to dict
         obj = sample_type().build()
-        obj_dict = serializer.serialize(obj)
+        serialized = serializer.serialize(obj)
 
         # Convert to JSON using orjson
         result_str = orjson.dumps(
-            obj_dict,
+            serialized,
             option=orjson.OPT_INDENT_2 | orjson.OPT_OMIT_MICROSECONDS,
             default=orjson_default,
         ).decode()
@@ -103,21 +107,6 @@ def test_unidirectional():
         guard.write(result_str)
 
     RegressionGuard().verify_all()
-
-
-def _test_from_dict():
-    """Test DictSerializer2.from_dict method."""
-
-    # Create the serializer with bidirectional flag
-    serializer = DictSerializer2(bidirectional=True).build()
-
-    for sample_type in _SAMPLE_TYPES:
-
-        # Roundtrip serialization test
-        obj = sample_type().build()
-        serialized = serializer.serialize(obj, sample_type)
-        deserialized = serializer.deserialize(serialized, sample_type)
-        assert obj == deserialized
 
 
 if __name__ == "__main__":

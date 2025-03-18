@@ -51,5 +51,5 @@ class DataclassSpec(DataSpec):
         ]
 
         # Create the enum spec
-        result = DataclassSpec(type_name=type_name, _class=class_, fields=fields)
+        result = DataclassSpec(type_name=type_name, _class=class_, fields=fields).build()
         return result
