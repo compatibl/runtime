@@ -67,13 +67,17 @@ class DictSerializer2(Freezable):
     def deserialize(self, data) -> Any:
         """Deserialize a dictionary into object using _type key and schema."""
         if self.bidirectional:
-            # Get type name from the input dict
-            if (type_name := data.get("_type", None)) is None:
-                raise RuntimeError(f"Key '_type' is missing in the serialized data, cannot deserialize.")
-            # Create type chain of length one from the type
-            type_chain = [type_name]
-            # Use typed deserialization
-            return self._typed_deserialize(data, type_chain)
+            if data is not None and data.__class__.__name__ in MAPPING_TYPE_NAMES:
+                # Get type name from the input dict
+                if (type_name := data.get("_type", None)) is None:
+                    raise RuntimeError(f"Key '_type' is missing in the serialized data, cannot deserialize.")
+                # Create type chain of length one from the type
+                type_chain = [type_name]
+                # Use typed deserialization
+                return self._typed_deserialize(data, type_chain)
+            else:
+                raise RuntimeError(f"Data is not a mapping, cannot deserialize without type_chain argument:\n"
+                                   f"{ErrorUtil.wrap(data)}.")
         else:
             raise RuntimeError(f"Deserialization is not supported when {self.__class__.__name__}.bidirectional\n"
                                f"flag is not set.")
@@ -84,7 +88,7 @@ class DictSerializer2(Freezable):
         # Get type and class of data and parse type chain
         data_class_name = data.__class__.__name__ if data is not None else None
         data_type_name = TypeUtil.name(data) if data is not None else None
-        schema_type_name, is_optional, remaining_chain = self._parse_type_chain(type_chain)
+        schema_type_name, is_optional, remaining_chain = self.unpack_type_chain(type_chain)
 
         if data is None:
             # Return None if no type information or is_optional flag is set, otherwise raise an error
@@ -104,7 +108,7 @@ class DictSerializer2(Freezable):
                 # Parse as a primitive type
                 if self.primitive_serializer:
                     # Deserialize using primitive serializer if specified
-                    return self.primitive_serializer.deserialize(data, schema_type_name)
+                    return self.primitive_serializer.serialize(data, [schema_type_name])
                 else:
                     # Otherwise return raw data after checking the class matches
                     if data_type_name in PRIMITIVE_CLASS_NAMES:
@@ -171,7 +175,7 @@ class DictSerializer2(Freezable):
                     (
                         (
                             # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
-                            self.primitive_serializer.serialize(v, field_spec.type_name)
+                            self.primitive_serializer.serialize(v, field_spec.type_chain)
                             if self.primitive_serializer is not None else
                             v
                         )
@@ -197,7 +201,7 @@ class DictSerializer2(Freezable):
         """Deserialize data using type_chain and schema."""
 
         # Parse type chain
-        type_name, is_optional, remaining_chain = self._parse_type_chain(type_chain)
+        type_name, is_optional, remaining_chain = self.unpack_type_chain(type_chain)
 
         if data is None:
             # Return None if is_optional flag is set, otherwise raise an error
@@ -211,7 +215,7 @@ class DictSerializer2(Freezable):
                 raise RuntimeError(f"Primitive type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
             # Deserialize primitive type using primitive serializer if specified, otherwise return raw data
             if self.primitive_serializer:
-                return self.primitive_serializer.deserialize(data, type_name)
+                return self.primitive_serializer.deserialize(data, [type_name])
             else:
                 return data
         elif type_name in SEQUENCE_TYPE_NAMES:
@@ -225,7 +229,13 @@ class DictSerializer2(Freezable):
                 raise RuntimeError(f"Inner type not specified for the mapping type {type_name}.\n"
                                    f"Use type_name[str, Any] to specify a mapping with any value type.")
             # Deserialize mapping into frozendict
-            return dict((k, self._typed_deserialize(v, remaining_chain)) for k, v in data.items())  # TODO: Replace by frozendict
+            # TODO: Replace by frozendict
+            return {
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k):
+                    self._typed_deserialize(v, remaining_chain)
+                for k, v in data.items()
+            }
+
         elif isinstance(data, str):
             # Parse as enum if data is a string
             type_spec = TypeSchema.for_type_name(type_name)
@@ -261,9 +271,10 @@ class DictSerializer2(Freezable):
 
             # Deserialize into a dict
             result_dict = {
-                k: self._typed_deserialize(v, field_dict[k].type_chain)
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k):
+                    self._typed_deserialize(v, field_dict[k].type_chain)
                 for k, v in data.items()
-                if not k.startswith("_") and v is not None and (not hasattr(v, "__len__") or len(v) > 0)
+                if not k.startswith("_") and v is not None
             }
             # Construct an instance of the target type
             result = type_class(**result_dict)
@@ -336,16 +347,23 @@ class DictSerializer2(Freezable):
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
     @classmethod
-    def _parse_type_chain(cls, type_chain: Sequence[str] | None) -> Tuple[str | None, bool | None, Sequence[str] | None]:
+    def unpack_type_chain(cls, type_chain: Sequence[str] | None) -> Tuple[str | None, bool | None, Sequence[str] | None]:
         """
         Parse type chain to return type name, is_optional flag, and remaining chain (if any).
 
         Returns:
-            Tuple of type name or None, is_optional flag or None, and remaining type chain or None.
-            Returns [None, None, None] if the type chain is empty or None.
+            Tuple of type_name, is_optional flag, and remaining chain (each item can be None)
+            Returns [None, None, None] if the type chain is empty or None
         """
 
-        if type_chain:
+        if type_chain is None:
+            # Type chain is None
+            return None, None, None
+        elif not isinstance(type_chain, (list, tuple)):
+            raise RuntimeError(f"Type chain {type_chain} for {cls.__name__} is not a list or tuple.")
+        elif len(type_chain) == 0:
+            raise RuntimeError(f"Type chain {type_chain} for {cls.__name__} has zero length.")
+        elif len(type_chain) > 0:
             # At least one item in type chain is present
             type_hint = type_chain[0]
             remaining_chain = type_chain[1:] if len(type_chain) > 1 else None
@@ -362,6 +380,4 @@ class DictSerializer2(Freezable):
                 raise RuntimeError(f"Type hint {type_hint} does not follow the format 'type_name' or 'type_name | None'.")
 
             return type_name, is_optional, remaining_chain
-        else:
-            # Type chain is None or empty
-            return None, None, None
+
