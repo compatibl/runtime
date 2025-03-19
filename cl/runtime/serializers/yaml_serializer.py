@@ -15,7 +15,7 @@
 import datetime as dt
 from dataclasses import dataclass
 from io import StringIO
-from typing import Any
+from typing import Any, Sequence
 from uuid import UUID
 from ruamel.yaml import YAML
 from ruamel.yaml import StringIO
@@ -35,8 +35,8 @@ primitive_to_string_serializer = PrimitiveSerializers.DEFAULT
 
 
 def str_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = primitive_to_string_serializer.serialize(data)
+    """Configure YAML class for serializing a str field."""
+    data_str = primitive_to_string_serializer.serialize(data, ["str | None"])
     if data_str:
         style = "|" if data_str and "\n" in data_str else None
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=style)
@@ -45,21 +45,38 @@ def str_representer(dumper, data):
 
 
 def float_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = primitive_to_string_serializer.serialize(data)
+    """Configure YAML class for serializing a float field."""
+    data_str = primitive_to_string_serializer.serialize(data, ["float | None"])
     return dumper.represent_scalar("tag:yaml.org,2002:float", data_str, style=None)
 
 
 def time_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = primitive_to_string_serializer.serialize(data)
+    """Configure YAML class for serializing a time field."""
+    data_str = primitive_to_string_serializer.serialize(data, ["time | None"])
     return dumper.represent_scalar("tag:yaml.org,2002:str", data_str)
 
 
 def datetime_representer(dumper, data):
-    """Use standard conversion to string for primitive types."""
-    data_str = primitive_to_string_serializer.serialize(data)
+    """Configure YAML class for serializing a datetime field."""
+    data_str = primitive_to_string_serializer.serialize(data, ["datetime | None"])
     return dumper.represent_scalar("tag:yaml.org,2002:timestamp", data_str, style=None)
+
+def uuid_representer(dumper, data):
+    """Configure YAML class for serializing a UUID field."""
+    data_str = primitive_to_string_serializer.serialize(data, ["UUID | None"])
+    if data_str:
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=None)
+    else:
+        return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
+
+def bytes_representer(dumper, data):
+    """Configure YAML class for serializing a bytes field."""
+    data_str = primitive_to_string_serializer.serialize(data, ["bytes | None"])
+    if data_str:
+        style = "|" if data_str and "\n" in data_str else None
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=style)
+    else:
+        return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
 
 
 # Roundtrip (typ=rt) style for the YAML writer is required to follow the formatting instructions in representers
@@ -70,8 +87,8 @@ yaml_writer.representer.add_representer(str, str_representer)
 yaml_writer.representer.add_representer(float, float_representer)
 yaml_writer.representer.add_representer(dt.datetime, datetime_representer)
 yaml_writer.representer.add_representer(dt.time, time_representer)
-yaml_writer.representer.add_representer(UUID, str_representer)
-yaml_writer.representer.add_representer(bytes, str_representer)
+yaml_writer.representer.add_representer(UUID, uuid_representer)
+yaml_writer.representer.add_representer(bytes, bytes_representer)
 
 
 class PrimitiveToStringConstructor(SafeConstructor):
@@ -112,13 +129,23 @@ class YamlSerializer(Freezable):
     dict_serializer: DictSerializer2 | None = None
     """Serializes data into dictionary from which it is serialized into YAML."""
 
+    dict_deserializer: DictSerializer2 | None = None
+    """Deserializes the result of YAML parsing, including converting string leaf nodes to primitive types and enums."""
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.dict_serializer is None:
-            # Create DictSerializer2 using the flags in this class
+            # Create serializer and deserializer using the flags in this class
+            # Serializer does serialize primitive types
             self.dict_serializer = DictSerializer2(
                 pascalize_keys=self.pascalize_keys,
                 bidirectional=self.bidirectional,
+            ).build()
+            # Deserializer uses default settings for deserializing primitive types from string
+            self.dict_deserializer = DictSerializer2(
+                pascalize_keys=self.pascalize_keys,
+                bidirectional=self.bidirectional,
+                primitive_serializer=PrimitiveSerializers.DEFAULT,
             ).build()
         else:
             # Check for mutually exclusive fields
@@ -156,5 +183,5 @@ class YamlSerializer(Freezable):
         yaml_dict = yaml_reader.load(StringIO(serialized_data))
 
         # Convert to object using self.dict_serializer
-        result = self.dict_serializer.deserialize(yaml_dict)
+        result = self.dict_deserializer.deserialize(yaml_dict)
         return result
