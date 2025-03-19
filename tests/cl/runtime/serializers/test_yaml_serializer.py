@@ -18,6 +18,7 @@ from unicodedata import bidirectional
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
+from cl.runtime.records.protocols import SEQUENCE_CLASSES, MAPPING_CLASSES
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
@@ -54,14 +55,20 @@ _SAMPLE_TYPES = [
 ]
 
 
+# TODO: Move to a dedicated utility class
 def approx(data, abs_tol=1e-6, rel_tol=1e-6):
     """Recursively apply pytest.approx to all floats in a nested structure."""
     if isinstance(data, float):
+        # Apply rounding to float values
         return pytest.approx(data, abs=abs_tol, rel=rel_tol)
-    elif isinstance(data, list):
-        return [approx(item, abs_tol, rel_tol) for item in data]
-    elif isinstance(data, dict):
-        return {key: approx(value, abs_tol, rel_tol) for key, value in data.items()}
+    elif isinstance(data, SEQUENCE_CLASSES):
+        # Recreate the same sequence type with pytest.approx for float
+        sequence_type = data.__class__
+        return sequence_type(approx(item, abs_tol, rel_tol) for item in data)
+    elif isinstance(data, MAPPING_CLASSES):
+        # Recreate the same mapping type with pytest.approx for float
+        mapping_type = data.__class__
+        return mapping_type((key, approx(value, abs_tol, rel_tol)) for key, value in data.items())
     return data
 
 

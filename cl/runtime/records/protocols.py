@@ -24,6 +24,8 @@ from typing import Type
 from typing import TypeGuard
 from typing import TypeVar
 from uuid import UUID
+
+from frozendict import frozendict
 from typing_extensions import Self
 
 PRIMITIVE_PYTHON_TYPES = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
@@ -62,12 +64,25 @@ PRIMITIVE_TYPE_NAMES = (
 )
 """Names of primitive value types, includes subtypes such as long and timestamp."""
 
+SEQUENCE_CLASSES = (
+    list,
+    tuple,
+)
+"""Classes that may be used to represent sequences, excluding abstract base classes."""
+
 SEQUENCE_TYPE_NAMES = (
     "MutableSequence",
     "Sequence",
     "list",
     "tuple"
 )
+"""Names of classes that may be used to represent sequences, including abstract base classes."""
+
+MAPPING_CLASSES = (
+    dict,
+    frozendict,
+)
+"""Classes that may be used to represent mapping, excluding abstract base classes."""
 
 MAPPING_TYPE_NAMES = (
     "MutableMapping",
@@ -75,6 +90,7 @@ MAPPING_TYPE_NAMES = (
     "dict",
     "frozendict"
 )
+"""Names of classes that may be used to represent mapping, including abstract base classes."""
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Python types used to store primitive values."""
