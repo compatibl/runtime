@@ -19,7 +19,7 @@ fields:
 - field_name: key_long_field
   type_hint: int
   type_chain:
-  - int
+  - long
 - field_name: key_date_field
   type_hint: date
   type_chain:
@@ -75,7 +75,7 @@ fields:
 - field_name: obj_long_field
   type_hint: int
   type_chain:
-  - int
+  - long
 - field_name: obj_date_field
   type_hint: date
   type_chain:
