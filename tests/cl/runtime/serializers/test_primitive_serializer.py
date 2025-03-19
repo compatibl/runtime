@@ -85,20 +85,20 @@ def test_roundtrip():
 
         # Test passthrough with and without type_name
         assert PrimitiveSerializers.PASSTHROUGH.serialize(value) == value
-        assert PrimitiveSerializers.PASSTHROUGH.serialize(value, type_name) == value
+        assert PrimitiveSerializers.PASSTHROUGH.serialize(value, [type_name]) == value
 
         # Serialize without type_name, deserialization always requires type_name
         assert PrimitiveSerializers.DEFAULT.serialize(value) == serialized
-        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, type_name) == value
+        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, [type_name]) == value
 
-        # Serialize and deserialize with typename
-        assert PrimitiveSerializers.DEFAULT.serialize(value, type_name) == serialized
-        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, type_name) == value
+        # Serialize and deserialize with type_name
+        assert PrimitiveSerializers.DEFAULT.serialize(value, [type_name]) == serialized
+        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, [type_name]) == value
 
         # Test alternative serialized forms
         if alternative_serialized_list:
             for alternative_serialized in alternative_serialized_list:
-                assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, type_name) == value
+                assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, [type_name]) == value
 
 
 def test_serialization_exceptions():
@@ -120,11 +120,11 @@ def test_serialization_exceptions():
 
         # Test passthrough with type_name
         with pytest.raises(Exception):
-            PrimitiveSerializers.PASSTHROUGH.serialize(value, type_name)
+            PrimitiveSerializers.PASSTHROUGH.serialize(value, [type_name])
 
         # Test default settings with type_name
         with pytest.raises(Exception):
-            PrimitiveSerializers.DEFAULT.serialize(value, type_name)
+            PrimitiveSerializers.DEFAULT.serialize(value, [type_name])
 
 
 def test_deserialization_exceptions():
@@ -149,9 +149,9 @@ def test_deserialization_exceptions():
     for test_case in test_cases:
         type_name, serialized = test_case
         with pytest.raises(Exception):
-            PrimitiveSerializers.PASSTHROUGH.deserialize(serialized, type_name)
+            PrimitiveSerializers.PASSTHROUGH.deserialize(serialized, [type_name])
         with pytest.raises(Exception):
-            PrimitiveSerializers.DEFAULT.deserialize(serialized, type_name)
+            PrimitiveSerializers.DEFAULT.deserialize(serialized, [type_name])
 
 
 if __name__ == "__main__":
