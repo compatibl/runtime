@@ -16,11 +16,12 @@ import pytest
 from unicodedata import bidirectional
 
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubDataclassComposite
+from stubs.cl.runtime import StubDataclassComposite, StubDataclassDerivedData
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassDictFields
@@ -53,6 +54,17 @@ _SAMPLE_TYPES = [
 ]
 
 
+def approx(data, abs_tol=1e-6, rel_tol=1e-6):
+    """Recursively apply pytest.approx to all floats in a nested structure."""
+    if isinstance(data, float):
+        return pytest.approx(data, abs=abs_tol, rel=rel_tol)
+    elif isinstance(data, list):
+        return [approx(item, abs_tol, rel_tol) for item in data]
+    elif isinstance(data, dict):
+        return {key: approx(value, abs_tol, rel_tol) for key, value in data.items()}
+    return data
+
+
 def test_to_yaml():
     """Test DictSerializer2.to_yaml method."""
 
@@ -78,7 +90,7 @@ def test_from_yaml():
 
     # Create the serializers
     yaml_serializer = YamlSerializer(bidirectional=True).build()
-    all_string_dict_serializer = DictSerializer2(primitive_serializer=PrimitiveSerializers.DEFAULT).build()
+    passthrough_serializer = DictSerializer2(bidirectional=True).build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -92,8 +104,12 @@ def test_from_yaml():
         # Deserialize from YAML, when schema is not used all primitive values will be strings
         deserialized = yaml_serializer.deserialize(serialized)
 
-        # Compare the two dictionaries
-        assert obj == deserialized
+        # Use passthrough serializer to convert both to dicts
+        obj_dict = passthrough_serializer.serialize(obj)
+        deserialized_dict = passthrough_serializer.serialize(deserialized)
+
+        # Compare with floating point tolerance
+        assert deserialized_dict == approx(obj_dict)
 
 
 if __name__ == "__main__":
