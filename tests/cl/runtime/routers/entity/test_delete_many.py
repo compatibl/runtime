@@ -14,10 +14,10 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.routers.entity.delete_request import DeleteRequest
-from cl.runtime.routers.entity.delete_response import DeleteResponse
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
+from cl.runtime.routers.entity.delete_request import DeleteRequest
+from cl.runtime.routers.entity.delete_response import DeleteResponse
 from stubs.cl.runtime import StubDataclassDerivedRecord
 
 

@@ -14,9 +14,9 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from stubs.cl.runtime import StubHandlers
 
 

@@ -14,10 +14,10 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
 from cl.runtime.serializers.string_serializer import StringSerializer
-from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubDataViewers
 
 # create stub with viewers

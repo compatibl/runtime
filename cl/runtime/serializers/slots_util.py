@@ -16,7 +16,6 @@ import sys
 from collections import Counter
 from typing import Tuple
 from typing import Type
-from typing import cast
 from memoization import cached
 from cl.runtime.records.type_util import TypeUtil
 
@@ -62,4 +61,3 @@ class SlotsUtil:
             )
 
         return result
-

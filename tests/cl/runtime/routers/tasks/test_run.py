@@ -14,14 +14,14 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
 from cl.runtime.routers.tasks.run_response_item import RunResponseItem
 from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
-from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubHandlers
 

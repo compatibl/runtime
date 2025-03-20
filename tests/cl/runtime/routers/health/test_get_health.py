@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import pytest
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.health.health_response import HealthResponse
 from cl.runtime.routers.user_request import UserRequest
-from cl.runtime.qa.qa_client import QaClient
 
 requests = [{}, {"user": "TestUser"}]
 expected_result = {"status": 200}

@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from abc import abstractmethod
-from typing import Type, Tuple
+from typing import Tuple
+from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.protocols import TData

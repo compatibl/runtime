@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.tasks.task import Task
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.tasks.task import Task
 
 
 @dataclass(slots=True, kw_only=True)

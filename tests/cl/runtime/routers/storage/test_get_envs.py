@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import pytest
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.env_response import EnvResponseItem
 from cl.runtime.routers.user_request import UserRequest
-from cl.runtime.qa.qa_client import QaClient
 
 requests = [{}, {"user": "TestUser"}]
 

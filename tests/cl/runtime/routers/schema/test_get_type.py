@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import pytest
+from cl.runtime.qa.qa_client import QaClient
+from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
-from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.qa.qa_client import QaClient
 
 requests = [{"name": "UiAppState"}, {"name": "UiAppState", "user": "TestUser"}]
 

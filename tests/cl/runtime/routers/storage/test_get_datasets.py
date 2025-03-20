@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import pytest
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.dataset_response import DatasetResponseItem
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
-from cl.runtime.qa.qa_client import QaClient
 
 requests = [{"type": "StubClass"}, {"type": "StubClass", "user": "TestUser"}]
 

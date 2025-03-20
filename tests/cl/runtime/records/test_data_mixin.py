@@ -14,8 +14,8 @@
 
 import pytest
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.freezable import Freezable
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.for_dataclasses.freezable import Freezable
 
 
 @dataclass(slots=True, kw_only=True)

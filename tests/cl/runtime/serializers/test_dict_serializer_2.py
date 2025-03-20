@@ -15,9 +15,9 @@
 import pytest
 import orjson
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.json_serializer import orjson_default
-from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

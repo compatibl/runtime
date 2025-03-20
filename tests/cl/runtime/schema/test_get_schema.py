@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.schema.for_dataclasses.dataclass_type_decl import DataclassTypeDecl
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.schema.for_dataclasses.dataclass_type_decl import DataclassTypeDecl
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields

@@ -14,11 +14,11 @@
 
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
-from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

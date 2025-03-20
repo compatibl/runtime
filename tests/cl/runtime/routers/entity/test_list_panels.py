@@ -17,10 +17,10 @@ import inspect
 from typing import List
 from typing import Type
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
-from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
+from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
+from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
 from stubs.cl.runtime import StubDataViewers
 
 

@@ -15,9 +15,9 @@
 import pytest
 from typing import Any
 from typing import Dict
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.auth.me_response import MeResponse
 from cl.runtime.routers.auth.me_response import UserRequest
-from cl.runtime.qa.qa_client import QaClient
 
 requests = [{}, {"user": "TestUser"}]
 

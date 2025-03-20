@@ -16,12 +16,12 @@ import pytest
 from typing import Dict
 from typing import List
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.run_response_item import handler_queue
 from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
 from cl.runtime.routers.tasks.task_status_response_item import TaskStatusResponseItem
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
-from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 

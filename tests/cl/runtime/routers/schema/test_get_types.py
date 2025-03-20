@@ -14,10 +14,10 @@
 
 import pytest
 from fastapi import FastAPI
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
 from cl.runtime.routers.user_request import UserRequest
-from cl.runtime.qa.qa_client import QaClient
 
 requests = [{}, {"user": "TestUser"}]
 
