@@ -31,7 +31,7 @@ T = TypeVar("T")
 
 
 class BuildUtil:
-    """Helper class for BuildMixin."""
+    """Helper class for DataMixin."""
 
     @classmethod
     def build(cls, obj: T) -> T:

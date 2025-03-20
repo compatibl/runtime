@@ -14,14 +14,17 @@
 
 from abc import ABC
 from dataclasses import dataclass
+from typing import Tuple
+
 from typing_extensions import Self
-from cl.runtime.records.build_mixin import BuildMixin
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class Freezable(BuildMixin, ABC):
+class Freezable(DataMixin, ABC):
     """
     Derive a dataclass from this base to add the ability to freeze from further modifications of its fields.
     Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
@@ -34,15 +37,14 @@ class Freezable(BuildMixin, ABC):
     __frozen: bool = required(default=False, init=False, repr=False, compare=False)
     """True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
+    @classmethod
+    def get_slots(cls) -> Tuple[str, ...]:
+        """Get slot names for serialization without schema."""
+        return SlotsUtil.get_slots(cls)
+
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         return self.__frozen
-
-    def check_frozen(self, action_str: str | None = None) -> None:
-        """Error message if the instance is not frozen."""
-        if not self.__frozen:
-            action_str = action_str if action_str else "using or performing setup"
-            raise RuntimeError(f"Freeze {TypeUtil.name(self)} before {action_str}.")
 
     def freeze(self) -> Self:
         """

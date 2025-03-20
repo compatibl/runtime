@@ -70,7 +70,7 @@ MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 """Names of classes that may be used to represent mapping, including abstract base classes."""
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
-"""Python types used to store primitive values."""
+"""Type alias for Python classes used to store primitive values."""
 
 TDataField = Dict[str, "TDataField"] | List["TDataField"] | TPrimitive | Enum
 """Field types for serialized data in dictionary format."""
@@ -84,42 +84,27 @@ TKeyField = Dict[str, "TKeyField"] | TPrimitive | Enum
 TKeyDict = Dict[str, TKeyField]
 """Serialized key in dictionary format."""
 
-TQuery = Tuple[
-    Type,  # Query type and its descendents will be returned by the query. It must include all query and order fields.
-    Dict[str, Any],  # NoSQL query conditions in MongoDB format.
-    Dict[str, Literal[1, -1]],  # NoSQL query order in MongoDB format.
-]
-"""NoSQL query data in MongoDB format."""
-
 TObj = TypeVar("TObj")
 """Generic type parameter for any object."""
-
-TRecord = TypeVar("TRecord")
-"""Generic type parameter for a record."""
-
-TKey = TypeVar("TKey")
-"""Generic type parameter for a key."""
 
 TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
 
+TFreezable = TypeVar("TFreezable", bound="FreezableProtocol")
+"""Generic type parameter for a class that can be frozen, preventing further modifications."""
 
-class BuildProtocol(Protocol):
-    """Protocol for objects with build method."""
+TData = TypeVar("TData", bound="FreezableProtocol | DataProtocol")
+"""Generic type parameter for a class that has slots and implements the builder pattern."""
 
-    def build(self) -> Self:
-        """
-        This method performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
-        """
-        ...
+TKey = TypeVar("TKey", bound="FreezableProtocol | DataProtocol | KeyProtocol")
+"""Generic type parameter for a key."""
+
+TRecord = TypeVar("TRecord", bound="FreezableProtocol | DataProtocol | KeyProtocol | RecordProtocol")
+"""Generic type parameter for a record."""
 
 
 class FreezableProtocol(Protocol):
-    """Protocol implemented by objects that require initialization."""
+    """Protocol for a class that can be frozen, preventing further modifications."""
 
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
@@ -133,8 +118,13 @@ class FreezableProtocol(Protocol):
         ...
 
 
-class InitProtocol(Protocol):
-    """Protocol implemented by objects that require initialization."""
+class DataProtocol(Protocol):
+    """Protocol for a class that has slots and implements the builder pattern."""
+
+    @classmethod
+    def get_slots(cls) -> Tuple[str, ...]:
+        """Get slot names for serialization without schema."""
+        ...
 
     def build(self) -> Self:
         """
@@ -148,7 +138,7 @@ class InitProtocol(Protocol):
 
 
 class KeyProtocol(Protocol):
-    """Protocol implemented by keys and also required for records which are derived from keys."""
+    """Protocol implemented by both keys and records."""
 
     def build(self) -> Self:
         """
@@ -167,7 +157,7 @@ class KeyProtocol(Protocol):
 
 
 class RecordProtocol(Protocol):
-    """Protocol implemented by records but not keys."""
+    """Protocol implemented by records."""
 
     def build(self) -> Self:
         """
@@ -190,47 +180,43 @@ class RecordProtocol(Protocol):
         ...
 
 
-def get_primitive_type_names() -> Tuple[str, ...]:
-    """Returns the list of supported primitive type names."""
-    return tuple(PRIMITIVE_CLASS_NAMES)
-
-
 def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
-    """Returns true if one of the supported primitive types."""
+    """Returns true if the argument is one of the supported primitive classes."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in PRIMITIVE_CLASS_NAMES
     return result
 
 
 def is_freezable(instance_or_type: Any) -> TypeGuard[FreezableProtocol]:
-    """
-    Return True if the instance is freezable (implements freeze).
-    A class must not implement freeze unless all of its mutable elements also implement freeze.
-    Among other things, this means a freezable class can have tuple elements but not list elements.
-    """
+    """Return True if the argument has 'freeze' method."""
     return hasattr(instance_or_type, "freeze")
 
 
-def is_record(instance_or_type: Any) -> TypeGuard[RecordProtocol]:
-    """Check if type or object is a record based on the presence of 'get_key' method."""
-    return hasattr(instance_or_type, "get_key")
-
-
-def is_record_or_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
-    """Check if type or object is a record or key based on the presence of 'get_key_type' method."""
-    return hasattr(instance_or_type, "get_key_type")
+def is_data(instance_or_type: Any) -> TypeGuard[DataProtocol]:
+    """Return True if the argument has 'build' method."""
+    return hasattr(instance_or_type, "build")
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
     """
-    Check if type or object is a key but not a record based on the presence of 'get_key_type' method and the
-    absence of 'get_key' method. Consider using a faster alternative 'is_record_or_key' if possible.
+    Return True if the argument is a key but not a record based on the presence of 'get_key_type' method and the
+    absence of 'get_key' method. Consider using a faster alternative 'is_key_or_record' if possible.
     """
     return hasattr(instance_or_type, "get_key_type") and not hasattr(instance_or_type, "get_key")
 
 
-def is_singleton_key(instance_or_type: Any):
-    """Check if this is a singleton key (has no key fields), error if the object is not a key or has no slots."""
+def is_key_or_record(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
+    """Return True if the argument is a key or record based on the presence of 'get_key_type' method."""
+    return hasattr(instance_or_type, "get_key_type")
+
+
+def is_record(instance_or_type: Any) -> TypeGuard[RecordProtocol]:
+    """Return True if the argument is a record based on the presence of 'get_key' method."""
+    return hasattr(instance_or_type, "get_key")
+
+
+def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere?
+    """Return True if the argument is a singleton key (has no key fields), error if not a key or has no slots."""
     if not is_key(instance_or_type):
         raise RuntimeError("Function 'is_singleton_key' is called on an object that is not a key.")
     if not hasattr(instance_or_type, "__slots__"):

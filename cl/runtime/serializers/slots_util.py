@@ -29,7 +29,7 @@ class SlotsUtil:
 
     @classmethod
     @cached
-    def get_slots(cls, data_type: Type) -> Tuple[str]:
+    def get_slots(cls, data_type: Type) -> Tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
 
         # Traverse the class hierarchy from base to derived (reverse MRO order) collecting slots as specified
@@ -61,4 +61,5 @@ class SlotsUtil:
                 f"Duplicate field names found in class hierarchy " f"for {TypeUtil.name(data_type)}: {duplicates_str}."
             )
 
-        return cast(Tuple[str], result)
+        return result
+

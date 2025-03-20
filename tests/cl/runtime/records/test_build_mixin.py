@@ -65,7 +65,7 @@ class __TwoLeadingUnderscores(Freezable):
 
 
 def test_build():
-    """Test BuildMixin.build method."""
+    """Test DataMixin.build method."""
 
     guard = RegressionGuard()
     guard.write("Testing Base:")
@@ -84,7 +84,7 @@ def test_build():
 
 
 def test_clone():
-    """Test BuildMixin.clone method."""
+    """Test DataMixin.clone method."""
 
     # Create target from source
     source = Base(public_base_field_1="public_base_field_1")
@@ -99,7 +99,7 @@ def test_clone():
 
 
 def test_clone_as():
-    """Test BuildMixin.clone_as method."""
+    """Test DataMixin.clone_as method."""
 
     # Create target from source
     source = Base(public_base_field_1="public_base_field_1")

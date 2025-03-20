@@ -15,10 +15,10 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import Type
-from cl.runtime.records.build_mixin import BuildMixin
+from cl.runtime.records.data_mixin import DataMixin
 
 
-class KeyMixin(BuildMixin, ABC):
+class KeyMixin(DataMixin, ABC):
     """Mixin class for a key."""
 
     __slots__ = ()

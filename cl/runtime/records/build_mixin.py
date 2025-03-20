@@ -12,19 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Type
-from typing import TypeVar
+from abc import abstractmethod
+from typing import Type, Tuple
 from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
+from cl.runtime.records.protocols import TData
 
-T = TypeVar("T")
 
-
-class BuildMixin:
+class DataMixin:
     """Mixin adding 'build' method to the class."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
+
+    @classmethod
+    @abstractmethod
+    def get_slots(cls) -> Tuple[str, ...]:
+        """Get slot names for serialization without schema."""
 
     def build(self) -> Self:
         """
@@ -39,15 +43,17 @@ class BuildMixin:
     def clone(self: Self) -> Self:
         """Return an unfrozen object of the same type populated by shallow copies of public fields."""
         result = type(self)()
-        for attr in self.__slots__:
+        slots = self.get_slots()
+        for attr in slots:
             if not attr.startswith("_"):  # Skip private fields
                 setattr(result, attr, getattr(self, attr))
         return result
 
-    def clone_as(self: Self, result_type: Type[T]) -> T:
+    def clone_as(self: Self, result_type: Type[TData]) -> TData:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
         result = result_type()
-        for attr in self.__slots__:
+        slots = self.get_slots()
+        for attr in slots:
             if not attr.startswith("_"):  # Skip private fields
                 setattr(result, attr, getattr(self, attr))
         return result
