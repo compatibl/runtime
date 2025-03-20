@@ -14,15 +14,17 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Sequence, Tuple
-from typing import Type
+from typing import Any
+from typing import Sequence
+from typing import Tuple
 from frozendict import frozendict
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES, MAPPING_TYPE_NAMES, \
-    PRIMITIVE_TYPE_NAMES, PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
@@ -76,11 +78,14 @@ class DictSerializer2(Freezable):
                 # Use typed deserialization
                 return self._typed_deserialize(data, type_chain)
             else:
-                raise RuntimeError(f"Data is not a mapping, cannot deserialize without type_chain argument:\n"
-                                   f"{ErrorUtil.wrap(data)}.")
+                raise RuntimeError(
+                    f"Data is not a mapping, cannot deserialize without type_chain argument:\n"
+                    f"{ErrorUtil.wrap(data)}."
+                )
         else:
-            raise RuntimeError(f"Deserialization is not supported when {self.__class__.__name__}.bidirectional\n"
-                               f"flag is not set.")
+            raise RuntimeError(
+                f"Deserialization is not supported when {self.__class__.__name__}.bidirectional\n" f"flag is not set."
+            )
 
     def _typed_serialize(self, data: Any, type_chain: Sequence[str] | None = None) -> Any:
         """Serialize a slots-based object to a dictionary."""
@@ -98,11 +103,15 @@ class DictSerializer2(Freezable):
                 raise RuntimeError(f"Data is None but type hint {type_chain[0]} indicates it is required.")
         elif data_class_name in PRIMITIVE_CLASS_NAMES:
             if remaining_chain:
-                raise RuntimeError(f"Data is an instance of a primitive class {data_class_name} while type chain\n"
-                                   f"{', '.join(remaining_chain)} is remaining.")
+                raise RuntimeError(
+                    f"Data is an instance of a primitive class {data_class_name} while type chain\n"
+                    f"{', '.join(remaining_chain)} is remaining."
+                )
             if schema_type_name is None:
-                raise RuntimeError(f"An instance of a primitive class {data_class_name} is passed to\n"
-                                   f"a typed serializer without specifying the schema type.")
+                raise RuntimeError(
+                    f"An instance of a primitive class {data_class_name} is passed to\n"
+                    f"a typed serializer without specifying the schema type."
+                )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
                 # Parse as a primitive type
@@ -114,34 +123,46 @@ class DictSerializer2(Freezable):
                     if data_type_name in PRIMITIVE_CLASS_NAMES:
                         return data
                     else:
-                        raise RuntimeError(f"Type of the data provided to serialize method ({data_class_name})\n"
-                                           f"does not match the type specified in schema ({schema_type_name}).")
+                        raise RuntimeError(
+                            f"Type of the data provided to serialize method ({data_class_name})\n"
+                            f"does not match the type specified in schema ({schema_type_name})."
+                        )
             else:
                 # Parse as enum
                 type_spec = TypeSchema.for_type_name(schema_type_name)
                 if not isinstance(type_spec, EnumSpec):
-                    raise RuntimeError(f"Schema type '{schema_type_name}' is not a primitive type or enum while"
-                                       f"the data is an instance of primitive class {data_class_name}:\n"
-                                       f"{ErrorUtil.wrap(data)}.")
+                    raise RuntimeError(
+                        f"Schema type '{schema_type_name}' is not a primitive type or enum while"
+                        f"the data is an instance of primitive class {data_class_name}:\n"
+                        f"{ErrorUtil.wrap(data)}."
+                    )
                 # Check that no type chain is remaining
                 if remaining_chain:
-                    raise RuntimeError(f"Enum type {schema_type_name} has type chain {', '.join(remaining_chain)} remaining.")
+                    raise RuntimeError(
+                        f"Enum type {schema_type_name} has type chain {', '.join(remaining_chain)} remaining."
+                    )
                 # Serialize
                 enum_class = type_spec.get_class()
                 result = self.enum_serializer.serialize(data, enum_class)
                 return result
         elif data_class_name in SEQUENCE_TYPE_NAMES:
             if not remaining_chain:
-                raise RuntimeError(f"Inner type is not specified in schema for the sequence type {data_class_name}.\n"
-                                   f"Use type_name[Any] to specify a sequence with any item type.")
+                raise RuntimeError(
+                    f"Inner type is not specified in schema for the sequence type {data_class_name}.\n"
+                    f"Use type_name[Any] to specify a sequence with any item type."
+                )
             # Serialize sequence into list
             return list(self._typed_serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
         elif data_class_name in MAPPING_TYPE_NAMES:
             if not remaining_chain:
-                raise RuntimeError(f"Inner type not specified for the mapping type {data_class_name}.\n"
-                                   f"Use type_name[str, Any] to specify a mapping with any value type.")
+                raise RuntimeError(
+                    f"Inner type not specified for the mapping type {data_class_name}.\n"
+                    f"Use type_name[str, Any] to specify a mapping with any value type."
+                )
             # Deserialize mapping into dict
-            return dict((k, self._typed_serialize(v, remaining_chain)) for k, v in data.items())  # TODO: Replace by frozendict
+            return dict(
+                (k, self._typed_serialize(v, remaining_chain)) for k, v in data.items()
+            )  # TODO: Replace by frozendict
         if getattr(data, "__slots__", None) is not None:
 
             # Type spec for the data
@@ -160,8 +181,10 @@ class DictSerializer2(Freezable):
                     if not isinstance(schema_type_spec, DataSpec):
                         raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
                     if not isinstance(data, schema_type_spec.get_class()):
-                        raise RuntimeError(f"Type {data_type_name} is not the same or a subclass of "
-                                           f"the type {schema_type_name} specified in schema.")
+                        raise RuntimeError(
+                            f"Type {data_type_name} is not the same or a subclass of "
+                            f"the type {schema_type_name} specified in schema."
+                        )
             else:
                 result = {}
 
@@ -171,23 +194,24 @@ class DictSerializer2(Freezable):
             # Serialize slot values in the order of declaration except those that are None
             result.update(
                 {
-                    k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k):
-                    (
+                    k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): (
                         (
                             # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
                             self.primitive_serializer.serialize(v, field_spec.type_chain)
-                            if self.primitive_serializer is not None else
-                            v
+                            if self.primitive_serializer is not None
+                            else v
                         )
-                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES else
-                        (
-                            # Use primitive serializer, specify enum class
-                            self.enum_serializer.serialize(v, field_spec.get_class())
-                            if self.enum_serializer is not None else
-                            v
+                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                        else (
+                            (
+                                # Use primitive serializer, specify enum class
+                                self.enum_serializer.serialize(v, field_spec.get_class())
+                                if self.enum_serializer is not None
+                                else v
+                            )
+                            if isinstance(v, Enum)
+                            else self._typed_serialize(v, field_spec.type_chain)
                         )
-                        if isinstance(v, Enum) else
-                        self._typed_serialize(v, field_spec.type_chain)
                     )
                     for k, field_spec in data_field_dict.items()
                     if (v := getattr(data, k)) is not None
@@ -220,19 +244,24 @@ class DictSerializer2(Freezable):
                 return data
         elif type_name in SEQUENCE_TYPE_NAMES:
             if not remaining_chain:
-                raise RuntimeError(f"Inner type not specified for the sequence type {type_name}.\n"
-                                   f"Use type_name[Any] to specify a sequence with any item type.")
+                raise RuntimeError(
+                    f"Inner type not specified for the sequence type {type_name}.\n"
+                    f"Use type_name[Any] to specify a sequence with any item type."
+                )
             # Deserialize sequence into tuple
             return list(self._typed_deserialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
         elif type_name in MAPPING_TYPE_NAMES:
             if not remaining_chain:
-                raise RuntimeError(f"Inner type not specified for the mapping type {type_name}.\n"
-                                   f"Use type_name[str, Any] to specify a mapping with any value type.")
+                raise RuntimeError(
+                    f"Inner type not specified for the mapping type {type_name}.\n"
+                    f"Use type_name[str, Any] to specify a mapping with any value type."
+                )
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
             return {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k):
-                    self._typed_deserialize(v, remaining_chain)
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._typed_deserialize(
+                    v, remaining_chain
+                )
                 for k, v in data.items()
             }
 
@@ -240,8 +269,9 @@ class DictSerializer2(Freezable):
             # Parse as enum if data is a string
             type_spec = TypeSchema.for_type_name(type_name)
             if not isinstance(type_spec, EnumSpec):
-                raise RuntimeError(f"Type '{type_name}' cannot be deserialized from the following string:\n"
-                                   f"{ErrorUtil.wrap(data)}.")
+                raise RuntimeError(
+                    f"Type '{type_name}' cannot be deserialized from the following string:\n" f"{ErrorUtil.wrap(data)}."
+                )
             # Check that no type chain is remaining
             if remaining_chain:
                 raise RuntimeError(f"Enum type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
@@ -255,7 +285,7 @@ class DictSerializer2(Freezable):
             data_type_name = data.pop("_type", None)
             if data_type_name is not None and data_type_name != type_name:
                 type_name = data_type_name
-    
+
             # Deserialize slotted type if data is a mapping
             type_spec = TypeSchema.for_type_name(type_name)
             if not isinstance(type_spec, DataSpec):
@@ -271,8 +301,9 @@ class DictSerializer2(Freezable):
 
             # Deserialize into a dict
             result_dict = {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k):
-                    self._typed_deserialize(v, field_dict[k].type_chain)
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._typed_deserialize(
+                    v, field_dict[k].type_chain
+                )
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
             }
@@ -280,8 +311,9 @@ class DictSerializer2(Freezable):
             result = type_class(**result_dict)
             return result
         else:
-            raise RuntimeError(f"Cannot deserialize the following data into type '{type_name}':\n"
-                               f"{ErrorUtil.wrap(data)}")
+            raise RuntimeError(
+                f"Cannot deserialize the following data into type '{type_name}':\n" f"{ErrorUtil.wrap(data)}"
+            )
 
     def _untyped_serialize(self, data: Any) -> Any:
         """
@@ -347,7 +379,9 @@ class DictSerializer2(Freezable):
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
     @classmethod
-    def unpack_type_chain(cls, type_chain: Sequence[str] | None) -> Tuple[str | None, bool | None, Sequence[str] | None]:
+    def unpack_type_chain(
+        cls, type_chain: Sequence[str] | None
+    ) -> Tuple[str | None, bool | None, Sequence[str] | None]:
         """
         Parse type chain to return type name, is_optional flag, and remaining chain (if any).
 
@@ -377,7 +411,8 @@ class DictSerializer2(Freezable):
                 type_name = type_tokens[0].strip()
                 is_optional = None  # Use None to indicate False
             else:
-                raise RuntimeError(f"Type hint {type_hint} does not follow the format 'type_name' or 'type_name | None'.")
+                raise RuntimeError(
+                    f"Type hint {type_hint} does not follow the format 'type_name' or 'type_name | None'."
+                )
 
             return type_name, is_optional, remaining_chain
-

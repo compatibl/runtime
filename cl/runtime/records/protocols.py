@@ -24,7 +24,6 @@ from typing import Type
 from typing import TypeGuard
 from typing import TypeVar
 from uuid import UUID
-
 from frozendict import frozendict
 from typing_extensions import Self
 
@@ -70,12 +69,7 @@ SEQUENCE_CLASSES = (
 )
 """Classes that may be used to represent sequences, excluding abstract base classes."""
 
-SEQUENCE_TYPE_NAMES = (
-    "MutableSequence",
-    "Sequence",
-    "list",
-    "tuple"
-)
+SEQUENCE_TYPE_NAMES = ("MutableSequence", "Sequence", "list", "tuple")
 """Names of classes that may be used to represent sequences, including abstract base classes."""
 
 MAPPING_CLASSES = (
@@ -84,12 +78,7 @@ MAPPING_CLASSES = (
 )
 """Classes that may be used to represent mapping, excluding abstract base classes."""
 
-MAPPING_TYPE_NAMES = (
-    "MutableMapping",
-    "Mapping",
-    "dict",
-    "frozendict"
-)
+MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 """Names of classes that may be used to represent mapping, including abstract base classes."""
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes

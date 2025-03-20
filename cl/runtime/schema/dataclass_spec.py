@@ -14,12 +14,11 @@
 
 import dataclasses
 from dataclasses import dataclass
-from typing import Type, Any
+from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.field_spec import FieldSpec
-from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
 @dataclass(slots=True, kw_only=True)

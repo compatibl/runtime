@@ -13,16 +13,13 @@
 # limitations under the License.
 
 import pytest
-from unicodedata import bidirectional
-
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.primitive.float_util import FloatUtil
-from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
-from cl.runtime.records.protocols import SEQUENCE_CLASSES, MAPPING_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.testing.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubDataclassComposite, StubDataclassDerivedData
+from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassDictFields

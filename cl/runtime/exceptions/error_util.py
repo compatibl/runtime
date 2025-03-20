@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from textwrap import TextWrapper
-from typing import Any, List
+from typing import Any
+from typing import List
 from typing import Type
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
@@ -122,9 +123,7 @@ class ErrorUtil:
         """
         fields_str = ", ".join(fields)
         details_str = cls.wrap(details) if details else ""
-        return RuntimeError(
-            f"Fields {fields_str} are mutually exclusive for type {class_name}.\n{details_str}"
-        )
+        return RuntimeError(f"Fields {fields_str} are mutually exclusive for type {class_name}.\n{details_str}")
 
     @classmethod
     def value_error(

@@ -43,6 +43,7 @@ def stub_dataclass_float_list_factory() -> List[float]:
         12345.6789,
     ]
 
+
 def stub_dataclass_float_or_none_list_factory() -> List[float | None]:
     """Create stub values."""
     return [
@@ -50,6 +51,7 @@ def stub_dataclass_float_or_none_list_factory() -> List[float | None]:
         12345.6789,
         None,
     ]
+
 
 def stub_dataclass_date_list_factory() -> List[dt.date]:
     """Create stub values."""

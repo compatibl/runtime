@@ -17,7 +17,8 @@ import datetime as dt
 from dataclasses import dataclass
 from enum import Enum
 from enum import IntEnum
-from typing import Sequence, Tuple
+from typing import Sequence
+from typing import Tuple
 from uuid import UUID
 from cl.runtime.primitive.bool_format_enum import BoolFormatEnum
 from cl.runtime.primitive.bool_util import BoolUtil
@@ -134,12 +135,15 @@ class PrimitiveSerializer(Freezable):
         if schema_type_name is not None and value_class_name != "NoneType" and schema_type_name != value_class_name:
             if schema_type_name == "long":
                 if value_class_name != "int":
-                    raise RuntimeError(f"Type {schema_type_name} can only be stored using int class, "
-                                       f"not {value_class_name} class.")
+                    raise RuntimeError(
+                        f"Type {schema_type_name} can only be stored using int class, " f"not {value_class_name} class."
+                    )
             elif schema_type_name == "timestamp":
                 if value_class_name != "UUID":
-                    raise RuntimeError(f"Type {schema_type_name} can only be stored using UUID class, "
-                                       f"not {value_class_name} class.")
+                    raise RuntimeError(
+                        f"Type {schema_type_name} can only be stored using UUID class, "
+                        f"not {value_class_name} class."
+                    )
             elif value_class_name != schema_type_name:
                 raise RuntimeError(f"Type {schema_type_name} cannot be stored as {value_class_name} class.")
 
@@ -505,7 +509,9 @@ class PrimitiveSerializer(Freezable):
                 type_name = type_tokens[0].strip()
                 is_optional = None  # Use None to indicate False
             else:
-                raise RuntimeError(f"Type hint {type_hint} does not follow the format 'type_name' or 'type_name | None'.")
+                raise RuntimeError(
+                    f"Type hint {type_hint} does not follow the format 'type_name' or 'type_name | None'."
+                )
 
             return type_name, is_optional
         else:

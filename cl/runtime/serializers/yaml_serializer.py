@@ -15,7 +15,7 @@
 import datetime as dt
 from dataclasses import dataclass
 from io import StringIO
-from typing import Any, Sequence
+from typing import Any
 from uuid import UUID
 from ruamel.yaml import YAML
 from ruamel.yaml import StringIO
@@ -23,7 +23,6 @@ from ruamel.yaml.constructor import SafeConstructor
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.freezable import Freezable
@@ -61,6 +60,7 @@ def datetime_representer(dumper, data):
     data_str = primitive_to_string_serializer.serialize(data, ["datetime | None"])
     return dumper.represent_scalar("tag:yaml.org,2002:timestamp", data_str, style=None)
 
+
 def uuid_representer(dumper, data):
     """Configure YAML class for serializing a UUID field."""
     data_str = primitive_to_string_serializer.serialize(data, ["UUID | None"])
@@ -68,6 +68,7 @@ def uuid_representer(dumper, data):
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=None)
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
+
 
 def bytes_representer(dumper, data):
     """Configure YAML class for serializing a bytes field."""

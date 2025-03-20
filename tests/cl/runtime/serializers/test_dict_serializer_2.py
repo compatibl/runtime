@@ -31,7 +31,6 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
-from stubs.cl.runtime import StubDataclassTupleFields
 
 _SAMPLE_TYPES = [
     StubDataclassRecord,
