@@ -14,7 +14,7 @@
 
 import pytest
 import os
-from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.qa.regression_guard import RegressionGuard
 
 module_path = __file__.removesuffix(".py")
 

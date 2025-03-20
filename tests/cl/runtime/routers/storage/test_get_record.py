@@ -16,9 +16,9 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.routers.storage.record_response import RecordResponse
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
-from cl.runtime.testing.regression_guard import RegressionGuard
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubDataclassRecord
 
 
@@ -47,7 +47,7 @@ def test_method(pytest_default_db):
 
 def test_api(pytest_default_db):
     """Test REST API for /storage/record route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         # Save test record
         record = StubDataclassRecord(id=__name__).build()
         DbContext.save_one(record)

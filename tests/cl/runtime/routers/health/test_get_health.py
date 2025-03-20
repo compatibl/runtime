@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.routers.health.health_response import HealthResponse
 from cl.runtime.routers.user_request import UserRequest
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.qa_client import QaClient
 
 requests = [{}, {"user": "TestUser"}]
 expected_result = {"status": 200}
@@ -38,7 +38,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /health route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request in requests:
             response = test_client.get("/health", headers=request)
             assert response.status_code == 200

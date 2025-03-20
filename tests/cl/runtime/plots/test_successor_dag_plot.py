@@ -19,7 +19,7 @@ from typing import Optional
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.patches import Rectangle
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
 def test_smoke(pytest_work_dir):

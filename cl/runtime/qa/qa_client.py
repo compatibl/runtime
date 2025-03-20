@@ -19,7 +19,7 @@ from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.routers.server_util import ServerUtil
 
 
-class TestingClient(TestClient):
+class QaClient(TestClient):
     """Creates FastAPI TestClient and enters into ProcessContext."""
 
     process_context: ProcessContext

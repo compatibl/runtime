@@ -24,7 +24,7 @@ from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
-from cl.runtime.testing.pytest.pytest_util import PytestUtil
+from cl.runtime.qa.pytest.pytest_util import PytestUtil
 
 
 @pytest.fixture(scope="function")

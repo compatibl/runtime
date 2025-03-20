@@ -17,7 +17,7 @@ import datetime as dt
 from typing import Iterable
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
-from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.qa.regression_guard import RegressionGuard
 
 
 def is_ordered(values: Iterable[str]):

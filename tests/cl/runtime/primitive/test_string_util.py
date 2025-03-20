@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.primitive.string_util import StringUtil
-from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.qa.regression_guard import RegressionGuard
 
 
 def test_is_empty():

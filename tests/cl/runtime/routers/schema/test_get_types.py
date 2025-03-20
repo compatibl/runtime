@@ -17,7 +17,7 @@ from fastapi import FastAPI
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
 from cl.runtime.routers.user_request import UserRequest
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.qa_client import QaClient
 
 requests = [{}, {"user": "TestUser"}]
 
@@ -47,7 +47,7 @@ def test_api():
 
     test_app = FastAPI()
     test_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"])
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request in requests:
             response = test_client.get("/schema/types", headers=request)
             assert response.status_code == 200

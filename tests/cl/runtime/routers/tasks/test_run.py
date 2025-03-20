@@ -20,8 +20,8 @@ from cl.runtime.routers.tasks.run_response_item import RunResponseItem
 from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_celery_queue  # noqa
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
+from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubHandlers
 
@@ -93,7 +93,7 @@ def test_api(pytest_celery_queue):
 
     DbContext.save_one(stub_handlers)
 
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request in simple_requests + save_to_db_requests:
             response = test_client.post("/tasks/run", json=request)
             assert response.status_code == 200

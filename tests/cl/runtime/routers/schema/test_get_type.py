@@ -15,8 +15,8 @@
 import pytest
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
-from cl.runtime.testing.regression_guard import RegressionGuard
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.qa.qa_client import QaClient
 
 requests = [{"name": "UiAppState"}, {"name": "UiAppState", "user": "TestUser"}]
 
@@ -34,7 +34,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /schema/typeV2 route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request in requests:
             # Split request headers and query
             request_headers = {"user": request.get("user")}

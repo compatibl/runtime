@@ -16,8 +16,8 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.routers.entity.save_response import SaveResponse
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 
@@ -74,7 +74,7 @@ def test_method(pytest_default_db):
 
 def test_api(pytest_default_db):
     """Test REST API for /entity/save route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         # Test saving new record
         save_new_record_request_obj = SaveRequest(record_dict=create_record_payload)
         request_params = {

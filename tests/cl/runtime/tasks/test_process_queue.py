@@ -15,8 +15,8 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.tasks.process_queue import ProcessQueue
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
-from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime.tasks.stub_task import StubTask
 
 

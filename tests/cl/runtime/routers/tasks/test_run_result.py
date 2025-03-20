@@ -20,8 +20,8 @@ from cl.runtime.routers.tasks.run_response_item import handler_queue
 from cl.runtime.routers.tasks.task_result_request import TaskResultRequest
 from cl.runtime.routers.tasks.task_result_response_item import TaskResultResponseItem
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
@@ -72,7 +72,7 @@ def test_method(pytest_default_db):
 
 def test_api(pytest_default_db):
     """Test REST API for /tasks/run/result route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request in _save_tasks_and_get_requests():
             response = test_client.post("/tasks/run/result", json=request)
             assert response.status_code == 200

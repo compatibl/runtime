@@ -18,7 +18,7 @@ from types import NoneType
 from uuid import UUID
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
-from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubIntEnum
 

@@ -19,8 +19,8 @@ from typing import Type
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubDataViewers
 
 
@@ -65,7 +65,7 @@ def test_method(pytest_default_db):
 
 def test_api(pytest_default_db):
     """Test REST API for /entity/list_panels route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request in requests:
             # Split request headers and query
             request_headers = {"user": request.get("user")}

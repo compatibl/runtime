@@ -15,7 +15,7 @@
 import pytest
 import os
 from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_work_dir  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
 def _test_working_dir(*, actual: str, expected: str):

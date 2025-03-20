@@ -16,8 +16,8 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.routers.entity.delete_response import DeleteResponse
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_default_db  # noqa
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubDataclassDerivedRecord
 
 
@@ -49,7 +49,7 @@ def test_method(pytest_default_db):
 
 def test_api(pytest_default_db):
     """Test REST API for /entity/delete_many route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         existing_records = [
             StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build()
             for i in range(5)

@@ -17,7 +17,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
 from cl.runtime.serializers.string_serializer import StringSerializer
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.qa_client import QaClient
 from stubs.cl.runtime import StubDataViewers
 
 # create stub with viewers
@@ -67,7 +67,7 @@ def test_api():
 
     DbContext.save_one(stub_viewers)
 
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request, expected_result in zip(requests, expected_results):
             # Split request headers and query
             request_headers = {"user": request.get("user")}

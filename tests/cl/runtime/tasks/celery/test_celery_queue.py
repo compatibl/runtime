@@ -22,7 +22,7 @@ from cl.runtime.tasks.static_method_task import StaticMethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
-from cl.runtime.testing.pytest.pytest_fixtures import pytest_celery_queue  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
 from stubs.cl.runtime import StubHandlers
 
 context_serializer = DictSerializer()

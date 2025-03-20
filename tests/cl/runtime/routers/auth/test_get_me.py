@@ -17,7 +17,7 @@ from typing import Any
 from typing import Dict
 from cl.runtime.routers.auth.me_response import MeResponse
 from cl.runtime.routers.auth.me_response import UserRequest
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.qa_client import QaClient
 
 requests = [{}, {"user": "TestUser"}]
 
@@ -54,7 +54,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /auth/me route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request in requests:
             response = test_client.get("/auth/me", headers=request)
             assert response.status_code == 200

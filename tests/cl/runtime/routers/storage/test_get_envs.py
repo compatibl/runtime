@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.routers.storage.env_response import EnvResponseItem
 from cl.runtime.routers.user_request import UserRequest
-from cl.runtime.testing.testing_client import TestingClient
+from cl.runtime.qa.qa_client import QaClient
 
 requests = [{}, {"user": "TestUser"}]
 
@@ -47,7 +47,7 @@ def test_method():
 
 def test_api():
     """Test REST API for /storage/get_envs route."""
-    with TestingClient() as test_client:
+    with QaClient() as test_client:
         for request in requests:
             response = test_client.get("/storage/get_envs", headers=request)
             assert response.status_code == 200

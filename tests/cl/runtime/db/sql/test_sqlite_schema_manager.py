@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.schema.schema import Schema
-from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassDictFields

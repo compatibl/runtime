@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
-from cl.runtime.testing.regression_guard import RegressionGuard
+from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
