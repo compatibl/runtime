@@ -27,26 +27,17 @@ from uuid import UUID
 from frozendict import frozendict
 from typing_extensions import Self
 
-PRIMITIVE_PYTHON_TYPES = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
+PRIMITIVE_CLASSES = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
 """
-The list of Python types used to store primitive types, excludes those primitive types that do not have their own
-Pyton representation such as long (uses Python type int) and timestamp (uses Python type UUID).
+The list of Python classes used to store primitive types, excludes those primitive types that do not have their own
+Pyton classes such as long (uses Python class int) and timestamp (uses Python class UUID).
 """
 
-_PRIMITIVE_TYPE_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_PYTHON_TYPES)  # TODO: Rename
-
-PRIMITIVE_CLASS_NAMES = (
-    "str",
-    "float",
-    "bool",
-    "int",
-    "date",
-    "time",
-    "datetime",
-    "UUID",
-    "bytes",
-)
-"""Names of classes used to store primitive values, excludes subtypes such as long or timestamp."""
+PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)  # TODO: Rename
+"""
+The list of Python class names used to store primitive types, excludes those primitive types that do not have their own
+Pyton classes such as long (uses Python type int) and timestamp (uses Python type UUID).
+"""
 
 PRIMITIVE_TYPE_NAMES = (
     "str",
@@ -61,21 +52,18 @@ PRIMITIVE_TYPE_NAMES = (
     "timestamp",  # Stored in UUID class
     "bytes",
 )
-"""Names of primitive value types, includes subtypes such as long and timestamp."""
+"""
+The list of primitive type names, includes those primitive types that do not have their own
+Pyton classes such as long (uses Python type int) and timestamp (uses Python type UUID).
+"""
 
-SEQUENCE_CLASSES = (
-    list,
-    tuple,
-)
+SEQUENCE_CLASSES = (list, tuple)
 """Classes that may be used to represent sequences, excluding abstract base classes."""
 
 SEQUENCE_TYPE_NAMES = ("MutableSequence", "Sequence", "list", "tuple")
 """Names of classes that may be used to represent sequences, including abstract base classes."""
 
-MAPPING_CLASSES = (
-    dict,
-    frozendict,
-)
+MAPPING_CLASSES = (dict, frozendict)
 """Classes that may be used to represent mapping, excluding abstract base classes."""
 
 MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
@@ -204,13 +192,13 @@ class RecordProtocol(Protocol):
 
 def get_primitive_type_names() -> Tuple[str, ...]:
     """Returns the list of supported primitive type names."""
-    return tuple(_PRIMITIVE_TYPE_NAMES)
+    return tuple(PRIMITIVE_CLASS_NAMES)
 
 
 def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     """Returns true if one of the supported primitive types."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    result = type_.__name__ in _PRIMITIVE_TYPE_NAMES
+    result = type_.__name__ in PRIMITIVE_CLASS_NAMES
     return result
 
 

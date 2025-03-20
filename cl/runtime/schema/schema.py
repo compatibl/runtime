@@ -27,7 +27,7 @@ from memoization import cached
 from typing_extensions import Self
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.protocols import PRIMITIVE_PYTHON_TYPES
+from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import is_record_or_key
 from cl.runtime.records.type_util import TypeUtil
@@ -105,7 +105,7 @@ class Schema:
             )
 
             # TODO: Support namespace aliases to resolve conflicts
-            record_types = list(PRIMITIVE_PYTHON_TYPES) + sorted(record_types, key=lambda x: x.__name__)
+            record_types = list(PRIMITIVE_CLASSES) + sorted(record_types, key=lambda x: x.__name__)
             record_names = [TypeUtil.name(record_type) for record_type in record_types]
 
             # Check that there are no repeated names, report errors if there are

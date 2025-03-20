@@ -24,7 +24,7 @@ from typing import Union
 from typing import get_args
 from typing import get_origin
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.records.protocols import _PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 T = TypeVar("T")
@@ -70,7 +70,7 @@ class BuildUtil:
                 for slot in slots
                 if not slot.startswith("_")
                 and (x := getattr(obj, slot, None)) is not None
-                and type(x).__name__ not in _PRIMITIVE_TYPE_NAMES
+                and type(x).__name__ not in PRIMITIVE_CLASS_NAMES
                 and not isinstance(x, Enum)
             )
 
@@ -85,7 +85,7 @@ class BuildUtil:
             return [
                 (
                     cls.build(v)
-                    if v is not None and type(v).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(v, Enum)
+                    if v is not None and type(v).__name__ not in PRIMITIVE_CLASS_NAMES and not isinstance(v, Enum)
                     else v
                 )
                 for v in obj
@@ -95,7 +95,7 @@ class BuildUtil:
             return tuple(
                 (
                     cls.build(v)
-                    if v is not None and type(v).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(v, Enum)
+                    if v is not None and type(v).__name__ not in PRIMITIVE_CLASS_NAMES and not isinstance(v, Enum)
                     else v
                 )
                 for v in obj
@@ -106,13 +106,13 @@ class BuildUtil:
                 {
                     k: (
                         cls.build(v)
-                        if v is not None and type(v).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(v, Enum)
+                        if v is not None and type(v).__name__ not in PRIMITIVE_CLASS_NAMES and not isinstance(v, Enum)
                         else v
                     )
                     for k, v in obj.items()
                 }
             )
-        elif obj is not None and type(obj).__name__ not in _PRIMITIVE_TYPE_NAMES and not isinstance(obj, Enum):
+        elif obj is not None and type(obj).__name__ not in PRIMITIVE_CLASS_NAMES and not isinstance(obj, Enum):
             cls._unsupported_object_error(obj)
 
     @classmethod
@@ -212,5 +212,5 @@ class BuildUtil:
             f"  1. Slotted classes where all public fields are supported types;\n"
             f"  2. Tuples where all values are supported types;\n"
             f"  3. Dictionaries with string keys where all values are supported types; and\n"
-            f"  4. Primitive types from the following list: {', '.join(_PRIMITIVE_TYPE_NAMES)}"
+            f"  4. Primitive types from the following list: {', '.join(PRIMITIVE_CLASS_NAMES)}"
         )
