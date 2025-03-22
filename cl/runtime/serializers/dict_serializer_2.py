@@ -214,7 +214,7 @@ class DictSerializer2(Data):
                         )
                     )
                     for k, field_spec in data_field_dict.items()
-                    if (v := getattr(data, k)) is not None
+                    if (v := getattr(data, k)) is not None and not k.startswith("_")
                 }
             )
             return result
@@ -336,7 +336,7 @@ class DictSerializer2(Data):
                     )
                 )
                 for k in slots
-                if (v := getattr(data, k)) is not None and (not hasattr(v, "__len__") or len(v) > 0)
+                if (v := getattr(data, k)) is not None and not k.startswith("_")
             }
             return result
         elif isinstance(data, list) or isinstance(data, tuple):

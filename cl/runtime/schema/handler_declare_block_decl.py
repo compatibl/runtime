@@ -47,7 +47,9 @@ class HandlerDeclareBlockDecl:
         # Search for methods in type members
         handlers: List[HandlerDeclareDecl] = list()
         for member_name in type_members:
-            if member_name.startswith(("_", "__")):  # Skip all private methods
+
+            # Skip private and protected methods
+            if member_name.startswith("_"):
                 continue
 
             member = getattr(record_type, member_name)

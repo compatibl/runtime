@@ -58,6 +58,7 @@ class DataclassTypeDecl(TypeDecl):
 
         # Use this flag to skip fields generation when the method is invoked from a derived class
         if not skip_fields:
+
             # Information about dataclass fields including the metadata (does not resolve ForwardRefs)
             fields = dataclasses.fields(record_type)
 
