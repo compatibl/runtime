@@ -68,6 +68,54 @@ MAPPING_CLASSES = (dict, frozendict)
 MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 """Names of classes that may be used to represent mapping, including abstract base classes."""
 
+
+class DataProtocol(Protocol):
+    """Protocol for a class that has slots and implements the builder pattern."""
+
+    @classmethod
+    def get_slots(cls) -> Tuple[str, ...]:
+        """Get slot names for serialization without schema."""
+        ...
+
+    def is_frozen(self) -> bool:
+        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
+        ...
+
+    def freeze(self) -> None:
+        """
+        Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
+        Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
+        """
+        ...
+
+    def build(self) -> Self:
+        """
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
+        """
+        ...
+
+
+class KeyProtocol(DataProtocol):
+    """Protocol implemented by both keys and records."""
+
+    @classmethod
+    def get_key_type(cls) -> Type:
+        """Return key type even when called from a record."""
+        ...
+
+
+class RecordProtocol(KeyProtocol):
+    """Protocol implemented by records."""
+
+    def get_key(self) -> KeyProtocol:
+        """Return a new key object whose fields populated from self, do not return self."""
+        ...
+
+
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Type alias for Python classes used to store primitive values."""
 
@@ -89,88 +137,14 @@ TObj = TypeVar("TObj")
 TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
 
-TData = TypeVar("TData", bound="DataProtocol")
+TData = TypeVar("TData", bound=DataProtocol)
 """Generic type parameter for a class that has slots and implements the builder pattern."""
 
-TKey = TypeVar("TKey", bound="DataProtocol | KeyProtocol")
+TKey = TypeVar("TKey", bound=KeyProtocol)
 """Generic type parameter for a key."""
 
-TRecord = TypeVar("TRecord", bound="DataProtocol | KeyProtocol | RecordProtocol")
+TRecord = TypeVar("TRecord", bound=RecordProtocol)
 """Generic type parameter for a record."""
-
-
-class DataProtocol(Protocol):
-    """Protocol for a class that has slots and implements the builder pattern."""
-
-    def is_frozen(self) -> bool:
-        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
-        ...
-
-    def freeze(self) -> None:
-        """
-        Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
-        Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
-        """
-        ...
-
-    @classmethod
-    def get_slots(cls) -> Tuple[str, ...]:
-        """Get slot names for serialization without schema."""
-        ...
-
-    def build(self) -> Self:
-        """
-        This method performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
-        """
-        ...
-
-
-class KeyProtocol(Protocol):
-    """Protocol implemented by both keys and records."""
-
-    def build(self) -> Self:
-        """
-        This method performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
-        """
-        ...
-
-    @classmethod
-    def get_key_type(cls) -> Type:
-        """Return key type even when called from a record."""
-        ...
-
-
-class RecordProtocol(Protocol):
-    """Protocol implemented by records."""
-
-    def build(self) -> Self:
-        """
-        This method performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
-        """
-        ...
-
-    # Do not use Protocol inheritance, repeat method instead as it is not yet supported by all static type checkers
-    @classmethod
-    def get_key_type(cls) -> Type:
-        """Return key type even when called from a record."""
-        ...
-
-    def get_key(self) -> KeyProtocol:
-        """Return a new key object whose fields populated from self, do not return self."""
-        ...
-
 
 def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     """Returns true if the argument is one of the supported primitive classes."""
@@ -202,7 +176,7 @@ def is_record(instance_or_type: Any) -> TypeGuard[RecordProtocol]:
     return hasattr(instance_or_type, "get_key")
 
 
-def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere?
+def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere and review logic
     """Return True if the argument is a singleton key (has no key fields), error if not a key or has no slots."""
     if not is_key(instance_or_type):
         raise RuntimeError("Function 'is_singleton_key' is called on an object that is not a key.")
