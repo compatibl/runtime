@@ -14,11 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 
 
 @dataclass(slots=True, kw_only=True)
-class EnumMemberSpec(Freezable):
+class EnumMemberSpec(Data):
     """Provides information about a single member (item) of an enum."""
 
     member_name: str = required()

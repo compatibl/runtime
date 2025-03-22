@@ -20,7 +20,7 @@ from typing import Tuple
 from frozendict import frozendict
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -35,7 +35,7 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class DictSerializer2(Freezable):
+class DictSerializer2(Data):
     """Roundtrip serialization of object to dictionary with optional type information."""
 
     primitive_serializer: PrimitiveSerializer | None = None

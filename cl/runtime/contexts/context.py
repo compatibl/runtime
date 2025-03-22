@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from typing import DefaultDict
 from typing import List
 from typing_extensions import Self
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.type_util import TypeUtil
 
@@ -32,7 +32,7 @@ Each asynchronous environment has its own stack dictionary
 
 
 @dataclass(slots=True, kw_only=True)
-class Context(Freezable, ABC):
+class Context(Data, ABC):
     """Abstract base of context classes."""
 
     @classmethod

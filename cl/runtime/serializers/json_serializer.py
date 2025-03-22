@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 import orjson
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 
@@ -28,7 +28,7 @@ def orjson_default(obj):
 
 
 @dataclass(slots=True, kw_only=True)
-class JsonSerializer(Freezable):
+class JsonSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
     pascalize_keys: bool | None = None

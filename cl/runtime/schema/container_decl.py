@@ -15,12 +15,12 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 
 
 @dataclass(slots=True, kw_only=True)
-class ContainerDecl(Freezable):
+class ContainerDecl(Data):
     """Container where values are stored for this field."""
 
     container_kind: ContainerKindEnum = required()  # TODO: Or ContainerKey, is Container a version of TypeDecl

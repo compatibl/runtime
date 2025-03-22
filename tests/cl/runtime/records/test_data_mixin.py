@@ -15,11 +15,11 @@
 import pytest
 from dataclasses import dataclass
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 
 
 @dataclass(slots=True, kw_only=True)
-class Base(Freezable):
+class Base(Data):
     _protected_base_field: str | None = None
     public_base_field_1: str | None = None
     public_base_field_2: str | None = None
@@ -51,14 +51,14 @@ class DerivedFromDerivedWithoutInit(Derived):
 
 
 @dataclass(slots=True, kw_only=True)
-class _OneLeadingUnderscore(Freezable):
+class _OneLeadingUnderscore(Data):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         RegressionGuard().write("> _OneLeadingUnderscore.init")
 
 
 @dataclass(slots=True, kw_only=True)
-class __TwoLeadingUnderscores(Freezable):
+class __TwoLeadingUnderscores(Data):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         RegressionGuard().write("> __TwoLeadingUnderscores.init")

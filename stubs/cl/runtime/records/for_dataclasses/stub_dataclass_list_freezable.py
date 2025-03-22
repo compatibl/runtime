@@ -15,12 +15,12 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassListFreezable(Freezable):
+class StubDataclassListFreezable(Data):
     """Freezable class must not have a list field, should raise (only tuples are allowed)."""
 
     value: str = "abc"

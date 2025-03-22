@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassSimpleFreezable(Freezable):
+class StubDataclassSimpleFreezable(Data):
     """Freezable class stub."""
 
     value: str = "abc"

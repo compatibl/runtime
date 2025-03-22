@@ -20,13 +20,13 @@ from typing import Type
 from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class FieldSpec(Freezable):
+class FieldSpec(Data):
     """Provides information about a field in DataSpec."""
 
     field_name: str = required()

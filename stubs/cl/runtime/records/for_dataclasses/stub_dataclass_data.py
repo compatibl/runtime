@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassData(Freezable):
+class StubDataclassData(Data):
     """Stub base data type."""
 
     str_field: str = "abc"

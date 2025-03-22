@@ -25,7 +25,7 @@ from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
@@ -118,7 +118,7 @@ yaml_reader.Constructor = PrimitiveToStringConstructor
 
 
 @dataclass(slots=True, kw_only=True)
-class YamlSerializer(Freezable):
+class YamlSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
     pascalize_keys: bool | None = None

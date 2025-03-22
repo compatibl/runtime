@@ -42,13 +42,13 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.timestamp_format_enum import TimestampFormatEnum
 from cl.runtime.primitive.uuid_format_enum import UuidFormatEnum
 from cl.runtime.primitive.uuid_util import UuidUtil
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class PrimitiveSerializer(Freezable):
+class PrimitiveSerializer(Data):
     """Helper class for serialization and deserialization of primitive types."""
 
     none_format: NoneFormatEnum | None = None

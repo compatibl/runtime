@@ -15,12 +15,12 @@
 from dataclasses import dataclass
 from typing import Tuple
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassComplexFreezable(Freezable):
+class StubDataclassComplexFreezable(Data):
     """Freezable class stub with complex freezable field and tuple field."""
 
     value: str = "abc"

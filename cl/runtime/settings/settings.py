@@ -29,7 +29,7 @@ from dynaconf import Dynaconf
 from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.primitive.timestamp import Timestamp
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -95,7 +95,7 @@ _dotenv_dir_path = os.path.dirname(_dotenv_file_path) if _dotenv_file_path is no
 
 
 @dataclass(slots=True, kw_only=True)
-class Settings(Freezable, ABC):
+class Settings(Data, ABC):
     """Base class for a singleton settings object."""
 
     process_timestamp: ClassVar[str] = _process_timestamp

@@ -16,13 +16,13 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Type
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class EnumSerializer(Freezable):
+class EnumSerializer(Data):
     """Helper class for serialization and deserialization of enum types."""
 
     @classmethod
