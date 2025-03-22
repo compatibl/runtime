@@ -27,7 +27,6 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.records.protocols import is_freezable
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
@@ -339,11 +338,6 @@ class DbContext(Context):
         elif not is_record(record):
             # Confirm the argument is a record
             raise RuntimeError(f"Attempting to an object of {type(record).__name__} which is not a record.")
-        elif not is_freezable(record):
-            raise RuntimeError(
-                f"Record of type {TypeUtil.name(record)} with key {record.get_key()}\n"
-                f"does not implement 'freeze' method. Only freezable records can be stored in DB."
-            )
         elif not FreezableUtil.is_frozen(record):
             raise RuntimeError(
                 f"Build method not invoked before saving for an record of type\n"

@@ -89,21 +89,18 @@ TObj = TypeVar("TObj")
 TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
 
-TFreezable = TypeVar("TFreezable", bound="FreezableProtocol")
-"""Generic type parameter for a class that can be frozen, preventing further modifications."""
-
-TData = TypeVar("TData", bound="FreezableProtocol | DataProtocol")
+TData = TypeVar("TData", bound="DataProtocol")
 """Generic type parameter for a class that has slots and implements the builder pattern."""
 
-TKey = TypeVar("TKey", bound="FreezableProtocol | DataProtocol | KeyProtocol")
+TKey = TypeVar("TKey", bound="DataProtocol | KeyProtocol")
 """Generic type parameter for a key."""
 
-TRecord = TypeVar("TRecord", bound="FreezableProtocol | DataProtocol | KeyProtocol | RecordProtocol")
+TRecord = TypeVar("TRecord", bound="DataProtocol | KeyProtocol | RecordProtocol")
 """Generic type parameter for a record."""
 
 
-class FreezableProtocol(Protocol):
-    """Protocol for a class that can be frozen, preventing further modifications."""
+class DataProtocol(Protocol):
+    """Protocol for a class that has slots and implements the builder pattern."""
 
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
@@ -115,10 +112,6 @@ class FreezableProtocol(Protocol):
         Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
         """
         ...
-
-
-class DataProtocol(Protocol):
-    """Protocol for a class that has slots and implements the builder pattern."""
 
     @classmethod
     def get_slots(cls) -> Tuple[str, ...]:
@@ -186,14 +179,9 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     return result
 
 
-def is_freezable(instance_or_type: Any) -> TypeGuard[FreezableProtocol]:
-    """Return True if the argument has 'freeze' method."""
-    return hasattr(instance_or_type, "freeze")
-
-
 def is_data(instance_or_type: Any) -> TypeGuard[DataProtocol]:
-    """Return True if the argument has 'build' method."""
-    return hasattr(instance_or_type, "build")
+    """Fast partial check for DataProtocol, return True if the argument has 'freeze' method."""
+    return hasattr(instance_or_type, "freeze")
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
