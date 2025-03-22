@@ -81,13 +81,6 @@ class DataProtocol(Protocol):
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         ...
 
-    def freeze(self) -> None:
-        """
-        Freeze the instance without recursively calling freeze on its fields, which will be done by the build method.
-        Once frozen, the instance cannot be unfrozen. The parameter indicates what kind of instance has been frozen.
-        """
-        ...
-
     def build(self) -> Self:
         """
         This method performs the following steps:

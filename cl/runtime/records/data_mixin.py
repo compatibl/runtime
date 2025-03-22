@@ -55,11 +55,10 @@ class DataMixin:
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
+        (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
+        (3) Validates root level object against the schema and calls its 'mark_frozen' method
         """
-        return BuildUtil.build(self)
+        return BuildUtil.typed_build(self)
 
     def clone(self: Self) -> Self:
         """Return an unfrozen object of the same type populated by shallow copies of public fields."""

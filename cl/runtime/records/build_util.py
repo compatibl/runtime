@@ -12,206 +12,130 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import dataclasses
-from dataclasses import MISSING
-from dataclasses import fields
 from enum import Enum
-from types import NoneType
-from types import UnionType
-from typing import Any
-from typing import Union
-from typing import get_args
-from typing import get_origin
-from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, TObj, DataProtocol
+from typing import Any, Sequence
+from frozendict import frozendict
+from cl.runtime.primitive.primitive_util import PrimitiveUtil
+from cl.runtime.records.protocols import TObj, is_data, is_primitive
+from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.data_spec import DataSpec
+from cl.runtime.schema.enum_spec import EnumSpec
+from cl.runtime.schema.type_schema import TypeSchema
+from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
+
 
 class BuildUtil:
-    """Helper class for DataMixin."""
+    """Helper methods for build functionality in DataMixin."""
 
     @classmethod
-    def check_frozen(cls, obj: DataProtocol) -> None:
+    def check_frozen(cls, obj: Any) -> None:
         """Error message if the object is not yet frozen."""
         if not obj.is_frozen():
             raise RuntimeError(f"An instance of {TypeUtil.name(obj)} is not yet frozen, call 'build' method first.")
 
     @classmethod
-    def build(cls, obj: TObj) -> TObj:
+    def typed_build(cls, data: Any, type_chain: Sequence[str] | None = None) -> Any:
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
+        (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
+        (3) Validates root level object against the schema and calls its 'mark_frozen' method
         """
+        # Get type and class of data and parse type chain
+        data_class_name = data.__class__.__name__ if data is not None else None
+        schema_type_name, is_optional, remaining_chain = DictSerializer2.unpack_type_chain(type_chain)
 
-        if (slots := getattr(obj, "__slots__", None)) is not None:
-
-            # Has slots, process as data, key or record
-            if obj.is_frozen():
-                # Stop further processing and return if the object has been frozen to
-                # prevent repeat initialization of shared instances
-                return obj
-
-            # Invoke '__init' in the order from base to derived
-            # Keep track of which init methods in class hierarchy were already called
-            invoked = set()
-            # Reverse the MRO to start from base to derived
-            for class_ in reversed(obj.__class__.__mro__):
-                # Remove leading underscores from the class name when generating mangling for __init
-                # to support classes that start from _ to mark them as protected
-                class_init = getattr(class_, f"_{class_.__name__.lstrip('_')}__init", None)
-                if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
-                    # Add qualname to invoked to prevent executing the same method twice
-                    invoked.add(qualname)
-                    # Invoke '__init' method if it exists, otherwise do nothing
-                    class_init(obj)
-
-            # Recursively call 'build' on public fields except those that are None, primitive or Enum
-            # and assign the result of build back to the field
-            tuple(
-                setattr(obj, slot, cls.build(x))
-                for slot in slots
-                if not slot.startswith("_")
-                and (x := getattr(obj, slot, None)) is not None
-                and type(x).__name__ not in PRIMITIVE_CLASS_NAMES
-                and not isinstance(x, Enum)
-            )
-
-            # Mark as frozen to prevent further modifications
-            obj.mark_frozen()
-
-            # Perform validation against the schema after the object is frozen and return
-            cls.validate(obj)
-            return obj
-        elif isinstance(obj, list):
-            # Recursively invoke on tuple elements in-place, skip primitive types or enums
-            return [
-                (
-                    cls.build(v)
-                    if v is not None and type(v).__name__ not in PRIMITIVE_CLASS_NAMES and not isinstance(v, Enum)
-                    else v
+        if data is None:
+            # Return None if no type information or is_optional flag is set, otherwise raise an error
+            if schema_type_name is None or is_optional:
+                return None
+            else:
+                raise RuntimeError(f"Data is None but type hint {type_chain[0]} indicates it is required.")
+        elif data_class_name in PRIMITIVE_CLASS_NAMES:
+            if remaining_chain:
+                raise RuntimeError(
+                    f"Data is an instance of a primitive class {data_class_name} while type chain\n"
+                    f"{', '.join(remaining_chain)} is remaining."
                 )
-                for v in obj
+            if schema_type_name is None:
+                raise RuntimeError(
+                    f"An instance of a primitive class {data_class_name} is passed to\n"
+                    f"the BuildUtil.typed_build method without specifying the schema type."
+                )
+
+            if schema_type_name in PRIMITIVE_TYPE_NAMES:
+                # Check that the class matches the type specified in schema
+                PrimitiveUtil.check_type(data, schema_type_name)
+                return data
+            else:
+                # Parse as enum
+                type_spec = TypeSchema.for_type_name(schema_type_name)
+                if not isinstance(type_spec, EnumSpec):
+                    raise RuntimeError(
+                        f"Schema type '{schema_type_name}' is not a primitive type or enum while"
+                        f"the data is an instance of primitive class {data_class_name}:\n"
+                        f"{ErrorUtil.wrap(data)}."
+                    )
+        elif data_class_name in SEQUENCE_TYPE_NAMES:
+            if not remaining_chain:
+                raise RuntimeError(
+                    f"Inner type is not specified in schema for the sequence type {data_class_name}.\n"
+                    f"Use type_name[Any] to specify a sequence with any item type."
+                )
+            # Serialize sequence into list
+            return tuple(data.typed_build(v, remaining_chain) for v in data)
+        elif data_class_name in MAPPING_TYPE_NAMES:
+            if not remaining_chain:
+                raise RuntimeError(
+                    f"Inner type not specified for the mapping type {data_class_name}.\n"
+                    f"Use type_name[str, Any] to specify a mapping with any value type."
+                )
+            # Deserialize mapping into dict
+            return frozendict((k, data.typed_build(v, remaining_chain)) for k, v in data.items())
+        elif is_data(data):
+
+            # Type spec for the data
+            data_type_spec = TypeSchema.for_class(data.__class__)
+            data_type_name = data_type_spec.type_name
+            if not isinstance(data_type_spec, DataSpec):
+                raise RuntimeError(f"Type of data '{schema_type_name}' is not a slotted class in the schema.")
+
+            if schema_type_name is not None and schema_type_name != data_type_name:
+                # If schema type is specified, ensure that data is an instance of the specified type
+                schema_type_spec = TypeSchema.for_type_name(schema_type_name)
+                schema_type_name = schema_type_spec.type_name
+                if not isinstance(schema_type_spec, DataSpec):
+                    raise RuntimeError(f"Declared type '{schema_type_name}' is not a slotted class in the schema.")
+                if not isinstance(data, schema_type_spec.get_class()):
+                    raise RuntimeError(
+                        f"Type {data_type_name} is not the same or a subclass of "
+                        f"the type {schema_type_name} specified in the schema."
+                    )
+
+            # Get class and field dictionary for schema_type_name
+            data_field_dict = data_type_spec.get_field_dict()
+
+            # Updates for the data object
+            update_items = [
+                (k, cls.typed_build(v, field_spec.type_chain))
+                for k, field_spec in data_field_dict.items()
+                if (v := getattr(data, k)) is not None and not is_primitive(v) and not isinstance(v, Enum) and not k.startswith("_")
             ]
-        elif isinstance(obj, tuple):
-            # Recursively invoke on tuple elements in-place, skip primitive types or enums
-            return tuple(
-                (
-                    cls.build(v)
-                    if v is not None and type(v).__name__ not in PRIMITIVE_CLASS_NAMES and not isinstance(v, Enum)
-                    else v
-                )
-                for v in obj
-            )
-        elif isinstance(obj, dict):  # TODO: Switch to frozendict and Map
-            # Recursively invoke on dict elements in-place, skip primitive types or enums
-            return dict(
-                {
-                    k: (
-                        cls.build(v)
-                        if v is not None and type(v).__name__ not in PRIMITIVE_CLASS_NAMES and not isinstance(v, Enum)
-                        else v
-                    )
-                    for k, v in obj.items()
-                }
-            )
-        elif obj is not None and type(obj).__name__ not in PRIMITIVE_CLASS_NAMES and not isinstance(obj, Enum):
-            cls._unsupported_object_error(obj)
-
-    @classmethod
-    def validate(cls, obj) -> None:
-        """Validate against schema (invoked by init_all after all init methods are called)."""
-        # TODO: Support other dataclass-like frameworks
-        class_name = TypeUtil.name(obj)
-        if dataclasses.is_dataclass(obj):
-            for field in fields(obj):
-                field_value = getattr(obj, field.name)
-                if not field.name.startswith("_"):  # Exclude private and protected fields
-                    if field_value is not None:
-                        # Check that for the fields that have values, the values are of the right type
-                        if not cls._is_instance(field_value, field.type):
-                            field_type_name = cls._get_field_type_name(field.type)
-                            value_type_name = TypeUtil.name(field_value)
-                            if "member_descriptor" not in value_type_name:  # TODO(Roman): Remove when fixed
-                                raise RuntimeError(
-                                    f"""Type mismatch for field '{field.name}' of class {class_name}.
-    Type in dataclass declaration: {field_type_name}
-    Type of the value: {TypeUtil.name(field_value)}
-    Note: In case of containers, type mismatch may be in one of the items.
-    """
-                                )
-                    else:
-                        default_is_none = field.default is None
-                        default_factory_is_missing = field.default_factory is MISSING
-                        default_value_not_set = default_is_none and default_factory_is_missing
-                        if default_value_not_set and not cls._is_optional(field.type):
-                            # Error if a field is None but declared as required
-                            raise UserError(f"Field '{field.name}' in class '{class_name}' is required but not set.")
-
-    @classmethod
-    def _is_instance(cls, field_value, field_type) -> bool:
-
-        origin = get_origin(field_type)
-        args = get_args(field_type)
-
-        if origin is None:
-            # If field_type is Any no need to check value
-            if field_type is Any:
-                return True
-
-            # Not a generic type, consider the possible use of annotation
-            if isinstance(field_type, type):
-                return isinstance(field_value, field_type)
-            elif isinstance(field_type, str):
-                field_value_type_name = TypeUtil.name(field_value)
-                return field_value_type_name == field_type
-            else:
-                raise RuntimeError(f"Field type {field_type} is neither a type nor a string.")
-        elif origin in [UnionType, Union]:
-            if field_value is None:
-                return NoneType in args
-            else:
-                return any(cls._is_instance(field_value, arg) for arg in args)
-        elif cls._is_instance(field_value, origin):
-            # If the generic has type parameters, check them
-            if args:
-                if (isinstance(field_value, list) and origin is list) or (
-                    isinstance(field_value, tuple) and origin is tuple
-                ):
-                    return all(cls._is_instance(item, args[0]) for item in field_value)
-                elif isinstance(field_value, dict) and origin is dict:
-                    return all(
-                        isinstance(key, args[0]) and cls._is_instance(value, args[1])
-                        for key, value in field_value.items()
-                    )
+            for k, v in update_items:
+                setattr(data, k, v)
+            return data
         else:
-            # Not an instance of the specified origin
-            return False
+            raise cls._unsupported_object_error(data)
 
     @classmethod
-    def _is_optional(cls, field_type) -> bool:
-        """Return true if None is an valid value for field_type."""
-        # Check if the type is a union
-        if get_origin(field_type) in [UnionType, Union]:
-            # Check if NoneType is one of the arguments in the union
-            return NoneType in get_args(field_type)
-        else:
-            # Type hint is not a union, the value cannot be None
-            return False
-
-    @classmethod
-    def _get_field_type_name(cls, field_type):
-        """Get the name of a type, including handling for Union types."""
-        if get_origin(field_type) in [UnionType, Union]:
-            return " | ".join(t.__name__ for t in get_args(field_type))
-        else:
-            return field_type.__name__
-
-    @classmethod
-    def _unsupported_object_error(cls, obj: Any) -> None:
+    def _unsupported_object_error(cls, obj: Any) -> Exception:
         obj_type_name = TypeUtil.name(obj)
-        raise RuntimeError(
+        return RuntimeError(
             f"Class {obj_type_name} cannot be a record or its field. Supported types include:\n"
             f"  1. Classes that implement DataProtocol;\n"
             f"  2. Tuples where all values are supported types;\n"
