@@ -14,7 +14,7 @@
 
 import datetime as dt
 from enum import Enum
-from typing import Any
+from typing import Any, Sequence, Mapping
 from typing import Dict
 from typing import List
 from typing import Protocol
@@ -119,6 +119,12 @@ class RecordProtocol(KeyProtocol):
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Type alias for Python classes used to store primitive values."""
 
+TSequence = list | tuple | Sequence
+"""Type alias for a supported sequence type."""
+
+TMapping = dict | frozendict | Mapping
+"""Type alias for a supported mapping type."""
+
 TDataField = Dict[str, "TDataField"] | List["TDataField"] | TPrimitive | Enum
 """Field types for serialized data in dictionary format."""
 
@@ -151,6 +157,20 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     """Returns true if the argument is one of the supported primitive classes."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in PRIMITIVE_CLASS_NAMES
+    return result
+
+
+def is_sequence(instance_or_type: Any) -> TypeGuard[TSequence]:
+    """Returns true if the argument is one of the supported sequence types."""
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    result = type_.__name__ in SEQUENCE_TYPE_NAMES
+    return result
+
+
+def is_mapping(instance_or_type: Any) -> TypeGuard[TSequence]:
+    """Returns true if the argument is one of the supported mapping types."""
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    result = type_.__name__ in MAPPING_TYPE_NAMES
     return result
 
 
