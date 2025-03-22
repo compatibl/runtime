@@ -33,7 +33,7 @@ class Data(DataMixin, ABC):
         - Use tuple which is immutable instead of list when deriving from this class
     """
 
-    __frozen: bool = required(default=False, init=False, repr=False, compare=False)
+    __frozen: bool = required(default=None, init=False, repr=False, compare=False)
     """True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
     @classmethod
@@ -43,20 +43,11 @@ class Data(DataMixin, ABC):
 
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
-        return self.__frozen
+        return bool(self.__frozen)
 
-    def freeze(self) -> Self:
+    def mark_frozen(self) -> None:
         """
-        Freeze the instance without recursively calling freeze on its fields. Return self for method chaining.
-        Once frozen, the instance cannot be unfrozen.
+        Mark the instance as frozen without actually freezing it,which is the responsibility of build method.
+        The action of marking the instance frozen cannot be reversed.
         """
         object.__setattr__(self, "_Data__frozen", True)
-        return self
-
-    def __setattr__(self, key, value):
-        """Raise an error on attempt to modify a public field for a frozen instance."""
-        if getattr(self, "_Data__frozen", False) and not key.startswith("_"):
-            raise RuntimeError(
-                f"Cannot modify public field {TypeUtil.name(self)}.{key} " f"because the instance is frozen."
-            )
-        object.__setattr__(self, key, value)

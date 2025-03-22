@@ -19,22 +19,24 @@ from enum import Enum
 from types import NoneType
 from types import UnionType
 from typing import Any
-from typing import TypeVar
 from typing import Union
 from typing import get_args
 from typing import get_origin
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, TObj, DataProtocol
 from cl.runtime.records.type_util import TypeUtil
-
-T = TypeVar("T")
-
 
 class BuildUtil:
     """Helper class for DataMixin."""
 
     @classmethod
-    def build(cls, obj: T) -> T:
+    def check_frozen(cls, obj: DataProtocol) -> None:
+        """Error message if the object is not yet frozen."""
+        if not obj.is_frozen():
+            raise RuntimeError(f"An instance of {TypeUtil.name(obj)} is not yet frozen, call 'build' method first.")
+
+    @classmethod
+    def build(cls, obj: TObj) -> TObj:
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
@@ -44,6 +46,7 @@ class BuildUtil:
         """
 
         if (slots := getattr(obj, "__slots__", None)) is not None:
+
             # Has slots, process as data, key or record
             if obj.is_frozen():
                 # Stop further processing and return if the object has been frozen to
@@ -56,6 +59,7 @@ class BuildUtil:
             # Reverse the MRO to start from base to derived
             for class_ in reversed(obj.__class__.__mro__):
                 # Remove leading underscores from the class name when generating mangling for __init
+                # to support classes that start from _ to mark them as protected
                 class_init = getattr(class_, f"_{class_.__name__.lstrip('_')}__init", None)
                 if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
                     # Add qualname to invoked to prevent executing the same method twice
@@ -74,8 +78,8 @@ class BuildUtil:
                 and not isinstance(x, Enum)
             )
 
-            # After the init methods, call freeze method if implemented, continue without error if not
-            obj.freeze()
+            # Mark as frozen to prevent further modifications
+            obj.mark_frozen()
 
             # Perform validation against the schema after the object is frozen and return
             cls.validate(obj)
@@ -209,7 +213,7 @@ class BuildUtil:
         obj_type_name = TypeUtil.name(obj)
         raise RuntimeError(
             f"Class {obj_type_name} cannot be a record or its field. Supported types include:\n"
-            f"  1. Slotted classes where all public fields are supported types;\n"
+            f"  1. Classes that implement DataProtocol;\n"
             f"  2. Tuples where all values are supported types;\n"
             f"  3. Dictionaries with string keys where all values are supported types; and\n"
             f"  4. Primitive types from the following list: {', '.join(PRIMITIVE_CLASS_NAMES)}"

@@ -18,6 +18,7 @@ from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.protocols import TData
+from cl.runtime.records.type_util import TypeUtil
 
 
 class DataMixin:
@@ -30,6 +31,25 @@ class DataMixin:
     @abstractmethod
     def get_slots(cls) -> Tuple[str, ...]:
         """Get slot names for serialization without schema."""
+
+    @abstractmethod
+    def is_frozen(self) -> bool:
+        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
+
+    @abstractmethod
+    def mark_frozen(self) -> None:
+        """
+        Mark the instance as frozen without actually freezing it,which is the responsibility of build method.
+        The action of marking the instance frozen cannot be reversed.
+        """
+
+    def __setattr__(self, key, value):
+        """Raise an error on attempt to modify a public field for a frozen instance."""
+        if getattr(self, "_Data__frozen", False) and not key.startswith("_"):
+            raise RuntimeError(
+                f"Cannot modify public field {TypeUtil.name(self)}.{key} " f"because the instance is frozen."
+            )
+        object.__setattr__(self, key, value)
 
     def build(self) -> Self:
         """

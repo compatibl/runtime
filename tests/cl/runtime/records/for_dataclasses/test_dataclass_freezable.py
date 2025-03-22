@@ -67,11 +67,11 @@ def test_freeze():
 
     # Try freezing freezable objects
     record = StubDataclassRecord()
-    record.freeze()
+    record.build()
     assert record.is_frozen()
 
     nested_fields = StubDataclassNestedFields()
-    nested_fields.freeze()
+    nested_fields.build()
     assert nested_fields.is_frozen()
 
 
@@ -82,11 +82,6 @@ def test_refreeze():
     record = StubDataclassRecord()
     record = record.build()
     record.build()
-
-    # Call freeze twice
-    record = StubDataclassRecord()
-    record.freeze()
-    record.freeze()
 
 
 if __name__ == "__main__":

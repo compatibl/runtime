@@ -24,7 +24,7 @@ def test_smoke():
     cache = LocalCache.instance()
 
     # Create test record and populate with sample data
-    record = StubDataclassRecord()
+    record = StubDataclassRecord().build()
     key = record.get_key()
 
     # Test saving and loading
