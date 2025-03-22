@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import asdict
 from dataclasses import dataclass
 from memoization import cached
 from typing_extensions import Self
@@ -30,5 +29,6 @@ class HandlerParamDecl(HandlerVariableDecl):
     @classmethod
     @cached
     def create(cls, name: str, variable_decl: HandlerVariableDecl) -> Self:
-        result = cls(**asdict(variable_decl), name=name)  # type: ignore
+        result = variable_decl.clone_as(HandlerParamDecl)
+        result.name = name
         return result

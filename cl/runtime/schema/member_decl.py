@@ -13,12 +13,14 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.value_decl import ValueDecl
 
 
 @dataclass(slots=True, kw_only=True)
-class MemberDecl:
+class MemberDecl(Data):
     """Type member declaration."""
 
     value: ValueDecl | None = None  # TODO: Flatten value and other types to a single field

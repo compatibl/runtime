@@ -91,9 +91,7 @@ declare:
     type_: Job
     params:
     - data:
-        _Freezable__frozen: false
         module:
-          _Freezable__frozen: true
           module_name: cl.runtime.file.file_data
         name: FileData
         label: File Data
@@ -105,9 +103,7 @@ declare:
           comment: Content name.
           field_kind: Primitive
           field_type_decl:
-            _Freezable__frozen: true
             module:
-              _Freezable__frozen: true
               module_name: builtins
             name: str
           optional_field: true
@@ -115,9 +111,7 @@ declare:
           comment: Embedded binary content to be displayed as the current view.
           field_kind: Primitive
           field_type_decl:
-            _Freezable__frozen: true
             module:
-              _Freezable__frozen: true
               module_name: builtins
             name: bytes
           optional_field: false
@@ -125,9 +119,7 @@ declare:
           comment: Embedded binary content type.
           field_kind: Enum
           field_type_decl:
-            _Freezable__frozen: true
             module:
-              _Freezable__frozen: true
               module_name: cl.runtime.file.file_type_enum
             name: FileTypeEnum
           optional_field: true
@@ -145,9 +137,7 @@ declare:
           vector: false
           optional: false
         - enum:
-            _Freezable__frozen: true
             module:
-              _Freezable__frozen: true
               module_name: cl.runtime.file.file_type_enum
             name: FileTypeEnum
           name: FileType
@@ -300,9 +290,7 @@ declare:
     type_: Job
     params:
     - data:
-        _Freezable__frozen: false
         module:
-          _Freezable__frozen: true
           module_name: cl.runtime.file.file_data
         name: FileData
         label: File Data
@@ -314,9 +302,7 @@ declare:
           comment: Content name.
           field_kind: Primitive
           field_type_decl:
-            _Freezable__frozen: true
             module:
-              _Freezable__frozen: true
               module_name: builtins
             name: str
           optional_field: true
@@ -324,9 +310,7 @@ declare:
           comment: Embedded binary content to be displayed as the current view.
           field_kind: Primitive
           field_type_decl:
-            _Freezable__frozen: true
             module:
-              _Freezable__frozen: true
               module_name: builtins
             name: bytes
           optional_field: false
@@ -334,9 +318,7 @@ declare:
           comment: Embedded binary content type.
           field_kind: Enum
           field_type_decl:
-            _Freezable__frozen: true
             module:
-              _Freezable__frozen: true
               module_name: cl.runtime.file.file_type_enum
             name: FileTypeEnum
           optional_field: true
@@ -354,9 +336,7 @@ declare:
           vector: false
           optional: false
         - enum:
-            _Freezable__frozen: true
             module:
-              _Freezable__frozen: true
               module_name: cl.runtime.file.file_type_enum
             name: FileTypeEnum
           name: FileType
