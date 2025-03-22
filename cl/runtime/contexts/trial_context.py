@@ -13,12 +13,10 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Tuple, Sequence
-
+from typing import Tuple
 from cl.runtime.contexts.context import Context
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
-from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import TPrimitive, is_sequence, is_primitive
+from cl.runtime.records.protocols import TPrimitive, is_sequence, is_primitive, PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -28,6 +26,12 @@ class TrialContext(Context):
 
     trial_chain: Tuple[str, ...]
     """Tuple of trial identifiers in the trial context stack."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if not self.trial_chain:
+            raise RuntimeError("TrialContext is created with an empty trial chain. Use TrialContext.create(token)\n"
+                               "method where token is an instance of a primitive type to create.")
 
     @classmethod
     def get_context_type(cls) -> str:
@@ -41,26 +45,28 @@ class TrialContext(Context):
         return "TrialContext"
 
     @classmethod
-    def with_trial_id(cls, trial_id: TPrimitive):
-        """Combine argument with the current chain and return a new context instance."""
+    def create(cls, token: TPrimitive):
+        """Combine the specified token with the current chain and return a new context instance."""
 
-        if trial_id is not None and is_primitive(trial_id):
+        # Allow only primitive types for tokens
+        if token is not None and is_primitive(token):
 
             # Serialize the trial identifier
-            serialized_id = PrimitiveSerializers.DEFAULT.serialize(trial_id)
+            serialized_id = PrimitiveSerializers.DEFAULT.serialize(token)
 
             # Get trial chain from the current context
             previous_chain = context.trial_chain if (context := cls.current_or_none()) is not None else None
 
             if previous_chain:
                 # Combine the previous chain and the new identifier
-                return TrialContext(trial_chain=tuple([x for x in previous_chain] + [serialized_id]))
+                return TrialContext(trial_chain=tuple([x for x in previous_chain] + [serialized_id])).build()
             else:
                 # Previous chain is empty, use the new trial identifier as the chain
-                return TrialContext(trial_chain=(serialized_id,))
+                return TrialContext(trial_chain=(serialized_id,)).build()
         else:
-            raise RuntimeError(f"Parameter trial_chain_or_id must be a primitive type.\n"
-                               f"The type {TypeUtil.name(trial_id)} is not supported.")
+            primitive_class_names = ", ".join(PRIMITIVE_CLASS_NAMES)
+            raise RuntimeError(f"The argument of TrialContext.create must be one of the following primitive classes:\n"
+                               f"{primitive_class_names}\nThe class {TypeUtil.name(token)} is not supported.")
 
     @classmethod
     def get_trial(cls) -> str:
@@ -69,16 +75,15 @@ class TrialContext(Context):
             return result
         else:
             raise RuntimeError(
-                "Trial was not specified in TrialContext(...) or method invoked "
-                "outside the outermost 'with TrialContext(...)' clause."
+                "Method is invoked outside the outermost 'with TrialContext.create(...)' clause."
             )
 
     @classmethod
     def get_trial_or_none(cls) -> str | None:
         """Concatenates trial identifiers from the context stack, returns None if no current context or all are None."""
-        if (context := cls.current_or_none()) is not None and context.trial_id is not None:
-            # Use the value from the current context if not None
-            return context.trial_id
+        if (context := cls.current_or_none()) is not None and context.trial_chain:
+            # Concatenate trial chain tokens from the current context if not None or empty
+            return "\\".join(context.trial_chain)
         else:
             # Otherwise return None
             return None
