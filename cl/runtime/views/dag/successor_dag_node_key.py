@@ -15,12 +15,11 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.for_dataclasses.key import Key
 
 
 @dataclass(slots=True)
-class SuccessorDagNodeKey(Freezable, KeyMixin):
+class SuccessorDagNodeKey(Key):
     """Single node of SuccessorDag, defines its successors."""
 
     node_id: str = required()

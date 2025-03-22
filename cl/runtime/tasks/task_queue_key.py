@@ -15,12 +15,11 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.for_dataclasses.key import Key
 
 
 @dataclass(slots=True)
-class TaskQueueKey(Freezable, KeyMixin):
+class TaskQueueKey(Key):
     """
     Run a query on tasks, run all returned tasks sequentially or in parallel, then repeat.
 

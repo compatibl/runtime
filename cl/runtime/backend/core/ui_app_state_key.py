@@ -16,12 +16,11 @@ from dataclasses import dataclass
 from typing import Type
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.for_dataclasses.key import Key
 
 
 @dataclass(slots=True)
-class UiAppStateKey(Freezable, KeyMixin):
+class UiAppStateKey(Key):
     """UiAppState."""
 
     user: UserKey = required()

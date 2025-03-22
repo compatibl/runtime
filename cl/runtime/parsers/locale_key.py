@@ -15,12 +15,11 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.for_dataclasses.key import Key
 
 
 @dataclass(slots=True)
-class LocaleKey(Freezable, KeyMixin):
+class LocaleKey(Key):
     """Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)."""
 
     locale_id: str = required()

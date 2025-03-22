@@ -16,13 +16,12 @@ from dataclasses import dataclass
 from typing import Type
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.for_dataclasses.key import Key
 from cl.runtime.records.protocols import is_key
 
 
 @dataclass(slots=True)
-class TaskKey(Freezable, KeyMixin):
+class TaskKey(Key):
     """
     The task 'run_task' method is invoked by the queue to which the task is submitted.
 

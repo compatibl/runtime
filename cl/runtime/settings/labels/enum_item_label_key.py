@@ -15,12 +15,11 @@
 from dataclasses import dataclass
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.freezable import Freezable
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.for_dataclasses.key import Key
 
 
 @dataclass(slots=True)
-class EnumItemLabelKey(Freezable, KeyMixin):
+class EnumItemLabelKey(Key):
     """
     Custom enum item label overrides the standard 'ITEM_NAME' -> 'Item Name' transformation.
 
