@@ -59,8 +59,8 @@ class ContextManager:
                         f"Context {type(context).__name__} cannot be activated by ContextManager "
                         f"because it is not derived from {Context.__name__}."
                     )
-                # Freeze the deserialized record without invoking build
-                context.freeze()
+                # Build the deserialized record
+                context.build()
 
     def __enter__(self) -> Self:
         """Invoke __enter__ for each item in the 'contexts' field."""

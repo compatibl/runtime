@@ -22,6 +22,7 @@ from cl.runtime import KeyUtil
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
+from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.class_info import ClassInfo
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import KeyProtocol
@@ -99,7 +100,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
             # Ensure the final type is subtype of the requested type
             TypeUtil.check_subtype(record_or_key, record_type)
             # Try freezing without calling build, no error if not freezable
-            record_or_key.freeze()
+            BuildUtil.check_frozen(record_or_key)
             return record_or_key
         else:
             # Same as is_key but a little faster, can use here because we already know it is not a record
@@ -128,9 +129,8 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
             if (result := self._load_one_or_none(key, dataset=dataset)) is not None:
                 # Ensure the final type is subtype of the requested type
                 TypeUtil.check_subtype(result, record_type)
-                # Try freezing without calling build, no error if not freezable
-                result.freeze()
-                return result
+                # Invoke build after loading and return
+                return result.build()
             else:
                 return None
 
