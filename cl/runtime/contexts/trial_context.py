@@ -13,22 +13,21 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Tuple, Sequence
+
 from cl.runtime.contexts.context import Context
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import TPrimitive, is_sequence, is_primitive
+from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
 class TrialContext(Context):
     """Context for a single trial in an experiment."""
 
-    trial_id: str | None = None
-    """
-    Trial identifier can be a single token or multiple tokens in backslash-delimited format.
-
-    Notes:
-      - Trial identifiers for the TrialContext stack are concatenated in the order entered
-      - If trial field is None, it is is disregarded
-    """
+    trial_chain: Tuple[str, ...]
+    """Tuple of trial identifiers in the trial context stack."""
 
     @classmethod
     def get_context_type(cls) -> str:
@@ -41,19 +40,27 @@ class TrialContext(Context):
         """
         return "TrialContext"
 
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+    @classmethod
+    def with_trial_id(cls, trial_id: TPrimitive):
+        """Combine argument with the current chain and return a new context instance."""
 
-        # Convert the specified value to string using PrimitiveSerializer
-        self.trial_id = PrimitiveSerializers.DEFAULT.serialize(self.trial_id)
-        # Get value from the current context
-        previous = context.trial_id if (context := self.current_or_none()) is not None else None
-        if self.trial_id and previous:
-            # Both not None and not empty, combine using backslash separator
-            self.trial_id = f"{previous}\\{self.trial_id}"
-        elif previous:
-            # None or empty in this context, copy previous value
-            self.trial_id = previous
+        if trial_id is not None and is_primitive(trial_id):
+
+            # Serialize the trial identifier
+            serialized_id = PrimitiveSerializers.DEFAULT.serialize(trial_id)
+
+            # Get trial chain from the current context
+            previous_chain = context.trial_chain if (context := cls.current_or_none()) is not None else None
+
+            if previous_chain:
+                # Combine the previous chain and the new identifier
+                return TrialContext(trial_chain=tuple([x for x in previous_chain] + [serialized_id]))
+            else:
+                # Previous chain is empty, use the new trial identifier as the chain
+                return TrialContext(trial_chain=(serialized_id,))
+        else:
+            raise RuntimeError(f"Parameter trial_chain_or_id must be a primitive type.\n"
+                               f"The type {TypeUtil.name(trial_id)} is not supported.")
 
     @classmethod
     def get_trial(cls) -> str:
