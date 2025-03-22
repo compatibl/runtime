@@ -146,6 +146,7 @@ TKey = TypeVar("TKey", bound=KeyProtocol)
 TRecord = TypeVar("TRecord", bound=RecordProtocol)
 """Generic type parameter for a record."""
 
+
 def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     """Returns true if the argument is one of the supported primitive classes."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)

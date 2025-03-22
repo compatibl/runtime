@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime import StubDataclassRecord, StubDataclassNestedFields, StubDataclassRecordKey, \
-    StubDataclassListDictFields
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_non_freezable import StubDataclassNonFreezable
+from stubs.cl.runtime import StubDataclassListDictFields
+from stubs.cl.runtime import StubDataclassNestedFields
+from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclassRecordKey
 
 FROZEN_MESSAGE_SUBSTR = "because the instance is frozen"
 NON_FREEZABLE_MESSAGE_SUBSTR = "does not support DataProtocol"
+
 
 def test_simple_fields():
     """Test for StubDataclassSimpleFreezable."""
@@ -39,6 +41,7 @@ def test_nested_fields():
     with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
         record = StubDataclassNestedFields().build()
         record.key_field = StubDataclassRecordKey(id="abc")
+
 
 @pytest.mark.skip(reason="TODO: Not yet implemented, will fix")  # TODO: Implement freezable for containers
 def test_container_fields():
