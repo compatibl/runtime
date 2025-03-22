@@ -13,17 +13,13 @@
 # limitations under the License.
 
 from abc import ABC
-from abc import abstractmethod
-from typing import Type
+from dataclasses import dataclass
+
+from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.key_mixin import KeyMixin
 
 
-class KeyMixin(ABC):
-    """Mixin class for a key."""
-
-    __slots__ = ()
-    """To prevent creation of __dict__ in derived types."""
-
-    @classmethod
-    @abstractmethod
-    def get_key_type(cls) -> Type:
-        """Return key type even when called from a record."""
+@dataclass(slots=True)
+class Key(Freezable, KeyMixin, DataMixin, ABC):
+    """Base class for keys and records (derived from keys) based on dataclasses framework."""
