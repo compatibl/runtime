@@ -248,23 +248,26 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         # Set display kind
         result.display_kind = "Basic"  # TODO: Remove Basic after display_kind is made optional
 
-        # Set parent class as the first class in MRO that is not self and does not have Mixin suffix
-        for parent_type in record_type.__mro__:
+        # Iterate over MRO types
+        for mro_type in record_type.__mro__:
             # TODO: Refactor to make it work not only for dataclasses
-            parent_type_name = TypeUtil.name(parent_type)
+            mro_type_name = TypeUtil.name(mro_type)
             if (
-                parent_type is not record_type
-                and not parent_type_name.endswith("Mixin")
-                and not parent_type_name.endswith("Key")
-                and not parent_type_name.endswith("Freezable")
-                and dataclasses.is_dataclass(parent_type)
+                mro_type is not record_type
+                and not mro_type_name.endswith("Mixin")
+                and not mro_type_name.endswith("Freezable")
+                and dataclasses.is_dataclass(mro_type)
             ):
-                parent_type_decl = cls.for_type(parent_type, dependencies=dependencies)
-                result.inherit = parent_type_decl.get_key()
+                if not result.inherit:
+                    # The first class in MRO sequence other than self is the direct parent
+                    mro_type_module = ModuleDeclKey(module_name=mro_type.__module__).build()
+                    result.inherit = TypeDeclKey(module=mro_type_module, name=mro_type_name).build()
 
-                # Add parent type to dependencies, do not use if dependencies to prevent from skipping on first item added
+                # Add all MRO types to dependencies
+                # Note - do not use 'if dependencies' syntax, otherwise
+                # an empty dependencies list will never be extended
                 if dependencies is not None:
-                    dependencies.add(parent_type)
+                    dependencies.add(mro_type)
 
         # Get type public methods
         if not skip_handlers:
