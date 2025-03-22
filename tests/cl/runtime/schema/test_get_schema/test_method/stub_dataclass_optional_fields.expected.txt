@@ -6,6 +6,10 @@ Label: Stub Dataclass Optional Fields
 Comment: Stub derived class.
 TypeKind: Record
 DisplayKind: Basic
+Inherit:
+  Module:
+    ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields_key
+  Name: StubDataclassOptionalFieldsKey
 Elements:
 - Value:
     Type: String

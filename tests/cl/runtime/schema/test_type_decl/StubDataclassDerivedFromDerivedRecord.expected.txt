@@ -8,8 +8,8 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
-  name: StubDataclassRecord
+    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record
+  name: StubDataclassDerivedRecord
 fields:
 - name: id
   field_kind: Primitive

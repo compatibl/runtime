@@ -9,6 +9,10 @@ stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassReco
   Comment: Stub record base class.
   TypeKind: Record
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    Name: StubDataclassRecordKey
   Fields:
   - Name: id
     Comment: Unique identifier.
@@ -24,6 +28,59 @@ stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassReco
     Comment: Unique identifier.
   Keys:
   - Id
+cl.runtime.records.for_dataclasses.data.Data:
+  _t: Data
+  Module:
+    ModuleName: cl.runtime.records.for_dataclasses.data
+  Name: Data
+  Label: Data
+  Comment: Base class for slotted classes other than keys or records based on dataclasses framework.
+  TypeKind: Data
+  DisplayKind: Basic
+  Fields: []
+  Elements: []
+cl.runtime.records.for_dataclasses.key.Key:
+  _t: Key
+  Module:
+    ModuleName: cl.runtime.records.for_dataclasses.key
+  Name: Key
+  Label: Key
+  Comment: Base class for keys and records (derived from keys) based on dataclasses framework.
+  TypeKind: Data
+  DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.data
+    Name: Data
+  Fields: []
+  Elements: []
+  Abstract: true
+stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey:
+  _t: StubDataclassRecordKey
+  Module:
+    ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+  Name: StubDataclassRecordKey
+  Label: Stub Dataclass Record Key
+  Comment: Stub record base class.
+  TypeKind: Data
+  DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.key
+    Name: Key
+  Fields:
+  - Name: id
+    Comment: Unique identifier.
+    FieldKind: Primitive
+    FieldTypeDecl:
+      Module:
+        ModuleName: builtins
+      Name: str
+  Elements:
+  - Value:
+      Type: String
+    Name: Id
+    Comment: Unique identifier.
 
 
 

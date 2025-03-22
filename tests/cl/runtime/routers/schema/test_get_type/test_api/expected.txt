@@ -7,6 +7,10 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   Comment: UiAppState.
   TypeKind: Record
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.backend.core.ui_app_state_key
+    Name: UiAppStateKey
   Fields:
   - Name: user
     Comment: A user the app state is applied for.
@@ -149,6 +153,10 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
   Comment: Base type info.
   TypeKind: Data
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.data
+    Name: Data
   Fields:
   - Name: name
     Comment: Name of type.
@@ -184,6 +192,33 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
       Type: String
     Name: Label
     Comment: Label of type.
+cl.runtime.records.for_dataclasses.data.Data:
+  _t: Data
+  Module:
+    ModuleName: cl.runtime.records.for_dataclasses.data
+  Name: Data
+  Label: Data
+  Comment: Base class for slotted classes other than keys or records based on dataclasses framework.
+  TypeKind: Data
+  DisplayKind: Basic
+  Fields: []
+  Elements: []
+cl.runtime.records.for_dataclasses.key.Key:
+  _t: Key
+  Module:
+    ModuleName: cl.runtime.records.for_dataclasses.key
+  Name: Key
+  Label: Key
+  Comment: Base class for keys and records (derived from keys) based on dataclasses framework.
+  TypeKind: Data
+  DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.data
+    Name: Data
+  Fields: []
+  Elements: []
+  Abstract: true
 cl.runtime.backend.core.tab_info.TabInfo:
   _t: TabInfo
   Module:
@@ -193,6 +228,10 @@ cl.runtime.backend.core.tab_info.TabInfo:
   Comment: Tab info.
   TypeKind: Data
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.data
+    Name: Data
   Fields:
   - Name: type
     Comment: Type.
@@ -209,6 +248,35 @@ cl.runtime.backend.core.tab_info.TabInfo:
       Name: BaseTypeInfo
     Name: Type
     Comment: Type.
+cl.runtime.backend.core.ui_app_state_key.UiAppStateKey:
+  _t: UiAppStateKey
+  Module:
+    ModuleName: cl.runtime.backend.core.ui_app_state_key
+  Name: UiAppStateKey
+  Label: Ui App State Key
+  Comment: UiAppState.
+  TypeKind: Data
+  DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.key
+    Name: Key
+  Fields:
+  - Name: user
+    Comment: A user the app state is applied for.
+    FieldKind: Key
+    FieldTypeDecl:
+      Module:
+        ModuleName: cl.runtime.backend.core.user_key
+      Name: UserKey
+  Elements:
+  - _t: cl.runtime.backend.core.user_key.UserKey
+    Key:
+      Module:
+        ModuleName: cl.runtime.backend.core.user_key
+      Name: UserKey
+    Name: User
+    Comment: A user the app state is applied for.
 cl.runtime.backend.core.user_key.UserKey:
   _t: UserKey
   Module:
@@ -218,6 +286,10 @@ cl.runtime.backend.core.user_key.UserKey:
   Comment: User which is allowed to log in.
   TypeKind: Data
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.key
+    Name: Key
   Fields:
   - Name: username
     Comment: Unique user identifier.
@@ -241,6 +313,10 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   Comment: UiAppState.
   TypeKind: Record
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.backend.core.ui_app_state_key
+    Name: UiAppStateKey
   Fields:
   - Name: user
     Comment: A user the app state is applied for.
@@ -383,6 +459,10 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
   Comment: Base type info.
   TypeKind: Data
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.data
+    Name: Data
   Fields:
   - Name: name
     Comment: Name of type.
@@ -418,6 +498,33 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
       Type: String
     Name: Label
     Comment: Label of type.
+cl.runtime.records.for_dataclasses.data.Data:
+  _t: Data
+  Module:
+    ModuleName: cl.runtime.records.for_dataclasses.data
+  Name: Data
+  Label: Data
+  Comment: Base class for slotted classes other than keys or records based on dataclasses framework.
+  TypeKind: Data
+  DisplayKind: Basic
+  Fields: []
+  Elements: []
+cl.runtime.records.for_dataclasses.key.Key:
+  _t: Key
+  Module:
+    ModuleName: cl.runtime.records.for_dataclasses.key
+  Name: Key
+  Label: Key
+  Comment: Base class for keys and records (derived from keys) based on dataclasses framework.
+  TypeKind: Data
+  DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.data
+    Name: Data
+  Fields: []
+  Elements: []
+  Abstract: true
 cl.runtime.backend.core.tab_info.TabInfo:
   _t: TabInfo
   Module:
@@ -427,6 +534,10 @@ cl.runtime.backend.core.tab_info.TabInfo:
   Comment: Tab info.
   TypeKind: Data
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.data
+    Name: Data
   Fields:
   - Name: type
     Comment: Type.
@@ -443,6 +554,35 @@ cl.runtime.backend.core.tab_info.TabInfo:
       Name: BaseTypeInfo
     Name: Type
     Comment: Type.
+cl.runtime.backend.core.ui_app_state_key.UiAppStateKey:
+  _t: UiAppStateKey
+  Module:
+    ModuleName: cl.runtime.backend.core.ui_app_state_key
+  Name: UiAppStateKey
+  Label: Ui App State Key
+  Comment: UiAppState.
+  TypeKind: Data
+  DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.key
+    Name: Key
+  Fields:
+  - Name: user
+    Comment: A user the app state is applied for.
+    FieldKind: Key
+    FieldTypeDecl:
+      Module:
+        ModuleName: cl.runtime.backend.core.user_key
+      Name: UserKey
+  Elements:
+  - _t: cl.runtime.backend.core.user_key.UserKey
+    Key:
+      Module:
+        ModuleName: cl.runtime.backend.core.user_key
+      Name: UserKey
+    Name: User
+    Comment: A user the app state is applied for.
 cl.runtime.backend.core.user_key.UserKey:
   _t: UserKey
   Module:
@@ -452,6 +592,10 @@ cl.runtime.backend.core.user_key.UserKey:
   Comment: User which is allowed to log in.
   TypeKind: Data
   DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl.runtime.records.for_dataclasses.key
+    Name: Key
   Fields:
   - Name: username
     Comment: Unique user identifier.

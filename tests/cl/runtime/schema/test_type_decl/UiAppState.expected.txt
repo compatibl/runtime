@@ -5,6 +5,10 @@ label: Ui App State
 comment: UiAppState.
 type_kind: Record
 display_kind: Basic
+inherit:
+  module:
+    module_name: cl.runtime.backend.core.ui_app_state_key
+  name: UiAppStateKey
 fields:
 - name: user
   comment: A user the app state is applied for.
