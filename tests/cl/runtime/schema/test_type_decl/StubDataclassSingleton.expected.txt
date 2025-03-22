@@ -25,4 +25,5 @@ elements:
   comment: Stub field.
   vector: false
   optional: false
+keys: []
 
