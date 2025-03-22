@@ -14,89 +14,76 @@
 
 import pytest
 from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
-from stubs.cl.runtime import StubDataclassData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_complex_freezable import StubDataclassComplexFreezable
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_freezable import StubDataclassListFreezable
+from stubs.cl.runtime import StubDataclassRecord, StubDataclassNestedFields, StubDataclassRecordKey, \
+    StubDataclassListDictFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_non_freezable import StubDataclassNonFreezable
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_partial_freezable import StubDataclassPartialFreezable
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_simple_freezable import StubDataclassSimpleFreezable
 
+FROZEN_MESSAGE_SUBSTR = "because the instance is frozen"
+NON_FREEZABLE_MESSAGE_SUBSTR = "does not support DataProtocol"
 
-def test_simple_freezable():
+def test_simple_fields():
     """Test for StubDataclassSimpleFreezable."""
 
-    # Create and modify field before freezing
-    record = StubDataclassSimpleFreezable()
-    record.value = "def"
-
-    # Freeze record
-    record.build()
-
     # Attempt to modify field after freezing
-    with pytest.raises(Exception):
-        record.value = "xyz"
+    with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
+        record = StubDataclassRecord().build()
+        record.id = "xyz"
 
 
-def test_complex_freezable():
+def test_nested_fields():
     """Test for StubDataclassComplexFreezable."""
 
-    # Create and modify field before freezing
-    record = StubDataclassComplexFreezable()
-    record.value = "def"
+    # Attempt to set fields after freezing
+    with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
+        record = StubDataclassNestedFields().build()
+        record.derived_from_derived_field.int_field = 456
+    with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
+        record = StubDataclassNestedFields().build()
+        record.key_field = StubDataclassRecordKey(id="abc")
 
-    # Freeze record
-    record.build()
+@pytest.mark.skip(reason="TODO: Not yet implemented, will fix")  # TODO: Implement freezable for containers
+def test_container_fields():
+    """Test for StubDataclassComplexFreezable."""
+
+    record = StubDataclassListDictFields().build()
+    record.float_list_dict["a"][0] = 4.56
 
     # Attempt to set fields after freezing
-    with pytest.raises(Exception):
-        record.value = "xyz"
-    with pytest.raises(Exception):
-        record.freezable_obj = StubDataclassSimpleFreezable()
-    with pytest.raises(Exception):
-        record.freezable_tuple = (StubDataclassSimpleFreezable(),)
-
-    # Attempt to modify freezable fields after freezing
-    with pytest.raises(Exception):
-        record.freezable_obj.value = "xyz"
-    with pytest.raises(Exception):
-        record.freezable_tuple[1].value = "xyz"
-
-
-@pytest.mark.skip("Turn back on when build requires freezable.")  # TODO: Turn back on when build requires freezable
-def test_incomplete_freezable():
-    """Test for classes that are not completely freezable."""
-
-    # Attempt to freeze non-freezable objects
-    with pytest.raises(Exception):
-        StubDataclassData().build()  # noqa
-    with pytest.raises(Exception):
-        StubDataclassPartialFreezable().build()
-    with pytest.raises(Exception):
-        StubDataclassListFreezable().build()
+    with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
+        record = StubDataclassListDictFields().build()
+        record.float_list_dict["a"][0] = 4.56
+    with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
+        record = StubDataclassListDictFields().build()
+        record.record_list_dict["a"][0].id = "xyz"
+    with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
+        record = StubDataclassListDictFields().build()
+        record.record_list_dict["a"][0] = StubDataclassRecord(id="xyz")
 
 
 def test_try_freeze():
     """Test for FreezableUtil.try_freeze."""
 
-    # Try freezing a non-freezable object
-    assert not FreezableUtil.try_freeze(StubDataclassNonFreezable())
-
     # Try freezing freezable objects
-    assert FreezableUtil.try_freeze(StubDataclassSimpleFreezable())
-    assert FreezableUtil.try_freeze(StubDataclassComplexFreezable())
+    assert FreezableUtil.try_freeze(StubDataclassRecord())
+    assert FreezableUtil.try_freeze(StubDataclassNestedFields())
+
+    # Try freezing a non-freezable object
+    with pytest.raises(RuntimeError, match=NON_FREEZABLE_MESSAGE_SUBSTR):
+        assert not FreezableUtil.try_freeze(StubDataclassNonFreezable())
 
 
 def test_refreeze():
     """Test calling build or freeze more than once."""
 
     # Call build twice
-    record = StubDataclassSimpleFreezable().build()
+    record = StubDataclassRecord()
+    record = record.build()
     record.build()
 
     # Call freeze twice
-    record = StubDataclassSimpleFreezable()
+    record = StubDataclassRecord()
     record.freeze()
-    record.build()
+    record.freeze()
 
 
 if __name__ == "__main__":

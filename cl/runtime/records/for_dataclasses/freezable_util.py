@@ -14,6 +14,8 @@
 
 from typing import Any
 
+from cl.runtime.records.type_util import TypeUtil
+
 
 class FreezableUtil:
     """Helper methods for any implementation of Freezable, not specific to dataclasses."""
@@ -39,4 +41,6 @@ class FreezableUtil:
             freeze_callable()
             return True
         else:
-            return False
+            type_name = TypeUtil.name(possibly_freezable)
+            raise RuntimeError(f"Class {type_name} does not support DataProtocol.\n"
+                               f"It must implement is_frozen, freeze, get_slots, and build methods.")
