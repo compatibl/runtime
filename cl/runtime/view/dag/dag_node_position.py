@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class DagNodePosition:
+class DagNodePosition(Data):
     """Directed acyclic graph (DAG) node position."""
 
     x: float = required()

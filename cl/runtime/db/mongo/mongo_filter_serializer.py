@@ -16,13 +16,15 @@ from dataclasses import dataclass
 from typing import Any
 from typing import ClassVar
 from typing import Type
+
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class MongoFilterSerializer:
+class MongoFilterSerializer(Data):
     """Serialize record for use as a MongoDB query filter."""
 
     primitive_type_names: ClassVar[Type] = ["str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"]

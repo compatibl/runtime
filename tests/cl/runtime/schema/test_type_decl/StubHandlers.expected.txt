@@ -98,6 +98,10 @@ declare:
         comment: Display the specified embedded binary content.
         type_kind: Data
         display_kind: Basic
+        inherit:
+          module:
+            module_name: cl.runtime.records.for_dataclasses.data
+          name: Data
         fields:
         - name: name
           comment: Content name.
@@ -297,6 +301,10 @@ declare:
         comment: Display the specified embedded binary content.
         type_kind: Data
         display_kind: Basic
+        inherit:
+          module:
+            module_name: cl.runtime.records.for_dataclasses.data
+          name: Data
         fields:
         - name: name
           comment: Content name.

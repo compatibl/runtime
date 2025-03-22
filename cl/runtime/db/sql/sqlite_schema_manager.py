@@ -22,13 +22,14 @@ from typing import Tuple
 from typing import Type
 from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
 
 
 @dataclass(slots=True, kw_only=True)
-class SqliteSchemaManager:
+class SqliteSchemaManager(Data):
     """Class to manage the sqlite schema (table names, columns mapping etc.)."""
 
     sqlite_connection: sqlite3.Connection = None
