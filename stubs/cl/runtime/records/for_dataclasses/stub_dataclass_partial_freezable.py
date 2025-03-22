@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from stubs.cl.runtime import StubDataclassData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_non_freezable import StubDataclassNonFreezable
 
 
 @dataclass(slots=True, kw_only=True)
@@ -26,7 +27,7 @@ class StubDataclassPartialFreezable(Data):
     """String value."""
 
     freezable_obj: StubDataclassData = required(default_factory=lambda: StubDataclassData())
-    """Embedded freezable object, will be frozen."""
+    """Embedded freezable object."""
 
-    non_freezable_obj: StubDataclassData = required(default_factory=lambda: StubDataclassData())
-    """Embedded non-freezable object, will be frozen."""
+    non_freezable_obj: StubDataclassNonFreezable = required(default_factory=lambda: StubDataclassNonFreezable())
+    """Embedded non-freezable object, will cause an error when attempting to freeze."""

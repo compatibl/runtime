@@ -255,7 +255,6 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
             if (
                 mro_type is not record_type
                 and not mro_type_name.endswith("Mixin")
-                and not mro_type_name.endswith("Freezable")
                 and dataclasses.is_dataclass(mro_type)
             ):
                 if not result.inherit:

@@ -23,7 +23,7 @@ NON_FREEZABLE_MESSAGE_SUBSTR = "does not support DataProtocol"
 
 
 def test_simple_fields():
-    """Test for StubDataclassSimpleFreezable."""
+    """Test for freezing of data inside simple fields."""
 
     # Attempt to modify field after freezing
     with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
@@ -32,7 +32,7 @@ def test_simple_fields():
 
 
 def test_nested_fields():
-    """Test for StubDataclassComplexFreezable."""
+    """Test for freezing of data inside nested fields."""
 
     # Attempt to set fields after freezing
     with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
@@ -45,7 +45,7 @@ def test_nested_fields():
 
 @pytest.mark.skip(reason="TODO: Not yet implemented, will fix")  # TODO: Implement freezable for containers
 def test_container_fields():
-    """Test for StubDataclassComplexFreezable."""
+    """Test for freezing of data inside containers."""
 
     record = StubDataclassListDictFields().build()
     record.float_list_dict["a"][0] = 4.56

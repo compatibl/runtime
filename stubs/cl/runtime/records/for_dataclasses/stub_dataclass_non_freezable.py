@@ -17,7 +17,7 @@ from dataclasses import dataclass
 
 @dataclass(slots=True, kw_only=True)
 class StubDataclassNonFreezable:
-    """Non-freezable class stub."""
+    """Stub class for testing error messages when freeze method is not implemented."""
 
     value: str = "abc"
     """String value."""
