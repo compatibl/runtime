@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from stubs.cl.runtime import StubDataclassRecord, StubDataclassNestedFields, StubDataclassRecordKey, \
     StubDataclassListDictFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_non_freezable import StubDataclassNonFreezable
@@ -60,16 +59,17 @@ def test_container_fields():
         record.record_list_dict["a"][0] = StubDataclassRecord(id="xyz")
 
 
-def test_try_freeze():
-    """Test for FreezableUtil.try_freeze."""
+def test_freeze():
+    """Test for freeze."""
 
     # Try freezing freezable objects
-    assert FreezableUtil.try_freeze(StubDataclassRecord())
-    assert FreezableUtil.try_freeze(StubDataclassNestedFields())
+    record = StubDataclassRecord()
+    record.freeze()
+    assert record.is_frozen()
 
-    # Try freezing a non-freezable object
-    with pytest.raises(RuntimeError, match=NON_FREEZABLE_MESSAGE_SUBSTR):
-        assert not FreezableUtil.try_freeze(StubDataclassNonFreezable())
+    nested_fields = StubDataclassNestedFields()
+    nested_fields.freeze()
+    assert nested_fields.is_frozen()
 
 
 def test_refreeze():

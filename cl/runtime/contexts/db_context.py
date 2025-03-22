@@ -21,7 +21,6 @@ from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
-from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -338,7 +337,7 @@ class DbContext(Context):
         elif not is_record(record):
             # Confirm the argument is a record
             raise RuntimeError(f"Attempting to an object of {type(record).__name__} which is not a record.")
-        elif not FreezableUtil.is_frozen(record):
+        elif not record.is_frozen():
             raise RuntimeError(
                 f"Build method not invoked before saving for an record of type\n"
                 f"{TypeUtil.name(record)} with key {record.get_key()}\n"

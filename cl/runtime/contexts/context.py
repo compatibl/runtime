@@ -21,7 +21,6 @@ from typing import DefaultDict
 from typing import List
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.type_util import TypeUtil
 
 _CONTEXT_STACK_DICT_VAR: ContextVar[DefaultDict[str, List] | None] = ContextVar("_CONTEXT_STACK_DICT_VAR", default=None)
@@ -95,7 +94,7 @@ class Context(Data, ABC):
         """Supports 'with' operator for resource disposal."""
 
         # Error if not frozen
-        if not FreezableUtil.is_frozen(self):
+        if not self.is_frozen():
             raise RuntimeError(
                 f"Context instance of type {TypeUtil.name(self)} must be frozen before\n"
                 f"entering 'with' clause. Invoke 'build' or 'freeze' first."

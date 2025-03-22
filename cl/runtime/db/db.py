@@ -23,7 +23,6 @@ from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.for_dataclasses.freezable_util import FreezableUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -100,7 +99,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
             # Ensure the final type is subtype of the requested type
             TypeUtil.check_subtype(record_or_key, record_type)
             # Try freezing without calling build, no error if not freezable
-            FreezableUtil.try_freeze(record_or_key)
+            record_or_key.freeze()
             return record_or_key
         else:
             # Same as is_key but a little faster, can use here because we already know it is not a record
@@ -113,7 +112,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
                 TypeUtil.check_type(record_or_key, key_type, name="record_or_key")
                 key = record_or_key
                 # Check that the key is frozen
-                if not FreezableUtil.is_frozen(key):
+                if not key.is_frozen():
                     raise RuntimeError(
                         f"Key {record_or_key} of type {TypeUtil.name(record_or_key)} is not frozen\n"
                         f"before it is used in DbContext.load_one method, invoke 'build' method first."
@@ -130,7 +129,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
                 # Ensure the final type is subtype of the requested type
                 TypeUtil.check_subtype(result, record_type)
                 # Try freezing without calling build, no error if not freezable
-                FreezableUtil.try_freeze(result)
+                result.freeze()
                 return result
             else:
                 return None
