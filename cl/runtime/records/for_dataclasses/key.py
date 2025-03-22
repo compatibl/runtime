@@ -14,12 +14,10 @@
 
 from abc import ABC
 from dataclasses import dataclass
-
-from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.for_dataclasses.freezable import Freezable
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class Key(Freezable, KeyMixin, DataMixin, ABC):
+class Key(Data, KeyMixin, ABC):
     """Base class for keys and records (derived from keys) based on dataclasses framework."""
