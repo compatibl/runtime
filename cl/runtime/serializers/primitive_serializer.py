@@ -481,7 +481,7 @@ class PrimitiveSerializer(Data):
             f"Input value: {value_str}"
         )
 
-    @classmethod
+    @classmethod  # TODO: Move to a separate helper class
     def unpack_type_chain(cls, type_chain: Sequence[str] | None) -> Tuple[str | None, bool | None]:
         """
         Parse type chain to return type name and is_optional flag, check that there is no remaining chain.

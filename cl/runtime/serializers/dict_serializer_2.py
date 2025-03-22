@@ -88,7 +88,7 @@ class DictSerializer2(Data):
             )
 
     def _typed_serialize(self, data: Any, type_chain: Sequence[str] | None = None) -> Any:
-        """Serialize a slots-based object to a dictionary."""
+        """Serialize the argument to a dictionary type_chain and schema."""
 
         # Get type and class of data and parse type chain
         data_class_name = data.__class__.__name__ if data is not None else None
@@ -136,11 +136,6 @@ class DictSerializer2(Data):
                         f"the data is an instance of primitive class {data_class_name}:\n"
                         f"{ErrorUtil.wrap(data)}."
                     )
-                # Check that no type chain is remaining
-                if remaining_chain:
-                    raise RuntimeError(
-                        f"Enum type {schema_type_name} has type chain {', '.join(remaining_chain)} remaining."
-                    )
                 # Serialize
                 enum_class = type_spec.get_class()
                 result = self.enum_serializer.serialize(data, enum_class)
@@ -163,7 +158,7 @@ class DictSerializer2(Data):
             return dict(
                 (k, self._typed_serialize(v, remaining_chain)) for k, v in data.items()
             )  # TODO: Replace by frozendict
-        if getattr(data, "__slots__", None) is not None:
+        elif getattr(data, "__slots__", None) is not None:
 
             # Type spec for the data
             data_type_spec = TypeSchema.for_class(data.__class__)
@@ -378,7 +373,7 @@ class DictSerializer2(Data):
             # Did not match a supported data type
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    @classmethod
+    @classmethod  # TODO: Move to a separate helper class
     def unpack_type_chain(
         cls, type_chain: Sequence[str] | None
     ) -> Tuple[str | None, bool | None, Sequence[str] | None]:
