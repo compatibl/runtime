@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.value_decl import ValueDecl

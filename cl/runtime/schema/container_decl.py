@@ -14,8 +14,8 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.container_kind_enum import ContainerKindEnum
 
 
