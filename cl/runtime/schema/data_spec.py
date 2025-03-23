@@ -33,5 +33,5 @@ class DataSpec(TypeSpec, ABC):
     def get_field_dict(self) -> Dict[str, FieldSpec]:
         """Dictionary of field specs indexed by field name."""
         if self._field_dict is None:
-            self._field_dict = {x.field_name: field for x in self.fields} if self.fields is not None else {}
+            self._field_dict = {x.field_name: x for x in self.fields} if self.fields is not None else {}
         return self._field_dict
