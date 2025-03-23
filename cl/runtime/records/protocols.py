@@ -92,7 +92,7 @@ class DataProtocol(Protocol):
         ...
 
 
-class KeyProtocol(DataProtocol):
+class KeyProtocol(Protocol):
     """Protocol implemented by both keys and records."""
 
     @classmethod
@@ -101,7 +101,7 @@ class KeyProtocol(DataProtocol):
         ...
 
 
-class RecordProtocol(KeyProtocol):
+class RecordProtocol(Protocol):
     """Protocol implemented by records."""
 
     def get_key(self) -> KeyProtocol:
@@ -139,10 +139,10 @@ TEnum = TypeVar("TEnum", bound=Enum)
 TData = TypeVar("TData", bound=DataProtocol)
 """Generic type parameter for a class that has slots and implements the builder pattern."""
 
-TKey = TypeVar("TKey", bound=KeyProtocol)
+TKey = TypeVar("TKey", bound=DataProtocol | KeyProtocol)
 """Generic type parameter for a key."""
 
-TRecord = TypeVar("TRecord", bound=RecordProtocol)
+TRecord = TypeVar("TRecord", bound=DataProtocol | KeyProtocol | RecordProtocol)
 """Generic type parameter for a record."""
 
 
@@ -168,8 +168,8 @@ def is_mapping(instance_or_type: Any) -> TypeGuard[TSequence]:
 
 
 def is_data(instance_or_type: Any) -> TypeGuard[DataProtocol]:
-    """Fast partial check for DataProtocol, return True if the argument has 'freeze' method."""
-    return hasattr(instance_or_type, "freeze")
+    """Fast partial check for DataProtocol, return True if the argument has 'get_slots' method."""
+    return hasattr(instance_or_type, "get_slots")
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
