@@ -1,4 +1,5 @@
 {
+  "_type": "StubDataclassDictListFields",
   "id": "abc",
   "float_dict_list": [
     {

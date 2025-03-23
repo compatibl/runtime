@@ -1,4 +1,5 @@
 {
+  "_type": "StubDataclassPrimitiveFields",
   "key_str_field": "abc",
   "key_float_field": 1.23,
   "key_bool_field": true,

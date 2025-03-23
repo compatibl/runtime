@@ -1,4 +1,5 @@
 {
+  "_type": "StubDataclassOptionalFields",
   "id": "abc",
   "optional_str": "xyz",
   "required_list_of_optional_str": [

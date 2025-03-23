@@ -1,4 +1,5 @@
 {
+  "_type": "StubDataclassDictFields",
   "id": "abc",
   "str_dict": {
     "a": "abc",

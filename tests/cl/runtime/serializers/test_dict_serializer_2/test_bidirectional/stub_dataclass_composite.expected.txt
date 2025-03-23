@@ -1,4 +1,5 @@
 {
+  "_type": "StubDataclassComposite",
   "primitive": "abc",
   "embedded_1": {
     "id": "def"

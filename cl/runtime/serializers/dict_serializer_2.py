@@ -244,7 +244,7 @@ class DictSerializer2(Data):
                     f"Use type_name[Any] to specify a sequence with any item type."
                 )
             # Deserialize sequence into tuple
-            return list(self._typed_deserialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
+            return list(self._typed_deserialize(v, remaining_chain) for v in data)
         elif type_name in MAPPING_TYPE_NAMES:
             if not remaining_chain:
                 raise RuntimeError(
@@ -259,9 +259,8 @@ class DictSerializer2(Data):
                 )
                 for k, v in data.items()
             }
-
-        elif isinstance(data, str):
-            # Parse as enum if data is a string
+        elif isinstance(data, str) or isinstance(data, Enum):
+            # Process as enum if data is a string or enum, after checking that schema type is not primitive
             type_spec = TypeSchema.for_type_name(type_name)
             if not isinstance(type_spec, EnumSpec):
                 raise RuntimeError(
@@ -275,9 +274,9 @@ class DictSerializer2(Data):
             result = self.enum_serializer.deserialize(data, enum_class)
             return result
         elif data.__class__.__name__ in MAPPING_TYPE_NAMES:
-
+            # Process as slotted class if data is a mapping but schema type is not
             # Get _type if provided, otherwise use type_name
-            data_type_name = data.pop("_type", None)
+            data_type_name = data.get("_type", None)
             if data_type_name is not None and data_type_name != type_name:
                 type_name = data_type_name
 
@@ -302,9 +301,12 @@ class DictSerializer2(Data):
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
             }
+
             # Construct an instance of the target type
             result = type_class(**result_dict)
-            return result
+
+            # Invoke build and return
+            return result.build()
         else:
             raise RuntimeError(
                 f"Cannot deserialize the following data into type '{type_name}':\n" f"{ErrorUtil.wrap(data)}"

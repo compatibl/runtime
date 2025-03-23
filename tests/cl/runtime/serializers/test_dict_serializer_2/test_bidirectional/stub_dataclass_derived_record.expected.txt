@@ -1,4 +1,5 @@
 {
+  "_type": "StubDataclassDerivedRecord",
   "id": "abc",
   "derived_str_field": "derived"
 }
