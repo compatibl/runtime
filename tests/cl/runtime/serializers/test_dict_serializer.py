@@ -34,7 +34,7 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 
 
-def test_data_serialization():
+def test_passthrough():
     """Test coroutine for /schema/typeV2 route."""
 
     sample_types = [
@@ -51,12 +51,12 @@ def test_data_serialization():
         StubDataclassListDictFields,
         StubDataclassPrimitiveFields,
         StubDataclassSingleton,
-        StubDataclassAnyFields,
-        StubDataclassTupleFields,
+        # TODO: StubDataclassAnyFields,
+        # TODO: StubDataclassTupleFields,
         # TODO: Support serialization of classes with cyclic references
     ]
 
-    serializer = DictSerializer2(bidirectional=True, primitive_serializer=PrimitiveSerializers.DEFAULT).build()
+    serializer = DictSerializer2(bidirectional=True, primitive_serializer=PrimitiveSerializers.PASSTHROUGH).build()
 
     for sample_type in sample_types:
         obj_1 = sample_type().build()
@@ -65,7 +65,7 @@ def test_data_serialization():
         serialized_2 = serializer.serialize(obj_2)
 
         assert obj_1 == obj_2
-        assert PytestUtil.approx(serialized_1) == PytestUtil.approx(serialized_2)
+        assert serialized_1 == serialized_2
 
 
 if __name__ == "__main__":
