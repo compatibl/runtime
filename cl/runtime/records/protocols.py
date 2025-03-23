@@ -167,12 +167,12 @@ def is_mapping(instance_or_type: Any) -> TypeGuard[TSequence]:
     return result
 
 
-def is_data(instance_or_type: Any) -> TypeGuard[DataProtocol]:
+def is_data(instance_or_type: Any) -> TypeGuard[TData]:
     """Fast partial check for DataProtocol, return True if the argument has 'get_slots' method."""
     return hasattr(instance_or_type, "get_slots")
 
 
-def is_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
+def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
     """
     Return True if the argument is a key but not a record based on the presence of 'get_key_type' method and the
     absence of 'get_key' method. Consider using a faster alternative 'is_key_or_record' if possible.
@@ -180,12 +180,12 @@ def is_key(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
     return hasattr(instance_or_type, "get_key_type") and not hasattr(instance_or_type, "get_key")
 
 
-def is_key_or_record(instance_or_type: Any) -> TypeGuard[KeyProtocol]:
+def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
     """Return True if the argument is a key or record based on the presence of 'get_key_type' method."""
     return hasattr(instance_or_type, "get_key_type")
 
 
-def is_record(instance_or_type: Any) -> TypeGuard[RecordProtocol]:
+def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
     """Return True if the argument is a record based on the presence of 'get_key' method."""
     return hasattr(instance_or_type, "get_key")
 
