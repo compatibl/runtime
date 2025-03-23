@@ -11,84 +11,6 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
     Module:
       ModuleName: cl.runtime.backend.core.ui_app_state_key
     Name: UiAppStateKey
-  Fields:
-  - Name: user
-    Comment: A user the app state is applied for.
-    FieldKind: Key
-    FieldTypeDecl:
-      Module:
-        ModuleName: cl.runtime.backend.core.user_key
-      Name: UserKey
-  - Name: opened_tabs
-    Comment: Information about opened tabs.
-    FieldKind: RecordOrData
-    FieldTypeDecl:
-      Module:
-        ModuleName: cl.runtime.backend.core.tab_info
-      Name: TabInfo
-    Container:
-      ContainerKind: List
-    OptionalField: true
-  - Name: active_tab_index
-    Comment: Index of active opened tab.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: int
-    OptionalField: true
-  - Name: backend_version
-    Comment: DEPRECATED. Use versions instead.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    OptionalField: true
-  - Name: versions
-    Comment: Component versions.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    Container:
-      ContainerKind: Dict
-    OptionalField: true
-  - Name: application_name
-    Comment: Application name.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    OptionalField: true
-  - Name: read_only
-    Comment: Flag indicating that UI is read-only.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: bool
-    OptionalField: true
-  - Name: application_theme
-    Comment: Application theme (dark, light, etc.).
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    OptionalField: true
-  - Name: user_secret_identifiers
-    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    Container:
-      ContainerKind: List
-    OptionalField: true
   Elements:
   - _t: cl.runtime.backend.core.user_key.UserKey
     Key:
@@ -157,28 +79,6 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Fields:
-  - Name: name
-    Comment: Name of type.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-  - Name: module
-    Comment: Module of type.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-  - Name: label
-    Comment: Label of type.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
   Elements:
   - Value:
       Type: String
@@ -201,7 +101,6 @@ cl.runtime.records.for_dataclasses.data.Data:
   Comment: "\n    Base for slotted classes other than keys or records based on dataclasses framework.\n    Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.\n\n    Notes:\n        - This base should be used for dataclasses, use the appropriate import of Data for other frameworks\n        - Use tuple which is immutable instead of list when deriving from this class\n    "
   TypeKind: Data
   DisplayKind: Basic
-  Fields: []
   Elements: []
 cl.runtime.records.for_dataclasses.key.Key:
   _t: Key
@@ -216,7 +115,6 @@ cl.runtime.records.for_dataclasses.key.Key:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Fields: []
   Elements: []
   Abstract: true
 cl.runtime.backend.core.tab_info.TabInfo:
@@ -232,14 +130,6 @@ cl.runtime.backend.core.tab_info.TabInfo:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Fields:
-  - Name: type
-    Comment: Type.
-    FieldKind: RecordOrData
-    FieldTypeDecl:
-      Module:
-        ModuleName: cl.runtime.backend.core.base_type_info
-      Name: BaseTypeInfo
   Elements:
   - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
     Data:
@@ -261,14 +151,6 @@ cl.runtime.backend.core.ui_app_state_key.UiAppStateKey:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.key
     Name: Key
-  Fields:
-  - Name: user
-    Comment: A user the app state is applied for.
-    FieldKind: Key
-    FieldTypeDecl:
-      Module:
-        ModuleName: cl.runtime.backend.core.user_key
-      Name: UserKey
   Elements:
   - _t: cl.runtime.backend.core.user_key.UserKey
     Key:
@@ -290,14 +172,6 @@ cl.runtime.backend.core.user_key.UserKey:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.key
     Name: Key
-  Fields:
-  - Name: username
-    Comment: Unique user identifier.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
   Elements:
   - Value:
       Type: String
@@ -317,84 +191,6 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
     Module:
       ModuleName: cl.runtime.backend.core.ui_app_state_key
     Name: UiAppStateKey
-  Fields:
-  - Name: user
-    Comment: A user the app state is applied for.
-    FieldKind: Key
-    FieldTypeDecl:
-      Module:
-        ModuleName: cl.runtime.backend.core.user_key
-      Name: UserKey
-  - Name: opened_tabs
-    Comment: Information about opened tabs.
-    FieldKind: RecordOrData
-    FieldTypeDecl:
-      Module:
-        ModuleName: cl.runtime.backend.core.tab_info
-      Name: TabInfo
-    Container:
-      ContainerKind: List
-    OptionalField: true
-  - Name: active_tab_index
-    Comment: Index of active opened tab.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: int
-    OptionalField: true
-  - Name: backend_version
-    Comment: DEPRECATED. Use versions instead.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    OptionalField: true
-  - Name: versions
-    Comment: Component versions.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    Container:
-      ContainerKind: Dict
-    OptionalField: true
-  - Name: application_name
-    Comment: Application name.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    OptionalField: true
-  - Name: read_only
-    Comment: Flag indicating that UI is read-only.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: bool
-    OptionalField: true
-  - Name: application_theme
-    Comment: Application theme (dark, light, etc.).
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    OptionalField: true
-  - Name: user_secret_identifiers
-    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-    Container:
-      ContainerKind: List
-    OptionalField: true
   Elements:
   - _t: cl.runtime.backend.core.user_key.UserKey
     Key:
@@ -463,28 +259,6 @@ cl.runtime.backend.core.base_type_info.BaseTypeInfo:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Fields:
-  - Name: name
-    Comment: Name of type.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-  - Name: module
-    Comment: Module of type.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
-  - Name: label
-    Comment: Label of type.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
   Elements:
   - Value:
       Type: String
@@ -507,7 +281,6 @@ cl.runtime.records.for_dataclasses.data.Data:
   Comment: "\n    Base for slotted classes other than keys or records based on dataclasses framework.\n    Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.\n\n    Notes:\n        - This base should be used for dataclasses, use the appropriate import of Data for other frameworks\n        - Use tuple which is immutable instead of list when deriving from this class\n    "
   TypeKind: Data
   DisplayKind: Basic
-  Fields: []
   Elements: []
 cl.runtime.records.for_dataclasses.key.Key:
   _t: Key
@@ -522,7 +295,6 @@ cl.runtime.records.for_dataclasses.key.Key:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Fields: []
   Elements: []
   Abstract: true
 cl.runtime.backend.core.tab_info.TabInfo:
@@ -538,14 +310,6 @@ cl.runtime.backend.core.tab_info.TabInfo:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Fields:
-  - Name: type
-    Comment: Type.
-    FieldKind: RecordOrData
-    FieldTypeDecl:
-      Module:
-        ModuleName: cl.runtime.backend.core.base_type_info
-      Name: BaseTypeInfo
   Elements:
   - _t: cl.runtime.backend.core.base_type_info.BaseTypeInfo
     Data:
@@ -567,14 +331,6 @@ cl.runtime.backend.core.ui_app_state_key.UiAppStateKey:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.key
     Name: Key
-  Fields:
-  - Name: user
-    Comment: A user the app state is applied for.
-    FieldKind: Key
-    FieldTypeDecl:
-      Module:
-        ModuleName: cl.runtime.backend.core.user_key
-      Name: UserKey
   Elements:
   - _t: cl.runtime.backend.core.user_key.UserKey
     Key:
@@ -596,14 +352,6 @@ cl.runtime.backend.core.user_key.UserKey:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.key
     Name: Key
-  Fields:
-  - Name: username
-    Comment: Unique user identifier.
-    FieldKind: Primitive
-    FieldTypeDecl:
-      Module:
-        ModuleName: builtins
-      Name: str
   Elements:
   - Value:
       Type: String

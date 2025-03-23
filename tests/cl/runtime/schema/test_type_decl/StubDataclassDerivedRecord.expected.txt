@@ -9,22 +9,6 @@ inherit:
   module:
     module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
   name: StubDataclassRecord
-fields:
-- name: id
-  field_kind: Primitive
-  field_type_decl:
-    module:
-      module_name: builtins
-    name: str
-  optional_field: false
-- name: derived_str_field
-  comment: Stub field.
-  field_kind: Primitive
-  field_type_decl:
-    module:
-      module_name: builtins
-    name: str
-  optional_field: false
 elements:
 - value:
     type_: String

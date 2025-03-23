@@ -157,9 +157,6 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     declare: HandlerDeclareBlockDecl | None = None  # TODO: Flatten or use block for abstract flag
     """Handler declaration block."""
 
-    fields: List[FieldDecl] | None = None
-    """Field declaration block."""
-
     elements: List[ElementDecl] | None = None  # TODO: Deprecated
     """Element declaration block."""
 
@@ -292,7 +289,6 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
                 member_comments = f"Primitive type {record_type.__name__}"
 
             # Add an element for each type hint
-            result.fields = []
             result.elements = []
             for field_name, field_type in type_hints.items():
 
@@ -324,7 +320,6 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
                 # Convert to element and add
                 element_decl = ElementDecl.create(field_decl)
-                result.fields.append(field_decl)
                 result.elements.append(element_decl)
 
         return result

@@ -102,31 +102,6 @@ declare:
           module:
             module_name: cl.runtime.records.for_dataclasses.data
           name: Data
-        fields:
-        - name: name
-          comment: Content name.
-          field_kind: Primitive
-          field_type_decl:
-            module:
-              module_name: builtins
-            name: str
-          optional_field: true
-        - name: file_bytes
-          comment: Embedded binary content to be displayed as the current view.
-          field_kind: Primitive
-          field_type_decl:
-            module:
-              module_name: builtins
-            name: bytes
-          optional_field: false
-        - name: file_type
-          comment: Embedded binary content type.
-          field_kind: Enum
-          field_type_decl:
-            module:
-              module_name: cl.runtime.file.file_type_enum
-            name: FileTypeEnum
-          optional_field: true
         elements:
         - value:
             type_: String
@@ -305,31 +280,6 @@ declare:
           module:
             module_name: cl.runtime.records.for_dataclasses.data
           name: Data
-        fields:
-        - name: name
-          comment: Content name.
-          field_kind: Primitive
-          field_type_decl:
-            module:
-              module_name: builtins
-            name: str
-          optional_field: true
-        - name: file_bytes
-          comment: Embedded binary content to be displayed as the current view.
-          field_kind: Primitive
-          field_type_decl:
-            module:
-              module_name: builtins
-            name: bytes
-          optional_field: false
-        - name: file_type
-          comment: Embedded binary content type.
-          field_kind: Enum
-          field_type_decl:
-            module:
-              module_name: cl.runtime.file.file_type_enum
-            name: FileTypeEnum
-          optional_field: true
         elements:
         - value:
             type_: String
@@ -491,15 +441,6 @@ declare:
     comment: Stub method.
     type_: Job
     static: false
-fields:
-- name: stub_id
-  comment: Stub identifier.
-  field_kind: Primitive
-  field_type_decl:
-    module:
-      module_name: builtins
-    name: str
-  optional_field: false
 elements:
 - value:
     type_: String
