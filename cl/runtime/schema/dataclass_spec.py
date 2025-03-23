@@ -47,7 +47,7 @@ class DataclassSpec(DataSpec):
         ]
 
         # Create the enum spec
-        result = DataclassSpec(type_name=type_name, _class=class_, fields=fields).build()
+        result = DataclassSpec(type_name=type_name, _class=class_, fields=fields)
         return result
 
     @classmethod

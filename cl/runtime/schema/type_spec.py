@@ -17,22 +17,20 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Type
 from typing_extensions import Self
-from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.schema.type_spec_key import TypeSpecKey
 
 
 @dataclass(slots=True, kw_only=True)
-class TypeSpec(TypeSpecKey, RecordMixin[TypeSpecKey], ABC):
+class TypeSpec(ABC):
     """
     Provides information about a type included in schema and its dependencies including data types,
     enums and primitive types.
     """
 
+    type_name: str
+    """Unique type name (the same as class name except when alias is specified)."""
+
     _class: Type
     """Class where the type is stored (this is not the type hint as it excludes container and optional info)."""
-
-    def get_key(self) -> TypeSpecKey:
-        return TypeSpecKey(type_name=self.type_name).build()
 
     def get_class(self) -> Type:
         """Class where the type is stored."""

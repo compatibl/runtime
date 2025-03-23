@@ -19,23 +19,22 @@ from typing import List
 from typing import Type
 from frozendict import frozendict
 from typing_extensions import Self
-from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class FieldSpec(Data):
+class FieldSpec:
     """Provides information about a field in DataSpec."""
 
-    field_name: str = required()
+    field_name: str
     """Field name (must be unique within the class)."""
 
-    type_hint: str = required()
+    type_hint: str
     """Type hint from which the type chain was created as string."""
 
-    type_chain: List[str] = required()
+    type_chain: List[str]
     """
     Chain of nested type hints, each item has format 'type_name' or 'type_name | None'
     where type_name may refer to a container, slotted type, or primitive type.

@@ -13,13 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class EnumMemberSpec(Data):
+class EnumMemberSpec:
     """Provides information about a single member (item) of an enum."""
 
-    member_name: str = required()
+    member_name: str
     """Name of the enum member (must be unique within the enum)."""
