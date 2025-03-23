@@ -13,13 +13,36 @@
 # limitations under the License.
 
 import os
+from typing import Any
+
+import pytest
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.protocols import SEQUENCE_CLASSES, MAPPING_CLASSES
 from cl.runtime.records.type_util import TypeUtil
 
 
 class PytestUtil:
     """Helper methods for pytest, depends on pytest package."""
+
+    @classmethod
+    def approx(cls, data: Any, *, abs_tol=1e-6, rel_tol=1e-6):
+        """Recursively apply pytest.approx to all floats in a nested structure."""
+        if isinstance(data, float):
+            # Apply rounding to float values
+            return pytest.approx(data, abs=abs_tol, rel=rel_tol)
+        elif isinstance(data, SEQUENCE_CLASSES):
+            # Recreate the same sequence type with pytest.approx for float
+            sequence_type = data.__class__
+            return sequence_type(cls.approx(item, abs_tol=abs_tol, rel_tol=rel_tol) for item in data)
+        elif isinstance(data, MAPPING_CLASSES):
+            # Recreate the same mapping type with pytest.approx for float
+            mapping_type = data.__class__
+            return mapping_type(
+                (key, cls.approx(value, abs_tol=abs_tol, rel_tol=rel_tol))
+                for key, value in data.items()
+            )
+        return data
 
     @classmethod
     def get_env_dir(cls, request: FixtureRequest) -> str:

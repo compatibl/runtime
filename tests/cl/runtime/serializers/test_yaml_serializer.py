@@ -14,9 +14,8 @@
 
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.protocols import MAPPING_CLASSES
-from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from stubs.cl.runtime import StubDataclassComposite
@@ -50,23 +49,6 @@ _SAMPLE_TYPES = [
     StubDataclassSingleton,
     StubDataclassTupleFields,
 ]
-
-
-# TODO: Move to a dedicated utility class
-def approx(data, abs_tol=1e-6, rel_tol=1e-6):
-    """Recursively apply pytest.approx to all floats in a nested structure."""
-    if isinstance(data, float):
-        # Apply rounding to float values
-        return pytest.approx(data, abs=abs_tol, rel=rel_tol)
-    elif isinstance(data, SEQUENCE_CLASSES):
-        # Recreate the same sequence type with pytest.approx for float
-        sequence_type = data.__class__
-        return sequence_type(approx(item, abs_tol, rel_tol) for item in data)
-    elif isinstance(data, MAPPING_CLASSES):
-        # Recreate the same mapping type with pytest.approx for float
-        mapping_type = data.__class__
-        return mapping_type((key, approx(value, abs_tol, rel_tol)) for key, value in data.items())
-    return data
 
 
 def test_to_yaml():
@@ -113,7 +95,7 @@ def test_from_yaml():
         deserialized_dict = passthrough_serializer.serialize(deserialized)
 
         # Compare with floating point tolerance
-        assert deserialized_dict == approx(obj_dict)
+        assert deserialized_dict == PytestUtil.approx(obj_dict)
 
 
 if __name__ == "__main__":

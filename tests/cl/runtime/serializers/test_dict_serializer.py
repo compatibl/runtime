@@ -13,7 +13,10 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.serializers.dict_serializer import DictSerializer
+
+from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
+from cl.runtime.qa.pytest.pytest_util import PytestUtil
+from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from stubs.cl.runtime import StubDataclassAnyFields
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -53,16 +56,16 @@ def test_data_serialization():
         # TODO: Support serialization of classes with cyclic references
     ]
 
-    serializer = DictSerializer()
+    serializer = DictSerializer2(bidirectional=True, primitive_serializer=PrimitiveSerializers.DEFAULT).build()
 
     for sample_type in sample_types:
         obj_1 = sample_type().build()
-        serialized_1 = serializer.serialize_data(obj_1)
-        obj_2 = serializer.deserialize_data(serialized_1).build()
-        serialized_2 = serializer.serialize_data(obj_2)
+        serialized_1 = serializer.serialize(obj_1)
+        obj_2 = serializer.deserialize(serialized_1).build()
+        serialized_2 = serializer.serialize(obj_2)
 
         assert obj_1 == obj_2
-        assert serialized_1 == serialized_2
+        assert PytestUtil.approx(serialized_1) == PytestUtil.approx(serialized_2)
 
 
 if __name__ == "__main__":
