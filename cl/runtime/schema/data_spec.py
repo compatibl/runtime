@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict
 from typing import List
 from cl.runtime.schema.field_spec import FieldSpec
