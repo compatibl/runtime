@@ -87,13 +87,13 @@ class DictSerializer2(Data):
                 f"Deserialization is not supported when {self.__class__.__name__}.bidirectional\n" f"flag is not set."
             )
 
-    def _typed_serialize(self, data: Any, type_chain: Sequence[str] | None = None) -> Any:
+    def _typed_serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
         """Serialize the argument to a dictionary type_chain and schema."""
 
         # Get type and class of data and parse type chain
         data_class_name = data.__class__.__name__ if data is not None else None
         data_type_name = TypeUtil.name(data) if data is not None else None
-        schema_type_name, is_optional, remaining_chain = self.unpack_type_chain(type_chain)
+        schema_type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
 
         if data is None:
             # Return None if no type information or is_optional flag is set, otherwise raise an error
@@ -216,11 +216,11 @@ class DictSerializer2(Data):
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def _typed_deserialize(self, data: Any, type_chain: Sequence[str]) -> Any:
+    def _typed_deserialize(self, data: Any, type_chain: Tuple[str, ...]) -> Any:
         """Deserialize data using type_chain and schema."""
 
         # Parse type chain
-        type_name, is_optional, remaining_chain = self.unpack_type_chain(type_chain)
+        type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
 
         if data is None:
             # Return None if is_optional flag is set, otherwise raise an error
@@ -372,42 +372,3 @@ class DictSerializer2(Data):
         else:
             # Did not match a supported data type
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
-
-    @classmethod  # TODO: Move to a separate helper class
-    def unpack_type_chain(
-        cls, type_chain: Sequence[str] | None
-    ) -> Tuple[str | None, bool | None, Sequence[str] | None]:
-        """
-        Parse type chain to return type name, is_optional flag, and remaining chain (if any).
-
-        Returns:
-            Tuple of type_name, is_optional flag, and remaining chain (each item can be None)
-            Returns [None, None, None] if the type chain is empty or None
-        """
-
-        if type_chain is None:
-            # Type chain is None
-            return None, None, None
-        elif not isinstance(type_chain, (list, tuple)):
-            raise RuntimeError(f"Type chain {type_chain} for {cls.__name__} is not a list or tuple.")
-        elif len(type_chain) == 0:
-            raise RuntimeError(f"Type chain {type_chain} for {cls.__name__} has zero length.")
-        elif len(type_chain) > 0:
-            # At least one item in type chain is present
-            type_hint = type_chain[0]
-            remaining_chain = type_chain[1:] if len(type_chain) > 1 else None
-
-            # Parse type hint to get type name and optional flag
-            type_tokens = type_chain[0].split("|")
-            if len(type_tokens) == 2 and type_tokens[1].strip() == "None":
-                type_name = type_tokens[0].strip()
-                is_optional = True
-            elif len(type_tokens) == 1:
-                type_name = type_tokens[0].strip()
-                is_optional = None  # Use None to indicate False
-            else:
-                raise RuntimeError(
-                    f"Type hint {type_hint} does not follow the format 'type_name' or 'type_name | None'."
-                )
-
-            return type_name, is_optional, remaining_chain

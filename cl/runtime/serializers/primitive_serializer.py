@@ -35,6 +35,7 @@ from cl.runtime.primitive.int_util import IntUtil
 from cl.runtime.primitive.long_format_enum import LongFormatEnum
 from cl.runtime.primitive.long_util import LongUtil
 from cl.runtime.primitive.none_format_enum import NoneFormatEnum
+from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.primitive.string_format_enum import StringFormatEnum
 from cl.runtime.primitive.time_format_enum import TimeFormatEnum
 from cl.runtime.primitive.time_util import TimeUtil
@@ -128,7 +129,7 @@ class PrimitiveSerializer(Data):
         value_class_name = value.__class__.__name__
 
         # Get type and class of data and parse type chain
-        schema_type_name, is_optional = self.unpack_type_chain(type_chain)
+        schema_type_name, is_optional = PrimitiveUtil.unpack_type_chain(type_chain)
 
         # Validate that schema_type_name is compatible with value_class_name if specified
         # Because the value of None is passed through, value_class_name NoneType is compatible with any schema_type_name
@@ -253,7 +254,7 @@ class PrimitiveSerializer(Data):
         """
 
         # Parse type chain
-        type_name, is_optional = self.unpack_type_chain(type_chain)
+        type_name, is_optional = PrimitiveUtil.unpack_type_chain(type_chain)
 
         if type_name == "NoneType":
             if value in [None, "", "null"]:
@@ -481,38 +482,3 @@ class PrimitiveSerializer(Data):
             f"Input value: {value_str}"
         )
 
-    @classmethod  # TODO: Move to a separate helper class
-    def unpack_type_chain(cls, type_chain: Sequence[str] | None) -> Tuple[str | None, bool | None]:
-        """
-        Parse type chain to return type name and is_optional flag, check that there is no remaining chain.
-
-        Returns:
-            Tuple of type name and is_optional flag, each tuple item can be None
-            Returns [None, None] if the type chain is empty or None
-        """
-
-        if type_chain is None:
-            # Type chain is None
-            return None, None
-        elif not isinstance(type_chain, (list, tuple)):
-            raise RuntimeError(f"Type chain {type_chain} for a primitive type is not a list or tuple.")
-        elif len(type_chain) == 1:
-            # At least one item in type chain is present
-            type_hint = type_chain[0]
-
-            # Parse type hint to get type name and optional flag
-            type_tokens = type_chain[0].split("|")
-            if len(type_tokens) == 2 and type_tokens[1].strip() == "None":
-                type_name = type_tokens[0].strip()
-                is_optional = True
-            elif len(type_tokens) == 1:
-                type_name = type_tokens[0].strip()
-                is_optional = None  # Use None to indicate False
-            else:
-                raise RuntimeError(
-                    f"Type hint {type_hint} does not follow the format 'type_name' or 'type_name | None'."
-                )
-
-            return type_name, is_optional
-        else:
-            raise RuntimeError(f"Type chain {type_chain} for primitive type is not a list of size 1.")
