@@ -29,19 +29,7 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
 
 
-def test_is_instance():
-    """Test BuildUtil.validate method."""
-
-    # Primitive types
-    assert BuildUtil._is_instance(True, bool)
-    assert not BuildUtil._is_instance(None, bool)
-
-    # Primitive types | None
-    assert BuildUtil._is_instance(True, bool | None)
-    assert BuildUtil._is_instance(None, bool | None)
-
-
-def test_validate():
+def test_build():
     """Test BuildUtil.validate method."""
 
     samples = [
@@ -62,7 +50,7 @@ def test_validate():
     ]
 
     for sample in samples:
-        BuildUtil.validate(sample)
+        sample.build()
 
 
 if __name__ == "__main__":
