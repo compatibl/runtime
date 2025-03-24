@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class StringFormatEnum(IntEnum):
     """Format used to serialize and deserialize int."""
+
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""

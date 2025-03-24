@@ -19,5 +19,8 @@ from enum import auto
 class TimestampFormatEnum(IntEnum):
     """Format used to serialize and deserialize UUIDv7 unique timestamp."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """ISO 8601 datetime to millisecond precision followed by hex[20]: "2023-05-01T10:15:30.000Z-1a1a1a1a1a1a1a1a1a1a"""

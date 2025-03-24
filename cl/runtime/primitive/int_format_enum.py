@@ -19,5 +19,8 @@ from enum import auto
 class IntFormatEnum(IntEnum):
     """Format used to serialize and deserialize int."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """Serialize as string using int(value) conversion."""

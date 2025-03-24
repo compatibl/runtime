@@ -19,6 +19,9 @@ from enum import auto
 class DateFormatEnum(IntEnum):
     """Format used to serialize and deserialize dt.date."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """ISO 8601 date string: yyyy-mm-dd"""
 

@@ -19,5 +19,8 @@ from enum import auto
 class UuidFormatEnum(IntEnum):
     """Format used to serialize and deserialize UUID other than UUIDv7."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """Lowercase string with the standard delimiter placement for UUID (8-4-4-4-12)."""

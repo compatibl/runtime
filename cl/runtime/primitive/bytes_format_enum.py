@@ -19,5 +19,8 @@ from enum import auto
 class BytesFormatEnum(IntEnum):
     """Format used to serialize and deserialize bytes."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL."""

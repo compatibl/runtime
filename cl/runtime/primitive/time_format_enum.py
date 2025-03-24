@@ -19,6 +19,9 @@ from enum import auto
 class TimeFormatEnum(IntEnum):
     """Format used to serialize and deserialize dt.datetime."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """ISO 8601 time string to millisecond precision without timezone: hh:mm:ss.fff"""
 

@@ -19,5 +19,8 @@ from enum import auto
 class FloatFormatEnum(IntEnum):
     """Format used to serialize and deserialize float."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """Rounded fixed point format where the number of decimal places depends on magnitude."""

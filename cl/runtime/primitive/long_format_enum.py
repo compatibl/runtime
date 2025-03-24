@@ -19,5 +19,11 @@ from enum import auto
 class LongFormatEnum(IntEnum):
     """Format used to serialize and deserialize long."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """Serialize as string using int(value) conversion."""
+
+    BSON_INT_64 = auto()
+    """Serialize long as bson.Int64 for MongoDB."""

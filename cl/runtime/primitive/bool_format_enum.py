@@ -19,5 +19,8 @@ from enum import auto
 class BoolFormatEnum(IntEnum):
     """Format used to serialize and deserialize bool."""
 
+    PASSTHROUGH = auto()
+    """Do not apply any transformation during serialization or deserialization."""
+
     DEFAULT = auto()
     """Serialize as string with lowercase values true and false."""
