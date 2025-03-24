@@ -15,6 +15,9 @@
 import pytest
 import datetime as dt
 from uuid import UUID
+
+from bson import Int64
+
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.primitive.time_util import TimeUtil
@@ -105,6 +108,10 @@ def test_mongo():
     """Test roundtrip serialization and deserialization using MongoDB settings."""
 
     test_cases = [
+        # long
+        ("long", None, None),
+        ("long", 12345, Int64(12345)),
+        ("long", 9223372036854775807, Int64(9223372036854775807)),  # Max int64
         # Date
         ("date", None, None),
         ("date", dt.date(2023, 4, 21), 20230421, "20230421"),
@@ -120,17 +127,17 @@ def test_mongo():
         type_name, value, serialized, *alternative_serialized_list = test_case
 
         # Serialize without type_name, deserialization always requires type_name
-        assert PrimitiveSerializers.MONGO.serialize(value) == serialized
-        assert PrimitiveSerializers.MONGO.deserialize(serialized, [type_name]) == value
+        assert PrimitiveSerializers.FOR_MONGO.serialize(value) == serialized
+        assert PrimitiveSerializers.FOR_MONGO.deserialize(serialized, [type_name]) == value
 
         # Serialize and deserialize with type_name
-        assert PrimitiveSerializers.MONGO.serialize(value, [type_name]) == serialized
-        assert PrimitiveSerializers.MONGO.deserialize(serialized, [type_name]) == value
+        assert PrimitiveSerializers.FOR_MONGO.serialize(value, [type_name]) == serialized
+        assert PrimitiveSerializers.FOR_MONGO.deserialize(serialized, [type_name]) == value
 
         # Test alternative serialized forms
         if alternative_serialized_list:
             for alternative_serialized in alternative_serialized_list:
-                assert PrimitiveSerializers.MONGO.deserialize(alternative_serialized, [type_name]) == value
+                assert PrimitiveSerializers.FOR_MONGO.deserialize(alternative_serialized, [type_name]) == value
 
 
 def test_serialization_exceptions():

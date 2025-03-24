@@ -25,27 +25,23 @@ from typing import Type
 from typing import TypeGuard
 from typing import TypeVar
 from uuid import UUID
+
+from bson import Int64
 from frozendict import frozendict
 from typing_extensions import Self
 
-PRIMITIVE_CLASSES = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
-"""
-The list of Python classes used to store primitive types, excludes those primitive types that do not have their own
-Pyton classes such as long (uses Python class int) and timestamp (uses Python class UUID).
-"""
+PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes)
+"""The list of Python classes used to store primitive types, not the same as type names."""
 
 PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)  # TODO: Rename
-"""
-The list of Python class names used to store primitive types, excludes those primitive types that do not have their own
-Pyton classes such as long (uses Python type int) and timestamp (uses Python type UUID).
-"""
+"""The list of Python class names used to store primitive types, not the same as type names."""
 
 PRIMITIVE_TYPE_NAMES = (
     "str",
     "float",
     "bool",
     "int",
-    "long",  # Stored in int class
+    "long",  # Stored in int or Int64 class
     "date",
     "time",
     "datetime",

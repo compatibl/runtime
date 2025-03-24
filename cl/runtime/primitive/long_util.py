@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
 
 class LongUtil:
-    """Helper methods for the long (64-bit signed integer) type stored in int class."""
+    """Helper methods for the 64-bit signed integer stored in Python class 'int'."""
 
     @classmethod
     def to_str(cls, value: int) -> str:
-        """Serialize long (64-bit signed integer) to string."""
+        """Serialize 64-bit signed integer stored in Python class 'int' to string."""
         if isinstance(value, int):
             return str(value)
         else:
@@ -26,7 +27,7 @@ class LongUtil:
 
     @classmethod
     def from_str(cls, value: str) -> int:
-        """Deserialize long (64-bit signed integer) from string."""
+        """Deserialize 64-bit signed integer stored in Python class 'int' from string."""
         if isinstance(value, str):
             try:
                 # Try to parse as int

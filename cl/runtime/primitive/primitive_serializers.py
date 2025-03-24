@@ -19,6 +19,8 @@ from cl.runtime.primitive.datetime_format_enum import DatetimeFormatEnum
 from cl.runtime.primitive.float_format_enum import FloatFormatEnum
 from cl.runtime.primitive.int_format_enum import IntFormatEnum
 from cl.runtime.primitive.long_format_enum import LongFormatEnum
+from cl.runtime.primitive.none_format_enum import NoneFormatEnum
+from cl.runtime.primitive.string_format_enum import StringFormatEnum
 from cl.runtime.primitive.time_format_enum import TimeFormatEnum
 from cl.runtime.primitive.timestamp_format_enum import TimestampFormatEnum
 from cl.runtime.primitive.uuid_format_enum import UuidFormatEnum
@@ -30,12 +32,25 @@ cls = PrimitiveSerializer
 class PrimitiveSerializers:
     """Standard combinations of primitive formats."""
 
-    PASSTHROUGH: cls = cls().build()
-    """Pass through all primitive values without conversion."""
+    PASSTHROUGH: cls = cls(
+        none_format=NoneFormatEnum.PASSTHROUGH,
+        string_format=StringFormatEnum.PASSTHROUGH,
+        float_format=FloatFormatEnum.PASSTHROUGH,
+        bool_format=BoolFormatEnum.PASSTHROUGH,
+        int_format=IntFormatEnum.PASSTHROUGH,
+        long_format=LongFormatEnum.PASSTHROUGH,
+        date_format=DateFormatEnum.PASSTHROUGH,
+        datetime_format=DatetimeFormatEnum.PASSTHROUGH,
+        time_format=TimeFormatEnum.PASSTHROUGH,
+        uuid_format=UuidFormatEnum.PASSTHROUGH,
+        timestamp_format=TimestampFormatEnum.PASSTHROUGH,
+        bytes_format=BytesFormatEnum.PASSTHROUGH,
+    ).build()
+    """Pass through None and all primitive values without conversion."""
 
     DEFAULT: cls = cls(
-        none_format=None,
-        string_format=None,
+        none_format=NoneFormatEnum.PASSTHROUGH,
+        string_format=StringFormatEnum.PASSTHROUGH,
         float_format=FloatFormatEnum.DEFAULT,
         bool_format=BoolFormatEnum.DEFAULT,
         int_format=IntFormatEnum.DEFAULT,
@@ -47,23 +62,26 @@ class PrimitiveSerializers:
         timestamp_format=TimestampFormatEnum.DEFAULT,
         bytes_format=BytesFormatEnum.DEFAULT,
     ).build()
-    """Pass through None, serialize all other primitive types to string using default format."""
+    """Pass through None and string, serialize all other primitive types to string using default format."""
 
-    MONGO: cls = cls(
-        none_format=None,
-        string_format=None,
-        float_format=FloatFormatEnum.DEFAULT,
-        bool_format=BoolFormatEnum.DEFAULT,
-        int_format=IntFormatEnum.DEFAULT,
-        long_format=LongFormatEnum.DEFAULT,
+    FOR_MONGO: cls = cls(
+        none_format=NoneFormatEnum.PASSTHROUGH,
+        string_format=StringFormatEnum.PASSTHROUGH,
+        float_format=FloatFormatEnum.PASSTHROUGH,
+        bool_format=BoolFormatEnum.PASSTHROUGH,
+        int_format=IntFormatEnum.PASSTHROUGH,
+        long_format=LongFormatEnum.PASSTHROUGH,
         date_format=DateFormatEnum.ISO_INT,
-        datetime_format=DatetimeFormatEnum.DEFAULT,
+        datetime_format=DatetimeFormatEnum.PASSTHROUGH,
         time_format=TimeFormatEnum.ISO_INT,
-        uuid_format=UuidFormatEnum.DEFAULT,
-        timestamp_format=TimestampFormatEnum.DEFAULT,
-        bytes_format=BytesFormatEnum.DEFAULT,
+        uuid_format=UuidFormatEnum.PASSTHROUGH,
+        timestamp_format=TimestampFormatEnum.PASSTHROUGH,
+        bytes_format=BytesFormatEnum.PASSTHROUGH,
     ).build()
     """
-    Pass through None, serialize date and time to ISO int format, serialize all other primitive types
-    to string using default format.
+    Bidirectional serializer with settings for MongoDB.
+    - Pass through None, str, float, bool, int, datetime, uuid, timestamp, bytes
+    - Serialize long to np.int64
+    - Serialize date and time to readable ISO int format
+    - Serialize all other primitive type to string using default format
     """
