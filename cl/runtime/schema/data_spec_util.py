@@ -14,12 +14,15 @@
 
 import dataclasses
 import datetime as dt
-from typing import Dict, Type, Any
+from typing import Any
+from typing import Dict
+from typing import Type
 from uuid import UUID
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
+
 
 class DataSpecUtil:
     """Helper methods for type spec."""

@@ -13,19 +13,19 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import Any, Sequence
-from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.protocols import is_data
+from typing import Any
+from typing import Sequence
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
+from cl.runtime.records.protocols import is_data
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.data_spec_util import DataSpecUtil
 from cl.runtime.schema.enum_spec import EnumSpec
-from cl.runtime.schema.type_spec import TypeSpec
 
 
 class BuildUtil:
@@ -39,8 +39,9 @@ class BuildUtil:
 
     @classmethod
     def typed_build(
-            cls,
-            data: Any, type_chain: Sequence[str] | None = None,
+        cls,
+        data: Any,
+        type_chain: Sequence[str] | None = None,
     ) -> Any:
         """
         This method performs the following steps:
@@ -127,7 +128,9 @@ class BuildUtil:
             if not isinstance(data_type_spec, DataSpec):
                 raise RuntimeError(f"Type of data '{schema_type_name}' is not a slotted class in the schema.")
 
-            if False and schema_type_name is not None and schema_type_name != data_type_name:  # TODO: Check when possible
+            if (
+                False and schema_type_name is not None and schema_type_name != data_type_name
+            ):  # TODO: Check when possible
                 # If schema type is specified, error if the data is not an instance of the specified type
                 raise RuntimeError(
                     f"Type {data_type_name} is not the same or a subclass of "
@@ -142,10 +145,10 @@ class BuildUtil:
                 setattr(data, k, cls.typed_build(v, field_spec.type_chain))
                 for k, field_spec in data_field_dict.items()
                 if (
-                        (v := getattr(data, k)) is not None and
-                        type(v).__name__ not in PRIMITIVE_CLASS_NAMES and
-                        not isinstance(v, Enum) and
-                        not k.startswith("_")
+                    (v := getattr(data, k)) is not None
+                    and type(v).__name__ not in PRIMITIVE_CLASS_NAMES
+                    and not isinstance(v, Enum)
+                    and not k.startswith("_")
                 )
             )
 

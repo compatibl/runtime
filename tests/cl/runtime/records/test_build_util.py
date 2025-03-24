@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.build_util import BuildUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

@@ -100,6 +100,7 @@ def test_roundtrip():
             for alternative_serialized in alternative_serialized_list:
                 assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, [type_name]) == value
 
+
 def test_mongo():
     """Test roundtrip serialization and deserialization using MongoDB settings."""
 
@@ -130,6 +131,7 @@ def test_mongo():
         if alternative_serialized_list:
             for alternative_serialized in alternative_serialized_list:
                 assert PrimitiveSerializers.MONGO.deserialize(alternative_serialized, [type_name]) == value
+
 
 def test_serialization_exceptions():
     """Test roundtrip serialization and deserialization."""

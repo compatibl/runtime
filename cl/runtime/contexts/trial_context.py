@@ -13,14 +13,15 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Tuple, Iterable
-
+from typing import Iterable
+from typing import Tuple
 from typing_extensions import Self
-
 from cl.runtime.contexts.context import Context
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
-from cl.runtime.records.protocols import TPrimitive, is_sequence, is_primitive, PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -94,18 +95,22 @@ class TrialContext(Context):
         if not is_primitive(token):
             # If the token is not a primitive type, raise an error
             primitive_class_names = ", ".join(PRIMITIVE_CLASS_NAMES)
-            raise RuntimeError(f"A TrialContext must be one of the following primitive classes:\n"
-                               f"{primitive_class_names}\n"
-                               f"The following token of type {TypeUtil.name(token)} is not supported:\n"
-                               f"{ErrorUtil.wrap(token)}")
+            raise RuntimeError(
+                f"A TrialContext must be one of the following primitive classes:\n"
+                f"{primitive_class_names}\n"
+                f"The following token of type {TypeUtil.name(token)} is not supported:\n"
+                f"{ErrorUtil.wrap(token)}"
+            )
         elif isinstance(token, str):
             if token == "":
                 raise RuntimeError("An empty string is not a valid token for a TrialContext.")
             elif "\n" in token:
                 raise RuntimeError("A token for a TrialContext cannot contain a newline character.")
             elif "\\" in token:
-                raise RuntimeError("A token for a TrialContext cannot contain a backslash character because\n"
-                                   "it serves as token separator in trial identifier.")
+                raise RuntimeError(
+                    "A token for a TrialContext cannot contain a backslash character because\n"
+                    "it serves as token separator in trial identifier."
+                )
             else:
                 return token
         else:

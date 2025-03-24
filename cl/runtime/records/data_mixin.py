@@ -16,7 +16,6 @@ from abc import abstractmethod
 from typing import Tuple
 from typing import Type
 from typing_extensions import Self
-
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.protocols import TData
 from cl.runtime.records.type_util import TypeUtil

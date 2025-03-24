@@ -33,11 +33,13 @@ def test_smoke():
     # Save a single record
     cache.save_many([record], dataset=dataset)
 
-    loaded_records = list(cache.load_many(
-        StubDataclassRecord,
-        [record, key, None],
-        dataset=dataset,
-    ))
+    loaded_records = list(
+        cache.load_many(
+            StubDataclassRecord,
+            [record, key, None],
+            dataset=dataset,
+        )
+    )
     assert loaded_records[0] is record  # Same object is returned without lookup
     assert loaded_records[1] is record  # In case of local cache only, also the same object
     assert loaded_records[2] is None

@@ -36,6 +36,7 @@ def test_append_token():
             assert trial_context_3.trial_chain == ["abc"]
             assert TrialContext.get_trial() == "abc"
 
+
 def test_exceptions():
     """Test TrialContext exceptions."""
 

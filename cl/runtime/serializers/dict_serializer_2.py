@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
-from typing import Sequence
 from typing import Tuple
 from frozendict import frozendict
 from cl.runtime.exceptions.error_util import ErrorUtil

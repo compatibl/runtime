@@ -18,7 +18,6 @@ from dataclasses import dataclass
 from enum import Enum
 from enum import IntEnum
 from typing import Sequence
-from typing import Tuple
 from uuid import UUID
 from cl.runtime.primitive.bool_format_enum import BoolFormatEnum
 from cl.runtime.primitive.bool_util import BoolUtil
@@ -509,4 +508,3 @@ class PrimitiveSerializer(Data):
             f"Input value type: {value_type_name}\n"
             f"Input value: {value_str}"
         )
-

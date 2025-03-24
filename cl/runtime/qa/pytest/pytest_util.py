@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 import os
 from typing import Any
-
-import pytest
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.protocols import SEQUENCE_CLASSES, MAPPING_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -39,8 +39,7 @@ class PytestUtil:
             # Recreate the same mapping type with pytest.approx for float
             mapping_type = data.__class__
             return mapping_type(
-                (key, cls.approx(value, abs_tol=abs_tol, rel_tol=rel_tol))
-                for key, value in data.items()
+                (key, cls.approx(value, abs_tol=abs_tol, rel_tol=rel_tol)) for key, value in data.items()
             )
         return data
 

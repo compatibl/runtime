@@ -13,11 +13,8 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
-from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
-from stubs.cl.runtime import StubDataclassAnyFields
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -31,7 +28,6 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
-from stubs.cl.runtime import StubDataclassTupleFields
 
 
 def test_passthrough():
