@@ -255,6 +255,7 @@ class BasicMongoDb(Db):
             # Create client
             client = client_type(
                 self.client_uri,
+                tz_aware=True,
                 uuidRepresentation="standard",
             )
             # TODO: Implement dispose logic
