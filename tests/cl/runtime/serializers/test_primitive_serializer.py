@@ -100,6 +100,36 @@ def test_roundtrip():
             for alternative_serialized in alternative_serialized_list:
                 assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, [type_name]) == value
 
+def test_mongo():
+    """Test roundtrip serialization and deserialization using MongoDB settings."""
+
+    test_cases = [
+        # Date
+        ("date", None, None),
+        ("date", dt.date(2023, 4, 21), 20230421, "20230421"),
+        # Time
+        ("time", None, None),
+        ("time", TimeUtil.from_fields(11, 10, 0), 111000000, "111000000"),
+        ("time", TimeUtil.from_fields(11, 10, 0, millisecond=123), 111000123, "111000123"),
+    ]
+
+    for test_case in test_cases:
+
+        # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
+        type_name, value, serialized, *alternative_serialized_list = test_case
+
+        # Serialize without type_name, deserialization always requires type_name
+        assert PrimitiveSerializers.MONGO.serialize(value) == serialized
+        assert PrimitiveSerializers.MONGO.deserialize(serialized, [type_name]) == value
+
+        # Serialize and deserialize with type_name
+        assert PrimitiveSerializers.MONGO.serialize(value, [type_name]) == serialized
+        assert PrimitiveSerializers.MONGO.deserialize(serialized, [type_name]) == value
+
+        # Test alternative serialized forms
+        if alternative_serialized_list:
+            for alternative_serialized in alternative_serialized_list:
+                assert PrimitiveSerializers.MONGO.deserialize(alternative_serialized, [type_name]) == value
 
 def test_serialization_exceptions():
     """Test roundtrip serialization and deserialization."""

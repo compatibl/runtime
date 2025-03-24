@@ -31,7 +31,7 @@ class PrimitiveSerializers:
     """Standard combinations of primitive formats."""
 
     PASSTHROUGH: cls = cls().build()
-    """Pass through the value without conversion for all primitive types."""
+    """Pass through all primitive values without conversion."""
 
     DEFAULT: cls = cls(
         none_format=None,
@@ -47,4 +47,23 @@ class PrimitiveSerializers:
         timestamp_format=TimestampFormatEnum.DEFAULT,
         bytes_format=BytesFormatEnum.DEFAULT,
     ).build()
-    """Convert all values except None to string using default format, pass through None."""
+    """Pass through None, serialize all other primitive types to string using default format."""
+
+    MONGO: cls = cls(
+        none_format=None,
+        string_format=None,
+        float_format=FloatFormatEnum.DEFAULT,
+        bool_format=BoolFormatEnum.DEFAULT,
+        int_format=IntFormatEnum.DEFAULT,
+        long_format=LongFormatEnum.DEFAULT,
+        date_format=DateFormatEnum.ISO_INT,
+        datetime_format=DatetimeFormatEnum.DEFAULT,
+        time_format=TimeFormatEnum.ISO_INT,
+        uuid_format=UuidFormatEnum.DEFAULT,
+        timestamp_format=TimestampFormatEnum.DEFAULT,
+        bytes_format=BytesFormatEnum.DEFAULT,
+    ).build()
+    """
+    Pass through None, serialize date and time to ISO int format, serialize all other primitive types
+    to string using default format.
+    """

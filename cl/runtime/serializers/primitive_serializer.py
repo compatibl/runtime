@@ -192,6 +192,8 @@ class PrimitiveSerializer(Data):
                 return value
             elif value_format == DateFormatEnum.DEFAULT:
                 return DateUtil.to_str(value)
+            elif value_format == DateFormatEnum.ISO_INT:
+                return DateUtil.to_iso_int(value)
             else:
                 raise self._enum_error(value_format)
         elif value_class_name == "time":
@@ -199,6 +201,8 @@ class PrimitiveSerializer(Data):
                 return value
             elif value_format == TimeFormatEnum.DEFAULT:
                 return TimeUtil.to_str(value)
+            elif value_format == TimeFormatEnum.ISO_INT:
+                return TimeUtil.to_iso_int(value)
             else:
                 raise self._enum_error(value_format)
         elif value_class_name == "datetime":
@@ -365,6 +369,18 @@ class PrimitiveSerializer(Data):
                     return DateUtil.from_str(value)
                 else:
                     raise self._deserialization_error(value, type_name, value_format)
+            elif value_format == DateFormatEnum.ISO_INT:
+                if value in [None, "", "null"]:
+                    # Treat an empty string and "null" as None
+                    return None
+                elif isinstance(value, str):
+                    # Date as string in ISO int format without separators ("yyyymmdd")
+                    return DateUtil.from_iso_int(int(value))
+                elif isinstance(value, int):
+                    # Date as int in ISO int format without separators (yyyymmdd)
+                    return DateUtil.from_iso_int(value)
+                else:
+                    raise self._deserialization_error(value, type_name, value_format)
             else:
                 raise self._enum_error(value_format)
         elif type_name == "time":
@@ -380,6 +396,18 @@ class PrimitiveSerializer(Data):
                     return None
                 elif isinstance(value, str):
                     return TimeUtil.from_str(value)
+                else:
+                    raise self._deserialization_error(value, type_name, value_format)
+            elif value_format == TimeFormatEnum.ISO_INT:
+                if value in [None, "", "null"]:
+                    # Treat an empty string and "null" as None
+                    return None
+                elif isinstance(value, str):
+                    # Time as string in ISO int format without separators to millisecond precision ("hhmmssfff")
+                    return TimeUtil.from_iso_int(int(value))
+                elif isinstance(value, int):
+                    # Time as int in ISO int format without separators to millisecond precision (hhmmssfff)
+                    return TimeUtil.from_iso_int(value)
                 else:
                     raise self._deserialization_error(value, type_name, value_format)
             else:
