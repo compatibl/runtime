@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Iterable
 
 from typing_extensions import Self
 
 from cl.runtime.contexts.context import Context
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.protocols import TPrimitive, is_sequence, is_primitive, PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
@@ -45,29 +46,37 @@ class TrialContext(Context):
     def append_token(cls, token: TPrimitive | None) -> Self:
         """
         Combine the specified token with the current chain and return a new context instance.
-        To make it easier to implement conditionally adding a token, the token can be None
+        To make it easier to implement conditionally adding a token, the argument can be None
+        to indicate that the current chain should not be modified.
+        """
+        return cls.append_tokens((token,))
+
+    @classmethod
+    def append_tokens(cls, tokens: Iterable[TPrimitive | None]) -> Self:
+        """
+        Combine the specified tokens with the current chain and return a new context instance.
+        To make it easier to implement conditionally adding a token, the argument can be None
         to indicate that the current chain should not be modified.
         """
 
         # Get trial chain from the current context
         previous_chain = context.trial_chain if (context := cls.current_or_none()) is not None else None
 
-        if token is None:
-            # If token is None, return the current context without modification
+        # Convert iterable to sequence, skipping None and checking each token for validity
+        tokens = tuple(cls._checked_token(token) for token in tokens if token is not None)
+
+        if not tokens:
+            # If no tokens are provided, return the current context without modification
             return TrialContext(trial_chain=previous_chain).build()
-        elif is_primitive(token):
-            # Allow only primitive types for tokens, serialize
-            serialized_id = PrimitiveSerializers.DEFAULT.serialize(token)
+        else:
+            # Serialize and append the tokens to the previous chain
+            serialized_tokens = [PrimitiveSerializers.DEFAULT.serialize(token) for token in tokens]
             if previous_chain:
                 # Combine the previous chain and the new identifier
-                return TrialContext(trial_chain=tuple([x for x in previous_chain] + [serialized_id])).build()
+                return TrialContext(trial_chain=tuple([x for x in previous_chain] + serialized_tokens)).build()
             else:
-                # Previous chain is empty, use the new trial identifier as the chain
-                return TrialContext(trial_chain=(serialized_id,)).build()
-        else:
-            primitive_class_names = ", ".join(PRIMITIVE_CLASS_NAMES)
-            raise RuntimeError(f"The argument of TrialContext.create must be one of the following primitive classes:\n"
-                               f"{primitive_class_names}\nThe class {TypeUtil.name(token)} is not supported.")
+                # Previous chain is empty, use serialized tokens as the entire chain
+                return TrialContext(trial_chain=tuple(serialized_tokens)).build()
 
     @classmethod
     def get_trial(cls) -> str | None:
@@ -78,3 +87,26 @@ class TrialContext(Context):
         else:
             # Otherwise return None
             return None
+
+    @classmethod
+    def _checked_token(cls, token: TPrimitive) -> None:
+        """Return an error if the token is not a primitive type."""
+        if not is_primitive(token):
+            # If the token is not a primitive type, raise an error
+            primitive_class_names = ", ".join(PRIMITIVE_CLASS_NAMES)
+            raise RuntimeError(f"A TrialContext must be one of the following primitive classes:\n"
+                               f"{primitive_class_names}\n"
+                               f"The following token of type {TypeUtil.name(token)} is not supported:\n"
+                               f"{ErrorUtil.wrap(token)}")
+        elif isinstance(token, str):
+            if token == "":
+                raise RuntimeError("An empty string is not a valid token for a TrialContext.")
+            elif "\n" in token:
+                raise RuntimeError("A token for a TrialContext cannot contain a newline character.")
+            elif "\\" in token:
+                raise RuntimeError("A token for a TrialContext cannot contain a backslash character because\n"
+                                   "it serves as token separator in trial identifier.")
+            else:
+                return token
+        else:
+            return token
