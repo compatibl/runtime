@@ -42,7 +42,7 @@ class TrialContext(Context):
         return "TrialContext"
 
     @classmethod
-    def create(cls, token: TPrimitive | None) -> Self:
+    def append_token(cls, token: TPrimitive | None) -> Self:
         """
         Combine the specified token with the current chain and return a new context instance.
         To make it easier to implement conditionally adding a token, the token can be None
