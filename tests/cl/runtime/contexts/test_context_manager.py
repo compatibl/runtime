@@ -82,7 +82,7 @@ def test_context_manager():
 
     # Inside two nested 'with' clauses for different same key types
     with StubContext().build() as context_1:
-        with TrialContext.create("modified_trial_id") as context_2:
+        with TrialContext.create("modified_trial") as context_2:
             _perform_serialization_test([context_1, context_2])
     # Recreate using ContextManager
     _perform_manager_test([context_1, context_2])
