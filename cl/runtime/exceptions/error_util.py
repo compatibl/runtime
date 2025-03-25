@@ -144,9 +144,11 @@ class ErrorUtil:
         """
         fields_str = ", ".join(fields)
         details_str = cls.wrap(details) if details else ""
-        return RuntimeError(f"Fields {fields_str} for type {class_name}\n"
-                            f"must be specified together or not not at all.\n"
-                            f"{details_str}")
+        return RuntimeError(
+            f"Fields {fields_str} for type {class_name}\n"
+            f"must be specified together or not not at all.\n"
+            f"{details_str}"
+        )
 
     @classmethod
     def value_error(

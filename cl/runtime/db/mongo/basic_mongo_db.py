@@ -31,7 +31,6 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
-from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 from cl.runtime.serializers.string_serializer import StringSerializer
 
@@ -130,9 +129,7 @@ class BasicMongoDb(Db):
         for serialized_record in serialized_records:
             del serialized_record["_id"]
             del serialized_record["_key"]
-            record = data_serializer.deserialize(
-                serialized_record
-            )  # TODO: Convert to comprehension for performance
+            record = data_serializer.deserialize(serialized_record)  # TODO: Convert to comprehension for performance
             result.append(record)
         return RecordUtil.sort_records_by_key(result)
 
@@ -161,9 +158,7 @@ class BasicMongoDb(Db):
         for serialized_record in serialized_records:
             del serialized_record["_id"]
             del serialized_record["_key"]
-            record = data_serializer.deserialize(
-                serialized_record
-            )  # TODO: Convert to comprehension for performance
+            record = data_serializer.deserialize(serialized_record)  # TODO: Convert to comprehension for performance
             result.append(record)
         return result
 

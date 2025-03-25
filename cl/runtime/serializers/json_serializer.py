@@ -17,7 +17,6 @@ from typing import Any
 import orjson
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 

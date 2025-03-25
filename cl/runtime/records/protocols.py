@@ -25,7 +25,6 @@ from typing import Type
 from typing import TypeGuard
 from typing import TypeVar
 from uuid import UUID
-
 from bson import Int64
 from frozendict import frozendict
 from typing_extensions import Self

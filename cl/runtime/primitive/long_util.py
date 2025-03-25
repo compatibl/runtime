@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 
 class LongUtil:
     """Helper methods for the 64-bit signed integer stored in Python class 'int'."""
