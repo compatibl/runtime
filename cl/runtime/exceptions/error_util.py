@@ -126,6 +126,29 @@ class ErrorUtil:
         return RuntimeError(f"Fields {fields_str} are mutually exclusive for type {class_name}.\n{details_str}")
 
     @classmethod
+    def mutually_required_fields_error(
+        cls,
+        fields: List[str],
+        *,
+        class_name: str,
+        details: str | None = None,
+    ) -> Exception:
+        """
+        Return exception instance stating that the specified fields should be specified together or not at all
+        for the specified type.
+
+        Args:
+            fields: List of field names that must be specified together
+            details: Further details about the error in single- or multi-line sentence format (optional)
+            class_name: Class name for which the error is reported
+        """
+        fields_str = ", ".join(fields)
+        details_str = cls.wrap(details) if details else ""
+        return RuntimeError(f"Fields {fields_str} for type {class_name}\n"
+                            f"must be specified together or not not at all.\n"
+                            f"{details_str}")
+
+    @classmethod
     def value_error(
         cls,
         value: Any,
