@@ -64,6 +64,24 @@ class PrimitiveSerializers:
     ).build()
     """Pass through None and string, serialize all other primitive types to string using default format."""
 
+    FOR_JSON: cls = cls(
+        none_format=NoneFormatEnum.PASSTHROUGH,
+        string_format=StringFormatEnum.PASSTHROUGH,
+        float_format=FloatFormatEnum.PASSTHROUGH,
+        bool_format=BoolFormatEnum.PASSTHROUGH,
+        int_format=IntFormatEnum.PASSTHROUGH,
+        long_format=LongFormatEnum.PASSTHROUGH,
+        date_format=DateFormatEnum.PASSTHROUGH,
+        datetime_format=DatetimeFormatEnum.PASSTHROUGH,
+        time_format=TimeFormatEnum.PASSTHROUGH,
+        uuid_format=UuidFormatEnum.PASSTHROUGH,
+        timestamp_format=TimestampFormatEnum.PASSTHROUGH,
+        bytes_format=BytesFormatEnum.PASSTHROUGH,
+    ).build()
+    """
+    Default primitive serializer settings for JSON.
+    """
+
     FOR_MONGO: cls = cls(
         none_format=NoneFormatEnum.PASSTHROUGH,
         string_format=StringFormatEnum.PASSTHROUGH,
@@ -79,7 +97,7 @@ class PrimitiveSerializers:
         bytes_format=BytesFormatEnum.PASSTHROUGH,
     ).build()
     """
-    Bidirectional serializer with settings for MongoDB.
+    Default primitive serializer settings for MongoDB.
     - Pass through None, str, float, bool, int, datetime, uuid, timestamp, bytes
     - Serialize long to np.int64
     - Serialize date and time to readable ISO int format
