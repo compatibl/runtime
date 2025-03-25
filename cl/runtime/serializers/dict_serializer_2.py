@@ -65,10 +65,14 @@ class DictSerializer2(Data):
             # Otherwise use untyped serialization
             return self._untyped_serialize(data)
 
-    def deserialize(self, data) -> Any:
-        """Deserialize a dictionary into object using _type key and schema."""
+    def deserialize(self, data: Any) -> Any:
+        """Deserialize a dictionary into object using type information extracted from the _type field."""
+
         if self.bidirectional:
-            if data is not None and data.__class__.__name__ in MAPPING_TYPE_NAMES:
+            if data is None:
+                # Pass through None
+                return None
+            elif data.__class__.__name__ in MAPPING_TYPE_NAMES:
                 # Get type name from the input dict
                 if (type_name := data.get("_type", None)) is None:
                     raise RuntimeError(f"Key '_type' is missing in the serialized data, cannot deserialize.")
@@ -76,9 +80,12 @@ class DictSerializer2(Data):
                 type_chain = [type_name]
                 # Use typed deserialization
                 return self._typed_deserialize(data, type_chain)
+            elif data is not None and data.__class__.__name__ in SEQUENCE_TYPE_NAMES:
+                # Invoke on each item in the sequence
+                return list(self.deserialize(v) for v in data)
             else:
                 raise RuntimeError(
-                    f"Data is not a mapping, cannot deserialize without type_chain argument:\n"
+                    f"Data is not a list or mapping, cannot deserialize without type_chain argument:\n"
                     f"{ErrorUtil.wrap(data)}."
                 )
         else:
@@ -109,7 +116,9 @@ class DictSerializer2(Data):
             if schema_type_name is None:
                 raise RuntimeError(
                     f"An instance of a primitive class {data_class_name} is passed to\n"
-                    f"a typed serializer without specifying the schema type."
+                    f"a typed serializer without specifying a type chain."
+                    f"For a primitive value, the type chain is required and must have\n"
+                    f"the size of one with primitive type at position 0."
                 )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
@@ -140,20 +149,14 @@ class DictSerializer2(Data):
                 result = self.enum_serializer.serialize(data, enum_class)
                 return result
         elif data_class_name in SEQUENCE_TYPE_NAMES:
-            if not remaining_chain:
-                raise RuntimeError(
-                    f"Inner type is not specified in schema for the sequence type {data_class_name}.\n"
-                    f"Use type_name[Any] to specify a sequence with any item type."
-                )
-            # Serialize sequence into list
+            # Serialize sequence into list, allowing remaining_chain to be None
+            # If remaining_chain is None, it will be provided for each slotted data
+            # item in the sequence, and will cause an error for a primitive item
             return list(self._typed_serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
         elif data_class_name in MAPPING_TYPE_NAMES:
-            if not remaining_chain:
-                raise RuntimeError(
-                    f"Inner type not specified for the mapping type {data_class_name}.\n"
-                    f"Use type_name[str, Any] to specify a mapping with any value type."
-                )
-            # Deserialize mapping into dict
+            # Deserialize mapping into dict, allowing remaining_chain to be None
+            # If remaining_chain is None, it will be provided for each slotted data
+            # item in the mapping, and will cause an error for a primitive item
             return dict(
                 (k, self._typed_serialize(v, remaining_chain)) for k, v in data.items()
             )  # TODO: Replace by frozendict
