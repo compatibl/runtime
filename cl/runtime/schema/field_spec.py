@@ -15,17 +15,19 @@
 import types
 import typing
 from dataclasses import dataclass
-from typing import List
+from typing import Tuple
 from typing import Type
 from frozendict import frozendict
 from typing_extensions import Self
+
+from cl.runtime.records.for_dataclasses.frozen_data_mixin import FrozenDataMixin
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
-@dataclass(slots=True, kw_only=True)
-class FieldSpec:
-    """Provides information about a field in DataSpec."""
+@dataclass(slots=True, kw_only=True, frozen=True)
+class FieldSpec(FrozenDataMixin):
+    """Provides information about a field in DataSpec, use frozen attribute."""
 
     field_name: str
     """Field name (must be unique within the class)."""
@@ -33,7 +35,7 @@ class FieldSpec:
     type_hint: str
     """Type hint from which the type chain was created as string."""
 
-    type_chain: List[str]
+    type_chain: Tuple[str, ...]
     """
     Chain of nested type hints, each item has format 'type_name' or 'type_name | None'
     where type_name may refer to a container, slotted type, or primitive type.
@@ -50,23 +52,33 @@ class FieldSpec:
     def create(
         cls,
         *,
-        type_hint: typing.TypeAlias,
         field_name: str,
+        type_hint: typing.TypeAlias,
+        field_optional: bool | None = None,
+        field_subtype: str | None = None,
+        field_alias: str | None = None,
+        field_label: str | None = None,
+        field_formatter: str | None = None,
         containing_type_name: str,
     ) -> Self:
         """
         Create type spec by parsing the type hint.
 
         Args:
-            type_hint: Type of the field obtained from get_type_hints where ForwardRefs are resolved
             field_name: Name of the field, used for error messages only and recorded into the output
-            containing_type_name: Name of the class that contains the field, used for error messages only
-                                  and recorded into the output
+            type_hint: Type of the field obtained from get_type_hints where ForwardRefs are resolved
+            field_subtype: Optional subtype from field metadata such as long or timestamp
+            field_optional: Optional flag from field metadata, cross check against type hint if not None
+            field_alias: Optional name alias from field metadata, field name is used when not specified
+            field_label: Optional label from field metadata, CaseUtil.titleize is used when not specified
+            field_formatter: Optional formatter from field metadata, standard formatting is used when not specified
+            containing_type_name: Name of the class that contains the field
         """
 
         # Variables to store the result of type hint parsing
         root_type_hint_str = cls._serialize_type_hint(type_hint)
         type_chain = []
+        is_optional = None
 
         # Get origin and args of the field type
         type_hint_origin = typing.get_origin(type_hint)
@@ -82,7 +94,7 @@ class FieldSpec:
                 if len(type_hint_args) != 2 or type_hint_args[1] is not type(None):
                     raise RuntimeError(
                         f"Union type hint '{cls._serialize_type_hint(type_hint)}'\n"
-                        f"for field {field_name} in record {containing_type_name}' is not supported\n"
+                        f"for field {field_name} in {containing_type_name} is not supported\n"
                         f"because it is not an optional value using the syntax 'Type | None'\n"
                     )
 
@@ -98,7 +110,7 @@ class FieldSpec:
                     if len(type_hint_args) != 1:
                         raise RuntimeError(
                             f"List type hint '{cls._serialize_type_hint(type_hint)}'\n"
-                            f"for field {field_name} in record {containing_type_name}' is not supported\n"
+                            f"for field {field_name} in {containing_type_name} is not supported\n"
                             f"because it is not a list of elements using the syntax 'List[Type]'\n"
                         )
                     # Populate container data and extract the inner type_hint
@@ -109,7 +121,7 @@ class FieldSpec:
                     if len(type_hint_args) != 2 or type_hint_args[1] is not Ellipsis:
                         raise RuntimeError(
                             f"Tuple type hint '{cls._serialize_type_hint(type_hint)}'\n"
-                            f"for field {field_name} in record {containing_type_name}' is not supported\n"
+                            f"for field {field_name} in {containing_type_name} is not supported\n"
                             f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]'\n"
                         )
                     # Populate container data and extract the inner type_hint
@@ -120,7 +132,7 @@ class FieldSpec:
                     if len(type_hint_args) != 2 or type_hint_args[0] is not str:
                         raise RuntimeError(
                             f"Dict type hint '{cls._serialize_type_hint(type_hint)}'\n"
-                            f"for field {field_name} in record {containing_type_name}' is not supported\n"
+                            f"for field {field_name} in {containing_type_name} is not supported\n"
                             f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'\n"
                         )
                     # Populate container data and extract the inner type_hint
@@ -155,11 +167,42 @@ class FieldSpec:
                             f"- {', '.join(PRIMITIVE_CLASS_NAMES)}\n"
                         )
 
+                    # Apply field subtype from metadata
+                    if field_subtype is not None:
+                        if field_subtype == "long":
+                            if type_chain == ["int"]:
+                                type_chain = ["long"]
+                            elif type_chain == ["int | None"]:
+                                type_chain = ["long | None"]
+                            else:
+                                raise RuntimeError(f"Subtype 'long' is not valid for type hint {type_hint}")
+                        elif field_subtype == "timestamp":
+                            if type_chain == ["UUID"]:
+                                type_chain = ["timestamp"]
+                            elif type_chain == ["UUID | None"]:
+                                type_chain = ["timestamp | None"]
+                            else:
+                                raise RuntimeError(f"Subtype 'timestamp' is not valid for type hint {type_hint}")
+                        else:
+                            raise RuntimeError(
+                                f"Subtype {field_subtype} is not valid, supported subtypes are 'long' and 'timestamp'.")
+
+                    # TODO: Check optional flag from metadata
+                    if field_optional is not None:
+                        pass
+                        # TODO: raise RuntimeError(f"Specifying 'field_optional' is not yet supported.")
+                    if field_alias is not None:
+                        raise RuntimeError(f"Specifying 'field_alias' is not yet supported.")
+                    if field_label is not None:
+                        raise RuntimeError(f"Specifying 'field_label' is not yet supported.")
+                    if field_formatter is not None:
+                        raise RuntimeError(f"Specifying 'field_formatter' in schema is not yet supported.")
+
                     # Create the field spec and return which ends the while True loop
                     result = cls(
                         field_name=field_name,
                         type_hint=root_type_hint_str,
-                        type_chain=type_chain,
+                        type_chain=tuple(type_chain),
                         _class=type_hint,
                     )
                     return result
