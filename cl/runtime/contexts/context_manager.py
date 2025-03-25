@@ -14,15 +14,15 @@
 
 from contextvars import Token
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Sequence
 from typing import List
 from typing_extensions import Self
 from cl.runtime.contexts.context import _CONTEXT_STACK_DICT_VAR
 from cl.runtime.contexts.context import Context
-from cl.runtime.serializers.dict_serializer import DictSerializer
+from cl.runtime.primitive.dict_serializers import DictSerializers
 
-_DICT_SERIALIZER = DictSerializer()
-"""Serializer used to serialize and deserialize contexts."""
+_CONTEXT_SERIALIZER = DictSerializers.FOR_JSON
+"""Serializer used to serialize and deserialize contexts to dicts, primitive types are passed through."""
 
 
 @dataclass(slots=True, kw_only=True)
@@ -41,7 +41,7 @@ class ContextManager:
     _token: Token | None = None
     """Stores the state of all context stacks saved in __enter__ and restored in __exit__ of this class."""
 
-    def __init__(self, data: List[Dict]):
+    def __init__(self, data: Sequence[Dict]):
         """Create from contexts serialized into a list of dicts."""
 
         # Assign default values for each field to avoid not initialized errors
@@ -51,7 +51,7 @@ class ContextManager:
 
         # Deserialize and build if _all_contexts is not empty
         if data:
-            self._all_contexts = _DICT_SERIALIZER.deserialize_data(data, list)
+            self._all_contexts = _CONTEXT_SERIALIZER.deserialize(data)
             for context in self._all_contexts:
                 # Ensure context is derived from Context
                 if not isinstance(context, Context):
@@ -125,7 +125,7 @@ class ContextManager:
         _CONTEXT_STACK_DICT_VAR.reset(token)
 
     @classmethod
-    def serialize_all_current(cls) -> List[Dict]:
+    def serialize_all_current(cls) -> Sequence[Dict]:
         """Serialize all current contexts to a list of dicts, each dict represents one serialized context."""
 
         # Get current contexts for all key types
@@ -136,9 +136,9 @@ class ContextManager:
         return result
 
     @classmethod
-    def _serialize_contexts(cls, contexts: List[Context]) -> List[Dict]:
+    def _serialize_contexts(cls, contexts: Sequence[Context]) -> Sequence[Dict]:
         """Serialize argument contexts to a list of dicts, each dict represents one serialized context."""
 
         # Use serializer
-        result = _DICT_SERIALIZER.serialize_data(contexts)
+        result = _CONTEXT_SERIALIZER.serialize(contexts)
         return result
