@@ -23,10 +23,9 @@ from ruamel.yaml.constructor import SafeConstructor
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
-from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 # Use primitive serializer with default settings to serialize all primitive types to string
@@ -121,47 +120,36 @@ yaml_reader.Constructor = PrimitiveToStringConstructor
 class YamlSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    pascalize_keys: bool | None = None
-    """Pascalize keys during serialization if set."""
-
     bidirectional: bool | None = None
     """Use schema to validate and include _type in output to support both serialization and deserialization."""
 
-    dict_serializer: DictSerializer2 | None = None
+    pascalize_keys: bool | None = None
+    """Pascalize keys during serialization if set."""
+
+    _dict_serializer: DictSerializer2 = required()
     """Serializes data into dictionary from which it is serialized into YAML."""
 
-    dict_deserializer: DictSerializer2 | None = None
+    _dict_deserializer: DictSerializer2 | None = None
     """Deserializes the result of YAML parsing, including converting string leaf nodes to primitive types and enums."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.dict_serializer is None:
-            # Create serializer and deserializer using the flags in this class
-            # Serializer does serialize primitive types
-            self.dict_serializer = DictSerializer2(
-                pascalize_keys=self.pascalize_keys,
-                bidirectional=self.bidirectional,
-            ).build()
+
+        # Serializer passes through primitive types during serialization,
+        # the conversions are done by the Ruamel YAML representers
+        self._dict_serializer = DictSerializer2(
+            bidirectional=self.bidirectional,
+            pascalize_keys=self.pascalize_keys,
+        ).build()
+
+        if self.bidirectional:
+            # Create deserializer only if bidirectional flag is set
             # Deserializer uses default settings for deserializing primitive types from string
-            self.dict_deserializer = DictSerializer2(
-                pascalize_keys=self.pascalize_keys,
+            self._dict_deserializer = DictSerializer2(
                 bidirectional=self.bidirectional,
+                pascalize_keys=self.pascalize_keys,
                 primitive_serializer=PrimitiveSerializers.DEFAULT,
             ).build()
-        else:
-            # Check for mutually exclusive fields
-            if self.pascalize_keys is not None:
-                raise ErrorUtil.mutually_exclusive_fields_error(
-                    ["pascalize_keys", "dict_serializer"],
-                    class_name=TypeUtil.name(self),
-                    details="When 'dict_serializer' field is set, its own 'pascalize_keys' setting will apply",
-                )
-            if self.bidirectional is not None:
-                raise ErrorUtil.mutually_exclusive_fields_error(
-                    ["bidirectional", "dict_serializer"],
-                    class_name=TypeUtil.name(self),
-                    details="When 'dict_serializer' field is set, its own 'bidirectional' setting will apply",
-                )
 
     def serialize(self, data: Any) -> str:
         """
@@ -169,7 +157,7 @@ class YamlSerializer(Data):
         not suitable for deserialization.
         """
         # Convert to dict
-        data_dict = self.dict_serializer.serialize(data)
+        data_dict = self._dict_serializer.serialize(data)
 
         # Use customized YAML object to follow the primitive type serialization conventions
         output = StringIO()
@@ -180,9 +168,12 @@ class YamlSerializer(Data):
     def deserialize(self, serialized_data: str) -> Any:
         """Read a YAML string and return the deserialized object."""
 
+        if not self.bidirectional:
+            raise ValueError("YAML deserialization is not supported unless bidirectional flag is set.")
+
         # Use customized YAML object to read all values as strings
         yaml_dict = yaml_reader.load(StringIO(serialized_data))
 
         # Convert to object using self.dict_serializer
-        result = self.dict_deserializer.deserialize(yaml_dict)
+        result = self._dict_deserializer.deserialize(yaml_dict)
         return result
