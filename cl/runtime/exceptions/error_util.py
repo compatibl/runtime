@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from enum import Enum
 from textwrap import TextWrapper
 from typing import Any
 from typing import List
@@ -103,6 +104,24 @@ class ErrorUtil:
         return RuntimeError(
             f"Invalid value for {callable_str} {param_str}.\n{details_str}" f"\nParameter value: {cls.wrap(value)}"
         )
+
+    @classmethod
+    def enum_value_error(cls, value: Enum | str, schema_type: Type | str | None = None) -> Exception:
+        """Error message on unknown format enum."""
+        schema_type = schema_type if isinstance(schema_type, str) else TypeUtil.name(schema_type)
+        if value is None:
+            type_str = f"the enum type {schema_type}" if schema_type is not None else "an enum type"
+            return RuntimeError(f"Value of None is passed for {type_str}.")
+        else:
+            # Check that schema type matches if specified
+            if schema_type is not None and schema_type != (value_type_name := TypeUtil.name(type(value))):
+                return RuntimeError(
+                    f"Type {value_type_name} of enum value does not match the type in schema {schema_type}")
+            else:
+                enum_type_name = TypeUtil.name(value)
+                enum_type_str = f"Enum {enum_type_name}" if not enum_type_name.endswith("Enum") else enum_type_name
+                enum_value_str = value.name if isinstance(value, Enum) else str(value)
+                return RuntimeError(f"{enum_type_str} does not include the item {enum_value_str}.")
 
     @classmethod
     def mutually_exclusive_fields_error(

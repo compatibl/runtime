@@ -14,12 +14,13 @@
 
 import pytest
 from cl.runtime.serializers.enum_serializer import EnumSerializer
+from cl.runtime.serializers.enum_serializers import EnumSerializers
 from stubs.cl.runtime import StubIntEnum
 
 
 def test_serialize():
     """Test serialize method."""
-    serializer = EnumSerializer().build()
+    serializer = EnumSerializers.DEFAULT
 
     # Valid values without type
     assert serializer.serialize(None) is None
@@ -36,7 +37,7 @@ def test_serialize():
 
 def test_deserialize():
     """Test deserialize method."""
-    serializer = EnumSerializer().build()
+    serializer = EnumSerializers.DEFAULT
 
     # Valid values
     assert serializer.deserialize(None, StubIntEnum) is None

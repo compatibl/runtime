@@ -31,6 +31,7 @@ from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
+from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.slots_util import SlotsUtil
 
@@ -55,7 +56,7 @@ class DocumentSerializer(Data):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.enum_serializer is None:
             # Create an EnumSerializer with default settings if not specified
-            self.enum_serializer = EnumSerializer().build()
+            self.enum_serializer = EnumSerializers.DEFAULT
 
     def serialize(self, data: Any) -> Any:
         """Serialize data to a dictionary."""

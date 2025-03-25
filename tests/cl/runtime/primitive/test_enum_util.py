@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.records.enum_util import EnumUtil
+from cl.runtime.primitive.enum_util import EnumUtil
 from stubs.cl.runtime import StubIntEnum
 
 

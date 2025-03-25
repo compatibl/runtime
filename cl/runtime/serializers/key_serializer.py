@@ -23,6 +23,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
+from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
@@ -40,7 +41,7 @@ class KeySerializer(Data):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.enum_serializer is None:
             # Create an EnumSerializer with default settings if not specified
-            self.enum_serializer = EnumSerializer().build()
+            self.enum_serializer = EnumSerializers.DEFAULT
 
     def serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
         """Serialize data into a flattened sequence, validating against type_chain if provided."""
