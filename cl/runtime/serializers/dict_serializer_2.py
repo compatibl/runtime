@@ -20,7 +20,7 @@ from frozendict import frozendict
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_data, MAPPING_CLASS_NAMES, SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -320,25 +320,14 @@ class DictSerializer2(Data):
         without using the schema or including _type in output.
         """
 
-        if getattr(data, "__slots__", None) is not None:
-            # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
-            slots = SlotsUtil.get_slots(data.__class__)
-            # Serialize slot values in the order of declaration except those that are None
-            result = {
-                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
-                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (
-                        (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
-                        if isinstance(v, Enum)
-                        else self._untyped_serialize(v)
-                    )
-                )
-                for k in slots
-                if (v := getattr(data, k)) is not None and not k.startswith("_")
-            }
+        if data is None:
+            # Pass through None
+            return None
+        elif (data_class_name := data.__class__.__name__) in PRIMITIVE_CLASS_NAMES:
+            # Primitive type, serialize using primitive serializer if specified, otherwise return raw data
+            result = self.primitive_serializer.serialize(data) if self.primitive_serializer is not None else data
             return result
-        elif isinstance(data, list) or isinstance(data, tuple):
+        elif data_class_name in SEQUENCE_CLASS_NAMES:
             # Sequence container, including items that are None in output to preserve item positions
             result = [
                 (
@@ -357,7 +346,7 @@ class DictSerializer2(Data):
                 for v in data
             ]
             return result
-        elif isinstance(data, dict) or isinstance(data, frozendict):
+        elif data_class_name in MAPPING_CLASS_NAMES:
             # Mapping container, do not include values that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
@@ -371,6 +360,27 @@ class DictSerializer2(Data):
                 )
                 for k, v in data.items()
                 if v is not None and (not hasattr(v, "__len__") or len(v) > 0)
+            }
+            return result
+        elif isinstance(data, Enum):
+            # Enum type, serialize using enum serializer if specified, otherwise return raw data
+            return self.enum_serializer.serialize(data) if self.enum_serializer is not None else data
+        elif is_data(data):
+            # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
+            slots = data.get_slots()
+            # Serialize slot values in the order of declaration except those that are None
+            result = {
+                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
+                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                    else (
+                        (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                        if isinstance(v, Enum)
+                        else self._untyped_serialize(v)
+                    )
+                )
+                for k in slots
+                if (v := getattr(data, k)) is not None and not k.startswith("_")
             }
             return result
         else:

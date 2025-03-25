@@ -32,7 +32,7 @@ from typing_extensions import Self
 PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes)
 """The list of Python classes used to store primitive types, not the same as type names."""
 
-PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)  # TODO: Rename
+PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)
 """The list of Python class names used to store primitive types, not the same as type names."""
 
 PRIMITIVE_TYPE_NAMES = (
@@ -56,14 +56,20 @@ Pyton classes such as long (uses Python type int) and timestamp (uses Python typ
 SEQUENCE_CLASSES = (list, tuple)
 """Classes that may be used to represent sequences, excluding abstract base classes."""
 
+SEQUENCE_CLASS_NAMES = frozenset(type_.__name__ for type_ in SEQUENCE_CLASSES)
+"""Names of classes that may be used to represent sequences, excluding abstract base classes."""
+
 SEQUENCE_TYPE_NAMES = ("MutableSequence", "Sequence", "list", "tuple")
 """Names of classes that may be used to represent sequences, including abstract base classes."""
 
 MAPPING_CLASSES = (dict, frozendict)
-"""Classes that may be used to represent mapping, excluding abstract base classes."""
+"""Classes that may be used to represent mappings, excluding abstract base classes."""
+
+MAPPING_CLASS_NAMES = frozenset(type_.__name__ for type_ in MAPPING_CLASSES)
+"""Names of classes that may be used to represent mappings, excluding abstract base classes."""
 
 MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
-"""Names of classes that may be used to represent mapping, including abstract base classes."""
+"""Names of classes that may be used to represent mappings, including abstract base classes."""
 
 
 class DataProtocol(Protocol):

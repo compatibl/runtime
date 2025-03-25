@@ -26,6 +26,7 @@ from ruamel.yaml.nodes import SequenceNode
 from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
 
 # Use primitive serializer with default settings to serialize all primitive types to string
@@ -157,13 +158,21 @@ class YamlSerializer(Data):
         not suitable for deserialization.
         """
         # Serialize to dict using self.dict_serializer
-        data_dict = self._dict_serializer.serialize(data)
+        serialized = self._dict_serializer.serialize(data)
 
-        # Use a YAML writer with custom representers to follow the primitive type serialization conventions
-        output = StringIO()
-        yaml_writer.dump(data_dict, output)
-        result = output.getvalue()
-        return result
+        if serialized is None:
+            return ""
+        elif serialized.__class__.__name__ in PRIMITIVE_CLASS_NAMES:
+            # Use default primitive serializer for a primitive type
+            result = PrimitiveSerializers.DEFAULT.serialize(serialized)
+            # Add trailing newline
+            return f"{result}\n"
+        else:
+            # Use a YAML writer with custom representers for any structured data
+            output = StringIO()
+            yaml_writer.dump(serialized, output)
+            result = output.getvalue()
+            return result
 
     def deserialize(self, yaml_str: str) -> Any:
         """Read a YAML string and return the deserialized object if bidirectional flag is set, and dict otherwise."""
