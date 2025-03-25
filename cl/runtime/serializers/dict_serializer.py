@@ -82,7 +82,7 @@ class DictSerializer:
         if getattr(data, "__slots__", None) is not None:
             # Slots class, serialize as dictionary
             # Get slots from this class and its bases in the order of declaration from base to derived
-            data_type = data.__class__
+            data_type = type(data)
             all_slots = SlotsUtil.get_slots(data_type)
             annots = AnnotationsUtil.get_class_hierarchy_annotations(data_type)
             # Serialize slot values in the order of declaration except those that are None

@@ -75,11 +75,6 @@ MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 class DataProtocol(Protocol):
     """Protocol for a class that has slots and implements the builder pattern."""
 
-    @classmethod
-    def get_slots(cls) -> Tuple[str, ...]:
-        """Get slot names for serialization without schema."""
-        ...
-
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         ...
@@ -171,8 +166,8 @@ def is_mapping(instance_or_type: Any) -> TypeGuard[TSequence]:
 
 
 def is_data(instance_or_type: Any) -> TypeGuard[TData]:
-    """Fast partial check for DataProtocol, return True if the argument has 'get_slots' method."""
-    return hasattr(instance_or_type, "get_slots")
+    """Fast partial check for DataProtocol, True if the argument has '__slots__' attribute or 'get_slots' method."""
+    return hasattr(instance_or_type, "__slots__") or hasattr(instance_or_type, "get_slots")
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[TKey]:

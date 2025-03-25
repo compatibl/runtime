@@ -19,6 +19,7 @@ from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.protocols import TData
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class DataMixin:
@@ -26,11 +27,6 @@ class DataMixin:
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
-
-    @classmethod
-    @abstractmethod
-    def get_slots(cls) -> Tuple[str, ...]:
-        """Get slot names for serialization without schema."""
 
     @abstractmethod
     def is_frozen(self) -> bool:
@@ -62,8 +58,9 @@ class DataMixin:
 
     def clone(self: Self) -> Self:
         """Return an unfrozen object of the same type populated by shallow copies of public fields."""
-        result = type(self)()
-        slots = self.get_slots()
+        type_ = type(self) # TODO: Consider using constructor with fields
+        result = type_()
+        slots = SlotsUtil.get_slots(type_)
         for attr in slots:
             if not attr.startswith("_"):  # Skip private fields
                 setattr(result, attr, getattr(self, attr))
@@ -71,8 +68,8 @@ class DataMixin:
 
     def clone_as(self: Self, result_type: Type[TData]) -> TData:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
-        result = result_type()
-        slots = self.get_slots()
+        result = result_type()  # TODO: Consider using constructor with fields
+        slots = SlotsUtil.get_slots(type(self))
         for attr in slots:
             if not attr.startswith("_"):  # Skip private fields
                 setattr(result, attr, getattr(self, attr))

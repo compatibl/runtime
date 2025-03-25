@@ -34,11 +34,6 @@ class Data(DataMixin, ABC):
     __frozen: bool = required(default=None, init=False, repr=False, compare=False)
     """True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
-    @classmethod
-    def get_slots(cls) -> Tuple[str, ...]:
-        """Get slot names for serialization without schema."""
-        return SlotsUtil.get_slots(cls)
-
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         return bool(self.__frozen)

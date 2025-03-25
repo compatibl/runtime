@@ -367,7 +367,7 @@ class DictSerializer2(Data):
             return self.enum_serializer.serialize(data) if self.enum_serializer is not None else data
         elif is_data(data):
             # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
-            slots = data.get_slots()
+            slots = SlotsUtil.get_slots(type(data))
             # Serialize slot values in the order of declaration except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (

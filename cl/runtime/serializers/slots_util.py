@@ -31,33 +31,44 @@ class SlotsUtil:
     def get_slots(cls, data_type: Type) -> Tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
 
-        # Traverse the class hierarchy from base to derived (reverse MRO order) collecting slots as specified
-        if _COLLECT_SLOTS:
-            # For v3.11 and later, __slots__ includes fields for this class only, use MRO to collect base class slots
-            # Exclude None or empty __slots__ (both are falsy)
-            class_hierarchy_slots = [
-                slots for base in reversed(data_type.__mro__) if (slots := getattr(base, "__slots__", None))
-            ]
+        if hasattr(data_type, "get_slots"):
+            # Providing @classmethod get_slots makes it possible to serialize
+            # a non-slotted class or override the default slots
+            return data_type.get_slots()
+        elif hasattr(data_type, "__slots__"):
+            # Traverse the class hierarchy from base to derived (reverse MRO order) collecting slots as specified
+            if _COLLECT_SLOTS:
+                # For v3.11 and later, __slots__ includes fields for this class only, use MRO to collect
+                # slots by traversing the entire class hierarchy, exclude None or empty __slots__ (both are falsy)
+                class_hierarchy_slots = [
+                    slots for base in reversed(data_type.__mro__) if (slots := getattr(base, "__slots__", None))
+                ]
+            else:
+                # Otherwise get slots from this type only
+                # Exclude None or empty __slots__ (both are falsy)
+                class_hierarchy_slots = [slots if (slots := getattr(data_type, "__slots__", None)) else tuple()]
+
+            # Exclude empty tuples and convert slots specified as a single string into tuple of size one
+            class_hierarchy_slots = [(slots,) if isinstance(slots, str) else slots for slots in class_hierarchy_slots]
+
+            # Flatten and convert to tuple, cast relies on elements of sublist being strings
+            # Exclude private and protected fields
+            result = tuple(slot for sublist in class_hierarchy_slots for slot in sublist if not slot.startswith("_"))
+
+            # Check for duplicates
+            if len(result) > len(set(result)):
+                # Error message if duplicates are found
+                counts = Counter(result)
+                duplicates = [slot for slot, count in counts.items() if count > 1]
+                duplicates_str = ", ".join(duplicates)
+                raise RuntimeError(
+                    f"Duplicate field names found in class hierarchy "
+                    f"for {TypeUtil.name(data_type)}: {duplicates_str}."
+                )
+            return result
         else:
-            # Otherwise get slots from this type only
-            # Exclude None or empty __slots__ (both are falsy)
-            class_hierarchy_slots = [slots if (slots := getattr(data_type, "__slots__", None)) else tuple()]
-
-        # Exclude empty tuples and convert slots specified as a single string into tuple of size one
-        class_hierarchy_slots = [(slots,) if isinstance(slots, str) else slots for slots in class_hierarchy_slots]
-
-        # Flatten and convert to tuple, cast relies on elements of sublist being strings
-        # Exclude private and protected fields
-        result = tuple(slot for sublist in class_hierarchy_slots for slot in sublist if not slot.startswith("_"))
-
-        # Check for duplicates
-        if len(result) > len(set(result)):
-            # Error message if duplicates are found
-            counts = Counter(result)
-            duplicates = [slot for slot, count in counts.items() if count > 1]
-            duplicates_str = ", ".join(duplicates)
+            # Error message if no __slots__ attribute is found
             raise RuntimeError(
-                f"Duplicate field names found in class hierarchy " f"for {TypeUtil.name(data_type)}: {duplicates_str}."
+                f"Class {TypeUtil.name(data_type)} cannot be serialized because it does not have\n"
+                f"the '__slots__' attribute and does not define a custom @classmethod 'get_slots'."
             )
-
-        return result
