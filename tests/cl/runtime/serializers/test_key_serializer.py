@@ -15,13 +15,26 @@
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializer import KeySerializer
-from stubs.cl.runtime import StubDataclassCompositeKey
+from stubs.cl.runtime import StubDataclassCompositeKey, StubDataclassListFields, StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
-_SAMPLE_TYPES = [
-    StubDataclassRecordKey,
-    StubDataclassCompositeKey,
+_SERIALIZATION_SAMPLES = [
+    StubDataclassRecordKey().build(),
+    StubDataclassCompositeKey().build(),
+    StubDataclassPrimitiveFieldsKey().build(),
+]
+
+_SERIALIZATION_EXCEPTION_SAMPLES = [
+    str,  # Primitive type
+    float,  # Primitive type
+    StubDataclassRecordKey(),  # Did not invoke build
+    [StubDataclassRecordKey().build()],  # List type
+    {"a": StubDataclassRecordKey().build()},  # Dict type
+    StubDataclassListFields().build(),  # Sequence fields
+    StubDataclassDictFields().build(),  # Mapping fields
 ]
 
 
@@ -31,23 +44,35 @@ def test_serialization():
     # Create the serializer
     serializer = KeySerializer().build()
 
-    for sample_type in _SAMPLE_TYPES:
-
+    for sample in _SERIALIZATION_SAMPLES:
         # Serialize without type information
-        obj = sample_type().build()
-        untyped_serialized = serializer.serialize(obj)
+        untyped_serialized = serializer.serialize(sample)
         untyped_delimited = ";".join(untyped_serialized)
 
         # Serialize with type information, output should be the same
-        typed_serialized = serializer.serialize(obj, (obj.__class__.__name__,))
+        typed_serialized = serializer.serialize(sample, (sample.__class__.__name__,))
         assert typed_serialized == untyped_serialized
 
         # Write to regression guard
-        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(TypeUtil.name(sample))
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(untyped_delimited)
-
     RegressionGuard().verify_all()
+
+
+def test_serialization_exceptions():
+    """Test exception handling in KeySerializer.serialize method."""
+
+    # Create the serializer
+    serializer = KeySerializer().build()
+
+    for sample in _SERIALIZATION_EXCEPTION_SAMPLES:
+        # Attempt untyped serialization
+        with pytest.raises(RuntimeError):
+            serializer.serialize(sample)
+        # Attempt typed serialization
+        with pytest.raises(RuntimeError):
+            serializer.serialize(sample, (sample.__class__.__name__,))
 
 
 if __name__ == "__main__":

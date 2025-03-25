@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from typing import Tuple
+
+from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
@@ -41,8 +43,8 @@ class KeySerializer(Data):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        # Pass through primitive types and use default serialization settings for enums
-        self._primitive_serializer = PrimitiveSerializers.PASSTHROUGH
+        # Use default serialization settings for primitive types and enums
+        self._primitive_serializer = PrimitiveSerializers.DEFAULT
         self._enum_serializer = EnumSerializers.DEFAULT
 
     def serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
@@ -58,6 +60,8 @@ class KeySerializer(Data):
             else:
                 raise RuntimeError(f"Data is None but type hint {type_chain[0]} indicates it is required.")
         elif is_data(data):
+            # Check that the instance is frozen
+            BuildUtil.check_frozen(data)
             # Check that schema type matches the data type, inheritance is not permitted
             data_type_name = TypeUtil.name(data)
             if schema_type_name is not None and schema_type_name != data_type_name:
