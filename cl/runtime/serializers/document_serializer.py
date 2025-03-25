@@ -19,6 +19,7 @@ from typing import Tuple
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
@@ -33,6 +34,7 @@ from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
@@ -40,22 +42,25 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 class DocumentSerializer(Data):
     """Roundtrip serialization of object to dictionary with optional type information."""
 
-    primitive_serializer: PrimitiveSerializer | None = None
-    """Use to serialize primitive types if set, otherwise leave primitive types unchanged."""
-
-    enum_serializer: EnumSerializer | None = None
-    """Use to serialize enum types if set, otherwise leave enum types unchanged."""
+    bidirectional: bool = required()
+    """Use schema to validate and include _type in output to support both serialization and deserialization."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    bidirectional: bool | None = None
-    """Use schema to validate and include _type in output to support both serialization and deserialization."""
+    primitive_serializer: PrimitiveSerializer = required()
+    """Use to serialize primitive types if set, otherwise leave primitive types unchanged."""
+
+    enum_serializer: EnumSerializer = required()
+    """Use to serialize enum types if set, otherwise leave enum types unchanged."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.primitive_serializer is None:
+            # Use passthrough primitive serializer if not specified
+            self.primitive_serializer = PrimitiveSerializers.PASSTHROUGH
         if self.enum_serializer is None:
-            # Create an EnumSerializer with default settings if not specified
+            # Use default enum serializer if not specified
             self.enum_serializer = EnumSerializers.DEFAULT
 
     def serialize(self, data: Any) -> Any:

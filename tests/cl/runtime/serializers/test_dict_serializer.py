@@ -52,7 +52,7 @@ def test_passthrough():
         # TODO: Support serialization of classes with cyclic references
     ]
 
-    serializer = DocumentSerializer(bidirectional=True, primitive_serializer=PrimitiveSerializers.PASSTHROUGH).build()
+    serializer = DocumentSerializer(bidirectional=True).build()
 
     for sample_type in sample_types:
         obj_1 = sample_type().build()

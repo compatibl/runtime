@@ -14,7 +14,7 @@
 
 from cl.runtime.primitive.enum_format_enum import EnumFormatEnum
 from cl.runtime.primitive.none_format_enum import NoneFormatEnum
-from cl.runtime.serializers.document_serializer import EnumSerializer
+from cl.runtime.serializers.enum_serializer import EnumSerializer
 
 cls = EnumSerializer
 

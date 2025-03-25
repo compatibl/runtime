@@ -85,7 +85,7 @@ def test_unidirectional():
     """Test DocumentSerializer.serialize method with bidirectional=None."""
 
     # Create the serializer
-    serializer = DocumentSerializer().build()
+    serializer = DocumentSerializer(bidirectional=False).build()
 
     for sample_type in _SAMPLE_TYPES:
 

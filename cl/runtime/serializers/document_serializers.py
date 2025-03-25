@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.document_serializer import DocumentSerializer
 
@@ -24,11 +25,13 @@ class DocumentSerializers:
     FOR_JSON: cls = cls(
         bidirectional=True,
         primitive_serializer=PrimitiveSerializers.FOR_JSON,
+        enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional dict serializer settings for JSON."""
 
     FOR_MONGO: cls = cls(
         bidirectional=True,
         primitive_serializer=PrimitiveSerializers.FOR_MONGO,
+        enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional dict serializer settings for MongoDB."""
