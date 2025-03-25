@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.document_serializer import DocumentSerializer
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -52,7 +52,7 @@ def test_passthrough():
         # TODO: Support serialization of classes with cyclic references
     ]
 
-    serializer = DictSerializer2(bidirectional=True, primitive_serializer=PrimitiveSerializers.PASSTHROUGH).build()
+    serializer = DocumentSerializer(bidirectional=True, primitive_serializer=PrimitiveSerializers.PASSTHROUGH).build()
 
     for sample_type in sample_types:
         obj_1 = sample_type().build()

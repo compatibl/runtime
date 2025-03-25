@@ -36,7 +36,7 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class DictSerializer2(Data):
+class DocumentSerializer(Data):
     """Roundtrip serialization of object to dictionary with optional type information."""
 
     primitive_serializer: PrimitiveSerializer | None = None

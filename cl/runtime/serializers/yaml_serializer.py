@@ -23,11 +23,11 @@ from ruamel.yaml.constructor import SafeConstructor
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
-from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.document_serializer import DocumentSerializer
 
 # Use primitive serializer with default settings to serialize all primitive types to string
 primitive_to_string_serializer = PrimitiveSerializers.DEFAULT
@@ -127,10 +127,10 @@ class YamlSerializer(Data):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    _dict_serializer: DictSerializer2 = required()
+    _dict_serializer: DocumentSerializer = required()
     """Serializes data into dictionary from which it is serialized into YAML."""
 
-    _dict_deserializer: DictSerializer2 | None = None
+    _dict_deserializer: DocumentSerializer | None = None
     """Deserializes the result of YAML parsing, including converting string leaf nodes to primitive types and enums."""
 
     def __init(self) -> None:
@@ -138,7 +138,7 @@ class YamlSerializer(Data):
 
         # Serializer passes through primitive types during serialization,
         # the conversions are done by the Ruamel YAML representers
-        self._dict_serializer = DictSerializer2(
+        self._dict_serializer = DocumentSerializer(
             bidirectional=self.bidirectional,
             pascalize_keys=self.pascalize_keys,
         ).build()
@@ -146,7 +146,7 @@ class YamlSerializer(Data):
         if self.bidirectional:
             # Create deserializer only if bidirectional flag is set
             # Deserializer uses default settings for deserializing primitive types from string
-            self._dict_deserializer = DictSerializer2(
+            self._dict_deserializer = DocumentSerializer(
                 bidirectional=self.bidirectional,
                 pascalize_keys=self.pascalize_keys,
                 primitive_serializer=PrimitiveSerializers.DEFAULT,

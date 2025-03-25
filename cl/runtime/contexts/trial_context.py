@@ -18,7 +18,7 @@ from typing import Tuple
 from typing_extensions import Self
 from cl.runtime.contexts.context import Context
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_primitive

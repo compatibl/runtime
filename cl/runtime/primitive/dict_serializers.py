@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.primitive.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.document_serializer import DocumentSerializer
 
-cls = DictSerializer2
+cls = DocumentSerializer
 
 
-class DictSerializers:
+class DocumentSerializers:
     """Standard combinations of primitive formats."""
 
     FOR_JSON: cls = cls(

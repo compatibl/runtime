@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.serializers.dict_serializer_2 import DictSerializer2
+from cl.runtime.serializers.document_serializer import DocumentSerializer
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -52,7 +52,7 @@ _SAMPLE_TYPES = [
 
 
 def test_to_yaml():
-    """Test DictSerializer2.to_yaml method."""
+    """Test DocumentSerializer.to_yaml method."""
 
     # Create the serializer
     serializer = YamlSerializer(bidirectional=True).build()
@@ -72,11 +72,11 @@ def test_to_yaml():
 
 
 def test_from_yaml():
-    """Test DictSerializer2.to_yaml method."""
+    """Test DocumentSerializer.to_yaml method."""
 
     # Create the serializers
     yaml_serializer = YamlSerializer(bidirectional=True).build()
-    passthrough_serializer = DictSerializer2(bidirectional=True).build()
+    passthrough_serializer = DocumentSerializer(bidirectional=True).build()
 
     for sample_type in _SAMPLE_TYPES:
 

@@ -22,7 +22,7 @@ from pymongo import MongoClient
 from pymongo.database import Database
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
-from cl.runtime.primitive.dict_serializers import DictSerializers
+from cl.runtime.serializers.document_serializers import DocumentSerializers
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -44,7 +44,7 @@ invalid_db_name_regex = re.compile(f"[{invalid_db_name_symbols}]")
 
 # TODO: Revise and consider making fields of the database
 # TODO: Review and consider alternative names, e.g. DataSerializer or RecordSerializer
-data_serializer = DictSerializers.FOR_MONGO
+data_serializer = DocumentSerializers.FOR_MONGO
 """Default bidirectional dict serializer settings for MongoDB."""
 
 key_serializer = StringSerializer()

@@ -20,9 +20,9 @@ from typing import Sequence
 from typing_extensions import Self
 from cl.runtime.contexts.context import _CONTEXT_STACK_DICT_VAR
 from cl.runtime.contexts.context import Context
-from cl.runtime.primitive.dict_serializers import DictSerializers
+from cl.runtime.serializers.document_serializers import DocumentSerializers
 
-_CONTEXT_SERIALIZER = DictSerializers.FOR_JSON
+_CONTEXT_SERIALIZER = DocumentSerializers.FOR_JSON
 """Serializer used to serialize and deserialize contexts to dicts, primitive types are passed through."""
 
 

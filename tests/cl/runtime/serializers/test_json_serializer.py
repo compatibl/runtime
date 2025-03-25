@@ -50,7 +50,7 @@ _SAMPLE_TYPES = [
 
 
 def test_to_json():
-    """Test DictSerializer2.to_json method."""
+    """Test DocumentSerializer.to_json method."""
 
     # Create the serializer
     serializer = JsonSerializer().build()
@@ -70,7 +70,7 @@ def test_to_json():
 
 
 def test_to_json_pascalize_keys():
-    """Test DictSerializer2.to_json method with pascalize_keys flag."""
+    """Test DocumentSerializer.to_json method with pascalize_keys flag."""
 
     # Create the serializer with pascalize_keys flag set
     serializer = JsonSerializer(pascalize_keys=True).build()
