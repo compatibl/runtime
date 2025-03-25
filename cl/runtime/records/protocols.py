@@ -20,7 +20,6 @@ from typing import List
 from typing import Mapping
 from typing import Protocol
 from typing import Sequence
-from typing import Tuple
 from typing import Type
 from typing import TypeGuard
 from typing import TypeVar

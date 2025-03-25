@@ -17,8 +17,8 @@ from enum import Enum
 from typing import Any
 from typing import Tuple
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import is_data
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_schema import TypeSchema
@@ -69,41 +69,47 @@ class KeySerializer(Data):
             type_spec = TypeSchema.for_class(type(data))
             if not isinstance(type_spec, DataSpec):
                 raise RuntimeError(
-                    f"Schema type '{schema_type_name}' is not a slotted class while data type {data_type_name} is.")
+                    f"Schema type '{schema_type_name}' is not a slotted class while data type {data_type_name} is."
+                )
             field_dict = type_spec.get_field_dict()
 
             # Serialize slot values in the order of declaration packing primitive types into size-one lists
             packed_result = tuple(
                 (
                     v
-                    if (v := getattr(data, k)) is None else
-                    [
-                        # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
-                        self.primitive_serializer.serialize(v, field_spec.type_chain)
-                        if self.primitive_serializer is not None
-                        else v
-                    ]
-                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES else
-                    [
-                        # Use enum serializer, specify enum class
-                        self.enum_serializer.serialize(v, field_spec.get_class())
-                        if self.enum_serializer is not None
-                        else v
-                    ]
-                    if isinstance(v, Enum) else
-                    self.serialize(v, field_spec.type_chain)
+                    if (v := getattr(data, k)) is None
+                    else (
+                        [
+                            # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
+                            (
+                                self.primitive_serializer.serialize(v, field_spec.type_chain)
+                                if self.primitive_serializer is not None
+                                else v
+                            )
+                        ]
+                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                        else (
+                            [
+                                # Use enum serializer, specify enum class
+                                (
+                                    self.enum_serializer.serialize(v, field_spec.get_class())
+                                    if self.enum_serializer is not None
+                                    else v
+                                )
+                            ]
+                            if isinstance(v, Enum)
+                            else self.serialize(v, field_spec.type_chain)
+                        )
+                    )
                 )
                 for k, field_spec in field_dict.items()
                 if not k.startswith("_")
             )
             # Flatten by unpacking the inner tuples
-            result = tuple(
-                token
-                for item in packed_result
-                for token in item
-            )
+            result = tuple(token for item in packed_result for token in item)
             return result
         else:
             raise RuntimeError(
                 f"Cannot serialize data of type '{type(data)}' into a flattened sequence\n"
-                f"because it is not a slotted class or None.")
+                f"because it is not a slotted class or None."
+            )

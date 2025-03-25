@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from abc import abstractmethod
-from typing import Tuple
 from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
@@ -58,7 +57,7 @@ class DataMixin:
 
     def clone(self: Self) -> Self:
         """Return an unfrozen object of the same type populated by shallow copies of public fields."""
-        type_ = type(self) # TODO: Consider using constructor with fields
+        type_ = type(self)  # TODO: Consider using constructor with fields
         result = type_()
         slots = SlotsUtil.get_slots(type_)
         for attr in slots:

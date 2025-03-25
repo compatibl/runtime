@@ -14,8 +14,9 @@
 
 from contextvars import Token
 from dataclasses import dataclass
-from typing import Dict, Sequence
+from typing import Dict
 from typing import List
+from typing import Sequence
 from typing_extensions import Self
 from cl.runtime.contexts.context import _CONTEXT_STACK_DICT_VAR
 from cl.runtime.contexts.context import Context

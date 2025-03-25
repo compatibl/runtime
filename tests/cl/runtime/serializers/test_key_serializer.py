@@ -16,7 +16,8 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.key_serializer import KeySerializer
-from stubs.cl.runtime import StubDataclassRecordKey, StubDataclassCompositeKey
+from stubs.cl.runtime import StubDataclassCompositeKey
+from stubs.cl.runtime import StubDataclassRecordKey
 
 _SAMPLE_TYPES = [
     StubDataclassRecordKey,
