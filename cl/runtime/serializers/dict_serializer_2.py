@@ -201,7 +201,7 @@ class DictSerializer2(Data):
                         if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                         else (
                             (
-                                # Use primitive serializer, specify enum class
+                                # Use enum serializer, specify enum class
                                 self.enum_serializer.serialize(v, field_spec.get_class())
                                 if self.enum_serializer is not None
                                 else v
