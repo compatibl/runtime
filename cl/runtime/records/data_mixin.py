@@ -16,9 +16,9 @@ from abc import abstractmethod
 from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
+from cl.runtime.records.clone_util import CloneUtil
 from cl.runtime.records.protocols import TData
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class DataMixin:
@@ -35,7 +35,7 @@ class DataMixin:
     def mark_frozen(self) -> None:
         """
         Mark the instance as frozen without actually freezing it,which is the responsibility of build method.
-        The action of marking the instance frozen cannot be reversed.
+        The action of marking the instance frozen cannot be reversed. Can be called more than once.
         """
 
     def __setattr__(self, key, value):
@@ -55,21 +55,10 @@ class DataMixin:
         """
         return BuildUtil.typed_build(self)
 
-    def clone(self: Self) -> Self:
-        """Return an unfrozen object of the same type populated by shallow copies of public fields."""
-        type_ = type(self)  # TODO: Consider using constructor with fields
-        result = type_()
-        slots = SlotsUtil.get_slots(type_)
-        for attr in slots:
-            if not attr.startswith("_"):  # Skip private fields
-                setattr(result, attr, getattr(self, attr))
-        return result
+    def clone(self) -> Self:
+        """Return an unfrozen object of the same type constructed from shallow copies of the public fields of self."""
+        return CloneUtil.clone(self)
 
-    def clone_as(self: Self, result_type: Type[TData]) -> TData:
-        """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
-        result = result_type()  # TODO: Consider using constructor with fields
-        slots = SlotsUtil.get_slots(type(self))
-        for attr in slots:
-            if not attr.startswith("_"):  # Skip private fields
-                setattr(result, attr, getattr(self, attr))
-        return result
+    def clone_as(self, result_type: Type[TData]) -> TData:
+        """Return an unfrozen object of the specified type populated by shallow copies of public fields of self."""
+        return CloneUtil.clone_as(self, result_type)
