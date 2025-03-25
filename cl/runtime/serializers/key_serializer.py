@@ -17,6 +17,7 @@ from enum import Enum
 from typing import Any
 from typing import Tuple
 from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.type_util import TypeUtil
@@ -25,23 +26,24 @@ from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
 @dataclass(slots=True, kw_only=True)
 class KeySerializer(Data):
     """Roundtrip serialization of object to a flattened sequence, object cannot have sequence fields."""
 
-    primitive_serializer: PrimitiveSerializer | None = None
-    """Use to serialize primitive types if set, otherwise leave primitive types unchanged."""
+    _primitive_serializer: PrimitiveSerializer = required()
+    """Use to serialize primitive types."""
 
-    enum_serializer: EnumSerializer | None = None
-    """Use to serialize enum types if set, otherwise leave enum types unchanged."""
+    _enum_serializer: EnumSerializer = required()
+    """Use to serialize enum types."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.enum_serializer is None:
-            # Create an EnumSerializer with default settings if not specified
-            self.enum_serializer = EnumSerializers.DEFAULT
+        # Pass through primitive types and use default serialization settings for enums
+        self._primitive_serializer = PrimitiveSerializers.PASSTHROUGH
+        self._enum_serializer = EnumSerializers.DEFAULT
 
     def serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
         """Serialize data into a flattened sequence, validating against type_chain if provided."""
@@ -83,8 +85,8 @@ class KeySerializer(Data):
                         [
                             # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
                             (
-                                self.primitive_serializer.serialize(v, field_spec.type_chain)
-                                if self.primitive_serializer is not None
+                                self._primitive_serializer.serialize(v, field_spec.type_chain)
+                                if self._primitive_serializer is not None
                                 else v
                             )
                         ]
@@ -93,8 +95,8 @@ class KeySerializer(Data):
                             [
                                 # Use enum serializer, specify enum class
                                 (
-                                    self.enum_serializer.serialize(v, field_spec.get_class())
-                                    if self.enum_serializer is not None
+                                    self._enum_serializer.serialize(v, field_spec.get_class())
+                                    if self._enum_serializer is not None
                                     else v
                                 )
                             ]

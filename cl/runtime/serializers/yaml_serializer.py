@@ -177,6 +177,9 @@ class YamlSerializer(Data):
     def deserialize(self, yaml_str: str) -> Any:
         """Read a YAML string and return the deserialized object if bidirectional flag is set, and dict otherwise."""
 
+        if not self.bidirectional:
+            raise RuntimeError("Deserialization is not supported when bidirectional flag is not set.")
+
         # Use a YAML reader with PrimitiveToStringConstructor to read all values as strings
         yaml_dict = yaml_reader.load(StringIO(yaml_str))
 

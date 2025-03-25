@@ -49,10 +49,10 @@ class DocumentSerializer(Data):
     """Pascalize keys during serialization if set."""
 
     primitive_serializer: PrimitiveSerializer = required()
-    """Use to serialize primitive types if set, otherwise leave primitive types unchanged."""
+    """Use to serialize primitive types."""
 
     enum_serializer: EnumSerializer = required()
-    """Use to serialize enum types if set, otherwise leave enum types unchanged."""
+    """Use to serialize enum types."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
@@ -130,19 +130,8 @@ class DocumentSerializer(Data):
                 )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
-                # Parse as a primitive type
-                if self.primitive_serializer:
-                    # Deserialize using primitive serializer if specified
-                    return self.primitive_serializer.serialize(data, [schema_type_name])
-                else:
-                    # Otherwise return raw data after checking the class matches
-                    if data_type_name in PRIMITIVE_CLASS_NAMES:
-                        return data
-                    else:
-                        raise RuntimeError(
-                            f"Type of the data provided to serialize method ({data_class_name})\n"
-                            f"does not match the type specified in schema ({schema_type_name})."
-                        )
+                # Deserialize using primitive serializer if specified
+                return self.primitive_serializer.serialize(data, [schema_type_name])
             else:
                 # Parse as enum
                 type_spec = TypeSchema.for_type_name(schema_type_name)
@@ -200,20 +189,10 @@ class DocumentSerializer(Data):
             result.update(
                 {
                     k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): (
-                        (
-                            # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
-                            self.primitive_serializer.serialize(v, field_spec.type_chain)
-                            if self.primitive_serializer is not None
-                            else v
-                        )
+                        self.primitive_serializer.serialize(v, field_spec.type_chain)
                         if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                         else (
-                            (
-                                # Use enum serializer, specify enum class
-                                self.enum_serializer.serialize(v, field_spec.get_class())
-                                if self.enum_serializer is not None
-                                else v
-                            )
+                            self.enum_serializer.serialize(v, field_spec.get_class())
                             if isinstance(v, Enum)
                             else self._typed_serialize(v, field_spec.type_chain)
                         )
@@ -243,10 +222,7 @@ class DocumentSerializer(Data):
             if remaining_chain:
                 raise RuntimeError(f"Primitive type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
             # Deserialize primitive type using primitive serializer if specified, otherwise return raw data
-            if self.primitive_serializer:
-                return self.primitive_serializer.deserialize(data, [type_name])
-            else:
-                return data
+            return self.primitive_serializer.deserialize(data, [type_name])
         elif type_name in SEQUENCE_TYPE_NAMES:
             if not remaining_chain:
                 raise RuntimeError(
@@ -333,8 +309,7 @@ class DocumentSerializer(Data):
             return None
         elif (data_class_name := data.__class__.__name__) in PRIMITIVE_CLASS_NAMES:
             # Primitive type, serialize using primitive serializer if specified, otherwise return raw data
-            result = self.primitive_serializer.serialize(data) if self.primitive_serializer is not None else data
-            return result
+            return self.primitive_serializer.serialize(data)
         elif data_class_name in SEQUENCE_CLASS_NAMES:
             # Sequence container, including items that are None in output to preserve item positions
             result = [
@@ -342,10 +317,10 @@ class DocumentSerializer(Data):
                     None
                     if v is None
                     else (
-                        (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                        self.primitive_serializer.serialize(v)
                         if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                         else (
-                            (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                            self.enum_serializer.serialize(v)
                             if isinstance(v, Enum)
                             else self._untyped_serialize(v)
                         )
@@ -358,10 +333,10 @@ class DocumentSerializer(Data):
             # Mapping container, do not include values that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                    self.primitive_serializer.serialize(v)
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                     else (
-                        (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                        self.enum_serializer.serialize(v)
                         if isinstance(v, Enum)
                         else self._untyped_serialize(v)
                     )
@@ -372,17 +347,17 @@ class DocumentSerializer(Data):
             return result
         elif isinstance(data, Enum):
             # Enum type, serialize using enum serializer if specified, otherwise return raw data
-            return self.enum_serializer.serialize(data) if self.enum_serializer is not None else data
+            return self.enum_serializer.serialize(data)
         elif is_data(data):
             # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
             slots = SlotsUtil.get_slots(type(data))
             # Serialize slot values in the order of declaration except those that are None
             result = {
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    (self.primitive_serializer.serialize(v) if self.primitive_serializer is not None else v)
+                    self.primitive_serializer.serialize(v)
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                     else (
-                        (self.enum_serializer.serialize(v) if self.enum_serializer is not None else v)
+                        self.enum_serializer.serialize(v)
                         if isinstance(v, Enum)
                         else self._untyped_serialize(v)
                     )

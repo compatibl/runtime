@@ -42,12 +42,11 @@ class JsonSerializer(Data):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self._dict_serializer is None:
-            self._dict_serializer = DocumentSerializer(
-                bidirectional=self.bidirectional,
-                pascalize_keys=self.pascalize_keys,
-                primitive_serializer=PrimitiveSerializers.DEFAULT,
-            ).build()
+        self._dict_serializer = DocumentSerializer(
+            bidirectional=self.bidirectional,
+            pascalize_keys=self.pascalize_keys,
+            primitive_serializer=PrimitiveSerializers.DEFAULT,
+        ).build()
 
     def serialize(self, data: Any) -> str:
         """Serialize to a JSON string."""
@@ -61,6 +60,9 @@ class JsonSerializer(Data):
 
     def deserialize(self, json_str: str) -> Any:
         """Deserialize a JSON string into an object if bidirectional flag is set, and to a dictionary if not."""
+
+        if not self.bidirectional:
+            raise RuntimeError("Deserialization is not supported when bidirectional flag is not set.")
 
         # Use orjson to parse the JSON string into a dictionary
         json_dict = orjson.loads(json_str.encode("utf-8"))
