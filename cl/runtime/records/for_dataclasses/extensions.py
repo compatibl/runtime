@@ -47,13 +47,13 @@ def required(
         formatter: Standard formatter name (without curly brackets) or raw Python format string (in curly brackets)
     """
     # Create metadata dict, include only those fields that are not None, set to None if no such fields
-    args = {
+    metadata = {
+        "optional": False,
         "name": name,
         "label": label,
         "subtype": subtype,
         "formatter": formatter,  # TODO: switch to formatter in other places as format causes Python warnings
     }
-    metadata = {key: value for key, value in args.items() if value is not None} if args else None
 
     if default_factory is None:
         return dataclasses.field(
@@ -109,14 +109,13 @@ def optional(
         formatter: Standard formatter name (without curly brackets) or raw Python format string (in curly brackets)
     """
     # Create metadata dict, include only those fields that are not None, set to None if no such fields
-    args = {
+    metadata = {
+        "optional": True,
         "name": name,
         "label": label,
         "subtype": subtype,
         "formatter": formatter,  # TODO: switch to formatter in other places as format causes Python warnings
-        "optional": True,
     }
-    metadata = {key: value for key, value in args.items() if value is not None}
 
     if default_factory is None:
         return dataclasses.field(

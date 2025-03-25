@@ -45,6 +45,9 @@ class DataclassFieldDecl(FieldDecl):
 
         # Populate fields that require access to dataclasses metadata
         metadata = dict(field.metadata)
+        if (name := metadata.pop("optional", None)) is not None:
+            # Already checked in field spec
+            pass
         if (name := metadata.pop("name", None)) is not None:
             result.name = name
         if (label := metadata.pop("label", None)) is not None:
@@ -62,6 +65,7 @@ class DataclassFieldDecl(FieldDecl):
 
         # Check that no parsed fields remained in metadata
         if len(metadata) > 0:
-            raise RuntimeError(f"Unrecognized attributes in dataclass field metadata: {metadata.keys()}")
+            unused_keys_str = ", ".join(k for k in metadata.keys())
+            raise RuntimeError(f"Unrecognized attributes in dataclass field metadata: {unused_keys_str}")
 
         return result

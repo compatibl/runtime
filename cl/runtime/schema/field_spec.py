@@ -77,8 +77,8 @@ class FieldSpec(FrozenDataMixin):
 
         # Variables to store the result of type hint parsing
         root_type_hint_str = cls._serialize_type_hint(type_hint)
+        root_optional = None
         type_chain = []
-        is_optional = None
 
         # Get origin and args of the field type
         type_hint_origin = typing.get_origin(type_hint)
@@ -89,7 +89,13 @@ class FieldSpec(FrozenDataMixin):
         supported_containers = [list, tuple, dict, frozendict]
         while True:
             # There are two possible forms of origin for optional, typing.Union and types.UnionType
-            if is_optional := type_hint_origin in union_types:
+            type_hint_optional = type_hint_origin in union_types
+
+            # Assign to True or False for the outer hit only
+            if root_optional is None:
+                root_optional = type_hint_optional
+
+            if type_hint_optional:
                 # Union with None is the only permitted Union type
                 if len(type_hint_args) != 2 or type_hint_args[1] is not type(None):
                     raise RuntimeError(
@@ -115,7 +121,7 @@ class FieldSpec(FrozenDataMixin):
                         )
                     # Populate container data and extract the inner type_hint
                     type_hint = type_hint_args[0]
-                    type_chain.append("list | None" if is_optional else "list")
+                    type_chain.append("list | None" if type_hint_optional else "list")
                 elif type_hint_origin is tuple:
                     # Perform additional checks for tuple
                     if len(type_hint_args) != 2 or type_hint_args[1] is not Ellipsis:
@@ -126,7 +132,7 @@ class FieldSpec(FrozenDataMixin):
                         )
                     # Populate container data and extract the inner type_hint
                     type_hint = type_hint_args[0]
-                    type_chain.append("tuple | None" if is_optional else "tuple")
+                    type_chain.append("tuple | None" if type_hint_optional else "tuple")
                 elif type_hint_origin is dict:
                     # Perform additional checks for dict
                     if len(type_hint_args) != 2 or type_hint_args[0] is not str:
@@ -137,7 +143,7 @@ class FieldSpec(FrozenDataMixin):
                         )
                     # Populate container data and extract the inner type_hint
                     type_hint = type_hint_args[1]
-                    type_chain.append("dict | None" if is_optional else "dict")
+                    type_chain.append("dict | None" if type_hint_optional else "dict")
                 else:
                     supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
                     raise RuntimeError(
@@ -157,7 +163,7 @@ class FieldSpec(FrozenDataMixin):
                     if type_hint_origin is None and not type_hint_args:
                         # Add the ultimate inner type inside nested containers to the last type chain item
                         type_name = TypeUtil.name(type_hint)
-                        type_chain.append(f"{type_name} | None" if is_optional else type_name)
+                        type_chain.append(f"{type_name} | None" if type_hint_optional else type_name)
                     else:
                         raise RuntimeError(
                             f"Type hint {type_hint} is not supported. Supported type hints include:\n"
@@ -188,9 +194,15 @@ class FieldSpec(FrozenDataMixin):
                                 f"Subtype {field_subtype} is not valid, supported subtypes are 'long' and 'timestamp'.")
 
                     # TODO: Check optional flag from metadata
-                    if field_optional is not None:
-                        pass
-                        # TODO: raise RuntimeError(f"Specifying 'field_optional' is not yet supported.")
+                    if field_optional is not None and field_optional != root_optional:
+                        if field_optional is True:
+                            raise RuntimeError(
+                                f"Field {containing_type_name}.{field_name} uses '= optional()'\n"
+                                f"but type hint is not a union with None: {root_type_hint_str}")
+                        if field_optional is False:
+                            raise RuntimeError(
+                                f"Field {containing_type_name}.{field_name} uses '= required()'\n"
+                                f"but type hint is a union with None: {root_type_hint_str}")
                     if field_alias is not None:
                         raise RuntimeError(f"Specifying 'field_alias' is not yet supported.")
                     if field_label is not None:
