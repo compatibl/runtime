@@ -19,7 +19,6 @@ from typing import Tuple
 from typing import Type
 from frozendict import frozendict
 from typing_extensions import Self
-
 from cl.runtime.records.for_dataclasses.frozen_data_mixin import FrozenDataMixin
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
@@ -191,18 +190,21 @@ class FieldSpec(FrozenDataMixin):
                                 raise RuntimeError(f"Subtype 'timestamp' is not valid for type hint {type_hint}")
                         else:
                             raise RuntimeError(
-                                f"Subtype {field_subtype} is not valid, supported subtypes are 'long' and 'timestamp'.")
+                                f"Subtype {field_subtype} is not valid, supported subtypes are 'long' and 'timestamp'."
+                            )
 
                     # TODO: Check optional flag from metadata
                     if field_optional is not None and field_optional != root_optional:
                         if field_optional is True:
                             raise RuntimeError(
                                 f"Field {containing_type_name}.{field_name} uses '= optional()'\n"
-                                f"but type hint is not a union with None: {root_type_hint_str}")
+                                f"but type hint is not a union with None: {root_type_hint_str}"
+                            )
                         if field_optional is False:
                             raise RuntimeError(
                                 f"Field {containing_type_name}.{field_name} uses '= required()'\n"
-                                f"but type hint is a union with None: {root_type_hint_str}")
+                                f"but type hint is a union with None: {root_type_hint_str}"
+                            )
                     if field_alias is not None:
                         raise RuntimeError(f"Specifying 'field_alias' is not yet supported.")
                     if field_label is not None:

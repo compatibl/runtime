@@ -319,11 +319,7 @@ class DocumentSerializer(Data):
                     else (
                         self.primitive_serializer.serialize(v)
                         if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                        else (
-                            self.enum_serializer.serialize(v)
-                            if isinstance(v, Enum)
-                            else self._untyped_serialize(v)
-                        )
+                        else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._untyped_serialize(v))
                     )
                 )
                 for v in data
@@ -335,11 +331,7 @@ class DocumentSerializer(Data):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     self.primitive_serializer.serialize(v)
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (
-                        self.enum_serializer.serialize(v)
-                        if isinstance(v, Enum)
-                        else self._untyped_serialize(v)
-                    )
+                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._untyped_serialize(v))
                 )
                 for k, v in data.items()
                 if v is not None and (not hasattr(v, "__len__") or len(v) > 0)
@@ -356,11 +348,7 @@ class DocumentSerializer(Data):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     self.primitive_serializer.serialize(v)
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (
-                        self.enum_serializer.serialize(v)
-                        if isinstance(v, Enum)
-                        else self._untyped_serialize(v)
-                    )
+                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._untyped_serialize(v))
                 )
                 for k in slots
                 if (v := getattr(data, k)) is not None and not k.startswith("_")

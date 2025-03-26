@@ -17,8 +17,8 @@ import datetime as dt
 from uuid import UUID
 from bson import Int64
 from cl.runtime.primitive.datetime_util import DatetimeUtil
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.primitive.time_util import TimeUtil
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
 def test_roundtrip():

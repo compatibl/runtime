@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.serializers.document_serializer import DocumentSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.document_serializer import DocumentSerializer
 
 cls = DocumentSerializer
 

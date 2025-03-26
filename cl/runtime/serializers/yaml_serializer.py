@@ -23,11 +23,11 @@ from ruamel.yaml.constructor import SafeConstructor
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.serializers.document_serializer import DocumentSerializer
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 # Use primitive serializer with default settings to serialize all primitive types to string
 primitive_to_string_serializer = PrimitiveSerializers.DEFAULT

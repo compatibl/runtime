@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from cl.runtime.serializers.enum_serializers import EnumSerializers
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.key_serializer import KeySerializer
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 cls = KeySerializer
 

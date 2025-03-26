@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import DbContext, _KEY_SERIALIZER
+from cl.runtime.contexts.db_context import _KEY_SERIALIZER
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil

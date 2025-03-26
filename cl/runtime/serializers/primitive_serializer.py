@@ -19,7 +19,6 @@ from enum import IntEnum
 from typing import Sequence
 from uuid import UUID
 from bson import Int64
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_format_enum import BoolFormatEnum
 from cl.runtime.primitive.bool_util import BoolUtil

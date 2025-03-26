@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 from stubs.cl.runtime import StubDataclassComposite
@@ -24,6 +23,7 @@ from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 
 _KEY_SERIALIZER = KeySerializers.DEFAULT
+
 
 def test_key_serialization():
     """Test key serialization."""

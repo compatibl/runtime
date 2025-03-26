@@ -31,11 +31,9 @@ class FrozenDataMixin:
 
     def mark_frozen(self) -> None:  # noqa
         """Frozen on construction, do nothing."""
-        pass
 
     def build(self) -> Self:
         """Frozen on construction, do nothing."""
-        pass
 
     def clone_as(self, result_type: Type[TData]) -> TData:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields of self."""

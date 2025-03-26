@@ -15,9 +15,9 @@
 from dataclasses import dataclass
 from typing import Any
 import orjson
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.serializers.document_serializer import DocumentSerializer
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
 def orjson_default(obj):

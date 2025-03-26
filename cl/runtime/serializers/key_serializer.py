@@ -16,13 +16,16 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from typing import Tuple
-
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, TObj, is_record, is_key_or_record, KeyProtocol, \
-    TPrimitive, is_key, DataProtocol
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import DataProtocol
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_or_record
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_schema import TypeSchema
@@ -60,7 +63,8 @@ class KeySerializer(Data):
             data.build()
         else:
             raise RuntimeError(
-                f"Type {TypeUtil.name(data)} passed to {TypeUtil.name(self)} is not a key or record, cannot serialize.")
+                f"Type {TypeUtil.name(data)} passed to {TypeUtil.name(self)} is not a key or record, cannot serialize."
+            )
 
         # Perform checks and convert to a sequence
         sequence = self._to_sequence(data)
@@ -86,8 +90,9 @@ class KeySerializer(Data):
         # Get type spec
         type_spec = TypeSchema.for_class(type(data))
         if not isinstance(type_spec, DataSpec):
-            raise RuntimeError(f"Key serializer cannot serialize '{TypeUtil.name(data)}'\n"
-                               f"because it is not a slotted class.")
+            raise RuntimeError(
+                f"Key serializer cannot serialize '{TypeUtil.name(data)}'\n" f"because it is not a slotted class."
+            )
         field_dict = type_spec.get_field_dict()
 
         # Serialize slot values in the order of declaration packing primitive types into size-one lists
@@ -98,13 +103,14 @@ class KeySerializer(Data):
                     self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_chain)
                 ]
                 if (v := getattr(data, k)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                else
-                [
-                    # Use enum serializer, specify enum class
-                    self.enum_serializer.serialize(self._checked_value(v), field_spec.get_class())
-                ]
-                if isinstance(v, Enum)
-                else self._to_sequence(v)
+                else (
+                    [
+                        # Use enum serializer, specify enum class
+                        self.enum_serializer.serialize(self._checked_value(v), field_spec.get_class())
+                    ]
+                    if isinstance(v, Enum)
+                    else self._to_sequence(v)
+                )
             )
             for k, field_spec in field_dict.items()
             if not k.startswith("_")

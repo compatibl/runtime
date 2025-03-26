@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from stubs.cl.runtime import StubIntEnum
 

@@ -21,7 +21,6 @@ from typing import Tuple
 from typing import Type
 from typing import get_type_hints
 from uuid import UUID
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil

@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Type
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_format_enum import EnumFormatEnum
@@ -49,7 +48,8 @@ class EnumSerializer(Data):
                 value_type_name = TypeUtil.name(type(value))
                 schema_type_name = TypeUtil.name(enum_type)
                 raise RuntimeError(
-                    f"Type {value_type_name} of enum value does not match the type in schema {schema_type_name}")
+                    f"Type {value_type_name} of enum value does not match the type in schema {schema_type_name}"
+                )
             # Serialize according to settings
             if (value_format := self.enum_format) == EnumFormatEnum.PASSTHROUGH:
                 # Pass through the enum instance without changes
@@ -86,4 +86,5 @@ class EnumSerializer(Data):
         else:
             schema_type_name = TypeUtil.name(enum_type)
             raise RuntimeError(
-                f"Schema type {schema_type_name} provided to {self.__class__.__name__} is not an enum type.")
+                f"Schema type {schema_type_name} provided to {self.__class__.__name__} is not an enum type."
+            )

@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import DbContext, _KEY_SERIALIZER
+from cl.runtime.contexts.db_context import _KEY_SERIALIZER
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem

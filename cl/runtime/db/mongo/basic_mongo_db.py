@@ -22,7 +22,6 @@ from pymongo import MongoClient
 from pymongo.database import Database
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
-from cl.runtime.serializers.document_serializers import DocumentSerializers
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -31,6 +30,7 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
+from cl.runtime.serializers.document_serializers import DocumentSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 

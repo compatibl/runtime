@@ -17,7 +17,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
-from stubs.cl.runtime import StubDataclassCompositeKey, StubDataclassListFields, StubDataclassDictFields
+from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
@@ -59,7 +59,6 @@ def test_serialization_exceptions():
         with pytest.raises(RuntimeError):
             print(f"Serializing type {type(sample)}")
             _KEY_SERIALIZER.serialize(sample)
-
 
 
 if __name__ == "__main__":

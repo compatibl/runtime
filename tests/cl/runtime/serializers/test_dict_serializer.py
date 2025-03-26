@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.document_serializer import DocumentSerializer
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord

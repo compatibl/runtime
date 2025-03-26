@@ -116,7 +116,8 @@ class ErrorUtil:
             # Check that schema type matches if specified
             if schema_type is not None and schema_type != (value_type_name := TypeUtil.name(type(value))):
                 return RuntimeError(
-                    f"Type {value_type_name} of enum value does not match the type in schema {schema_type}")
+                    f"Type {value_type_name} of enum value does not match the type in schema {schema_type}"
+                )
             else:
                 enum_type_name = TypeUtil.name(value)
                 enum_type_str = f"Enum {enum_type_name}" if not enum_type_name.endswith("Enum") else enum_type_name
