@@ -24,7 +24,6 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Literal
-from typing import Optional
 from typing import Set
 from typing import Type
 from typing import get_type_hints
@@ -107,7 +106,7 @@ def for_type_key_maker(
     return f"{record_type.__module__}.{TypeUtil.name(record_type)}.{dependencies.__hash__}{skip_fields}{skip_handlers}"
 
 
-def get_name_of_type_decl_dict(dict_: Dict[str, Dict]) -> Optional[str]:
+def get_name_of_type_decl_dict(dict_: Dict[str, Dict]) -> str | None:
     """Search for the type name in the given dict and return in format {module}.{name} ."""
 
     # Element fields contain "key_" in case of key-field or "data" section in case of data-field

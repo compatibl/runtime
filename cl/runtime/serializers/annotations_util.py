@@ -52,7 +52,7 @@ class AnnotationsUtil:
 
     @classmethod
     def handle_optional_annot(cls, type_):
-        """Extract inner type if 'type_' is Optional[...], otherwise return unchanged."""
+        """Extract inner type if 'type_' is optional, otherwise return unchanged."""
 
         if type_ is None:
             return None

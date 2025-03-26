@@ -165,7 +165,7 @@ class UiDictSerializer(DictSerializer):
         if not self.pascalize_keys:
             raise RuntimeError("UI serialization format only supports pascalize_keys=True mode.")
 
-        # Extract inner type if type_ is Optional[...]
+        # Extract inner type if type_ is optional
         type_ = AnnotationsUtil.handle_optional_annot(type_)
 
         if isinstance(data, dict):

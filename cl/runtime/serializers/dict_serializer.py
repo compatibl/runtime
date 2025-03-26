@@ -173,7 +173,7 @@ class DictSerializer:
         serialized dataclasses. For a serialized dataclasses, the type is specified in the "_type" attribute.
         """
 
-        # Extract inner type if type_ is Optional[...]
+        # Extract inner type if type_ is optional
         type_ = AnnotationsUtil.handle_optional_annot(type_)
 
         if isinstance(data, dict):

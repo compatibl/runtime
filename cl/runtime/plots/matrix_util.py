@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import List
-from typing import Optional
 import pandas as pd
 from sklearn.metrics import confusion_matrix
 
@@ -39,7 +38,7 @@ class MatrixUtil:
         return result
 
     @staticmethod
-    def create_confusion_matrix_labels(data: pd.DataFrame, in_percent: Optional[bool] = False) -> List[List[str]]:
+    def create_confusion_matrix_labels(data: pd.DataFrame, in_percent: bool | None = False) -> List[List[str]]:
         # str of each non-zero element of data for annotations
 
         if in_percent:

@@ -14,7 +14,6 @@
 
 from typing import Dict
 from typing import List
-from typing import Optional
 from typing import Tuple
 from typing import Union
 import numpy as np
@@ -77,8 +76,8 @@ class MatplotlibUtil:
         im: AxesImage,
         labels: List[List[str]],
         text_colors: Union[str, Tuple[str]] = ("black", "white"),
-        threshold: Optional[float] = None,
-        **kwargs,
+        threshold: float | None = None,
+        **kwargs,  # TODO: Avoid **kwargs
     ):
         """
         Annotate a heatmap.

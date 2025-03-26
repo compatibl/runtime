@@ -117,7 +117,7 @@ class FlatDictSerializer(DictSerializer):
 
     def deserialize_data(self, data: TDataDict, type_: Type | None = None):
 
-        # Extract inner type if type_ is Optional[...]
+        # Extract inner type if type_ is optional
         type_ = AnnotationsUtil.handle_optional_annot(type_)
 
         if type_ is Any:

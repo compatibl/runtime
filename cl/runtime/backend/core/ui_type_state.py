@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import List
-from typing import Optional
 from typing import final
 from cl.runtime.backend.core.ui_type_state_key import UiTypeStateKey
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -26,16 +25,16 @@ from cl.runtime.records.record_mixin import RecordMixin
 class UiTypeState(UiTypeStateKey, RecordMixin[UiTypeStateKey]):
     """Defines ui settings for a type."""
 
-    read_only: Optional[bool] = required()
+    read_only: bool | None = None
     """Specifies if records of this type are readonly."""
 
-    use_cache: Optional[bool] = required()
+    use_cache: bool | None = None
     """
     If set and TRUE data will be cached until tab is opened. This means that the next time the tab is
     activated, the main grid data request will not be submitted, it will be taken from the browser cache.
     """
 
-    pinned_handlers: Optional[List[str]] = required()
+    pinned_handlers: List[str] | None = None
     """List of names of the handlers pinned for the type"""
 
     def get_key(self) -> UiTypeStateKey:

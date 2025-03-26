@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import List
-from typing import Optional
 from cl.runtime import RecordMixin
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
@@ -88,14 +87,14 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
     def build_dag(
         node: "SuccessorDagNode",
         layout_mode: DagLayoutEnum = DagLayoutEnum.PLANAR,
-        ignore_fields: Optional[list[str]] = None,
+        ignore_fields: List[str] | None = None,
     ) -> Dag:
         """Build the DAG for the given node.
 
         Args:
-            node (SuccessorDagNode): The root node to start the DAG from.
-            layout_mode (DagLayoutEnum): Layout mode for arranging the DAG. Defaults to DagLayoutEnum.PLANAR.
-            ignore_fields (Optional[list[str]]): Fields to ignore during traversal. Defaults to an empty list.
+            node: The root node to start the DAG from.
+            layout_mode: Layout mode for arranging the DAG. Defaults to DagLayoutEnum.PLANAR.
+            ignore_fields: Fields to ignore during traversal. Defaults to an empty list.
 
         Returns:
             Dag: The constructed directed acyclic graph (DAG).

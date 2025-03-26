@@ -15,7 +15,6 @@
 import pytest
 from dataclasses import dataclass
 from typing import List
-from typing import Optional
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.patches import Rectangle
@@ -27,7 +26,7 @@ def test_smoke(pytest_work_dir):
     @dataclass
     class Node:
         title: str
-        successors: Optional[List["Node"]] = None
+        successors: List["Node"] | None = None
 
     # Define the nodes with successors
     staff_a = Node(title="Staff A")
