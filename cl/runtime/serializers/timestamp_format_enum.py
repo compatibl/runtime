@@ -24,3 +24,6 @@ class TimestampFormatEnum(IntEnum):
 
     DEFAULT = auto()
     """ISO 8601 datetime to millisecond precision followed by hex[20]: "2023-05-01T10:15:30.000Z-1a1a1a1a1a1a1a1a1a1a"""
+
+    UUID = auto()
+    """Lowercase string with the standard delimiter placement for UUID (8-4-4-4-12), same as UUID default."""

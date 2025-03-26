@@ -60,7 +60,7 @@ class PrimitiveSerializers:
         time_format=TimeFormatEnum.DEFAULT,
         uuid_format=UuidFormatEnum.DEFAULT,
         timestamp_format=TimestampFormatEnum.DEFAULT,
-        bytes_format=BytesFormatEnum.DEFAULT,
+        bytes_format=BytesFormatEnum.MIME,
     ).build()
     """Pass through None and string, serialize all other primitive types to string using default format."""
 
@@ -87,13 +87,13 @@ class PrimitiveSerializers:
         string_format=StringFormatEnum.PASSTHROUGH,
         float_format=FloatFormatEnum.PASSTHROUGH,
         bool_format=BoolFormatEnum.PASSTHROUGH,
-        int_format=IntFormatEnum.DEFAULT,
-        long_format=LongFormatEnum.DEFAULT,
+        int_format=IntFormatEnum.DEFAULT,  # TODO: Review, should be passthrough
+        long_format=LongFormatEnum.DEFAULT,  # TODO: Review, should be passthrough
         date_format=DateFormatEnum.DEFAULT,
         datetime_format=DatetimeFormatEnum.DEFAULT,
         time_format=TimeFormatEnum.DEFAULT,
         uuid_format=UuidFormatEnum.DEFAULT,
-        timestamp_format=TimestampFormatEnum.DEFAULT,
+        timestamp_format=TimestampFormatEnum.UUID,  # TODO: Review, should accept DEFAULT
         bytes_format=BytesFormatEnum.DEFAULT,
     ).build()
     """

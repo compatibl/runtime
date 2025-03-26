@@ -23,4 +23,7 @@ class BytesFormatEnum(IntEnum):
     """Do not apply any transformation during serialization or deserialization."""
 
     DEFAULT = auto()
+    """Base64 encoding for bytes on a single line."""
+
+    MIME = auto()
     """Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL."""

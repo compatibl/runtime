@@ -210,12 +210,18 @@ class PrimitiveSerializer(Data):
                 elif value_format == TimestampFormatEnum.DEFAULT:
                     # Use timestamp-hex UUIDv7 format
                     return Timestamp.from_uuid7(value)
+                elif value_format == TimestampFormatEnum.UUID:
+                    # Use the standard delimited UUID format
+                    return UuidUtil.to_str(value)
                 else:
                     raise ErrorUtil.enum_value_error(value_format, TimestampFormatEnum)
         elif value_class_name == "bytes":
             if (value_format := self.bytes_format) == BytesFormatEnum.PASSTHROUGH:
                 return value
             elif value_format == BytesFormatEnum.DEFAULT:
+                # Base64 encoding for bytes on a single line
+                return base64.b64encode(value).decode("utf-8")  # TODO: Create BytesUtil
+            elif value_format == BytesFormatEnum.MIME:
                 # Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL
                 return base64.encodebytes(value).decode("utf-8").rstrip("\n")  # TODO: Create BytesUtil
             else:
@@ -451,11 +457,31 @@ class PrimitiveSerializer(Data):
                     # Treat an empty string and "null" as None
                     return None
                 elif isinstance(value, str):
-                    # Accepts both standard format for any UUID version and timestamp-hex format for version 7
                     result = UuidUtil.from_str(value)
+                    # Accepts both standard format for any UUID version and timestamp-hex format for version 7,
+                    # perform an explicit check to ensure UUID version matches the subtype
                     if result.version != 7:
                         raise RuntimeError("For timestamp type, only version 7 of UUID is valid.")
                     return result
+                else:
+                    raise self._deserialization_error(value, schema_type_name, value_format)
+            elif value_format == TimestampFormatEnum.UUID:
+                if value in [None, "", "null"]:
+                    # Treat an empty string and "null" as None
+                    return None
+                elif isinstance(value, str):
+                    if value in [None, "", "null"]:
+                        # Treat an empty string and "null" as None
+                        return None
+                    elif isinstance(value, str):
+                        result = UuidUtil.from_str(value)
+                        # Accepts both standard format for any UUID version and timestamp-hex format for version 7,
+                        # perform an explicit check to ensure UUID version matches the subtype
+                        if result.version != 7:
+                            raise RuntimeError("For timestamp type, only version 7 of UUID is valid.")
+                        return result
+                    else:
+                        raise self._deserialization_error(value, schema_type_name, value_format)
                 else:
                     raise self._deserialization_error(value, schema_type_name, value_format)
             else:
@@ -472,6 +498,16 @@ class PrimitiveSerializer(Data):
                     # Treat an empty string and "null" as None
                     return None
                 elif isinstance(value, str):
+                    # Base64 encoding for bytes, the decoder accepts any line wrap convention
+                    return base64.b64decode(value)  # TODO: Create BytesUtil
+                else:
+                    raise self._deserialization_error(value, schema_type_name, value_format)
+            elif value_format == BytesFormatEnum.MIME:
+                if value in [None, "", "null"]:
+                    # Treat an empty string and "null" as None
+                    return None
+                elif isinstance(value, str):
+                    # Base64 encoding for bytes, the decoder accepts any line wrap convention
                     return base64.b64decode(value)  # TODO: Create BytesUtil
                 else:
                     raise self._deserialization_error(value, schema_type_name, value_format)
