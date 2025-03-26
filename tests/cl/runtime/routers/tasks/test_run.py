@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.db_context import DbContext, _KEY_SERIALIZER
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
@@ -27,7 +27,7 @@ from stubs.cl.runtime import StubHandlers
 
 stub_handlers = StubHandlers()
 key_serializer = StringSerializer()
-key_str = key_serializer.serialize_key(stub_handlers.get_key())
+key_str = _KEY_SERIALIZER.serialize(stub_handlers)
 
 simple_requests = [
     {

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassListFields
@@ -21,6 +23,7 @@ from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 
 def test_key_serialization():
     """Test key serialization."""
@@ -39,7 +42,7 @@ def test_key_serialization():
     for sample_type in sample_types:
         obj_1 = sample_type()
         obj_1_key = obj_1.get_key()
-        serialized = key_serializer.serialize_key(obj_1_key)
+        serialized = _KEY_SERIALIZER.serialize(obj_1_key)
 
         deserialized_key = key_serializer.deserialize_key(serialized, sample_type.get_key_type()).build()
         assert obj_1_key == deserialized_key

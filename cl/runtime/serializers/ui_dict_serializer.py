@@ -27,11 +27,13 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.annotations_util import AnnotationsUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names
 
 key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 
 
 @dataclass(slots=True, kw_only=True)
@@ -67,7 +69,7 @@ class UiDictSerializer(DictSerializer):
             return pascal_case_value
         elif is_key(data):
             # Serialize key as string
-            return key_serializer.serialize_key(data)
+            return _KEY_SERIALIZER.serialize(data)
         elif isinstance(data, dict):
             # Serialize dict as list of dicts in format [{"key": [key], "value": [value_as_legacy_variant]}]
             serialized_dict_items = []
@@ -139,7 +141,7 @@ class UiDictSerializer(DictSerializer):
 
         # Add "_t" and "_key" attributes
         table_dict["_t"] = TypeUtil.name(record)
-        table_dict["_key"] = key_serializer.serialize_key(record.get_key())
+        table_dict["_key"] = _KEY_SERIALIZER.serialize(record)
 
         return table_dict
 

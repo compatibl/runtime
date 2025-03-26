@@ -24,11 +24,13 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 param_dict_serializer = DictSerializer()  # TODO: Support complex params
 
 
@@ -86,7 +88,7 @@ class InstanceMethodTask(MethodTask):
         key_type = record_or_key.get_key_type()
         result.key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
         key = record_or_key.get_key() if is_record(record_or_key) else record_or_key
-        result.key_str = key_serializer.serialize_key(key)
+        result.key_str = _KEY_SERIALIZER.serialize(key)
 
         # Two tokens because the callable is bound to a class or its instance
         method_tokens = method_callable.__qualname__.split(".")

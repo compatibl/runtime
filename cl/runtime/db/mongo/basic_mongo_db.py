@@ -31,6 +31,7 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 
 invalid_db_name_symbols = r'/\\. "$*<>:|?'
@@ -48,6 +49,7 @@ data_serializer = DocumentSerializers.FOR_MONGO
 """Default bidirectional dict serializer settings for MongoDB."""
 
 key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 filter_serializer = MongoFilterSerializer()
 
 _client_dict: Dict[str, MongoClient] = {}
@@ -75,7 +77,7 @@ class BasicMongoDb(Db):
         db = self._get_db()
         collection = db[collection_name]
 
-        serialized_key = key_serializer.serialize_key(key)
+        serialized_key = _KEY_SERIALIZER.serialize(key)
         serialized_record = collection.find_one({"_key": serialized_key})
         if serialized_record is not None:
             del serialized_record["_id"]
@@ -175,7 +177,7 @@ class BasicMongoDb(Db):
 
         # Serialize key
         # TODO: Consider getting the key first instead of serializing the entire record
-        serialized_key = key_serializer.serialize_key(record.get_key())
+        serialized_key = _KEY_SERIALIZER.serialize(record)
 
         # Use update_one with upsert=True to insert if not present or update if present
         # TODO (Roman): update_one does not affect fields not presented in record. Changed to replace_one
@@ -203,7 +205,7 @@ class BasicMongoDb(Db):
         db = self._get_db()
         collection = db[collection_name]
 
-        serialized_key = key_serializer.serialize_key(key)
+        serialized_key = _KEY_SERIALIZER.serialize(key)
 
         delete_filter = {"_key": serialized_key}
         collection.delete_one(delete_filter)

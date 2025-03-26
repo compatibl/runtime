@@ -31,9 +31,11 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 
 key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 """Serializer for keys."""
 
 data_serializer = DictSerializer()
@@ -344,7 +346,7 @@ class DbContext(Context):
             )
         else:
             # TODO: To prevent calling get_key more than once, pass to DB save method
-            if not key_serializer.serialize_key(key := record.get_key()):
+            if not _KEY_SERIALIZER.serialize(key := record.get_key()):
                 # Error only if not a singleton
                 if not is_singleton_key(key):
                     record_data = data_serializer.serialize_data(record)

@@ -27,10 +27,12 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.serializers.annotations_util import AnnotationsUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.dict_serializer import get_type_dict
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names
 
 key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 """Serializer for key to string conversion."""
 
 
@@ -89,7 +91,7 @@ class FlatDictSerializer(DictSerializer):
             return StringSerializer.serialize_primitive(data)
         elif is_key(data):
             # Serialize key as string
-            key_str = key_serializer.serialize_key(data)
+            key_str = _KEY_SERIALIZER.serialize(data)
             if self._is_json_str(key_str):
                 raise RuntimeError(f"Key str must not match json condition, key_str value: {key_str}.")
 

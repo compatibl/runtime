@@ -24,9 +24,11 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 
 key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 """Serializer for keys used in cache lookup."""
 
 _local_cache_instance = None
@@ -47,7 +49,7 @@ class LocalCache(Db):
         dataset: str | None = None,
     ) -> RecordProtocol | None:
         # Serialize key in semicolon-delimited format
-        serialized_key = key_serializer.serialize_key(key)
+        serialized_key = _KEY_SERIALIZER.serialize(key)
         # Try to retrieve table dictionary
         key_type_name = TypeUtil.name(key)
         if (table_cache := self.__cache.get(key_type_name, None)) is not None:
@@ -106,7 +108,7 @@ class LocalCache(Db):
 
         # Serialize both key and record
         key = record.get_key()
-        serialized_key = key_serializer.serialize_key(key)
+        serialized_key = _KEY_SERIALIZER.serialize(key)
 
         # Add record to cache, overwriting an existing record if present
         table_cache[serialized_key] = record
