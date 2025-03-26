@@ -82,6 +82,26 @@ class PrimitiveSerializers:
     Default primitive serializer settings for JSON.
     """
 
+    FOR_UI: cls = cls(
+        none_format=NoneFormatEnum.PASSTHROUGH,
+        string_format=StringFormatEnum.PASSTHROUGH,
+        float_format=FloatFormatEnum.PASSTHROUGH,
+        bool_format=BoolFormatEnum.PASSTHROUGH,
+        int_format=IntFormatEnum.DEFAULT,
+        long_format=LongFormatEnum.DEFAULT,
+        date_format=DateFormatEnum.DEFAULT,
+        datetime_format=DatetimeFormatEnum.DEFAULT,
+        time_format=TimeFormatEnum.DEFAULT,
+        uuid_format=UuidFormatEnum.DEFAULT,
+        timestamp_format=TimestampFormatEnum.DEFAULT,
+        bytes_format=BytesFormatEnum.DEFAULT,
+    ).build()
+    """
+    Default primitive serializer settings for UI.
+    - Pass through None, str, float, bool, int, datetime, uuid, timestamp, bytes
+    - Serialize all other primitive type to string using default format
+    """
+
     FOR_MONGO: cls = cls(
         none_format=NoneFormatEnum.PASSTHROUGH,
         string_format=StringFormatEnum.PASSTHROUGH,

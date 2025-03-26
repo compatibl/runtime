@@ -54,7 +54,7 @@ class DataSerializers:
         type_format=TypeFormatEnum.NAME_ONLY,
         type_field="_t",
         pascalize_keys=True,
-        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        primitive_serializer=PrimitiveSerializers.FOR_UI,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
     ).build()
