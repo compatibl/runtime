@@ -37,17 +37,13 @@ from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
+from cl.runtime.serializers.type_format_enum import TypeFormatEnum
+from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 
 
 @dataclass(slots=True, kw_only=True)
 class DataSerializer(Data):
     """Roundtrip serialization of object to dictionary with optional type information."""
-
-    bidirectional: bool = required()
-    """Use schema to validate and include _type in output to support both serialization and deserialization."""
-
-    pascalize_keys: bool | None = None
-    """Pascalize keys during serialization if set."""
 
     primitive_serializer: PrimitiveSerializer = required()
     """Use to serialize primitive types."""
@@ -58,20 +54,31 @@ class DataSerializer(Data):
     key_serializer: KeySerializer | None = None
     """Use to serialize key types if specified, otherwise use the same serialization as for data."""
 
+    type_inclusion: TypeInclusionEnum = required()
+    """Where to include type information in serialized data."""
+
+    type_format: TypeFormatEnum = required()
+    """Format of the type information in serialized data."""
+
+    pascalize_keys: bool | None = None
+    """Pascalize keys during serialization if set."""
+
     def serialize(self, data: Any) -> Any:
         """Serialize data to a dictionary."""
 
-        if self.bidirectional:
+        if self.type_inclusion == TypeInclusionEnum.DEFAULT or TypeInclusionEnum.ALWAYS:
             # Use typed serialization if bidirectional flag is on
             return self._typed_serialize(data)
-        else:
+        elif self.type_inclusion == TypeInclusionEnum.NEVER:
             # Otherwise use untyped serialization
             return self._untyped_serialize(data)
+        else:
+            ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
     def deserialize(self, data: Any) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
 
-        if self.bidirectional:
+        if self.type_inclusion == TypeInclusionEnum.DEFAULT or TypeInclusionEnum.ALWAYS:
             if data is None:
                 # Pass through None
                 return None
@@ -91,17 +98,16 @@ class DataSerializer(Data):
                     f"Data is not a list or mapping, cannot deserialize without type_chain argument:\n"
                     f"{ErrorUtil.wrap(data)}."
                 )
+        elif self.type_inclusion == TypeInclusionEnum.NEVER:
+            raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
         else:
-            raise RuntimeError(
-                f"Deserialization is not supported when {self.__class__.__name__}.bidirectional\n" f"flag is not set."
-            )
+            ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
     def _typed_serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
         """Serialize the argument to a dictionary type_chain and schema."""
 
         # Get type and class of data and parse type chain
         data_class_name = data.__class__.__name__ if data is not None else None
-        data_type_name = TypeUtil.name(data) if data is not None else None
         schema_type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
 
         if data is None:
@@ -160,22 +166,34 @@ class DataSerializer(Data):
             if not isinstance(data_type_spec, DataSpec):
                 raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
 
-            if schema_type_name is None or schema_type_name != data_type_name:
-                # Write _type if type name from schema is not available or different from the type of data
-                result = {"_type": data_type_name}
-                if schema_type_name:
-                    # If schema type is specified, ensure that data is an instance of the specified type
-                    schema_type_spec = TypeSchema.for_type_name(schema_type_name)
-                    schema_type_name = schema_type_spec.type_name
-                    if not isinstance(schema_type_spec, DataSpec):
-                        raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
-                    if not isinstance(data, schema_type_spec.get_class()):
-                        raise RuntimeError(
-                            f"Type {data_type_name} is not the same or a subclass of "
-                            f"the type {schema_type_name} specified in schema."
-                        )
+            # Perform check against the schema if provided irrespective of the type inclusion setting
+            if schema_type_name is not None and schema_type_name != data_type_name:
+                # If schema type is specified, ensure that data is an instance of the specified type
+                schema_type_spec = TypeSchema.for_type_name(schema_type_name)
+                schema_type_name = schema_type_spec.type_name
+                if not isinstance(schema_type_spec, DataSpec):
+                    raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
+                if not isinstance(data, schema_type_spec.get_class()):
+                    raise RuntimeError(
+                        f"Type {data_type_name} is not the same or a subclass of "
+                        f"the type {schema_type_name} specified in schema."
+                    )
+
+            # Include type in output according to the type_inclusion setting
+            include_type = None
+            if self.type_inclusion == TypeInclusionEnum.ALWAYS:
+                include_type = True
+            elif self.type_inclusion == TypeInclusionEnum.DEFAULT:
+                # Include if schema type is not provided or not the same as data type
+                include_type = schema_type_name is None or schema_type_name != data_type_name
+            elif self.type_inclusion == TypeInclusionEnum.NEVER:
+                include_type = False
             else:
-                result = {}
+                ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
+
+            # Include type information depending on the outcome of the above logic
+            result = {"_type": data_type_name} if include_type else {}
+
 
             # Get class and field dictionary for schema_type_name
             data_field_dict = data_type_spec.get_field_dict()

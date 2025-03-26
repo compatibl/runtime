@@ -16,9 +16,12 @@ from dataclasses import dataclass
 from typing import Any
 import orjson
 from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.type_format_enum import TypeFormatEnum
+from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 
 
 def orjson_default(obj):
@@ -32,8 +35,11 @@ def orjson_default(obj):
 class JsonSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    bidirectional: bool | None = None
-    """Use schema to validate and include _type in output to support both serialization and deserialization."""
+    type_inclusion: TypeInclusionEnum = required()
+    """Where to include type information in serialized data."""
+
+    type_format: TypeFormatEnum = required()
+    """Format of the type information in serialized data."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
@@ -44,7 +50,8 @@ class JsonSerializer(Data):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         self._dict_serializer = DataSerializer(
-            bidirectional=self.bidirectional,
+            type_inclusion=self.type_inclusion,
+            type_format=self.type_format,
             pascalize_keys=self.pascalize_keys,
             primitive_serializer=PrimitiveSerializers.DEFAULT,
             enum_serializer=EnumSerializers.DEFAULT,
@@ -63,8 +70,8 @@ class JsonSerializer(Data):
     def deserialize(self, json_str: str) -> Any:
         """Deserialize a JSON string into an object if bidirectional flag is set, and to a dictionary if not."""
 
-        if not self.bidirectional:
-            raise RuntimeError("Deserialization is not supported when bidirectional flag is not set.")
+        if self.type_inclusion == TypeInclusionEnum.NEVER:
+            raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
 
         # Use orjson to parse the JSON string into a dictionary
         json_dict = orjson.loads(json_str.encode("utf-8"))

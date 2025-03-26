@@ -16,6 +16,8 @@ from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.type_format_enum import TypeFormatEnum
+from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 
 cls = DataSerializer
 
@@ -24,28 +26,32 @@ class DataSerializers:
     """Standard combinations of primitive formats."""
 
     PASSTHROUGH: cls = cls(
-        bidirectional=True,
+        type_inclusion=TypeInclusionEnum.DEFAULT,
+        type_format=TypeFormatEnum.TYPE_NAME,
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
         enum_serializer=EnumSerializers.PASSTHROUGH,
     ).build()
     """Bidirectional conversion of classes to dicts and back without any conversion of primitive types or enums."""
 
     DEFAULT: cls = cls(
-        bidirectional=True,
+        type_inclusion=TypeInclusionEnum.DEFAULT,
+        type_format=TypeFormatEnum.TYPE_NAME,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional data serializer with default serialization for primitive types and enums."""
 
     FOR_JSON: cls = cls(
-        bidirectional=True,
+        type_inclusion=TypeInclusionEnum.DEFAULT,
+        type_format=TypeFormatEnum.TYPE_NAME,
         primitive_serializer=PrimitiveSerializers.FOR_JSON,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional data serializer settings for JSON."""
 
     FOR_UI: cls = cls(
-        bidirectional=True,
+        type_inclusion=TypeInclusionEnum.DEFAULT,
+        type_format=TypeFormatEnum.TYPE_NAME,
         pascalize_keys=True,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
@@ -54,7 +60,8 @@ class DataSerializers:
     """Default bidirectional data serializer settings for UI."""
 
     FOR_MONGO: cls = cls(
-        bidirectional=True,
+        type_inclusion=TypeInclusionEnum.DEFAULT,
+        type_format=TypeFormatEnum.TYPE_NAME,
         primitive_serializer=PrimitiveSerializers.FOR_MONGO,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()

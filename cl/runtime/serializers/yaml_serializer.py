@@ -29,6 +29,8 @@ from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.type_format_enum import TypeFormatEnum
+from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 
 # Use primitive serializer with default settings to serialize all primitive types to string
 primitive_to_string_serializer = PrimitiveSerializers.DEFAULT
@@ -122,8 +124,11 @@ yaml_reader.Constructor = PrimitiveToStringConstructor
 class YamlSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    bidirectional: bool | None = None
-    """Use schema to validate and include _type in output to support both serialization and deserialization."""
+    type_inclusion: TypeInclusionEnum = required()
+    """Where to include type information in serialized data."""
+
+    type_format: TypeFormatEnum = required()
+    """Format of the type information in serialized data."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
@@ -140,17 +145,19 @@ class YamlSerializer(Data):
         # Serializer passes through primitive types during serialization,
         # the conversions are done by the Ruamel YAML representers
         self._dict_serializer = DataSerializer(
-            bidirectional=self.bidirectional,
+            type_inclusion=self.type_inclusion,
+            type_format=self.type_format,
             pascalize_keys=self.pascalize_keys,
             primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
             enum_serializer=EnumSerializers.DEFAULT,
         ).build()
 
-        if self.bidirectional:
+        if self.type_format:
             # Create deserializer only if bidirectional flag is set
             # Deserializer uses default settings for deserializing primitive types from string
             self._dict_deserializer = DataSerializer(
-                bidirectional=self.bidirectional,
+                type_inclusion=self.type_inclusion,
+                type_format=self.type_format,
                 pascalize_keys=self.pascalize_keys,
                 primitive_serializer=PrimitiveSerializers.DEFAULT,
                 enum_serializer=EnumSerializers.DEFAULT,
@@ -181,8 +188,8 @@ class YamlSerializer(Data):
     def deserialize(self, yaml_str: str) -> Any:
         """Read a YAML string and return the deserialized object if bidirectional flag is set, and dict otherwise."""
 
-        if not self.bidirectional:
-            raise RuntimeError("Deserialization is not supported when bidirectional flag is not set.")
+        if self.type_inclusion == TypeInclusionEnum.NEVER:
+            raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
 
         # Use a YAML reader with PrimitiveToStringConstructor to read all values as strings
         yaml_dict = yaml_reader.load(StringIO(yaml_str))

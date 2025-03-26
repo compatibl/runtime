@@ -19,6 +19,8 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.type_format_enum import TypeFormatEnum
+from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -57,7 +59,10 @@ def test_to_yaml():
     """Test DataSerializer.to_yaml method."""
 
     # Create the serializer
-    serializer = YamlSerializer(bidirectional=True).build()
+    serializer = YamlSerializer(
+        type_inclusion=TypeInclusionEnum.DEFAULT,
+        type_format=TypeFormatEnum.TYPE_NAME,
+    ).build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -77,9 +82,13 @@ def test_from_yaml():
     """Test DataSerializer.to_yaml method."""
 
     # Create the serializers
-    yaml_serializer = YamlSerializer(bidirectional=True).build()
+    yaml_serializer = YamlSerializer(
+        type_inclusion=TypeInclusionEnum.DEFAULT,
+        type_format=TypeFormatEnum.TYPE_NAME,
+    ).build()
     passthrough_serializer = DataSerializer(
-        bidirectional=True,
+        type_inclusion=TypeInclusionEnum.DEFAULT,
+        type_format=TypeFormatEnum.TYPE_NAME,
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
