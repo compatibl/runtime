@@ -1,0 +1,23 @@
+Id: abc
+OptionalStr: xyz
+RequiredListOfOptionalStr:
+- abc
+- 
+OptionalFloat: 1.23
+RequiredListOfOptionalFloat:
+- 1.23
+- 
+RequiredListOfOptionalData:
+- StrField: abc
+  IntField: '123'
+  _t: StubDataclassData
+- 
+RequiredListOfOptionalKey:
+- abc
+- 
+RequiredListOfOptionalRecord:
+- Id: abc
+  _t: StubDataclassRecord
+- 
+_t: StubDataclassOptionalFields
+

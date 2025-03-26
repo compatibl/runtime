@@ -13,8 +13,11 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
+from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -63,6 +66,12 @@ def test_data_serialization():
 
         assert obj_1 == obj_2
         assert serialized_1 == serialized_2
+
+        # Record in RegressionGuard
+        result_str = YamlSerializers.REPORTING.serialize(serialized_1)
+        guard = RegressionGuard(channel=sample_type.__name__)
+        guard.write(result_str)
+    RegressionGuard().verify_all()
 
 
 if __name__ == "__main__":

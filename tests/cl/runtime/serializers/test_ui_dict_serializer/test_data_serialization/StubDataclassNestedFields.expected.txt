@@ -1,0 +1,33 @@
+Id: abc
+BaseField:
+  StrField: abc
+  IntField: '123'
+  _t: StubDataclassData
+DerivedField:
+  StrField: abc
+  IntField: '123'
+  DerivedStrField: derived
+  _t: StubDataclassDerivedData
+DerivedFromDerivedField:
+  StrField: abc
+  IntField: '123'
+  DerivedStrField: derived
+  DerivedFromDerivedStrField: derived_from_derived
+  _t: StubDataclassDerivedFromDerivedData
+PolymorphicField:
+  StrField: abc
+  IntField: '123'
+  DerivedStrField: derived
+  _t: StubDataclassDerivedData
+PolymorphicDerivedField:
+  StrField: abc
+  IntField: '123'
+  DerivedStrField: derived
+  DerivedFromDerivedStrField: derived_from_derived
+  _t: StubDataclassDerivedFromDerivedData
+KeyField: uvw
+RecordAsKeyField:
+  Id: abc
+  _t: StubDataclassRecord
+_t: StubDataclassNestedFields
+

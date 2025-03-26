@@ -1,0 +1,5 @@
+Id: abc
+DerivedStrField: derived
+DerivedFromDerivedStrField: derived_from_derived
+_t: StubDataclassDerivedFromDerivedRecord
+

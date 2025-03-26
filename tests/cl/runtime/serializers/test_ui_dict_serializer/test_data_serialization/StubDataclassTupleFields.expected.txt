@@ -1,0 +1,42 @@
+Id: abc
+StrTuple:
+- abc
+- def
+FloatTuple:
+- 0.0000123457
+- 0.0001234568
+- 0.0012345679
+- 0.0123456789
+- 0.123456789
+- 1.23456789
+- 12.3456789
+- 123.456789
+- 1234.56789
+- 12345.6789
+DateTuple:
+- '2003-04-21'
+- '2003-05-01'
+DataTuple:
+- StrField: A
+  IntField: '0'
+  _t: StubDataclassData
+- StrField: B
+  IntField: '1'
+  _t: StubDataclassData
+KeyTuple:
+- A
+- B
+RecordTuple:
+- Id: A
+  _t: StubDataclassRecord
+- Id: B
+  _t: StubDataclassRecord
+DerivedRecordTuple:
+- Id: A
+  DerivedStrField: derived
+  _t: StubDataclassDerivedRecord
+- Id: B
+  DerivedStrField: derived
+  _t: StubDataclassDerivedRecord
+_t: StubDataclassTupleFields
+
