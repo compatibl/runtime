@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 from stubs.cl.runtime import StubDataclassComposite
@@ -29,6 +28,7 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 
 DOCUMENT_SERIALIZER = DataSerializers.FOR_UI
+
 
 def test_data_serialization():
     sample_types = [

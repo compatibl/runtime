@@ -20,32 +20,32 @@ from typing import Sequence
 from uuid import UUID
 from bson import Int64
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.serializers.bool_format_enum import BoolFormatEnum
 from cl.runtime.primitive.bool_util import BoolUtil
-from cl.runtime.serializers.bytes_format_enum import BytesFormatEnum
-from cl.runtime.serializers.date_format_enum import DateFormatEnum
 from cl.runtime.primitive.date_util import DateUtil
-from cl.runtime.serializers.datetime_format_enum import DatetimeFormatEnum
 from cl.runtime.primitive.datetime_util import DatetimeUtil
-from cl.runtime.serializers.float_format_enum import FloatFormatEnum
 from cl.runtime.primitive.float_util import FloatUtil
-from cl.runtime.serializers.int_format_enum import IntFormatEnum
 from cl.runtime.primitive.int_util import IntUtil
-from cl.runtime.serializers.long_format_enum import LongFormatEnum
 from cl.runtime.primitive.long_util import LongUtil
-from cl.runtime.serializers.none_format_enum import NoneFormatEnum
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.serializers.string_format_enum import StringFormatEnum
-from cl.runtime.serializers.time_format_enum import TimeFormatEnum
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
-from cl.runtime.serializers.timestamp_format_enum import TimestampFormatEnum
-from cl.runtime.serializers.uuid_format_enum import UuidFormatEnum
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.bool_format_enum import BoolFormatEnum
+from cl.runtime.serializers.bytes_format_enum import BytesFormatEnum
+from cl.runtime.serializers.date_format_enum import DateFormatEnum
+from cl.runtime.serializers.datetime_format_enum import DatetimeFormatEnum
+from cl.runtime.serializers.float_format_enum import FloatFormatEnum
+from cl.runtime.serializers.int_format_enum import IntFormatEnum
+from cl.runtime.serializers.long_format_enum import LongFormatEnum
+from cl.runtime.serializers.none_format_enum import NoneFormatEnum
+from cl.runtime.serializers.string_format_enum import StringFormatEnum
+from cl.runtime.serializers.time_format_enum import TimeFormatEnum
+from cl.runtime.serializers.timestamp_format_enum import TimestampFormatEnum
+from cl.runtime.serializers.uuid_format_enum import UuidFormatEnum
 
 
 @dataclass(slots=True, kw_only=True)

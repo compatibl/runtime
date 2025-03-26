@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.serializers.json_serializer import JsonSerializer
 from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
-from cl.runtime.serializers.json_serializer import JsonSerializer
 
 cls = JsonSerializer
 

@@ -15,7 +15,6 @@
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.enum_spec import EnumSpec
-from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubIntEnum

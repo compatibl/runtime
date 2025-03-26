@@ -20,11 +20,11 @@ from cl.runtime.serializers.float_format_enum import FloatFormatEnum
 from cl.runtime.serializers.int_format_enum import IntFormatEnum
 from cl.runtime.serializers.long_format_enum import LongFormatEnum
 from cl.runtime.serializers.none_format_enum import NoneFormatEnum
+from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.string_format_enum import StringFormatEnum
 from cl.runtime.serializers.time_format_enum import TimeFormatEnum
 from cl.runtime.serializers.timestamp_format_enum import TimestampFormatEnum
 from cl.runtime.serializers.uuid_format_enum import UuidFormatEnum
-from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 cls = PrimitiveSerializer
 

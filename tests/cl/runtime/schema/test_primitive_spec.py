@@ -18,7 +18,6 @@ from types import NoneType
 from uuid import UUID
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
-from cl.runtime.serializers.yaml_serializer import YamlSerializer
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubIntEnum
@@ -45,6 +44,7 @@ _FROM_CLASS_EXCEPTION_CASES = [
     (int, "int64"),
     (float, "long"),
 ]
+
 
 def test_from_class():
     """Test PrimitiveSpec.from_class method."""

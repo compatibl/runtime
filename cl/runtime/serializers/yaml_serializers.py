@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.serializers.enum_serializers import EnumSerializers
-from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
