@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.string_serializer import StringSerializer
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
@@ -37,14 +36,12 @@ def test_key_serialization():
         StubDataclassOptionalFields,
     ]
 
-    key_serializer = StringSerializer()
-
     for sample_type in sample_types:
         obj_1 = sample_type()
         obj_1_key = obj_1.get_key()
         serialized = _KEY_SERIALIZER.serialize(obj_1_key)
 
-        deserialized_key = key_serializer.deserialize_key(serialized, sample_type.get_key_type()).build()
+        deserialized_key = _KEY_SERIALIZER.deserialize(serialized, sample_type.get_key_type()).build()
         assert obj_1_key == deserialized_key
 
 

@@ -18,13 +18,11 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 ui_serializer = UiDictSerializer()
 
 _KEY_SERIALIZER = KeySerializers.DEFAULT
-key_serializer = StringSerializer()
 
 
 class SaveResponse(BaseModel):
@@ -64,7 +62,7 @@ class SaveResponse(BaseModel):
                 raise UserError(f"Record with key {record_key_str} already exists.")
         elif request.old_record_key != record_key_str:
             # Requested update record with new key - delete old record
-            deserialized_old_record = key_serializer.deserialize_key(request.old_record_key, type(record_key)).build()
+            deserialized_old_record = _KEY_SERIALIZER.deserialize(request.old_record_key, type(record_key))
             DbContext.delete_one(key_type=type(record_key), key=deserialized_old_record, dataset=request.dataset)
 
         DbContext.save_one(record, dataset=request.dataset)

@@ -28,12 +28,9 @@ from cl.runtime.serializers.annotations_util import AnnotationsUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.dict_serializer import get_type_dict
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.string_serializer import StringSerializer
-from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names
+from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names, StringSerializer
 
-key_serializer = StringSerializer()
 _KEY_SERIALIZER = KeySerializers.DEFAULT
-"""Serializer for key to string conversion."""
 
 
 class FlatDictSerializer(DictSerializer):
@@ -144,7 +141,7 @@ class FlatDictSerializer(DictSerializer):
                 return StringSerializer.deserialize_primitive(data, type_)
             elif is_key(type_) and not self._is_json_str(data):
                 # Deserialize key as string if it is declared as key and is not a JSON string
-                return key_serializer.deserialize_key(data, type_)
+                return _KEY_SERIALIZER.deserialize(data, type_)
             elif (mro := getattr(type_, "__mro__", None)) and Enum in mro:
                 # Deserialize enum value using upper case value
                 upper_case_value = CaseUtil.pascal_to_upper_case(data)

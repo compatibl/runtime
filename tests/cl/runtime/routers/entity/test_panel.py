@@ -18,12 +18,12 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
-from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataViewers
 
 # create stub with viewers
 stub_viewers = StubDataViewers()
-key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 key_str = _KEY_SERIALIZER.serialize(stub_viewers)
 
 

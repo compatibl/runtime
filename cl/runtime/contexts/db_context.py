@@ -32,9 +32,7 @@ from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.string_serializer import StringSerializer
 
-key_serializer = StringSerializer()
 _KEY_SERIALIZER = KeySerializers.DEFAULT
 """Serializer for keys."""
 

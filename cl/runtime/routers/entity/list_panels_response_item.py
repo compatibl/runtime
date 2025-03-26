@@ -21,8 +21,9 @@ from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 
 class ListPanelsResponseItem(BaseModel):
     """Data type for a single item in the response list for the /entity/list_panels route."""
@@ -46,10 +47,8 @@ class ListPanelsResponseItem(BaseModel):
 
         # Get actual type from record if request.key is not None
         if request.key is not None:
-            key_serializer = StringSerializer()
-
             # Deserialize ui key
-            key = key_serializer.deserialize_key(request.key, request_type.get_key_type()).build()
+            key = _KEY_SERIALIZER.deserialize(request.key, request_type)
 
             # If the record is not found, display panel tabs for the base type
             record = DbContext.load_one_or_none(request_type, key)

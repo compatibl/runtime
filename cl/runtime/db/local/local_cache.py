@@ -25,9 +25,7 @@ from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.string_serializer import StringSerializer
 
-key_serializer = StringSerializer()
 _KEY_SERIALIZER = KeySerializers.DEFAULT
 """Serializer for keys used in cache lookup."""
 

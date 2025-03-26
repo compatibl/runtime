@@ -25,11 +25,9 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
-key_serializer = StringSerializer()
 _KEY_SERIALIZER = KeySerializers.DEFAULT
 param_dict_serializer = DictSerializer()  # TODO: Support complex params
 
@@ -49,7 +47,7 @@ class InstanceMethodTask(MethodTask):
         """Invoke the specified instance method."""
 
         key_type = ClassInfo.get_class_type(self.key_type_str)
-        key = key_serializer.deserialize_key(self.key_str, key_type).build()
+        key = _KEY_SERIALIZER.deserialize(self.key_str, key_type)
 
         # Load record from storage
         record = DbContext.load_one(key_type, key)  # TODO: Require record type?

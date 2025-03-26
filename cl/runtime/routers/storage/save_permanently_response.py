@@ -26,16 +26,17 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
-from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
+
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 
 
 def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[Type, TRecord]:
     """Fetch records from the database and return them."""
 
     request_type = Schema.get_type_by_short_name(request.type)
-    key_serializer = StringSerializer()
 
-    key_objs = [key_serializer.deserialize_key(key, request_type.get_key_type()).build() for key in request.keys]
+    key_objs = [_KEY_SERIALIZER.deserialize(key, request_type)for key in request.keys]
     records = DbContext.load_many(key_objs, ignore_not_found=True)
 
     # TODO (Bohdan): Implement with_dependencies logic.

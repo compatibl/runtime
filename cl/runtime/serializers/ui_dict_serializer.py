@@ -29,10 +29,8 @@ from cl.runtime.serializers.annotations_util import AnnotationsUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
-from cl.runtime.serializers.string_serializer import StringSerializer
-from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names
+from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names, StringSerializer
 
-key_serializer = StringSerializer()
 _KEY_SERIALIZER = KeySerializers.DEFAULT
 
 
@@ -190,7 +188,7 @@ class UiDictSerializer(DictSerializer):
                 return key_serializer.deserialize_primitive(data, type_)
             elif is_key(type_):
                 # Deserialize key from string
-                return key_serializer.deserialize_key(data, type_)  # noqa
+                return _KEY_SERIALIZER.deserialize(data, type_)  # noqa
             elif issubclass(type_, Enum):
                 # Deserialize enum from string using type in declaration
                 return type_[CaseUtil.pascal_to_upper_case(data)]

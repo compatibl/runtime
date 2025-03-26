@@ -21,7 +21,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 PanelResponseDataItem = Dict[str, Any]
@@ -29,7 +29,7 @@ PanelResponse = Dict[str, PanelResponseDataItem | List[PanelResponseDataItem] | 
 
 # Create serializers
 ui_serializer = UiDictSerializer()
-key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 
 
 class PanelResponseUtil:
@@ -43,7 +43,7 @@ class PanelResponseUtil:
         type_ = Schema.get_type_by_short_name(request.type)
 
         # Deserialize key from string to object
-        key_obj = key_serializer.deserialize_key(request.key, type_.get_key_type()).build()
+        key_obj = _KEY_SERIALIZER.deserialize(request.key, type_)
 
         # Get database from the current context
         db = DbContext.get_db()

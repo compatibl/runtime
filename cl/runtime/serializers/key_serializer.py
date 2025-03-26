@@ -200,7 +200,7 @@ class KeySerializer(Data):
             )
             result_type = type_spec.get_class()
             result = result_type(*key_tokens)
-            return result
+            return result.build()
         else:
             raise RuntimeError(
                 f"Field type {field_class.__name__} inside key type {root_class.__name__} \n"

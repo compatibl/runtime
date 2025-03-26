@@ -20,14 +20,14 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
 from cl.runtime.routers.tasks.run_response_item import RunResponseItem
-from cl.runtime.serializers.string_serializer import StringSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubHandlers
 
 stub_handlers = StubHandlers()
-key_serializer = StringSerializer()
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 key_str = _KEY_SERIALIZER.serialize(stub_handlers)
 
 simple_requests = [

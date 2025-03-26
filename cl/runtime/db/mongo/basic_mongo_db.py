@@ -32,7 +32,6 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serializers.document_serializers import DocumentSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.string_serializer import StringSerializer
 
 invalid_db_name_symbols = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -48,7 +47,6 @@ invalid_db_name_regex = re.compile(f"[{invalid_db_name_symbols}]")
 data_serializer = DocumentSerializers.FOR_MONGO
 """Default bidirectional dict serializer settings for MongoDB."""
 
-key_serializer = StringSerializer()
 _KEY_SERIALIZER = KeySerializers.DEFAULT
 filter_serializer = MongoFilterSerializer()
 
