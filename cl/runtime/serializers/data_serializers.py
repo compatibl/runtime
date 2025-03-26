@@ -52,6 +52,7 @@ class DataSerializers:
     FOR_UI: cls = cls(
         type_inclusion=TypeInclusionEnum.AS_NEEDED,
         type_format=TypeFormatEnum.NAME_ONLY,
+        type_field="_t",
         pascalize_keys=True,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,

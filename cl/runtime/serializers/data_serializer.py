@@ -57,8 +57,11 @@ class DataSerializer(Data):
     type_inclusion: TypeInclusionEnum = required()
     """Where to include type information in serialized data."""
 
-    type_format: TypeFormatEnum = required()
-    """Format of the type information in serialized data."""
+    type_format: TypeFormatEnum | None = None
+    """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
+
+    type_field: str = "_type"
+    """Dictionary key under which type information is stored (optional, defaults to '_type')."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
@@ -84,7 +87,7 @@ class DataSerializer(Data):
                 return None
             elif data.__class__.__name__ in MAPPING_TYPE_NAMES:
                 # Get type name from the input dict
-                if (type_name := data.get("_type", None)) is None:
+                if (type_name := data.get(self.type_field, None)) is None:
                     raise RuntimeError(f"Key '_type' is missing in the serialized data, cannot deserialize.")
                 # Create type chain of length one from the type
                 type_chain = [type_name]
@@ -192,7 +195,7 @@ class DataSerializer(Data):
                 ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
             # Include type information depending on the outcome of the above logic
-            result = {"_type": data_type_name} if include_type else {}
+            result = {self.type_field: data_type_name} if include_type else {}
 
 
             # Get class and field dictionary for schema_type_name
@@ -275,7 +278,7 @@ class DataSerializer(Data):
         elif data.__class__.__name__ in MAPPING_TYPE_NAMES:
             # Process as slotted class if data is a mapping but schema type is not
             # Get _type if provided, otherwise use type_name
-            data_type_name = data.get("_type", None)
+            data_type_name = data.get(self.type_field, None)
             if data_type_name is not None and data_type_name != type_name:
                 type_name = data_type_name
 

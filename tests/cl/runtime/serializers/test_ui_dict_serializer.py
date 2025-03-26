@@ -56,7 +56,6 @@ def test_data_serialization():
         obj_1 = sample_type()
         serialized_1 = serializer.serialize_data(obj_1)
         serialized_new = DOCUMENT_SERIALIZER.serialize(obj_1)
-        serialized_new["_t"] = serialized_new.pop("_type", None)
         # TODO: assert serialized_1 == serialized_new
 
         obj_2 = serializer.deserialize_data(serialized_1)

@@ -38,8 +38,11 @@ class JsonSerializer(Data):
     type_inclusion: TypeInclusionEnum = required()
     """Where to include type information in serialized data."""
 
-    type_format: TypeFormatEnum = required()
-    """Format of the type information in serialized data."""
+    type_format: TypeFormatEnum | None = None
+    """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
+
+    type_field: str = "_type"
+    """Dictionary key under which type information is stored (optional, defaults to '_type')."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
@@ -52,6 +55,7 @@ class JsonSerializer(Data):
         self._dict_serializer = DataSerializer(
             type_inclusion=self.type_inclusion,
             type_format=self.type_format,
+            type_field=self.type_field,
             pascalize_keys=self.pascalize_keys,
             primitive_serializer=PrimitiveSerializers.DEFAULT,
             enum_serializer=EnumSerializers.DEFAULT,
