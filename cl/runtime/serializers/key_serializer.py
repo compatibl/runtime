@@ -15,13 +15,13 @@
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
-from typing import Type, Deque
+from typing import Type, Deque, Any
 from typing import Tuple
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, TPrimitive, is_sequence, is_primitive
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, TPrimitive, is_sequence, is_primitive, is_enum, TKey
 from cl.runtime.records.protocols import DataProtocol
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TObj
@@ -49,7 +49,7 @@ class KeySerializer(Data):
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
 
-    def serialize(self, data: DataProtocol | KeyProtocol) -> str | Tuple[TPrimitive, ...]:
+    def serialize(self, data: TKey) -> str | Tuple[TPrimitive, ...]:
         """Serialize key into a delimited string or a flattened sequence of primitive types."""
 
         # Convert to key if a record
@@ -58,7 +58,7 @@ class KeySerializer(Data):
             data.build()
             # The returned key should be frozen, this will be checked below
             data = data.get_key()
-        elif is_key_or_record(data):
+        elif is_key(data):
             # Build the key (this has no effect if already frozen)
             data.build()
         else:
@@ -77,8 +77,19 @@ class KeySerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(key_format, KeyFormatEnum)
 
-    def deserialize(self, data: str | Tuple[TPrimitive, ...], key_type: Type[KeyProtocol]) -> KeyProtocol:
+    def deserialize(self, data: str | Tuple[TPrimitive, ...], key_or_record_type: Type) -> KeyProtocol:
         """Deserialize key from a delimited string or a flattened sequence of primitive types."""
+
+        # Convert to key if a record
+        if is_record(key_or_record_type):
+            key_type = key_or_record_type.get_key_type()
+        elif is_key(key_or_record_type):
+            key_type = key_or_record_type
+        else:
+            raise RuntimeError(
+                f"Type {TypeUtil.name(key_or_record_type)} passed to {TypeUtil.name(self)}\n"
+                f"is not a key or record type, cannot serialize."
+            )
 
         # Convert argument to a sequence based on the key_format field
         if (key_format := self.key_format) == KeyFormatEnum.FLATTENED_SEQUENCE:
@@ -103,7 +114,8 @@ class KeySerializer(Data):
         tokens = deque(self._checked_value(x) for x in sequence)
 
         # Perform deserialization
-        result = self._from_sequence(tokens, key_type, key_type)
+        key_type_chain = (TypeUtil.name(key_type),)
+        result = self._from_sequence(tokens, key_type, key_type_chain, key_type)
 
         # Check if any tokens are remaining
         if (remaining_length := len(tokens)) > 0:
@@ -161,20 +173,20 @@ class KeySerializer(Data):
             raise RuntimeError(f"Type {class_name} inside key is not a primitive type, enum, or another key.")
         return value
 
-    def _from_sequence(
-            self,
+    def _from_sequence(self,
             tokens: Deque[TPrimitive],
-            field_class: Type[KeyProtocol],
-            root_class: Type[KeyProtocol]
-    ) -> KeyProtocol:
+            field_class: Type,
+            field_type_chain: Tuple[str, ...],
+            root_class: Type,
+    ) -> Any:
         """Deserialize key from a flattened sequence of primitive types."""
         if len(tokens) == 0:
             raise RuntimeError(f"Insufficient serialized sequence size for key {root_class.__name__}.")
         elif is_primitive(field_class):
             # Primitive type, extract one token
             token = tokens.popleft()
-            return self.primitive_serializer.deserialize(token, [field_class.__name__])
-        elif isinstance(field_class, Enum):
+            return self.primitive_serializer.deserialize(token, field_type_chain)
+        elif is_enum(field_class):
             # Enum type, extract one token
             token = tokens.popleft()
             return self.enum_serializer.deserialize(token, field_class)
@@ -183,7 +195,7 @@ class KeySerializer(Data):
             type_spec = TypeSchema.for_class(field_class)
             field_dict = type_spec.get_field_dict()
             key_tokens = tuple(
-                self._from_sequence(tokens, field_spec.get_class(), root_class)
+                self._from_sequence(tokens, field_spec.get_class(), field_spec.type_chain, root_class)
                 for field_spec in field_dict.values()
             )
             result_type = type_spec.get_class()
