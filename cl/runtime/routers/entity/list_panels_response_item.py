@@ -25,6 +25,7 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DEFAULT
 
+
 class ListPanelsResponseItem(BaseModel):
     """Data type for a single item in the response list for the /entity/list_panels route."""
 

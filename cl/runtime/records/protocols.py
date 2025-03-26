@@ -149,11 +149,13 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     result = type_.__name__ in PRIMITIVE_CLASS_NAMES
     return result
 
+
 def is_enum(instance_or_type: Any) -> TypeGuard[TEnum]:
     """Returns true if the argument is an enum."""
     return (
         issubclass(instance_or_type, Enum) if isinstance(instance_or_type, type) else isinstance(instance_or_type, Enum)
     )
+
 
 def is_sequence(instance_or_type: Any) -> TypeGuard[TSequence]:
     """Returns true if the argument is one of the supported sequence types."""

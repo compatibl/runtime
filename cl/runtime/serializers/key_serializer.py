@@ -15,19 +15,25 @@
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum
-from typing import Type, Deque, Any
+from typing import Any
+from typing import Deque
 from typing import Tuple
+from typing import Type
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, TPrimitive, is_sequence, is_primitive, is_enum, TKey
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import DataProtocol
 from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_key_or_record
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_schema import TypeSchema
@@ -97,7 +103,8 @@ class KeySerializer(Data):
             if not is_sequence(data):
                 raise RuntimeError(
                     f"Key format is FLATTENED_SEQUENCE but data passed to\n"
-                    f"KeySerializer.deserialize method has type {TypeUtil.name(data)}")
+                    f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
+                )
             # Check each token and create a deque so popleft is available
             sequence = [self._checked_value(x) for x in data]
         elif key_format == KeyFormatEnum.FLATTENED_STRING:
@@ -105,7 +112,8 @@ class KeySerializer(Data):
             if not isinstance(data, str):
                 raise RuntimeError(
                     f"Key format is FLATTENED_STRING but data passed to\n"
-                    f"KeySerializer.deserialize method has type {TypeUtil.name(data)}")
+                    f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
+                )
             sequence = data.split(";")
         else:
             raise ErrorUtil.enum_value_error(key_format, KeyFormatEnum)
@@ -120,7 +128,8 @@ class KeySerializer(Data):
         # Check if any tokens are remaining
         if (remaining_length := len(tokens)) > 0:
             raise RuntimeError(
-                f"Serialized sequence size for key {key_type.__name__} is long by {remaining_length} tokens.")
+                f"Serialized sequence size for key {key_type.__name__} is long by {remaining_length} tokens."
+            )
         return result
 
     def _to_sequence(self, data: DataProtocol | KeyProtocol) -> Tuple[TPrimitive, ...]:
@@ -145,18 +154,21 @@ class KeySerializer(Data):
 
         # Serialize slot values in the order of declaration packing primitive types into size-one lists
         packed_result = tuple(
-            [
-                # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
-                self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_chain)
-            ]
-            if (v := getattr(data, k)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
-            else
-            [
-                # Use enum serializer, specify enum class
-                self.enum_serializer.serialize(self._checked_value(v), field_spec.get_class())
-            ]
-            if isinstance(v, Enum)
-            else self._to_sequence(v)
+            (
+                [
+                    # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
+                    self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_chain)
+                ]
+                if (v := getattr(data, k)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                else (
+                    [
+                        # Use enum serializer, specify enum class
+                        self.enum_serializer.serialize(self._checked_value(v), field_spec.get_class())
+                    ]
+                    if isinstance(v, Enum)
+                    else self._to_sequence(v)
+                )
+            )
             for k, field_spec in field_dict.items()
         )
 
@@ -173,11 +185,12 @@ class KeySerializer(Data):
             raise RuntimeError(f"Type {class_name} inside key is not a primitive type, enum, or another key.")
         return value
 
-    def _from_sequence(self,
-            tokens: Deque[TPrimitive],
-            field_class: Type,
-            field_type_chain: Tuple[str, ...],
-            root_class: Type,
+    def _from_sequence(
+        self,
+        tokens: Deque[TPrimitive],
+        field_class: Type,
+        field_type_chain: Tuple[str, ...],
+        root_class: Type,
     ) -> Any:
         """Deserialize key from a flattened sequence of primitive types."""
         if len(tokens) == 0:
@@ -204,4 +217,5 @@ class KeySerializer(Data):
         else:
             raise RuntimeError(
                 f"Field type {field_class.__name__} inside key type {root_class.__name__} \n"
-                f"is not a primitive type, enum, or another key.")
+                f"is not a primitive type, enum, or another key."
+            )
