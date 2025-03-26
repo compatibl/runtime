@@ -26,11 +26,12 @@ from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.schema.field_decl import primitive_types  # TODO: Move definition to a separate module
 from cl.runtime.schema.schema import Schema
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
-ui_serializer = UiDictSerializer()
+_UI_SERIALIZER = DataSerializers.FOR_UI
 
 
 class RecordResponse(BaseModel):
@@ -73,7 +74,7 @@ class RecordResponse(BaseModel):
 
         # Serialize record to ui format
         # TODO: Optimize speed
-        record_dict = ui_serializer.serialize_data(record)
+        record_dict = _UI_SERIALIZER.serialize(record)
 
         return RecordResponse(schema=type_decl_dict, data=record_dict)
 

@@ -20,10 +20,10 @@ from inflection import underscore
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.callable_task import CallableTask
 
-data_serializer = UiDictSerializer()
+_UI_SERIALIZER = DataSerializers.FOR_UI
 
 
 @dataclass(slots=True, kw_only=True)
@@ -61,7 +61,7 @@ class MethodTask(CallableTask, ABC):
             if not isinstance(param_values, dict):
                 continue
 
-            type_instance = data_serializer.deserialize_data(param_values)
+            type_instance = _UI_SERIALIZER.deserialize(param_values)
 
             # Assign deserialized value instead of dict
             params[param_name] = type_instance

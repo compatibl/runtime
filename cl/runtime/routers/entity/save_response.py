@@ -17,12 +17,12 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.save_request import SaveRequest
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
-ui_serializer = UiDictSerializer()
-
 _KEY_SERIALIZER = KeySerializers.DELIMITED
+_UI_SERIALIZER = DataSerializers.FOR_UI
 
 
 class SaveResponse(BaseModel):
@@ -47,7 +47,7 @@ class SaveResponse(BaseModel):
             return SaveResponse(key=None)
 
         # Deserialize record
-        record = ui_serializer.deserialize_data(ui_record).build()
+        record = _UI_SERIALIZER.deserialize(ui_record)
         record_key = record.get_key()
         record_key_str = _KEY_SERIALIZER.serialize(record_key)
 

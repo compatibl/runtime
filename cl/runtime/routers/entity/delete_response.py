@@ -19,7 +19,6 @@ from cl.runtime.serializers.dict_serializer import get_type_dict
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
-data_serializer = UiDictSerializer()
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
