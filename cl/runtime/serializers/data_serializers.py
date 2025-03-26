@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.serializers.document_serializer import DocumentSerializer
+from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
-cls = DocumentSerializer
+cls = DataSerializer
 
 
-class DocumentSerializers:
+class DataSerializers:
     """Standard combinations of primitive formats."""
 
     FOR_JSON: cls = cls(

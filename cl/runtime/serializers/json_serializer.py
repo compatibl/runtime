@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 import orjson
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.serializers.document_serializer import DocumentSerializer
+from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
@@ -37,12 +37,12 @@ class JsonSerializer(Data):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    _dict_serializer: DocumentSerializer | None = None
+    _dict_serializer: DataSerializer | None = None
     """Serializes data into dictionary from which it is serialized into JSON."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        self._dict_serializer = DocumentSerializer(
+        self._dict_serializer = DataSerializer(
             bidirectional=self.bidirectional,
             pascalize_keys=self.pascalize_keys,
             primitive_serializer=PrimitiveSerializers.DEFAULT,

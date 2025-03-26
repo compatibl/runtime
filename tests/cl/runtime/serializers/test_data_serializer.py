@@ -16,7 +16,7 @@ import pytest
 import orjson
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.serializers.document_serializer import DocumentSerializer
+from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.json_serializer import orjson_default
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -51,10 +51,10 @@ _SAMPLE_TYPES = [
 
 
 def test_bidirectional():
-    """Test DocumentSerializer.serialize method with bidirectional=True."""
+    """Test DataSerializer.serialize method with bidirectional=True."""
 
     # Create the serializer
-    serializer = DocumentSerializer(bidirectional=True).build()
+    serializer = DataSerializer(bidirectional=True).build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -82,10 +82,10 @@ def test_bidirectional():
 
 
 def test_unidirectional():
-    """Test DocumentSerializer.serialize method with bidirectional=None."""
+    """Test DataSerializer.serialize method with bidirectional=None."""
 
     # Create the serializer
-    serializer = DocumentSerializer(bidirectional=False).build()
+    serializer = DataSerializer(bidirectional=False).build()
 
     for sample_type in _SAMPLE_TYPES:
 

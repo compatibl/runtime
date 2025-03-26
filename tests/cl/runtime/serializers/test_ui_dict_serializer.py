@@ -14,7 +14,7 @@
 
 import pytest
 
-from cl.runtime.serializers.document_serializers import DocumentSerializers
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -28,7 +28,7 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 
-DOCUMENT_SERIALIZER = DocumentSerializers.FOR_UI
+DOCUMENT_SERIALIZER = DataSerializers.FOR_UI
 
 def test_data_serialization():
     sample_types = [
