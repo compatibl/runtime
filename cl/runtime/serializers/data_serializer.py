@@ -20,7 +20,7 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_key
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -32,10 +32,9 @@ from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
-from cl.runtime.serializers.enum_serializers import EnumSerializers
+from cl.runtime.serializers.key_format_enum import KeyFormatEnum
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
@@ -161,7 +160,11 @@ class DataSerializer(Data):
             return dict(
                 (k, self._typed_serialize(v, remaining_chain)) for k, v in data.items()
             )  # TODO: Replace by frozendict
-        elif getattr(data, "__slots__", None) is not None:
+        elif is_data(data):
+
+            if self.key_serializer is not None and is_key(data):
+                # Use key serializer for key types if specified
+                return self.key_serializer.serialize(data)
 
             # Type spec for the data
             data_type_spec = TypeSchema.for_class(data.__class__)
@@ -266,17 +269,33 @@ class DataSerializer(Data):
         elif isinstance(data, str) or isinstance(data, Enum):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
             type_spec = TypeSchema.for_type_name(type_name)
-            if not isinstance(type_spec, EnumSpec):
+            type_class = type_spec.get_class()
+            if is_key(type_class):
+                if self.key_serializer is None:
+                    raise RuntimeError(
+                        f"Key type '{type_name}' cannot be deserialized from the following string\n"
+                        f"without a dedicated key deserializer:\n" f"{ErrorUtil.wrap(data)}."
+                    )
+                elif self.key_serializer.key_format != KeyFormatEnum.DELIMITED:
+                    raise RuntimeError(
+                        f"Key type '{type_name}' cannot be deserialized from the following string\n"
+                        f"if KeyFormatEnum is not DELIMITED:\n" f"{ErrorUtil.wrap(data)}."
+                    )
+                else:
+                    # Use key serializer
+                    return self.key_serializer.deserialize(data, type_class)
+            elif isinstance(type_spec, EnumSpec):
+                # Check that no type chain is remaining
+                if remaining_chain:
+                    raise RuntimeError(f"Enum type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
+                # Deserialize
+                result = self.enum_serializer.deserialize(data, type_class)
+                return result
+            else:
                 raise RuntimeError(
-                    f"Type '{type_name}' cannot be deserialized from the following string:\n" f"{ErrorUtil.wrap(data)}."
+                    f"Type '{type_name}' cannot be deserialized\n"
+                    f"from the following string or enum:\n{ErrorUtil.wrap(data)}."
                 )
-            # Check that no type chain is remaining
-            if remaining_chain:
-                raise RuntimeError(f"Enum type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
-            # Deserialize
-            enum_class = type_spec.get_class()
-            result = self.enum_serializer.deserialize(data, enum_class)
-            return result
         elif data.__class__.__name__ in MAPPING_TYPE_NAMES:
             # Process as slotted class if data is a mapping but schema type is not
             # Get _type if provided, otherwise use type_name
