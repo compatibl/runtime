@@ -1,5 +1,5 @@
+_t: StubDataclassComposite
 Primitive: abc
 Embedded1: def
 Embedded2: xyz
-_t: StubDataclassComposite
 

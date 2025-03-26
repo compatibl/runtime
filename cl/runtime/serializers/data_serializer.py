@@ -198,8 +198,7 @@ class DataSerializer(Data):
                 ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
             # Include type information depending on the outcome of the above logic
-            result = {}
-            # TODO: result = {self.type_field: data_type_name} if include_type else {}
+            result = {self.type_field: data_type_name} if include_type else {}
 
             # Get class and field dictionary for schema_type_name
             data_field_dict = data_type_spec.get_field_dict()
@@ -220,8 +219,6 @@ class DataSerializer(Data):
                     if (v := getattr(data, k)) is not None
                 }
             )
-            if include_type:
-                result[self.type_field] = data_type_name
             return result
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")

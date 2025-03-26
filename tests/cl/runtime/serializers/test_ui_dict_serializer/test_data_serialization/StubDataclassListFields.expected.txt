@@ -1,3 +1,4 @@
+_t: StubDataclassListFields
 Id: abc
 StrList:
 - abc
@@ -17,26 +18,25 @@ DateList:
 - '2003-04-21'
 - '2003-05-01'
 DataList:
-- StrField: A
+- _t: StubDataclassData
+  StrField: A
   IntField: '0'
-  _t: StubDataclassData
-- StrField: B
+- _t: StubDataclassData
+  StrField: B
   IntField: '1'
-  _t: StubDataclassData
 KeyList:
 - A
 - B
 RecordList:
-- Id: A
-  _t: StubDataclassRecord
-- Id: B
-  _t: StubDataclassRecord
+- _t: StubDataclassRecord
+  Id: A
+- _t: StubDataclassRecord
+  Id: B
 DerivedRecordList:
-- Id: A
+- _t: StubDataclassDerivedRecord
+  Id: A
   DerivedStrField: derived
-  _t: StubDataclassDerivedRecord
-- Id: B
+- _t: StubDataclassDerivedRecord
+  Id: B
   DerivedStrField: derived
-  _t: StubDataclassDerivedRecord
-_t: StubDataclassListFields
 

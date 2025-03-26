@@ -1,4 +1,4 @@
+_t: StubDataclassDerivedRecord
 Id: abc
 DerivedStrField: derived
-_t: StubDataclassDerivedRecord
 

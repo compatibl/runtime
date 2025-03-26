@@ -1,33 +1,33 @@
+_t: StubDataclassNestedFields
 Id: abc
 BaseField:
-  StrField: abc
-  IntField: '123'
   _t: StubDataclassData
+  StrField: abc
+  IntField: '123'
 DerivedField:
+  _t: StubDataclassDerivedData
   StrField: abc
   IntField: '123'
   DerivedStrField: derived
-  _t: StubDataclassDerivedData
 DerivedFromDerivedField:
+  _t: StubDataclassDerivedFromDerivedData
   StrField: abc
   IntField: '123'
   DerivedStrField: derived
   DerivedFromDerivedStrField: derived_from_derived
-  _t: StubDataclassDerivedFromDerivedData
 PolymorphicField:
+  _t: StubDataclassDerivedData
   StrField: abc
   IntField: '123'
   DerivedStrField: derived
-  _t: StubDataclassDerivedData
 PolymorphicDerivedField:
+  _t: StubDataclassDerivedFromDerivedData
   StrField: abc
   IntField: '123'
   DerivedStrField: derived
   DerivedFromDerivedStrField: derived_from_derived
-  _t: StubDataclassDerivedFromDerivedData
 KeyField: uvw
 RecordAsKeyField:
-  Id: abc
   _t: StubDataclassRecord
-_t: StubDataclassNestedFields
+  Id: abc
 
