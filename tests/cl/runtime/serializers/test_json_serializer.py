@@ -16,6 +16,9 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.json_serializer import JsonSerializer
+from cl.runtime.serializers.json_serializers import JsonSerializers
+from cl.runtime.serializers.type_format_enum import TypeFormatEnum
+from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -52,14 +55,11 @@ _SAMPLE_TYPES = [
 def test_to_json():
     """Test DataSerializer.to_json method."""
 
-    # Create the serializer
-    serializer = JsonSerializer().build()
-
     for sample_type in _SAMPLE_TYPES:
 
         # Serialize to JSON
         obj = sample_type().build()
-        result_str = serializer.serialize(obj)
+        result_str = JsonSerializers.REPORTING.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
@@ -73,7 +73,10 @@ def test_to_json_pascalize_keys():
     """Test DataSerializer.to_json method with pascalize_keys flag."""
 
     # Create the serializer with pascalize_keys flag set
-    serializer = JsonSerializer(pascalize_keys=True).build()
+    serializer = JsonSerializer(
+        type_inclusion=TypeInclusionEnum.OMIT,
+        pascalize_keys=True,
+    ).build()
 
     for sample_type in _SAMPLE_TYPES:
         # Serialize to JSON

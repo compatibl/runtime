@@ -66,19 +66,19 @@ class DataSerializer(Data):
     def serialize(self, data: Any) -> Any:
         """Serialize data to a dictionary."""
 
-        if self.type_inclusion == TypeInclusionEnum.DEFAULT or TypeInclusionEnum.ALWAYS:
+        if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
             # Use typed serialization if bidirectional flag is on
             return self._typed_serialize(data)
-        elif self.type_inclusion == TypeInclusionEnum.NEVER:
+        elif self.type_inclusion == TypeInclusionEnum.OMIT:
             # Otherwise use untyped serialization
             return self._untyped_serialize(data)
         else:
-            ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
+            raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
     def deserialize(self, data: Any) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
 
-        if self.type_inclusion == TypeInclusionEnum.DEFAULT or TypeInclusionEnum.ALWAYS:
+        if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
             if data is None:
                 # Pass through None
                 return None
@@ -98,7 +98,7 @@ class DataSerializer(Data):
                     f"Data is not a list or mapping, cannot deserialize without type_chain argument:\n"
                     f"{ErrorUtil.wrap(data)}."
                 )
-        elif self.type_inclusion == TypeInclusionEnum.NEVER:
+        elif self.type_inclusion == TypeInclusionEnum.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
         else:
             ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
@@ -183,10 +183,10 @@ class DataSerializer(Data):
             include_type = None
             if self.type_inclusion == TypeInclusionEnum.ALWAYS:
                 include_type = True
-            elif self.type_inclusion == TypeInclusionEnum.DEFAULT:
+            elif self.type_inclusion == TypeInclusionEnum.AS_NEEDED:
                 # Include if schema type is not provided or not the same as data type
                 include_type = schema_type_name is None or schema_type_name != data_type_name
-            elif self.type_inclusion == TypeInclusionEnum.NEVER:
+            elif self.type_inclusion == TypeInclusionEnum.OMIT:
                 include_type = False
             else:
                 ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)

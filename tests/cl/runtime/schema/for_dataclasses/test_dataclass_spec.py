@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.dataclass_spec import DataclassSpec
-from cl.runtime.serializers.yaml_serializer import YamlSerializer
+from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -64,8 +64,6 @@ _FROM_CLASS_EXCEPTION_CASES = [
     StubIntEnum,
 ]
 
-yaml_serializer = YamlSerializer().build()
-
 
 def test_from_class():
     """Test EnumSpec.from_class method."""
@@ -73,7 +71,7 @@ def test_from_class():
 
         # Get enum spec and serialize as YAML
         type_spec = DataclassSpec.from_class(test_case)
-        type_spec_str = yaml_serializer.serialize(type_spec)
+        type_spec_str = YamlSerializers.REPORTING.serialize(type_spec)
 
         # Record in RegressionGuard
         guard = RegressionGuard(channel=type_spec.type_name)

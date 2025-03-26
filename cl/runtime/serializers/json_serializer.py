@@ -70,7 +70,7 @@ class JsonSerializer(Data):
     def deserialize(self, json_str: str) -> Any:
         """Deserialize a JSON string into an object if bidirectional flag is set, and to a dictionary if not."""
 
-        if self.type_inclusion == TypeInclusionEnum.NEVER:
+        if self.type_inclusion == TypeInclusionEnum.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
 
         # Use orjson to parse the JSON string into a dictionary

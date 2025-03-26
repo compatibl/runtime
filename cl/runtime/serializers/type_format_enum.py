@@ -19,8 +19,8 @@ from enum import auto
 class TypeFormatEnum(IntEnum):
     """Format of the type information in serialized data."""
 
-    TYPE_NAME = auto()
-    """Unique type alias alias or ClassName without the module if type alias is not provided."""
+    NAME_ONLY = auto()
+    """ClassName or its alias without the module in PascalCase."""
 
-    IMPORT_PATH = auto()
-    """Import path inclusive of module using Python conventions (e.g., module.ClassName)."""
+    FULL_PATH = auto()
+    """Full path inclusive of module using Python conventions (e.g., module.ClassName)."""

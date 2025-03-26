@@ -18,6 +18,7 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
+from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -56,8 +57,6 @@ _SAMPLE_TYPES = [
     StubDataclassVersionedRecord,
 ]
 
-yaml_serializer = YamlSerializer().build()
-
 
 def test_type_decl():
     """Test type decls generated for stub records."""
@@ -69,7 +68,7 @@ def test_type_decl():
         assert type_decl is not None
 
         # Create YAML string for the declaration
-        type_decl_str = yaml_serializer.serialize(type_decl)
+        type_decl_str = YamlSerializers.REPORTING.serialize(type_decl)
 
         # Record in regression guard
         guard = RegressionGuard(channel=type_name)

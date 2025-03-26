@@ -19,11 +19,11 @@ from enum import auto
 class TypeInclusionEnum(IntEnum):
     """Where to include type information in serialized data."""
 
-    DEFAULT = auto()
-    """Include type information in serialized data at root level always, and at other levels for derived types only."""
-
-    NEVER = auto()
+    OMIT = auto()
     """Do not include type information in serialized data, deserialization is not possible."""
+
+    AS_NEEDED = auto()
+    """Always include type information at root level, include at other levels as needed."""
 
     ALWAYS = auto()
     """Always include type information in serialized data at all levels."""

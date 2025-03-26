@@ -59,8 +59,8 @@ def test_bidirectional():
 
     # Create the serializer
     serializer = DataSerializer(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
+        type_inclusion=TypeInclusionEnum.AS_NEEDED,
+        type_format=TypeFormatEnum.NAME_ONLY,
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
@@ -95,7 +95,7 @@ def test_unidirectional():
 
     # Create the serializer
     serializer = DataSerializer(
-        type_inclusion=TypeInclusionEnum.NEVER,
+        type_inclusion=TypeInclusionEnum.OMIT,
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()

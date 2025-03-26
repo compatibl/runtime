@@ -19,6 +19,7 @@ from uuid import UUID
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
+from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubIntEnum
 
@@ -45,9 +46,6 @@ _FROM_CLASS_EXCEPTION_CASES = [
     (float, "long"),
 ]
 
-yaml_serializer = YamlSerializer().build()
-
-
 def test_from_class():
     """Test PrimitiveSpec.from_class method."""
     for test_case in _FROM_CLASS_VALID_CASES:
@@ -63,7 +61,7 @@ def test_from_class():
 
         # Get enum spec and serialize as YAML
         type_spec = PrimitiveSpec.from_class(sample_type, subtype)
-        type_spec_str = yaml_serializer.serialize(type_spec)
+        type_spec_str = YamlSerializers.REPORTING.serialize(type_spec)
 
         # Record in RegressionGuard
         guard = RegressionGuard(channel=type_spec.type_name)

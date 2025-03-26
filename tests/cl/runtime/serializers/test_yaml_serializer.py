@@ -17,11 +17,13 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializer import DataSerializer
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
+from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -54,21 +56,21 @@ _SAMPLE_TYPES = [
     StubDataclassTupleFields,
 ]
 
+_PASSTHROUGH_SERIALIZER = DataSerializer(
+    type_inclusion=TypeInclusionEnum.AS_NEEDED,
+    type_format=TypeFormatEnum.NAME_ONLY,
+    primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+    enum_serializer=EnumSerializers.DEFAULT,
+).build()
 
 def test_to_yaml():
     """Test DataSerializer.to_yaml method."""
-
-    # Create the serializer
-    serializer = YamlSerializer(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
-    ).build()
 
     for sample_type in _SAMPLE_TYPES:
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        obj_yaml = serializer.serialize(obj)
+        obj_yaml = YamlSerializers.BIDIRECTIONAL.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
@@ -81,33 +83,21 @@ def test_to_yaml():
 def test_from_yaml():
     """Test DataSerializer.to_yaml method."""
 
-    # Create the serializers
-    yaml_serializer = YamlSerializer(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
-    ).build()
-    passthrough_serializer = DataSerializer(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
-        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
-        enum_serializer=EnumSerializers.DEFAULT,
-    ).build()
-
     for sample_type in _SAMPLE_TYPES:
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        serialized = yaml_serializer.serialize(obj)
+        serialized = YamlSerializers.BIDIRECTIONAL.serialize(obj)
 
         # Serialize to dict using all_string_dict_serializer flag, all primitive values are strings except None
         # all_string_obj_dict = all_string_dict_serializer.serialize(obj)
 
         # Deserialize from YAML, when schema is not used all primitive values will be strings
-        deserialized = yaml_serializer.deserialize(serialized)
+        deserialized = YamlSerializers.BIDIRECTIONAL.deserialize(serialized)
 
         # Use passthrough serializer to convert both to dicts
-        obj_dict = passthrough_serializer.serialize(obj)
-        deserialized_dict = passthrough_serializer.serialize(deserialized)
+        obj_dict = _PASSTHROUGH_SERIALIZER.serialize(obj)
+        deserialized_dict = _PASSTHROUGH_SERIALIZER.serialize(deserialized)
 
         # Compare with floating point tolerance
         assert deserialized_dict == PytestUtil.approx(obj_dict)

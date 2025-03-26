@@ -56,8 +56,8 @@ def test_passthrough():
     ]
 
     serializer = DataSerializer(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
+        type_inclusion=TypeInclusionEnum.AS_NEEDED,
+        type_format=TypeFormatEnum.NAME_ONLY,
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()

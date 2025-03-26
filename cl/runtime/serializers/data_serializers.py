@@ -26,32 +26,32 @@ class DataSerializers:
     """Standard combinations of primitive formats."""
 
     PASSTHROUGH: cls = cls(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
+        type_inclusion=TypeInclusionEnum.AS_NEEDED,
+        type_format=TypeFormatEnum.NAME_ONLY,
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
         enum_serializer=EnumSerializers.PASSTHROUGH,
     ).build()
     """Bidirectional conversion of classes to dicts and back without any conversion of primitive types or enums."""
 
     DEFAULT: cls = cls(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
+        type_inclusion=TypeInclusionEnum.AS_NEEDED,
+        type_format=TypeFormatEnum.NAME_ONLY,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional data serializer with default serialization for primitive types and enums."""
 
     FOR_JSON: cls = cls(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
+        type_inclusion=TypeInclusionEnum.AS_NEEDED,
+        type_format=TypeFormatEnum.NAME_ONLY,
         primitive_serializer=PrimitiveSerializers.FOR_JSON,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional data serializer settings for JSON."""
 
     FOR_UI: cls = cls(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
+        type_inclusion=TypeInclusionEnum.AS_NEEDED,
+        type_format=TypeFormatEnum.NAME_ONLY,
         pascalize_keys=True,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
@@ -60,8 +60,8 @@ class DataSerializers:
     """Default bidirectional data serializer settings for UI."""
 
     FOR_MONGO: cls = cls(
-        type_inclusion=TypeInclusionEnum.DEFAULT,
-        type_format=TypeFormatEnum.TYPE_NAME,
+        type_inclusion=TypeInclusionEnum.AS_NEEDED,
+        type_format=TypeFormatEnum.NAME_ONLY,
         primitive_serializer=PrimitiveSerializers.FOR_MONGO,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
