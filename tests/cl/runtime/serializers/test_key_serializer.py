@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -41,8 +42,10 @@ def test_serialization():
     """Test KeySerializer.serialize method."""
 
     for sample in _SERIALIZATION_SAMPLES:
-        # Serialize
+        # Roundtrip serialization
         serialized = _KEY_SERIALIZER.serialize(sample)
+        deserialized = _KEY_SERIALIZER.deserialize(serialized, type(sample))
+        assert sample == PytestUtil.approx(deserialized)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(TypeUtil.name(sample))

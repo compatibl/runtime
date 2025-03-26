@@ -198,7 +198,7 @@ class DocumentSerializer(Data):
                         )
                     )
                     for k, field_spec in data_field_dict.items()
-                    if (v := getattr(data, k)) is not None and not k.startswith("_")
+                    if (v := getattr(data, k)) is not None
                 }
             )
             return result
