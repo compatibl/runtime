@@ -67,7 +67,7 @@ class StringSerializer:
             return base64.b64encode(value).decode()
         elif value.__class__.__name__ == "bool":
             # Serialize bool to Y/N char
-            return "Y" if value else "N"
+            return "true" if value else "false"
         else:
             raise RuntimeError(f"Value of type {value.__class__} is not primitive.")
 
@@ -94,7 +94,7 @@ class StringSerializer:
             return TimeUtil.from_str(str_value)
         elif type_.__name__ == "bool":
             # Deserialize bool from string
-            if (bool_value := True if str_value == "Y" else False if str_value == "N" else None) is not None:
+            if (bool_value := True if str_value == "true" else False if str_value == "false" else None) is not None:
                 return bool_value
             else:
                 raise RuntimeError(f"Serialized boolean field has value {str_value} but only Y/N and 1/0 are allowed.")
