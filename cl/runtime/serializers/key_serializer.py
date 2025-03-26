@@ -21,7 +21,7 @@ from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, TObj, is_record, is_key_or_record, KeyProtocol, \
-    TPrimitive, is_key
+    TPrimitive, is_key, DataProtocol
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
@@ -43,18 +43,27 @@ class KeySerializer(Data):
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
 
-    def serialize(self, data: KeyProtocol) -> Any:
+    def serialize(self, data: DataProtocol | KeyProtocol) -> Any:
         """
         Serialize data into a delimited string or flattened sequence based on delimited flag,
-        validating against type_chain if provided.
+        validating against type_chain if provided. Invokes build before serializing.
         """
 
-        # Convert to key if record
+        # Convert to key if a record
         if is_record(data):
+            # Build the data before getting the key
+            data.build()
+            # The returned key should be frozen, this will be checked below
             data = data.get_key()
+        elif is_key_or_record(data):
+            # Build the key (this has no effect if already frozen)
+            data.build()
+        else:
+            raise RuntimeError(
+                f"Type {TypeUtil.name(data)} passed to {TypeUtil.name(self)} is not a key or record, cannot serialize.")
 
-        # Check and invoke the helper method
-        sequence = self._to_sequence(self._checked_key(data))
+        # Perform checks and convert to a sequence
+        sequence = self._to_sequence(data)
 
         # Return a delimited string or sequence depending on settings
         if self.delimited:
@@ -64,6 +73,15 @@ class KeySerializer(Data):
 
     def _to_sequence(self, data: Any) -> Tuple[Any, ...]:
         """Serialize data into a flattened sequence."""
+
+        # Check that the argument is a key
+        if data is None:
+            raise RuntimeError("An inner key field inside a composite key cannot be None.")
+        elif not is_key(data):
+            raise RuntimeError(f"Type {TypeUtil.name(data)} inside key is not a primitive type, enum, or another key.")
+
+        # Check that the argument is frozen
+        BuildUtil.check_frozen(data)
 
         # Get type spec
         type_spec = TypeSchema.for_class(type(data))
@@ -86,28 +104,21 @@ class KeySerializer(Data):
                     self.enum_serializer.serialize(self._checked_value(v), field_spec.get_class())
                 ]
                 if isinstance(v, Enum)
-                else self._to_sequence(self._checked_key(v))
+                else self._to_sequence(v)
             )
             for k, field_spec in field_dict.items()
             if not k.startswith("_")
         )
+
         # Flatten by unpacking the inner tuples
         result = tuple(token for item in packed_result for token in item)
         return result
 
     @classmethod
     def _checked_value(cls, value: TObj) -> TObj:
+        """Return checked primitive value or enum."""
         if value is None:
             raise RuntimeError("A primitive field or enum inside a key cannot be None.")
         if (class_name := value.__class__.__name__) not in PRIMITIVE_CLASS_NAMES and not isinstance(value, Enum):
             raise RuntimeError(f"Type {class_name} inside key is not a primitive type, enum, or another key.")
         return value
-
-    @classmethod
-    def _checked_key(cls, key: TObj) -> TObj:
-        if key is None:
-            raise RuntimeError("A field inside a key cannot be None.")
-        if not is_key(key):
-            raise RuntimeError(f"Type {TypeUtil.name(key)} inside key is not a primitive type, enum, or another key.")
-        BuildUtil.check_frozen(key)
-        return key

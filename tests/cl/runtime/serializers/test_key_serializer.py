@@ -32,7 +32,6 @@ _SERIALIZATION_SAMPLES = [
 _SERIALIZATION_EXCEPTION_SAMPLES = [
     str,  # Primitive type
     float,  # Primitive type
-    StubDataclassRecordKey(),  # Did not invoke build
     [StubDataclassRecordKey().build()],  # List type
     {"a": StubDataclassRecordKey().build()},  # Dict type
 ]
@@ -58,6 +57,7 @@ def test_serialization_exceptions():
     for sample in _SERIALIZATION_EXCEPTION_SAMPLES:
         # Attempt serialization
         with pytest.raises(RuntimeError):
+            print(f"Serializing type {type(sample)}")
             _KEY_SERIALIZER.serialize(sample)
 
 
