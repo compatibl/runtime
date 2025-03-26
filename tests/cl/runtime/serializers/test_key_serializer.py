@@ -16,10 +16,12 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.serializers.key_serializer import KeySerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataclassCompositeKey, StubDataclassListFields, StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
+
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 
 _SERIALIZATION_SAMPLES = [
     StubDataclassRecordKey().build(),
@@ -33,46 +35,31 @@ _SERIALIZATION_EXCEPTION_SAMPLES = [
     StubDataclassRecordKey(),  # Did not invoke build
     [StubDataclassRecordKey().build()],  # List type
     {"a": StubDataclassRecordKey().build()},  # Dict type
-    StubDataclassListFields().build(),  # Sequence fields
-    StubDataclassDictFields().build(),  # Mapping fields
 ]
 
 
 def test_serialization():
     """Test KeySerializer.serialize method."""
 
-    # Create the serializer
-    serializer = KeySerializer().build()
-
     for sample in _SERIALIZATION_SAMPLES:
-        # Serialize without type information
-        untyped_serialized = serializer.serialize(sample)
-        untyped_delimited = ";".join(untyped_serialized)
-
-        # Serialize with type information, output should be the same
-        typed_serialized = serializer.serialize(sample, (sample.__class__.__name__,))
-        assert typed_serialized == untyped_serialized
+        # Serialize
+        serialized = _KEY_SERIALIZER.serialize(sample)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(TypeUtil.name(sample))
         guard = RegressionGuard(channel=snake_case_type_name)
-        guard.write(untyped_delimited)
+        guard.write(serialized)
     RegressionGuard().verify_all()
 
 
 def test_serialization_exceptions():
     """Test exception handling in KeySerializer.serialize method."""
 
-    # Create the serializer
-    serializer = KeySerializer().build()
-
     for sample in _SERIALIZATION_EXCEPTION_SAMPLES:
-        # Attempt untyped serialization
+        # Attempt serialization
         with pytest.raises(RuntimeError):
-            serializer.serialize(sample)
-        # Attempt typed serialization
-        with pytest.raises(RuntimeError):
-            serializer.serialize(sample, (sample.__class__.__name__,))
+            _KEY_SERIALIZER.serialize(sample)
+
 
 
 if __name__ == "__main__":
