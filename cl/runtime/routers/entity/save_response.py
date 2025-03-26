@@ -17,10 +17,13 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.save_request import SaveRequest
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 ui_serializer = UiDictSerializer()
+
+_KEY_SERIALIZER = KeySerializers.DEFAULT
 key_serializer = StringSerializer()
 
 
@@ -48,9 +51,9 @@ class SaveResponse(BaseModel):
         # Deserialize record
         record = ui_serializer.deserialize_data(ui_record).build()
         record_key = record.get_key()
-        record_key_str = key_serializer.serialize_key(record_key)
+        record_key_str = _KEY_SERIALIZER.serialize(record_key)
 
-        if request.old_record_key is None:
+        if not request.old_record_key:
             # Requested save new record - check if record already exists
             existing_record = DbContext.load_one_or_none(
                 record_type=type(record),
