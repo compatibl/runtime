@@ -21,6 +21,8 @@ from typing import Tuple
 from typing import Type
 from typing import get_type_hints
 from uuid import UUID
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
@@ -127,7 +129,7 @@ class StringSerializer:
             type_dict = get_type_dict()
             type_dict[short_name] = data.__class__
 
-            return f"{short_name}.{data.name}"
+            return f"{CaseUtil.upper_to_pascal_case(data.name)}"
         else:
             return cls.serialize_primitive(data)
 
@@ -135,17 +137,9 @@ class StringSerializer:
     def _deserialize_key_token(cls, token: str, slot_type: Type):
         """Deserialize single key token in str format."""
         if issubclass(slot_type, Enum):
-            enum_type, enum_value = token.split(".")
-            type_dict = get_type_dict()
-            deserialized_type = type_dict.get(enum_type, None)  # noqa
-            if deserialized_type is None:
-                raise RuntimeError(
-                    f"Enum not found for name or alias '{enum_type}' during key token deserialization. "
-                    f"Ensure all serialized enums are included in package import settings."
-                )
-
             # Get enum value
-            return deserialized_type[enum_value]  # noqa
+            enum_value = CaseUtil.pascal_to_upper_case(token)
+            return slot_type[enum_value]  # noqa
         elif (primitive := cls.deserialize_primitive(token, slot_type)) is not None:
             return primitive
         else:
