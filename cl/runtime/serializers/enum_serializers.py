@@ -22,6 +22,12 @@ cls = EnumSerializer
 class EnumSerializers:
     """Standard combinations of primitive formats."""
 
+    PASSTHROUGH: cls = cls(
+        none_format=NoneFormatEnum.PASSTHROUGH,
+        enum_format=EnumFormatEnum.PASSTHROUGH,
+    ).build()
+    """Do not perform any conversion but validate against type information if provided."""
+
     DEFAULT: cls = cls(
         none_format=NoneFormatEnum.PASSTHROUGH,
         enum_format=EnumFormatEnum.DEFAULT,

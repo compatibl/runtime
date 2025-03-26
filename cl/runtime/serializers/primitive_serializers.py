@@ -46,7 +46,7 @@ class PrimitiveSerializers:
         timestamp_format=TimestampFormatEnum.PASSTHROUGH,
         bytes_format=BytesFormatEnum.PASSTHROUGH,
     ).build()
-    """Pass through None and all primitive values without conversion."""
+    """Do not perform any conversion but validate against type information if provided."""
 
     DEFAULT: cls = cls(
         none_format=NoneFormatEnum.PASSTHROUGH,

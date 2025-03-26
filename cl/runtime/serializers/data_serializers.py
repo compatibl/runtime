@@ -23,6 +23,20 @@ cls = DataSerializer
 class DataSerializers:
     """Standard combinations of primitive formats."""
 
+    PASSTHROUGH: cls = cls(
+        bidirectional=True,
+        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        enum_serializer=EnumSerializers.PASSTHROUGH,
+    ).build()
+    """Bidirectional conversion of classes to dicts and back without any conversion of primitive types or enums."""
+
+    DEFAULT: cls = cls(
+        bidirectional=True,
+        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        enum_serializer=EnumSerializers.DEFAULT,
+    ).build()
+    """Default bidirectional data serializer with default serialization for primitive types and enums."""
+
     FOR_JSON: cls = cls(
         bidirectional=True,
         primitive_serializer=PrimitiveSerializers.FOR_JSON,
