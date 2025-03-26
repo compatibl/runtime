@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.primitive.bool_format_enum import BoolFormatEnum
-from cl.runtime.primitive.bytes_format_enum import BytesFormatEnum
-from cl.runtime.primitive.date_format_enum import DateFormatEnum
-from cl.runtime.primitive.datetime_format_enum import DatetimeFormatEnum
-from cl.runtime.primitive.float_format_enum import FloatFormatEnum
-from cl.runtime.primitive.int_format_enum import IntFormatEnum
-from cl.runtime.primitive.long_format_enum import LongFormatEnum
-from cl.runtime.primitive.none_format_enum import NoneFormatEnum
-from cl.runtime.primitive.string_format_enum import StringFormatEnum
-from cl.runtime.primitive.time_format_enum import TimeFormatEnum
-from cl.runtime.primitive.timestamp_format_enum import TimestampFormatEnum
-from cl.runtime.primitive.uuid_format_enum import UuidFormatEnum
+from cl.runtime.serializers.bool_format_enum import BoolFormatEnum
+from cl.runtime.serializers.bytes_format_enum import BytesFormatEnum
+from cl.runtime.serializers.date_format_enum import DateFormatEnum
+from cl.runtime.serializers.datetime_format_enum import DatetimeFormatEnum
+from cl.runtime.serializers.float_format_enum import FloatFormatEnum
+from cl.runtime.serializers.int_format_enum import IntFormatEnum
+from cl.runtime.serializers.long_format_enum import LongFormatEnum
+from cl.runtime.serializers.none_format_enum import NoneFormatEnum
+from cl.runtime.serializers.string_format_enum import StringFormatEnum
+from cl.runtime.serializers.time_format_enum import TimeFormatEnum
+from cl.runtime.serializers.timestamp_format_enum import TimestampFormatEnum
+from cl.runtime.serializers.uuid_format_enum import UuidFormatEnum
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 cls = PrimitiveSerializer
