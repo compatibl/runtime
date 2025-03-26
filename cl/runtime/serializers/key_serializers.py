@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from cl.runtime.serializers.enum_serializers import EnumSerializers
+from cl.runtime.serializers.key_format_enum import KeyFormatEnum
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
@@ -23,7 +24,7 @@ class KeySerializers:
     """Standard key serializers."""
 
     DEFAULT: cls = cls(
-        delimited=True,
+        key_format=KeyFormatEnum.FLATTENED_STRING,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
