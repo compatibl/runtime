@@ -50,7 +50,7 @@ class DataSerializers:
     """Default bidirectional data serializer settings for JSON."""
 
     FOR_UI: cls = cls(
-        type_inclusion=TypeInclusionEnum.AS_NEEDED,
+        type_inclusion=TypeInclusionEnum.ALWAYS,
         type_format=TypeFormatEnum.NAME_ONLY,
         type_field="_t",
         pascalize_keys=True,

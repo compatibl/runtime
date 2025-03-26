@@ -32,8 +32,10 @@ from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
+from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
@@ -193,7 +195,8 @@ class DataSerializer(Data):
                 ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
             # Include type information depending on the outcome of the above logic
-            result = {self.type_field: data_type_name} if include_type else {}
+            result = {}
+            # TODO: result = {self.type_field: data_type_name} if include_type else {}
 
             # Get class and field dictionary for schema_type_name
             data_field_dict = data_type_spec.get_field_dict()
@@ -214,6 +217,8 @@ class DataSerializer(Data):
                     if (v := getattr(data, k)) is not None
                 }
             )
+            if include_type:
+                result[self.type_field] = data_type_name
             return result
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
@@ -294,9 +299,8 @@ class DataSerializer(Data):
 
             # Deserialize into a dict
             result_dict = {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._typed_deserialize(
-                    v, field_dict[k].type_chain
-                )
+                (snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)):
+                    self._typed_deserialize(v, field_dict[snake_case_k].type_chain)
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
             }
