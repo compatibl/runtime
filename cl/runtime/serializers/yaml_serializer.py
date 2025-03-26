@@ -27,6 +27,7 @@ from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.serializers.data_serializer import DataSerializer
+from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 # Use primitive serializer with default settings to serialize all primitive types to string
@@ -141,6 +142,8 @@ class YamlSerializer(Data):
         self._dict_serializer = DataSerializer(
             bidirectional=self.bidirectional,
             pascalize_keys=self.pascalize_keys,
+            primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+            enum_serializer=EnumSerializers.DEFAULT,
         ).build()
 
         if self.bidirectional:
@@ -150,6 +153,7 @@ class YamlSerializer(Data):
                 bidirectional=self.bidirectional,
                 pascalize_keys=self.pascalize_keys,
                 primitive_serializer=PrimitiveSerializers.DEFAULT,
+                enum_serializer=EnumSerializers.DEFAULT,
             ).build()
 
     def serialize(self, data: Any) -> str:

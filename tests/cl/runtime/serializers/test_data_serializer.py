@@ -17,7 +17,9 @@ import orjson
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializer import DataSerializer
+from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -54,7 +56,11 @@ def test_bidirectional():
     """Test DataSerializer.serialize method with bidirectional=True."""
 
     # Create the serializer
-    serializer = DataSerializer(bidirectional=True).build()
+    serializer = DataSerializer(
+        bidirectional=True,
+        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        enum_serializer=EnumSerializers.DEFAULT,
+    ).build()
 
     for sample_type in _SAMPLE_TYPES:
 
@@ -85,7 +91,11 @@ def test_unidirectional():
     """Test DataSerializer.serialize method with bidirectional=None."""
 
     # Create the serializer
-    serializer = DataSerializer(bidirectional=False).build()
+    serializer = DataSerializer(
+        bidirectional=False,
+        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        enum_serializer=EnumSerializers.DEFAULT,
+    ).build()
 
     for sample_type in _SAMPLE_TYPES:
 

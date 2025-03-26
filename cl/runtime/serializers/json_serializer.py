@@ -17,6 +17,7 @@ from typing import Any
 import orjson
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.serializers.data_serializer import DataSerializer
+from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
@@ -46,6 +47,7 @@ class JsonSerializer(Data):
             bidirectional=self.bidirectional,
             pascalize_keys=self.pascalize_keys,
             primitive_serializer=PrimitiveSerializers.DEFAULT,
+            enum_serializer=EnumSerializers.DEFAULT,
         ).build()
 
     def serialize(self, data: Any) -> str:

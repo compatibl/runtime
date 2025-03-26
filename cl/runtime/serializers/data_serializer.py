@@ -58,15 +58,6 @@ class DataSerializer(Data):
     key_serializer: KeySerializer | None = None
     """Use to serialize key types if specified, otherwise use the same serialization as for data."""
 
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.primitive_serializer is None:
-            # Use passthrough primitive serializer if not specified
-            self.primitive_serializer = PrimitiveSerializers.PASSTHROUGH
-        if self.enum_serializer is None:
-            # Use default enum serializer if not specified
-            self.enum_serializer = EnumSerializers.DEFAULT
-
     def serialize(self, data: Any) -> Any:
         """Serialize data to a dictionary."""
 
