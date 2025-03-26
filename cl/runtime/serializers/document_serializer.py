@@ -33,6 +33,7 @@ from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
+from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -53,6 +54,9 @@ class DocumentSerializer(Data):
 
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
+
+    key_serializer: KeySerializer | None = None
+    """Use to serialize key types if specified, otherwise use the same serialization as for data."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

@@ -47,7 +47,7 @@ invalid_db_name_regex = re.compile(f"[{invalid_db_name_symbols}]")
 data_serializer = DocumentSerializers.FOR_MONGO
 """Default bidirectional dict serializer settings for MongoDB."""
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 filter_serializer = MongoFilterSerializer()
 
 _client_dict: Dict[str, MongoClient] = {}

@@ -42,7 +42,7 @@ from stubs.cl.runtime import StubDataclassRecord
 flat_serializer = FlatDictSerializer()
 """Serializer for file serialization."""
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 """Serializer for keys."""
 
 

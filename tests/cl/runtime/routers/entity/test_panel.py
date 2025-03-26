@@ -23,7 +23,7 @@ from stubs.cl.runtime import StubDataViewers
 
 # create stub with viewers
 stub_viewers = StubDataViewers()
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 key_str = _KEY_SERIALIZER.serialize(stub_viewers)
 
 

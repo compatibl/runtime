@@ -23,9 +23,12 @@ cls = KeySerializer
 class KeySerializers:
     """Standard key serializers."""
 
-    DEFAULT: cls = cls(
-        key_format=KeyFormatEnum.FLATTENED_STRING,
+    DELIMITED: cls = cls(
+        key_format=KeyFormatEnum.DELIMITED,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
-    """Default bidirectional key serializer to delimited string."""
+    """
+    Delimited string constructed from a flattened sequence of primitive and enum tokens serialized using
+    primitive_serializer and enum_serializer respectively. The default delimiter is semicolon.
+    """

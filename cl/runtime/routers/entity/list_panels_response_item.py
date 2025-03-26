@@ -23,7 +23,7 @@ from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 class ListPanelsResponseItem(BaseModel):

@@ -14,6 +14,7 @@
 
 from cl.runtime.serializers.document_serializer import DocumentSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 cls = DocumentSerializer
@@ -27,11 +28,20 @@ class DocumentSerializers:
         primitive_serializer=PrimitiveSerializers.FOR_JSON,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
-    """Default bidirectional dict serializer settings for JSON."""
+    """Default bidirectional data serializer settings for JSON."""
+
+    FOR_UI: cls = cls(
+        bidirectional=True,
+        pascalize_keys=True,
+        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        enum_serializer=EnumSerializers.DEFAULT,
+        key_serializer=KeySerializers.DELIMITED,
+    ).build()
+    """Default bidirectional data serializer settings for UI."""
 
     FOR_MONGO: cls = cls(
         bidirectional=True,
         primitive_serializer=PrimitiveSerializers.FOR_MONGO,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
-    """Default bidirectional dict serializer settings for MongoDB."""
+    """Default bidirectional data serializer settings for MongoDB."""

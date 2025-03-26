@@ -19,8 +19,14 @@ from enum import auto
 class KeyFormatEnum(IntEnum):
     """Format of the serialized key."""
 
-    FLATTENED_SEQUENCE = auto()
-    """Sequence where primitive tokens from inner keys are flattened into a single linear sequence."""
+    DELIMITED = auto()
+    """
+    Delimited string constructed from a flattened sequence of primitive and enum tokens serialized using
+    primitive_serializer and enum_serializer respectively. The default delimiter is semicolon.
+    """
 
-    FLATTENED_STRING = auto()
-    """Delimited string constructed from a flattened sequence, default delimiter is semicolon."""
+    SEQUENCE = auto()
+    """
+    Flattened sequence of primitive and enum tokens serialized using
+    primitive_serializer and enum_serializer respectively.
+    """

@@ -22,7 +22,7 @@ from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 _SERIALIZATION_SAMPLES = [
     StubDataclassRecordKey().build(),

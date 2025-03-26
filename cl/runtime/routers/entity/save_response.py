@@ -22,7 +22,7 @@ from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 ui_serializer = UiDictSerializer()
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 class SaveResponse(BaseModel):

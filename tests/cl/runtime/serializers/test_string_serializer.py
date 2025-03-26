@@ -21,7 +21,7 @@ from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 def test_key_serialization():

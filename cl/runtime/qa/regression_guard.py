@@ -34,7 +34,7 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 _supported_extensions = ["txt", "yaml"]
 """The list of supported output file extensions (formats)."""
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 """Serializer for keys."""
 
 data_serializer = DictSerializer()

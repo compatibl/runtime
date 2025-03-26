@@ -32,7 +32,7 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 @dataclass(slots=True, kw_only=True)

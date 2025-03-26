@@ -31,7 +31,7 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.string_serializer import StringSerializer
 from cl.runtime.serializers.string_serializer import primitive_type_names as str_primitive_type_names
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 class FlatDictSerializer(DictSerializer):

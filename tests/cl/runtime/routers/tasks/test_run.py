@@ -27,7 +27,7 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubHandlers
 
 stub_handlers = StubHandlers()
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 key_str = _KEY_SERIALIZER.serialize(stub_handlers)
 
 simple_requests = [

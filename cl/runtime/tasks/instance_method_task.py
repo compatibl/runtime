@@ -28,7 +28,7 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 param_dict_serializer = DictSerializer()  # TODO: Support complex params
 
 

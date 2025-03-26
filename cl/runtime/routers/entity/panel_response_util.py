@@ -29,7 +29,7 @@ PanelResponse = Dict[str, PanelResponseDataItem | List[PanelResponseDataItem] | 
 
 # Create serializers
 ui_serializer = UiDictSerializer()
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 class PanelResponseUtil:

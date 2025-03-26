@@ -33,7 +33,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 """Serializer for keys."""
 
 data_serializer = DictSerializer()

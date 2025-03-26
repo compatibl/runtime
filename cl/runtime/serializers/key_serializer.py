@@ -75,11 +75,12 @@ class KeySerializer(Data):
         # Perform checks and convert to a sequence
         sequence = self._to_sequence(data)
 
-        if (key_format := self.key_format) == KeyFormatEnum.FLATTENED_SEQUENCE:
-            return sequence
-        elif key_format == KeyFormatEnum.FLATTENED_STRING:
+        if (key_format := self.key_format) == KeyFormatEnum.DELIMITED:
             # Convert sequence to a semicolon-delimited string
             return ";".join(sequence)
+        if key_format == KeyFormatEnum.SEQUENCE:
+            # Sequence format
+            return sequence
         else:
             raise ErrorUtil.enum_value_error(key_format, KeyFormatEnum)
 
@@ -98,23 +99,23 @@ class KeySerializer(Data):
             )
 
         # Convert argument to a sequence based on the key_format field
-        if (key_format := self.key_format) == KeyFormatEnum.FLATTENED_SEQUENCE:
+        if (key_format := self.key_format) == KeyFormatEnum.DELIMITED:
+            # Check the argument is a string
+            if not isinstance(data, str):
+                raise RuntimeError(
+                    f"Key format is DELIMITED but data passed to\n"
+                    f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
+                )
+            sequence = data.split(";")
+        elif key_format == KeyFormatEnum.SEQUENCE:
             # Check the argument is a sequence
             if not is_sequence(data):
                 raise RuntimeError(
-                    f"Key format is FLATTENED_SEQUENCE but data passed to\n"
+                    f"Key format is SEQUENCE but data passed to\n"
                     f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
                 )
             # Check each token and create a deque so popleft is available
             sequence = [self._checked_value(x) for x in data]
-        elif key_format == KeyFormatEnum.FLATTENED_STRING:
-            # Check the argument is a string
-            if not isinstance(data, str):
-                raise RuntimeError(
-                    f"Key format is FLATTENED_STRING but data passed to\n"
-                    f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
-                )
-            sequence = data.split(";")
         else:
             raise ErrorUtil.enum_value_error(key_format, KeyFormatEnum)
 

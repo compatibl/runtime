@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.serializers.document_serializers import DocumentSerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -26,6 +28,7 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 
+DOCUMENT_SERIALIZER = DocumentSerializers.FOR_UI
 
 def test_data_serialization():
     sample_types = [
@@ -52,6 +55,9 @@ def test_data_serialization():
     for sample_type in sample_types:
         obj_1 = sample_type()
         serialized_1 = serializer.serialize_data(obj_1)
+        serialized_new = DOCUMENT_SERIALIZER.serialize(obj_1)
+        serialized_new["_t"] = serialized_new.pop("_type", None)
+        # TODO: assert serialized_1 == serialized_new
 
         obj_2 = serializer.deserialize_data(serialized_1)
         serialized_2 = serializer.serialize_data(obj_2)

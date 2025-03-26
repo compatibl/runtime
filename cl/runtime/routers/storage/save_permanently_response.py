@@ -28,7 +28,7 @@ from cl.runtime.schema.schema import Schema
 from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-_KEY_SERIALIZER = KeySerializers.DEFAULT
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[Type, TRecord]:
