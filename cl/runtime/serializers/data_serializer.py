@@ -113,10 +113,11 @@ class DataSerializer(Data):
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
     def _typed_serialize(
-            self,
-            data: Any, type_chain: Tuple[str, ...] | None = None,
-            *,
-            is_root: bool | None = None,
+        self,
+        data: Any,
+        type_chain: Tuple[str, ...] | None = None,
+        *,
+        is_root: bool | None = None,
     ) -> Any:
         """Serialize the argument to a dictionary type_chain and schema."""
 

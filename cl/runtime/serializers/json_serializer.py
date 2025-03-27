@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from typing import Any
 import orjson
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.serializers.data_serializer import DataSerializer

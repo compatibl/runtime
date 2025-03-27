@@ -58,7 +58,7 @@ class DataSerializers:
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=JsonSerializers.FOR_CSV,  # TODO: Add Serializer base and standard API for all serializers
-        inner_serializer=JsonSerializers.FOR_CSV, # TODO: Add Serializer base and standard API for all serializers
+        inner_serializer=JsonSerializers.FOR_CSV,  # TODO: Add Serializer base and standard API for all serializers
     ).build()
     """Default bidirectional data serializer settings for UI."""
 

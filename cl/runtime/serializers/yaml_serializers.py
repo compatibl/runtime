@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 

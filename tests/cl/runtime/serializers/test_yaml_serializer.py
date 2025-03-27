@@ -19,8 +19,6 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.type_format_enum import TypeFormatEnum
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
