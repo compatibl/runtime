@@ -1,0 +1,5 @@
+primitive: abc
+embedded_1: def
+embedded_2: xyz
+_type: StubDataclassComposite
+
