@@ -38,6 +38,7 @@ from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
+from cl.runtime.serializers.type_placement_enum import TypePlacementEnum
 
 
 @dataclass(slots=True, kw_only=True)
@@ -53,11 +54,14 @@ class DataSerializer(Data):
     key_serializer: KeySerializer | None = None
     """Use to serialize key types if specified, otherwise use the same serialization as for data."""
 
-    type_inclusion: TypeInclusionEnum = required()
+    type_inclusion: TypeInclusionEnum = TypeInclusionEnum.AS_NEEDED
     """Where to include type information in serialized data."""
 
-    type_format: TypeFormatEnum | None = None
+    type_format: TypeFormatEnum = TypeFormatEnum.NAME_ONLY
     """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
+
+    type_placement: TypePlacementEnum = TypePlacementEnum.FIRST
+    """Placement of type information in the output dictionary (optional, do not provide if type_inclusion=OMIT)."""
 
     type_field: str = "_type"
     """Dictionary key under which type information is stored (optional, defaults to '_type')."""
@@ -72,7 +76,7 @@ class DataSerializer(Data):
             # Use typed serialization if bidirectional flag is on
             return self._typed_serialize(data)
         elif self.type_inclusion == TypeInclusionEnum.OMIT:
-            # Otherwise use untyped serialization
+            # Use untyped serialization
             return self._untyped_serialize(data)
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
@@ -103,7 +107,7 @@ class DataSerializer(Data):
         elif self.type_inclusion == TypeInclusionEnum.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
         else:
-            ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
+            raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
     def _typed_serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
         """Serialize the argument to a dictionary type_chain and schema."""
@@ -186,7 +190,6 @@ class DataSerializer(Data):
                     )
 
             # Include type in output according to the type_inclusion setting
-            include_type = None
             if self.type_inclusion == TypeInclusionEnum.ALWAYS:
                 include_type = True
             elif self.type_inclusion == TypeInclusionEnum.AS_NEEDED:
@@ -195,10 +198,35 @@ class DataSerializer(Data):
             elif self.type_inclusion == TypeInclusionEnum.OMIT:
                 include_type = False
             else:
-                ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
+                raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
-            # Include type information depending on the outcome of the above logic
-            result = {self.type_field: data_type_name} if include_type else {}
+            # Parse type_format field
+            if self.type_inclusion != TypeInclusionEnum.OMIT:
+                if self.type_format == TypeFormatEnum.NAME_ONLY:
+                    type_field = data_type_name
+                elif self.type_format == TypeFormatEnum.FULL_PATH:
+                    raise RuntimeError("TypeFormatEnum.FULL_PATH is not supported.")
+                else:
+                    raise ErrorUtil.enum_value_error(self.type_format, TypeFormatEnum)
+            else:
+                type_field = None
+
+            # Parse type_placement field
+            if self.type_inclusion != TypeInclusionEnum.OMIT:
+                if self.type_placement == TypePlacementEnum.FIRST:
+                    include_type_first = include_type
+                    include_type_last = False
+                elif self.type_placement == TypePlacementEnum.LAST:
+                    include_type_first = False
+                    include_type_last = include_type
+                else:
+                    raise ErrorUtil.enum_value_error(self.type_placement, TypePlacementEnum)
+            else:
+                include_type_first = False
+                include_type_last = False
+
+            # # Include type information first based on include_type_first flag
+            result = {self.type_field: type_field} if include_type_first else {}
 
             # Get class and field dictionary for schema_type_name
             data_field_dict = data_type_spec.get_field_dict()
@@ -219,6 +247,10 @@ class DataSerializer(Data):
                     if (v := getattr(data, k)) is not None
                 }
             )
+
+            if include_type_last:
+                # Include type information last based on include_type_last flag
+                result[self.type_field] = type_field
             return result
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")

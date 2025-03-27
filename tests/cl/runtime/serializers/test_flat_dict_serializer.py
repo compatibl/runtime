@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import json
 
 import pytest
@@ -60,7 +61,7 @@ def test_data_serialization():
 
     for sample_type in sample_types:
         sample = sample_type()
-        serialized = DataSerializers.FOR_UI.serialize(sample)
+        serialized = DataSerializers.FOR_SQLITE.serialize(sample)
         # deserialized = DataSerializers.FOR_UI.deserialize(serialized)
         # TODO: assert deserialized == sample
 
@@ -75,8 +76,11 @@ def test_data_serialization():
         # Record in RegressionGuard
         resuld_dict_old = json.loads(serialized_old)
         result_str_old = YamlSerializers.REPORTING.serialize(resuld_dict_old)
-        guard = RegressionGuard(channel=sample_type.__name__)
+        guard = RegressionGuard(channel=f"{sample_type.__name__}.old")
         guard.write(result_str_old)
+
+        guard = RegressionGuard(channel=sample_type.__name__)
+        guard.write(serialized)
     RegressionGuard().verify_all()
 
 

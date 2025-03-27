@@ -16,14 +16,11 @@ from enum import IntEnum
 from enum import auto
 
 
-class TypeInclusionEnum(IntEnum):
-    """When to include type information in serialized data."""
+class TypePlacementEnum(IntEnum):
+    """Placement of type information in the output dictionary."""
 
-    OMIT = auto()
-    """Do not include type information in serialized data, deserialization is not possible."""
+    FIRST = auto()
+    """Type is the first key."""
 
-    AS_NEEDED = auto()
-    """Always include type information at root level, include at other levels as needed."""
-
-    ALWAYS = auto()
-    """Always include type information in serialized data at all levels."""
+    LAST = auto()
+    """Type is the last key."""

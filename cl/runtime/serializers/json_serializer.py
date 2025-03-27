@@ -68,7 +68,7 @@ class JsonSerializer(Data):
         data_dict = self._dict_serializer.serialize(data)
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
-        result = orjson.dumps(data_dict, option=orjson.OPT_INDENT_2).decode()
+        result = orjson.dumps(data_dict, option=orjson.OPT_INDENT_2).decode("utf-8")
         return result
 
     def deserialize(self, json_str: str) -> Any:

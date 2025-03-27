@@ -57,7 +57,7 @@ def test_data_serialization():
         sample = sample_type()
         serialized = DataSerializers.FOR_UI.serialize(sample)
         deserialized = DataSerializers.FOR_UI.deserialize(serialized)
-        # TODO: serialized = deserialized
+        assert deserialized == sample
 
         serialized_old = serializer_old.serialize_data(sample)
         assert serialized_old == serialized
