@@ -19,3 +19,9 @@ from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 @dataclass(slots=True, kw_only=True)
 class BasicMongoMockDb(BasicMongoDb):
     """MongoDB database without datasets using in-memory client from the mongomock library."""
+
+    client_uri: str = "mongomock"
+    """
+    The client URI is used to cache client objects, changing the default value to
+    avoid conflict with PyMongo.
+    """
