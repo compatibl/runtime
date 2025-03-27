@@ -14,14 +14,11 @@
 
 import datetime as dt
 import time
-import traceback
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.log_context import LogContext
-from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.log.log_message import LogMessage
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -91,7 +88,10 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
 
+        logger = LogContext.get_logger(module_name=__name__)
         try:
+            logger.info("Start task execution.")
+
             # Save with Running status
             update = self.clone()
             update.status = TaskStatusEnum.RUNNING
@@ -101,22 +101,8 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             self._execute()
 
         except Exception as e:  # noqa
-            traceback.print_exception(e)  # TODO: Add full stack trade to the log message as well
-            # TODO: Perform additional processing for UserError
-            if isinstance(e, UserError):
-                # TODO: Perform additional processing
-                pass
-            else:
-                # TODO: Perform additional processing
-                pass
 
-            # Save log entry to the database
-            log_message = LogMessage(message=str(e)).build()
-            DbContext.save_one(log_message)
-
-            logger = LogContext.get_logger(module_name=__name__)
-            logger.debug("An error occurred: %s", e)
-            logger.debug("Stack trace:\n%s", traceback.format_exc())
+            logger.error("Task failed with exception.", exc_info=True)
 
             # Save with Failed status and execution info
             update = self.clone()
@@ -127,6 +113,9 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             update.error_message = str(e)
             DbContext.save_one(update.build())
         else:
+
+            logger.info("Task completed successfully.")
+
             # Record the end time
             end_time = DatetimeUtil.now()
 

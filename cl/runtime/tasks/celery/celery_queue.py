@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging.config
 import multiprocessing
 import os
 from dataclasses import dataclass
+from typing import Dict
 from typing import Final
 from typing import List
 from celery import Celery
+from celery.signals import setup_logging
 from cl.runtime.contexts.context_manager import ContextManager
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.process_context import ProcessContext
+from cl.runtime.log.log_config import celery_empty_logging_config
+from cl.runtime.log.log_config import logging_config
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.settings.context_settings import ContextSettings
@@ -55,6 +60,15 @@ context_serializer = DictSerializer()
 """Serializer for the context parameter of 'execute_task' method."""
 
 
+@setup_logging.connect()
+def config_loggers(*args, **kwargs):
+    """Setup logging config for celery worker."""
+    from logging.config import dictConfig
+
+    # Use empty config to suppress celery logger and propagate to root.
+    dictConfig(celery_empty_logging_config)
+
+
 @celery_app.task(max_retries=0)  # Do not retry failed tasks
 def execute_task(
     task_id: str,
@@ -71,20 +85,16 @@ def execute_task(
         task.run_task()
 
 
-def celery_start_queue_callable(*, log_dir: str) -> None:
+def celery_start_queue_callable(*, log_config: Dict) -> None:
     """
     Callable for starting the celery queue process.
 
     Args:
-        log_dir: Directory where Celery console log file will be written
+        log_config: logging dict config from the main process.
     """
 
-    # Redirect console output from celery to a log file
-    # TODO: Use an additional Logger handler instead
-    log_file_path = os.path.join(log_dir, "celery_queue.log")
-    # with open(log_file_path, "w") as log_file:
-    #    os.dup2(log_file.fileno(), 1)  # Redirect stdout (file descriptor 1)
-    #    os.dup2(log_file.fileno(), 2)  # Redirect stderr (file descriptor 2)
+    # Setup logging config from the main process.
+    logging.config.dictConfig(log_config)
 
     celery_app.worker_main(
         argv=[
@@ -107,7 +117,7 @@ def celery_delete_existing_tasks() -> None:
         os.remove(celery_file)
 
 
-def celery_start_queue(*, log_dir: str) -> None:
+def celery_start_queue() -> None:
     """
     Start Celery workers (will exit when the current process exits).
 
@@ -115,7 +125,7 @@ def celery_start_queue(*, log_dir: str) -> None:
         log_dir: Directory where Celery console log file will be written
     """
     worker_process = multiprocessing.Process(
-        target=celery_start_queue_callable, daemon=True, kwargs={"log_dir": log_dir}
+        target=celery_start_queue_callable, daemon=True, kwargs={"log_config": logging_config}
     )
     worker_process.start()
 
