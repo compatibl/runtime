@@ -14,9 +14,13 @@
 
 import pytest
 import os
+import uuid
 from typing import Iterator
 from typing import Type
+from unittest import mock
 from _pytest.fixtures import FixtureRequest
+from bson import UUID_SUBTYPE
+from bson import Binary
 from cl.runtime import Db
 from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
@@ -66,6 +70,25 @@ def _pytest_db(request: FixtureRequest, *, db_type: Type | None = None) -> Itera
     db.delete_all_and_drop_db()
 
 
+def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
+    """Convert a UUID to BSON Binary object."""
+    return Binary(uuid_.bytes, UUID_SUBTYPE)
+
+
+@pytest.fixture(scope="function")
+def patch_uuid_conversion(request):
+    """
+    Fixture to patch the Binary.from_uuid method if request.param is None or BasicMongoMockDb.
+    Required for tests with mongomock.
+    """
+    if (request_param := getattr(request, "param", None)) is None or request_param == BasicMongoMockDb:
+        # The mongomock client does not convert UUID objects by default, but the real pymongo client does.
+        with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
+            yield
+    else:
+        yield
+
+
 @pytest.fixture(scope="function")
 def pytest_default_db(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using default DB."""
@@ -91,13 +114,13 @@ def pytest_basic_mongo_db(request: FixtureRequest) -> Iterator[Db]:
 
 
 @pytest.fixture(scope="function")
-def pytest_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
+def pytest_basic_mongo_mock_db(request: FixtureRequest, patch_uuid_conversion) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using BasicMongoMockDb."""
     yield from _pytest_db(request, db_type=BasicMongoMockDb)
 
 
-@pytest.fixture(scope="function", params=[SqliteDb, BasicMongoDb, BasicMongoMockDb])
-def pytest_multi_db(request) -> Iterator[Db]:
+@pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb])
+def pytest_multi_db(request, patch_uuid_conversion) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.

@@ -17,6 +17,7 @@ from typing import Any
 from typing import Iterable
 from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
