@@ -52,12 +52,12 @@ class JsonSerializer(Data):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    _dict_serializer: DataSerializer | None = None
+    _data_serializer: DataSerializer | None = None
     """Serializes data into dictionary from which it is serialized into JSON."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        self._dict_serializer = DataSerializer(
+        self._data_serializer = DataSerializer(
             type_inclusion=self.type_inclusion,
             type_format=self.type_format,
             type_field=self.type_field,
@@ -70,7 +70,7 @@ class JsonSerializer(Data):
         """Serialize to a JSON string."""
 
         # Use self.dict_serializer to serialize the data to a dictionary
-        data_dict = self._dict_serializer.serialize(data)
+        data_dict = self._data_serializer.serialize(data)
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
         if self.json_output_format == JsonOutputFormatEnum.PRETTY_PRINT:
@@ -93,5 +93,5 @@ class JsonSerializer(Data):
         json_dict = orjson.loads(json_str.encode("utf-8"))
 
         # Use self.dict_serializer to deserialize from the dictionary
-        result = self._dict_serializer.deserialize(json_dict)
+        result = self._data_serializer.deserialize(json_dict)
         return result

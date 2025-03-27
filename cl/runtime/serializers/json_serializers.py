@@ -28,5 +28,8 @@ class JsonSerializers:
     REPORTING: cls = cls(type_inclusion=TypeInclusionEnum.OMIT).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""
 
+    FOR_CSV: cls = cls(json_output_format=JsonOutputFormatEnum.COMPACT).build()
+    """Omit type information when the output is used for reporting, deserialization is not possible."""
+
     FOR_SQLITE: cls = cls(json_output_format=JsonOutputFormatEnum.COMPACT).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""

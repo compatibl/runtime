@@ -54,9 +54,17 @@ class DataSerializers:
     ).build()
     """Default bidirectional data serializer settings for UI."""
 
+    FOR_CSV: cls = cls(
+        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        enum_serializer=EnumSerializers.DEFAULT,
+        key_serializer=JsonSerializers.FOR_CSV,  # TODO: Add Serializer base and standard API for all serializers
+        inner_serializer=JsonSerializers.FOR_CSV, # TODO: Add Serializer base and standard API for all serializers
+    ).build()
+    """Default bidirectional data serializer settings for UI."""
+
     FOR_SQLITE: cls = cls(
         type_inclusion=TypeInclusionEnum.ALWAYS,
-        type_placement=TypePlacementEnum.LAST,
+        type_placement=TypePlacementEnum.LAST,  # TODO: Remove after all tests pass
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,

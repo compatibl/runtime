@@ -32,3 +32,13 @@ class KeySerializers:
     Delimited string constructed from a flattened sequence of primitive and enum tokens serialized using
     primitive_serializer and enum_serializer respectively. The default delimiter is semicolon.
     """
+
+    FOR_SQLITE: cls = cls(
+        key_format=KeyFormatEnum.SEQUENCE,
+        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        enum_serializer=EnumSerializers.DEFAULT,
+    ).build()
+    """
+    Flattened sequence of primitive and enum tokens serialized using
+    primitive_serializer and enum_serializer respectively.
+    """
