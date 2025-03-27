@@ -25,7 +25,7 @@ class YamlSerializers:
     DEFAULT: cls = cls().build()
     """Include type information as needed, both serialization and deserialization are possible."""
 
-    REPORTING: cls = cls(
+    FOR_REPORTING: cls = cls(
         type_inclusion=TypeInclusionEnum.OMIT,
     ).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""

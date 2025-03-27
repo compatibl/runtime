@@ -67,7 +67,7 @@ def test_type_decl():
         assert type_decl is not None
 
         # Create YAML string for the declaration
-        type_decl_str = YamlSerializers.REPORTING.serialize(type_decl)
+        type_decl_str = YamlSerializers.FOR_REPORTING.serialize(type_decl)
 
         # Record in regression guard
         guard = RegressionGuard(channel=type_name)

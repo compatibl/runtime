@@ -39,7 +39,7 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 data_serializer = DictSerializer()
 """Serializer for records."""
 
-_YAML_SERIALIZER = YamlSerializers.REPORTING
+_YAML_SERIALIZER = YamlSerializers.FOR_REPORTING
 """Serializer for classes and containers."""
 
 

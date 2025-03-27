@@ -64,7 +64,7 @@ def test_data_serialization():
         assert deserialized_old == deserialized
 
         # Record in RegressionGuard
-        result_str = YamlSerializers.REPORTING.serialize(serialized)
+        result_str = YamlSerializers.FOR_REPORTING.serialize(serialized)
         guard = RegressionGuard(channel=sample_type.__name__)
         guard.write(result_str)
     RegressionGuard().verify_all()

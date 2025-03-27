@@ -58,7 +58,7 @@ def test_to_json():
 
         # Serialize to JSON
         obj = sample_type().build()
-        result_str = JsonSerializers.REPORTING.serialize(obj)
+        result_str = JsonSerializers.FOR_REPORTING.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
