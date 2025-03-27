@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from typing import Any
 from typing import Dict
 from typing import List
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.log.log_message import LogMessage
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.schema.schema import Schema
@@ -77,8 +77,11 @@ class PanelResponseUtil:
         try:
             return cls._get_content(request)
         except Exception as e:
-            # TODO (Roman): Improve main error handler
-            DbContext.save_one(LogMessage(message=str(e)).build())
+            # Log exception manually because the FastAPI logger will not be triggered.
+            logger = logging.getLogger(__name__)
+            logger.error(str(e), exc_info=True)
+
+            # Return custom error response.
             return {  # TODO: Refactor
                 "_t": "Script",
                 "Name": None,

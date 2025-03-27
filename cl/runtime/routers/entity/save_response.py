@@ -15,7 +15,6 @@
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -70,9 +69,4 @@ class SaveResponse(BaseModel):
 
     @classmethod
     def get_response(cls, request: SaveRequest) -> "SaveResponse":
-        try:
-            return cls._save_entity(request)
-        except Exception as e:
-            # TODO (Roman): Improve main error handler
-            DbContext.save_one(LogMessage(message=str(e)).build())
-            raise e
+        return cls._save_entity(request)

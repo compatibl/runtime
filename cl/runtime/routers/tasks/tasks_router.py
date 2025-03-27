@@ -15,8 +15,6 @@
 from typing import List
 from fastapi import APIRouter
 from fastapi import Request
-from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
 from cl.runtime.routers.tasks.run_request import RunRequest
 from cl.runtime.routers.tasks.run_response_item import RunResponseItem
@@ -32,19 +30,15 @@ router = APIRouter()
 async def tasks_run(request: Request, payload: RunRequest):
     """Receive params for tasks execute."""
 
-    try:
-        # TODO: Refactor tasks_run and other routes
-        headers = {}
-        request_headers = dict(request.headers)
-        for key in ("host", "user", "environment", "cutofftime"):
-            headers[key] = request_headers.get(key)
+    # TODO: Refactor tasks_run and other routes
+    headers = {}
+    request_headers = dict(request.headers)
+    for key in ("host", "user", "environment", "cutofftime"):
+        headers[key] = request_headers.get(key)
 
-        # Run tasks without blocking the process
-        payload.headers = headers
-        return RunResponseItem.run_tasks(payload)
-    except Exception as e:
-        DbContext.save_one(LogMessage(message=str(e)).build())
-        raise e
+    # Run tasks without blocking the process
+    payload.headers = headers
+    return RunResponseItem.run_tasks(payload)
 
 
 @router.post("/run/cancel")
@@ -66,8 +60,4 @@ async def tasks_status(payload: TaskStatusRequest):
 
 @router.post("/run/result", response_model=List[TaskResultResponseItem])
 async def tasks_result(payload: TaskResultRequest):
-    try:
-        return TaskResultResponseItem.get_task_results(request=payload)
-    except Exception as e:
-        DbContext.save_one(LogMessage(message=str(e)).build())
-        raise e
+    return TaskResultResponseItem.get_task_results(request=payload)
