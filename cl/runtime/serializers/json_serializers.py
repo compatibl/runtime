@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum
 from cl.runtime.serializers.json_serializer import JsonSerializer
-from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 
 cls = JsonSerializer
@@ -25,7 +25,8 @@ class JsonSerializers:
     DEFAULT: cls = cls().build()
     """Include type information as needed, both serialization and deserialization are possible."""
 
-    REPORTING: cls = cls(
-        type_inclusion=TypeInclusionEnum.OMIT,
-    ).build()
+    REPORTING: cls = cls(type_inclusion=TypeInclusionEnum.OMIT).build()
+    """Omit type information when the output is used for reporting, deserialization is not possible."""
+
+    FOR_SQLITE: cls = cls(json_output_format=JsonOutputFormatEnum.COMPACT).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""

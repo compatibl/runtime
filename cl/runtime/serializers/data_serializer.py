@@ -33,7 +33,6 @@ from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
-from cl.runtime.serializers.key_format_enum import KeyFormatEnum
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -52,8 +51,11 @@ class DataSerializer(Data):
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
 
+    inner_serializer: KeySerializer | None = None  # TODO: Introduce Serializer base
+    """Use to serialize data fields below root level to JSON if specified."""
+
     key_serializer: KeySerializer | None = None
-    """Use to serialize key types if specified, otherwise use the same serialization as for data."""
+    """Use to serialize keys to string if specified, otherwise serialize the same way as data fields."""
 
     type_inclusion: TypeInclusionEnum = TypeInclusionEnum.AS_NEEDED
     """Where to include type information in serialized data."""
@@ -75,7 +77,7 @@ class DataSerializer(Data):
 
         if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
             # Use typed serialization if bidirectional flag is on
-            return self._typed_serialize(data)
+            return self._typed_serialize(data, is_root=True)
         elif self.type_inclusion == TypeInclusionEnum.OMIT:
             # Use untyped serialization
             return self._untyped_serialize(data)
@@ -110,7 +112,12 @@ class DataSerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
-    def _typed_serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
+    def _typed_serialize(
+            self,
+            data: Any, type_chain: Tuple[str, ...] | None = None,
+            *,
+            is_root: bool | None = None,
+    ) -> Any:
         """Serialize the argument to a dictionary type_chain and schema."""
 
         # Get type and class of data and parse type chain
@@ -167,9 +174,14 @@ class DataSerializer(Data):
             )  # TODO: Replace by frozendict
         elif is_data(data):
 
-            if self.key_serializer is not None and is_key(data):
-                # Use key serializer for key types if specified
-                return self.key_serializer.serialize(data)
+            # Do not apply custom key and inner serializers at root level
+            if not is_root:
+                if self.key_serializer is not None and is_key(data):
+                    # Use key serializer for key types if specified
+                    return self.key_serializer.serialize(data)
+                elif self.inner_serializer is not None:
+                    # Use inner serializer for data below root level if specified
+                    return self.inner_serializer.serialize(data)
 
             # Type spec for the data
             data_type_spec = TypeSchema.for_class(data.__class__)
@@ -300,22 +312,12 @@ class DataSerializer(Data):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
             type_spec = TypeSchema.for_type_name(type_name)
             type_class = type_spec.get_class()
-            if is_key(type_class):
-                if self.key_serializer is None:
-                    raise RuntimeError(
-                        f"Key type '{type_name}' cannot be deserialized from the following string\n"
-                        f"without a dedicated key deserializer:\n"
-                        f"{ErrorUtil.wrap(data)}."
-                    )
-                elif self.key_serializer.key_format != KeyFormatEnum.DELIMITED:
-                    raise RuntimeError(
-                        f"Key type '{type_name}' cannot be deserialized from the following string\n"
-                        f"if KeyFormatEnum is not DELIMITED:\n"
-                        f"{ErrorUtil.wrap(data)}."
-                    )
-                else:
-                    # Use key serializer
-                    return self.key_serializer.deserialize(data, type_class)
+            if is_key(type_class) and self.key_serializer is not None:
+                # Use key serializer to deserialize
+                return self.key_serializer.deserialize(data, type_class)
+            elif is_data(type_class) and self.inner_serializer is not None:
+                # Use inner serializer to deserialize
+                return self.inner_serializer.deserialize(data, type_class)
             elif isinstance(type_spec, EnumSpec):
                 # Check that no type chain is remaining
                 if remaining_chain:

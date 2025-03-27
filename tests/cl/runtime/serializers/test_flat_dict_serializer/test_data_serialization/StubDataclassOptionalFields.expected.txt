@@ -1,12 +1,20 @@
 id: abc
 optional_str: xyz
-required_list_of_optional_str: '["abc", null]'
+required_list_of_optional_str:
+- abc
+- 
 optional_float: 1.23
-required_list_of_optional_float: '[1.23, null]'
-required_list_of_optional_data: '["{\"str_field\": \"abc\", \"int_field\": 123, \"_type\":
-  \"StubDataclassData\"}", null]'
-required_list_of_optional_key: '["abc", null]'
-required_list_of_optional_record: '["{\"id\": \"abc\", \"_type\": \"StubDataclassRecord\"}",
-  null]'
+required_list_of_optional_float:
+- 1.23
+- 
+required_list_of_optional_data:
+- '{"_type":"StubDataclassData","str_field":"abc","int_field":"123"}'
+- 
+required_list_of_optional_key:
+- abc
+- 
+required_list_of_optional_record:
+- '{"_type":"StubDataclassRecord","id":"abc"}'
+- 
 _type: StubDataclassOptionalFields
 

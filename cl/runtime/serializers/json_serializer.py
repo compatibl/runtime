@@ -18,7 +18,6 @@ import orjson
 
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum

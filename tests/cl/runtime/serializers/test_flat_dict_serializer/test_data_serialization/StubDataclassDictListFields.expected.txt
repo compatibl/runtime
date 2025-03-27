@@ -1,16 +1,21 @@
 id: abc
-float_dict_list: '["{\"a\": 1.0}", "{\"b\": 2.0}"]'
-date_dict_list: '["{\"a\": \"2003-04-21\", \"b\": \"2003-05-01\"}", "{\"a\": \"2003-04-21\",
-  \"b\": \"2003-05-01\"}"]'
-record_dict_list: '["{\"a\": \"{\\\"id\\\": \\\"A\\\", \\\"_type\\\": \\\"StubDataclassRecord\\\"}\",
-  \"b\": \"{\\\"id\\\": \\\"B\\\", \\\"_type\\\": \\\"StubDataclassRecord\\\"}\"}",
-  "{\"a\": \"{\\\"id\\\": \\\"A\\\", \\\"_type\\\": \\\"StubDataclassRecord\\\"}\",
-  \"b\": \"{\\\"id\\\": \\\"B\\\", \\\"_type\\\": \\\"StubDataclassRecord\\\"}\"}"]'
-derived_record_dict_list: '["{\"a\": \"{\\\"id\\\": \\\"A\\\", \\\"derived_str_field\\\":
-  \\\"derived\\\", \\\"_type\\\": \\\"StubDataclassDerivedRecord\\\"}\", \"b\": \"{\\\"id\\\":
-  \\\"B\\\", \\\"derived_str_field\\\": \\\"derived\\\", \\\"_type\\\": \\\"StubDataclassDerivedRecord\\\"}\"}",
-  "{\"a\": \"{\\\"id\\\": \\\"A\\\", \\\"derived_str_field\\\": \\\"derived\\\", \\\"_type\\\":
-  \\\"StubDataclassDerivedRecord\\\"}\", \"b\": \"{\\\"id\\\": \\\"B\\\", \\\"derived_str_field\\\":
-  \\\"derived\\\", \\\"_type\\\": \\\"StubDataclassDerivedRecord\\\"}\"}"]'
+float_dict_list:
+- a: 1.
+- b: 2.
+date_dict_list:
+- a: '2003-04-21'
+  b: '2003-05-01'
+- a: '2003-04-21'
+  b: '2003-05-01'
+record_dict_list:
+- a: '{"_type":"StubDataclassRecord","id":"A"}'
+  b: '{"_type":"StubDataclassRecord","id":"B"}'
+- a: '{"_type":"StubDataclassRecord","id":"A"}'
+  b: '{"_type":"StubDataclassRecord","id":"B"}'
+derived_record_dict_list:
+- a: '{"_type":"StubDataclassDerivedRecord","id":"A","derived_str_field":"derived"}'
+  b: '{"_type":"StubDataclassDerivedRecord","id":"B","derived_str_field":"derived"}'
+- a: '{"_type":"StubDataclassDerivedRecord","id":"A","derived_str_field":"derived"}'
+  b: '{"_type":"StubDataclassDerivedRecord","id":"B","derived_str_field":"derived"}'
 _type: StubDataclassDictListFields
 

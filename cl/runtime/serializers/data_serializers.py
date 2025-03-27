@@ -14,6 +14,7 @@
 
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
+from cl.runtime.serializers.json_serializers import JsonSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
@@ -59,6 +60,7 @@ class DataSerializers:
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
+        inner_serializer=JsonSerializers.FOR_SQLITE,
     ).build()
     """Default bidirectional data serializer settings for UI."""
 
