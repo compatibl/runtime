@@ -78,9 +78,7 @@ class PrimitiveSerializers:
         timestamp_format=TimestampFormatEnum.PASSTHROUGH,
         bytes_format=BytesFormatEnum.PASSTHROUGH,
     ).build()
-    """
-    Default primitive serializer settings for JSON.
-    """
+    """Default primitive serializer settings for JSON."""
 
     FOR_UI: cls = cls(
         none_format=NoneFormatEnum.PASSTHROUGH,
@@ -96,11 +94,23 @@ class PrimitiveSerializers:
         timestamp_format=TimestampFormatEnum.UUID,  # TODO: Review, should accept DEFAULT
         bytes_format=BytesFormatEnum.DEFAULT,
     ).build()
-    """
-    Default primitive serializer settings for UI.
-    - Pass through None, str, float, bool, int, datetime, uuid, timestamp, bytes
-    - Serialize all other primitive type to string using default format
-    """
+    """Default primitive serializer settings for UI."""
+
+    FOR_SQLITE: cls = cls(
+        none_format=NoneFormatEnum.PASSTHROUGH,
+        string_format=StringFormatEnum.PASSTHROUGH,
+        float_format=FloatFormatEnum.PASSTHROUGH,
+        bool_format=BoolFormatEnum.DEFAULT, # TODO: Review, should be passthrough
+        int_format=IntFormatEnum.PASSTHROUGH,
+        long_format=LongFormatEnum.PASSTHROUGH,
+        date_format=DateFormatEnum.DEFAULT,
+        datetime_format=DatetimeFormatEnum.DEFAULT,
+        time_format=TimeFormatEnum.PASSTHROUGH,
+        uuid_format=UuidFormatEnum.DEFAULT,
+        timestamp_format=TimestampFormatEnum.UUID,  # TODO: Review, should accept DEFAULT
+        bytes_format=BytesFormatEnum.DEFAULT,
+    ).build()
+    """Default primitive serializer settings for UI."""
 
     FOR_MONGO: cls = cls(
         none_format=NoneFormatEnum.PASSTHROUGH,

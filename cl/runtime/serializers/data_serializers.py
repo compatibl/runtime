@@ -16,7 +16,6 @@ from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 from cl.runtime.serializers.type_placement_enum import TypePlacementEnum
 
@@ -57,7 +56,7 @@ class DataSerializers:
     FOR_SQLITE: cls = cls(
         type_inclusion=TypeInclusionEnum.ALWAYS,
         type_placement=TypePlacementEnum.LAST,
-        primitive_serializer=PrimitiveSerializers.FOR_UI,
+        primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
     ).build()

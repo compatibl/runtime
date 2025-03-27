@@ -14,22 +14,23 @@
 
 import difflib
 import os
+import datetime as dt
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from typing import ClassVar
 from typing import Dict
 from typing import Literal
-import yaml
 from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.yaml_serializers import YamlSerializers
 
 _supported_extensions = ["txt", "yaml"]
 """The list of supported output file extensions (formats)."""
@@ -40,25 +41,8 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 data_serializer = DictSerializer()
 """Serializer for records."""
 
-
-# Custom Dumper to ensure proper block style for multi-line strings
-class NoExtraLineBreakDumper(yaml.SafeDumper):
-    def represent_scalar(self, tag, value, style=None):
-        """Use block style (|) for multiline strings."""
-        if "\n" in value:
-            style = "|"
-        return super().represent_scalar(tag, value, style)
-
-
-# Custom YAML representer for Enum
-def enum_representer(dumper, data):
-    item_name = CaseUtil.upper_to_pascal_case(data.name)
-    return dumper.represent_scalar("tag:yaml.org,2002:str", item_name)  # Dumps the name instead of value
-
-
-# Add the custom representer to NoExtraLineBreakDumper
-yaml.add_multi_representer(Enum, enum_representer, Dumper=NoExtraLineBreakDumper)
-
+_YAML_SERIALIZER =YamlSerializers.REPORTING
+"""Serializer for classes and containers."""
 
 def _error_extension_not_supported(ext: str) -> Any:
     raise RuntimeError(
@@ -379,17 +363,8 @@ class RegressionGuard:
             # TODO: Use specialized conversion for primitive types
             return str(value) + "\n"
         elif value_type == dict:
-            return (
-                yaml.dump(
-                    value,
-                    Dumper=NoExtraLineBreakDumper,
-                    default_flow_style=False,
-                    sort_keys=False,
-                    allow_unicode=True,  # Ensure Unicode characters are displayed as is
-                    width=float("inf"),  # Prevent line wrapping
-                )
-                + "\n"
-            )
+            result = _YAML_SERIALIZER.serialize(value) + "\n"
+            return result
         elif issubclass(value_type, Enum):
             return str(value.name)
         elif hasattr(value_type, "__iter__"):

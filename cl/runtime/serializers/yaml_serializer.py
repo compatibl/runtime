@@ -33,12 +33,12 @@ from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 
 # Use primitive serializer with default settings to serialize all primitive types to string
-primitive_to_string_serializer = PrimitiveSerializers.DEFAULT
+_PRIMITIVE_SERIALIZER = PrimitiveSerializers.DEFAULT
 
 
 def str_representer(dumper, data):
     """Configure YAML class for serializing a str field."""
-    data_str = primitive_to_string_serializer.serialize(data, ["str | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["str | None"])
     if data_str:
         style = "|" if data_str and "\n" in data_str else None
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=style)
@@ -48,25 +48,25 @@ def str_representer(dumper, data):
 
 def float_representer(dumper, data):
     """Configure YAML class for serializing a float field."""
-    data_str = primitive_to_string_serializer.serialize(data, ["float | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["float | None"])
     return dumper.represent_scalar("tag:yaml.org,2002:float", data_str, style=None)
 
 
 def time_representer(dumper, data):
     """Configure YAML class for serializing a time field."""
-    data_str = primitive_to_string_serializer.serialize(data, ["time | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["time | None"])
     return dumper.represent_scalar("tag:yaml.org,2002:str", data_str)
 
 
 def datetime_representer(dumper, data):
     """Configure YAML class for serializing a datetime field."""
-    data_str = primitive_to_string_serializer.serialize(data, ["datetime | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["datetime | None"])
     return dumper.represent_scalar("tag:yaml.org,2002:timestamp", data_str, style=None)
 
 
 def uuid_representer(dumper, data):
     """Configure YAML class for serializing a UUID field."""
-    data_str = primitive_to_string_serializer.serialize(data, ["UUID | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["UUID | None"])
     if data_str:
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=None)
     else:
@@ -75,7 +75,7 @@ def uuid_representer(dumper, data):
 
 def bytes_representer(dumper, data):
     """Configure YAML class for serializing a bytes field."""
-    data_str = primitive_to_string_serializer.serialize(data, ["bytes | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["bytes | None"])
     if data_str:
         style = "|" if data_str and "\n" in data_str else None
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=style)

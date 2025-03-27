@@ -61,7 +61,12 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   - Value:
       Type: String
     Name: UserSecretIdentifiers
-    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
+    Comment: |-
+      Suggested key names in My Keys section of the head and shoulders dialog.
+
+      Notes:
+          - This is a list of suggestions, no restriction on entering secrets with other names
+          - The secret names should be in snake_case, for example ["openai_api_key", "anthropic_api_key"] 
     Vector: true
     Optional: true
   Keys:
@@ -98,24 +103,31 @@ cl.runtime.records.for_dataclasses.data.Data:
     ModuleName: cl.runtime.records.for_dataclasses.data
   Name: Data
   Label: Data
-  Comment: "\n    Base for slotted classes other than keys or records based on dataclasses framework.\n    Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.\n\n    Notes:\n        - This base should be used for dataclasses, use the appropriate import of Data for other frameworks\n        - Use tuple which is immutable instead of list when deriving from this class\n    "
+  Comment: |2-
+
+        Base for slotted classes other than keys or records based on dataclasses framework.
+        Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
+
+        Notes:
+            - This base should be used for dataclasses, use the appropriate import of Data for other frameworks
+            - Use tuple which is immutable instead of list when deriving from this class
+        
   TypeKind: Data
   DisplayKind: Basic
-  Elements: []
 cl.runtime.records.for_dataclasses.key.Key:
   _t: Key
   Module:
     ModuleName: cl.runtime.records.for_dataclasses.key
   Name: Key
   Label: Key
-  Comment: Base class for keys and records (derived from keys) based on dataclasses framework.
+  Comment: Base class for keys and records (derived from keys) based on dataclasses
+    framework.
   TypeKind: Data
   DisplayKind: Basic
   Inherit:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Elements: []
   Abstract: true
 cl.runtime.backend.core.tab_info.TabInfo:
   _t: TabInfo
@@ -241,7 +253,12 @@ cl.runtime.backend.core.ui_app_state.UiAppState:
   - Value:
       Type: String
     Name: UserSecretIdentifiers
-    Comment: "Suggested key names in My Keys section of the head and shoulders dialog.\n\nNotes:\n    - This is a list of suggestions, no restriction on entering secrets with other names\n    - The secret names should be in snake_case, for example [\"openai_api_key\", \"anthropic_api_key\"] "
+    Comment: |-
+      Suggested key names in My Keys section of the head and shoulders dialog.
+
+      Notes:
+          - This is a list of suggestions, no restriction on entering secrets with other names
+          - The secret names should be in snake_case, for example ["openai_api_key", "anthropic_api_key"] 
     Vector: true
     Optional: true
   Keys:
@@ -278,24 +295,31 @@ cl.runtime.records.for_dataclasses.data.Data:
     ModuleName: cl.runtime.records.for_dataclasses.data
   Name: Data
   Label: Data
-  Comment: "\n    Base for slotted classes other than keys or records based on dataclasses framework.\n    Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.\n\n    Notes:\n        - This base should be used for dataclasses, use the appropriate import of Data for other frameworks\n        - Use tuple which is immutable instead of list when deriving from this class\n    "
+  Comment: |2-
+
+        Base for slotted classes other than keys or records based on dataclasses framework.
+        Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
+
+        Notes:
+            - This base should be used for dataclasses, use the appropriate import of Data for other frameworks
+            - Use tuple which is immutable instead of list when deriving from this class
+        
   TypeKind: Data
   DisplayKind: Basic
-  Elements: []
 cl.runtime.records.for_dataclasses.key.Key:
   _t: Key
   Module:
     ModuleName: cl.runtime.records.for_dataclasses.key
   Name: Key
   Label: Key
-  Comment: Base class for keys and records (derived from keys) based on dataclasses framework.
+  Comment: Base class for keys and records (derived from keys) based on dataclasses
+    framework.
   TypeKind: Data
   DisplayKind: Basic
   Inherit:
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Elements: []
   Abstract: true
 cl.runtime.backend.core.tab_info.TabInfo:
   _t: TabInfo
