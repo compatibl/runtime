@@ -70,7 +70,7 @@ def test_data_serialization():
         resuld_dict_old = json.loads(serialized_old)
         result_str_old = YamlSerializers.REPORTING.serialize(resuld_dict_old)
         guard = RegressionGuard(channel=f"{sample_type.__name__}")
-        guard.write(result_str_old)
+        guard.write(serialized)
 
         # guard = RegressionGuard(channel=sample_type.__name__)
         # guard.write(serialized)

@@ -124,10 +124,10 @@ yaml_reader.Constructor = PrimitiveToStringConstructor
 class YamlSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    type_inclusion: TypeInclusionEnum = required()
+    type_inclusion: TypeInclusionEnum = TypeInclusionEnum.AS_NEEDED
     """Where to include type information in serialized data."""
 
-    type_format: TypeFormatEnum | None = None
+    type_format: TypeFormatEnum = TypeFormatEnum.NAME_ONLY
     """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
 
     type_field: str = "_type"
@@ -136,10 +136,10 @@ class YamlSerializer(Data):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    _dict_serializer: DataSerializer = required()
+    _serializer: DataSerializer = required()
     """Serializes data into dictionary from which it is serialized into YAML."""
 
-    _dict_deserializer: DataSerializer | None = None
+    _deserializer: DataSerializer | None = None
     """Deserializes the result of YAML parsing, including converting string leaf nodes to primitive types and enums."""
 
     def __init(self) -> None:
@@ -147,7 +147,7 @@ class YamlSerializer(Data):
 
         # Serializer passes through primitive types during serialization,
         # the conversions are done by the Ruamel YAML representers
-        self._dict_serializer = DataSerializer(
+        self._serializer = DataSerializer(
             type_inclusion=self.type_inclusion,
             type_format=self.type_format,
             type_field=self.type_field,
@@ -159,7 +159,7 @@ class YamlSerializer(Data):
         if self.type_format:
             # Create deserializer only if bidirectional flag is set
             # Deserializer uses default settings for deserializing primitive types from string
-            self._dict_deserializer = DataSerializer(
+            self._deserializer = DataSerializer(
                 type_inclusion=self.type_inclusion,
                 type_format=self.type_format,
                 type_field=self.type_field,
@@ -174,7 +174,7 @@ class YamlSerializer(Data):
         not suitable for deserialization.
         """
         # Serialize to dict using self.dict_serializer
-        serialized = self._dict_serializer.serialize(data)
+        serialized = self._serializer.serialize(data)
 
         if serialized is None:
             return ""
@@ -200,5 +200,5 @@ class YamlSerializer(Data):
         yaml_dict = yaml_reader.load(StringIO(yaml_str))
 
         # Deserialized from dict using self.dict_serializer
-        result = self._dict_deserializer.deserialize(yaml_dict)
+        result = self._deserializer.deserialize(yaml_dict)
         return result

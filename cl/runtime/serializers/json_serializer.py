@@ -15,10 +15,13 @@
 from dataclasses import dataclass
 from typing import Any
 import orjson
+
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
+from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_format_enum import TypeFormatEnum
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
@@ -35,10 +38,13 @@ def orjson_default(obj):
 class JsonSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    type_inclusion: TypeInclusionEnum = required()
+    json_output_format: JsonOutputFormatEnum = JsonOutputFormatEnum.PRETTY_PRINT
+    """JSON output format (pretty print, compact, etc)."""
+
+    type_inclusion: TypeInclusionEnum = TypeInclusionEnum.AS_NEEDED
     """Where to include type information in serialized data."""
 
-    type_format: TypeFormatEnum | None = None
+    type_format: TypeFormatEnum = TypeFormatEnum.NAME_ONLY
     """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
 
     type_field: str = "_type"
@@ -68,7 +74,14 @@ class JsonSerializer(Data):
         data_dict = self._dict_serializer.serialize(data)
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
-        result = orjson.dumps(data_dict, option=orjson.OPT_INDENT_2).decode("utf-8")
+        if self.json_output_format == JsonOutputFormatEnum.PRETTY_PRINT:
+            option = orjson.OPT_INDENT_2
+        elif self.json_output_format == JsonOutputFormatEnum.COMPACT:
+            option = None
+        else:
+            raise ErrorUtil.enum_value_error(self.json_output_format, JsonOutputFormatEnum)
+
+        result = orjson.dumps(data_dict, option=option).decode("utf-8")
         return result
 
     def deserialize(self, json_str: str) -> Any:

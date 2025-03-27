@@ -55,8 +55,6 @@ _SAMPLE_TYPES = [
 ]
 
 _PASSTHROUGH_SERIALIZER = DataSerializer(
-    type_inclusion=TypeInclusionEnum.AS_NEEDED,
-    type_format=TypeFormatEnum.NAME_ONLY,
     primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
     enum_serializer=EnumSerializers.DEFAULT,
 ).build()
@@ -69,7 +67,7 @@ def test_to_yaml():
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        obj_yaml = YamlSerializers.BIDIRECTIONAL.serialize(obj)
+        obj_yaml = YamlSerializers.DEFAULT.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
@@ -86,13 +84,13 @@ def test_from_yaml():
 
         # Create and serialize to YAML
         obj = sample_type().build()
-        serialized = YamlSerializers.BIDIRECTIONAL.serialize(obj)
+        serialized = YamlSerializers.DEFAULT.serialize(obj)
 
         # Serialize to dict using all_string_dict_serializer flag, all primitive values are strings except None
         # all_string_obj_dict = all_string_dict_serializer.serialize(obj)
 
         # Deserialize from YAML, when schema is not used all primitive values will be strings
-        deserialized = YamlSerializers.BIDIRECTIONAL.deserialize(serialized)
+        deserialized = YamlSerializers.DEFAULT.deserialize(serialized)
 
         # Use passthrough serializer to convert both to dicts
         obj_dict = _PASSTHROUGH_SERIALIZER.serialize(obj)
