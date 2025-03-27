@@ -14,7 +14,6 @@
 
 import difflib
 import os
-import datetime as dt
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
@@ -29,7 +28,6 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 
 _supported_extensions = ["txt", "yaml"]
@@ -41,8 +39,9 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 data_serializer = DictSerializer()
 """Serializer for records."""
 
-_YAML_SERIALIZER =YamlSerializers.REPORTING
+_YAML_SERIALIZER = YamlSerializers.REPORTING
 """Serializer for classes and containers."""
+
 
 def _error_extension_not_supported(ext: str) -> Any:
     raise RuntimeError(

@@ -28,7 +28,6 @@ from cl.runtime.schema.field_decl import primitive_types  # TODO: Move definitio
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 _UI_SERIALIZER = DataSerializers.FOR_UI

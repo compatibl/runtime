@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
@@ -28,7 +27,6 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
-from stubs.cl.runtime import StubDataclassTupleFields
 
 
 def test_data_serialization():

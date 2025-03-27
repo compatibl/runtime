@@ -23,7 +23,6 @@ from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 PanelResponseDataItem = Dict[str, Any]
 PanelResponse = Dict[str, PanelResponseDataItem | List[PanelResponseDataItem] | None]

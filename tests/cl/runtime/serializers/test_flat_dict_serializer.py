@@ -12,16 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-
 import pytest
-
+import json
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
-from cl.runtime.serializers.json_serializers import JsonSerializers
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
-from stubs.cl.runtime import StubDataclassAnyFields
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -33,9 +29,6 @@ from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime import StubDataclassSingleton
-from stubs.cl.runtime import StubDataclassTupleFields
 
 
 def test_data_serialization():
@@ -79,8 +72,8 @@ def test_data_serialization():
         guard = RegressionGuard(channel=f"{sample_type.__name__}")
         guard.write(result_str_old)
 
-        #guard = RegressionGuard(channel=sample_type.__name__)
-        #guard.write(serialized)
+        # guard = RegressionGuard(channel=sample_type.__name__)
+        # guard.write(serialized)
     RegressionGuard().verify_all()
 
 

@@ -19,7 +19,6 @@ from cl.runtime.log.log_message import LogMessage
 from cl.runtime.routers.entity.save_request import SaveRequest
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 _UI_SERIALIZER = DataSerializers.FOR_UI

@@ -100,7 +100,7 @@ class PrimitiveSerializers:
         none_format=NoneFormatEnum.PASSTHROUGH,
         string_format=StringFormatEnum.PASSTHROUGH,
         float_format=FloatFormatEnum.PASSTHROUGH,
-        bool_format=BoolFormatEnum.DEFAULT, # TODO: Review, should be passthrough
+        bool_format=BoolFormatEnum.DEFAULT,  # TODO: Review, should be passthrough
         int_format=IntFormatEnum.PASSTHROUGH,
         long_format=LongFormatEnum.PASSTHROUGH,
         date_format=DateFormatEnum.DEFAULT,

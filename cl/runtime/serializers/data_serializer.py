@@ -20,13 +20,14 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_key
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
@@ -303,12 +304,14 @@ class DataSerializer(Data):
                 if self.key_serializer is None:
                     raise RuntimeError(
                         f"Key type '{type_name}' cannot be deserialized from the following string\n"
-                        f"without a dedicated key deserializer:\n" f"{ErrorUtil.wrap(data)}."
+                        f"without a dedicated key deserializer:\n"
+                        f"{ErrorUtil.wrap(data)}."
                     )
                 elif self.key_serializer.key_format != KeyFormatEnum.DELIMITED:
                     raise RuntimeError(
                         f"Key type '{type_name}' cannot be deserialized from the following string\n"
-                        f"if KeyFormatEnum is not DELIMITED:\n" f"{ErrorUtil.wrap(data)}."
+                        f"if KeyFormatEnum is not DELIMITED:\n"
+                        f"{ErrorUtil.wrap(data)}."
                     )
                 else:
                     # Use key serializer
@@ -347,8 +350,9 @@ class DataSerializer(Data):
 
             # Deserialize into a dict
             result_dict = {
-                (snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)):
-                    self._typed_deserialize(v, field_dict[snake_case_k].type_chain)
+                (
+                    snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)
+                ): self._typed_deserialize(v, field_dict[snake_case_k].type_chain)
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
             }

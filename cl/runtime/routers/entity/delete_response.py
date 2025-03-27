@@ -17,7 +17,6 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.delete_request import DeleteRequest
 from cl.runtime.serializers.dict_serializer import get_type_dict
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
