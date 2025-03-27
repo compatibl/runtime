@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from typing import Iterable
 from typing import Type
-import yaml
 from cl.runtime import Db
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
@@ -32,6 +31,7 @@ from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.serializers.yaml_serializers import YamlSerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 """Serializer for keys."""
@@ -348,9 +348,7 @@ class DbContext(Context):
                 # Error only if not a singleton
                 if not is_singleton_key(key):
                     record_data = data_serializer.serialize_data(record)
-                    record_data_str = yaml.safe_dump(
-                        record_data, default_flow_style=False, sort_keys=False, allow_unicode=True
-                    )
+                    record_data_str = YamlSerializers.FOR_REPORTING.serialize(record_data)
                     raise RuntimeError(
                         f"Attempting to save a record with empty key, invoke build before saving.\n"
                         f"Values of other fields:\n{record_data_str}"
