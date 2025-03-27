@@ -15,11 +15,18 @@
 import logging
 from dataclasses import dataclass
 from cl.runtime.contexts.context import Context
+from cl.runtime.records.for_dataclasses.extensions import optional
 
 
 @dataclass(slots=True, kw_only=True)
 class LogContext(Context):
     """Provides get_logger() method returning a configured logger."""
+
+    handler: str | None = optional()
+    """Name of the called handler."""
+
+    type: str | None = optional()
+    """Type name."""
 
     @classmethod
     def get_context_type(cls) -> str:

@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import traceback
+import logging.config
 import webbrowser
 import uvicorn
 from fastapi import FastAPI
@@ -22,10 +21,10 @@ from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 from cl.runtime import Db
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.log.log_message import LogMessage
+from cl.runtime.log.log_config import logging_config
+from cl.runtime.log.log_config import uvicorn_empty_logging_config
 from cl.runtime.routers.context_middleware import ContextMiddleware
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.settings.api_settings import ApiSettings
@@ -40,39 +39,14 @@ server_app = FastAPI()
 
 # Universal exception handler function
 async def handle_exception(request, exc):
+    """Create error response."""
 
-    # Get context logger using request URL as name
-    # TODO: Record str(request.url) and other request info
-    logger = LogContext.get_logger(module_name=__name__)
-
-    # Log the exception
-    logger.error(repr(exc))
-
-    # Output traceback
-    traceback.print_exception(exc)
-
-    # TODO: Perform additional processing for UserError
-    if isinstance(exc, UserError):
-        # TODO: Perform additional processing
-        pass
-    else:
-        # TODO: Perform additional processing
-        pass
-
-    # TODO (Sasha): Use different types of log entry for user-displayed error vs. all other
-    log_type = LogMessage if isinstance(exc, UserError) else LogMessage
-    # Save log entry to the database
-    log_message = LogMessage(message=str(exc)).build()
-    DbContext.save_one(log_message)
-
-    # Determine if the message should be displayed for the user
-    user_message = str(exc) if log_message.priority >= 40 else None  # TODO: Configure the threshold in settings
-
-    # Return 500 response to avoid exception handler multiple calls
+    # TODO (Roman): Temporary before introduce sse.
+    # Return 500 response to avoid exception handler multiple calls.
     # IMPORTANT:
-    # - If UserMessage is set it will be shown to the user on toast badge and bell becomes red,
-    # - Otherwise default message will be shown
-    # TODO: Make it possible to customize default message in client code or pass from settings via runtime
+    # - If UserMessage is set it will be shown to the user on toast badge and bell becomes red.
+    # - Otherwise default message will be shown.
+    user_message = str(exc) if isinstance(exc, UserError) else None
     return JSONResponse({"UserMessage": user_message}, status_code=500)
 
 
@@ -101,29 +75,33 @@ server_app.add_middleware(ContextMiddleware)
 # Add routers
 ServerUtil.include_routers(server_app)
 
+
 if __name__ == "__main__":
-    with ProcessContext().build():
-        with DbContext(db=Db.create()).build():
-            # TODO: This only works for the Mongo celery backend
-            celery_delete_existing_tasks()
+    # Set up logging config
+    logging.config.dictConfig(logging_config)
 
-            # Start Celery workers (will exit when the current process exits)
-            log_dir = os.path.join(ProjectSettings.get_project_root(), "logs")  # TODO: Make unique
-            celery_start_queue(log_dir=log_dir)
+    with ProcessContext().build(), DbContext(db=Db.create()).build():
+        # TODO: This only works for the Mongo celery backend
+        celery_delete_existing_tasks()
 
-            # Save records from preload directory to DB and execute run_configure on all preloaded Config records
-            PreloadSettings.instance().save_and_configure()
+        # Start Celery workers (will exit when the current process exits)
+        celery_start_queue()
 
-    # Find wwwroot directory, error if not found
-    wwwroot_dir = ProjectSettings.get_wwwroot()
+        # Save records from preload directory to DB and execute run_configure on all preloaded Config records
+        PreloadSettings.instance().save_and_configure()
 
-    # Mount static client files
-    server_app.mount("/", StaticFiles(directory=wwwroot_dir, html=True))
+        # Find wwwroot directory, error if not found
+        wwwroot_dir = ProjectSettings.get_wwwroot()
 
-    # Open new browser tab in the default browser using http protocol.
-    # It will switch to https if cert is present.
-    webbrowser.open_new_tab(f"http://{api_settings.hostname}:{api_settings.port}")
+        # Mount static client files
+        server_app.mount("/", StaticFiles(directory=wwwroot_dir, html=True))
 
-    # Run Uvicorn using hostname and port specified by Dynaconf
-    api_settings = ApiSettings.instance()
-    uvicorn.run(server_app, host=api_settings.hostname, port=api_settings.port)
+        # Open new browser tab in the default browser using http protocol.
+        # It will switch to https if cert is present.
+        webbrowser.open_new_tab(f"http://{api_settings.hostname}:{api_settings.port}")
+
+        # Run Uvicorn using hostname and port specified by Dynaconf
+        api_settings = ApiSettings.instance()
+        uvicorn.run(
+            server_app, host=api_settings.hostname, port=api_settings.port, log_config=uvicorn_empty_logging_config
+        )

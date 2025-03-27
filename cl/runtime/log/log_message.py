@@ -34,6 +34,12 @@ class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
     message: str | None = None
     """A descriptive message providing details about the logging event."""
 
+    logger_name: str | None = None
+    """Name of the logger that produced log record."""
+
+    readable_time: str | None = None
+    """Human-readable time when the log record was created in UTC."""
+
     def get_key(self) -> LogMessageKey:
         return LogMessageKey(timestamp=self.timestamp).build()
 
