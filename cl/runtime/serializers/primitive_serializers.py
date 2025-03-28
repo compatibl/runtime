@@ -104,8 +104,8 @@ class PrimitiveSerializers:
         int_format=IntFormatEnum.PASSTHROUGH,
         long_format=LongFormatEnum.PASSTHROUGH,
         date_format=DateFormatEnum.DEFAULT,
-        time_format=TimeFormatEnum.PASSTHROUGH,
-        datetime_format=DatetimeFormatEnum.DEFAULT,
+        time_format=TimeFormatEnum.DEFAULT,
+        datetime_format=DatetimeFormatEnum.DEFAULT,  # TODO: Support float for Excel?
         uuid_format=UuidFormatEnum.DEFAULT,
         timestamp_format=TimestampFormatEnum.UUID,  # TODO: Review, should accept DEFAULT
         bytes_format=BytesFormatEnum.DEFAULT,
