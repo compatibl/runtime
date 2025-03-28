@@ -86,8 +86,10 @@ class JsonSerializer(Data):
         result = orjson.dumps(data_dict, option=option).decode("utf-8")
         return result
 
-    def deserialize(self, json_str: str) -> Any:
+    def deserialize(self, json_str: str, type_chain: Tuple[str, ...]) -> Any:
         """Deserialize a JSON string into an object if bidirectional flag is set, and to a dictionary if not."""
+
+        # TODO: Validate type_chain
 
         if self.type_inclusion == TypeInclusionEnum.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
@@ -96,5 +98,5 @@ class JsonSerializer(Data):
         json_dict = orjson.loads(json_str.encode("utf-8"))
 
         # Use self.dict_serializer to deserialize from the dictionary
-        result = self._data_serializer.deserialize(json_dict)
+        result = self._data_serializer.typed_deserialize(json_dict, type_chain)
         return result

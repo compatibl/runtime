@@ -316,7 +316,7 @@ class DataSerializer(Data):
                 return self.key_serializer.deserialize(data, type_class)
             elif is_data(type_class) and self.inner_serializer is not None:
                 # Use inner serializer to deserialize
-                return self.inner_serializer.deserialize(data, type_class)
+                return self.inner_serializer.deserialize(data, type_chain)
             elif isinstance(type_spec, EnumSpec):
                 # Check that no type chain is remaining
                 if remaining_chain:
