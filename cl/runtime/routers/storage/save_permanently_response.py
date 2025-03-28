@@ -25,7 +25,7 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
 from cl.runtime.schema.schema import Schema
-from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -79,9 +79,7 @@ class SavePermanentlyResponse(BaseModel):
         """Write serialized records on the disk."""
 
         file_extension = file_path.stem
-
-        serializer = FlatDictSerializer()  # TODO (Bohdan): Provide a proper serializer
-        serialized_records = [serializer.serialize_data(record) for record in records]
+        serialized_records = [DataSerializers.FOR_CSV.serialize(record) for record in records]
 
         if file_extension == "csv":
             df = pd.DataFrame([serialized_records])
