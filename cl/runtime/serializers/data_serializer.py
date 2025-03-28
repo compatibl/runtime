@@ -20,7 +20,7 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_enum
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -72,12 +72,16 @@ class DataSerializer(Data):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    def serialize(self, data: Any) -> Any:
+    def serialize(
+            self,
+            data: Any,
+            type_chain: Tuple[str, ...] | None = None,
+    ) -> Any:
         """Serialize data to a dictionary."""
 
         if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
             # Use typed serialization if bidirectional flag is on
-            return self.typed_serialize(data, is_root=True)
+            return self.typed_serialize(data, type_chain)
         elif self.type_inclusion == TypeInclusionEnum.OMIT:
             # Use untyped serialization
             return self.untyped_serialize(data)
@@ -116,8 +120,6 @@ class DataSerializer(Data):
         self,
         data: Any,
         type_chain: Tuple[str, ...] | None = None,
-        *,
-        is_root: bool | None = None,
     ) -> Any:
         """Serialize the argument to a dictionary type_chain and schema."""
 
@@ -165,30 +167,24 @@ class DataSerializer(Data):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the sequence, and will cause an error for a primitive item
-            return list(self.typed_serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
+            return list(self.serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
             return dict(
-                (k, self.typed_serialize(v, remaining_chain)) for k, v in data.items()
+                (k, self.serialize(v, remaining_chain)) for k, v in data.items()
             )  # TODO: Replace by frozendict
+        # Do not apply custom key and inner serializers at root level
         elif is_data(data):
 
-            # Do not apply custom key and inner serializers at root level
-            if not is_root:
-                if self.key_serializer is not None and is_key(data):
-                    # Use key serializer for key types if specified
-                    return self.key_serializer.serialize(data)
-                elif self.inner_serializer is not None:
-                    # Use inner serializer for data below root level if specified
-                    return self.inner_serializer.serialize(data)
+            # Use key serializer for key types if specified
+            if self.key_serializer is not None and is_key(data):
+                return self.key_serializer.serialize(data, type_chain)
 
             # Type spec for the data
             data_type_spec = TypeSchema.for_class(data.__class__)
             data_type_name = data_type_spec.type_name
-            if not isinstance(data_type_spec, DataSpec):
-                raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
 
             # Perform check against the schema if provided irrespective of the type inclusion setting
             if schema_type_name is not None and schema_type_name != data_type_name:
@@ -246,16 +242,18 @@ class DataSerializer(Data):
             data_field_dict = data_type_spec.get_field_dict()
 
             # Serialize slot values in the order of declaration except those that are None
+            key_serializer = self.key_serializer if self.key_serializer is not None else self
+            data_serializer = self.inner_serializer if self.inner_serializer is not None else self
             result.update(
                 {
                     k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): (
                         self.primitive_serializer.serialize(v, field_spec.type_chain)
-                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                        else (
-                            self.enum_serializer.serialize(v, field_spec.get_class())
-                            if isinstance(v, Enum)
-                            else self.typed_serialize(v, field_spec.type_chain)
-                        )
+                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES else
+                        self.enum_serializer.serialize(v, field_spec.get_class())
+                        if is_enum(v) else
+                        key_serializer.serialize(v, field_spec.type_chain)
+                        if is_key(v) else
+                        data_serializer.serialize(v, field_spec.type_chain)
                     )
                     for k, field_spec in data_field_dict.items()
                     if (v := getattr(data, k)) is not None
@@ -429,3 +427,4 @@ class DataSerializer(Data):
         else:
             # Did not match a supported data type
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
+

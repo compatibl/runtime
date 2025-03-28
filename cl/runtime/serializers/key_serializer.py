@@ -55,21 +55,38 @@ class KeySerializer(Data):
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
 
-    def serialize(self, data: TKey) -> str | Tuple[TPrimitive, ...]:
+    def serialize(
+        self,
+        data: Any,
+        type_chain: Tuple[str, ...] | None = None,
+    ) -> Any:
         """Serialize key into a delimited string or a flattened sequence of primitive types."""
 
-        # Convert to key if a record
-        if is_record(data):
-            # Build the data before getting the key
-            data.build()
-            # The returned key should be frozen, this will be checked below
-            data = data.get_key()
+        data_class_name = TypeUtil.name(data)
+        schema_type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
+
+        # Ensure data type is the same as schema type if type chain is specified
+        if schema_type_name is not None and data_class_name != schema_type_name:
+            raise RuntimeError(
+                f"Key is an instance of type {data_class_name} while schema type is {schema_type_name}.\n"
+                f"Substituting records for keys is allowed, but deriving one key type from another is not.")
+        if remaining_chain:
+            raise RuntimeError(
+                f"Data is an instance of a key class {data_class_name} while type chain\n"
+                f"{', '.join(remaining_chain)} is remaining."
+            )
+
+        if data is None:
+            if is_optional:
+                return None
+            else:
+                raise RuntimeError(f"Key is None while its type hint {type_chain[0]} is not optional.")
         elif is_key(data):
             # Build the key (this has no effect if already frozen)
             data.build()
         else:
             raise RuntimeError(
-                f"Type {TypeUtil.name(data)} passed to {TypeUtil.name(self)} is not a key or record, cannot serialize."
+                f"Type {TypeUtil.name(data)} passed to {TypeUtil.name(self)} is not a key, cannot serialize."
             )
 
         # Perform checks and convert to a sequence

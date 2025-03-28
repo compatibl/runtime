@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Tuple
 import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
@@ -65,11 +65,15 @@ class JsonSerializer(Data):
             enum_serializer=EnumSerializers.DEFAULT,
         ).build()
 
-    def serialize(self, data: Any) -> str:
+    def serialize(
+            self,
+            data: Any,
+            type_chain: Tuple[str, ...] | None = None,
+    ) -> Any:
         """Serialize to a JSON string."""
 
         # Use self.dict_serializer to serialize the data to a dictionary
-        data_dict = self._data_serializer.serialize(data)
+        data_dict = self._data_serializer.serialize(data, type_chain)
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
         if self.json_output_format == JsonOutputFormatEnum.PRETTY_PRINT:
