@@ -109,7 +109,7 @@ def test_mongo():
         # long
         ("long", None, None),
         ("long", 12345, Int64(12345)),
-        ("long", 9223372036854775807, Int64(9223372036854775807)),  # Max int64
+        ("long", 9007199254740991, Int64(9007199254740991)),  # Max int54
         # Date
         ("date", None, None),
         ("date", dt.date(2023, 4, 21), 20230421, "20230421"),
@@ -149,6 +149,8 @@ def test_serialization_exceptions():
         ("bool", 0),
         ("bool", "None"),
         ("bool", "Null"),
+        ("int", 2147483648),  # Out of range for int32
+        ("long", 9007199254740992),  # Out of range for int54
     ]
 
     # Check exception cases with type name (without type name, the call will succeed for most values)
@@ -157,6 +159,7 @@ def test_serialization_exceptions():
 
         # Test passthrough with type_name
         with pytest.raises(Exception):
+            print(value)
             PrimitiveSerializers.PASSTHROUGH.serialize(value, [type_name])
 
         # Test default settings with type_name
@@ -180,6 +183,8 @@ def test_deserialization_exceptions():
         ("bool", "N"),
         ("bool", "YES"),
         ("bool", "NO"),  # Norway problem
+        ("int", "2147483648"),  # Out of range for int32
+        ("long", "9007199254740992"),  # Out of range for int54
     ]
 
     # Check exception cases

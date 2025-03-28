@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.primitive.float_util import FloatUtil
+from cl.runtime.primitive.limits import check_int_54
+
 
 class LongUtil:
     """Helper methods for the 64-bit signed integer stored in Python class 'int'."""
@@ -20,6 +23,7 @@ class LongUtil:
     def to_str(cls, value: int) -> str:
         """Serialize 64-bit signed integer stored in Python class 'int' to string."""
         if isinstance(value, int):
+            check_int_54(value)
             return str(value)
         else:
             raise RuntimeError(f"Class {type(value).__name__} is passed to LongUtil.to_str method which expects int.")
@@ -31,8 +35,17 @@ class LongUtil:
             try:
                 # Try to parse as int
                 result = int(value)
+                check_int_54(result)
+                return result
             except ValueError:
                 raise RuntimeError(f"Cannot parse string '{value}' as int.")
         else:
             raise RuntimeError(f"Class {type(value).__name__} is passed to LongUtil.from_str method which expects str.")
-        return result
+
+    @classmethod
+    def from_float(cls, value: float) -> int:
+        """
+        Check that float value is within roundoff tolerance from an long and return the long, error otherwise.
+        Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
+        """
+        return FloatUtil.to_long(value)

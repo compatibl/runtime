@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.primitive.limits import check_int_54
 from cl.runtime.primitive.long_util import LongUtil
 
 
@@ -44,6 +46,19 @@ def test_from_str():
         assert LongUtil.from_str("null")  # noqa
     with pytest.raises(Exception):
         assert LongUtil.from_str("None")  # noqa
+
+def test_int_54():
+    """Test for check_int_32 method."""
+
+    check_int_54(1000)
+    with pytest.raises(Exception):
+        check_int_54("")  # noqa
+    with pytest.raises(Exception):
+        check_int_54("null")  # noqa
+    with pytest.raises(Exception):
+        check_int_54("None")  # noqa
+    with pytest.raises(Exception):
+        check_int_54(2 ** 53)  # Out of int54 range
 
 
 if __name__ == "__main__":

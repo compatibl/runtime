@@ -12,28 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Final
-
 from cl.runtime.primitive.float_util import FloatUtil
+from cl.runtime.primitive.limits import check_int_32
 
 
 class IntUtil:
     """Helper methods for int class."""
 
-    INT32_MIN: Final[int] = -(2**31)
-    """Minimum value of 32-bit signed integer."""
-
-    INT32_MAX: Final[int] = 2**31 - 1
-    """Maximum value of 32-bit signed integer."""
-
     @classmethod
     def to_str(cls, value: int) -> str:
         """Serialize int to string after checking it is an int that fits in 32-bit signed integer range."""
         if isinstance(value, int):
-            cls.check_range(value)
+            check_int_32(value)
             return str(value)
         else:
-            raise RuntimeError(f"Class {type(value).__name__} is passed to IntUtil.to_str method which expects int.")
+            raise RuntimeError(f"Class {type(value).__name__} is passed to IntUtil.to_str method which expects int.\n"
+                               f"None is not a valid value.")
 
     @classmethod
     def from_str(cls, value: str) -> int:
@@ -42,36 +36,20 @@ class IntUtil:
             try:
                 # Try to parse as int
                 result = int(value)
+                check_int_32(result)
+                return result
             except ValueError:
                 raise RuntimeError(f"Cannot parse string '{value}' as int.")
         else:
-            raise RuntimeError(f"Class {type(value).__name__} is passed to IntUtil.from_str method which expects str.")
-
-    @classmethod
-    def from_int(cls, value: int) -> int:
-        """Check it fits in 32-bit signed integer range, return unmodified argument."""
-        if not isinstance(value, int):
-            raise RuntimeError(
-                f"Class {type(value).__name__} is passed to IntUtil.from_int method which expects an int.")
-
-        # Check that the value fits in 32-bit signed integer range
-        cls.check_range(value)
-        return value
+            raise RuntimeError(f"Class {type(value).__name__} is passed to IntUtil.from_str method which expects str.\n"
+                               f"None is not a valid value.")
 
     @classmethod
     def from_float(cls, value: float) -> int:
-        """Check that value is round int and fits in 32-bit signed integer range, return unmodified argument."""
-        # Check that the value is a float and is a round int within floating point tolerance
+        """
+        Check that float value is within roundoff tolerance from an int and return the int, error otherwise.
+        Verifies that the value fits in 32-bit signed integer range.
+        """
         result = FloatUtil.to_int(value)
-        # Check that the value fits in 32-bit signed integer range
-        cls.check_range(result)
         return result
 
-    @classmethod
-    def check_range(cls, value: int) -> None:
-        """Error message if the value does not fit in 32-bit signed integer range."""
-        if value < cls.INT32_MIN or value > cls.INT32_MAX:
-            raise RuntimeError(
-                f"Integer {value} value does not fit in 32-bit signed integer range, "
-                f"use long (64-bit signed integer) type instead."
-            )

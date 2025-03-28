@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.primitive.int_util import IntUtil
+from cl.runtime.primitive.limits import check_int_32
 
 
 def test_to_str():
@@ -50,20 +51,18 @@ def test_from_str():
         assert IntUtil.from_str("2147483648")  # Out of int32 range
 
 
-def test_check_range():
-    """Test for IntUtil.check_range method."""
+def test_int_32():
+    """Test for check_int_32 method."""
 
-    IntUtil.check_range(1000)
+    check_int_32(1000)
     with pytest.raises(Exception):
-        IntUtil.check_range(None)  # noqa
+        check_int_32("")  # noqa
     with pytest.raises(Exception):
-        IntUtil.check_range("")  # noqa
+        check_int_32("null")  # noqa
     with pytest.raises(Exception):
-        IntUtil.check_range("null")  # noqa
+        check_int_32("None")  # noqa
     with pytest.raises(Exception):
-        IntUtil.check_range("None")  # noqa
-    with pytest.raises(Exception):
-        IntUtil.check_range(2**31)  # Out of int32 range
+        check_int_32(2 ** 31)  # Out of int32 range
 
 
 if __name__ == "__main__":

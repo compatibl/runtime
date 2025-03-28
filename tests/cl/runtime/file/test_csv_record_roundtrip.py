@@ -24,6 +24,7 @@ from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataclassComposite
@@ -39,11 +40,8 @@ from stubs.cl.runtime import StubDataclassOtherDerivedRecord
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 
-flat_serializer = FlatDictSerializer()
-"""Serializer for file serialization."""
-
-_KEY_SERIALIZER = KeySerializers.DELIMITED
-"""Serializer for keys."""
+_CSV_SERIALIZER = DataSerializers.FOR_CSV
+"""Serializer for CSV serialization."""
 
 
 stub_entries: List[List[RecordProtocol]] = [  # noqa
@@ -69,7 +67,7 @@ def save_records_to_csv(records: Iterable, file_path: str) -> None:
     # Serialize records with flat serializer but use StringSerializer for keys
     record_dicts = []
     for rec in records:
-        serialized_record = flat_serializer.serialize_data(rec, is_root=True)
+        serialized_record = _CSV_SERIALIZER.serialize(rec)
         serialized_record.pop("_type", None)
         record_dicts.append(serialized_record)
 
