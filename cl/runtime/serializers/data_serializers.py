@@ -14,7 +14,7 @@
 
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
-from cl.runtime.serializers.json_serializers import JsonSerializers
+from cl.runtime.serializers.json_encoders import JsonEncoders
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
@@ -57,8 +57,8 @@ class DataSerializers:
     FOR_CSV: cls = cls(
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
-        key_serializer=JsonSerializers.FOR_CSV,  # TODO: Add Serializer base and standard API for all serializers
-        inner_serializer=JsonSerializers.FOR_CSV,  # TODO: Add Serializer base and standard API for all serializers
+        key_serializer=KeySerializers.DELIMITED,
+        data_encoder=JsonEncoders.COMPACT,
     ).build()
     """Default bidirectional data serializer settings for UI."""
 
@@ -68,7 +68,7 @@ class DataSerializers:
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
-        inner_serializer=JsonSerializers.FOR_SQLITE,
+        data_encoder=JsonEncoders.COMPACT,
     ).build()
     """Default bidirectional data serializer settings for UI."""
 

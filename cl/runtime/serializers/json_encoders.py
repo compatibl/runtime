@@ -12,25 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.serializers.json_encoder import JsonEncoder
 from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum
-from cl.runtime.serializers.json_serializer import JsonSerializer
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 
-cls = JsonSerializer
+cls = JsonEncoder
 
 
-class JsonSerializers:
+class JsonEncoders:
     """Standard combinations of primitive formats."""
 
     DEFAULT: cls = cls().build()
-    """Include type information as needed, bidirectional, pretty print format."""
+    """Pretty print format."""
 
     COMPACT: cls = cls(
         json_output_format=JsonOutputFormatEnum.COMPACT
     ).build()
-    """Include type information as needed, bidirectional, compact format."""
+    """Compact format without line breaks."""
 
-    FOR_REPORTING: cls = cls(
-        type_inclusion=TypeInclusionEnum.OMIT
-    ).build()
-    """Omit type information when the output is used for reporting, deserialization is not possible."""

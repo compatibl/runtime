@@ -20,7 +20,7 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_enum
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_enum, MAPPING_CLASSES, SEQUENCE_CLASSES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -33,6 +33,7 @@ from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
+from cl.runtime.serializers.json_encoder import JsonEncoder
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -51,11 +52,11 @@ class DataSerializer(Data):
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
 
-    inner_serializer: KeySerializer | None = None  # TODO: Introduce Serializer base
-    """Use to serialize data fields below root level to JSON if specified."""
-
     key_serializer: KeySerializer | None = None
     """Use to serialize keys to string if specified, otherwise serialize the same way as data fields."""
+
+    data_encoder: JsonEncoder | None = None
+    """Transformation applied to the data fields after converting them to dict (does not apply to keys)."""
 
     type_inclusion: TypeInclusionEnum = TypeInclusionEnum.AS_NEEDED
     """Where to include type information in serialized data."""
@@ -101,9 +102,18 @@ class DataSerializer(Data):
 
         if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
             if data is None:
-                # Pass through None
-                return None
-            elif data.__class__.__name__ in MAPPING_TYPE_NAMES:
+                if is_optional:
+                    # Pass through None
+                    return None
+                else:
+                    raise RuntimeError(f"Data is None but type hint {type_chain} indicates it is required.")
+            elif data.__class__ in SEQUENCE_CLASSES:
+                if schema_type_name is None or schema_type_name in SEQUENCE_TYPE_NAMES:
+                    return [self.typed_deserialize(v, type_chain) for v in data]
+                else:
+                    raise RuntimeError(
+                        f"Data type {data_class_name} is a sequence but schema type {schema_type_name} is not.")
+            elif data.__class__ in MAPPING_CLASSES:
                 # Get type name from the input dict
                 if (type_name := data.get(self.type_field, None)) is None:
                     if schema_type_name is not None:
@@ -251,7 +261,6 @@ class DataSerializer(Data):
 
             # Serialize slot values in the order of declaration except those that are None
             key_serializer = self.key_serializer if self.key_serializer is not None else self
-            data_serializer = self.inner_serializer if self.inner_serializer is not None else self
             result.update(
                 {
                     k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): (
@@ -261,7 +270,11 @@ class DataSerializer(Data):
                         if is_enum(v) else
                         key_serializer.serialize(v, field_spec.type_chain)
                         if is_key(v) else
-                        data_serializer.serialize(v, field_spec.type_chain)
+                        (
+                            self.data_encoder.encode(self.serialize(v, field_spec.type_chain))
+                            if self.data_encoder is not None
+                            else self.serialize(v, field_spec.type_chain)
+                        )
                     )
                     for k, field_spec in data_field_dict.items()
                     if (v := getattr(data, k)) is not None
@@ -281,7 +294,6 @@ class DataSerializer(Data):
         # Parse type chain
         type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
 
-        inner_serializer = self.inner_serializer if self.inner_serializer is not None else self
         if data is None:
             # Return None if is_optional flag is set, otherwise raise an error
             if is_optional:
@@ -292,6 +304,8 @@ class DataSerializer(Data):
             # Check that no type chain is remaining
             if remaining_chain:
                 raise RuntimeError(f"Primitive type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
+            if self.data_encoder is not None and isinstance(data, str) and len(data) > 0 and data[0] == "{":
+                data = self.data_encoder.decode(data)
             # Deserialize primitive type using primitive serializer if specified, otherwise return raw data
             return self.primitive_serializer.deserialize(data, [type_name])
         elif type_name in SEQUENCE_TYPE_NAMES:
@@ -300,11 +314,11 @@ class DataSerializer(Data):
                     f"Inner type not specified for the sequence type {type_name}.\n"
                     f"Use type_name[Any] to specify a sequence with any item type."
                 )
+            # Decode if necessary
+            if self.data_encoder is not None and isinstance(data, str) and len(data) > 0 and data[0] == "[":
+                data = self.data_encoder.decode(data)
             # Deserialize sequence into tuple
-            if self.inner_serializer is not None and isinstance(data, str) and data[0] == "[":
-                return self.inner_serializer.deserialize(data, type_chain)
-            else:
-                return list(self.typed_deserialize(v, remaining_chain) for v in data)
+            return list(self.typed_deserialize(v, remaining_chain) for v in data)
         elif type_name in MAPPING_TYPE_NAMES:
             if not remaining_chain:
                 raise RuntimeError(
@@ -314,32 +328,54 @@ class DataSerializer(Data):
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
             return {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): inner_serializer.typed_deserialize(
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self.typed_deserialize(
                     v, remaining_chain
                 )
                 for k, v in data.items()
             }
-        elif isinstance(data, str) or isinstance(data, Enum):
+        elif isinstance(data, str):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
             type_spec = TypeSchema.for_type_name(type_name)
-            type_class = type_spec.get_class()
-            if self.key_serializer is not None and is_key(type_class) and isinstance(data, str) and data[0] != "{":
-                # Use key serializer to deserialize only if the string does not contain JSON
-                return self.key_serializer.deserialize(data, type_class)
-            elif is_data(type_class) and self.inner_serializer is not None:
-                # Use inner serializer to deserialize
-                return self.inner_serializer.deserialize(data, type_chain)
-            elif isinstance(type_spec, EnumSpec):
+            schema_class = type_spec.get_class()
+            if self.key_serializer is not None and is_key(schema_class):
+                if self.data_encoder is not None and len(data) > 0 and data[0]=="{":  # TODO: Fix for non-JSON encoding
+                    # Decode data field using data_encoder if provided and deserialize using self
+                    decoded_data = self.data_encoder.decode(data)
+                    return self.typed_deserialize(decoded_data, [type_spec.type_name])
+                else:
+                    # Otherwise use key serializer to deserialize
+                    return self.key_serializer.deserialize(data, schema_class)
+            elif self.data_encoder is not None and is_data(schema_class):
+                # Decode data field using data_encoder and deserialize
+                decoded_data = self.data_encoder.decode(data)
+                return self.typed_deserialize(decoded_data, type_chain)
+            elif is_enum(schema_class):
                 # Check that no type chain is remaining
                 if remaining_chain:
                     raise RuntimeError(f"Enum type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
                 # Deserialize
-                result = self.enum_serializer.deserialize(data, type_class)
+                result = self.enum_serializer.deserialize(data, schema_class)
                 return result
             else:
                 raise RuntimeError(
                     f"Type '{type_name}' cannot be deserialized\n"
                     f"from the following string or enum:\n{ErrorUtil.wrap(data)}."
+                )
+        elif isinstance(data, Enum):
+            # Process as enum if data is a string or enum, after checking that schema type is not primitive
+            type_spec = TypeSchema.for_type_name(type_name)
+            if isinstance(type_spec, EnumSpec):
+                # Check that no type chain is remaining
+                if remaining_chain:
+                    raise RuntimeError(f"Enum type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
+                # Deserialize
+                schema_class = type_spec.get_class()
+                result = self.enum_serializer.deserialize(data, schema_class)
+                return result
+            else:
+                raise RuntimeError(
+                    f"Type '{type_name}' cannot be deserialized from enum type {TypeUtil.name(data)}\n"
+                    f"with the following value:\n{ErrorUtil.wrap(data)}."
                 )
         elif data.__class__.__name__ in MAPPING_TYPE_NAMES:
             # Process as slotted class if data is a mapping but schema type is not
@@ -354,11 +390,11 @@ class DataSerializer(Data):
                 raise RuntimeError(f"Type '{type_name}' cannot be deserialized from a dictionary.")
 
             # Check that no type chain is remaining
-            if len(type_chain) > 1:
+            if type_chain is not None and len(type_chain) > 1:
                 raise RuntimeError(f"Slotted type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
 
             # Get class and field dictionary for type_name
-            type_class = type_spec.get_class()
+            schema_class = type_spec.get_class()
             field_dict = type_spec.get_field_dict()
 
             # Deserialize into a dict
@@ -367,16 +403,16 @@ class DataSerializer(Data):
                     snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)
                 ):
                 (
-                    self.inner_serializer.deserialize(v, field_dict[snake_case_k].type_chain)
-                    if self.inner_serializer is not None and isinstance(v, str) and v[0] == "{"
-                    else self.typed_deserialize(v, field_dict[snake_case_k].type_chain)
+                    self.typed_deserialize(self.data_encoder.decode(v), field_dict[snake_case_k].type_chain)
+                    if self.data_encoder is not None and isinstance(v, str) and len(v) > 0 and v[0] == "{" else
+                    self.typed_deserialize(v, field_dict[snake_case_k].type_chain)
                 )
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
             }
 
             # Construct an instance of the target type
-            result = type_class(**result_dict)
+            result = schema_class(**result_dict)
 
             # Invoke build and return
             return result.build()
