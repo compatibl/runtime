@@ -14,6 +14,8 @@
 
 from typing import Final
 
+from cl.runtime.primitive.float_util import FloatUtil
+
 
 class IntUtil:
     """Helper methods for int class."""
@@ -45,6 +47,22 @@ class IntUtil:
         else:
             raise RuntimeError(f"Class {type(value).__name__} is passed to IntUtil.from_str method which expects str.")
 
+    @classmethod
+    def from_int(cls, value: int) -> int:
+        """Check it fits in 32-bit signed integer range, return unmodified argument."""
+        if not isinstance(value, int):
+            raise RuntimeError(
+                f"Class {type(value).__name__} is passed to IntUtil.from_int method which expects an int.")
+
+        # Check that the value fits in 32-bit signed integer range
+        cls.check_range(value)
+        return value
+
+    @classmethod
+    def from_float(cls, value: float) -> int:
+        """Check that value is round int and fits in 32-bit signed integer range, return unmodified argument."""
+        # Check that the value is a float and is a round int within floating point tolerance
+        result = FloatUtil.to_int(value)
         # Check that the value fits in 32-bit signed integer range
         cls.check_range(result)
         return result

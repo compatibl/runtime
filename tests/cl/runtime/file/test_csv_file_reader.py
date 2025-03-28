@@ -54,9 +54,7 @@ def test_csv_file_reader(pytest_default_db):
         assert record == expected_record
 
     for i in range(1, 4):
-        expected_record = StubDataclassNestedFields(
-            id=f"nested_{i}",
-        ).build()
+        expected_record = StubDataclassNestedFields().build()
         record = DbContext.load_one(StubDataclassNestedFields, expected_record.get_key())
         assert record == expected_record
 

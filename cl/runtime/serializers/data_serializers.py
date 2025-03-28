@@ -45,30 +45,30 @@ class DataSerializers:
     """Default bidirectional data serializer settings for JSON."""
 
     FOR_UI: cls = cls(
-        type_inclusion=TypeInclusionEnum.ALWAYS,
-        type_field="_t",
         pascalize_keys=True,
         primitive_serializer=PrimitiveSerializers.FOR_UI,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
+        type_inclusion=TypeInclusionEnum.ALWAYS,
+        type_field="_t",
     ).build()
     """Default bidirectional data serializer settings for UI."""
 
     FOR_CSV: cls = cls(
-        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        primitive_serializer=PrimitiveSerializers.FOR_CSV,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
         data_encoder=JsonEncoders.COMPACT,
     ).build()
-    """Default bidirectional data serializer settings for UI."""
+    """Default bidirectional data serializer settings for CSV."""
 
     FOR_SQLITE: cls = cls(
-        type_inclusion=TypeInclusionEnum.ALWAYS,
-        type_placement=TypePlacementEnum.LAST,  # TODO: Remove after all tests pass
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
         data_encoder=JsonEncoders.COMPACT,
+        type_inclusion=TypeInclusionEnum.ALWAYS,  # TODO: Consider changing to AS_NEEDED
+        type_placement=TypePlacementEnum.LAST,  # TODO: Remove after all tests pass
     ).build()
     """Default bidirectional data serializer settings for UI."""
 

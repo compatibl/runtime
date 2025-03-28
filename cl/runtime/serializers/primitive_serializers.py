@@ -96,6 +96,22 @@ class PrimitiveSerializers:
     ).build()
     """Default primitive serializer settings for UI."""
 
+    FOR_CSV: cls = cls(
+        none_format=NoneFormatEnum.PASSTHROUGH,
+        string_format=StringFormatEnum.PASSTHROUGH,
+        float_format=FloatFormatEnum.PASSTHROUGH,
+        bool_format=BoolFormatEnum.DEFAULT,  # TODO: Review, should be passthrough
+        int_format=IntFormatEnum.PASSTHROUGH,
+        long_format=LongFormatEnum.PASSTHROUGH,
+        date_format=DateFormatEnum.DEFAULT,
+        time_format=TimeFormatEnum.PASSTHROUGH,
+        datetime_format=DatetimeFormatEnum.DEFAULT,
+        uuid_format=UuidFormatEnum.DEFAULT,
+        timestamp_format=TimestampFormatEnum.UUID,  # TODO: Review, should accept DEFAULT
+        bytes_format=BytesFormatEnum.DEFAULT,
+    ).build()
+    """Default primitive serializer settings for UI."""
+
     FOR_SQLITE: cls = cls(
         none_format=NoneFormatEnum.PASSTHROUGH,
         string_format=StringFormatEnum.PASSTHROUGH,

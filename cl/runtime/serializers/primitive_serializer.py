@@ -309,6 +309,9 @@ class PrimitiveSerializer(Data):
                     # Passthrough int after checking that value is within 32-bit signed integer range
                     IntUtil.check_range(value)
                     return value
+                elif isinstance(value, float):
+                    # Checks that the value is round and is within 32-bit signed integer range
+                    return IntUtil.from_float(value)
                 else:
                     raise self._deserialization_error(value, schema_type_name, value_format)
             elif value_format == IntFormatEnum.DEFAULT:

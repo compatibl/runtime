@@ -24,9 +24,10 @@ from cl.runtime.primitive.char_util import CharUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
 
-serializer = FlatDictSerializer()
+_SERIALIZER = DataSerializers.FOR_CSV
 
 
 @dataclass(slots=True, kw_only=True)
@@ -86,5 +87,5 @@ class CsvFileReader(Reader):
         row_dict = {CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()}
         row_dict["_type"] = TypeUtil.name(record_type)
 
-        result = serializer.deserialize_data(row_dict).build()
+        result = _SERIALIZER.deserialize(row_dict).build()
         return result
