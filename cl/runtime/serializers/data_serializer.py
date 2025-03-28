@@ -77,10 +77,10 @@ class DataSerializer(Data):
 
         if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
             # Use typed serialization if bidirectional flag is on
-            return self._typed_serialize(data, is_root=True)
+            return self.typed_serialize(data, is_root=True)
         elif self.type_inclusion == TypeInclusionEnum.OMIT:
             # Use untyped serialization
-            return self._untyped_serialize(data)
+            return self.untyped_serialize(data)
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
@@ -98,7 +98,7 @@ class DataSerializer(Data):
                 # Create type chain of length one from the type
                 type_chain = [type_name]
                 # Use typed deserialization
-                return self._typed_deserialize(data, type_chain)
+                return self.typed_deserialize(data, type_chain)
             elif data is not None and data.__class__.__name__ in SEQUENCE_TYPE_NAMES:
                 # Invoke on each item in the sequence
                 return list(self.deserialize(v) for v in data)
@@ -112,7 +112,7 @@ class DataSerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
-    def _typed_serialize(
+    def typed_serialize(
         self,
         data: Any,
         type_chain: Tuple[str, ...] | None = None,
@@ -165,13 +165,13 @@ class DataSerializer(Data):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the sequence, and will cause an error for a primitive item
-            return list(self._typed_serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
+            return list(self.typed_serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
             return dict(
-                (k, self._typed_serialize(v, remaining_chain)) for k, v in data.items()
+                (k, self.typed_serialize(v, remaining_chain)) for k, v in data.items()
             )  # TODO: Replace by frozendict
         elif is_data(data):
 
@@ -254,7 +254,7 @@ class DataSerializer(Data):
                         else (
                             self.enum_serializer.serialize(v, field_spec.get_class())
                             if isinstance(v, Enum)
-                            else self._typed_serialize(v, field_spec.type_chain)
+                            else self.typed_serialize(v, field_spec.type_chain)
                         )
                     )
                     for k, field_spec in data_field_dict.items()
@@ -269,7 +269,7 @@ class DataSerializer(Data):
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def _typed_deserialize(self, data: Any, type_chain: Tuple[str, ...]) -> Any:
+    def typed_deserialize(self, data: Any, type_chain: Tuple[str, ...]) -> Any:
         """Deserialize data using type_chain and schema."""
 
         # Parse type chain
@@ -294,7 +294,7 @@ class DataSerializer(Data):
                     f"Use type_name[Any] to specify a sequence with any item type."
                 )
             # Deserialize sequence into tuple
-            return list(self._typed_deserialize(v, remaining_chain) for v in data)
+            return list(self.typed_deserialize(v, remaining_chain) for v in data)
         elif type_name in MAPPING_TYPE_NAMES:
             if not remaining_chain:
                 raise RuntimeError(
@@ -304,7 +304,7 @@ class DataSerializer(Data):
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
             return {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._typed_deserialize(
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self.typed_deserialize(
                     v, remaining_chain
                 )
                 for k, v in data.items()
@@ -355,7 +355,7 @@ class DataSerializer(Data):
             result_dict = {
                 (
                     snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)
-                ): self._typed_deserialize(v, field_dict[snake_case_k].type_chain)
+                ): self.typed_deserialize(v, field_dict[snake_case_k].type_chain)
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
             }
@@ -370,7 +370,7 @@ class DataSerializer(Data):
                 f"Cannot deserialize the following data into type '{type_name}':\n" f"{ErrorUtil.wrap(data)}"
             )
 
-    def _untyped_serialize(self, data: Any) -> Any:
+    def untyped_serialize(self, data: Any) -> Any:
         """
         Serialize slotted classes, primitive types, and supported dict- and list-like containers
         without using the schema or including _type in output.
@@ -391,7 +391,7 @@ class DataSerializer(Data):
                     else (
                         self.primitive_serializer.serialize(v)
                         if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                        else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._untyped_serialize(v))
+                        else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self.untyped_serialize(v))
                     )
                 )
                 for v in data
@@ -403,7 +403,7 @@ class DataSerializer(Data):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     self.primitive_serializer.serialize(v)
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._untyped_serialize(v))
+                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self.untyped_serialize(v))
                 )
                 for k, v in data.items()
                 if v is not None and (not hasattr(v, "__len__") or len(v) > 0)
@@ -420,7 +420,7 @@ class DataSerializer(Data):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     self.primitive_serializer.serialize(v)
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._untyped_serialize(v))
+                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self.untyped_serialize(v))
                 )
                 for k in slots
                 if (v := getattr(data, k)) is not None and not k.startswith("_")
