@@ -304,8 +304,6 @@ class DataSerializer(Data):
             # Check that no type chain is remaining
             if remaining_chain:
                 raise RuntimeError(f"Primitive type {type_name} has type chain {', '.join(remaining_chain)} remaining.")
-            if self.data_encoder is not None and isinstance(data, str) and len(data) > 0 and data[0] == "{":
-                data = self.data_encoder.decode(data)
             # Deserialize primitive type using primitive serializer if specified, otherwise return raw data
             return self.primitive_serializer.deserialize(data, [type_name])
         elif type_name in SEQUENCE_TYPE_NAMES:
