@@ -35,7 +35,7 @@ class KeySerializers:
 
     FOR_SQLITE: cls = cls(
         key_format=KeyFormatEnum.SEQUENCE,
-        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """

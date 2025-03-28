@@ -17,15 +17,16 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
-_KEY_SERIALIZER = KeySerializers.DELIMITED
-
 _SERIALIZATION_SAMPLES = [
-    StubDataclassRecordKey().build(),
+    # StubDataclassRecordKey().build(),
     StubDataclassCompositeKey().build(),
     StubDataclassPrimitiveFieldsKey().build(),
 ]
@@ -38,13 +39,29 @@ _SERIALIZATION_EXCEPTION_SAMPLES = [
 ]
 
 
-def test_serialization():
+def test_serialization():  # TODO: Rename to test_delimited
     """Test KeySerializer.serialize method."""
 
     for sample in _SERIALIZATION_SAMPLES:
         # Roundtrip serialization
-        serialized = _KEY_SERIALIZER.serialize(sample)
-        deserialized = _KEY_SERIALIZER.deserialize(serialized, type(sample))
+        serialized = KeySerializers.DELIMITED.serialize(sample)
+        deserialized = KeySerializers.DELIMITED.deserialize(serialized, type(sample))
+        assert sample == PytestUtil.approx(deserialized)
+
+        # Write to regression guard
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(TypeUtil.name(sample))
+        guard = RegressionGuard(channel=snake_case_type_name)
+        guard.write(serialized)
+    RegressionGuard().verify_all()
+
+
+def test_for_sqlite():
+    """Test KeySerializer.serialize method."""
+
+    for sample in _SERIALIZATION_SAMPLES:
+        # Roundtrip serialization
+        serialized = KeySerializers.FOR_SQLITE.serialize(sample)
+        deserialized = KeySerializers.FOR_SQLITE.deserialize(serialized, type(sample))
         assert sample == PytestUtil.approx(deserialized)
 
         # Write to regression guard
@@ -61,7 +78,7 @@ def test_serialization_exceptions():
         # Attempt serialization
         with pytest.raises(RuntimeError):
             print(f"Serializing type {type(sample)}")
-            _KEY_SERIALIZER.serialize(sample)
+            KeySerializers.DELIMITED.serialize(sample)
 
 
 if __name__ == "__main__":

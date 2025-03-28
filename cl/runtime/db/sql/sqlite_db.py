@@ -32,9 +32,10 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.schema.schema import Schema
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.project_settings import ProjectSettings
 
+_KEY_SERIALIZER = KeySerializers.FOR_SQLITE
 _SERIALIZER = DataSerializers.FOR_SQLITE
 
 _connection_dict: Dict[str, sqlite3.Connection] = {}
@@ -81,18 +82,14 @@ class SqliteDb(Db):
         return sql_statement
 
     @classmethod
-    def _serialize_keys_to_flat_tuple(
-        cls,
-        keys: Iterable[KeyProtocol],
-        key_fields: Tuple[str, ...],
-        serializer,
-    ) -> Tuple[Any, ...]:
+    def _serialize_keys_to_flat_tuple(cls, keys: Iterable[KeyProtocol]) -> Tuple[Any, ...]:
         """
         Sequentially serialize key fields for each key in keys into a flat tuple of values.
         Expected all keys are of the same type for which key fields are specified.
         """
-
-        return tuple(serializer.serialize_data(getattr(key, key_field)) for key in keys for key_field in key_fields)
+        key_tuples = tuple(_KEY_SERIALIZER.serialize(key) for key in keys)
+        flattened_tuple = tuple(item for group in key_tuples for item in group)
+        return flattened_tuple  # TODO(Roman): Review why it should be flattened
 
     def _load_one_or_none(
         self,
@@ -111,7 +108,6 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
-        serializer = FlatDictSerializer()
         schema_manager = self._get_schema_manager()
 
         # Use itertools.groupby to preserve the original order of records_or_keys
@@ -151,10 +147,13 @@ class SqliteDb(Db):
                 sql_statement += ";"
 
                 # serialize keys to tuple
-                query_values = self._serialize_keys_to_flat_tuple(keys_group, key_fields, serializer)
+                query_values = self._serialize_keys_to_flat_tuple(keys_group)
 
                 cursor = self._get_connection().cursor()
-                cursor.execute(sql_statement, query_values)
+                try:
+                    cursor.execute(sql_statement, query_values)
+                except Exception as e:
+                    raise RuntimeError(str(query_values))
 
                 reversed_columns_mapping = {v: k for k, v in columns_mapping.items()}
 
@@ -314,7 +313,6 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
     ) -> None:
-        serializer = FlatDictSerializer()
         schema_manager = self._get_schema_manager()
 
         # TODO (Roman): improve grouping
@@ -342,7 +340,7 @@ class SqliteDb(Db):
             sql_statement += ";"
 
             # serialize keys to tuple
-            query_values = self._serialize_keys_to_flat_tuple(keys_group, key_fields, serializer)
+            query_values = self._serialize_keys_to_flat_tuple(keys_group)
 
             # perform delete query
             connection = self._get_connection()
