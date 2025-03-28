@@ -14,23 +14,24 @@
 
 from typing import Final
 
-INT32_MIN: Final[int] = -(2 ** 31)
+INT32_MIN: Final[int] = -(2**31)
 """Minimum value of 32-bit signed integer."""
 
-INT32_MAX: Final[int] = 2 ** 31 - 1
+INT32_MAX: Final[int] = 2**31 - 1
 """Maximum value of 32-bit signed integer."""
 
-LONG_64_MIN: Final[int] = -(2 ** 63)
+LONG_64_MIN: Final[int] = -(2**63)
 """Minimum value of 64-bit signed integer."""
 
-LONG_64_MAX: Final[int] = 2 ** 63 - 1
+LONG_64_MAX: Final[int] = 2**63 - 1
 """Maximum value of 64-bit signed integer."""
 
-LONG_54_MIN: Final[int] = -(2 ** 53)
+LONG_54_MIN: Final[int] = -(2**53)
 """Minimum value of 54-bit signed integer, numbers in this range can be represented as a float exactly."""
 
-LONG_54_MAX: Final[int] = 2 ** 53 - 1
+LONG_54_MAX: Final[int] = 2**53 - 1
 """Maximum value of 54-bit signed integer, numbers in this range can be represented as a float exactly."""
+
 
 def check_int_32(value: int | float | None) -> None:
     """Error message if the value does not fit in 32-bit signed integer range, pass through None."""
@@ -40,14 +41,20 @@ def check_int_32(value: int | float | None) -> None:
             f"use long (64-bit signed integer) type instead."
         )
 
+
 def check_int_64(value: int | float | None) -> None:
     """Error message if the value does not fit in 32-bit signed integer range, pass through None."""
     if value is not None and (value < LONG_64_MIN or value > LONG_64_MAX):
-        raise RuntimeError(f"The value {value} does not fit in 64-bit signed integer (signed long) range\n"
-                           f"from {LONG_64_MIN} to {LONG_64_MAX}.")
+        raise RuntimeError(
+            f"The value {value} does not fit in 64-bit signed integer (signed long) range\n"
+            f"from {LONG_64_MIN} to {LONG_64_MAX}."
+        )
+
 
 def check_int_54(value: int | float | None) -> None:
     """Error message if the value does not fit in 54-bit signed integer range, pass through None."""
     if value is not None and (value < LONG_54_MIN or value > LONG_54_MAX):
-        raise RuntimeError(f"The value {value} cannot be represented as a float exactly because it does not fit\n"
-                           f"in 54-bit signed integer range from {LONG_54_MIN} to {LONG_54_MAX}.")
+        raise RuntimeError(
+            f"The value {value} cannot be represented as a float exactly because it does not fit\n"
+            f"in 54-bit signed integer range from {LONG_54_MIN} to {LONG_54_MAX}."
+        )

@@ -20,13 +20,16 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_enum, MAPPING_CLASSES, SEQUENCE_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
+from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
@@ -74,9 +77,9 @@ class DataSerializer(Data):
     """Pascalize keys during serialization if set."""
 
     def serialize(
-            self,
-            data: Any,
-            type_chain: Tuple[str, ...] | None = None,
+        self,
+        data: Any,
+        type_chain: Tuple[str, ...] | None = None,
     ) -> Any:
         """Serialize data to a dictionary."""
 
@@ -112,7 +115,8 @@ class DataSerializer(Data):
                     return [self.typed_deserialize(v, type_chain) for v in data]
                 else:
                     raise RuntimeError(
-                        f"Data type {data_class_name} is a sequence but schema type {schema_type_name} is not.")
+                        f"Data type {data_class_name} is a sequence but schema type {schema_type_name} is not."
+                    )
             elif data.__class__ in MAPPING_CLASSES:
                 # Get type name from the input dict
                 if (type_name := data.get(self.type_field, None)) is None:
@@ -190,9 +194,7 @@ class DataSerializer(Data):
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
-            return dict(
-                (k, self.serialize(v, remaining_chain)) for k, v in data.items()
-            )  # TODO: Replace by frozendict
+            return dict((k, self.serialize(v, remaining_chain)) for k, v in data.items())  # TODO: Replace by frozendict
         # Do not apply custom key and inner serializers at root level
         elif is_data(data):
 
@@ -265,15 +267,19 @@ class DataSerializer(Data):
                 {
                     k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): (
                         self.primitive_serializer.serialize(v, field_spec.type_chain)
-                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES else
-                        self.enum_serializer.serialize(v, field_spec.get_class())
-                        if is_enum(v) else
-                        key_serializer.serialize(v, field_spec.type_chain)
-                        if is_key(v) else
-                        (
-                            self.data_encoder.encode(self.serialize(v, field_spec.type_chain))
-                            if self.data_encoder is not None
-                            else self.serialize(v, field_spec.type_chain)
+                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                        else (
+                            self.enum_serializer.serialize(v, field_spec.get_class())
+                            if is_enum(v)
+                            else (
+                                key_serializer.serialize(v, field_spec.type_chain)
+                                if is_key(v)
+                                else (
+                                    self.data_encoder.encode(self.serialize(v, field_spec.type_chain))
+                                    if self.data_encoder is not None
+                                    else self.serialize(v, field_spec.type_chain)
+                                )
+                            )
                         )
                     )
                     for k, field_spec in data_field_dict.items()
@@ -336,7 +342,9 @@ class DataSerializer(Data):
             type_spec = TypeSchema.for_type_name(type_name)
             schema_class = type_spec.get_class()
             if self.key_serializer is not None and is_key(schema_class):
-                if self.data_encoder is not None and len(data) > 0 and data[0]=="{":  # TODO: Fix for non-JSON encoding
+                if (
+                    self.data_encoder is not None and len(data) > 0 and data[0] == "{"
+                ):  # TODO: Fix for non-JSON encoding
                     # Decode data field using data_encoder if provided and deserialize using self
                     decoded_data = self.data_encoder.decode(data)
                     return self.typed_deserialize(decoded_data, [type_spec.type_name])
@@ -397,13 +405,10 @@ class DataSerializer(Data):
 
             # Deserialize into a dict
             result_dict = {
-                (
-                    snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)
-                ):
-                (
+                (snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)): (
                     self.typed_deserialize(self.data_encoder.decode(v), field_dict[snake_case_k].type_chain)
-                    if self.data_encoder is not None and isinstance(v, str) and len(v) > 0 and v[0] == "{" else
-                    self.typed_deserialize(v, field_dict[snake_case_k].type_chain)
+                    if self.data_encoder is not None and isinstance(v, str) and len(v) > 0 and v[0] == "{"
+                    else self.typed_deserialize(v, field_dict[snake_case_k].type_chain)
                 )
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
@@ -478,4 +483,3 @@ class DataSerializer(Data):
         else:
             # Did not match a supported data type
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
-

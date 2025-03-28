@@ -24,8 +24,5 @@ class JsonEncoders:
     DEFAULT: cls = cls().build()
     """Pretty print format."""
 
-    COMPACT: cls = cls(
-        json_output_format=JsonOutputFormatEnum.COMPACT
-    ).build()
+    COMPACT: cls = cls(json_output_format=JsonOutputFormatEnum.COMPACT).build()
     """Compact format without line breaks."""
-

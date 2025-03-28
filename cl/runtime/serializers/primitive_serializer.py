@@ -25,7 +25,8 @@ from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.primitive.int_util import IntUtil
-from cl.runtime.primitive.limits import check_int_32, check_int_54
+from cl.runtime.primitive.limits import check_int_32
+from cl.runtime.primitive.limits import check_int_54
 from cl.runtime.primitive.long_util import LongUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.primitive.time_util import TimeUtil

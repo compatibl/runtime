@@ -62,7 +62,7 @@ def test_int_32():
     with pytest.raises(Exception):
         check_int_32("None")  # noqa
     with pytest.raises(Exception):
-        check_int_32(2 ** 31)  # Out of int32 range
+        check_int_32(2**31)  # Out of int32 range
 
 
 if __name__ == "__main__":

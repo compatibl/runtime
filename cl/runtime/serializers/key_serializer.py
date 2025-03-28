@@ -26,7 +26,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import DataProtocol
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_enum
@@ -69,7 +68,8 @@ class KeySerializer(Data):
         if schema_type_name is not None and data_class_name != schema_type_name:
             raise RuntimeError(
                 f"Key is an instance of type {data_class_name} while schema type is {schema_type_name}.\n"
-                f"Substituting records for keys is allowed, but deriving one key type from another is not.")
+                f"Substituting records for keys is allowed, but deriving one key type from another is not."
+            )
         if remaining_chain:
             raise RuntimeError(
                 f"Data is an instance of a key class {data_class_name} while type chain\n"

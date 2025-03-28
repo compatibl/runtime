@@ -22,6 +22,7 @@ from stubs.cl.runtime import StubDataViewers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
+
 def get_requests(key_str: str):
     """Get requests for testing."""
     return [
@@ -29,6 +30,7 @@ def get_requests(key_str: str):
         {"type": "StubDataViewers", "panel_id": "View Instance 1B", "key": key_str},
         {"type": "StubDataViewers", "panel_id": "View Instance 1C", "key": key_str},
     ]
+
 
 def get_expected_results(key_str: str):
     """Get expected_results for testing."""

@@ -26,8 +26,10 @@ class IntUtil:
             check_int_32(value)
             return str(value)
         else:
-            raise RuntimeError(f"Class {type(value).__name__} is passed to IntUtil.to_str method which expects int.\n"
-                               f"None is not a valid value.")
+            raise RuntimeError(
+                f"Class {type(value).__name__} is passed to IntUtil.to_str method which expects int.\n"
+                f"None is not a valid value."
+            )
 
     @classmethod
     def from_str(cls, value: str) -> int:
@@ -41,8 +43,10 @@ class IntUtil:
             except ValueError:
                 raise RuntimeError(f"Cannot parse string '{value}' as int.")
         else:
-            raise RuntimeError(f"Class {type(value).__name__} is passed to IntUtil.from_str method which expects str.\n"
-                               f"None is not a valid value.")
+            raise RuntimeError(
+                f"Class {type(value).__name__} is passed to IntUtil.from_str method which expects str.\n"
+                f"None is not a valid value."
+            )
 
     @classmethod
     def from_float(cls, value: float) -> int:
@@ -52,4 +56,3 @@ class IntUtil:
         """
         result = FloatUtil.to_int(value)
         return result
-

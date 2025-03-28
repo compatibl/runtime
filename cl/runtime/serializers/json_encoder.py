@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Any, Tuple
+from typing import Any
 import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum
+
 
 def orjson_default(obj):
     """Handler for unsupported types in orjson."""

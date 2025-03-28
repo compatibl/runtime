@@ -46,6 +46,7 @@ def get_simple_requests(key_str: str):
         },
     ]
 
+
 def get_save_to_db_requests(key_str: str):
     """Get requests for testing."""
     return [

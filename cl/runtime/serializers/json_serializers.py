@@ -25,12 +25,8 @@ class JsonSerializers:
     DEFAULT: cls = cls().build()
     """Include type information as needed, bidirectional, pretty print format."""
 
-    COMPACT: cls = cls(
-        json_output_format=JsonOutputFormatEnum.COMPACT
-    ).build()
+    COMPACT: cls = cls(json_output_format=JsonOutputFormatEnum.COMPACT).build()
     """Include type information as needed, bidirectional, compact format."""
 
-    FOR_REPORTING: cls = cls(
-        type_inclusion=TypeInclusionEnum.OMIT
-    ).build()
+    FOR_REPORTING: cls = cls(type_inclusion=TypeInclusionEnum.OMIT).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""

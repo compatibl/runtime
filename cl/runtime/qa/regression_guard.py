@@ -22,11 +22,11 @@ from typing import Dict
 from typing import Literal
 from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.records.protocols import is_key, MAPPING_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.field_decl import primitive_types
-from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 
