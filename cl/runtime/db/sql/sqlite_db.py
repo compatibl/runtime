@@ -31,8 +31,11 @@ from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.schema.schema import Schema
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
 from cl.runtime.settings.project_settings import ProjectSettings
+
+_SERIALIZER = DataSerializers.FOR_SQLITE
 
 _connection_dict: Dict[str, sqlite3.Connection] = {}
 """Dict of Connection instances with db_id key stored outside the class to avoid serialization."""
@@ -162,7 +165,7 @@ class SqliteDb(Db):
                 for data in cursor.fetchall():
                     # TODO (Roman): select only needed columns on db side.
                     data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
-                    deserialized_data = serializer.deserialize_data(data)
+                    deserialized_data = _SERIALIZER.deserialize(data)
 
                     # TODO (Roman): make key hashable and remove conversion of key to str
                     result[str(deserialized_data.get_key())] = deserialized_data
@@ -180,7 +183,6 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
-        serializer = FlatDictSerializer()
         schema_manager = self._get_schema_manager()
 
         table_name: str = schema_manager.table_name_for_type(record_type)
@@ -215,7 +217,7 @@ class SqliteDb(Db):
         for data in cursor.fetchall():
             # TODO (Roman): Select only needed columns on db side.
             data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
-            yield serializer.deserialize_data(data)
+            yield _SERIALIZER.deserialize(data)
 
     def load_filter(
         self,
@@ -240,7 +242,6 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
     ) -> None:
-        serializer = FlatDictSerializer()
         schema_manager = self._get_schema_manager()
 
         grouped_records = defaultdict(list)
@@ -251,7 +252,7 @@ class SqliteDb(Db):
 
         for key_type, records_group in grouped_records.items():
             # serialize records
-            serialized_records = [serializer.serialize_data(rec, is_root=True) for rec in records_group]
+            serialized_records = [_SERIALIZER.serialize(rec) for rec in records_group]
 
             # get maximum set of fields from records
             all_fields = list({k for rec in serialized_records for k in rec.keys()})
@@ -290,7 +291,10 @@ class SqliteDb(Db):
 
             connection = self._get_connection()
             cursor = connection.cursor()
-            cursor.execute(sql_statement, sql_values)
+            try:
+                cursor.execute(sql_statement, sql_values)
+            except Exception as e:
+                raise RuntimeError(str(sql_values))
 
             connection.commit()
 
