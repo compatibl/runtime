@@ -311,8 +311,8 @@ class DataSerializer(Data):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
             type_spec = TypeSchema.for_type_name(type_name)
             type_class = type_spec.get_class()
-            if is_key(type_class) and self.key_serializer is not None:
-                # Use key serializer to deserialize
+            if self.key_serializer is not None and is_key(type_class) and isinstance(data, str) and data[0] != "{":
+                # Use key serializer to deserialize only if the string does not contain JSON
                 return self.key_serializer.deserialize(data, type_class)
             elif is_data(type_class) and self.inner_serializer is not None:
                 # Use inner serializer to deserialize
