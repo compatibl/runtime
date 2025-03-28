@@ -62,7 +62,7 @@ stub_entries: List[List[RecordProtocol]] = [  # noqa
 def save_records_to_csv(records: Iterable, file_path: str) -> None:
     """Save records to file with specified path."""
 
-    # Serialize records with flat serializer but use StringSerializer for keys
+    # Serialize records with flat serializer but use delimited serializer for keys
     record_dicts = []
     for rec in records:
         serialized_record = _CSV_SERIALIZER.serialize(rec)
