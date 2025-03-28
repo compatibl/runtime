@@ -113,37 +113,6 @@ class UiDictSerializer(DictSerializer):
         else:
             return super(UiDictSerializer, self).serialize_data(data, annot_type)
 
-    def serialize_record_for_table(self, record: RecordProtocol) -> Dict[str, Any]:
-        """
-        Serialize record to ui table format.
-        Contains only fields of supported types, _key and _t will be added based on record.
-        """
-
-        all_slots = SlotsUtil.get_slots(record.__class__)
-
-        # Get subset of slots which supported in table format
-        table_fields = {
-            CaseUtil.snake_to_pascal_case_keep_trailing_underscore(slot)
-            for slot in all_slots
-            if (slot_v := getattr(record, slot))
-            and (
-                # TODO (Roman): check other types for table format
-                # Check if field is primitive, key or enum
-                slot_v.__class__.__name__ in (*self.primitive_type_names, "str")
-                or is_key(slot_v)
-                or isinstance(slot_v, Enum)
-            )
-        }
-
-        # Serialize record to ui format and filter table fields
-        table_dict = {k: v for k, v in self.serialize_data(record).items() if k in table_fields}
-
-        # Add "_t" and "_key" attributes
-        table_dict["_t"] = TypeUtil.name(record)
-        table_dict["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
-
-        return table_dict
-
     @classmethod
     def _check_patch_binary_content(cls, data: TDataDict, short_type_name: str):
         """

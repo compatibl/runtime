@@ -13,21 +13,24 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+from enum import Enum
 from typing import Any
 from typing import Dict
 from typing import List
 from pydantic import BaseModel
 from pydantic import Field
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
+from cl.runtime.records.protocols import RecordProtocol, is_key
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.serializers.ui_dict_serializer import UiDictSerializer
-
-ui_serializer = UiDictSerializer()
-_UI_SERIALIZER = DataSerializers.FOR_UI
+from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class SelectResponse(BaseModel):
@@ -49,9 +52,41 @@ class SelectResponse(BaseModel):
         records = DbContext.get_db().load_all(record_type)  # noqa
 
         # Serialize records for table
-        serialized_records = [ui_serializer.serialize_record_for_table(record) for record in records]
+        serialized_records = [cls._serialize_record_for_table(record) for record in records]
 
         # Get schema dict for type
         type_decl_dict = TypeResponseUtil.get_type(TypeRequest(name=request.type_, module=request.module, user="root"))
 
         return SelectResponse(schema=type_decl_dict, data=serialized_records)
+
+    @classmethod
+    def _serialize_record_for_table(cls, record: RecordProtocol) -> Dict[str, Any]:
+        """
+        Serialize record to ui table format.
+        Contains only fields of supported types, _key and _t will be added based on record.
+        """
+
+        all_slots = SlotsUtil.get_slots(record.__class__)
+
+        # Get subset of slots which supported in table format
+        table_fields = {
+            CaseUtil.snake_to_pascal_case_keep_trailing_underscore(slot)
+            for slot in all_slots
+            if (slot_v := getattr(record, slot))
+            and (
+                # TODO (Roman): check other types for table format
+                # Check if field is primitive, key or enum
+                slot_v.__class__.__name__ in (*self.primitive_type_names, "str")
+                or is_key(slot_v)
+                or isinstance(slot_v, Enum)
+            )
+        }
+
+        # Serialize record to ui format and filter table fields
+        table_dict = {k: v for k, v in DataSerializers.FOR_UI.serialize(record).items() if k in table_fields}
+
+        # Add "_t" and "_key" attributes
+        table_dict["_t"] = TypeUtil.name(record)
+        table_dict["_key"] = KeySerializers.DELIMITED.serialize(record.get_key())
+
+        return table_dict
