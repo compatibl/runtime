@@ -22,7 +22,7 @@ from typing import Dict
 from typing import Literal
 from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES, SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
@@ -349,7 +349,7 @@ class RegressionGuard:
         """Format text for regression testing."""
 
         # Convert to one of the supported output types
-        if is_record(value) or value.__class__ in MAPPING_CLASSES:
+        if is_record(value) or value.__class__ in SEQUENCE_CLASSES or value.__class__ in MAPPING_CLASSES:
             value = _YAML_SERIALIZER.serialize(value)
         elif is_key(value):
             value = _KEY_SERIALIZER.serialize(value)

@@ -1,82 +1,78 @@
-schema_
-
-stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord:
-  _t: StubDataclassRecord
-  Module:
-    ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
-  Name: StubDataclassRecord
-  Label: Stub Dataclass Record
-  Comment: Stub record base class.
-  TypeKind: Record
-  DisplayKind: Basic
-  Inherit:
+- schema_
+- stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord:
+    _t: StubDataclassRecord
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
-    Name: StubDataclassRecordKey
-  Elements:
-  - Value:
-      Type: String
-    Name: Id
-    Comment: Unique identifier.
-  Keys:
-  - Id
-cl.runtime.records.for_dataclasses.data.Data:
-  _t: Data
-  Module:
-    ModuleName: cl.runtime.records.for_dataclasses.data
-  Name: Data
-  Label: Data
-  Comment: |2-
-
-        Base for slotted classes other than keys or records based on dataclasses framework.
-        Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
-
-        Notes:
-            - This base should be used for dataclasses, use the appropriate import of Data for other frameworks
-            - Use tuple which is immutable instead of list when deriving from this class
-        
-  TypeKind: Data
-  DisplayKind: Basic
-cl.runtime.records.for_dataclasses.key.Key:
-  _t: Key
-  Module:
-    ModuleName: cl.runtime.records.for_dataclasses.key
-  Name: Key
-  Label: Key
-  Comment: Base class for keys and records (derived from keys) based on dataclasses
-    framework.
-  TypeKind: Data
-  DisplayKind: Basic
-  Inherit:
+      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+    Name: StubDataclassRecord
+    Label: Stub Dataclass Record
+    Comment: Stub record base class.
+    TypeKind: Record
+    DisplayKind: Basic
+    Inherit:
+      Module:
+        ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      Name: StubDataclassRecordKey
+    Elements:
+    - Value:
+        Type: String
+      Name: Id
+      Comment: Unique identifier.
+    Keys:
+    - Id
+  cl.runtime.records.for_dataclasses.data.Data:
+    _t: Data
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.data
     Name: Data
-  Abstract: true
-stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey:
-  _t: StubDataclassRecordKey
-  Module:
-    ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
-  Name: StubDataclassRecordKey
-  Label: Stub Dataclass Record Key
-  Comment: Stub record base class.
-  TypeKind: Data
-  DisplayKind: Basic
-  Inherit:
+    Label: Data
+    Comment: |2-
+
+          Base for slotted classes other than keys or records based on dataclasses framework.
+          Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
+
+          Notes:
+              - This base should be used for dataclasses, use the appropriate import of Data for other frameworks
+              - Use tuple which is immutable instead of list when deriving from this class
+          
+    TypeKind: Data
+    DisplayKind: Basic
+  cl.runtime.records.for_dataclasses.key.Key:
+    _t: Key
     Module:
       ModuleName: cl.runtime.records.for_dataclasses.key
     Name: Key
-  Elements:
-  - Value:
-      Type: String
-    Name: Id
-    Comment: Unique identifier.
+    Label: Key
+    Comment: Base class for keys and records (derived from keys) based on dataclasses
+      framework.
+    TypeKind: Data
+    DisplayKind: Basic
+    Inherit:
+      Module:
+        ModuleName: cl.runtime.records.for_dataclasses.data
+      Name: Data
+    Abstract: true
+  stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey:
+    _t: StubDataclassRecordKey
+    Module:
+      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    Name: StubDataclassRecordKey
+    Label: Stub Dataclass Record Key
+    Comment: Stub record base class.
+    TypeKind: Data
+    DisplayKind: Basic
+    Inherit:
+      Module:
+        ModuleName: cl.runtime.records.for_dataclasses.key
+      Name: Key
+    Elements:
+    - Value:
+        Type: String
+      Name: Id
+      Comment: Unique identifier.
 
 
-
-data
-
-_t: StubDataclassRecord
-Id: test_get_record
-
+- data
+- _t: StubDataclassRecord
+  Id: test_get_record
 
 
