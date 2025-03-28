@@ -36,9 +36,6 @@ _supported_extensions = ["txt", "yaml"]
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 """Serializer for keys."""
 
-data_serializer = DictSerializer()
-"""Serializer for records."""
-
 _YAML_SERIALIZER = YamlSerializers.FOR_REPORTING
 """Serializer for classes and containers."""
 
@@ -353,7 +350,7 @@ class RegressionGuard:
 
         # Convert to one of the supported output types
         if is_record(value) or value.__class__ in MAPPING_CLASSES:
-            value = data_serializer.serialize_data(value)
+            value = _YAML_SERIALIZER.serialize(value)
         elif is_key(value):
             value = _KEY_SERIALIZER.serialize(value)
 
