@@ -175,7 +175,7 @@ class BasicMongoDb(Db):
 
         # Serialize key
         # TODO: Consider getting the key first instead of serializing the entire record
-        serialized_key = _KEY_SERIALIZER.serialize(record)
+        serialized_key = _KEY_SERIALIZER.serialize(record.get_key())
 
         # Use update_one with upsert=True to insert if not present or update if present
         # TODO (Roman): update_one does not affect fields not presented in record. Changed to replace_one

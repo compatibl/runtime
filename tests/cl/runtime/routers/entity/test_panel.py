@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import _KEY_SERIALIZER
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.entity.panel_request import PanelRequest
@@ -21,40 +20,42 @@ from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataViewers
 
-# create stub with viewers
-stub_viewers = StubDataViewers()
 _KEY_SERIALIZER = KeySerializers.DELIMITED
-key_str = _KEY_SERIALIZER.serialize(stub_viewers)
 
+def get_requests(key_str: str):
+    """Get requests for testing."""
+    return [
+        {"type": "StubDataViewers", "panel_id": "View Instance 1A", "key": key_str},
+        {"type": "StubDataViewers", "panel_id": "View Instance 1B", "key": key_str},
+        {"type": "StubDataViewers", "panel_id": "View Instance 1C", "key": key_str},
+    ]
 
-requests = [
-    {"type": "StubDataViewers", "panel_id": "View Instance 1A", "key": key_str},
-    {"type": "StubDataViewers", "panel_id": "View Instance 1B", "key": key_str},
-    {"type": "StubDataViewers", "panel_id": "View Instance 1C", "key": key_str},
-]
-
-expected_results = [
-    {
-        "ViewOf": {
-            "_t": "Script",
-            "Name": None,
-            "Language": "Markdown",
-            "Body": ["# Viewer with UI element", "### _Script_"],
-            "WordWrap": None,
-        }
-    },
-    {"ViewOf": None},
-    {"ViewOf": {"StubId": key_str, "_t": "StubDataViewersKey"}},
-]
+def get_expected_results(key_str: str):
+    """Get expected_results for testing."""
+    return [
+        {
+            "ViewOf": {
+                "_t": "Script",
+                "Name": None,
+                "Language": "Markdown",
+                "Body": ["# Viewer with UI element", "### _Script_"],
+                "WordWrap": None,
+            }
+        },
+        {"ViewOf": None},
+        {"ViewOf": {"StubId": key_str, "_t": "StubDataViewersKey"}},
+    ]
 
 
 @pytest.mark.skip("Temporarily skip due to SQLite concurrency issue.")  # TODO: Switch test to MongoMock
 def test_method():
     """Test coroutine for /entity/panel route."""
 
+    stub_viewers = StubDataViewers()
+    key_str = _KEY_SERIALIZER.serialize(stub_viewers.get_key())
     DbContext.save_one(stub_viewers)
 
-    for request, expected_result in zip(requests, expected_results):
+    for request, expected_result in zip(get_requests(key_str), get_expected_results(key_str)):
         request_object = PanelRequest(**request)
         result = PanelResponseUtil.get_response(request_object)
 
@@ -66,10 +67,12 @@ def test_method():
 def test_api():
     """Test REST API for /entity/panel route."""
 
+    stub_viewers = StubDataViewers()
+    key_str = _KEY_SERIALIZER.serialize(stub_viewers.get_key())
     DbContext.save_one(stub_viewers)
 
     with QaClient() as test_client:
-        for request, expected_result in zip(requests, expected_results):
+        for request, expected_result in zip(get_requests(key_str), get_expected_results(key_str)):
             # Split request headers and query
             request_headers = {"user": request.get("user")}
             request_params = {

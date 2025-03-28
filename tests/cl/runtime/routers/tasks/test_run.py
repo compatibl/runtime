@@ -26,45 +26,48 @@ from cl.runtime.tasks.task_key import TaskKey
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubHandlers
 
-stub_handlers = StubHandlers()
 _KEY_SERIALIZER = KeySerializers.DELIMITED
-key_str = _KEY_SERIALIZER.serialize(stub_handlers)
 
-simple_requests = [
-    {
-        "db": "DEPRECATED",  # TODO: Review and remove
-        "dataset": "",
-        "table": "StubHandlers",
-        "keys": [key_str],
-        "method": "InstanceHandler1b",
-    },
-    {
-        "dataset": "",
-        "table": "StubHandlers",
-        "method": "StaticHandler1a",
-    },
-]
 
-save_to_db_requests = [
-    {
-        "db": "DEPRECATED",  # TODO: Review and remove
-        "dataset": "",
-        "table": "StubHandlers",
-        "keys": [key_str],
-        "method": "HandlerSaveToDb",
-    }
-]
+def get_simple_requests(key_str: str):
+    """Get requests for testing."""
+    return [
+        {
+            "db": "DEPRECATED",  # TODO: Review and remove
+            "dataset": "",
+            "table": "StubHandlers",
+            "keys": [key_str],
+            "method": "InstanceHandler1b",
+        },
+        {
+            "dataset": "",
+            "table": "StubHandlers",
+            "method": "StaticHandler1a",
+        },
+    ]
 
-expected_records_in_db = [[StubDataclassRecord(id="saved_from_handler")]]
+def get_save_to_db_requests(key_str: str):
+    """Get requests for testing."""
+    return [
+        {
+            "db": "DEPRECATED",  # TODO: Review and remove
+            "dataset": "",
+            "table": "StubHandlers",
+            "keys": [key_str],
+            "method": "HandlerSaveToDb",
+        }
+    ]
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
 def test_method(pytest_celery_queue):
     """Test coroutine for /tasks/run route."""
 
+    stub_handlers = StubHandlers()
+    key_str = _KEY_SERIALIZER.serialize(stub_handlers.get_key())
     DbContext.save_one(stub_handlers)
 
-    for request in simple_requests + save_to_db_requests:
+    for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):
         request_object = RunRequest(**request)
         result = RunResponseItem.run_tasks(request_object)
 
@@ -78,7 +81,8 @@ def test_method(pytest_celery_queue):
                 assert result_item.key is not None
                 assert result_item.key in request_object.keys
 
-    for request, expected_records in zip(save_to_db_requests, expected_records_in_db):
+    expected_records_in_db = [[StubDataclassRecord(id="saved_from_handler")]]
+    for request, expected_records in zip(get_save_to_db_requests(key_str), expected_records_in_db):
         expected_keys = [rec.get_key() for rec in expected_records]
 
         request_object = RunRequest(**request)
@@ -92,10 +96,12 @@ def test_method(pytest_celery_queue):
 def test_api(pytest_celery_queue):
     """Test REST API for /tasks/run route."""
 
+    stub_handlers = StubHandlers()
+    key_str = _KEY_SERIALIZER.serialize(stub_handlers.get_key())
     DbContext.save_one(stub_handlers)
 
     with QaClient() as test_client:
-        for request in simple_requests + save_to_db_requests:
+        for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):
             response = test_client.post("/tasks/run", json=request)
             assert response.status_code == 200
             result = response.json()
@@ -112,7 +118,8 @@ def test_api(pytest_celery_queue):
                     assert item.get("Key") is not None
                     assert item.get("Key") in request["keys"]
 
-        for request, expected_records in zip(save_to_db_requests, expected_records_in_db):
+        expected_records_in_db = [[StubDataclassRecord(id="saved_from_handler")]]
+        for request, expected_records in zip(get_save_to_db_requests(key_str), expected_records_in_db):
             expected_keys = [rec.get_key() for rec in expected_records]
 
             test_client.post("/tasks/run", json=request)

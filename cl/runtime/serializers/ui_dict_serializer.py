@@ -140,7 +140,7 @@ class UiDictSerializer(DictSerializer):
 
         # Add "_t" and "_key" attributes
         table_dict["_t"] = TypeUtil.name(record)
-        table_dict["_key"] = _KEY_SERIALIZER.serialize(record)
+        table_dict["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
 
         return table_dict
 
