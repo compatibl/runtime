@@ -88,8 +88,16 @@ class DataSerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
-    def deserialize(self, data: Any) -> Any:
+    def deserialize(
+        self,
+        data: Any,
+        type_chain: Tuple[str, ...] | None = None,
+    ) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
+
+        # Get type and class of data and parse type chain
+        data_class_name = data.__class__.__name__ if data is not None else None
+        schema_type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
 
         if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
             if data is None:
@@ -98,14 +106,14 @@ class DataSerializer(Data):
             elif data.__class__.__name__ in MAPPING_TYPE_NAMES:
                 # Get type name from the input dict
                 if (type_name := data.get(self.type_field, None)) is None:
-                    raise RuntimeError(f"Key '_type' is missing in the serialized data, cannot deserialize.")
+                    if schema_type_name is not None:
+                        type_name = schema_type_name
+                    else:
+                        raise RuntimeError(f"Key '_type' is missing in the serialized data, cannot deserialize.")
                 # Create type chain of length one from the type
                 type_chain = [type_name]
                 # Use typed deserialization
                 return self.typed_deserialize(data, type_chain)
-            elif data is not None and data.__class__.__name__ in SEQUENCE_TYPE_NAMES:
-                # Invoke on each item in the sequence
-                return list(self.deserialize(v) for v in data)
             else:
                 raise RuntimeError(
                     f"Data is not a list or mapping, cannot deserialize without type_chain argument:\n"
@@ -273,6 +281,7 @@ class DataSerializer(Data):
         # Parse type chain
         type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
 
+        inner_serializer = self.inner_serializer if self.inner_serializer is not None else self
         if data is None:
             # Return None if is_optional flag is set, otherwise raise an error
             if is_optional:
@@ -292,7 +301,10 @@ class DataSerializer(Data):
                     f"Use type_name[Any] to specify a sequence with any item type."
                 )
             # Deserialize sequence into tuple
-            return list(self.typed_deserialize(v, remaining_chain) for v in data)
+            if self.inner_serializer is not None and isinstance(data, str) and data[0] == "[":
+                return self.inner_serializer.deserialize(data, type_chain)
+            else:
+                return list(self.typed_deserialize(v, remaining_chain) for v in data)
         elif type_name in MAPPING_TYPE_NAMES:
             if not remaining_chain:
                 raise RuntimeError(
@@ -302,7 +314,7 @@ class DataSerializer(Data):
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
             return {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self.typed_deserialize(
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): inner_serializer.typed_deserialize(
                     v, remaining_chain
                 )
                 for k, v in data.items()
@@ -353,7 +365,12 @@ class DataSerializer(Data):
             result_dict = {
                 (
                     snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)
-                ): self.typed_deserialize(v, field_dict[snake_case_k].type_chain)
+                ):
+                (
+                    self.inner_serializer.deserialize(v, field_dict[snake_case_k].type_chain)
+                    if self.inner_serializer is not None and isinstance(v, str) and v[0] == "{"
+                    else self.typed_deserialize(v, field_dict[snake_case_k].type_chain)
+                )
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
             }

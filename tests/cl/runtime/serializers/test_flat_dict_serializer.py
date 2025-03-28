@@ -14,9 +14,14 @@
 
 import pytest
 import json
+
+from orjson import orjson
+
+from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.flat_dict_serializer import FlatDictSerializer
+from cl.runtime.serializers.json_serializers import JsonSerializers
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -55,25 +60,15 @@ def test_data_serialization():
     for sample_type in sample_types:
         sample = sample_type()
         serialized = DataSerializers.FOR_SQLITE.serialize(sample)
-        # deserialized = DataSerializers.FOR_UI.deserialize(serialized)
-        # TODO: assert deserialized == sample
+        deserialized = DataSerializers.FOR_SQLITE.typed_deserialize(serialized, (sample_type.__name__,))
+        assert deserialized == PytestUtil.approx(sample)
 
         serialized_old = serializer_old.serialize_data(sample)
         # assert serialized_old == serialized
 
-        deserialized_old = serializer_old.deserialize_data(serialized_old)
-        # assert deserialized_old == sample
-
-        # Read JSONN and
-
         # Record in RegressionGuard
-        resuld_dict_old = json.loads(serialized_old)
-        result_str_old = YamlSerializers.FOR_REPORTING.serialize(resuld_dict_old)
         guard = RegressionGuard(channel=f"{sample_type.__name__}")
         guard.write(serialized)
-
-        # guard = RegressionGuard(channel=sample_type.__name__)
-        # guard.write(serialized)
     RegressionGuard().verify_all()
 
 
