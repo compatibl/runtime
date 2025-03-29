@@ -17,9 +17,11 @@ from typing import List
 from inflection import titleize
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.user_request import UserRequest
 from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_schema import TypeSchema
 
 
 class TypesResponseItem(BaseModel):
@@ -45,7 +47,7 @@ class TypesResponseItem(BaseModel):
         # TODO: Check why UserRequest is not used in this method
 
         # Get a dictionary of types indexed by short name
-        type_dict = Schema.get_type_dict()
+        class_dict = TypeSchema.get_class_dict()
 
         result = [
             TypesResponseItem(
@@ -53,7 +55,7 @@ class TypesResponseItem(BaseModel):
                 module=CaseUtil.snake_to_pascal_case(record_type.__module__),
                 label=titleize(TypeUtil.name(record_type)),
             )
-            for record_type in type_dict.values()
-            if hasattr(record_type, "get_key")
+            for record_type in class_dict.values()
+            if is_record(record_type)
         ]
         return result

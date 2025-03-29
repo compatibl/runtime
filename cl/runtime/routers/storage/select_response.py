@@ -23,7 +23,7 @@ from pydantic import Field
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.protocols import RecordProtocol, is_key
+from cl.runtime.records.protocols import RecordProtocol, is_key, PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
@@ -76,7 +76,7 @@ class SelectResponse(BaseModel):
             and (
                 # TODO (Roman): check other types for table format
                 # Check if field is primitive, key or enum
-                slot_v.__class__.__name__ in (*self.primitive_type_names, "str")
+                slot_v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                 or is_key(slot_v)
                 or isinstance(slot_v, Enum)
             )

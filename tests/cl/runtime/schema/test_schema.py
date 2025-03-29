@@ -16,16 +16,17 @@ import pytest
 from cl.runtime import ClassInfo
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.schema.type_schema import TypeSchema
 from stubs.cl.runtime import StubDataclassRecord
 
 
 def test_get_types():
     """Test Schema.get_types() method."""
 
-    type_dict = Schema.get_type_dict()
-    assert "TypeDecl" in type_dict
-    assert "StubDataclassRecord" in type_dict
-    assert "RecordMixin" not in type_dict
+    class_dict = TypeSchema.get_class_dict()
+    assert "TypeDecl" in class_dict
+    assert "StubDataclassRecord" in class_dict
+    assert "RecordMixin" not in class_dict
 
 
 def test_get_type_by_short_name():
