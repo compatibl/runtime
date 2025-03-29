@@ -23,13 +23,11 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
-param_dict_serializer = DictSerializer()  # TODO: Support complex params
 
 
 @dataclass(slots=True, kw_only=True)

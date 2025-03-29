@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import _KEY_SERIALIZER
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
 from cl.runtime.qa.qa_client import QaClient
@@ -25,8 +24,6 @@ from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubHandlers
-
-_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 def get_simple_requests(key_str: str):
@@ -65,7 +62,7 @@ def test_method(pytest_celery_queue):
     """Test coroutine for /tasks/run route."""
 
     stub_handlers = StubHandlers()
-    key_str = _KEY_SERIALIZER.serialize(stub_handlers.get_key())
+    key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
     DbContext.save_one(stub_handlers)
 
     for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):
@@ -98,7 +95,7 @@ def test_api(pytest_celery_queue):
     """Test REST API for /tasks/run route."""
 
     stub_handlers = StubHandlers()
-    key_str = _KEY_SERIALIZER.serialize(stub_handlers.get_key())
+    key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
     DbContext.save_one(stub_handlers)
 
     with QaClient() as test_client:

@@ -27,7 +27,6 @@ from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.log.log_config import celery_empty_logging_config
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.records.protocols import TDataDict
-from cl.runtime.serializers.dict_serializer import DictSerializer
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.tasks.task import Task
@@ -55,9 +54,6 @@ celery_app = Celery(
 )
 
 celery_app.conf.task_track_started = True
-
-context_serializer = DictSerializer()
-"""Serializer for the context parameter of 'execute_task' method."""
 
 
 @setup_logging.connect()
