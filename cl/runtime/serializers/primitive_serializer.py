@@ -90,7 +90,7 @@ class PrimitiveSerializer(Data):
     bytes_format: BytesFormatEnum = required()
     """Serialization format for bytes (pass through without conversion if not set)."""
 
-    def serialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
         """
         Serialize a primitive type to a string or another primitive type.
 
@@ -241,7 +241,7 @@ class PrimitiveSerializer(Data):
         else:
             raise RuntimeError(f"Class {value_class_name} cannot be serialized using {type(self).__name__}.")
 
-    def deserialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
+    def deserialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
         """
         Deserialize a string or another primitive value such as int or None to an instance of type_name.
 

@@ -34,7 +34,7 @@ class FieldSpec(FrozenDataMixin):
     type_hint: str
     """Type hint from which the type chain was created as string."""
 
-    type_chain: Tuple[str, ...]
+    type_chain: Tuple[Tuple[str, Type, bool], ...]
     """
     Chain of nested type hints, each item has format 'type_name' or 'type_name | None'
     where type_name may refer to a container, slotted type, or primitive type.

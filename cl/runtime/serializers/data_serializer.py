@@ -76,7 +76,7 @@ class DataSerializer(Data):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    def serialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
         """Serialize data to a dictionary."""
 
         if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
@@ -88,7 +88,7 @@ class DataSerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
-    def deserialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
+    def deserialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
 
         # Get type and class of data and parse type chain
@@ -130,11 +130,7 @@ class DataSerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
-    def typed_serialize(
-        self,
-        data: Any,
-        type_chain: Tuple[str, ...] | None = None,
-    ) -> Any:
+    def typed_serialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
         """Serialize the argument to a dictionary type_chain and schema."""
 
         # Get type and class of data and parse type chain
@@ -286,7 +282,7 @@ class DataSerializer(Data):
         else:
             raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
 
-    def typed_deserialize(self, data: Any, type_chain: Tuple[str, ...]) -> Any:
+    def typed_deserialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...]) -> Any:
         """Deserialize data using type_chain and schema."""
 
         # Parse type chain

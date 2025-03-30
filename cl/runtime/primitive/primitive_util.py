@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, Type
 from typing import Tuple
 from cl.runtime.records.type_util import TypeUtil
 
@@ -56,7 +56,7 @@ class PrimitiveUtil:
                 raise RuntimeError(f"Type {schema_type_name} cannot be stored as {value_class_name} class.")
 
     @classmethod  # TODO: Move to a separate helper class
-    def unpack_type_chain(cls, type_chain: Tuple[str, ...] | None) -> Tuple[str | None, bool | None]:
+    def unpack_type_chain(cls, type_chain: Tuple[Tuple[str, Type, bool], ...] | None) -> Tuple[str | Type | None, bool | None]:
         """
         Parse type chain to return type name and is_optional flag, check that there is no remaining chain.
 

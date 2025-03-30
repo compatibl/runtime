@@ -54,7 +54,7 @@ class KeySerializer(Data):
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
 
-    def serialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
         """Serialize key into a delimited string or a flattened sequence of primitive types."""
 
         data_class_name = TypeUtil.name(data)

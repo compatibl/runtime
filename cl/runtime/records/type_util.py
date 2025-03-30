@@ -91,10 +91,8 @@ class TypeUtil:
             return True
 
     @classmethod  # TODO: Move to a separate helper class
-    def unpack_type_chain(
-        cls,
-        type_chain: Tuple[str, ...] | None,
-    ) -> Tuple[str | None, bool | None, Tuple[str, ...] | None]:
+    def unpack_type_chain(cls, type_chain: Tuple[Tuple[str, Type, bool], ...] | None
+    ) -> Tuple[str | Type | None, bool | None, Tuple[Tuple[str, Type, bool], ...] | None]:
         """
         Parse type chain to return type name, is_optional flag, and remaining chain (if any).
 
