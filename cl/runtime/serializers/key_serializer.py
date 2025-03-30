@@ -54,11 +54,7 @@ class KeySerializer(Data):
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
 
-    def serialize(
-        self,
-        data: Any,
-        type_chain: Tuple[str, ...] | None = None,
-    ) -> Any:
+    def serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
         """Serialize key into a delimited string or a flattened sequence of primitive types."""
 
         data_class_name = TypeUtil.name(data)
@@ -101,7 +97,7 @@ class KeySerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(key_format, KeyFormatEnum)
 
-    def deserialize(self, data: str | Tuple[TPrimitive, ...], key_or_record_type: Type) -> KeyProtocol:
+    def deserialize(self, data: Any, key_or_record_type: Type) -> Any:
         """Deserialize key from a delimited string or a flattened sequence of primitive types."""
 
         # Convert to key if a record

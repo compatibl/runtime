@@ -190,14 +190,14 @@ class YamlSerializer(Data):
             result = output.getvalue()
             return result
 
-    def deserialize(self, yaml_str: str) -> Any:
+    def deserialize(self, data: Any) -> Any:
         """Read a YAML string and return the deserialized object if bidirectional flag is set, and dict otherwise."""
 
         if self.type_inclusion == TypeInclusionEnum.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
 
         # Use a YAML reader with PrimitiveToStringConstructor to read all values as strings
-        yaml_dict = yaml_reader.load(StringIO(yaml_str))
+        yaml_dict = yaml_reader.load(StringIO(data))
 
         # Deserialized from dict using self.dict_serializer
         result = self._deserializer.deserialize(yaml_dict)

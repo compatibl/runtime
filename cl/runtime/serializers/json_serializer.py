@@ -66,11 +66,7 @@ class JsonSerializer(Data):
             enum_serializer=EnumSerializers.DEFAULT,
         ).build()
 
-    def serialize(
-        self,
-        data: Any,
-        type_chain: Tuple[str, ...] | None = None,
-    ) -> Any:
+    def serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
         """Serialize to a JSON string."""
 
         # Use self.dict_serializer to serialize the data to a dictionary
@@ -87,7 +83,7 @@ class JsonSerializer(Data):
         result = orjson.dumps(data_dict, option=option).decode("utf-8")
         return result
 
-    def deserialize(self, json_str: str, type_chain: Tuple[str, ...]) -> Any:
+    def deserialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
         """Deserialize a JSON string into an object if bidirectional flag is set, and to a dictionary if not."""
 
         # TODO: Validate type_chain
@@ -96,7 +92,7 @@ class JsonSerializer(Data):
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
 
         # Use orjson to parse the JSON string into a dictionary
-        json_dict = orjson.loads(json_str.encode("utf-8"))
+        json_dict = orjson.loads(data.encode("utf-8"))
 
         # Use self.dict_serializer to deserialize from the dictionary
         result = self._data_serializer.typed_deserialize(json_dict, type_chain)

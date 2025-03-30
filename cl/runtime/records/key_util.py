@@ -24,7 +24,7 @@ class KeyUtil:
     """Utilities for working with keys."""
 
     @classmethod
-    def format(cls, value: KeyProtocol) -> str:
+    def format(cls, value: KeyProtocol) -> str:  # TODO: Remove, use key_serializer instead
         """Convert to semicolon-delimited string without type (error message if value is None)."""
         if value is not None:
             return cls.serialize(value)
@@ -32,7 +32,7 @@ class KeyUtil:
             raise RuntimeError("Argument to KeyUtil.format method is None or an empty string.")
 
     @classmethod
-    def serialize(cls, value: KeyProtocol | None) -> str | None:
+    def serialize(cls, value: KeyProtocol | None) -> str | None:  # TODO: Remove, use key_serializer instead
         """Convert to semicolon-delimited string without type (return None if argument is None)."""
         return str(value)  # TODO: Add checks
 

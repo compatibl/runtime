@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Type
+from typing import Type, Any
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
@@ -35,17 +35,17 @@ class EnumSerializer(Data):
     enum_format: EnumFormatEnum = required()
     """Serialization format for enums that are not None."""
 
-    def serialize(self, value: Enum | None, enum_type: Type | None = None) -> TPrimitive | None:
+    def serialize(self, data: Any, enum_type: Type | None = None) -> Any:
         """Serialize an enum to a string or another primitive type (return None if value is None)."""
-        if value is None:
+        if data is None:
             if (value_format := self.none_format) == NoneFormatEnum.PASSTHROUGH:
-                return value
+                return data
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormatEnum)
-        elif isinstance(value, Enum):
+        elif isinstance(data, Enum):
             # Check that schema type matches if specified
-            if enum_type is not None and type(value) is not enum_type:
-                value_type_name = TypeUtil.name(type(value))
+            if enum_type is not None and type(data) is not enum_type:
+                value_type_name = TypeUtil.name(type(data))
                 schema_type_name = TypeUtil.name(enum_type)
                 raise RuntimeError(
                     f"Type {value_type_name} of enum value does not match the type in schema {schema_type_name}"
@@ -53,34 +53,34 @@ class EnumSerializer(Data):
             # Serialize according to settings
             if (value_format := self.enum_format) == EnumFormatEnum.PASSTHROUGH:
                 # Pass through the enum instance without changes
-                return value
+                return data
             elif value_format == EnumFormatEnum.DEFAULT:
                 # Serialize as name without type in PascalCase
-                return CaseUtil.upper_to_pascal_case(value.name) if value is not None else None
+                return CaseUtil.upper_to_pascal_case(data.name) if data is not None else None
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormatEnum)
         else:
-            value_type_name = TypeUtil.name(type(value))
+            value_type_name = TypeUtil.name(type(data))
             raise RuntimeError(f"Type {value_type_name} provided to {self.__class__.__name__} is not an enum type.")
 
-    def deserialize(self, value: TPrimitive | None, enum_type: Type) -> Enum | None:
+    def deserialize(self, data: Any, enum_type: Type) -> Any:
         """Deserialize a string or another primitive type to the specified enum type (return None if value is None)."""
-        if value is None:
+        if data is None:
             if (value_format := self.none_format) == NoneFormatEnum.PASSTHROUGH:
-                return value
+                return data
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormatEnum)
         elif issubclass(enum_type, Enum):
             if (value_format := self.enum_format) == EnumFormatEnum.PASSTHROUGH:
                 # Pass through the enum instance without changes
-                return value
+                return data
             elif value_format == EnumFormatEnum.DEFAULT:
                 try:
                     # Serialized value is name without type in PascalCase, convert to UPPER_CASE
-                    return enum_type[CaseUtil.pascal_to_upper_case(value)]
+                    return enum_type[CaseUtil.pascal_to_upper_case(data)]
                 except KeyError:
                     enum_type_name = TypeUtil.name(enum_type)
-                    raise RuntimeError(f"Enum type {enum_type_name} does not include the item {value}.")
+                    raise RuntimeError(f"Enum type {enum_type_name} does not include the item {data}.")
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormatEnum)
         else:
