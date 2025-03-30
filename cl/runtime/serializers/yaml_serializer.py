@@ -15,7 +15,7 @@
 import datetime as dt
 from dataclasses import dataclass
 from io import StringIO
-from typing import Any, Tuple
+from typing import Any, Tuple, Type
 from uuid import UUID
 from ruamel.yaml import YAML
 from ruamel.yaml import StringIO
@@ -168,7 +168,7 @@ class YamlSerializer(Data):
                 enum_serializer=EnumSerializers.DEFAULT,
             ).build()
 
-    def serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
         """
         Serialize a slots-based object to a YAML string without using the schema or retaining type information,
         not suitable for deserialization.
@@ -190,7 +190,7 @@ class YamlSerializer(Data):
             result = output.getvalue()
             return result
 
-    def deserialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
+    def deserialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
         """Read a YAML string and return the deserialized object if bidirectional flag is set, and dict otherwise."""
 
         if self.type_inclusion == TypeInclusionEnum.OMIT:

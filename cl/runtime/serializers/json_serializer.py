@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Type
 from typing import Tuple
 import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
@@ -66,7 +66,7 @@ class JsonSerializer(Data):
             enum_serializer=EnumSerializers.DEFAULT,
         ).build()
 
-    def serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
         """Serialize to a JSON string."""
 
         # Use self.dict_serializer to serialize the data to a dictionary
@@ -83,7 +83,7 @@ class JsonSerializer(Data):
         result = orjson.dumps(data_dict, option=option).decode("utf-8")
         return result
 
-    def deserialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
+    def deserialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
         """Deserialize a JSON string into an object if bidirectional flag is set, and to a dictionary if not."""
 
         # TODO: Validate type_chain

@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from typing import Any, Type
 from typing import Tuple
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
@@ -76,7 +76,7 @@ class DataSerializer(Data):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    def serialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
         """Serialize data to a dictionary."""
 
         if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
@@ -88,7 +88,7 @@ class DataSerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
 
-    def deserialize(self, data: Any, type_chain: Tuple[str, ...] | None = None) -> Any:
+    def deserialize(self, data: Any, type_chain: Tuple[str | Type, ...] | None = None) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
 
         # Get type and class of data and parse type chain
