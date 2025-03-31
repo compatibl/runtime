@@ -13,13 +13,12 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List
 from pydantic import BaseModel
-from cl.runtime import TypeImport
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
+from cl.runtime.routers.entity.panels_request import PanelsRequest
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
+from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -27,13 +26,13 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
-class ListPanelsResponseItem(BaseModel):
-    """Data type for a single item in the response list for the /entity/list_panels route."""
+class PanelsResponseItem(BaseModel):
+    """Data type for a single item in the response list for the /entity/panels route."""
 
     name: str | None
     """Name of the panel."""
 
-    type: str | None
+    kind: str | None
     """Type of the record, e.g. Primary."""
 
     class Config:
@@ -41,11 +40,11 @@ class ListPanelsResponseItem(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def get_response(cls, request: ListPanelsRequest) -> List[ListPanelsResponseItem]:
-        """Implements /entity/list_panels route."""
+    def get_response(cls, request: PanelsRequest) -> list[PanelsResponseItem]:
+        """Implements /entity/panels route."""
 
         # TODO: Return saved view names
-        request_type = TypeImport.class_from_type_name(request.type)
+        request_type = Schema.get_type_by_short_name(request.type_name)
 
         # Get actual type from record if request.key is not None
         if request.key is not None:
@@ -64,14 +63,14 @@ class ListPanelsResponseItem(BaseModel):
 
         if handlers is not None and handlers:
             return [
-                ListPanelsResponseItem(name=handler.label, type=cls.get_type(handler))
+                PanelsResponseItem(name=handler.label, kind=cls.get_panel_kind(handler))
                 for handler in handlers
                 if handler.type_ == "Viewer"
             ]
         return []
 
     @classmethod
-    def get_type(cls, handler: HandlerDeclareDecl) -> str | None:
+    def get_panel_kind(cls, handler: HandlerDeclareDecl) -> str | None:
         """Get type of the handler."""
 
         if handler.type_ == "Viewer" and handler.name == "view_self":

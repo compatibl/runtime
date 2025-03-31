@@ -26,9 +26,9 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 def get_requests(key_str: str):
     """Get requests for testing."""
     return [
-        {"type": "StubDataViewers", "panel_id": "View Instance 1A", "key": key_str},
-        {"type": "StubDataViewers", "panel_id": "View Instance 1B", "key": key_str},
-        {"type": "StubDataViewers", "panel_id": "View Instance 1C", "key": key_str},
+        {"type_name": "StubDataViewers", "panel_id": "View Instance 1A", "key": key_str},
+        {"type_name": "StubDataViewers", "panel_id": "View Instance 1B", "key": key_str},
+        {"type_name": "StubDataViewers", "panel_id": "View Instance 1C", "key": key_str},
     ]
 
 
@@ -49,7 +49,6 @@ def get_expected_results(key_str: str):
     ]
 
 
-@pytest.mark.skip("Temporarily skip due to SQLite concurrency issue.")  # TODO: Switch test to MongoMock
 def test_method():
     """Test coroutine for /entity/panel route."""
 
@@ -65,7 +64,6 @@ def test_method():
         assert result == expected_result
 
 
-@pytest.mark.skip("Temporarily skip due to SQLite concurrency issue.")  # TODO: Switch test to MongoMock
 def test_api():
     """Test REST API for /entity/panel route."""
 
@@ -75,20 +73,9 @@ def test_api():
 
     with QaClient() as test_client:
         for request, expected_result in zip(get_requests(key_str), get_expected_results(key_str)):
-            # Split request headers and query
-            request_headers = {"user": request.get("user")}
-            request_params = {
-                "type": request.get("type"),
-                "panel_id": request.get("panel_id"),
-                "key": request.get("key"),
-            }
-
-            # Eliminate empty keys
-            request_headers = {k: v for k, v in request_headers.items() if v is not None}
-            request_params = {k: v for k, v in request_params.items() if v is not None}
 
             # Get response
-            response = test_client.get("/entity/panel", headers=request_headers, params=request_params)
+            response = test_client.get("/entity/panel", params=request)
             assert response.status_code == 200
             result = response.json()
 

@@ -12,19 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
-from typing import Dict
-from pydantic import BaseModel
+from cl.runtime.routers.user_request import UserRequest
 
 
-class SaveRequest(BaseModel):
-    """Request data type for the /entity/save route."""
+class ContextRequest(UserRequest):
+    """Base request with context properties."""
 
-    record_dict: Dict[str, Any]
-    """Dict representation of the record to be saved/updated."""
+    env: str | None = None
+    """Name of the environment (database), e.g. 'Dev;Runtime;V2'"""
 
     dataset: str | None = None
-    """Dataset string."""
-
-    user: str | None = None
-    """Dataset string."""
+    """Dataset string"""

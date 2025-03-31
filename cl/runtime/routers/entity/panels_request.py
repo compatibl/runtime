@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.user_request import UserRequest
+from cl.runtime.routers.context_request import ContextRequest
 
 
-class ListPanelsRequest(UserRequest):
+class PanelsRequest(ContextRequest):
     """Request data type for the /entity/list_panels route."""
 
-    type: str
+    type_name: str
     """Class name."""
 
     key: str | None = None

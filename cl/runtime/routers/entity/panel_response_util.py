@@ -14,19 +14,17 @@
 
 import logging
 from typing import Any
-from typing import Dict
-from typing import List
-from cl.runtime import TypeImport
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
+from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-PanelResponseDataItem = Dict[str, Any]
-PanelResponse = Dict[str, PanelResponseDataItem | List[PanelResponseDataItem] | None]
+PanelResponseDataItem = dict[str, Any]
+PanelResponse = dict[str, PanelResponseDataItem | list[PanelResponseDataItem] | None]
 
 # Create serializers
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -41,7 +39,7 @@ class PanelResponseUtil:
         """Implements /entity/panel route."""
 
         # Get type of the record
-        type_ = TypeImport.class_from_type_name(request.type)
+        type_ = Schema.get_type_by_short_name(request.type)
 
         # Deserialize key from string to object
         type_hint = TypeHint.for_class(type_.get_key_type())

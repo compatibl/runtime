@@ -19,8 +19,8 @@ from typing import Type
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
-from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
-from cl.runtime.routers.entity.list_panels_response_item import ListPanelsResponseItem
+from cl.runtime.routers.entity.panels_request import PanelsRequest
+from cl.runtime.routers.entity.panels_response_item import PanelsResponseItem
 from stubs.cl.runtime import StubDataViewers
 
 
@@ -36,55 +36,54 @@ def _get_viewer_names_in_pascal_case(record_type: Type) -> List[str]:
 
 
 requests = [
-    {"type": "StubDataViewers"},
-    {"type": "StubDataViewers", "key": "L"},
-    {"type": "StubDataViewers", "key": "L", "dataset": "xyz"},
-    {"type": "StubDataViewers", "key": "L", "dataset": "xyz", "user": "TestUser"},
+    {"query_params": {"type_name": "StubDataViewers"}, "headers": {}},
+    {"query_params": {"type_name": "StubDataViewers", "key": "L"}, "headers": {}},
+    {"query_params": {"type_name": "StubDataViewers", "key": "L"}, "headers": {"Dataset": "xyz"}},
+    {"query_params": {"type_name": "StubDataViewers", "key": "L"}, "headers": {"Dataset": "xyz", "User": "TestUser"}},
 ]
 
 
 def test_method(pytest_default_db):
-    """Test coroutine for /entity/list_panels route."""
+    """Test coroutine for /entity/panels route."""
 
     for request in requests:
         # Run the coroutine wrapper added by the FastAPI decorator and get the result
-        request_obj = ListPanelsRequest(**request)
-        result = ListPanelsResponseItem.get_response(request_obj)
+        model_query_params = request["query_params"]
+        model_headers = {CaseUtil.pascal_to_snake_case(k): v for k, v in request["headers"].items()}
+        request_obj = PanelsRequest(**model_headers, **model_query_params)
+
+        result = PanelsResponseItem.get_response(request_obj)
 
         # Check if the result is a list
         assert isinstance(result, list)
 
-        # Check if each item in the result is a ListPanelsResponseItem instance
-        assert all(isinstance(x, ListPanelsResponseItem) for x in result)
+        # Check if each item in the result is a PanelsResponseItem instance
+        assert all(isinstance(x, PanelsResponseItem) for x in result)
 
-        # Check if each item in the result is a valid ListPanelsResponseItem instance
+        # Check if each item in the result is a valid PanelsResponseItem instance
         panel_names_set = set(x.name for x in result)
         expected_panel_names_set = set(_get_viewer_names_in_pascal_case(StubDataViewers))
         assert panel_names_set == expected_panel_names_set
 
 
 def test_api(pytest_default_db):
-    """Test REST API for /entity/list_panels route."""
+    """Test REST API for /entity/panels route."""
     with QaClient() as test_client:
         for request in requests:
             # Split request headers and query
-            request_headers = {"user": request.get("user")}
-            request_params = {
-                "type": request.get("type"),
-                "key": request.get("key"),
-                "dataset": request.get("dataset"),
-            }
+            request_headers = request["headers"]
+            request_query_params = request["query_params"]
 
             # Eliminate empty keys
             request_headers = {k: v for k, v in request_headers.items() if v is not None}
-            request_params = {k: v for k, v in request_params.items() if v is not None}
+            request_query_params = {k: v for k, v in request_query_params.items() if v is not None}
 
             # Get response
-            response = test_client.get("/entity/list_panels", headers=request_headers, params=request_params)
+            response = test_client.get("/entity/panels", headers=request_headers, params=request_query_params)
             assert response.status_code == 200
             result = response.json()
 
-            # Check if each item in the result is a valid ListPanelsResponseItem instance
+            # Check if each item in the result is a valid PanelsResponseItem instance
             panel_names_set = set(x["Name"] for x in result)
             expected_panel_names_set = set(_get_viewer_names_in_pascal_case(StubDataViewers))
             assert panel_names_set == expected_panel_names_set

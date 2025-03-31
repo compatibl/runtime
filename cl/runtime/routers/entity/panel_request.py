@@ -12,21 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.routers.context_request import ContextRequest
 
-from cl.runtime.routers.user_request import UserRequest
 
-
-class PanelRequest(UserRequest):
+class PanelRequest(ContextRequest):
     """Request data type for the /entity/panel route."""
 
-    type: str
+    type_name: str
     """Class name."""
-
-    key: str | None = None
-    """Primary key fields in semicolon-delimited format."""
 
     panel_id: str
     """View name."""
 
-    dataset: str | None = None
-    """Dataset string."""
+    key: str | None = None
+    """Primary key fields in semicolon-delimited format."""
