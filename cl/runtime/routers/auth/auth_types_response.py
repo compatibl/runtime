@@ -13,9 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List
 from pydantic import BaseModel
-from cl.runtime.routers.user_request import UserRequest
 
 
 class AuthTypesResponseItem(BaseModel):
@@ -27,11 +25,8 @@ class AuthTypesResponseItem(BaseModel):
     name: str
     """Name of the authentication type."""
 
-    type: str
-    """Type of the authentication."""
-
     @classmethod
-    def get_types(cls, request: UserRequest) -> List[AuthTypesResponseItem]:
+    def get_types(cls) -> list[AuthTypesResponseItem]:
         """Implements /auth/types route."""
 
         # Do not perform authentication in the open source version

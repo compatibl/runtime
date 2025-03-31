@@ -15,11 +15,13 @@
 import pytest
 from typing import Any
 from typing import Dict
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.auth.me_response import MeResponse
 from cl.runtime.routers.auth.me_response import UserRequest
 
-requests = [{}, {"user": "TestUser"}]
+request_headers = [{}, {"User": "TestUser"}]
 
 
 def get_expected_result(request_obj: UserRequest) -> Dict[str, Any]:
@@ -30,21 +32,22 @@ def get_expected_result(request_obj: UserRequest) -> Dict[str, Any]:
     user = request_obj.user if request_obj.user is not None else "root"
 
     return {
-        "id": user,
-        "username": user,
-        "first_name": user,
-        "last_name": None,
-        "email": None,
-        "scopes": ["Read", "Write", "Execute", "Developer"],
+        "Id": user,
+        "Username": user,
+        "FirstName": user,
+        "LastName": None,
+        "Email": None,
+        "Scopes": ["Read", "Write", "Execute", "Developer"],
     }
 
 
 def test_method():
     """Test coroutine for /auth/me route."""
 
-    for request in requests:
+    for headers in request_headers:
         # Run the coroutine wrapper added by the FastAPI decorator and get the result
-        request_obj = UserRequest(**request)
+        model_headers = {CaseUtil.pascal_to_snake_case(k): v for k, v in headers.items()}
+        request_obj = UserRequest(**model_headers)
         result = MeResponse.get_me(request_obj)
 
         # Check the result
@@ -55,13 +58,14 @@ def test_method():
 def test_api():
     """Test REST API for /auth/me route."""
     with QaClient() as test_client:
-        for request in requests:
-            response = test_client.get("/auth/me", headers=request)
+        for headers in request_headers:
+            response = test_client.get("/auth/me", headers=headers)
             assert response.status_code == 200
             result = response.json()
 
             # Check result
-            request_obj = UserRequest(**request)
+            model_headers = {CaseUtil.pascal_to_snake_case(k): v for k, v in headers.items()}
+            request_obj = UserRequest(**model_headers)
             expected_result = get_expected_result(request_obj)
             assert result == expected_result
 

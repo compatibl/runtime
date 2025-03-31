@@ -13,8 +13,9 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List
 from pydantic import BaseModel
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.user_request import UserRequest
 
 
@@ -36,8 +37,12 @@ class MeResponse(BaseModel):
     email: str | None
     """Email of the user."""
 
-    scopes: List[str] | None
+    scopes: list[str] | None
     """List of scopes for the user."""
+
+    class Config:
+        alias_generator = CaseUtil.snake_to_pascal_case
+        populate_by_name = True
 
     @classmethod
     def get_me(cls, request: UserRequest) -> MeResponse:
