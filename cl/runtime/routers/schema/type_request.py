@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.user_request import UserRequest
+from pydantic import BaseModel
 
 
-class TypeRequest(UserRequest):
-    """Request data type for the /schema/typeV2 route."""
+class TypeRequest(BaseModel):
+    """Request data class for the /schema/type route."""
 
-    name: str
-    """Class name."""
-
-    module: str | None = None
-    """Dot-delimited module string."""
+    type_name: str
+    """Type shortname."""

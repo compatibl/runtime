@@ -12,47 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict
-from typing import List
+from typing import Annotated
 from fastapi import APIRouter
-from fastapi import Header
 from fastapi import Query
-from starlette.requests import Request
-from cl.runtime.routers.schema.type_hierarchy_request import TypeHierarchyRequest
-from cl.runtime.routers.schema.type_hierarchy_response_item import TypeHierarchyResponseItem
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
+from cl.runtime.routers.schema.type_successors_response_item import TypeSuccessorsResponseItem
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
-from cl.runtime.routers.user_request import UserRequest
 
 router = APIRouter()
 
 
-@router.get("/types", response_model=List[TypesResponseItem])
-async def get_types(
-    user: str = Header(None, description="User identifier or identity token")
-) -> List[TypesResponseItem]:
+@router.get("/types", response_model=list[TypesResponseItem])
+async def get_types() -> list[TypesResponseItem]:
     """Information about the record types."""
-    return TypesResponseItem.get_types(UserRequest(user=user))
+    return TypesResponseItem.get_types()
 
 
-@router.get("/typeV2", response_model=Dict[str, Dict])
+@router.get("/type", response_model=dict[str, dict])
 async def get_type(
-    name: str = Query(..., description="Class name"),  # noqa Suppress report about shadowed built-in type
-    module: str = Query(None, description="Dot-delimited module string"),
-    user: str = Header(None, description="User identifier or identity token"),
-) -> Dict[str, Dict]:
+    type_name: Annotated[str, Query(description="Type shortname.")],
+) -> dict[str, dict]:
     """Schema for the specified type and its dependencies."""
-    return TypeResponseUtil.get_type(TypeRequest(name=name, module=module, user=user))
+    return TypeResponseUtil.get_type(TypeRequest(type_name=type_name))
 
 
-@router.get("/type-hierarchy", response_model=List[TypeHierarchyResponseItem])
-async def get_type_hierarchy(
-    request: Request,
-    name: str = Query(..., description="Class name"),  # noqa Suppress report about shadowed built-in type
-    return_ancestors: bool = Query(
-        False, description="If true, type ancestors will be returned with the specified type."
-    ),
-) -> List[TypeHierarchyResponseItem]:
-    """Return type class hierarchy."""
-    return TypeHierarchyResponseItem.get_types(TypeHierarchyRequest(name=name, return_ancestors=return_ancestors))
+@router.get("/type-successors", response_model=list[TypeSuccessorsResponseItem])
+async def get_type_successors(
+    type_name: Annotated[str, Query(description="Type shortname.")],
+) -> list[TypeSuccessorsResponseItem]:
+    """Return type class successors."""
+    return TypeSuccessorsResponseItem.get_type_successors(TypeRequest(type_name=type_name))

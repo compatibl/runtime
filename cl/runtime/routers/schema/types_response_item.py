@@ -13,14 +13,12 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List
 from inflection import titleize
 from pydantic import BaseModel
-from cl.runtime import TypeImport
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.routers.user_request import UserRequest
+from cl.runtime.schema.type_schema import TypeSchema
 
 
 class TypesResponseItem(BaseModel):
@@ -29,10 +27,7 @@ class TypesResponseItem(BaseModel):
     name: str
     """Class name (may be customized in settings)."""
 
-    module: str
-    """Module path in dot-delimited format (may be customized in settings)."""
-
-    label: str
+    label: str | None
     """Type label displayed in the UI is humanized class name (may be customized in settings)."""
 
     class Config:
@@ -40,20 +35,18 @@ class TypesResponseItem(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def get_types(cls, request: UserRequest) -> List[TypesResponseItem]:
+    def get_types(cls) -> list[TypesResponseItem]:
         """Implements /schema/types route."""
 
-        # TODO: Check why UserRequest is not used in this method
-
-        # Get cached classes (does not rebuild cache)
-        record_types = TypeImport.cached_classes(predicate=is_record)
+        # Get a dictionary of types indexed by short name
+        class_dict = TypeSchema.get_class_dict()
 
         result = [
             TypesResponseItem(
                 name=TypeUtil.name(record_type),
-                module=CaseUtil.snake_to_pascal_case(record_type.__module__),
                 label=titleize(TypeUtil.name(record_type)),
             )
-            for record_type in record_types
+            for record_type in class_dict.values()
+            if is_record(record_type)
         ]
         return result

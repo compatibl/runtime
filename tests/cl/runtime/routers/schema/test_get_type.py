@@ -18,37 +18,36 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 
-requests = [{"name": "UiAppState"}, {"name": "UiAppState", "user": "TestUser"}]
+requests = [{"type_name": "UiAppState"}]
 
 
 def test_method():
-    """Test coroutine for /schema/typeV2 route."""
+    """Test coroutine for /schema/type route."""
 
     for request in requests:
         # Run the coroutine wrapper added by the FastAPI decorator and validate the result
         request_obj = TypeRequest(**request)
         result_dict = TypeResponseUtil.get_type(request_obj)
         RegressionGuard().write(result_dict)
+
     RegressionGuard().verify_all()
 
 
 def test_api():
-    """Test REST API for /schema/typeV2 route."""
+    """Test REST API for /schema/type route."""
     with QaClient() as test_client:
         for request in requests:
-            # Split request headers and query
-            request_headers = {"user": request.get("user")}
-            request_params = {"name": request.get("name"), "module": request.get("module")}
 
             # Eliminate empty keys
             request_headers = {k: v for k, v in request_headers.items() if v is not None}
             request_params = {k: v for k, v in request_params.items() if v is not None}
 
             # Get response
-            response = test_client.get("/schema/typeV2", headers=request_headers, params=request_params)
+            response = test_client.get("/schema/type", params=request)
             assert response.status_code == 200
             result = response.json()
             RegressionGuard().write(result)
+
         RegressionGuard().verify_all()
 
 

@@ -17,29 +17,25 @@ from fastapi import FastAPI
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
-from cl.runtime.routers.user_request import UserRequest
 
-requests = [{}, {"user": "TestUser"}]
 
-expected_result = {"Name": "TypeDecl", "Module": "Cl.Runtime.Schema.TypeDecl", "Label": "Type Decl"}
+expected_result = {"Name": "TypeDecl", "Label": "Type Decl"}
 
 
 def test_method():
     """Test coroutine for /schema/types route."""
 
-    for request in requests:
-        # Run the coroutine wrapper added by the FastAPI decorator and get the result
-        request_obj = UserRequest(**request)
-        result = TypesResponseItem.get_types(request_obj)
+    # Run the coroutine wrapper added by the FastAPI decorator and get the result
+    result = TypesResponseItem.get_types()
 
-        # Check if the result is a list
-        assert isinstance(result, list)
+    # Check if the result is a list
+    assert isinstance(result, list)
 
-        # Check if each item in the result is a TypesResponseItem instance
-        assert all(isinstance(x, TypesResponseItem) for x in result)
+    # Check if each item in the result is a TypesResponseItem instance
+    assert all(isinstance(x, TypesResponseItem) for x in result)
 
-        type_decl_item = next(x for x in result if x.name == "TypeDecl")
-        assert type_decl_item == TypesResponseItem(**expected_result)
+    type_decl_item = next(x for x in result if x.name == "TypeDecl")
+    assert type_decl_item == TypesResponseItem(**expected_result)
 
 
 def test_api():
@@ -48,20 +44,19 @@ def test_api():
     test_app = FastAPI()
     test_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"])
     with QaClient() as test_client:
-        for request in requests:
-            response = test_client.get("/schema/types", headers=request)
-            assert response.status_code == 200
-            result = response.json()
+        response = test_client.get("/schema/types")
+        assert response.status_code == 200
+        result = response.json()
 
-            # Check that the result is a list
-            assert isinstance(result, list)
+        # Check that the result is a list
+        assert isinstance(result, list)
 
-            # Check if each item in the result has valid data to construct TypesResponseItem
-            for item in result:
-                TypesResponseItem(**item)
+        # Check if each item in the result has valid data to construct TypesResponseItem
+        for item in result:
+            TypesResponseItem(**item)
 
-            type_decl_item = next(x for x in result if x["Name"] == "TypeDecl")
-            assert type_decl_item == expected_result
+        type_decl_item = next(x for x in result if x["Name"] == "TypeDecl")
+        assert type_decl_item == expected_result
 
 
 if __name__ == "__main__":

@@ -14,21 +14,20 @@
 
 from __future__ import annotations
 import inspect
-from typing import List
 from inflection import titleize
 from pydantic import BaseModel
-from cl.runtime import TypeImport
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.routers.schema.type_hierarchy_request import TypeHierarchyRequest
+from cl.runtime.routers.schema.type_request import TypeRequest
+from cl.runtime.schema.schema import Schema
 
 
-class TypeHierarchyResponseItem(BaseModel):
-    """Single item of the list returned by the /schema/type-hierarchy route."""
+class TypeSuccessorsResponseItem(BaseModel):
+    """Single item of the list returned by the /schema/type-successors route."""
 
     name: str
     """Class name (may be customized in settings)."""
 
-    label: str
+    label: str | None
     """Type label displayed in the UI is humanized class name (may be customized in settings)."""
 
     class Config:
@@ -36,18 +35,18 @@ class TypeHierarchyResponseItem(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def get_types(cls, request: TypeHierarchyRequest) -> List[TypeHierarchyResponseItem]:
-        """Implements /schema/type-hierarchy route."""
+    def get_type_successors(cls, request: TypeRequest) -> list[TypeSuccessorsResponseItem]:
+        """Implements /schema/type-successors route."""
 
-        base_type_name = request.name
+        base_type_name = request.type_name
 
         # Getting type's successor names
-        base_type = TypeImport.class_from_type_name(base_type_name)
+        base_type = Schema.get_type_by_short_name(base_type_name)
         # TODO: Modify the method for removing types to also cover non-abstract Mixins
         successor_types = [t for t in base_type.__subclasses__() if not inspect.isabstract(t)]
         all_type_names = list(set([s_type.__name__ for s_type in successor_types]))
         if not inspect.isabstract(base_type):
             all_type_names.append(base_type_name)
 
-        result = [TypeHierarchyResponseItem(name=type_name, label=titleize(type_name)) for type_name in all_type_names]
+        result = [TypeSuccessorsResponseItem(name=type_name, label=titleize(type_name)) for type_name in all_type_names]
         return result
