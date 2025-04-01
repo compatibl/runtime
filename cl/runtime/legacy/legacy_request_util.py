@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.entity.save_request import SaveRequest
+from cl.runtime.routers.storage.save_request import SaveRequest
 
 
 class LegacyRequestUtil:
@@ -22,22 +22,30 @@ class LegacyRequestUtil:
     def format_save_request(cls, save_request: SaveRequest) -> SaveRequest:
         # TODO (Roman): Fix on UI
 
-        record_dict = {k: v for k, v in save_request.record_dict.items()}
+        new_records = []
+        for old_record in save_request.records:
+            new_record = {k: v for k, v in old_record.items()}
 
-        # Workaround for UiAppState request. Ui send OpenedTabs without _t
-        if record_dict.get("_t") == "UiAppState" and (opened_tabs := record_dict.get("OpenedTabs")) is not None:
-            # Add _t to each TabInfo in list
-            record_dict["OpenedTabs"] = [
-                {
-                    **{k: v for k, v in item.items() if k != "Type"},
-                    "Type": {**item["Type"], "_t": "BaseTypeInfo"},
-                    "_t": "TabInfo",
-                }
-                for item in opened_tabs
-            ]
+            # Workaround for UiAppState request. Ui send OpenedTabs without _t
+            if new_record.get("_t") == "UiAppState" and (opened_tabs := new_record.get("OpenedTabs")) is not None:
+                # Add _t to each TabInfo in list
+                new_record["OpenedTabs"] = [
+                    {
+                        **{k: v for k, v in item.items() if k != "Type"},
+                        "Type": {**item["Type"], "_t": "BaseTypeInfo"},
+                        "_t": "TabInfo",
+                    }
+                    for item in opened_tabs
+                ]
+                new_records.append(new_record)
+
+            else:
+                new_records.append(old_record)
+
 
         return SaveRequest(
-            record_dict=record_dict,
-            dataset=save_request.dataset,
             user=save_request.user,
+            env=save_request.env,
+            dataset=save_request.dataset,
+            records=new_records
         )

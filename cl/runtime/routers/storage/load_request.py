@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.user_request import UserRequest
+from cl.runtime.routers.context_request import ContextRequest
+from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 
 
-class ContextRequest(UserRequest):
-    """Base request with context properties."""
+class LoadRequest(ContextRequest):
+    """Request data type for the /storage/load route."""
 
-    env: str | None = None
-    """Name of the environment (database), e.g. 'Dev;Runtime;V2'."""
+    load_keys: list[KeyRequestItem] | None = None
+    """List of key objects to load."""
 
-    dataset: str | None = None
-    """Dataset string."""
+    ignore_not_found: bool = False
+    """If true, empty response will be returned without error if the record is not found."""

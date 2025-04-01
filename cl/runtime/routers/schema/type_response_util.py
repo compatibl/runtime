@@ -25,7 +25,7 @@ class TypeResponseUtil:
         """Implements /storage/get_datasets route."""
 
         # TODO: Check why empty module is passed, is module the short name prefix?
-        record_type = Schema.get_type_by_short_name(request.name)
+        record_type = Schema.get_type_by_short_name(request.type_name)
         handler_args_elements = dict()
         result = Schema.for_type(record_type)
 
@@ -34,7 +34,7 @@ class TypeResponseUtil:
         # - Top grid
         # - When a new record is created and the editor is opened
         # - When getting the schema for the picker, however this is excluded by endswith("Key")
-        if request.name is not None and not request.name.endswith("Key"):
+        if request.type_name is not None and not request.type_name.endswith("Key"):
             type_dict = list(result.values())[0] if len(result) > 0 else None
             if type_dict is not None:
                 elements = type_dict.get("Elements", None)

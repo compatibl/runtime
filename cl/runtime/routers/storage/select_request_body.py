@@ -12,14 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.user_request import UserRequest
+from pydantic import BaseModel
+
+from cl.runtime.primitive.case_util import CaseUtil
 
 
-class ContextRequest(UserRequest):
-    """Base request with context properties."""
+class SelectRequestBody(BaseModel):
+    """Class for /storage/select route body parameter."""
 
-    env: str | None = None
-    """Name of the environment (database), e.g. 'Dev;Runtime;V2'."""
+    class Config:
+        alias_generator = CaseUtil.snake_to_pascal_case
+        populate_by_name = True
 
-    dataset: str | None = None
-    """Dataset string."""
+    type: str
+    """Select type shortname."""
+
+    query_dict: dict | None = None
+    """Query dict."""

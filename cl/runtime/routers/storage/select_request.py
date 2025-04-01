@@ -12,27 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Dict
-from pydantic import BaseModel
+from cl.runtime.routers.context_request import ContextRequest
 
 
-class SelectRequest(BaseModel):
+class SelectRequest(ContextRequest):
     """Request data type for the /storage/select route."""
 
     type_: str
-    """The type of records."""
+    """Select type shortname."""
 
-    query_dict: Dict | None = None
+    query_dict: dict | None = None
     """Query dictionary."""
 
-    threshold: int | None = None
+    limit: int | None = None
     """Select a specified number of records from the beginning of the list."""
 
     skip: int = 0
     """Number of skipped records from the beginning of the list."""
 
-    module: str | None = None
-    """Dot-delimited module string."""
-
-    table_format: bool = False
+    table_format: bool = True
     """If true, response will be returned in the table format."""

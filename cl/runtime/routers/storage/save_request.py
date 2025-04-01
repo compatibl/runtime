@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.user_request import UserRequest
+from cl.runtime.routers.context_request import ContextRequest
 
 
-class ContextRequest(UserRequest):
-    """Base request with context properties."""
+class SaveRequest(ContextRequest):
+    """Request data type for the /storage/save route."""
 
-    env: str | None = None
-    """Name of the environment (database), e.g. 'Dev;Runtime;V2'."""
-
-    dataset: str | None = None
-    """Dataset string."""
+    records: list[dict] | None = None
+    """List of records to save."""

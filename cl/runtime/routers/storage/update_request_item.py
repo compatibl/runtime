@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.user_request import UserRequest
+from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 
 
-class ContextRequest(UserRequest):
-    """Base request with context properties."""
+class UpdateRequestItem(KeyRequestItem):
+    """Class for single update request item."""
 
-    env: str | None = None
-    """Name of the environment (database), e.g. 'Dev;Runtime;V2'."""
+    class Config:
+        alias_generator = CaseUtil.snake_to_pascal_case
+        populate_by_name = True
 
-    dataset: str | None = None
-    """Dataset string."""
+    record: dict
+    """Record dict to update."""

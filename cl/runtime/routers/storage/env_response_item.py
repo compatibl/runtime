@@ -16,20 +16,26 @@ from __future__ import annotations
 from typing import List
 from pydantic import BaseModel
 from pydantic import Field
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.user_request import UserRequest
 
 
 class EnvResponseItem(BaseModel):
-    """Response data type for the /storage/get_envs route."""
+    """Response data type for the /storage/envs route."""
 
-    name: str = Field(..., alias="Name")
+    name: str
     """Name of the environment."""
 
-    parent: str = Field(..., alias="Parent")
+    parent: str | None = None
     """Name of the parent environment."""
 
+    class Config:
+        alias_generator = CaseUtil.snake_to_pascal_case
+        populate_by_name = True
+
     @classmethod
-    def get_envs(cls, request: UserRequest) -> List[EnvResponseItem]:
+    def get_envs(cls) -> list[EnvResponseItem]:
         """Implements /storage/get_envs route."""
 
         # Default response when running locally without authorization
