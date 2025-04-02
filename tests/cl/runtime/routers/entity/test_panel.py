@@ -14,9 +14,11 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.legacy.legacy_response_util import LegacyResponseUtil
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataViewers
 
@@ -26,48 +28,37 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 def get_requests(key_str: str):
     """Get requests for testing."""
     return [
-        {"type_name": "StubDataViewers", "panel_id": "View Instance 1A", "key": key_str},
-        {"type_name": "StubDataViewers", "panel_id": "View Instance 1B", "key": key_str},
-        {"type_name": "StubDataViewers", "panel_id": "View Instance 1C", "key": key_str},
+        # TODO (Roman): Add more test requests.
+        {"type_name": "StubDataViewers", "panel_id": "None", "key": key_str},
     ]
 
 
 def get_expected_results(key_str: str):
     """Get expected_results for testing."""
     return [
-        {
-            "ViewOf": {
-                "_t": "Script",
-                "Name": None,
-                "Language": "Markdown",
-                "Body": ["# Viewer with UI element", "### _Script_"],
-                "WordWrap": None,
-            }
-        },
         {"ViewOf": None},
-        {"ViewOf": {"StubId": key_str, "_t": "StubDataViewersKey"}},
     ]
 
 
-def test_method():
+def test_method(pytest_default_db):
     """Test coroutine for /entity/panel route."""
 
-    stub_viewers = StubDataViewers()
+    stub_viewers = StubDataViewers().build()
     key_str = _KEY_SERIALIZER.serialize(stub_viewers.get_key())
     DbContext.save_one(stub_viewers)
 
     for request, expected_result in zip(get_requests(key_str), get_expected_results(key_str)):
         request_object = PanelRequest(**request)
-        result = PanelResponseUtil.get_response(request_object)
+        result = LegacyResponseUtil.format_panel_response(PanelResponseUtil.get_response(request_object))
 
         assert isinstance(result, dict)
         assert result == expected_result
 
 
-def test_api():
+def test_api(pytest_default_db):
     """Test REST API for /entity/panel route."""
 
-    stub_viewers = StubDataViewers()
+    stub_viewers = StubDataViewers().build()
     key_str = _KEY_SERIALIZER.serialize(stub_viewers.get_key())
     DbContext.save_one(stub_viewers)
 

@@ -39,7 +39,7 @@ class PanelResponseUtil:
         """Implements /entity/panel route."""
 
         # Get type of the record
-        type_ = Schema.get_type_by_short_name(request.type)
+        type_ = Schema.get_type_by_short_name(request.type_name)
 
         # Deserialize key from string to object
         type_hint = TypeHint.for_class(type_.get_key_type())
@@ -52,7 +52,7 @@ class PanelResponseUtil:
         record = db.load_one(type_, key_obj, dataset=request.dataset)
         if record is None:
             raise RuntimeError(
-                f"Record with type {request.type} and key {request.key} is not found in dataset {request.dataset}."
+                f"Record with type {request.type_name} and key {request.key} is not found in dataset {request.dataset}."
             )
 
         # Check if the selected type has the needed viewer and get its name (only viewer's label is provided)
