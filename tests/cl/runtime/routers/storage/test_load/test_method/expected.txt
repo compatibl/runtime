@@ -1,4 +1,4 @@
-schema:
+Schema:
   stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord:
     _t: StubDataclassRecord
     Module:
@@ -69,7 +69,7 @@ schema:
         Type: String
       Name: Id
       Comment: Unique identifier.
-data:
-  _t: StubDataclassRecord
-  Id: test_get_record
+Data:
+- _t: StubDataclassRecord
+  Id: test_load
 

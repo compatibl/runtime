@@ -17,7 +17,7 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.dataset_response import DatasetResponseItem
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
 
-requests = [{"type": "StubClass"}, {"type": "StubClass", "user": "TestUser"}]
+requests = [{"type_name": "StubClass"}]
 
 expected_result = [
     {
@@ -28,41 +28,33 @@ expected_result = [
 
 
 def test_method():
-    """Test coroutine for /storage/get_envs route."""
+    """Test coroutine for /storage/datasets route."""
 
     for request in requests:
-        # Run the coroutine wrapper added by the FastAPI decorator and get the result
+        # Run the coroutine wrapper added by the FastAPI decorator and get the result.
         request_obj = DatasetsRequest(**request)
         result = DatasetResponseItem.get_datasets(request_obj)
 
-        # Check if the result is a list
+        # Check if the result is a list.
         assert isinstance(result, list)
 
-        # Check if each item in the result is a DatasetResponseItem instance
+        # Check if each item in the result is a DatasetResponseItem instance.
         assert all(isinstance(x, DatasetResponseItem) for x in result)
 
-        # Check if each item in the result is a valid DatasetResponseItem instance
+        # Check if each item in the result is a valid DatasetResponseItem instance.
         assert result == [DatasetResponseItem(**x) for x in expected_result]
 
 
 def test_api():
-    """Test REST API for /storage/get_envs route."""
+    """Test REST API for /storage/datasets route."""
     with QaClient() as test_client:
         for request in requests:
-            # Split request headers and query
-            request_headers = {"user": request.get("user")}
-            request_params = {"type": request.get("type"), "module": request.get("module")}
-
-            # Eliminate empty keys
-            request_headers = {k: v for k, v in request_headers.items() if v is not None}
-            request_params = {k: v for k, v in request_params.items() if v is not None}
-
-            # Get response
-            response = test_client.get("/storage/get_datasets", headers=request_headers, params=request_params)
+            # Get response.
+            response = test_client.get("/storage/datasets", params=request)
             assert response.status_code == 200
             result = response.json()
 
-            # Check result
+            # Check result.
             assert result == expected_result
 
 

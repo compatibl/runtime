@@ -17,58 +17,53 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.routers.storage.record_request import RecordRequest
-from cl.runtime.routers.storage.record_response import RecordResponse
+from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.routers.storage.key_request_item import KeyRequestItem
+from cl.runtime.routers.storage.load_request import LoadRequest
+from cl.runtime.routers.storage.load_response import LoadResponse
 from stubs.cl.runtime import StubDataclassRecord
 
 
 def test_method(pytest_default_db):
-    """Test coroutine for /storage/record route."""
+    """Test coroutine for /storage/load route."""
 
-    # Save test record
+    # Save test record.
     record = StubDataclassRecord(id=__name__).build()
     DbContext.save_one(record)
 
-    # Run the coroutine wrapper added by the FastAPI decorator and get the result
-    request_obj = RecordRequest(type="StubDataclassRecord", key=record.id)
-    result = RecordResponse.get_record(request_obj)
+    # Run the coroutine wrapper added by the FastAPI decorator and get the result.
+    load_request = LoadRequest(load_keys=[KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclassRecord))])
+    result = LoadResponse.get_response(load_request)
 
-    # Check if the result is a RecordResponse instance
-    assert isinstance(result, RecordResponse)
+    # Check if the result is a LoadResponse instance.
+    assert isinstance(result, LoadResponse)
 
-    # Check if there are only "schema" and "data"
+    # Check if there are only "schema" and "data".
     assert [x.strip("_") for x in dict(result).keys()] == ["schema", "data"]
 
-    # Check result
+    # Check result.
     guard = RegressionGuard()
-    guard.write(result)
+    guard.write(result.model_dump(by_alias=True))
     guard.verify()
 
 
 def test_api(pytest_default_db):
-    """Test REST API for /storage/record route."""
+    """Test REST API for /storage/load route."""
+
     with QaClient() as test_client:
-        # Save test record
+        # Save test record.
         record = StubDataclassRecord(id=__name__).build()
         DbContext.save_one(record)
 
-        # Request parameters
-        request_obj = RecordRequest(type="StubDataclassRecord", key=record.id)
+        # Request body.
+        request_body = [KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclassRecord)).model_dump()]
 
-        # Split request headers and query
-        request_headers = {"user": request_obj.user}
-        request_params = {"type": request_obj.type, "key": request_obj.key, "dataset": request_obj.dataset}
-
-        # Eliminate empty keys
-        request_headers = {k: v for k, v in request_headers.items() if v is not None}
-        request_params = {k: v for k, v in request_params.items() if v is not None}
-
-        # Get response
-        response = test_client.get("/storage/record", headers=request_headers, params=request_params)
+        # Get response.
+        response = test_client.post("/storage/load", json=request_body)
         assert response.status_code == 200
         result = response.json()
 
-        # Check result
+        # Check result.
         guard = RegressionGuard()
         guard.write(result)
         guard.verify()

@@ -34,6 +34,7 @@ from cl.runtime.routers.storage.save_response_util import SaveResponseUtil
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.routers.storage.select_request_body import SelectRequestBody
 from cl.runtime.routers.storage.select_response import SelectResponse
+from cl.runtime.routers.storage.update_request_item import UpdateRequestItem
 
 router = APIRouter()
 
@@ -47,8 +48,8 @@ async def get_envs() -> list[EnvResponseItem]:
 
 @router.get("/datasets", response_model=list[DatasetResponseItem])
 async def get_datasets(
-    environment: Annotated[str, Header(None, description="Name of the environment (database).")],
-    type_name: Annotated[str, Query(description="Type shortname.")]
+    type_name: Annotated[str, Query(description="Type shortname.")],
+    environment: Annotated[str, Header(description="Name of the environment (database).")] = None,
 ) -> list[DatasetResponseItem]:
     """Information about the environments."""
 
@@ -99,7 +100,7 @@ async def post_select(
 
 
 @router.post("/delete", response_model=list[KeyRequestItem])
-async def delete(
+async def post_delete(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     delete_keys: Annotated[list[KeyRequestItem] | None, Body(description="List of key objects to delete.")] = None
 ) -> list[KeyRequestItem]:
@@ -116,11 +117,11 @@ async def delete(
 
 
 @router.post("/save", response_model=list[KeyRequestItem])
-async def save(
+async def post_save(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     records: Annotated[list[dict] | None, Body(description="List of records to save.")] = None,
 ) -> list[KeyRequestItem]:
-    """Save provided records without checking for existence."""
+    """Bulk save records to DB. Don't check if the record already exists."""
 
     save_request = SaveRequest(
         user=context_headers.user,
@@ -133,13 +134,28 @@ async def save(
     return SaveResponseUtil.save_records(save_request)
 
 
-@router.post("/update")
-async def update():
+@router.post("/update", response_model=list[KeyRequestItem])
+async def post_update(
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa unused
+    update_items: Annotated[list[UpdateRequestItem] | None, Body(description="List of update items.")] = None  # noqa unused
+) -> list[KeyRequestItem]:
+    """
+    Bulk update records in DB. Single update item represents key and new record for this key.
+
+    If updated record has the same key - update this record.
+    Else - try to save new record without deleting old one, fails if updated record already exists.
+    """
+    # TODO (Roman): Implement /update route.
     raise NotImplementedError("/storage/update route is not implemented.")
 
 
-@router.post("/insert")
-async def insert():
+@router.post("/insert", response_model=list[KeyRequestItem])
+async def post_insert(
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa unused
+    records: Annotated[list[dict] | None, Body(description="List of records to insert.")] = None,  # noqa unused
+) -> list[KeyRequestItem]:
+    """Bulk insert records to DB. The same as /storage/save route but fails if the record already exists."""
+    # TODO (Roman): Implement /insert route.
     raise NotImplementedError("/storage/insert route is not implemented.")
 
 

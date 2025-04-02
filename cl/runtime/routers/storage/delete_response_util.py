@@ -15,6 +15,7 @@
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
+from cl.runtime.schema.schema import Schema
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -41,9 +42,7 @@ class DeleteResponseUtil:
         key_type = Schema.get_type_by_short_name(request.delete_keys[0].type).get_key_type()  # noqa
 
         # Deserialize keys in request.
-        deserialized_keys = tuple(
-            _KEY_SERIALIZER.deserialize(key, key_type).build() for key, _ in request.load_keys or tuple()
-        )
+        deserialized_keys = tuple(_KEY_SERIALIZER.deserialize(key_item.key, key_type).build() for key_item in request.delete_keys or tuple())
 
         # Delete records.
         DbContext.delete_many(deserialized_keys)
