@@ -38,10 +38,6 @@ def test_api():
     with QaClient() as test_client:
         for request in requests:
 
-            # Eliminate empty keys
-            request_headers = {k: v for k, v in request_headers.items() if v is not None}
-            request_params = {k: v for k, v in request_params.items() if v is not None}
-
             # Get response
             response = test_client.get("/schema/type", params=request)
             assert response.status_code == 200
