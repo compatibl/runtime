@@ -14,7 +14,7 @@
 
 from typing import Type
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
@@ -24,7 +24,7 @@ from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 class RecordsWithSchemaResponse(BaseModel):
     """Class for records with schema response."""
 
-    schema: dict
+    schema_: dict = Field(alias="Schema")
     """Schema dict."""
 
     data: list[dict]

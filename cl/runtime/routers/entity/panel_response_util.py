@@ -15,16 +15,14 @@
 import logging
 from typing import Any
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-PanelResponseDataItem = dict[str, Any]
-PanelResponse = dict[str, PanelResponseDataItem | list[PanelResponseDataItem] | None]
 
 # Create serializers
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -35,29 +33,28 @@ class PanelResponseUtil:
     """Response util for the /entity/panel route."""
 
     @classmethod
-    def _get_content(cls, request: PanelRequest) -> PanelResponse:
+    def _get_content(cls, request: PanelRequest) -> dict[str, Any]:
         """Implements /entity/panel route."""
 
-        # Get type of the record
+        # Get type of the record.
         type_ = Schema.get_type_by_short_name(request.type_name)
 
-        # Deserialize key from string to object
-        type_hint = TypeHint.for_class(type_.get_key_type())
-        key_obj = _KEY_SERIALIZER.deserialize(request.key, type_hint)
+        # Deserialize key from string to object.
+        key_obj = _KEY_SERIALIZER.deserialize(request.key, type_)
 
-        # Get database from the current context
+        # Get database from the current context.
         db = DbContext.get_db()
 
-        # Load record from the database
+        # Load record from the database.
         record = db.load_one(type_, key_obj, dataset=request.dataset)
         if record is None:
             raise RuntimeError(
                 f"Record with type {request.type_name} and key {request.key} is not found in dataset {request.dataset}."
             )
 
-        # Check if the selected type has the needed viewer and get its name (only viewer's label is provided)
+        # Check if the selected type has the needed viewer and get its name (only viewer's label is provided).
 
-        # Get handlers from TypeDecl
+        # Get handlers from TypeDecl.
         handlers = declare.handlers if (declare := TypeDecl.for_type(type(record)).declare) is not None else None
 
         if not handlers or not (
@@ -65,14 +62,17 @@ class PanelResponseUtil:
         ):
             raise RuntimeError(f"Type {TypeUtil.name(record)} has no view named '{request.panel_id}'.")
 
-        # Call the viewer and get the result
+        # Call the viewer and get the result.
         viewer = getattr(record, viewer_name)
         view = viewer()
+
+        # Load record if view result is a key.
+        view = cls._load_keys(view)
 
         return _UI_SERIALIZER.serialize(view)
 
     @classmethod
-    def get_response(cls, request: PanelRequest) -> PanelResponse:
+    def get_response(cls, request: PanelRequest) -> dict[str, Any]:
 
         try:
             return cls._get_content(request)
@@ -89,3 +89,16 @@ class PanelResponseUtil:
                 "Body": ["## The following error occurred during the rendering of this view:\n", f"{str(e)}"],
                 "WordWrap": True,
             }
+
+    @classmethod
+    def _load_keys(cls, viewer_result):
+        """Check if viewer result is key or list of keys and load records for them."""
+
+        if is_key(viewer_result):
+            # Load one if it is single key.
+            return DbContext.load_one(viewer_result.get_key_type(), viewer_result)
+        elif isinstance(viewer_result, (list, tuple)) and len(viewer_result) > 0 and is_key(first_elem := viewer_result[0]):
+            # Load many if it is list or tuple of keys.
+            return tuple(x for x in DbContext.load_many(first_elem.get_key_type(), viewer_result) if x is not None)
+        else:
+            return viewer_result

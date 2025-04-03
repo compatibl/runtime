@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.qa.qa_client import QaClient
-from cl.runtime.routers.storage.dataset_response import DatasetResponseItem
+from cl.runtime.routers.storage.datasets_response_item import DatasetsResponseItem
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
 
 requests = [{"type_name": "StubClass"}]
@@ -33,16 +33,16 @@ def test_method():
     for request in requests:
         # Run the coroutine wrapper added by the FastAPI decorator and get the result.
         request_obj = DatasetsRequest(**request)
-        result = DatasetResponseItem.get_datasets(request_obj)
+        result = DatasetsResponseItem.get_datasets(request_obj)
 
         # Check if the result is a list.
         assert isinstance(result, list)
 
-        # Check if each item in the result is a DatasetResponseItem instance.
-        assert all(isinstance(x, DatasetResponseItem) for x in result)
+        # Check if each item in the result is a DatasetsResponseItem instance.
+        assert all(isinstance(x, DatasetsResponseItem) for x in result)
 
-        # Check if each item in the result is a valid DatasetResponseItem instance.
-        assert result == [DatasetResponseItem(**x) for x in expected_result]
+        # Check if each item in the result is a valid DatasetsResponseItem instance.
+        assert result == [DatasetsResponseItem(**x) for x in expected_result]
 
 
 def test_api():

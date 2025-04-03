@@ -20,7 +20,7 @@ from fastapi import Header
 from fastapi import Query
 from cl.runtime.legacy.legacy_request_util import LegacyRequestUtil
 from cl.runtime.routers.dependencies.context_headers import ContextHeaders, get_context_headers
-from cl.runtime.routers.storage.dataset_response import DatasetResponseItem
+from cl.runtime.routers.storage.datasets_response_item import DatasetsResponseItem
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.delete_response_util import DeleteResponseUtil
@@ -46,14 +46,13 @@ async def get_envs() -> list[EnvResponseItem]:
     return EnvResponseItem.get_envs()
 
 
-@router.get("/datasets", response_model=list[DatasetResponseItem])
+@router.get("/datasets", response_model=list[DatasetsResponseItem])
 async def get_datasets(
     type_name: Annotated[str, Query(description="Type shortname.")],
     environment: Annotated[str, Header(description="Name of the environment (database).")] = None,
-) -> list[DatasetResponseItem]:
+) -> list[DatasetsResponseItem]:
     """Information about the environments."""
-
-    return DatasetResponseItem.get_datasets(DatasetsRequest(env=environment, type_name=type_name))
+    return DatasetsResponseItem.get_datasets(DatasetsRequest(env=environment, type_name=type_name))
 
 
 @router.post("/load", response_model=LoadResponse)
@@ -84,6 +83,9 @@ async def post_select(
     table_format: Annotated[bool, Query(description="If true, response will be returned in the table format.")] = True,
 ) -> SelectResponse:
     """Select records by query."""
+
+    # TODO (Roman): Support select with 'limit'.
+    limit = None
 
     return SelectResponse.get_response(
         SelectRequest(

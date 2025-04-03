@@ -35,7 +35,7 @@ class LoadResponse(RecordsWithSchemaResponse):
 
         # Handle empty request.
         if not request.load_keys:
-            return LoadResponse(schema=cls._get_schema_dict(None), data=[])
+            return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa
 
         # TODO (Roman): Consider allowing different key types in a single load request.
         #  If different key types are prohibited then the load request model should be simplified.
@@ -63,14 +63,18 @@ class LoadResponse(RecordsWithSchemaResponse):
 
                 loaded_records.append(record)
         else:
-            # Load record using current context.
-            loaded_records = tuple(DbContext.load_many(key_type, deserialized_keys))
+            # Load record using current context, filter None values.
+            loaded_records = tuple(x for x in DbContext.load_many(key_type, deserialized_keys) if x is not None)
 
         # TODO (Roman): Improve check for not found.
-        if request.ignore_not_found and len(loaded_records) != len(request.load_keys):
+        if not request.ignore_not_found and len(loaded_records) != len(request.load_keys):
             raise RuntimeError(
                 f"Not all records were found. Requested {len(request.load_keys)} keys, found {len(loaded_records)} records."
             )
+
+        # Return empty response if records not found.
+        if not loaded_records:
+            return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa
 
         # TODO (Roman): Merge schema for all types.
         # Check if all loaded records are of the same type.
@@ -85,7 +89,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         # Serialize records.
         serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
-        return LoadResponse(schema=schema_dict, data=serialized_records)
+        return LoadResponse(schema_=schema_dict, data=serialized_records)  # noqa
 
 
     @classmethod

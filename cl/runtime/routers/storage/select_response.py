@@ -58,7 +58,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         # Get schema dict for type.
         schema_dict = cls._get_schema_dict(select_type)
 
-        return SelectResponse(schema=schema_dict, data=serialized_records)
+        return SelectResponse(schema_=schema_dict, data=serialized_records)  # noqa
 
     @classmethod
     def _serialize_record_for_table(cls, record: RecordProtocol) -> dict[str, Any]:

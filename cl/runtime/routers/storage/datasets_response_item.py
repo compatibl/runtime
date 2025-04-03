@@ -18,7 +18,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
 
 
-class DatasetResponseItem(BaseModel):
+class DatasetsResponseItem(BaseModel):
     """Response data type for the /storage/datasets route."""
 
     name: str | None
@@ -32,7 +32,7 @@ class DatasetResponseItem(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def get_datasets(cls, request: DatasetsRequest) -> list[DatasetResponseItem]:
+    def get_datasets(cls, request: DatasetsRequest) -> list[DatasetsResponseItem]:
         """Implements /storage/datasets route."""
 
         # Default response when running locally without authorization
@@ -40,4 +40,4 @@ class DatasetResponseItem(BaseModel):
             "name": None,
         }
 
-        return [DatasetResponseItem(**result_dict)]
+        return [DatasetsResponseItem(**result_dict)]

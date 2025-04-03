@@ -22,19 +22,19 @@ from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.views.stub_viewers import StubViewers
 
-nested_fields_key = StubDataclassRecordKey(id="nested_1")
+nested_fields_key = StubDataclassRecordKey(id="nested_1").build()
 """Key returned by the viewer."""
 
-nested_fields_record = StubDataclassNestedFields()
+nested_fields_record = StubDataclassNestedFields().build()
 """Record returned by the viewer."""
 
-list_fields_record = StubDataclassListFields()
+list_fields_record = StubDataclassListFields().build()
 """Record returned by the viewer."""
 
-composite_key = StubDataclassCompositeKey()
+composite_key = StubDataclassCompositeKey().build()
 """Record returned by the viewer."""
 
-composite_record = StubDataclassComposite()
+composite_record = StubDataclassComposite().build()
 """Record returned by the viewer."""
 
 

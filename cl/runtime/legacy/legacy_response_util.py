@@ -15,7 +15,6 @@
 from typing import Any
 from typing import Dict
 from cl.runtime.records.protocols import is_primitive
-from cl.runtime.routers.entity.panel_response_util import PanelResponse
 
 
 class LegacyResponseUtil:
@@ -63,7 +62,7 @@ class LegacyResponseUtil:
             return data
 
     @classmethod
-    def format_panel_response(cls, panel_response: PanelResponse) -> PanelResponse:
+    def format_panel_response(cls, panel_response: dict[str, Any]) -> dict[str, Any]:
         """Format /get_panel response to legacy format."""
 
         return {"ViewOf": cls._format_data(panel_response)}
