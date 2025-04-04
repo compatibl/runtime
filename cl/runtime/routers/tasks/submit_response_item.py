@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.primitive.case_util import CaseUtil
@@ -95,4 +94,3 @@ class SubmitResponseItem(BaseModel):
                 response_items.append(SubmitResponseItem(key=serialized_key, task_run_id=handler_task.task_id))
 
         return response_items
-

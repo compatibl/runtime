@@ -23,7 +23,6 @@ from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-
 # Create serializers
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 _UI_SERIALIZER = DataSerializers.FOR_UI
@@ -97,7 +96,11 @@ class PanelResponseUtil:
         if is_key(viewer_result):
             # Load one if it is single key.
             return DbContext.load_one(viewer_result.get_key_type(), viewer_result)
-        elif isinstance(viewer_result, (list, tuple)) and len(viewer_result) > 0 and is_key(first_elem := viewer_result[0]):
+        elif (
+            isinstance(viewer_result, (list, tuple))
+            and len(viewer_result) > 0
+            and is_key(first_elem := viewer_result[0])
+        ):
             # Load many if it is list or tuple of keys.
             return tuple(x for x in DbContext.load_many(first_elem.get_key_type(), viewer_result) if x is not None)
         else:

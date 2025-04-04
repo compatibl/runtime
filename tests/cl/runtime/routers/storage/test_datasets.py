@@ -14,8 +14,8 @@
 
 import pytest
 from cl.runtime.qa.qa_client import QaClient
-from cl.runtime.routers.storage.datasets_response_item import DatasetsResponseItem
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
+from cl.runtime.routers.storage.datasets_response_item import DatasetsResponseItem
 
 requests = [{"type_name": "StubClass"}]
 

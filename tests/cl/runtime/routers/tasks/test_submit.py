@@ -54,6 +54,7 @@ def get_save_to_db_requests(key_str: str):
         }
     ]
 
+
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
 def test_method(pytest_default_db, pytest_celery_queue):
     """Test coroutine for /tasks/run route."""
@@ -82,9 +83,13 @@ def test_method(pytest_default_db, pytest_celery_queue):
 
         request_object = SubmitRequest(**request)
         response_items = SubmitResponseItem.get_response(request_object)
-        [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build()) for response_item in response_items]
+        [
+            Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build())
+            for response_item in response_items
+        ]
         actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
         assert actual_records == expected_records
+
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
 def test_api(pytest_celery_queue):

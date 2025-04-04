@@ -13,12 +13,8 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import List
 from pydantic import BaseModel
-from pydantic import Field
-
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.routers.user_request import UserRequest
 
 
 class EnvResponseItem(BaseModel):

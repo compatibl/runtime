@@ -19,17 +19,17 @@ from fastapi import Depends
 from fastapi import Header
 from fastapi import Query
 from cl.runtime.legacy.legacy_request_util import LegacyRequestUtil
-from cl.runtime.routers.dependencies.context_headers import ContextHeaders, get_context_headers
-from cl.runtime.routers.storage.datasets_response_item import DatasetsResponseItem
+from cl.runtime.routers.dependencies.context_headers import ContextHeaders
+from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
+from cl.runtime.routers.storage.datasets_response_item import DatasetsResponseItem
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.delete_response_util import DeleteResponseUtil
 from cl.runtime.routers.storage.env_response_item import EnvResponseItem
-from cl.runtime.routers.storage.save_request import SaveRequest
-
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.load_response import LoadResponse
+from cl.runtime.routers.storage.save_request import SaveRequest
 from cl.runtime.routers.storage.save_response_util import SaveResponseUtil
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.routers.storage.select_request_body import SelectRequestBody
@@ -59,7 +59,9 @@ async def get_datasets(
 async def post_load(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     load_keys: Annotated[list[KeyRequestItem] | None, Body(description="List of key objects to load.")] = None,
-    ignore_not_found: Annotated[bool, Query(description="If true, empty response will be returned without error if the record is not found.")] = False,
+    ignore_not_found: Annotated[
+        bool, Query(description="If true, empty response will be returned without error if the record is not found.")
+    ] = False,
 ) -> LoadResponse:
     """Bulk load records by list of keys."""
 
@@ -78,7 +80,9 @@ async def post_load(
 async def post_select(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     select_body: Annotated[SelectRequestBody, Body(description="Select request body.")],
-    limit: Annotated[int | None, Query(description="Select a specified number of records from the beginning of the list.")] = None,
+    limit: Annotated[
+        int | None, Query(description="Select a specified number of records from the beginning of the list.")
+    ] = None,
     skip: Annotated[int, Query(description="Number of skipped records from the beginning of the list.")] = 0,
     table_format: Annotated[bool, Query(description="If true, response will be returned in the table format.")] = True,
 ) -> SelectResponse:
@@ -96,7 +100,7 @@ async def post_select(
             query_dict=select_body.query_dict,
             limit=limit,
             skip=skip,
-            table_format=table_format
+            table_format=table_format,
         )
     )
 
@@ -104,16 +108,13 @@ async def post_select(
 @router.post("/delete", response_model=list[KeyRequestItem])
 async def post_delete(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
-    delete_keys: Annotated[list[KeyRequestItem] | None, Body(description="List of key objects to delete.")] = None
+    delete_keys: Annotated[list[KeyRequestItem] | None, Body(description="List of key objects to delete.")] = None,
 ) -> list[KeyRequestItem]:
     """Bulk delete records by list of keys."""
 
     return DeleteResponseUtil.delete_records(
         DeleteRequest(
-            user=context_headers.user,
-            env=context_headers.env,
-            dataset=context_headers.dataset,
-            delete_keys=delete_keys
+            user=context_headers.user, env=context_headers.env, dataset=context_headers.dataset, delete_keys=delete_keys
         )
     )
 
@@ -126,10 +127,7 @@ async def post_save(
     """Bulk save records to DB. Don't check if the record already exists."""
 
     save_request = SaveRequest(
-        user=context_headers.user,
-        env=context_headers.env,
-        dataset=context_headers.dataset,
-        records=records
+        user=context_headers.user, env=context_headers.env, dataset=context_headers.dataset, records=records
     )
 
     save_request = LegacyRequestUtil.format_save_request(save_request)
@@ -139,7 +137,9 @@ async def post_save(
 @router.post("/update", response_model=list[KeyRequestItem])
 async def post_update(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa unused
-    update_items: Annotated[list[UpdateRequestItem] | None, Body(description="List of update items.")] = None  # noqa unused
+    update_items: Annotated[
+        list[UpdateRequestItem] | None, Body(description="List of update items.")
+    ] = None,  # noqa unused
 ) -> list[KeyRequestItem]:
     """
     Bulk update records in DB. Single update item represents key and new record for this key.
@@ -159,5 +159,3 @@ async def post_insert(
     """Bulk insert records to DB. The same as /storage/save route but fails if the record already exists."""
     # TODO (Roman): Implement /insert route.
     raise NotImplementedError("/storage/insert route is not implemented.")
-
-

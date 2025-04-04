@@ -13,17 +13,14 @@
 # limitations under the License.
 
 from __future__ import annotations
-
-from typing import cast, Iterable
-
+from typing import Iterable
+from typing import cast
 from pydantic import BaseModel
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.tasks.status_request import StatusRequest
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
-
 
 LEGACY_TASK_STATUS_NAMES_MAP: dict[str, str] = {  # TODO: Update UI to sync the status list
     "PENDING": "Submitted",

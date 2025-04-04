@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Annotated, Any
+from typing import Annotated
+from typing import Any
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Query
 from cl.runtime.legacy.legacy_response_util import LegacyResponseUtil
-from cl.runtime.routers.dependencies.context_headers import ContextHeaders, get_context_headers
-from cl.runtime.routers.entity.panels_request import PanelsRequest
-from cl.runtime.routers.entity.panels_response_item import PanelsResponseItem
+from cl.runtime.routers.dependencies.context_headers import ContextHeaders
+from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
+from cl.runtime.routers.entity.panels_request import PanelsRequest
+from cl.runtime.routers.entity.panels_response_item import PanelsResponseItem
 
 router = APIRouter()
 
@@ -49,7 +51,7 @@ async def get_panel(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     type_name: Annotated[str, Query(description="Class name")],
     panel_id: Annotated[str, Query(description="View name")],
-    key: Annotated[str | None, Query(description="Primary key fields in semicolon-delimited format")]=None,
+    key: Annotated[str | None, Query(description="Primary key fields in semicolon-delimited format")] = None,
 ) -> dict[str, Any]:
     """Return panel content by its displayed name."""
 
@@ -60,7 +62,7 @@ async def get_panel(
             dataset=context_headers.dataset,
             type_name=type_name,
             panel_id=panel_id,
-            key=key
+            key=key,
         )
     )
     return LegacyResponseUtil.format_panel_response(response)

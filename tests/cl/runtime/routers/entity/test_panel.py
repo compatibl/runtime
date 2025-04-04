@@ -15,10 +15,10 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.legacy.legacy_response_util import LegacyResponseUtil
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataViewers
 

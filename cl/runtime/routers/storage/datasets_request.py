@@ -23,4 +23,3 @@ class DatasetsRequest(BaseModel):
 
     type_name: str
     """Type shortname."""
-

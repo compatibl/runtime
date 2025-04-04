@@ -14,11 +14,11 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.routers.storage.select_response import SelectResponse
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from stubs.cl.runtime import StubDataclassRecord
 
 

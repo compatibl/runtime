@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from pydantic import BaseModel
-
 from cl.runtime.primitive.case_util import CaseUtil
 
 

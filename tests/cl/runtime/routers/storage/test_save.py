@@ -114,10 +114,7 @@ def test_api(pytest_default_db):
         existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value").build()
         DbContext.save_one(existing_record)
 
-        update_record_response = test_client.post(
-            "/storage/save",
-            json=[update_record_payload]
-        )
+        update_record_response = test_client.post("/storage/save", json=[update_record_payload])
 
         assert update_record_response.status_code == 200
 

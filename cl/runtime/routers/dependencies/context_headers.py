@@ -32,7 +32,9 @@ class ContextHeaders:
 
 
 def get_context_headers(
-    environment: Annotated[str | None, Header(description="Name of the environment (database), e.g. 'Dev;Runtime;V2'")] = None,
+    environment: Annotated[
+        str | None, Header(description="Name of the environment (database), e.g. 'Dev;Runtime;V2'")
+    ] = None,
     dataset: Annotated[str | None, Header(description="Dataset string")] = None,
     user: Annotated[str | None, Header(description="User identifier or identity token")] = None,
 ) -> ContextHeaders:

@@ -42,10 +42,6 @@ class LegacyRequestUtil:
             else:
                 new_records.append(old_record)
 
-
         return SaveRequest(
-            user=save_request.user,
-            env=save_request.env,
-            dataset=save_request.dataset,
-            records=new_records
+            user=save_request.user, env=save_request.env, dataset=save_request.dataset, records=new_records
         )

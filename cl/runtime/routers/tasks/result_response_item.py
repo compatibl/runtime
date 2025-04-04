@@ -13,11 +13,10 @@
 # limitations under the License.
 
 from __future__ import annotations
-
-from typing import Any, cast, Iterable
-
+from typing import Any
+from typing import Iterable
+from typing import cast
 from pydantic import BaseModel
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.tasks.result_request import ResultRequest
 from cl.runtime.tasks.task import Task

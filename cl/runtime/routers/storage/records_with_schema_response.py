@@ -13,9 +13,8 @@
 # limitations under the License.
 
 from typing import Type
-
-from pydantic import BaseModel, Field
-
+from pydantic import BaseModel
+from pydantic import Field
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil

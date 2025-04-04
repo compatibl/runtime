@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-
 from cl.runtime.backend.core.ui_type_state import UiTypeState
 from cl.runtime.backend.core.ui_type_state_key import UiTypeStateKey
 from cl.runtime.contexts.db_context import DbContext
@@ -48,7 +47,9 @@ class LoadResponse(RecordsWithSchemaResponse):
         key_type = Schema.get_type_by_short_name(first_key_item_type).get_key_type()  # noqa
 
         # Deserialize keys in request.
-        deserialized_keys = tuple(_KEY_SERIALIZER.deserialize(key_item.key, key_type).build() for key_item in request.load_keys or tuple())
+        deserialized_keys = tuple(
+            _KEY_SERIALIZER.deserialize(key_item.key, key_type).build() for key_item in request.load_keys or tuple()
+        )
 
         # TODO (Yauheni): Remove temporary workaround of pinning handlers for all requested types.
         # Pin all handlers by default.
@@ -90,7 +91,6 @@ class LoadResponse(RecordsWithSchemaResponse):
         serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
         return LoadResponse(schema_=schema_dict, data=serialized_records)  # noqa
-
 
     @classmethod
     def _get_default_ui_type_state(cls, ui_type_state_requested_key: UiTypeStateKey) -> UiTypeState:

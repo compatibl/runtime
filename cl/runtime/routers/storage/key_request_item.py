@@ -14,13 +14,14 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.protocols import is_record, is_key
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
+
 
 class KeyRequestItem(BaseModel):
     """Class for single key information."""

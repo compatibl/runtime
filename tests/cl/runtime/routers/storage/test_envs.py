@@ -16,7 +16,6 @@ import pytest
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.env_response_item import EnvResponseItem
 
-
 expected_result = [
     {
         "Name": "Dev;Runtime;V2",

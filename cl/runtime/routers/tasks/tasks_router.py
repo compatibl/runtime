@@ -13,14 +13,15 @@
 # limitations under the License.
 
 from typing import Annotated
-from fastapi import APIRouter, Depends, Body
-
-from cl.runtime.routers.dependencies.context_headers import ContextHeaders, get_context_headers
+from fastapi import APIRouter
+from fastapi import Body
+from fastapi import Depends
+from cl.runtime.routers.dependencies.context_headers import ContextHeaders
+from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.routers.tasks.result_request import ResultRequest
 from cl.runtime.routers.tasks.result_response_item import ResultResponseItem
 from cl.runtime.routers.tasks.status_request import StatusRequest
 from cl.runtime.routers.tasks.status_response_item import StatusResponseItem
-
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.routers.tasks.submit_request_body import SubmitRequestBody
 from cl.runtime.routers.tasks.submit_response_item import SubmitResponseItem
@@ -44,7 +45,7 @@ async def post_submit(
             type=submit_body.type,
             method=submit_body.method,
             keys=submit_body.keys,
-            arguments=submit_body.arguments
+            arguments=submit_body.arguments,
         )
     )
 
@@ -52,7 +53,7 @@ async def post_submit(
 @router.post("/cancel", response_model=list)
 async def post_cancel(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa
-    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to cancel.")]  # noqa
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to cancel.")],  # noqa
 ) -> list:
     """Bulk cancel tasks by run ids."""
     raise NotImplementedError("/tasks/cancel route is not implemented.")
@@ -69,7 +70,7 @@ async def post_cancel_all(
 @router.post("/status", response_model=list[StatusResponseItem])
 async def post_status(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
-    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to get status.")]
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to get status.")],
 ) -> list[StatusResponseItem]:
     """Bulk request task statuses by run ids."""
 
@@ -78,15 +79,15 @@ async def post_status(
             user=context_headers.user,
             env=context_headers.env,
             dataset=context_headers.dataset,
-            task_run_ids=task_run_ids.task_run_ids
+            task_run_ids=task_run_ids.task_run_ids,
         )
     )
 
 
 @router.post("/result", response_model=list[ResultResponseItem])
 async def post_result(
-        context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
-        task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to get result.")]
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to get result.")],
 ) -> list[ResultResponseItem]:
     """Bulk request task results by run ids."""
 
@@ -95,7 +96,6 @@ async def post_result(
             user=context_headers.user,
             env=context_headers.env,
             dataset=context_headers.dataset,
-            task_run_ids=task_run_ids.task_run_ids
+            task_run_ids=task_run_ids.task_run_ids,
         )
     )
-
