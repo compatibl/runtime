@@ -13,37 +13,31 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Any
-from typing import Iterable
-from typing import List
-from typing import cast
+
+from typing import Any, cast, Iterable
+
 from pydantic import BaseModel
+
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.routers.tasks.task_result_request import TaskResultRequest
+from cl.runtime.routers.tasks.result_request import ResultRequest
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 
 
-class TaskResultResponseItem(BaseModel):
-    """Data type for a single item in the response list for the /tasks/run/result route."""
-
-    # TODO: Decide on permitted result formats
-    result: Any
-    """Result of the task run."""
+class ResultResponseItem(BaseModel):
+    """Response data type for the /tasks/result route."""
 
     task_run_id: str
     """Task run id."""
 
-    key: str | None
-    """Key of the record."""
+    key: str
+    """Key string in semicolon-delimited format."""
 
-    class Config:
-        alias_generator = CaseUtil.snake_to_pascal_case
-        populate_by_name = True
+    result: Any
+    """Task result."""
 
     @classmethod
-    def get_task_results(cls, request: TaskResultRequest) -> List[TaskResultResponseItem]:
+    def get_response(cls, request: ResultRequest) -> list[ResultResponseItem]:
         """Get results for tasks in request."""
 
         task_keys = [TaskKey(task_id=x).build() for x in request.task_run_ids]
@@ -52,7 +46,7 @@ class TaskResultResponseItem(BaseModel):
         response_items = []
         for task in tasks:
             response_items.append(
-                TaskResultResponseItem(
+                ResultResponseItem(
                     result=task.status,
                     task_run_id=str(task.task_id),
                     key=str(task.task_id),

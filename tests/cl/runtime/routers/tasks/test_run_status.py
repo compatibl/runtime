@@ -18,9 +18,9 @@ from typing import List
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
-from cl.runtime.routers.tasks.run_response_item import handler_queue
-from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
-from cl.runtime.routers.tasks.task_status_response_item import TaskStatusResponseItem
+from cl.runtime.routers.tasks.status_request import StatusRequest
+from cl.runtime.routers.tasks.status_response_item import StatusResponseItem
+from cl.runtime.routers.tasks.submit_response_item import handler_queue
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
@@ -44,7 +44,6 @@ def _save_tasks_and_get_requests() -> List[Dict]:
     requests = [
         {
             "task_run_ids": [str(task.task_id) for task in tasks],
-            "db": "DEPRECATED",
             "dataset": "",
         }
     ]
@@ -52,17 +51,17 @@ def _save_tasks_and_get_requests() -> List[Dict]:
 
 
 def test_method(pytest_default_db):
-    """Test coroutine for /tasks/run/status route."""
+    """Test coroutine for /tasks/status route."""
 
     for request in _save_tasks_and_get_requests():
-        request_obj = TaskStatusRequest(**request)
-        result = TaskStatusResponseItem.get_task_statuses(request_obj)
+        request_obj = StatusRequest(**request)
+        result = StatusResponseItem.get_response(request_obj)
 
         assert isinstance(result, list)
         for result_response_item, task_run_id in zip(result, request_obj.task_run_ids):
 
             # Validate type
-            assert isinstance(result_response_item, TaskStatusResponseItem)
+            assert isinstance(result_response_item, StatusResponseItem)
 
             # Validate fields
             # TODO: Review the spec for the value of result_response_item.key
@@ -72,22 +71,22 @@ def test_method(pytest_default_db):
 
 
 def test_api(pytest_default_db):
-    """Test REST API for /tasks/run/status route."""
+    """Test REST API for /tasks/status route."""
     with QaClient() as test_client:
         for request in _save_tasks_and_get_requests():
 
             # Invoke
-            response = test_client.post("/tasks/run/status", json=request)
+            response = test_client.post("/tasks/status", json=request)
             assert response.status_code == 200
             result = response.json()
 
             # Validate
             assert isinstance(result, list)
-            request_obj = TaskStatusRequest(**request)
+            request_obj = StatusRequest(**request)
             for result_item, task_run_id in zip(result, request_obj.task_run_ids):
 
                 # Validate with Pydantic
-                result_response_item = TaskStatusResponseItem(**result_item)
+                result_response_item = StatusResponseItem(**result_item)
 
                 # Validate fields
                 # TODO: Review the spec for the value of result_response_item.key

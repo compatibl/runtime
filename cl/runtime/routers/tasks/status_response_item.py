@@ -13,19 +13,19 @@
 # limitations under the License.
 
 from __future__ import annotations
-from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import cast
+
+from typing import cast, Iterable
+
 from pydantic import BaseModel
+
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
+from cl.runtime.routers.tasks.status_request import StatusRequest
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 
-LEGACY_TASK_STATUS_NAMES_MAP: Dict[str, str] = {  # TODO: Update UI to sync the status list
+
+LEGACY_TASK_STATUS_NAMES_MAP: dict[str, str] = {  # TODO: Update UI to sync the status list
     "PENDING": "Submitted",
     "RUNNING": "Running",
     "AWAITING": "Paused",
@@ -36,27 +36,23 @@ LEGACY_TASK_STATUS_NAMES_MAP: Dict[str, str] = {  # TODO: Update UI to sync the 
 """Status name to legacy status name map according to UI convention."""
 
 
-class TaskStatusResponseItem(BaseModel):
-    """Data type for a single item in the response list for the /tasks/run/status route."""
-
-    status_code: str
-    """Task status code."""
+class StatusResponseItem(BaseModel):
+    """Response data type for the /tasks/status route."""
 
     task_run_id: str
-    """Task run unique id."""
+    """Task run id."""
 
-    key: str | None  # TODO: Rename to task_id in REST API for clarity
-    """Task key."""
+    status_code: str
+    """Task status."""
 
-    user_message: str | None
+    key: str | None = None
+    """Key string in semicolon-delimited format."""
+
+    user_message: str | None = None
     """Optional user message."""
 
-    class Config:
-        alias_generator = CaseUtil.snake_to_pascal_case
-        populate_by_name = True
-
     @classmethod
-    def get_task_statuses(cls, request: TaskStatusRequest) -> List[TaskStatusResponseItem]:
+    def get_response(cls, request: StatusRequest) -> list[StatusResponseItem]:
         """Get status for tasks in request."""
 
         task_keys = [TaskKey(task_id=x).build() for x in request.task_run_ids]  # TODO: Update if task_run_id is UUID
@@ -64,16 +60,17 @@ class TaskStatusResponseItem(BaseModel):
 
         response_items = []
         for task in tasks:
-            # TODO: Add support message depending on exception type
+            # TODO: Add support message depending on exception type.
             user_message = task.error_message
 
             record_key = None
-            # Only InstanceMethodTask has `key_str` attribute
+
+            # Only InstanceMethodTask has `key_str` attribute.
             if isinstance(task, InstanceMethodTask):
                 record_key = task.key_str
 
             response_items.append(
-                TaskStatusResponseItem(
+                StatusResponseItem(
                     status_code=LEGACY_TASK_STATUS_NAMES_MAP.get(task.status.name),
                     task_run_id=str(task.task_id),
                     key=record_key,

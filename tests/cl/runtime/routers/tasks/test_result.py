@@ -18,9 +18,9 @@ from typing import List
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
-from cl.runtime.routers.tasks.run_response_item import handler_queue
-from cl.runtime.routers.tasks.task_result_request import TaskResultRequest
-from cl.runtime.routers.tasks.task_result_response_item import TaskResultResponseItem
+from cl.runtime.routers.tasks.result_request import ResultRequest
+from cl.runtime.routers.tasks.result_response_item import ResultResponseItem
+from cl.runtime.routers.tasks.submit_response_item import handler_queue
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
@@ -44,7 +44,6 @@ def _save_tasks_and_get_requests() -> List[Dict]:
     requests = [
         {
             "task_run_ids": [str(task.task_id) for task in tasks],
-            "db": "DEPRECATED",
             "dataset": "",
         }
     ]
@@ -52,41 +51,42 @@ def _save_tasks_and_get_requests() -> List[Dict]:
 
 
 def test_method(pytest_default_db):
-    """Test coroutine for /tasks/run/result route."""
+    """Test coroutine for /tasks/result route."""
 
     for request in _save_tasks_and_get_requests():
-        request_obj = TaskResultRequest(**request)
-        result = TaskResultResponseItem.get_task_results(request_obj)
+        request_obj = ResultRequest(**request)
+        result = ResultResponseItem.get_response(request_obj)
 
         assert isinstance(result, list)
         for result_response_item, task_run_id in zip(result, request_obj.task_run_ids):
 
-            # Validate type
-            assert isinstance(result_response_item, TaskResultResponseItem)
+            # Validate type.
+            assert isinstance(result_response_item, ResultResponseItem)
 
-            # Validate fields
+            # Validate fields.
             assert result_response_item.key == task_run_id
             assert result_response_item.task_run_id == task_run_id
             assert result_response_item.result is not None
 
 
 def test_api(pytest_default_db):
-    """Test REST API for /tasks/run/result route."""
+    """Test REST API for /tasks/result route."""
+
     with QaClient() as test_client:
         for request in _save_tasks_and_get_requests():
-            response = test_client.post("/tasks/run/result", json=request)
+            response = test_client.post("/tasks/result", json=request)
             assert response.status_code == 200
 
             result = response.json()
 
             assert isinstance(result, list)
-            request_obj = TaskResultRequest(**request)
+            request_obj = ResultRequest(**request)
             for result_item, task_run_id in zip(result, request_obj.task_run_ids):
 
-                # Validate with Pydantic
-                result_response_item = TaskResultResponseItem(**result_item)
+                # Validate with Pydantic.
+                result_response_item = ResultResponseItem(**result_item)
 
-                # Validate fields
+                # Validate fields.
                 assert result_response_item.key == task_run_id
                 assert result_response_item.task_run_id == task_run_id
                 assert result_response_item.result is not None

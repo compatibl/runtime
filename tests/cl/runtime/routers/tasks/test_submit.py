@@ -15,10 +15,10 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
-from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
-from cl.runtime.routers.tasks.run_request import RunRequest
-from cl.runtime.routers.tasks.run_response_item import RunResponseItem
+from cl.runtime.routers.tasks.submit_request import SubmitRequest
+from cl.runtime.routers.tasks.submit_response_item import SubmitResponseItem
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
@@ -30,16 +30,15 @@ def get_simple_requests(key_str: str):
     """Get requests for testing."""
     return [
         {
-            "db": "DEPRECATED",  # TODO: Review and remove
             "dataset": "",
-            "table": "StubHandlers",
+            "type": "StubHandlers",
             "keys": [key_str],
-            "method": "InstanceHandler1b",
+            "method": "run_instance_method_1b",
         },
         {
             "dataset": "",
-            "table": "StubHandlers",
-            "method": "StaticHandler1a",
+            "type": "StubHandlers",
+            "method": "run_static_method_1a",
         },
     ]
 
@@ -48,31 +47,29 @@ def get_save_to_db_requests(key_str: str):
     """Get requests for testing."""
     return [
         {
-            "db": "DEPRECATED",  # TODO: Review and remove
             "dataset": "",
-            "table": "StubHandlers",
+            "type": "StubHandlers",
             "keys": [key_str],
-            "method": "HandlerSaveToDb",
+            "method": "run_save_to_db",
         }
     ]
 
-
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_method(pytest_celery_queue):
+def test_method(pytest_default_db, pytest_celery_queue):
     """Test coroutine for /tasks/run route."""
 
-    stub_handlers = StubHandlers()
+    stub_handlers = StubHandlers().build()
     key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
     DbContext.save_one(stub_handlers)
 
     for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):
-        request_object = RunRequest(**request)
-        result = RunResponseItem.run_tasks(request_object)
+        request_object = SubmitRequest(**request)
+        result = SubmitResponseItem.get_response(request_object)
 
         assert isinstance(result, list)
 
         for result_item in result:
-            assert isinstance(result_item, (RunResponseItem, RunErrorResponseItem))
+            assert isinstance(result_item, SubmitResponseItem)
             assert result_item.task_run_id is not None
 
             if request_object.keys:
@@ -83,16 +80,15 @@ def test_method(pytest_celery_queue):
     for request, expected_records in zip(get_save_to_db_requests(key_str), expected_records_in_db):
         expected_keys = [rec.get_key() for rec in expected_records]
 
-        request_object = RunRequest(**request)
-        response_items = RunResponseItem.run_tasks(request_object)
-        [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
+        request_object = SubmitRequest(**request)
+        response_items = SubmitResponseItem.get_response(request_object)
+        [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build()) for response_item in response_items]
         actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
         assert actual_records == expected_records
 
-
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
 def test_api(pytest_celery_queue):
-    """Test REST API for /tasks/run route."""
+    """Test REST API for /tasks/submit route."""
 
     stub_handlers = StubHandlers()
     key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
@@ -100,16 +96,16 @@ def test_api(pytest_celery_queue):
 
     with QaClient() as test_client:
         for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):
-            response = test_client.post("/tasks/run", json=request)
+            response = test_client.post("/tasks/submit", json=request)
             assert response.status_code == 200
             result = response.json()
 
             # Check that the result is a list
             assert isinstance(result, list)
 
-            # Check if each item in the result has valid data to construct RunResponseItem
+            # Check if each item in the result has valid data to construct SubmitResponseItem
             for item in result:
-                RunResponseItem(**item)
+                SubmitResponseItem(**item)
                 assert item.get("TaskRunId") is not None
 
                 if request.get("keys"):
@@ -120,9 +116,9 @@ def test_api(pytest_celery_queue):
         for request, expected_records in zip(get_save_to_db_requests(key_str), expected_records_in_db):
             expected_keys = [rec.get_key() for rec in expected_records]
 
-            test_client.post("/tasks/run", json=request)
-            request_object = RunRequest(**request)
-            response_items = RunResponseItem.run_tasks(request_object)
+            test_client.post("/tasks/submit", json=request)
+            request_object = SubmitRequest(**request)
+            response_items = SubmitResponseItem.run_tasks(request_object)
             [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
             actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
             assert actual_records == expected_records

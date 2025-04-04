@@ -16,10 +16,13 @@ import datetime as dt
 import inspect
 from dataclasses import dataclass
 from uuid import UUID
+
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.record_mixin import RecordMixin
+from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
 
@@ -218,3 +221,10 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
         """Stub method."""
         _log_method_info()
         LogContext.get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
+
+    # TODO (Roman): Uncomment for tasks/test_submit.
+    # def run_save_to_db(self):
+    #     """Stub method."""
+    #     record_to_save = StubDataclassRecord(id="saved_from_handler").build()
+    #     DbContext.save_one(record_to_save)
+    #     LogContext.get_logger(module_name=__name__).info(f"Record {record_to_save} has been saved to db from handler.")

@@ -13,30 +13,17 @@
 # limitations under the License.
 
 from pydantic import BaseModel
+
 from cl.runtime.primitive.case_util import CaseUtil
 
 
-class RunErrorResponseItem(BaseModel):
-    """Data type for a single item in the response list for the /tasks/run route in case of an error."""
-
-    task_run_id: str | None = None
-    """Task run id."""
-
-    key: str | None = None
-    """Key of the record."""
-
-    name: str | None = None
-    """Name of the exception."""
-
-    status_code: int | None = None
-    """Status code of the task."""
-
-    message: str | None = None
-    """Message of the exception."""
-
-    stack_trace: str | None = None
-    """Stack trace of the exception."""
+# TODO (Roman): Remove the separate model class with only one field and use a simple 'list[str]' instead.
+class TaskRunIdsRequestBody(BaseModel):
+    """Class for bulk request by task run ids."""
 
     class Config:
         alias_generator = CaseUtil.snake_to_pascal_case
         populate_by_name = True
+
+    task_run_ids: list[str]
+    """List of task run ids."""

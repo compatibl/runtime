@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydantic import BaseModel
+from cl.runtime.routers.tasks.task_run_ids_request import TaskRunIdsRequest
 
 
-class TaskResultRequest(BaseModel):
-    """Request data type for the /tasks/run/result route."""
-
-    task_run_ids: list[str]
-    """Task run ids."""
+class StatusRequest(TaskRunIdsRequest):
+    """Request data type for the /tasks/status route."""

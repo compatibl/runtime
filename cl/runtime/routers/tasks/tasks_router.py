@@ -12,52 +12,90 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
-from fastapi import APIRouter
-from fastapi import Request
-from cl.runtime.routers.tasks.run_error_response_item import RunErrorResponseItem
-from cl.runtime.routers.tasks.run_request import RunRequest
-from cl.runtime.routers.tasks.run_response_item import RunResponseItem
-from cl.runtime.routers.tasks.task_result_request import TaskResultRequest
-from cl.runtime.routers.tasks.task_result_response_item import TaskResultResponseItem
-from cl.runtime.routers.tasks.task_status_request import TaskStatusRequest
-from cl.runtime.routers.tasks.task_status_response_item import TaskStatusResponseItem
+from typing import Annotated
+from fastapi import APIRouter, Depends, Body
+
+from cl.runtime.routers.dependencies.context_headers import ContextHeaders, get_context_headers
+from cl.runtime.routers.tasks.result_request import ResultRequest
+from cl.runtime.routers.tasks.result_response_item import ResultResponseItem
+from cl.runtime.routers.tasks.status_request import StatusRequest
+from cl.runtime.routers.tasks.status_response_item import StatusResponseItem
+
+from cl.runtime.routers.tasks.submit_request import SubmitRequest
+from cl.runtime.routers.tasks.submit_request_body import SubmitRequestBody
+from cl.runtime.routers.tasks.submit_response_item import SubmitResponseItem
+from cl.runtime.routers.tasks.task_run_ids_request_body import TaskRunIdsRequestBody
 
 router = APIRouter()
 
 
-@router.post("/run", response_model=List[RunResponseItem | RunErrorResponseItem])
-async def tasks_run(request: Request, payload: RunRequest):
-    """Receive params for tasks execute."""
+@router.post("/submit", response_model=list[SubmitResponseItem])
+async def post_submit(
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
+    submit_body: Annotated[SubmitRequestBody, Body(description="Submit request body.")],
+) -> list[SubmitResponseItem]:
+    """Submit run handler in Celery task."""
 
-    # TODO: Refactor tasks_run and other routes
-    headers = {}
-    request_headers = dict(request.headers)
-    for key in ("host", "user", "environment", "cutofftime"):
-        headers[key] = request_headers.get(key)
-
-    # Run tasks without blocking the process
-    payload.headers = headers
-    return RunResponseItem.run_tasks(payload)
-
-
-@router.post("/run/cancel")
-async def tasks_cancel():
-    # TODO: Implement this endpoint if needed
-    return None
-
-
-@router.post("/run/cancel_all")
-async def tasks_cancel_all():
-    # TODO: Implement this endpoint if needed
-    return None
+    return SubmitResponseItem.get_response(
+        SubmitRequest(
+            user=context_headers.user,
+            env=context_headers.env,
+            dataset=context_headers.dataset,
+            type=submit_body.type,
+            method=submit_body.method,
+            keys=submit_body.keys,
+            arguments=submit_body.arguments
+        )
+    )
 
 
-@router.post("/run/status", response_model=List[TaskStatusResponseItem])
-async def tasks_status(payload: TaskStatusRequest):
-    return TaskStatusResponseItem.get_task_statuses(request=payload)
+@router.post("/cancel", response_model=list)
+async def post_cancel(
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to cancel.")]  # noqa
+) -> list:
+    """Bulk cancel tasks by run ids."""
+    raise NotImplementedError("/tasks/cancel route is not implemented.")
 
 
-@router.post("/run/result", response_model=List[TaskResultResponseItem])
-async def tasks_result(payload: TaskResultRequest):
-    return TaskResultResponseItem.get_task_results(request=payload)
+@router.post("/cancel_all", response_model=list)
+async def post_cancel_all(
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa
+) -> list:
+    """Cancel all running tasks."""
+    raise NotImplementedError("/tasks/cancel_all route is not implemented.")
+
+
+@router.post("/status", response_model=list[StatusResponseItem])
+async def post_status(
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to get status.")]
+) -> list[StatusResponseItem]:
+    """Bulk request task statuses by run ids."""
+
+    return StatusResponseItem.get_response(
+        StatusRequest(
+            user=context_headers.user,
+            env=context_headers.env,
+            dataset=context_headers.dataset,
+            task_run_ids=task_run_ids.task_run_ids
+        )
+    )
+
+
+@router.post("/result", response_model=list[ResultResponseItem])
+async def post_result(
+        context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
+        task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to get result.")]
+) -> list[ResultResponseItem]:
+    """Bulk request task results by run ids."""
+
+    return ResultResponseItem.get_response(
+        ResultRequest(
+            user=context_headers.user,
+            env=context_headers.env,
+            dataset=context_headers.dataset,
+            task_run_ids=task_run_ids.task_run_ids
+        )
+    )
+
