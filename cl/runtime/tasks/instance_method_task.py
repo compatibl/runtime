@@ -23,6 +23,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
@@ -45,7 +46,8 @@ class InstanceMethodTask(MethodTask):
         """Invoke the specified instance method."""
 
         key_type = ClassInfo.get_class_type(self.key_type_str)
-        key = _KEY_SERIALIZER.deserialize(self.key_str, key_type)
+        type_hint = TypeHint.for_class(key_type)
+        key = _KEY_SERIALIZER.deserialize(self.key_str, type_hint)
 
         # Load record from storage
         record = DbContext.load_one(key_type, key)  # TODO: Require record type?

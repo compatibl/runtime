@@ -26,6 +26,7 @@ from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.schema.field_decl import primitive_types  # TODO: Move definition to a separate module
 from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -47,7 +48,8 @@ class RecordResponse(BaseModel):
         """Implements /storage/record route."""
 
         record_type = Schema.get_type_by_short_name(request.type)
-        deserialized_key = _KEY_SERIALIZER.deserialize(request.key, record_type.get_key_type()).build()
+        type_hint = TypeHint.for_class(record_type.get_key_type(), optional=True)
+        deserialized_key = _KEY_SERIALIZER.deserialize(request.key, type_hint).build()
 
         # TODO: Review the use of load_one_or_none here
         record = DbContext.get_db().load_one_or_none(record_type, deserialized_key)

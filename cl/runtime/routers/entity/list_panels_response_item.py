@@ -21,6 +21,7 @@ from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -49,7 +50,8 @@ class ListPanelsResponseItem(BaseModel):
         # Get actual type from record if request.key is not None
         if request.key is not None:
             # Deserialize ui key
-            key = _KEY_SERIALIZER.deserialize(request.key, request_type)
+            type_hint = TypeHint.for_class(request_type.get_key_type())
+            key = _KEY_SERIALIZER.deserialize(request.key, type_hint)
 
             # If the record is not found, display panel tabs for the base type
             record = DbContext.load_one_or_none(request_type, key)

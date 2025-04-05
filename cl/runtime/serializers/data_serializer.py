@@ -346,7 +346,7 @@ class DataSerializer(Data):
                     return self.typed_deserialize(decoded_data, type_hint)
                 else:
                     # Otherwise use key serializer to deserialize
-                    return self.key_serializer.deserialize(data, type_hint.schema_class)
+                    return self.key_serializer.deserialize(data, type_hint)
             elif self.data_encoder is not None and is_data(schema_class):
                 # Decode data field using data_encoder and deserialize
                 decoded_data = self.data_encoder.decode(data)

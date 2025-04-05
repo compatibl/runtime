@@ -103,17 +103,20 @@ class KeySerializer(Data):
         else:
             raise ErrorUtil.enum_value_error(key_format, KeyFormatEnum)
 
-    def deserialize(self, data: Any, key_or_record_type: Type) -> Any:
+    def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize key from a delimited string or a flattened sequence of primitive types."""
 
+        # Get schema class from the type hint
+        schema_class = type_hint.schema_class
+
         # Convert to key if a record
-        if is_record(key_or_record_type):
-            key_type = key_or_record_type.get_key_type()
-        elif is_key(key_or_record_type):
-            key_type = key_or_record_type
+        if is_record(schema_class):
+            key_type = schema_class.get_key_type()
+        elif is_key(schema_class):
+            key_type = schema_class
         else:
             raise RuntimeError(
-                f"Type {TypeUtil.name(key_or_record_type)} passed to {TypeUtil.name(self)}\n"
+                f"Type {TypeUtil.name(schema_class)} passed to {TypeUtil.name(self)}\n"
                 f"is not a key or record type, cannot serialize."
             )
 

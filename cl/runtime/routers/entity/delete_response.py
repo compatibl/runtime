@@ -15,6 +15,7 @@
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.entity.delete_request import DeleteRequest
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -30,8 +31,13 @@ class DeleteResponse(BaseModel):
         class_dict = TypeSchema.get_class_dict()
 
         record_key_dicts = [key.model_dump() for key in request.record_keys]
+        key_type_hints = [TypeHint.for_class(key.__class__) for key in request.record_keys]
         deserialized_record_keys = [
-            _KEY_SERIALIZER.deserialize(key["_key"], class_dict[key["_t"]]) for key in record_key_dicts
+            _KEY_SERIALIZER.deserialize(
+                key["_key"],
+                TypeHint.for_class(TypeSchema.for_type_name(key["_t"]).get_class()),
+            )
+            for key in record_key_dicts
         ]
         DbContext.delete_many(deserialized_record_keys, dataset=request.dataset)
 

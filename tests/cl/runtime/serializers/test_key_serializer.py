@@ -17,6 +17,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
@@ -45,7 +46,8 @@ def test_serialization():  # TODO: Rename to test_delimited
     for sample in _SERIALIZATION_SAMPLES:
         # Roundtrip serialization
         serialized = KeySerializers.DELIMITED.serialize(sample)
-        deserialized = KeySerializers.DELIMITED.deserialize(serialized, type(sample))
+        type_hint = TypeHint.for_class(sample.__class__)
+        deserialized = KeySerializers.DELIMITED.deserialize(serialized, type_hint)
         assert sample == PytestUtil.approx(deserialized)
 
         # Write to regression guard
@@ -61,7 +63,8 @@ def test_for_sqlite():
     for sample in _SERIALIZATION_SAMPLES:
         # Roundtrip serialization
         serialized = KeySerializers.FOR_SQLITE.serialize(sample)
-        deserialized = KeySerializers.FOR_SQLITE.deserialize(serialized, type(sample))
+        type_hint = TypeHint.for_class(sample.__class__)
+        deserialized = KeySerializers.FOR_SQLITE.deserialize(serialized, type_hint)
         assert sample == PytestUtil.approx(deserialized)
 
         # Write to regression guard

@@ -16,6 +16,7 @@ from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.routers.entity.save_request import SaveRequest
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -60,7 +61,8 @@ class SaveResponse(BaseModel):
                 raise UserError(f"Record with key {record_key_str} already exists.")
         elif request.old_record_key != record_key_str:
             # Requested update record with new key - delete old record
-            deserialized_old_record = _KEY_SERIALIZER.deserialize(request.old_record_key, type(record_key))
+            type_hint = TypeHint.for_type(record_key.__class__, optional=True)
+            deserialized_old_record = _KEY_SERIALIZER.deserialize(request.old_record_key, type_hint)  # TODO: Remove old record check
             DbContext.delete_one(key_type=type(record_key), key=deserialized_old_record, dataset=request.dataset)
 
         DbContext.save_one(record, dataset=request.dataset)

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassListFields
@@ -41,7 +43,8 @@ def test_key_serialization():
         obj_1_key = obj_1.get_key()
         serialized = _KEY_SERIALIZER.serialize(obj_1_key)
 
-        deserialized_key = _KEY_SERIALIZER.deserialize(serialized, sample_type.get_key_type()).build()
+        type_hint = TypeHint.for_class(sample_type.get_key_type())
+        deserialized_key = _KEY_SERIALIZER.deserialize(serialized, type_hint).build()
         assert obj_1_key == deserialized_key
 
 
