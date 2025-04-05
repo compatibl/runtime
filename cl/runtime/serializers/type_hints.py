@@ -21,29 +21,29 @@ from cl.runtime.schema.type_hint import TypeHint
 class TypeHints:
     """Standard type hints."""
 
-    STR_OR_NONE: TypeHint = TypeHint.for_class(str, is_optional=True)
+    STR_OR_NONE: TypeHint = TypeHint.for_class(str, optional=True)
     """Type hint for str | None."""
 
-    FLOAT_OR_NONE: TypeHint = TypeHint.for_class(float, is_optional=True)
+    FLOAT_OR_NONE: TypeHint = TypeHint.for_class(float, optional=True)
     """Type hint for float | None."""
 
-    BOOL_OR_NONE: TypeHint = TypeHint.for_class(bool, is_optional=True)
+    BOOL_OR_NONE: TypeHint = TypeHint.for_class(bool, optional=True)
     """Type hint for bool | None."""
 
-    INT_OR_NONE: TypeHint = TypeHint.for_class(int, is_optional=True)
+    INT_OR_NONE: TypeHint = TypeHint.for_class(int, optional=True)
     """Type hint for int | None."""
 
-    DATE_OR_NONE: TypeHint = TypeHint.for_class(dt.date, is_optional=True)
+    DATE_OR_NONE: TypeHint = TypeHint.for_class(dt.date, optional=True)
     """Type hint for date | None."""
 
-    TIME_OR_NONE: TypeHint = TypeHint.for_class(dt.time, is_optional=True)
+    TIME_OR_NONE: TypeHint = TypeHint.for_class(dt.time, optional=True)
     """Type hint for time | None."""
 
-    DATETIME_OR_NONE: TypeHint = TypeHint.for_class(dt.datetime, is_optional=True)
+    DATETIME_OR_NONE: TypeHint = TypeHint.for_class(dt.datetime, optional=True)
     """Type hint for datetime | None."""
 
-    UUID_OR_NONE: TypeHint = TypeHint.for_class(UUID, is_optional=True)
+    UUID_OR_NONE: TypeHint = TypeHint.for_class(UUID, optional=True)
     """Type hint for UUID | None."""
 
-    BYTES_OR_NONE: TypeHint = TypeHint.for_class(bytes, is_optional=True)
+    BYTES_OR_NONE: TypeHint = TypeHint.for_class(bytes, optional=True)
     """Type hint for bytes | None."""

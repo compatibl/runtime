@@ -121,7 +121,7 @@ class DataSerializer(Data):
                     else:
                         raise RuntimeError(f"Key '_type' is missing in the serialized data, cannot deserialize.")
                 # Create type chain of length one from the type
-                type_hint = TypeHint(schema_type_name=type_name)
+                type_hint = TypeHint(schema_type_name=type_name, optional=False)
                 # Use typed deserialization
                 return self.typed_deserialize(data, type_hint)
             else:

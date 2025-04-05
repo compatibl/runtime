@@ -36,11 +36,15 @@ class TypeHint(FrozenDataMixin):
     schema_class: Type | None = None
     """Class if available, if not provided it will be looked up using the type name."""
 
-    optional: bool | None = None
+    optional: bool
     """Optional flag, True if the type hint is a union with None, None otherwise."""
 
     remaining: Self | None = None
     """Remaining chain if present, None otherwise."""
+
+    def get_schema_class_or_none(self) -> Type:
+        """Return schema class if available, otherwise return None."""
+        return self.schema_class
 
     def to_str(self):
         """Serialize as string in type alias format."""
@@ -70,11 +74,31 @@ class TypeHint(FrozenDataMixin):
             raise RuntimeError(f"The type hint {self.to_str()} is a mapping but does not specify item type.")
 
     @classmethod
-    def for_class(cls, class_: Type, *, is_optional: bool | None = None) -> Self:
+    def for_class(
+            cls,
+            class_: Type,
+            *,
+            optional: bool = False,
+            schema_type_name: str | None = None,
+    ) -> Self:
+        """Create type hint for a class with optional parameters."""
+
+        class_name = TypeUtil.name(class_)
+        if (
+                schema_type_name is None or
+                (schema_type_name == "long" and class_ is int) or
+                (schema_type_name == "timestamp" and class_ is UUID)
+        ):
+            # Validate and use subtype if specified
+            schema_type_name = class_name
+        elif schema_type_name != class_name:
+            # Otherwise use class name
+            raise RuntimeError(f"Subtype {schema_type_name} is not valid for class {class_name}.")
+
         return cls(
-            schema_type_name=class_.__name__,
+            schema_type_name=schema_type_name,
             schema_class=class_,
-            optional=is_optional,
+            optional=optional,
         )
 
     @classmethod
@@ -95,7 +119,6 @@ class TypeHint(FrozenDataMixin):
         """
 
         # Variables to store the result of type hint parsing
-        root_optional = None
         type_hint_tokens = []
 
         # Get origin and args of the field type
@@ -107,13 +130,7 @@ class TypeHint(FrozenDataMixin):
         supported_containers = [list, tuple, dict, frozendict]
         while True:
             # There are two possible forms of origin for optional, typing.Union and types.UnionType
-            type_alias_optional = type_alias_origin in union_types
-
-            # Assign to True or False for the outer hit only
-            if root_optional is None:
-                root_optional = type_alias_optional
-
-            if type_alias_optional:
+            if type_alias_optional := type_alias_origin in union_types:
                 # Union with None is the only permitted Union type
                 if len(type_alias_args) != 2 or type_alias_args[1] is not type(None):
                     raise RuntimeError(

@@ -21,6 +21,7 @@ from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.enum_format_enum import EnumFormatEnum
 from cl.runtime.serializers.none_format_enum import NoneFormatEnum
 
