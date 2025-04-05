@@ -23,9 +23,6 @@ class SaveRequest(BaseModel):
     record_dict: Dict[str, Any]
     """Dict representation of the record to be saved/updated."""
 
-    old_record_key: str | None = None
-    """Optional key of the record to be updated."""
-
     dataset: str | None = None
     """Dataset string."""
 

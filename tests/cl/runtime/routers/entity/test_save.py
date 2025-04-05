@@ -54,7 +54,7 @@ def test_method(pytest_default_db):
     # Test updating existing record
     existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value").build()
     DbContext.save_one(existing_record)
-    update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
+    update_record_request_obj = SaveRequest(record_dict=update_record_payload)
 
     update_record_result = SaveResponse.get_response(update_record_request_obj)
     existing_record_key = StubDataclassRecordKey(id="existing_record").build()
@@ -77,9 +77,7 @@ def test_api(pytest_default_db):
     with QaClient() as test_client:
         # Test saving new record
         save_new_record_request_obj = SaveRequest(record_dict=create_record_payload)
-        request_params = {
-            "old_record_key": save_new_record_request_obj.old_record_key,
-        }
+        request_params = {}
 
         save_new_record_response = test_client.post(
             "/entity/save",
@@ -104,10 +102,8 @@ def test_api(pytest_default_db):
         # Test updating existing record
         existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value").build()
         DbContext.save_one(existing_record)
-        update_record_request_obj = SaveRequest(record_dict=update_record_payload, old_record_key="existing_record")
-        request_params = {
-            "old_record_key": update_record_request_obj.old_record_key,
-        }
+        update_record_request_obj = SaveRequest(record_dict=update_record_payload)
+        request_params = {}
 
         update_record_response = test_client.post(
             "/entity/save",

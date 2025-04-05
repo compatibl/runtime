@@ -38,7 +38,6 @@ class LegacyRequestUtil:
 
         return SaveRequest(
             record_dict=record_dict,
-            old_record_key=save_request.old_record_key,
             dataset=save_request.dataset,
             user=save_request.user,
         )

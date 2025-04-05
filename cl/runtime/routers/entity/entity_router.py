@@ -60,7 +60,6 @@ async def get_panel(
 @router.post("/save", response_model=SaveResponse)
 async def save(
     record_in_dict: Dict = Body(..., description="Dict representation of the record to be saved/updated."),
-    old_record_key: str = Query(None, description="Optional key of the record to be updated"),
     dataset: str = Query(None, description="Dataset string"),
     user: str = Header(None, description="User identifier or identity token"),
 ) -> SaveResponse:
@@ -68,7 +67,6 @@ async def save(
 
     save_request = SaveRequest(
         record_dict=record_in_dict,
-        old_record_key=old_record_key,
         dataset=dataset,
         user=user,
     )

@@ -49,24 +49,6 @@ class SaveResponse(BaseModel):
         record = _UI_SERIALIZER.deserialize(ui_record)
         record_key = record.get_key()
         record_key_str = _KEY_SERIALIZER.serialize(record_key)
-
-        if not request.old_record_key:
-            # Requested save new record - check if record already exists
-            existing_record = DbContext.load_one_or_none(
-                record_type=type(record),
-                record_or_key=record_key,
-                dataset=request.dataset,
-            )
-            if existing_record is not None:  # TODO: Review performance implications of this check
-                raise UserError(f"Record with key {record_key_str} already exists.")
-        elif request.old_record_key != record_key_str:
-            # Requested update record with new key - delete old record
-            type_hint = TypeHint.for_type(record_key.__class__, optional=True)
-            deserialized_old_record = _KEY_SERIALIZER.deserialize(
-                request.old_record_key, type_hint
-            )  # TODO: Remove old record check
-            DbContext.delete_one(key_type=type(record_key), key=deserialized_old_record, dataset=request.dataset)
-
         DbContext.save_one(record, dataset=request.dataset)
 
         return SaveResponse(key=record_key_str)
