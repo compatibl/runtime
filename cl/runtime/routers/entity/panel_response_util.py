@@ -44,7 +44,7 @@ class PanelResponseUtil:
         type_ = Schema.get_type_by_short_name(request.type)
 
         # Deserialize key from string to object
-        type_hint = TypeHint.for_class(request.key.__class__)
+        type_hint = TypeHint.for_class(type_.get_key_type())
         key_obj = _KEY_SERIALIZER.deserialize(request.key, type_hint)
 
         # Get database from the current context
