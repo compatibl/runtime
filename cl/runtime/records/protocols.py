@@ -171,9 +171,19 @@ def is_mapping(instance_or_type: Any) -> TypeGuard[TSequence]:
     return result
 
 
+def is_abstract(instance_or_type: Any) -> bool:
+    """Return True if the argument is an abstract class."""
+    return bool(getattr(instance_or_type, "__abstractmethods__", None))
+
+
 def is_data(instance_or_type: Any) -> TypeGuard[TData]:
-    """Fast partial check for DataProtocol, True if the argument has '__slots__' attribute or 'get_slots' method."""
+    """True if the argument has '__slots__' attribute (which may be empty) or 'get_slots' method and is not a mixin."""
     return hasattr(instance_or_type, "__slots__") or hasattr(instance_or_type, "get_slots")
+
+
+def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
+    """Return True if the argument is a key or record based on the presence of 'get_key_type' method."""
+    return hasattr(instance_or_type, "get_key_type")
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
@@ -184,19 +194,9 @@ def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
     return hasattr(instance_or_type, "get_key_type") and not hasattr(instance_or_type, "get_key")
 
 
-def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
-    """Return True if the argument is a key or record based on the presence of 'get_key_type' method."""
-    return hasattr(instance_or_type, "get_key_type")
-
-
 def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
     """Return True if the argument is a record based on the presence of 'get_key' method."""
     return hasattr(instance_or_type, "get_key")
-
-
-def is_abstract(instance_or_type: Any) -> bool:
-    """Return True if the argument is an abstract class."""
-    return bool(getattr(instance_or_type, "__abstractmethods__", None))
 
 
 def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere and review logic
