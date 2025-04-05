@@ -110,14 +110,16 @@ class DataSerializer(Data):
                         f"Data type {data_class_name} is a sequence but schema type\n" f"{schema_type_name} is not."
                     )
             elif data_class_name in MAPPING_CLASS_NAMES:
-                # Get type name from the input dict
-                if (type_name := data.get(self.type_field, None)) is None:
-                    if type_hint is not None:
-                        type_name = schema_type_name
+                # Get type name from the input dict if type hint is not specified
+                if type_hint is None:
+                    if (type_name := data.get(self.type_field, None) if data else None) is not None:
+                        # Type name is specified, look up the class
+                        type_spec = TypeSchema.for_type_name(type_name)
+                        type_hint = TypeHint.for_class(type_spec.get_class())
                     else:
-                        raise RuntimeError(f"Key '_type' is missing in the serialized data, cannot deserialize.")
-                # Create type chain of length one from the type
-                type_hint = TypeHint(schema_type_name=type_name, optional=False)
+                        raise RuntimeError(
+                            f"Key '_type' is missing in the serialized data and type hint is not specified, "
+                            f"cannot deserialize.")
                 # Use typed deserialization
                 return self.typed_deserialize(data, type_hint)
             else:

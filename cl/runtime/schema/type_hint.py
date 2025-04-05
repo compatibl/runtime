@@ -34,7 +34,7 @@ class TypeHint(FrozenDataMixin):
     schema_type_name: str
     """Type name in the schema."""
 
-    schema_class: Type | None = None
+    schema_class: Type
     """Class if available, if not provided it will be looked up using the type name."""
 
     optional: bool
