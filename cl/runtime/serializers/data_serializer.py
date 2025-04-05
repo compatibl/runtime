@@ -119,7 +119,8 @@ class DataSerializer(Data):
                     else:
                         raise RuntimeError(
                             f"Key '_type' is missing in the serialized data and type hint is not specified, "
-                            f"cannot deserialize.")
+                            f"cannot deserialize."
+                        )
                 # Use typed deserialization
                 return self.typed_deserialize(data, type_hint)
             else:

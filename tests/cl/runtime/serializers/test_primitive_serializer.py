@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from types import NoneType
 import pytest
 import datetime as dt
+from types import NoneType
 from uuid import UUID
 from bson import Int64
 from cl.runtime.primitive.datetime_util import DatetimeUtil

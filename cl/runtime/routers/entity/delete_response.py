@@ -28,10 +28,8 @@ class DeleteResponse(BaseModel):
     @classmethod
     def get_response(cls, request: DeleteRequest) -> "DeleteResponse":
         """Delete entities."""
-        class_dict = TypeSchema.get_class_dict()
 
         record_key_dicts = [key.model_dump() for key in request.record_keys]
-        key_type_hints = [TypeHint.for_class(key.__class__) for key in request.record_keys]
         deserialized_record_keys = [
             _KEY_SERIALIZER.deserialize(
                 key["_key"],
