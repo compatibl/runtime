@@ -26,7 +26,7 @@ from typing import List
 from typing import Literal
 from typing import Set
 from typing import Type
-from typing import get_type_hints
+from typing import get_type_hints  # TODO: Use TypeHint class instead
 from inflection import titleize
 from memoization import cached
 from typing_extensions import Self
@@ -278,8 +278,8 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
         # Use this flag to skip fields generation when the method is invoked from a derived class
         if not skip_fields:
-            # Get type hints to resolve ForwardRefs
-            type_hints = get_type_hints(record_type)
+            # Get type aliases with resolved ForwardRefs
+            type_aliases = get_type_hints(record_type)
 
             # Dictionary of member comments (docstrings), currently requires source parsing due Python limitations
             if not is_primitive(record_type):
@@ -289,7 +289,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
             # Add an element for each type hint
             result.elements = []
-            for field_name, field_type in type_hints.items():
+            for field_name, field_type in type_aliases.items():
 
                 # Skip protected fields
                 if field_name.startswith("_"):

@@ -36,6 +36,7 @@ from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format_enum import BoolFormatEnum
 from cl.runtime.serializers.bytes_format_enum import BytesFormatEnum
 from cl.runtime.serializers.date_format_enum import DateFormatEnum
@@ -90,7 +91,7 @@ class PrimitiveSerializer(Data):
     bytes_format: BytesFormatEnum = required()
     """Serialization format for bytes (pass through without conversion if not set)."""
 
-    def serialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """
         Serialize a primitive type to a string or another primitive type.
 
@@ -99,55 +100,58 @@ class PrimitiveSerializer(Data):
 
         Args:
             data: An instance of primitive class from PRIMITIVE_CLASS_NAMES
-            type_chain: Optional type chain to use for validation and to identify a type that shares
+            type_hint: Optional type chain to use for validation and to identify a type that shares
                        the same class with another type (e.g. long and int types share the int class)
         """
 
-        # Match by class name rather than class type because different import packages may be used for some of the
-        # primitive types such as UUID throughout the code, so class types may not always match but class names will
-        value_class_name = data.__class__.__name__
+        # Get the class of data
+        data_class_name = TypeUtil.name(data)
 
-        # Get type and class of data and parse type chain
-        schema_type_name, is_optional = PrimitiveUtil.unpack_type_chain(type_chain)
+        # Get parameters from the type chain, considering the possibility that it may be None
+        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
+        is_optional = type_hint.optional if type_hint is not None else None
 
         # Validate that schema_type_name is compatible with value_class_name if specified
         # Because the value of None is passed through, value_class_name NoneType is compatible with any schema_type_name
-        if schema_type_name is not None and value_class_name != "NoneType" and schema_type_name != value_class_name:
+        if schema_type_name is not None and data_class_name != "NoneType" and schema_type_name != data_class_name:
             if schema_type_name == "long":
-                if value_class_name != "int":
+                if data_class_name != "int":
                     raise RuntimeError(
-                        f"Type {schema_type_name} can only be stored using int class, " f"not {value_class_name} class."
+                        f"Type {schema_type_name} can only be stored using int class, " f"not {data_class_name} class."
                     )
             elif schema_type_name == "timestamp":
-                if value_class_name != "UUID":
+                if data_class_name != "UUID":
                     raise RuntimeError(
                         f"Type {schema_type_name} can only be stored using UUID class, "
-                        f"not {value_class_name} class."
+                        f"not {data_class_name} class."
                     )
-            elif value_class_name != schema_type_name:
-                raise RuntimeError(f"Type {schema_type_name} cannot be stored as {value_class_name} class.")
+            elif data is not None and data_class_name != schema_type_name:
+                raise RuntimeError(f"Type {schema_type_name} cannot be stored as {data_class_name} class.")
 
         # Serialize based on value_class_name, using schema_type_name to distinguish between types that share the same class
         if data is None:
-            return None
-        elif value_class_name == "str":
+            if type_hint is None or type_hint.schema_type_name == "NoneType" or is_optional:
+                return None
+            else:
+                raise RuntimeError(f"Field value is None but type hint {type_hint.to_str()} does not allow it.")
+        elif data_class_name == "str":
             # Return None for an empty string
             return data if data else None
-        elif value_class_name == "float":
+        elif data_class_name == "float":
             if (value_format := self.float_format) == FloatFormatEnum.PASSTHROUGH:
                 return data
             elif value_format == FloatFormatEnum.DEFAULT:
                 return FloatUtil.format(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, FloatFormatEnum)
-        elif value_class_name == "bool":
+        elif data_class_name == "bool":
             if (value_format := self.bool_format) == BoolFormatEnum.PASSTHROUGH:
                 return data
             elif value_format == BoolFormatEnum.DEFAULT:
                 return BoolUtil.to_str_or_none(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, BoolFormatEnum)
-        elif value_class_name == "int":
+        elif data_class_name == "int":
             if schema_type_name is not None and schema_type_name == "int":
                 # Use methods that check that the value is in 32-bit signed integer range
                 # if schema_type_name is specified and is int rather than long
@@ -178,7 +182,7 @@ class PrimitiveSerializer(Data):
                     return Int64(data)
                 else:
                     raise ErrorUtil.enum_value_error(value_format, LongFormatEnum)
-        elif value_class_name == "date":
+        elif data_class_name == "date":
             if (value_format := self.date_format) == DateFormatEnum.PASSTHROUGH:
                 return data
             elif value_format == DateFormatEnum.DEFAULT:
@@ -187,7 +191,7 @@ class PrimitiveSerializer(Data):
                 return DateUtil.to_iso_int(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, DateFormatEnum)
-        elif value_class_name == "time":
+        elif data_class_name == "time":
             if (value_format := self.time_format) == TimeFormatEnum.PASSTHROUGH:
                 return data
             elif value_format == TimeFormatEnum.DEFAULT:
@@ -196,14 +200,14 @@ class PrimitiveSerializer(Data):
                 return TimeUtil.to_iso_int(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, TimeFormatEnum)
-        elif value_class_name == "datetime":
+        elif data_class_name == "datetime":
             if (value_format := self.datetime_format) == DatetimeFormatEnum.PASSTHROUGH:
                 return data
             elif value_format == DatetimeFormatEnum.DEFAULT:
                 return DatetimeUtil.to_str(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, DatetimeFormatEnum)
-        elif value_class_name == "UUID":
+        elif data_class_name == "UUID":
             if data.version != 7 or (schema_type_name is not None and schema_type_name == "UUID"):
                 if (value_format := self.uuid_format) == UuidFormatEnum.PASSTHROUGH:
                     return data
@@ -227,7 +231,7 @@ class PrimitiveSerializer(Data):
                     return UuidUtil.to_str(data)
                 else:
                     raise ErrorUtil.enum_value_error(value_format, TimestampFormatEnum)
-        elif value_class_name == "bytes":
+        elif data_class_name == "bytes":
             if (value_format := self.bytes_format) == BytesFormatEnum.PASSTHROUGH:
                 return data
             elif value_format == BytesFormatEnum.DEFAULT:
@@ -239,9 +243,9 @@ class PrimitiveSerializer(Data):
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormatEnum)
         else:
-            raise RuntimeError(f"Class {value_class_name} cannot be serialized using {type(self).__name__}.")
+            raise RuntimeError(f"Class {data_class_name} cannot be serialized using {type(self).__name__}.")
 
-    def deserialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
+    def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """
         Deserialize a string or another primitive value such as int or None to an instance of type_name.
 
@@ -250,14 +254,15 @@ class PrimitiveSerializer(Data):
 
         Args:
             data: A string or another serialization output such as int or None
-            type_chain: Type chain of size one to use for validation and to identify a type that shares
+            type_hint: Type chain of size one to use for validation and to identify a type that shares
                         the same class with another type (e.g. long and int types share the int class)
         """
 
-        # Parse type chain
-        schema_type_name, is_optional = PrimitiveUtil.unpack_type_chain(type_chain)
+        # Get parameters from the type chain, considering the possibility that it may be None
+        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
+        is_optional = type_hint.optional if type_hint is not None else None
 
-        if schema_type_name == "NoneType":
+        if schema_type_name == "NoneType":  # TODO: Review the logic for None
             if data in [None, "", "null"]:
                 # Treat an empty string and "null" as None
                 return None

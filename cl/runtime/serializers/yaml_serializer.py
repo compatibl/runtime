@@ -26,10 +26,12 @@ from ruamel.yaml.nodes import SequenceNode
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_format_enum import TypeFormatEnum
+from cl.runtime.serializers.type_hints import TypeHints
 from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
 
 # Use primitive serializer with default settings to serialize all primitive types to string
@@ -38,7 +40,7 @@ _PRIMITIVE_SERIALIZER = PrimitiveSerializers.DEFAULT
 
 def str_representer(dumper, data):
     """Configure YAML class for serializing a str field."""
-    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["str | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.STR_OR_NONE)
     if data_str:
         style = "|" if data_str and "\n" in data_str else None
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=style)
@@ -48,25 +50,25 @@ def str_representer(dumper, data):
 
 def float_representer(dumper, data):
     """Configure YAML class for serializing a float field."""
-    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["float | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.FLOAT_OR_NONE)
     return dumper.represent_scalar("tag:yaml.org,2002:float", data_str, style=None)
 
 
 def time_representer(dumper, data):
     """Configure YAML class for serializing a time field."""
-    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["time | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.TIME_OR_NONE)
     return dumper.represent_scalar("tag:yaml.org,2002:str", data_str)
 
 
 def datetime_representer(dumper, data):
     """Configure YAML class for serializing a datetime field."""
-    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["datetime | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.DATETIME_OR_NONE)
     return dumper.represent_scalar("tag:yaml.org,2002:timestamp", data_str, style=None)
 
 
 def uuid_representer(dumper, data):
     """Configure YAML class for serializing a UUID field."""
-    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["UUID | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.UUID_OR_NONE)
     if data_str:
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=None)
     else:
@@ -75,7 +77,7 @@ def uuid_representer(dumper, data):
 
 def bytes_representer(dumper, data):
     """Configure YAML class for serializing a bytes field."""
-    data_str = _PRIMITIVE_SERIALIZER.serialize(data, ["bytes | None"])
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.BYTES_OR_NONE)
     if data_str:
         style = "|" if data_str and "\n" in data_str else None
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=style)
@@ -168,13 +170,11 @@ class YamlSerializer(Data):
                 enum_serializer=EnumSerializers.DEFAULT,
             ).build()
 
-    def serialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
-        """
-        Serialize a slots-based object to a YAML string without using the schema or retaining type information,
-        not suitable for deserialization.
-        """
+    def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
+        """Serialize a slots-based object to a YAML string."""
+
         # Serialize to dict using self.dict_serializer
-        serialized = self._serializer.serialize(data, type_chain)
+        serialized = self._serializer.serialize(data, type_hint)
 
         if serialized is None:
             return ""
@@ -190,8 +190,8 @@ class YamlSerializer(Data):
             result = output.getvalue()
             return result
 
-    def deserialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
-        """Read a YAML string and return the deserialized object if bidirectional flag is set, and dict otherwise."""
+    def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
+        """Read a YAML string and return the deserialized object if bidirectional flag is set, or dict otherwise."""
 
         if self.type_inclusion == TypeInclusionEnum.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
@@ -200,5 +200,5 @@ class YamlSerializer(Data):
         yaml_dict = yaml_reader.load(StringIO(data))
 
         # Deserialized from dict using self.dict_serializer
-        result = self._deserializer.deserialize(yaml_dict, type_chain)
+        result = self._deserializer.deserialize(yaml_dict, type_hint)
         return result

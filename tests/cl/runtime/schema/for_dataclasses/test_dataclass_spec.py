@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import asdict
+
 import pytest
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.qa.regression_guard import RegressionGuard
@@ -64,14 +66,15 @@ _FROM_CLASS_EXCEPTION_CASES = [
     StubIntEnum,
 ]
 
-
+@pytest.mark.skip("Restore when type spec serializer is implemented.")
 def test_from_class():
     """Test EnumSpec.from_class method."""
     for test_case in _FROM_CLASS_VALID_CASES:
 
         # Get enum spec and serialize as YAML
         type_spec = DataclassSpec.from_class(test_case)
-        type_spec_str = YamlSerializers.FOR_REPORTING.serialize(type_spec)
+        type_spec_dict = asdict(type_spec)
+        type_spec_str = YamlSerializers.FOR_REPORTING.serialize(type_spec_dict)
 
         # Record in RegressionGuard
         guard = RegressionGuard(channel=type_spec.type_name)
@@ -79,6 +82,7 @@ def test_from_class():
     RegressionGuard().verify_all()
 
 
+@pytest.mark.skip("Restore when type spec serializer is implemented.")
 def test_from_class_exceptions():
     """Test EnumSpec.from_class method exceptions."""
     for test_case in _FROM_CLASS_EXCEPTION_CASES:

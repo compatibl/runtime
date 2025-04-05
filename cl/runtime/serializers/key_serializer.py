@@ -35,6 +35,7 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.key_format_enum import KeyFormatEnum
@@ -54,11 +55,16 @@ class KeySerializer(Data):
     enum_serializer: EnumSerializer = required()
     """Use to serialize enum types."""
 
-    def serialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize key into a delimited string or a flattened sequence of primitive types."""
 
+        # Get the class of data, which may be NoneType
         data_class_name = TypeUtil.name(data)
-        schema_type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
+
+        # Get parameters from the type chain, considering the possibility that it may be None
+        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
+        is_optional = type_hint.optional if type_hint is not None else None
+        remaining_chain = type_hint.remaining if type_hint is not None else None
 
         # Ensure data type is the same as schema type if type chain is specified
         if schema_type_name is not None and data_class_name != schema_type_name:
@@ -68,15 +74,15 @@ class KeySerializer(Data):
             )
         if remaining_chain:
             raise RuntimeError(
-                f"Data is an instance of a key class {data_class_name} while type chain\n"
-                f"{', '.join(remaining_chain)} is remaining."
+                f"Data is an instance of a key class {data_class_name} that is incompatible with\n"
+                f"a composite type hint: {type_hint.to_str()}."
             )
 
         if data is None:
             if is_optional:
                 return None
             else:
-                raise RuntimeError(f"Key is None while its type hint {type_chain[0]} is not optional.")
+                raise RuntimeError(f"Key is None while its type hint {type_hint[0]} is not optional.")
         elif is_key(data):
             # Build the key (this has no effect if already frozen)
             data.build()
@@ -136,8 +142,8 @@ class KeySerializer(Data):
         tokens = deque(self._checked_value(x) for x in sequence)
 
         # Perform deserialization
-        key_type_chain = (TypeUtil.name(key_type),)
-        result = self._from_sequence(tokens, key_type, key_type_chain, key_type)
+        key_type_hint = (TypeUtil.name(key_type),)
+        result = self._from_sequence(tokens, key_type, key_type_hint, key_type)
 
         # Check if any tokens are remaining
         if (remaining_length := len(tokens)) > 0:
@@ -171,7 +177,7 @@ class KeySerializer(Data):
             (
                 [
                     # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
-                    self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_chain)
+                    self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_hint)
                 ]
                 if (v := getattr(data, k)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
                 else (
@@ -203,7 +209,7 @@ class KeySerializer(Data):
         self,
         tokens: Deque[TPrimitive],
         field_class: Type,
-        field_type_chain: Tuple[str, ...],
+        field_type_hint: TypeHint,
         root_class: Type,
     ) -> Any:
         """Deserialize key from a flattened sequence of primitive types."""
@@ -212,7 +218,7 @@ class KeySerializer(Data):
         elif is_primitive(field_class):
             # Primitive type, extract one token
             token = tokens.popleft()
-            return self.primitive_serializer.deserialize(token, field_type_chain)
+            return self.primitive_serializer.deserialize(token, field_type_hint)
         elif is_enum(field_class):
             # Enum type, extract one token
             token = tokens.popleft()
@@ -222,7 +228,7 @@ class KeySerializer(Data):
             type_spec = TypeSchema.for_class(field_class)
             field_dict = type_spec.get_field_dict()
             key_tokens = tuple(
-                self._from_sequence(tokens, field_spec.get_class(), field_spec.type_chain, root_class)
+                self._from_sequence(tokens, field_spec.get_class(), field_spec.type_hint, root_class)
                 for field_spec in field_dict.values()
             )
             result_type = type_spec.get_class()

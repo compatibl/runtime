@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import Any
+from typing import Any, Tuple, Type
 from typing import Sequence
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -26,6 +26,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.data_spec_util import DataSpecUtil
 from cl.runtime.schema.enum_spec import EnumSpec
+from cl.runtime.schema.type_hint import TypeHint
 
 
 class BuildUtil:
@@ -38,37 +39,37 @@ class BuildUtil:
             raise RuntimeError(f"An instance of {TypeUtil.name(obj)} is not yet frozen, call 'build' method first.")
 
     @classmethod
-    def typed_build(
-        cls,
-        data: Any,
-        type_chain: Sequence[str] | None = None,
-    ) -> Any:
+    def typed_build(cls, data: Any, type_hint: TypeHint | None = None) -> Any:  # TODO: Rename to build?
         """
         This method performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Validates root level object against the schema and calls its 'mark_frozen' method
         """
-        # Get type and class of data and parse type chain
-        data_class_name = type(data).__name__ if data is not None else None
-        schema_type_name, is_optional, remaining_chain = TypeUtil.unpack_type_chain(type_chain)
+        # Get the class of data, which may be NoneType
+        data_class_name = TypeUtil.name(data)
+        
+        # Get parameters from the type chain, considering the possibility that it may be None
+        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
+        is_optional = type_hint.optional if type_hint is not None else None
+        remaining_chain = type_hint.remaining if type_hint is not None else None
 
-        if data is None:
-            # Return None if no type information or is_optional flag is set, otherwise raise an error
-            if schema_type_name is None or is_optional:
+        if data_class_name == "NoneType":
+            if type_hint is None or is_optional:
+                # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
                 return None
             else:
-                raise RuntimeError(f"Data is None but type hint {type_chain[0]} indicates it is required.")
+                raise RuntimeError(f"Data is None but type hint {type_hint[0]} indicates it is required.")
         elif data_class_name in PRIMITIVE_CLASS_NAMES:
             if remaining_chain:
                 raise RuntimeError(
-                    f"Data is an instance of a primitive class {data_class_name} while type chain\n"
-                    f"{', '.join(remaining_chain)} is remaining."
+                    f"Data is an instance of a primitive class {data_class_name} that is incompatible with\n"
+                    f"a composite type hint: {type_hint.to_str()}."
                 )
-            if schema_type_name is None:
+            if type_hint is None:
                 raise RuntimeError(
                     f"An instance of a primitive class {data_class_name} is passed to\n"
-                    f"the BuildUtil.typed_build method without specifying the schema type."
+                    f"the BuildUtil.typed_build method without specifying the type chain."
                 )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
@@ -79,24 +80,16 @@ class BuildUtil:
                 # Error if not an enum
                 if not isinstance(data, EnumSpec):
                     raise RuntimeError(
-                        f"Schema type '{schema_type_name}' is not a primitive type or enum while"
+                        f"Type hint '{type_hint.to_str()}' is not a primitive type or enum while"
                         f"the data is an instance of primitive class {data_class_name}:\n"
                         f"{ErrorUtil.wrap(data)}."
                     )
         elif data_class_name in SEQUENCE_TYPE_NAMES:
-            if not remaining_chain:
-                raise RuntimeError(
-                    f"Inner type is not specified in schema for the sequence type {data_class_name}.\n"
-                    f"Use type_name[Any] to specify a sequence with any item type."
-                )
+            type_hint.validate_for_sequence()
             # TODO: Use tuple instead of list
             return list(cls.typed_build(v, remaining_chain) for v in data)
         elif data_class_name in MAPPING_TYPE_NAMES:
-            if not remaining_chain:
-                raise RuntimeError(
-                    f"Inner type not specified for the mapping type {data_class_name}.\n"
-                    f"Use type_name[str, Any] to specify a mapping with any value type."
-                )
+            type_hint.validate_for_mapping()
             # TODO: Use frozendict instead of dict
             return dict((k, cls.typed_build(v, remaining_chain)) for k, v in data.items())
         elif is_data(data):
@@ -142,7 +135,7 @@ class BuildUtil:
 
             # Apply updates to the data object
             tuple(
-                setattr(data, k, cls.typed_build(v, field_spec.type_chain))
+                setattr(data, k, cls.typed_build(v, field_spec.type_hint))
                 for k, field_spec in data_field_dict.items()
                 if (
                     (v := getattr(data, k)) is not None

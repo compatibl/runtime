@@ -16,7 +16,7 @@ import dataclasses
 from dataclasses import dataclass
 from typing import Set
 from typing import Type
-from typing import get_type_hints
+from typing import get_type_hints  # TODO: Use TypeHint class instead
 from memoization import cached
 from typing_extensions import Self
 from cl.runtime.records.type_util import TypeUtil
@@ -62,8 +62,8 @@ class DataclassTypeDecl(TypeDecl):
             # Information about dataclass fields including the metadata (does not resolve ForwardRefs)
             fields = dataclasses.fields(record_type)
 
-            # Get type hints to resolve ForwardRefs
-            type_hints = get_type_hints(record_type)
+            # Get type aliases with resolved ForwardRefs
+            type_aliases = get_type_hints(record_type)
 
             # Dictionary of member comments (docstrings), currently requires source parsing due Python limitations
             member_comments = cls.get_member_comments(record_type)
@@ -77,7 +77,7 @@ class DataclassTypeDecl(TypeDecl):
                     continue
 
                 # Get type from type hints because they resolve forward references
-                field_type = type_hints[field.name]
+                field_type = type_aliases[field.name]
 
                 # Field comment (docstring)
                 field_comment = member_comments.get(field.name, None)

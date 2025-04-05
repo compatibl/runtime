@@ -18,6 +18,7 @@ from typing import Tuple
 import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum
@@ -66,11 +67,11 @@ class JsonSerializer(Data):
             enum_serializer=EnumSerializers.DEFAULT,
         ).build()
 
-    def serialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
+    def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize to a JSON string."""
 
         # Use self.dict_serializer to serialize the data to a dictionary
-        data_dict = self._data_serializer.serialize(data, type_chain)
+        data_dict = self._data_serializer.serialize(data, type_hint)
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
         if self.json_output_format == JsonOutputFormatEnum.PRETTY_PRINT:
@@ -83,10 +84,10 @@ class JsonSerializer(Data):
         result = orjson.dumps(data_dict, option=option).decode("utf-8")
         return result
 
-    def deserialize(self, data: Any, type_chain: Tuple[Tuple[str, Type, bool], ...] | None = None) -> Any:
+    def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize a JSON string into an object if bidirectional flag is set, and to a dictionary if not."""
 
-        # TODO: Validate type_chain
+        # TODO: Validate type_hint
 
         if self.type_inclusion == TypeInclusionEnum.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
@@ -95,5 +96,5 @@ class JsonSerializer(Data):
         json_dict = orjson.loads(data.encode("utf-8"))
 
         # Use self.dict_serializer to deserialize from the dictionary
-        result = self._data_serializer.typed_deserialize(json_dict, type_chain)
+        result = self._data_serializer.typed_deserialize(json_dict, type_hint)
         return result

@@ -18,6 +18,7 @@ from uuid import UUID
 from bson import Int64
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
@@ -83,23 +84,24 @@ def test_roundtrip():
 
         # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
         type_name, value, serialized, *alternative_serialized_list = test_case
+        type_hint = TypeHint(schema_type_name=type_name, optional=(value is None))
 
         # Test passthrough with and without type_name
         assert PrimitiveSerializers.PASSTHROUGH.serialize(value) == value
-        assert PrimitiveSerializers.PASSTHROUGH.serialize(value, [type_name]) == value
+        assert PrimitiveSerializers.PASSTHROUGH.serialize(value, type_hint) == value
 
         # Serialize without type_name, deserialization always requires type_name
         assert PrimitiveSerializers.DEFAULT.serialize(value) == serialized
-        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, [type_name]) == value
+        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, type_hint) == value
 
         # Serialize and deserialize with type_name
-        assert PrimitiveSerializers.DEFAULT.serialize(value, [type_name]) == serialized
-        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, [type_name]) == value
+        assert PrimitiveSerializers.DEFAULT.serialize(value, type_hint) == serialized
+        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, type_hint) == value
 
         # Test alternative serialized forms
         if alternative_serialized_list:
             for alternative_serialized in alternative_serialized_list:
-                assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, [type_name]) == value
+                assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, type_hint) == value
 
 
 def test_mongo():
@@ -123,19 +125,20 @@ def test_mongo():
 
         # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
         type_name, value, serialized, *alternative_serialized_list = test_case
+        type_hint = TypeHint(schema_type_name=type_name, optional=(value is None))
 
         # Serialize without type_name, deserialization always requires type_name
         assert PrimitiveSerializers.FOR_MONGO.serialize(value) == serialized
-        assert PrimitiveSerializers.FOR_MONGO.deserialize(serialized, [type_name]) == value
+        assert PrimitiveSerializers.FOR_MONGO.deserialize(serialized, type_hint) == value
 
         # Serialize and deserialize with type_name
-        assert PrimitiveSerializers.FOR_MONGO.serialize(value, [type_name]) == serialized
-        assert PrimitiveSerializers.FOR_MONGO.deserialize(serialized, [type_name]) == value
+        assert PrimitiveSerializers.FOR_MONGO.serialize(value, type_hint) == serialized
+        assert PrimitiveSerializers.FOR_MONGO.deserialize(serialized, type_hint) == value
 
         # Test alternative serialized forms
         if alternative_serialized_list:
             for alternative_serialized in alternative_serialized_list:
-                assert PrimitiveSerializers.FOR_MONGO.deserialize(alternative_serialized, [type_name]) == value
+                assert PrimitiveSerializers.FOR_MONGO.deserialize(alternative_serialized, type_hint) == value
 
 
 def test_serialization_exceptions():
@@ -156,15 +159,16 @@ def test_serialization_exceptions():
     # Check exception cases with type name (without type name, the call will succeed for most values)
     for test_case in test_cases:
         type_name, value = test_case
+        type_hint = TypeHint(schema_type_name=type_name, optional=(value is None))
 
         # Test passthrough with type_name
         with pytest.raises(Exception):
             print(value)
-            PrimitiveSerializers.PASSTHROUGH.serialize(value, [type_name])
+            PrimitiveSerializers.PASSTHROUGH.serialize(value, type_hint)
 
         # Test default settings with type_name
         with pytest.raises(Exception):
-            PrimitiveSerializers.DEFAULT.serialize(value, [type_name])
+            PrimitiveSerializers.DEFAULT.serialize(value, type_hint)
 
 
 def test_deserialization_exceptions():
@@ -190,10 +194,11 @@ def test_deserialization_exceptions():
     # Check exception cases
     for test_case in test_cases:
         type_name, serialized = test_case
+        type_hint = TypeHint(schema_type_name=type_name, optional=(serialized is None))
         with pytest.raises(Exception):
-            PrimitiveSerializers.PASSTHROUGH.deserialize(serialized, [type_name])
+            PrimitiveSerializers.PASSTHROUGH.deserialize(serialized, type_hint)
         with pytest.raises(Exception):
-            PrimitiveSerializers.DEFAULT.deserialize(serialized, [type_name])
+            PrimitiveSerializers.DEFAULT.deserialize(serialized, type_hint)
 
 
 if __name__ == "__main__":

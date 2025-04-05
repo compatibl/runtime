@@ -59,7 +59,7 @@ class DataclassSpec(DataSpec):
 
         result = FieldSpec.create(
             field_name=field.name,
-            type_hint=field.type,
+            type_alias=field.type,
             containing_type_name=containing_type_name,
             field_optional=metadata.pop("optional", None),
             field_subtype=metadata.pop("subtype", None),
