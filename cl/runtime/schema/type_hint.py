@@ -14,15 +14,16 @@
 
 import types
 import typing
-from typing import List
 from dataclasses import dataclass
+from typing import List
 from typing import Type
 from uuid import UUID
-
 from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.frozen_data_mixin import FrozenDataMixin
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, SEQUENCE_TYPE_NAMES, MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -75,19 +76,19 @@ class TypeHint(FrozenDataMixin):
 
     @classmethod
     def for_class(
-            cls,
-            class_: Type,
-            *,
-            optional: bool = False,
-            schema_type_name: str | None = None,
+        cls,
+        class_: Type,
+        *,
+        optional: bool = False,
+        schema_type_name: str | None = None,
     ) -> Self:
         """Create type hint for a class with optional parameters."""
 
         class_name = TypeUtil.name(class_)
         if (
-                schema_type_name is None or
-                (schema_type_name == "long" and class_ is int) or
-                (schema_type_name == "timestamp" and class_ is UUID)
+            schema_type_name is None
+            or (schema_type_name == "long" and class_ is int)
+            or (schema_type_name == "timestamp" and class_ is UUID)
         ):
             # Validate and use subtype if specified
             schema_type_name = class_name
@@ -156,11 +157,13 @@ class TypeHint(FrozenDataMixin):
                         )
                     # Populate container data and extract the inner type alias
                     type_alias = type_alias_args[0]
-                    type_hint_tokens.append(TypeHint(
-                        schema_type_name="list",
-                        schema_class=list,
-                        optional=type_alias_optional,
-                    ))
+                    type_hint_tokens.append(
+                        TypeHint(
+                            schema_type_name="list",
+                            schema_class=list,
+                            optional=type_alias_optional,
+                        )
+                    )
                 elif type_alias_origin is tuple:
                     # Perform additional checks for tuple
                     if len(type_alias_args) != 2 or type_alias_args[1] is not Ellipsis:
@@ -171,11 +174,13 @@ class TypeHint(FrozenDataMixin):
                         )
                     # Populate container data and extract the inner type alias
                     type_alias = type_alias_args[0]
-                    type_hint_tokens.append(TypeHint(
-                        schema_type_name="tuple",
-                        schema_class=tuple,
-                        optional=type_alias_optional,
-                    ))
+                    type_hint_tokens.append(
+                        TypeHint(
+                            schema_type_name="tuple",
+                            schema_class=tuple,
+                            optional=type_alias_optional,
+                        )
+                    )
                 elif type_alias_origin is dict:
                     # Perform additional checks for dict
                     if len(type_alias_args) != 2 or type_alias_args[0] is not str:
@@ -186,11 +191,13 @@ class TypeHint(FrozenDataMixin):
                         )
                     # Populate container data and extract the inner type alias
                     type_alias = type_alias_args[1]
-                    type_hint_tokens.append(TypeHint(
-                        schema_type_name="dict",
-                        schema_class=dict,
-                        optional=type_alias_optional,
-                    ))
+                    type_hint_tokens.append(
+                        TypeHint(
+                            schema_type_name="dict",
+                            schema_class=dict,
+                            optional=type_alias_optional,
+                        )
+                    )
                 else:
                     supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
                     raise RuntimeError(
@@ -214,33 +221,37 @@ class TypeHint(FrozenDataMixin):
 
                         # Apply field subtype from metadata if specified
                         if field_subtype is None or field_subtype == schema_type_name:
-                            type_hint_tokens.append(TypeHint(
-                                schema_type_name=schema_type_name,
-                                schema_class=type_alias,
-                                optional=type_alias_optional,
-                            ))
+                            type_hint_tokens.append(
+                                TypeHint(
+                                    schema_type_name=schema_type_name,
+                                    schema_class=type_alias,
+                                    optional=type_alias_optional,
+                                )
+                            )
                         elif field_subtype == "long":
                             if schema_type_name == "int":
-                                type_hint_tokens.append(TypeHint(
-                                    schema_type_name="long",
-                                    schema_class=int,
-                                    optional=type_alias_optional,
-                                ))
+                                type_hint_tokens.append(
+                                    TypeHint(
+                                        schema_type_name="long",
+                                        schema_class=int,
+                                        optional=type_alias_optional,
+                                    )
+                                )
                             else:
                                 raise RuntimeError(f"Subtype 'long' is not valid for type hint {type_alias}")
                         elif field_subtype == "timestamp":
                             if schema_type_name == "UUID":
-                                type_hint_tokens.append(TypeHint(
-                                    schema_type_name="timestamp",
-                                    schema_class=UUID,
-                                    optional=type_alias_optional,
-                                ))
+                                type_hint_tokens.append(
+                                    TypeHint(
+                                        schema_type_name="timestamp",
+                                        schema_class=UUID,
+                                        optional=type_alias_optional,
+                                    )
+                                )
                             else:
                                 raise RuntimeError(f"Subtype 'timestamp' is not valid for type hint {type_alias}")
                         else:
-                            raise RuntimeError(
-                                f"Type name {field_subtype} is not valid for class {schema_type_name}."
-                            )
+                            raise RuntimeError(f"Type name {field_subtype} is not valid for class {schema_type_name}.")
                     else:
                         raise RuntimeError(
                             f"Type hint {type_alias} is not supported. Supported type hints include:\n"
@@ -267,14 +278,14 @@ class TypeHint(FrozenDataMixin):
 
     @classmethod
     def _link_type_hint_tokens(cls, type_hints: List[Self] | None) -> Self | None:
-            """Convert a list of type chain tokens into a linked type chain using the 'remaining' field."""
-            if type_hints:
-                head, *tail = type_hints
-                return TypeHint(
-                    schema_type_name=head.schema_type_name,
-                    schema_class=head.schema_class,
-                    optional=head.optional,
-                    remaining=cls._link_type_hint_tokens(tail)
-                )
-            else:
-                return None
+        """Convert a list of type chain tokens into a linked type chain using the 'remaining' field."""
+        if type_hints:
+            head, *tail = type_hints
+            return TypeHint(
+                schema_type_name=head.schema_type_name,
+                schema_class=head.schema_class,
+                optional=head.optional,
+                remaining=cls._link_type_hint_tokens(tail),
+            )
+        else:
+            return None

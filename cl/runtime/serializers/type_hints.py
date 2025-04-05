@@ -14,7 +14,6 @@
 
 import datetime as dt
 from uuid import UUID
-
 from cl.runtime.schema.type_hint import TypeHint
 
 

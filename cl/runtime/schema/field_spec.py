@@ -42,16 +42,16 @@ class FieldSpec(FrozenDataMixin):
 
     @classmethod
     def create(
-            cls,
-            *,
-            field_name: str,
-            type_alias: typing.TypeAlias,
-            field_optional: bool | None = None,
-            field_subtype: str | None = None,
-            field_alias: str | None = None,
-            field_label: str | None = None,
-            field_formatter: str | None = None,
-            containing_type_name: str,
+        cls,
+        *,
+        field_name: str,
+        type_alias: typing.TypeAlias,
+        field_optional: bool | None = None,
+        field_subtype: str | None = None,
+        field_alias: str | None = None,
+        field_label: str | None = None,
+        field_formatter: str | None = None,
+        containing_type_name: str,
     ) -> Self:
         """
         Create type spec by parsing the type hint.
@@ -71,7 +71,7 @@ class FieldSpec(FrozenDataMixin):
         type_hint = TypeHint.for_type_alias(
             type_alias=type_alias,
             field_subtype=field_subtype,
-            where_msg=f"for field {field_name} in {containing_type_name}"
+            where_msg=f"for field {field_name} in {containing_type_name}",
         )
 
         if field_alias is not None:

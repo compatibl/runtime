@@ -13,11 +13,10 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import Any, Tuple, Type
-from typing import Sequence
+from typing import Any
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, PRIMITIVE_CLASSES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -48,7 +47,7 @@ class BuildUtil:
         """
         # Get the class of data, which may be NoneType
         data_class_name = TypeUtil.name(data)
-        
+
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
         is_optional = type_hint.optional if type_hint is not None else None

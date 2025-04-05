@@ -16,7 +16,7 @@ import base64
 import datetime as dt
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Sequence, Any, Tuple, Type
+from typing import Any
 from uuid import UUID
 from bson import Int64
 from cl.runtime.exceptions.error_util import ErrorUtil
@@ -28,7 +28,6 @@ from cl.runtime.primitive.int_util import IntUtil
 from cl.runtime.primitive.limits import check_int_32
 from cl.runtime.primitive.limits import check_int_54
 from cl.runtime.primitive.long_util import LongUtil
-from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
@@ -122,8 +121,7 @@ class PrimitiveSerializer(Data):
             elif schema_type_name == "timestamp":
                 if data_class_name != "UUID":
                     raise RuntimeError(
-                        f"Type {schema_type_name} can only be stored using UUID class, "
-                        f"not {data_class_name} class."
+                        f"Type {schema_type_name} can only be stored using UUID class, " f"not {data_class_name} class."
                     )
             elif data is not None and data_class_name != schema_type_name:
                 raise RuntimeError(f"Type {schema_type_name} cannot be stored as {data_class_name} class.")
@@ -260,7 +258,9 @@ class PrimitiveSerializer(Data):
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
-        is_optional = type_hint.optional if type_hint is not None else None  # TODO: Add a check for optional if value is not provided
+        is_optional = (
+            type_hint.optional if type_hint is not None else None
+        )  # TODO: Add a check for optional if value is not provided
 
         # Check if data is empty and validate is_optional flag
         is_data_empty = data in [None, "", "null"]

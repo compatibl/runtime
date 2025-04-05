@@ -14,12 +14,11 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Type, Any
+from typing import Any
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.enum_format_enum import EnumFormatEnum

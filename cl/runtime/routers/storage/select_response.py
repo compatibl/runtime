@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-
 from enum import Enum
 from typing import Any
 from typing import Dict
@@ -23,7 +22,9 @@ from pydantic import Field
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.class_info import ClassInfo
-from cl.runtime.records.protocols import RecordProtocol, is_key, PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil

@@ -22,7 +22,8 @@ from typing import Dict
 from typing import Literal
 from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.records.protocols import MAPPING_CLASSES, SEQUENCE_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil

@@ -24,6 +24,7 @@ from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers
 
+
 def _create_task(queue: TaskQueueKey) -> TaskKey:
     """Create a test task."""
 

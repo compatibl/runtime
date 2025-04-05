@@ -14,7 +14,6 @@
 
 from typing import Any
 from typing import Dict
-from typing import Tuple
 from typing import Type
 from typing import TypeGuard
 from cl.runtime.records.protocols import TObj

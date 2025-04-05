@@ -20,19 +20,16 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
-from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
-from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
-from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
@@ -110,8 +107,7 @@ class DataSerializer(Data):
                     return [self.typed_deserialize(v, type_hint) for v in data]
                 else:
                     raise RuntimeError(
-                        f"Data type {data_class_name} is a sequence but schema type\n"
-                        f"{schema_type_name} is not."
+                        f"Data type {data_class_name} is a sequence but schema type\n" f"{schema_type_name} is not."
                     )
             elif data_class_name in MAPPING_CLASS_NAMES:
                 # Get type name from the input dict
@@ -283,7 +279,7 @@ class DataSerializer(Data):
 
     def typed_deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize data using type_hint and schema."""
-        
+
         # Get the class of data, which may be NoneType
         data_class_name = TypeUtil.name(data)
 
@@ -301,8 +297,10 @@ class DataSerializer(Data):
         elif schema_type_name in PRIMITIVE_TYPE_NAMES:
             # Check that no type chain is remaining
             if remaining_chain:
-                raise RuntimeError(f"Type chain {type_hint.to_str()} is not valid because\n"
-                                   f"it specifies an inner type for a primitive outer type.")
+                raise RuntimeError(
+                    f"Type chain {type_hint.to_str()} is not valid because\n"
+                    f"it specifies an inner type for a primitive outer type."
+                )
             # Deserialize primitive type using primitive serializer if specified, otherwise return raw data
             return self.primitive_serializer.deserialize(data, type_hint)
         elif schema_type_name in SEQUENCE_TYPE_NAMES:
@@ -330,7 +328,9 @@ class DataSerializer(Data):
             if self.key_serializer is not None and is_key(schema_class):
                 if (
                     # TODO: Eliminate check for the fist character
-                    self.data_encoder is not None and len(data) > 0 and data[0] == "{"
+                    self.data_encoder is not None
+                    and len(data) > 0
+                    and data[0] == "{"
                 ):  # TODO: Fix for non-JSON encoding
                     # Decode data field using data_encoder if provided and deserialize using self
                     decoded_data = self.data_encoder.decode(data)
@@ -346,7 +346,8 @@ class DataSerializer(Data):
                 # Check that no type chain is remaining
                 if remaining_chain:
                     raise RuntimeError(
-                        f"Type hint {type_hint.to_str()} is not a container but specifies an inner type.")
+                        f"Type hint {type_hint.to_str()} is not a container but specifies an inner type."
+                    )
                 # Deserialize
                 result = self.enum_serializer.deserialize(data, type_hint)
                 return result
@@ -379,7 +380,8 @@ class DataSerializer(Data):
             if type_hint is not None and type_hint.remaining is not None:
                 raise RuntimeError(
                     f"Data type {type_name} is not a container but type hint specifies an inner type:\n"
-                    f"{type_hint.to_str()}.")
+                    f"{type_hint.to_str()}."
+                )
 
             # Get class and field dictionary for type_name
             schema_class = type_spec.get_class()

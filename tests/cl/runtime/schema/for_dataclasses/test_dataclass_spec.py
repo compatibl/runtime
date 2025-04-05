@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import asdict
-
 import pytest
+from dataclasses import asdict
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.dataclass_spec import DataclassSpec
@@ -65,6 +64,7 @@ _FROM_CLASS_EXCEPTION_CASES = [
     type,
     StubIntEnum,
 ]
+
 
 @pytest.mark.skip("Restore when type spec serializer is implemented.")
 def test_from_class():

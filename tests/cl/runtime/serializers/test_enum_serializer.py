@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from stubs.cl.runtime import StubIntEnum

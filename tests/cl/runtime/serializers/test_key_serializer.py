@@ -18,10 +18,7 @@ from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
