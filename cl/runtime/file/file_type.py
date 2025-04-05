@@ -18,9 +18,6 @@ from enum import IntEnum, auto
 class FileType(IntEnum):
     """Binary content type enumeration."""
 
-    UNDEFINED = auto()
-    """Undefined content type."""
-
     JPG = auto()
     """Jpg image type."""
 
