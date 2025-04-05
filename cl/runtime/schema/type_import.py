@@ -22,7 +22,7 @@ from memoization import cached  # TODO: Replace cached package by custom caching
 from cl.runtime.records.type_util import TypeUtil
 
 
-class ClassInfo(ABC):
+class TypeImport(ABC):
     """Helper methods for Record."""
 
     @classmethod

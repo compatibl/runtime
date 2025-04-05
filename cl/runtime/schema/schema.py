@@ -26,7 +26,7 @@ from typing import cast
 from memoization import cached
 from typing_extensions import Self
 from cl.runtime.primitive.string_util import StringUtil
-from cl.runtime.records.class_info import ClassInfo
+from cl.runtime.schema.type_import import TypeImport
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import is_key_or_record
@@ -146,7 +146,7 @@ class Schema:
     def for_class_path(cls, class_path: str) -> Dict[str, Dict]:
         """Create or return cached object for the specified class path in module.ClassName format."""
 
-        record_type = ClassInfo.get_class_type(class_path)
+        record_type = TypeImport.get_class_type(class_path)
         return cls.for_type(record_type)
 
     @classmethod
@@ -238,7 +238,7 @@ class Schema:
     def get_type_successors(cls, record_type: Type) -> Set[Type]:
         """Returns a set of successors."""
 
-        # TODO)Major): Use ClassInfo.get_inheritance_chain and record base classes in DB so unknow types can also be returned
+        # TODO)Major): Use TypeImport.get_inheritance_chain and record base classes in DB so unknow types can also be returned
         return set(  # noqa
             schema_type
             for schema_type in Schema.get_types()

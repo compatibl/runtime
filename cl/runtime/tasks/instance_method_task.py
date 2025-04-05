@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Callable
 from typing_extensions import Self
 from typing_extensions import override
-from cl.runtime import ClassInfo
+from cl.runtime import TypeImport
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -45,7 +45,7 @@ class InstanceMethodTask(MethodTask):
     def _execute(self) -> None:
         """Invoke the specified instance method."""
 
-        key_type = ClassInfo.get_class_type(self.key_type_str)
+        key_type = TypeImport.get_class_type(self.key_type_str)
         type_hint = TypeHint.for_class(key_type)
         key = _KEY_SERIALIZER.deserialize(self.key_str, type_hint)
 

@@ -18,7 +18,7 @@ from typing import Callable
 from typing import Type
 from typing_extensions import Self
 from typing_extensions import override
-from cl.runtime import ClassInfo
+from cl.runtime import TypeImport
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
@@ -38,7 +38,7 @@ class StaticMethodTask(MethodTask):
         """Invoke the specified @staticmethod or @classmethod."""
 
         # Get record type from fully qualified name in module.ClassName format
-        record_type = ClassInfo.get_class_type(self.type_str)
+        record_type = TypeImport.get_class_type(self.type_str)
 
         # Method callable is already bound to cls, it is not necessary to pass cls as an explicit parameter
         method_name = self.normalized_method_name()

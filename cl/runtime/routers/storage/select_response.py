@@ -21,7 +21,7 @@ from pydantic import BaseModel
 from pydantic import Field
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.class_info import ClassInfo
+from cl.runtime.schema.type_import import TypeImport
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
@@ -47,7 +47,7 @@ class SelectResponse(BaseModel):
     def get_records(cls, request: SelectRequest) -> SelectResponse:
         """Implements /storage/select route."""
 
-        record_type = ClassInfo.get_class_type(f"{request.module}.{request.type_}")
+        record_type = TypeImport.get_class_type(f"{request.module}.{request.type_}")
 
         # Load records for type
         records = DbContext.get_db().load_all(record_type)  # noqa

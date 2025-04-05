@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime import ClassInfo
+from cl.runtime import TypeImport
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_schema import TypeSchema
@@ -39,9 +39,9 @@ def test_get_type_by_short_name():
 def test_get_type_by_class_path():
     """Test Schema.get_type_by_class_path() method."""
 
-    assert ClassInfo.get_class_type("cl.runtime.schema.type_decl.TypeDecl") is TypeDecl
+    assert TypeImport.get_class_type("cl.runtime.schema.type_decl.TypeDecl") is TypeDecl
     assert (
-        ClassInfo.get_class_type("stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord")
+        TypeImport.get_class_type("stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord")
         is StubDataclassRecord
     )
 

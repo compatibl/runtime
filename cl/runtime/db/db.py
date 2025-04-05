@@ -23,7 +23,7 @@ from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.build_util import BuildUtil
-from cl.runtime.records.class_info import ClassInfo
+from cl.runtime.schema.type_import import TypeImport
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -297,7 +297,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         # Get DB type from context settings if not specified
         if db_type is None:
             context_settings = ContextSettings.instance()
-            db_type = ClassInfo.get_class_type(context_settings.db_class)
+            db_type = TypeImport.get_class_type(context_settings.db_class)
 
         # Get DB identifier if not specified
         if db_id is None:
