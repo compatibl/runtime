@@ -164,20 +164,11 @@ class DataSerializer(Data):
                 )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
-                # Deserialize using primitive serializer if specified
+                # Deserialize using primitive serializer if a primitive type
                 return self.primitive_serializer.serialize(data, type_hint)
             else:
-                # Parse as enum
-                type_spec = TypeSchema.for_type_name(schema_type_name)
-                if not isinstance(type_spec, EnumSpec):
-                    raise RuntimeError(
-                        f"Type hint '{type_hint.to_str()}' is not a primitive type or enum while\n"
-                        f"the data is an instance of primitive class {data_class_name}:\n"
-                        f"{ErrorUtil.wrap(data)}."
-                    )
-                # Serialize
-                enum_class = type_spec.get_class()
-                result = self.enum_serializer.serialize(data, enum_class)
+                # Otherwise assume it is an enum
+                result = self.enum_serializer.serialize(data, type_hint)
                 return result
         elif data_class_name in SEQUENCE_TYPE_NAMES:
             # Serialize sequence into list, allowing remaining_chain to be None
@@ -265,7 +256,7 @@ class DataSerializer(Data):
                         self.primitive_serializer.serialize(v, field_spec.type_hint)
                         if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                         else (
-                            self.enum_serializer.serialize(v, field_spec.get_class())
+                            self.enum_serializer.serialize(v, field_spec.type_hint)
                             if is_enum(v)
                             else (
                                 key_serializer.serialize(v, field_spec.type_hint)
@@ -357,7 +348,7 @@ class DataSerializer(Data):
                     raise RuntimeError(
                         f"Type hint {type_hint.to_str()} is not a container but specifies an inner type.")
                 # Deserialize
-                result = self.enum_serializer.deserialize(data, type_hint.schema_class)
+                result = self.enum_serializer.deserialize(data, type_hint)
                 return result
             else:
                 raise RuntimeError(
@@ -365,21 +356,8 @@ class DataSerializer(Data):
                     f"from the following string or enum data:\n{ErrorUtil.wrap(data)}."
                 )
         elif isinstance(data, Enum):
-            # Process as enum if data is a string or enum, after checking that schema type is not primitive
-            type_spec = TypeSchema.for_type_name(schema_type_name)
-            if isinstance(type_spec, EnumSpec):
-                # Check that no type chain is remaining
-                if remaining_chain:
-                    raise RuntimeError(
-                        f"Type hint {type_hint.to_str()} is not a container but specifies an inner type.")
-                # Deserialize
-                schema_class = type_spec.get_class()
-                result = self.enum_serializer.deserialize(data, schema_class)
-                return result
-            else:
-                raise RuntimeError(
-                    f"Type hint '{type_hint.to_str()}' is incompatible with enum type {TypeUtil.name(data)}."
-                )
+            # Process as enum
+            return self.enum_serializer.deserialize(data, type_hint)
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Process as slotted class if data is a mapping but schema type is not
             # Get _type if provided, otherwise use schema_type_name

@@ -186,7 +186,7 @@ class KeySerializer(Data):
                 else (
                     [
                         # Use enum serializer, specify enum class
-                        self.enum_serializer.serialize(self._checked_value(v), field_spec.get_class())
+                        self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
                     ]
                     if isinstance(v, Enum)
                     else self._to_sequence(v)
@@ -225,7 +225,7 @@ class KeySerializer(Data):
         elif is_enum(field_class):
             # Enum type, extract one token
             token = tokens.popleft()
-            return self.enum_serializer.deserialize(token, field_class)
+            return self.enum_serializer.deserialize(token, field_type_hint)
         elif is_key(field_class):
             # Key type, extract as many tokens as slots
             type_spec = TypeSchema.for_class(field_class)

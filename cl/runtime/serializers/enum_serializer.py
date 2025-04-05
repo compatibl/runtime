@@ -36,20 +36,20 @@ class EnumSerializer(Data):
     enum_format: EnumFormatEnum = required()
     """Serialization format for enums that are not None."""
 
-    def serialize(self, data: Any, enum_type: Type | None = None) -> Any:
+    def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize an enum to a string or another primitive type (return None if value is None)."""
         if data is None:
-            if (value_format := self.none_format) == NoneFormatEnum.PASSTHROUGH:
+            if type_hint is not None and not type_hint.optional:
+                raise RuntimeError(f"Enum {type_hint.schema_type_name} value is None but marked as required.")
+            elif (value_format := self.none_format) == NoneFormatEnum.PASSTHROUGH:
                 return data
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormatEnum)
         elif isinstance(data, Enum):
             # Check that schema type matches if specified
-            if enum_type is not None and type(data) is not enum_type:
-                value_type_name = TypeUtil.name(type(data))
-                schema_type_name = TypeUtil.name(enum_type)
+            if type_hint is not None and type_hint.schema_type_name != (data_type_name := TypeUtil.name(data)):
                 raise RuntimeError(
-                    f"Type {value_type_name} of enum value does not match the type in schema {schema_type_name}"
+                    f"Enum value type {data_type_name} does not match the schema type {type_hint.schema_type_name}."
                 )
             # Serialize according to settings
             if (value_format := self.enum_format) == EnumFormatEnum.PASSTHROUGH:
@@ -64,14 +64,20 @@ class EnumSerializer(Data):
             value_type_name = TypeUtil.name(type(data))
             raise RuntimeError(f"Type {value_type_name} provided to {self.__class__.__name__} is not an enum type.")
 
-    def deserialize(self, data: Any, enum_type: Type) -> Any:
+    def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize a string or another primitive type to the specified enum type (return None if value is None)."""
-        if data is None:
+        if type_hint is None:
+            raise RuntimeError(f"Type hint is required for enum deserialization.")
+        elif type_hint.schema_class is None:
+            raise RuntimeError(f"Type hint must specify the class for enum deserialization.")
+        elif data in [None, "", "null"]:
+            if not type_hint.optional:
+                raise RuntimeError(f"Enum {type_hint.schema_type_name} value is None but marked as required.")
             if (value_format := self.none_format) == NoneFormatEnum.PASSTHROUGH:
                 return data
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormatEnum)
-        elif issubclass(enum_type, Enum):
+        elif issubclass(enum_type := type_hint.schema_class, Enum):
             if (value_format := self.enum_format) == EnumFormatEnum.PASSTHROUGH:
                 # Pass through the enum instance without changes
                 return data
