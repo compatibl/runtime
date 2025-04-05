@@ -15,6 +15,7 @@
 import pytest
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.schema.schema import Schema
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -31,9 +32,9 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import
 
 # TODO (Roman): move to Schema tests
 def test_get_subtypes_in_hierarchy():
-    types_in_hierarchy = Schema.get_types_in_hierarchy(StubDataclassRecordKey)
-
-    expected_types = {
+    result = RecordUtil.child_records_of(StubDataclassRecordKey)
+    expected = {
+        StubDataclassRecordKey,
         StubDataclassRecord,
         StubDataclassDerivedRecord,
         StubDataclassDerivedFromDerivedRecord,
@@ -46,13 +47,13 @@ def test_get_subtypes_in_hierarchy():
         StubDataclassNestedFields,
     }
 
-    assert len(types_in_hierarchy) == len(expected_types)
-    assert set(types_in_hierarchy) == expected_types
+    assert len(result) == len(expected)
+    assert set(result) == expected
 
 
 # TODO (Roman): move to Schema tests
 def test_get_key_class():
-    test_subtypes = (
+    samples = (
         StubDataclassRecord,
         StubDataclassDerivedRecord,
         StubDataclassDerivedFromDerivedRecord,
@@ -62,11 +63,8 @@ def test_get_key_class():
         StubDataclassListFields,
         StubDataclassOtherDerivedRecord,
     )
-
-    expected_key_type = StubDataclassRecordKey
-
-    for type_ in test_subtypes:
-        assert type_.get_key_type() == expected_key_type
+    for type_ in samples:
+        assert type_.get_key_type() == StubDataclassRecordKey
 
 
 def test_get_columns_mapping():

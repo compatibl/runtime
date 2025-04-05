@@ -119,7 +119,7 @@ class BasicMongoDb(Db):
         db = self._get_db()
         collection = db[collection_name]
 
-        subtype_names = list(t.__name__ for t in Schema.get_type_successors(record_type))
+        subtype_names = list(t.__name__ for t in RecordUtil.child_records_of(record_type))
         serialized_records = collection.find({"_type": {"$in": subtype_names}})
         result = []
         for serialized_record in serialized_records:

@@ -44,20 +44,17 @@ def test_functions():
         key_mixin_class,
     )
     data_classes = (
-        key_mixin_class,
         data_class,
         key_class,
         record_class,
         derived_class,
     )
     key_or_record_classes = (
-        key_mixin_class,
         key_class,
         record_class,
         derived_class,
     )
     key_classes = (
-        key_mixin_class,
         key_class,
     )
     record_classes = (

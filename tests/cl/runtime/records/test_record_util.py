@@ -17,7 +17,7 @@ from cl.runtime.records.record_util import RecordUtil
 from stubs.cl.runtime import StubDataclassRecord, StubDataclassDerivedRecord, StubDataclassData, StubDataclassRecordKey
 
 
-def test_get_non_abstract_ancestors():
+def test_get_superclasses():
     """Test getting class path from class."""
 
     # TODO: Add more test cases
@@ -26,17 +26,19 @@ def test_get_non_abstract_ancestors():
     derived_class = StubDataclassDerivedRecord
 
     # Common base class, returns self and key class
-    assert RecordUtil.get_non_abstract_ancestors(StubDataclassRecord) == [base_class, key_class]
+    assert RecordUtil.parent_records_of(StubDataclassRecord) == (base_class, key_class)
 
     # Derived class, returns self, common base and key
-    assert RecordUtil.get_non_abstract_ancestors(StubDataclassDerivedRecord) == [derived_class, base_class, key_class]
+    assert RecordUtil.parent_records_of(StubDataclassDerivedRecord) == (derived_class, base_class, key_class)
 
     # Invoke for a type that does not have a key class
     with pytest.raises(RuntimeError):
-        RecordUtil.get_non_abstract_ancestors(StubDataclassData)
+        RecordUtil.parent_records_of(StubDataclassData)
 
-    # Call one more time and confirm that method results are cached
-    assert RecordUtil.get_non_abstract_ancestors(StubDataclassRecord) == [base_class, key_class]
+    # Call twice to confirm that method results are cached
+    assert RecordUtil.parent_records_of(StubDataclassRecord) == (base_class, key_class)
+    assert RecordUtil.parent_records_of(StubDataclassRecord) == (base_class, key_class)
+    assert RecordUtil.parent_records_of.cache_info().hits > 1
 
 
 if __name__ == "__main__":

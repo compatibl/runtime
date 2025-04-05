@@ -24,6 +24,7 @@ from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.schema import Schema
 
@@ -111,7 +112,7 @@ class SqliteSchemaManager(Data):
     def get_columns_mapping(self, type_: Type) -> Dict[str, str]:
         """Collect all types in hierarchy and check type conflicts for fields with the same name."""
 
-        types_in_hierarchy = Schema.get_types_in_hierarchy(type_)
+        types_in_hierarchy = RecordUtil.records_sharing_key_with(type_)
         key_type = cast(KeyProtocol, type_).get_key_type()
 
         # Get table name inclusive of Key suffix if present

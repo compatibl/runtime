@@ -297,7 +297,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         # Get DB type from context settings if not specified
         if db_type is None:
             context_settings = ContextSettings.instance()
-            db_type = TypeImport.from_qual_name(context_settings.db_class)
+            db_type = TypeImport.class_from_qual_name(context_settings.db_class)
 
         # Get DB identifier if not specified
         if db_id is None:

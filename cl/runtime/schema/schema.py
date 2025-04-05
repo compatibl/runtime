@@ -13,29 +13,15 @@
 # limitations under the License.
 
 from __future__ import annotations
-import inspect
-from collections import Counter
-from collections import defaultdict
 from enum import Enum
 from typing import Dict
-from typing import Iterable
-from typing import List
-from typing import Set
 from typing import Type
-from typing import cast
 from memoization import cached
 from typing_extensions import Self
-from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.schema.type_import import TypeImport
-from cl.runtime.records.protocols import PRIMITIVE_CLASSES
-from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_decl_key import TypeDeclKey
-from cl.runtime.schema.type_schema import TypeSchema
-from cl.runtime.schema.type_schema import is_schema_type
-from cl.runtime.settings.context_settings import ContextSettings
 
 
 class Schema:
@@ -43,98 +29,10 @@ class Schema:
     Provide declarations for the specified type and all dependencies.
     """
 
-    _type_dict_by_short_name: Dict[str, Type] = None
-
-    @classmethod
-    @cached
-    def get_types(cls) -> Iterable[Type]:
-        """
-        Get all record and field types found in the list of packages specified in settings.
-
-        Notes:
-            The result is returned in the alphabetical order of module.ClassName.
-        """
-        return cls.get_type_dict().values()
-
-    @classmethod
-    def add_types_to_dict_by_short_name(cls, types: Iterable[Type]) -> None:
-        """Add types to the dictionary by short name (class name with optional package alias)."""
-
-        types_dict = {TypeUtil.name(x): x for x in types}
-        cls.get_type_dict().update(types_dict)
-
     @classmethod
     def get_type_by_short_name(cls, short_name: str) -> Type:
         """Get type from short name (class name with optional package alias)."""
-        if StringUtil.is_empty(short_name):
-            raise RuntimeError("Empty short name is passed to Schema.get_type_by_short_name.")
-
-        # Get dictionary of types indexed by alias
-        type_dict_by_short_name = cls.get_type_dict()
-
-        # TODO: Update to support short name with namespace prefix
-        record_type = type_dict_by_short_name.get(short_name, None)
-        if record_type is None:
-            raise RuntimeError(
-                f"Record class with short name {short_name} is not found "
-                f"in the list of packages specified in settings. Check for "
-                f"the presence of __init__.py in each source directory."
-            )
-        return record_type
-
-    @classmethod
-    def get_type_dict(cls) -> Dict[str, Type]:
-        """
-        Get dictionary of types indexed by short name (class name with optional package alias).
-
-        Notes:
-            The result is returned in the alphabetical order of module.ClassName.
-        """
-
-        if cls._type_dict_by_short_name is None:
-            # Load packages from Dynaconf
-            context_settings = ContextSettings.instance()
-            packages = context_settings.packages
-
-            # Get modules for the specified packages
-            modules = TypeSchema._get_modules()
-
-            # Get record types by iterating over modules
-            record_types = set(
-                record_type for module in modules for name, record_type in inspect.getmembers(module, is_schema_type)
-            )
-
-            # TODO: Support namespace aliases to resolve conflicts
-            record_types = list(PRIMITIVE_CLASSES) + sorted(record_types, key=lambda x: x.__name__)
-            record_names = [TypeUtil.name(record_type) for record_type in record_types]
-
-            # Check that there are no repeated names, report errors if there are
-            if len(set(record_names)) != len(record_names):
-                # Count the occurrences of each name in the list
-                record_name_counts = Counter(record_names)
-
-                # Find names and their types that are repeated more than once
-                repeated_names = [record_name for record_name, count in record_name_counts.items() if count > 1]
-
-                # Report repeated names
-                repeated_type_reports = "\n".join(
-                    repeated_name
-                    + ": "
-                    + ", ".join(
-                        f"{x.__module__}.{x.__name__}" for x in record_types if TypeUtil.name(x) == repeated_name
-                    )
-                    for repeated_name in repeated_names
-                )
-                raise RuntimeError(f"The following class names are not unique:\n{repeated_type_reports}\n")
-
-            # Create dictionary
-            result = dict(zip(record_names, record_types))
-
-            # Sort alphabetically by module_shortname.ClassName
-            # TODO: Support module_shortname
-            cls._type_dict_by_short_name = {key: result[key] for key in sorted(result)}
-
-        return cls._type_dict_by_short_name
+        return TypeImport.class_from_type_name(short_name)
 
     @classmethod
     def for_key(cls, key: TypeDeclKey) -> Self:
@@ -146,7 +44,7 @@ class Schema:
     def for_class_path(cls, class_path: str) -> Dict[str, Dict]:
         """Create or return cached object for the specified class path in module.ClassName format."""
 
-        record_type = TypeImport.from_qual_name(class_path)
+        record_type = TypeImport.class_from_qual_name(class_path)
         return cls.for_type(record_type)
 
     @classmethod
@@ -166,9 +64,6 @@ class Schema:
         # Sort the list of dependencies
         dependencies = sorted(dependencies, key=lambda x: TypeUtil.name(x))
 
-        # Add to the dict by type name
-        cls.add_types_to_dict_by_short_name(dependencies)
-
         # TODO: Restore after Enum decl generation is supported
         dependencies = [dependency_type for dependency_type in dependencies if not issubclass(dependency_type, Enum)]
 
@@ -181,66 +76,3 @@ class Schema:
             for type_decl in type_decl_list
         }
         return result
-
-    @classmethod
-    @cached
-    def get_types_in_hierarchy(cls, record_type: Type) -> List[Type]:
-        """
-        Find all record types in hierarchy for given record_type.
-        Include all base and child classes ordered by hierarchy.
-        """
-
-        key_type = record_type.get_key_type()
-
-        # container to collect types
-        types_ = defaultdict(list)
-
-        # TODO(Sasha): Do not iterate over all types, follow the specific type's hierarchy instead
-        all_schema_types = cls.get_types()
-        for type_ in all_schema_types:
-            # TODO (Roman): should not skip if input type is not key
-
-            if type_ == record_type:
-                # Skip the specified type
-                continue
-
-            if not hasattr(type_, "get_key_type"):
-                # Skip types that do not implement get_key_type
-                continue
-
-            # Get key type of type_
-            key_type_of_type_ = cast(KeyProtocol, type_).get_key_type()
-
-            if key_type != key_type_of_type_:
-                # skip types of another key type
-                continue
-
-            # Try to resolve hierarchy
-            try:
-                i = type_.__mro__.index(key_type)
-            except ValueError:
-                # if key_type is not in mro default i = 1
-                i = 1
-
-            types_[i].append(type_)
-
-        # final list of types in hierarchy
-        result: List[Type] = []
-
-        # order by place in hierarchy. more derived in the end.
-        for k, v in sorted(types_.items(), key=lambda item: item[0]):
-            result.extend(v)
-
-        return result
-
-    @classmethod
-    @cached
-    def get_type_successors(cls, record_type: Type) -> Set[Type]:
-        """Returns a set of successors."""
-
-        # TODO)Major): Use TypeImport.get_mro and record base classes in DB so unknown types can also be returned
-        return set(  # noqa
-            schema_type
-            for schema_type in Schema.get_types()
-            if is_key_or_record(schema_type) and record_type in schema_type.__mro__
-        )

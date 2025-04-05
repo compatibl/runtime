@@ -14,6 +14,7 @@
 
 import datetime as dt
 from enum import Enum
+from inspect import isclass
 from typing import Any
 from typing import Dict
 from typing import List
@@ -173,17 +174,21 @@ def is_mapping(instance_or_type: Any) -> TypeGuard[TSequence]:
 
 def is_abstract(instance_or_type: Any) -> bool:
     """Return True if the argument is an abstract class."""
-    return bool(getattr(instance_or_type, "__abstractmethods__", None))
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    # Mixin classes are treated as abstract even if they are not
+    return bool(getattr(type_, "__abstractmethods__", None)) or type_.__name__.endswith("Mixin")
 
 
 def is_data(instance_or_type: Any) -> TypeGuard[TData]:
     """True if the argument has '__slots__' attribute (which may be empty) or 'get_slots' method and is not a mixin."""
-    return hasattr(instance_or_type, "__slots__") or hasattr(instance_or_type, "get_slots")
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    return (hasattr(type_, "__slots__") or hasattr(type_, "get_slots")) and not type_.__name__.endswith("Mixin")
 
 
 def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
     """Return True if the argument is a key or record based on the presence of 'get_key_type' method."""
-    return hasattr(instance_or_type, "get_key_type")
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    return hasattr(type_, "get_key_type") and not type_.__name__.endswith("Mixin")
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
@@ -191,12 +196,14 @@ def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
     Return True if the argument is a key but not a record based on the presence of 'get_key_type' method and the
     absence of 'get_key' method. Consider using a faster alternative 'is_key_or_record' if possible.
     """
-    return hasattr(instance_or_type, "get_key_type") and not hasattr(instance_or_type, "get_key")
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not is_abstract(type_)
 
 
 def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
     """Return True if the argument is a record based on the presence of 'get_key' method."""
-    return hasattr(instance_or_type, "get_key")
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    return hasattr(type_, "get_key") and not type_.__name__.endswith("Mixin")
 
 
 def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere and review logic

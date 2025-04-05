@@ -27,17 +27,16 @@ from typing import Tuple
 from typing import Type
 from uuid import UUID
 from frozendict import frozendict
+
+from cl.runtime import TypeImport
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.schema.type_spec import TypeSpec
-from cl.runtime.settings.context_settings import ContextSettings
 
 
-def is_schema_type(data_type) -> bool:
-    """Return true if the type should be included in schema, includes classes with build method and enums."""
-    return inspect.isclass(data_type) and (hasattr(data_type, "build") or issubclass(data_type, Enum))
+
 
 
 class TypeSchema:
@@ -112,88 +111,4 @@ class TypeSchema:
     @classmethod
     def get_class(cls, type_name) -> Type:
         """Get class for the specified type name, excludes primitive types."""
-
-        # Get or create type dictionary
-        type_dict = cls.get_class_dict()
-
-        if (result := type_dict.get(type_name, None)) is not None:
-            return result
-        else:
-            packages_str = "\n".join(cls._get_packages())
-            raise RuntimeError(f"Type {type_name} is not found in the packages specified in settings:\n{packages_str}")
-
-    @classmethod
-    def _get_packages(cls) -> Iterable[str]:
-        """Get the list of packages specified in the settings."""
-        if (result := cls._packages) is None:
-            context_settings = ContextSettings.instance()
-            result = context_settings.packages
-            cls._packages = result
-        return result
-
-    @classmethod
-    def _get_modules(cls) -> Iterable[ModuleType]:
-        """
-        Get a list of ModuleType objects for submodules at all levels of the specified packages or root modules
-        in the alphabetical order of dot-delimited module name.
-        """
-
-        if (result := cls._modules) is None:
-
-            result = []
-            packages = cls._get_packages()
-            for package in packages:
-                # Import root module of the package
-                root_module = importlib.import_module(package)
-                # Add the root module itself
-                result.append(root_module)
-                # Get module info for all submodules, note the trailing period added per walk_packages documentation
-                for module_info in walk_packages(root_module.__path__, root_module.__name__ + "."):
-                    module_name = module_info.name
-                    # Import the submodule using its full name
-                    submodule = importlib.import_module(module_name)
-                    result.append(submodule)
-
-            # Sort the result by module path
-            result = tuple(sorted(result, key=lambda module: module.__name__))
-            cls._modules = result
-        return result
-
-    @classmethod
-    def get_class_dict(cls) -> Dict[str, Type]:
-        """Get or create a dictionary of types indexed by their name, excludes primitive types."""
-
-        if (result := cls._class_dict) is None:
-
-            # Get modules for the packages specified in the settings
-            modules = TypeSchema._get_modules()
-
-            # Get classes by iterating over modules
-            classes = set(class_ for module in modules for name, class_ in inspect.getmembers(module, is_schema_type))
-
-            # Use namespace alias to resolve conflicts
-            class_names = [TypeUtil.name(record_type) for record_type in classes]
-
-            # Check that there are no repeated names, report errors if there are
-            if len(set(class_names)) != len(class_names):
-
-                # Count the occurrences of each name in the list
-                class_name_counts = Counter(class_names)
-
-                # Find names and their types that are repeated more than once
-                repeated_names = [class_name for class_name, count in class_name_counts.items() if count > 1]
-
-                # Report repeated names
-                repeated_type_reports = "\n".join(
-                    repeated_name
-                    + ": "
-                    + ", ".join(f"{x.__module__}.{x.__name__}" for x in classes if TypeUtil.name(x) == repeated_name)
-                    for repeated_name in repeated_names
-                )
-                raise RuntimeError(f"The following class names are not unique:\n{repeated_type_reports}\n")
-
-            # Create and cache the result
-            result = frozendict(zip(class_names, classes))
-            cls._class_dict = result
-
-        return result
+        return TypeImport.class_from_type_name(type_name)

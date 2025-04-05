@@ -20,15 +20,6 @@ from cl.runtime.schema.type_schema import TypeSchema
 from stubs.cl.runtime import StubDataclassRecord
 
 
-def test_get_types():
-    """Test Schema.get_types() method."""
-
-    class_dict = TypeSchema.get_class_dict()
-    assert "TypeDecl" in class_dict
-    assert "StubDataclassRecord" in class_dict
-    assert "RecordMixin" not in class_dict
-
-
 def test_get_type_by_short_name():
     """Test Schema.get_type_by_short_name() method."""
 
@@ -39,9 +30,9 @@ def test_get_type_by_short_name():
 def test_get_type_by_class_path():
     """Test Schema.get_type_by_class_path() method."""
 
-    assert TypeImport.from_qual_name("cl.runtime.schema.type_decl.TypeDecl") is TypeDecl
+    assert TypeImport.class_from_qual_name("cl.runtime.schema.type_decl.TypeDecl") is TypeDecl
     assert (
-        TypeImport.from_qual_name("stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord")
+        TypeImport.class_from_qual_name("stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord")
         is StubDataclassRecord
     )
 

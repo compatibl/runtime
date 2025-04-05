@@ -45,7 +45,7 @@ class InstanceMethodTask(MethodTask):
     def _execute(self) -> None:
         """Invoke the specified instance method."""
 
-        key_type = TypeImport.from_qual_name(self.key_type_str)
+        key_type = TypeImport.class_from_qual_name(self.key_type_str)
         type_hint = TypeHint.for_class(key_type)
         key = _KEY_SERIALIZER.deserialize(self.key_str, type_hint)
 

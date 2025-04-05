@@ -47,7 +47,7 @@ class SelectResponse(BaseModel):
     def get_records(cls, request: SelectRequest) -> SelectResponse:
         """Implements /storage/select route."""
 
-        record_type = TypeImport.from_qual_name(f"{request.module}.{request.type_}")
+        record_type = TypeImport.class_from_qual_name(f"{request.module}.{request.type_}")
 
         # Load records for type
         records = DbContext.get_db().load_all(record_type)  # noqa
