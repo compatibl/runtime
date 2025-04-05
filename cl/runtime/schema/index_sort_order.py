@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class IndexSortOrder(IntEnum):
     """Index sorting order."""
 
-    ASCENDING = 0
+    ASCENDING = auto()
     """Ascending index sorting order."""
 
-    DESCENDING = 1
+    DESCENDING = auto()
     """Descending index sorting order."""

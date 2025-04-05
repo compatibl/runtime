@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class StubRelabeledIntEnum(IntEnum):
     """Stub enum with custom label that does not match the name."""
 
-    ENUM_VALUE1 = 1
+    ENUM_VALUE1 = auto()
     """Enum value 1."""
 
-    ENUM_VALUE2 = 2
+    ENUM_VALUE2 = auto()
     """Enum value 2."""

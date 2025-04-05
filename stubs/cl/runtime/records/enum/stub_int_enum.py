@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class StubIntEnum(IntEnum):  # Enum is derived from IntEnum
     """Sample enum."""
 
-    ENUM_VALUE_1 = 1
+    ENUM_VALUE_1 = auto()
     """Enum value 1."""
 
-    ENUM_VALUE_2 = 2
+    ENUM_VALUE_2 = auto()
     """Enum value 2."""

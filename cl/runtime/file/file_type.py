@@ -12,41 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class FileType(IntEnum):
     """Binary content type enumeration."""
 
-    UNDEFINED = 0
+    UNDEFINED = auto()
     """Undefined content type."""
 
-    JPG = 1
+    JPG = auto()
     """Jpg image type."""
 
-    JPEG = 2
+    JPEG = auto()
     """Jpeg image type."""
 
-    HTML = 3
+    HTML = auto()
     """Html content type."""
 
-    PLOTLY = 4
+    PLOTLY = auto()
     """The output provided by Plotly Graphing Library."""
 
-    PNG = 5
+    PNG = auto()
     """PNG image type."""
 
-    SVG = 6
+    SVG = auto()
     """SVG image type."""
 
-    CSV = 7
+    CSV = auto()
     """Csv type."""
 
-    ZIP = 8
+    ZIP = auto()
     """Zip type."""
 
-    PDF = 9
+    PDF = auto()
     """PDF type."""
 
-    XLSX = 10
+    XLSX = auto()
     """Excel type."""

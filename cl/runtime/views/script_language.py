@@ -12,47 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class ScriptLanguage(IntEnum):
     """Script language."""
 
-    R = 0
+    R = auto()
     """R language."""
 
-    JSON = 1
+    JSON = auto()
     """Json markup."""
 
-    XML = 2
+    XML = auto()
     """Xml markup."""
 
-    PYTHON = 3
+    PYTHON = auto()
     """Python language."""
 
-    MARKDOWN = 4
+    MARKDOWN = auto()
     """Lightweight markup language."""
 
-    SQL = 5
+    SQL = auto()
     """Sql."""
 
-    CPP = 6
+    CPP = auto()
     """C++ language."""
 
-    C = 7
+    C = auto()
     """C language."""
 
-    CSHARP = 8
+    CSHARP = auto()
     """C# language."""
 
-    JAVA = 9
+    JAVA = auto()
     """Java language."""
 
-    TYPESCRIPT = 10
+    TYPESCRIPT = auto()
     """TypeScript language."""
 
-    JAVASCRIPT = 11
+    JAVASCRIPT = auto()
     """JavaScript language."""
 
-    PLAINTEXT = 12
+    PLAINTEXT = auto()
     """Plaintext."""

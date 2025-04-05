@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class TaskStatus(IntEnum):
@@ -21,20 +21,20 @@ class TaskStatus(IntEnum):
     optionally Paused state and ending in one of Completed, Failed, or Cancelled states.
     """
 
-    PENDING = 1
+    PENDING = auto()
     """The task has been submitted to the queue but is not yet running."""
 
-    RUNNING = 2
+    RUNNING = auto()
     """The task is running."""
 
-    AWAITING = 3
+    AWAITING = auto()
     """The task is awaiting completion of other tasks and will have priority for subsequent execution."""
 
-    COMPLETED = 4
+    COMPLETED = auto()
     """The task has been completed (successful completion)."""
 
-    FAILED = 5
+    FAILED = auto()
     """The task has failed (this status is distinct from 'Cancelled')."""
 
-    CANCELLED = 6
+    CANCELLED = auto()
     """The task has been cancelled (this status is distinct from 'Failed')."""
