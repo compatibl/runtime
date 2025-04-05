@@ -38,7 +38,7 @@ from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
-from cl.runtime.serializers.key_format_enum import KeyFormatEnum
+from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 
 
@@ -46,7 +46,7 @@ from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 class KeySerializer(Data):
     """Roundtrip serialization of object to a flattened sequence, object cannot have sequence fields."""
 
-    key_format: KeyFormatEnum = required()
+    key_format: KeyFormat = required()
     """Format of the serialized key."""
 
     primitive_serializer: PrimitiveSerializer = required()
@@ -94,14 +94,14 @@ class KeySerializer(Data):
         # Perform checks and convert to a sequence
         sequence = self._to_sequence(data)
 
-        if (key_format := self.key_format) == KeyFormatEnum.DELIMITED:
+        if (key_format := self.key_format) == KeyFormat.DELIMITED:
             # Convert sequence to a semicolon-delimited string
             return ";".join(sequence)
-        if key_format == KeyFormatEnum.SEQUENCE:
+        if key_format == KeyFormat.SEQUENCE:
             # Sequence format
             return sequence
         else:
-            raise ErrorUtil.enum_value_error(key_format, KeyFormatEnum)
+            raise ErrorUtil.enum_value_error(key_format, KeyFormat)
 
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize key from a delimited string or a flattened sequence of primitive types."""
@@ -121,7 +121,7 @@ class KeySerializer(Data):
             )
 
         # Convert argument to a sequence based on the key_format field
-        if (key_format := self.key_format) == KeyFormatEnum.DELIMITED:
+        if (key_format := self.key_format) == KeyFormat.DELIMITED:
             # Check the argument is a string
             if not isinstance(data, str):
                 raise RuntimeError(
@@ -129,7 +129,7 @@ class KeySerializer(Data):
                     f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
                 )
             sequence = data.split(";")
-        elif key_format == KeyFormatEnum.SEQUENCE:
+        elif key_format == KeyFormat.SEQUENCE:
             # Check the argument is a sequence
             if not is_sequence(data):
                 raise RuntimeError(
@@ -139,7 +139,7 @@ class KeySerializer(Data):
             # Check each token and create a deque so popleft is available
             sequence = [self._checked_value(x) for x in data]
         else:
-            raise ErrorUtil.enum_value_error(key_format, KeyFormatEnum)
+            raise ErrorUtil.enum_value_error(key_format, KeyFormat)
 
         # Check each token and convert to a deque so popleft is available
         tokens = deque(self._checked_value(x) for x in sequence)

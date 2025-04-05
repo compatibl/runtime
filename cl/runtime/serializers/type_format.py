@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class TypeFormatEnum(IntEnum):
+class TypeFormat(IntEnum):
     """Format of the type information in serialized data."""
 
     NAME_ONLY = auto()

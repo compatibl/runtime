@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.schema.index_sort_order_enum import IndexSortOrderEnum
+from cl.runtime.schema.index_sort_order import IndexSortOrder
 
 
 @dataclass(slots=True, kw_only=True)
@@ -24,5 +24,5 @@ class IndexDecl:
     name: str = required()
     """Target index element name."""
 
-    direction: IndexSortOrderEnum = required()
+    direction: IndexSortOrder = required()
     """Index sort order direction (if not specified ascending sorting will be used)."""

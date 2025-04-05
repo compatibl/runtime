@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class KeyFormatEnum(IntEnum):
+class KeyFormat(IntEnum):
     """Format of the serialized key."""
 
     DELIMITED = auto()

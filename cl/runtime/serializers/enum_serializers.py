@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.serializers.enum_format_enum import EnumFormatEnum
+from cl.runtime.serializers.enum_format import EnumFormat
 from cl.runtime.serializers.enum_serializer import EnumSerializer
-from cl.runtime.serializers.none_format_enum import NoneFormatEnum
+from cl.runtime.serializers.none_format import NoneFormat
 
 cls = EnumSerializer
 
@@ -23,13 +23,13 @@ class EnumSerializers:
     """Standard combinations of primitive formats."""
 
     PASSTHROUGH: cls = cls(
-        none_format=NoneFormatEnum.PASSTHROUGH,
-        enum_format=EnumFormatEnum.PASSTHROUGH,
+        none_format=NoneFormat.PASSTHROUGH,
+        enum_format=EnumFormat.PASSTHROUGH,
     ).build()
     """Do not perform any conversion but validate against type information if provided."""
 
     DEFAULT: cls = cls(
-        none_format=NoneFormatEnum.PASSTHROUGH,
-        enum_format=EnumFormatEnum.DEFAULT,
+        none_format=NoneFormat.PASSTHROUGH,
+        enum_format=EnumFormat.DEFAULT,
     ).build()
     """Serialize as item name string converted to PascalCase."""

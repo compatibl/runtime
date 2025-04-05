@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class TimestampFormatEnum(IntEnum):
+class TimestampFormat(IntEnum):
     """Format used to serialize and deserialize UUIDv7 unique timestamp."""
 
     PASSTHROUGH = auto()

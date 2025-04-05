@@ -20,10 +20,10 @@ from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
-from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum
+from cl.runtime.serializers.json_output_format import JsonOutputFormat
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.type_format_enum import TypeFormatEnum
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
+from cl.runtime.serializers.type_format import TypeFormat
+from cl.runtime.serializers.type_inclusion import TypeInclusion
 
 
 def orjson_default(obj):
@@ -37,13 +37,13 @@ def orjson_default(obj):
 class JsonSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    json_output_format: JsonOutputFormatEnum = JsonOutputFormatEnum.PRETTY_PRINT
+    json_output_format: JsonOutputFormat = JsonOutputFormat.PRETTY_PRINT
     """JSON output format (pretty print, compact, etc)."""
 
-    type_inclusion: TypeInclusionEnum = TypeInclusionEnum.AS_NEEDED
+    type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
     """Where to include type information in serialized data."""
 
-    type_format: TypeFormatEnum = TypeFormatEnum.NAME_ONLY
+    type_format: TypeFormat = TypeFormat.NAME_ONLY
     """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
 
     type_field: str = "_type"
@@ -73,12 +73,12 @@ class JsonSerializer(Data):
         data_dict = self._data_serializer.serialize(data, type_hint)
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
-        if self.json_output_format == JsonOutputFormatEnum.PRETTY_PRINT:
+        if self.json_output_format == JsonOutputFormat.PRETTY_PRINT:
             option = orjson.OPT_INDENT_2
-        elif self.json_output_format == JsonOutputFormatEnum.COMPACT:
+        elif self.json_output_format == JsonOutputFormat.COMPACT:
             option = None
         else:
-            raise ErrorUtil.enum_value_error(self.json_output_format, JsonOutputFormatEnum)
+            raise ErrorUtil.enum_value_error(self.json_output_format, JsonOutputFormat)
 
         result = orjson.dumps(data_dict, option=option).decode("utf-8")
         return result
@@ -88,7 +88,7 @@ class JsonSerializer(Data):
 
         # TODO: Validate type_hint
 
-        if self.type_inclusion == TypeInclusionEnum.OMIT:
+        if self.type_inclusion == TypeInclusion.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
 
         # Use orjson to parse the JSON string into a dictionary

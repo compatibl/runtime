@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.views.script_language_enum import ScriptLanguageEnum
+from cl.runtime.views.script_language import ScriptLanguage
 
 
 @dataclass(slots=True, kw_only=True)
@@ -25,7 +25,7 @@ class Script:
     name: str = required()
     """Script name."""
 
-    language: ScriptLanguageEnum | None = None
+    language: ScriptLanguage | None = None
     """Script Language."""
 
     body: List[str] = required()

@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class EnumFormatEnum(IntEnum):
+class EnumFormat(IntEnum):
     """Format used to serialize and deserialize enums."""
 
     PASSTHROUGH = auto()

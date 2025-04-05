@@ -40,7 +40,7 @@ from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
-from cl.runtime.schema.type_kind_enum import TypeKindEnum
+from cl.runtime.schema.type_kind import TypeKind
 
 
 def dict_public_fields_factory(x):
@@ -141,7 +141,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     comment: str | None = None
     """Type comment. Contains additional information."""
 
-    type_kind: TypeKindEnum = required()  # TODO: ObjectKind or inherit
+    type_kind: TypeKind = required()  # TODO: ObjectKind or inherit
     """Type kind."""
 
     display_kind: str = required()  # TODO: Make optional, treat None as Basic
@@ -239,7 +239,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
         # Set type kind by detecting the presence of 'get_key' method to indicate a record vs. an element
         is_record = hasattr(record_type, "get_key")
-        result.type_kind = TypeKindEnum.RECORD if is_record else TypeKindEnum.DATA
+        result.type_kind = TypeKind.RECORD if is_record else TypeKind.DATA
 
         # Set abstract flag, use None instead of False
         is_abstract = hasattr(record_type, "__abstractmethods__") and bool(record_type.__abstractmethods__)

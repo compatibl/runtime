@@ -20,7 +20,7 @@ from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
+from cl.runtime.serializers.type_inclusion import TypeInclusion
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -92,7 +92,7 @@ def test_unidirectional():
 
     # Create the serializer
     serializer = DataSerializer(
-        type_inclusion=TypeInclusionEnum.OMIT,
+        type_inclusion=TypeInclusion.OMIT,
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()

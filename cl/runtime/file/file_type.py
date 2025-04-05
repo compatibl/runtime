@@ -15,7 +15,7 @@
 from enum import IntEnum
 
 
-class FileTypeEnum(IntEnum):
+class FileType(IntEnum):
     """Binary content type enumeration."""
 
     UNDEFINED = 0

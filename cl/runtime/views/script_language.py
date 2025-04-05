@@ -15,7 +15,7 @@
 from enum import IntEnum
 
 
-class ScriptLanguageEnum(IntEnum):
+class ScriptLanguage(IntEnum):
     """Script language."""
 
     R = 0

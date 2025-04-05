@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class UuidFormatEnum(IntEnum):
+class UuidFormat(IntEnum):
     """Format used to serialize and deserialize UUID other than UUIDv7."""
 
     PASSTHROUGH = auto()

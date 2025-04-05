@@ -36,58 +36,58 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.serializers.bool_format_enum import BoolFormatEnum
-from cl.runtime.serializers.bytes_format_enum import BytesFormatEnum
-from cl.runtime.serializers.date_format_enum import DateFormatEnum
-from cl.runtime.serializers.datetime_format_enum import DatetimeFormatEnum
-from cl.runtime.serializers.float_format_enum import FloatFormatEnum
-from cl.runtime.serializers.int_format_enum import IntFormatEnum
-from cl.runtime.serializers.long_format_enum import LongFormatEnum
-from cl.runtime.serializers.none_format_enum import NoneFormatEnum
-from cl.runtime.serializers.string_format_enum import StringFormatEnum
-from cl.runtime.serializers.time_format_enum import TimeFormatEnum
-from cl.runtime.serializers.timestamp_format_enum import TimestampFormatEnum
-from cl.runtime.serializers.uuid_format_enum import UuidFormatEnum
+from cl.runtime.serializers.bool_format import BoolFormat
+from cl.runtime.serializers.bytes_format import BytesFormat
+from cl.runtime.serializers.date_format import DateFormat
+from cl.runtime.serializers.datetime_format import DatetimeFormat
+from cl.runtime.serializers.float_format import FloatFormat
+from cl.runtime.serializers.int_format import IntFormat
+from cl.runtime.serializers.long_format import LongFormat
+from cl.runtime.serializers.none_format import NoneFormat
+from cl.runtime.serializers.string_format import StringFormat
+from cl.runtime.serializers.time_format import TimeFormat
+from cl.runtime.serializers.timestamp_format import TimestampFormat
+from cl.runtime.serializers.uuid_format import UuidFormat
 
 
 @dataclass(slots=True, kw_only=True)
 class PrimitiveSerializer(Data):
     """Helper class for serialization and deserialization of primitive types."""
 
-    none_format: NoneFormatEnum = required()
+    none_format: NoneFormat = required()
     """Serialization format for None (pass through without conversion if not set)."""
 
-    string_format: StringFormatEnum = required()
+    string_format: StringFormat = required()
     """Serialization format for str (pass through without conversion if not set)."""
 
-    float_format: FloatFormatEnum = required()
+    float_format: FloatFormat = required()
     """Serialization format for float (pass through without conversion if not set)."""
 
-    bool_format: BoolFormatEnum = required()
+    bool_format: BoolFormat = required()
     """Serialization format for bool (pass through without conversion if not set)."""
 
-    int_format: IntFormatEnum = required()
+    int_format: IntFormat = required()
     """Serialization format for int (pass through without conversion if not set)."""
 
-    long_format: LongFormatEnum = required()
+    long_format: LongFormat = required()
     """Serialization format for long (pass through without conversion if not set)."""
 
-    date_format: DateFormatEnum = required()
+    date_format: DateFormat = required()
     """Serialization format for dt.date (pass through without conversion if not set)."""
 
-    datetime_format: DatetimeFormatEnum = required()
+    datetime_format: DatetimeFormat = required()
     """Serialization format for dt.datetime (pass through without conversion if not set)."""
 
-    time_format: TimeFormatEnum = required()
+    time_format: TimeFormat = required()
     """Serialization format for dt.time (pass through without conversion if not set)."""
 
-    uuid_format: UuidFormatEnum = required()
+    uuid_format: UuidFormat = required()
     """Serialization format for UUID other than UUIDv7 (pass through without conversion if not set)."""
 
-    timestamp_format: TimestampFormatEnum = required()
+    timestamp_format: TimestampFormat = required()
     """Serialization format for UUIDv7 unique timestamp (pass through without conversion if not set)."""
 
-    bytes_format: BytesFormatEnum = required()
+    bytes_format: BytesFormat = required()
     """Serialization format for bytes (pass through without conversion if not set)."""
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
@@ -136,110 +136,110 @@ class PrimitiveSerializer(Data):
             # Return None for an empty string
             return data if data else None
         elif data_class_name == "float":
-            if (value_format := self.float_format) == FloatFormatEnum.PASSTHROUGH:
+            if (value_format := self.float_format) == FloatFormat.PASSTHROUGH:
                 return data
-            elif value_format == FloatFormatEnum.DEFAULT:
+            elif value_format == FloatFormat.DEFAULT:
                 return FloatUtil.format(data)
             else:
-                raise ErrorUtil.enum_value_error(value_format, FloatFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, FloatFormat)
         elif data_class_name == "bool":
-            if (value_format := self.bool_format) == BoolFormatEnum.PASSTHROUGH:
+            if (value_format := self.bool_format) == BoolFormat.PASSTHROUGH:
                 return data
-            elif value_format == BoolFormatEnum.DEFAULT:
+            elif value_format == BoolFormat.DEFAULT:
                 return BoolUtil.to_str_or_none(data)
             else:
-                raise ErrorUtil.enum_value_error(value_format, BoolFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, BoolFormat)
         elif data_class_name == "int":
             if schema_type_name is not None and schema_type_name == "int":
                 # Use methods that check that the value is in 32-bit signed integer range
                 # if schema_type_name is specified and is int rather than long
-                if (value_format := self.int_format) == IntFormatEnum.PASSTHROUGH:
+                if (value_format := self.int_format) == IntFormat.PASSTHROUGH:
                     check_int_32(data)
                     return data
-                elif value_format == IntFormatEnum.DEFAULT:
+                elif value_format == IntFormat.DEFAULT:
                     return IntUtil.to_str(data)
                 else:
-                    raise ErrorUtil.enum_value_error(value_format, IntFormatEnum)
+                    raise ErrorUtil.enum_value_error(value_format, IntFormat)
             elif schema_type_name is not None and schema_type_name == "long":
                 # Use methods that check that the value is in 32-bit signed integer range
                 # if schema_type_name is specified and is int rather than long
-                if (value_format := self.long_format) == LongFormatEnum.PASSTHROUGH:
+                if (value_format := self.long_format) == LongFormat.PASSTHROUGH:
                     check_int_54(data)
                     return data
-                elif value_format == LongFormatEnum.DEFAULT:
+                elif value_format == LongFormat.DEFAULT:
                     return LongUtil.to_str(data)
                 else:
-                    raise ErrorUtil.enum_value_error(value_format, LongFormatEnum)
+                    raise ErrorUtil.enum_value_error(value_format, LongFormat)
             else:
                 # Otherwise do not perform range checks
-                if (value_format := self.long_format) == LongFormatEnum.PASSTHROUGH:
+                if (value_format := self.long_format) == LongFormat.PASSTHROUGH:
                     return data
-                elif value_format == LongFormatEnum.DEFAULT:
+                elif value_format == LongFormat.DEFAULT:
                     return LongUtil.to_str(data)
-                elif value_format == LongFormatEnum.BSON_INT_64:
+                elif value_format == LongFormat.BSON_INT_64:
                     return Int64(data)
                 else:
-                    raise ErrorUtil.enum_value_error(value_format, LongFormatEnum)
+                    raise ErrorUtil.enum_value_error(value_format, LongFormat)
         elif data_class_name == "date":
-            if (value_format := self.date_format) == DateFormatEnum.PASSTHROUGH:
+            if (value_format := self.date_format) == DateFormat.PASSTHROUGH:
                 return data
-            elif value_format == DateFormatEnum.DEFAULT:
+            elif value_format == DateFormat.DEFAULT:
                 return DateUtil.to_str(data)
-            elif value_format == DateFormatEnum.ISO_INT:
+            elif value_format == DateFormat.ISO_INT:
                 return DateUtil.to_iso_int(data)
             else:
-                raise ErrorUtil.enum_value_error(value_format, DateFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, DateFormat)
         elif data_class_name == "time":
-            if (value_format := self.time_format) == TimeFormatEnum.PASSTHROUGH:
+            if (value_format := self.time_format) == TimeFormat.PASSTHROUGH:
                 return data
-            elif value_format == TimeFormatEnum.DEFAULT:
+            elif value_format == TimeFormat.DEFAULT:
                 return TimeUtil.to_str(data)
-            elif value_format == TimeFormatEnum.ISO_INT:
+            elif value_format == TimeFormat.ISO_INT:
                 return TimeUtil.to_iso_int(data)
             else:
-                raise ErrorUtil.enum_value_error(value_format, TimeFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, TimeFormat)
         elif data_class_name == "datetime":
-            if (value_format := self.datetime_format) == DatetimeFormatEnum.PASSTHROUGH:
+            if (value_format := self.datetime_format) == DatetimeFormat.PASSTHROUGH:
                 return data
-            elif value_format == DatetimeFormatEnum.DEFAULT:
+            elif value_format == DatetimeFormat.DEFAULT:
                 return DatetimeUtil.to_str(data)
             else:
-                raise ErrorUtil.enum_value_error(value_format, DatetimeFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, DatetimeFormat)
         elif data_class_name == "UUID":
             if data.version != 7 or (schema_type_name is not None and schema_type_name == "UUID"):
-                if (value_format := self.uuid_format) == UuidFormatEnum.PASSTHROUGH:
+                if (value_format := self.uuid_format) == UuidFormat.PASSTHROUGH:
                     return data
-                elif value_format == UuidFormatEnum.DEFAULT:
+                elif value_format == UuidFormat.DEFAULT:
                     # Use the standard delimited UUID format
                     return UuidUtil.to_str(data)
                 else:
-                    raise ErrorUtil.enum_value_error(value_format, UuidFormatEnum)
+                    raise ErrorUtil.enum_value_error(value_format, UuidFormat)
             else:
                 # Under else, value.version == 7 and schema_type_name != "UUID"
                 if schema_type_name is not None and schema_type_name != "timestamp":
                     raise RuntimeError("For UUID version 7, only UUID or timestamp types are valid.")
 
-                if (value_format := self.timestamp_format) == TimestampFormatEnum.PASSTHROUGH:
+                if (value_format := self.timestamp_format) == TimestampFormat.PASSTHROUGH:
                     return data
-                elif value_format == TimestampFormatEnum.DEFAULT:
+                elif value_format == TimestampFormat.DEFAULT:
                     # Use timestamp-hex UUIDv7 format
                     return Timestamp.from_uuid7(data)
-                elif value_format == TimestampFormatEnum.UUID:
+                elif value_format == TimestampFormat.UUID:
                     # Use the standard delimited UUID format
                     return UuidUtil.to_str(data)
                 else:
-                    raise ErrorUtil.enum_value_error(value_format, TimestampFormatEnum)
+                    raise ErrorUtil.enum_value_error(value_format, TimestampFormat)
         elif data_class_name == "bytes":
-            if (value_format := self.bytes_format) == BytesFormatEnum.PASSTHROUGH:
+            if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
                 return data
-            elif value_format == BytesFormatEnum.DEFAULT:
+            elif value_format == BytesFormat.DEFAULT:
                 # Base64 encoding for bytes on a single line
                 return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
-            elif value_format == BytesFormatEnum.MIME:
+            elif value_format == BytesFormat.MIME:
                 # Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL
                 return base64.encodebytes(data).decode("utf-8").rstrip("\n")  # TODO: Create BytesUtil
             else:
-                raise ErrorUtil.enum_value_error(value_format, BytesFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         else:
             raise RuntimeError(f"Class {data_class_name} cannot be serialized using {type(self).__name__}.")
 
@@ -284,7 +284,7 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, self.string_format)
         elif schema_type_name == "float":
-            if (value_format := self.float_format) in [FloatFormatEnum.PASSTHROUGH, FloatFormatEnum.DEFAULT]:
+            if (value_format := self.float_format) in [FloatFormat.PASSTHROUGH, FloatFormat.DEFAULT]:
                 # Accept additional input types in addition to the one generated by the serializer
                 if is_data_empty:
                     # Treat an empty string and "null" as None
@@ -301,15 +301,15 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, FloatFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, FloatFormat)
         elif schema_type_name == "bool":
-            if (value_format := self.bool_format) == BoolFormatEnum.PASSTHROUGH:
+            if (value_format := self.bool_format) == BoolFormat.PASSTHROUGH:
                 if data is None or isinstance(data, bool):
                     # Pass through None and bool
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == BoolFormatEnum.DEFAULT:
+            elif value_format == BoolFormat.DEFAULT:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -319,9 +319,9 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, BoolFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, BoolFormat)
         elif schema_type_name == "int":
-            if (value_format := self.int_format) in [IntFormatEnum.PASSTHROUGH, IntFormatEnum.DEFAULT]:
+            if (value_format := self.int_format) in [IntFormat.PASSTHROUGH, IntFormat.DEFAULT]:
                 # Accept both passthrough and default formats
                 if is_data_empty:
                     # Treat an empty string and "null" as None
@@ -339,9 +339,9 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, IntFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, IntFormat)
         elif schema_type_name == "long":
-            if (value_format := self.long_format) in [LongFormatEnum.PASSTHROUGH, LongFormatEnum.DEFAULT]:
+            if (value_format := self.long_format) in [LongFormat.PASSTHROUGH, LongFormat.DEFAULT]:
                 # Accept both passthrough and default formats
                 if is_data_empty:
                     # Treat an empty string and "null" as None
@@ -359,7 +359,7 @@ class PrimitiveSerializer(Data):
                     return LongUtil.from_float(data)
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == LongFormatEnum.BSON_INT_64:
+            elif value_format == LongFormat.BSON_INT_64:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -368,9 +368,9 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, LongFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, LongFormat)
         elif schema_type_name == "date":
-            if (value_format := self.date_format) in [DateFormatEnum.PASSTHROUGH, DateFormatEnum.DEFAULT]:
+            if (value_format := self.date_format) in [DateFormat.PASSTHROUGH, DateFormat.DEFAULT]:
                 # Accept both passthrough and default formats
                 if is_data_empty:
                     # Treat an empty string and "null" as None
@@ -383,7 +383,7 @@ class PrimitiveSerializer(Data):
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == DateFormatEnum.ISO_INT:
+            elif value_format == DateFormat.ISO_INT:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -396,9 +396,9 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, DateFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, DateFormat)
         elif schema_type_name == "time":
-            if (value_format := self.time_format) in [TimeFormatEnum.PASSTHROUGH, TimeFormatEnum.DEFAULT]:
+            if (value_format := self.time_format) in [TimeFormat.PASSTHROUGH, TimeFormat.DEFAULT]:
                 # Accept both passthrough and default formats
                 if is_data_empty:
                     # Treat an empty string and "null" as None
@@ -411,7 +411,7 @@ class PrimitiveSerializer(Data):
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == TimeFormatEnum.ISO_INT:
+            elif value_format == TimeFormat.ISO_INT:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -424,9 +424,9 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, TimeFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, TimeFormat)
         elif schema_type_name == "datetime":
-            if (value_format := self.datetime_format) in [DatetimeFormatEnum.PASSTHROUGH, DatetimeFormatEnum.DEFAULT]:
+            if (value_format := self.datetime_format) in [DatetimeFormat.PASSTHROUGH, DatetimeFormat.DEFAULT]:
                 # Accept both passthrough and default formats
                 if is_data_empty:
                     # Treat an empty string and "null" as None
@@ -440,15 +440,15 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, DatetimeFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, DatetimeFormat)
         elif schema_type_name == "UUID":
-            if (value_format := self.uuid_format) == UuidFormatEnum.PASSTHROUGH:
+            if (value_format := self.uuid_format) == UuidFormat.PASSTHROUGH:
                 if data is None or isinstance(data, UUID):
                     # Pass through None and UUID
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == UuidFormatEnum.DEFAULT:
+            elif value_format == UuidFormat.DEFAULT:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -458,9 +458,9 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, UuidFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, UuidFormat)
         elif schema_type_name == "timestamp":
-            if (value_format := self.timestamp_format) == TimestampFormatEnum.PASSTHROUGH:
+            if (value_format := self.timestamp_format) == TimestampFormat.PASSTHROUGH:
                 if data is None:
                     # Pass through None
                     return data
@@ -471,7 +471,7 @@ class PrimitiveSerializer(Data):
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == TimestampFormatEnum.DEFAULT:
+            elif value_format == TimestampFormat.DEFAULT:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -484,7 +484,7 @@ class PrimitiveSerializer(Data):
                     return result
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == TimestampFormatEnum.UUID:
+            elif value_format == TimestampFormat.UUID:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -504,15 +504,15 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, TimestampFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, TimestampFormat)
         elif schema_type_name == "bytes":
-            if (value_format := self.bytes_format) == BytesFormatEnum.PASSTHROUGH:
+            if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
                 if data is None or isinstance(data, bytes):
                     # Pass through None and bytes
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == BytesFormatEnum.DEFAULT:
+            elif value_format == BytesFormat.DEFAULT:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -521,7 +521,7 @@ class PrimitiveSerializer(Data):
                     return base64.b64decode(data)  # TODO: Create BytesUtil
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == BytesFormatEnum.MIME:
+            elif value_format == BytesFormat.MIME:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -531,7 +531,7 @@ class PrimitiveSerializer(Data):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
-                raise ErrorUtil.enum_value_error(value_format, BytesFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         else:
             value_class_name = TypeUtil.name(data)
             serializer_type_name = TypeUtil.name(self)

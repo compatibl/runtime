@@ -17,7 +17,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.json_serializer import JsonSerializer
 from cl.runtime.serializers.json_serializers import JsonSerializers
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
+from cl.runtime.serializers.type_inclusion import TypeInclusion
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -73,7 +73,7 @@ def test_to_json_pascalize_keys():
 
     # Create the serializer with pascalize_keys flag set
     serializer = JsonSerializer(
-        type_inclusion=TypeInclusionEnum.OMIT,
+        type_inclusion=TypeInclusion.OMIT,
         pascalize_keys=True,
     ).build()
 

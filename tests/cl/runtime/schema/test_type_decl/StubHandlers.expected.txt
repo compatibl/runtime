@@ -117,8 +117,8 @@ declare:
           optional: false
         - enum:
             module:
-              module_name: cl.runtime.file.file_type_enum
-            name: FileTypeEnum
+              module_name: cl.runtime.file.file_type
+            name: FileType
           name: FileType
           comment: Embedded binary content type.
           vector: false
@@ -295,8 +295,8 @@ declare:
           optional: false
         - enum:
             module:
-              module_name: cl.runtime.file.file_type_enum
-            name: FileTypeEnum
+              module_name: cl.runtime.file.file_type
+            name: FileType
           name: FileType
           comment: Embedded binary content type.
           vector: false

@@ -19,7 +19,7 @@ from cl.runtime import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.view.dag.dag_edge import DagEdge
 from cl.runtime.view.dag.dag_key import DagKey
-from cl.runtime.view.dag.dag_layout_enum import DagLayoutEnum
+from cl.runtime.view.dag.dag_layout import DagLayout
 from cl.runtime.view.dag.dag_node_position import DagNodePosition
 from cl.runtime.view.dag.nodes.dag_node import DagNode
 
@@ -40,7 +40,7 @@ class Dag(DagKey, RecordMixin[DagKey]):
     @staticmethod
     def auto_layout_dag(
         dag: "Dag",
-        layout_mode: DagLayoutEnum = DagLayoutEnum.SPRING,
+        layout_mode: DagLayout = DagLayout.SPRING,
         offset_x: int = 600,
         base_scale: int = 100,
     ) -> "Dag":
@@ -63,11 +63,11 @@ class Dag(DagKey, RecordMixin[DagKey]):
         for subgraph in subgraphs:
             subgraph_scale = base_scale * len(subgraph.nodes) ** 0.5
 
-            if layout_mode == DagLayoutEnum.CIRCULAR:
+            if layout_mode == DagLayout.CIRCULAR:
                 layout = nx.circular_layout(subgraph, scale=subgraph_scale)
-            elif layout_mode == DagLayoutEnum.PLANAR:
+            elif layout_mode == DagLayout.PLANAR:
                 layout = nx.planar_layout(subgraph, scale=subgraph_scale)
-            elif layout_mode == DagLayoutEnum.SPRING:
+            elif layout_mode == DagLayout.SPRING:
                 layout = nx.spring_layout(
                     subgraph,
                     scale=subgraph_scale,

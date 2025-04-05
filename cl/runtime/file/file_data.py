@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.file.file_type_enum import FileTypeEnum
+from cl.runtime.file.file_type import FileType
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 
@@ -28,5 +28,5 @@ class FileData(Data):
     file_bytes: bytes = required()
     """Embedded binary content to be displayed as the current view."""
 
-    file_type: FileTypeEnum | None = None
+    file_type: FileType | None = None
     """Embedded binary content type."""

@@ -17,7 +17,7 @@ from typing import Any
 import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum
+from cl.runtime.serializers.json_output_format import JsonOutputFormat
 
 
 def orjson_default(obj):
@@ -31,19 +31,19 @@ def orjson_default(obj):
 class JsonEncoder(Data):
     """Encoding of dictionary to and from JSON."""
 
-    json_output_format: JsonOutputFormatEnum = JsonOutputFormatEnum.PRETTY_PRINT
+    json_output_format: JsonOutputFormat = JsonOutputFormat.PRETTY_PRINT
     """JSON output format (pretty print, compact, etc)."""
 
     def encode(self, data: Any) -> str:
         """Encode to a JSON string."""
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
-        if self.json_output_format == JsonOutputFormatEnum.PRETTY_PRINT:
+        if self.json_output_format == JsonOutputFormat.PRETTY_PRINT:
             option = orjson.OPT_INDENT_2
-        elif self.json_output_format == JsonOutputFormatEnum.COMPACT:
+        elif self.json_output_format == JsonOutputFormat.COMPACT:
             option = None
         else:
-            raise ErrorUtil.enum_value_error(self.json_output_format, JsonOutputFormatEnum)
+            raise ErrorUtil.enum_value_error(self.json_output_format, JsonOutputFormat)
 
         result = orjson.dumps(data, option=option).decode("utf-8")
         return result

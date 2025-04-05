@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class FieldKindEnum(IntEnum):
+class FieldKind(IntEnum):
     """Field kind (primitive, enum, data, key, record)."""
 
     PRIMITIVE = auto()

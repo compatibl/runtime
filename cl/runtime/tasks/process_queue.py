@@ -19,7 +19,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_queue import TaskQueue
-from cl.runtime.tasks.task_status_enum import TaskStatusEnum
+from cl.runtime.tasks.task_status import TaskStatus
 
 
 @dataclass(slots=True, kw_only=True)
@@ -46,10 +46,10 @@ class ProcessQueue(TaskQueue):
             # TODO: Use DB queries with filter by queue field
             all_tasks = DbContext.load_all(Task)
             awaiting_tasks = [
-                task for task in all_tasks if task.queue.queue_id == queue_id and task.status == TaskStatusEnum.AWAITING
+                task for task in all_tasks if task.queue.queue_id == queue_id and task.status == TaskStatus.AWAITING
             ]
             pending_tasks = [
-                task for task in all_tasks if task.queue.queue_id == queue_id and task.status == TaskStatusEnum.PENDING
+                task for task in all_tasks if task.queue.queue_id == queue_id and task.status == TaskStatus.PENDING
             ]
 
             # Awaiting tasks have priority over pending tasks

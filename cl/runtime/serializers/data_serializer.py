@@ -37,9 +37,9 @@ from cl.runtime.serializers.json_encoder import JsonEncoder
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.slots_util import SlotsUtil
-from cl.runtime.serializers.type_format_enum import TypeFormatEnum
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
-from cl.runtime.serializers.type_placement_enum import TypePlacementEnum
+from cl.runtime.serializers.type_format import TypeFormat
+from cl.runtime.serializers.type_inclusion import TypeInclusion
+from cl.runtime.serializers.type_placement import TypePlacement
 
 
 @dataclass(slots=True, kw_only=True)
@@ -58,13 +58,13 @@ class DataSerializer(Data):
     data_encoder: JsonEncoder | None = None
     """Transformation applied to the data fields after converting them to dict (does not apply to keys)."""
 
-    type_inclusion: TypeInclusionEnum = TypeInclusionEnum.AS_NEEDED
+    type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
     """Where to include type information in serialized data."""
 
-    type_format: TypeFormatEnum = TypeFormatEnum.NAME_ONLY
+    type_format: TypeFormat = TypeFormat.NAME_ONLY
     """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
 
-    type_placement: TypePlacementEnum = TypePlacementEnum.FIRST
+    type_placement: TypePlacement = TypePlacement.FIRST
     """Placement of type information in the output dictionary (optional, do not provide if type_inclusion=OMIT)."""
 
     type_field: str = "_type"
@@ -76,14 +76,14 @@ class DataSerializer(Data):
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize data to a dictionary."""
 
-        if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
+        if self.type_inclusion in [TypeInclusion.AS_NEEDED, TypeInclusion.ALWAYS]:
             # Use typed serialization if bidirectional flag is on
             return self.typed_serialize(data, type_hint)
-        elif self.type_inclusion == TypeInclusionEnum.OMIT:
+        elif self.type_inclusion == TypeInclusion.OMIT:
             # Use untyped serialization
             return self.untyped_serialize(data)
         else:
-            raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
+            raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
@@ -95,7 +95,7 @@ class DataSerializer(Data):
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
         is_optional = type_hint.optional if type_hint is not None else None
 
-        if self.type_inclusion in [TypeInclusionEnum.AS_NEEDED, TypeInclusionEnum.ALWAYS]:
+        if self.type_inclusion in [TypeInclusion.AS_NEEDED, TypeInclusion.ALWAYS]:
             if data_class_name == "NoneType":
                 if type_hint is None or is_optional:
                     # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
@@ -128,10 +128,10 @@ class DataSerializer(Data):
                     f"Data is not a list or mapping, cannot deserialize without type_hint argument:\n"
                     f"{ErrorUtil.wrap(data)}."
                 )
-        elif self.type_inclusion == TypeInclusionEnum.OMIT:
+        elif self.type_inclusion == TypeInclusion.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
         else:
-            raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
+            raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
     def typed_serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize the argument to a dictionary type_hint and schema."""
@@ -206,37 +206,37 @@ class DataSerializer(Data):
                     )
 
             # Include type in output according to the type_inclusion setting
-            if self.type_inclusion == TypeInclusionEnum.ALWAYS:
+            if self.type_inclusion == TypeInclusion.ALWAYS:
                 include_type = True
-            elif self.type_inclusion == TypeInclusionEnum.AS_NEEDED:
+            elif self.type_inclusion == TypeInclusion.AS_NEEDED:
                 # Include if schema type is not provided or not the same as data type
                 include_type = schema_type_name is None or schema_type_name != data_type_name
-            elif self.type_inclusion == TypeInclusionEnum.OMIT:
+            elif self.type_inclusion == TypeInclusion.OMIT:
                 include_type = False
             else:
-                raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusionEnum)
+                raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
             # Parse type_format field
-            if self.type_inclusion != TypeInclusionEnum.OMIT:
-                if self.type_format == TypeFormatEnum.NAME_ONLY:
+            if self.type_inclusion != TypeInclusion.OMIT:
+                if self.type_format == TypeFormat.NAME_ONLY:
                     type_field = data_type_name
-                elif self.type_format == TypeFormatEnum.FULL_PATH:
-                    raise RuntimeError("TypeFormatEnum.FULL_PATH is not supported.")
+                elif self.type_format == TypeFormat.FULL_PATH:
+                    raise RuntimeError("TypeFormat.FULL_PATH is not supported.")
                 else:
-                    raise ErrorUtil.enum_value_error(self.type_format, TypeFormatEnum)
+                    raise ErrorUtil.enum_value_error(self.type_format, TypeFormat)
             else:
                 type_field = None
 
             # Parse type_placement field
-            if self.type_inclusion != TypeInclusionEnum.OMIT:
-                if self.type_placement == TypePlacementEnum.FIRST:
+            if self.type_inclusion != TypeInclusion.OMIT:
+                if self.type_placement == TypePlacement.FIRST:
                     include_type_first = include_type
                     include_type_last = False
-                elif self.type_placement == TypePlacementEnum.LAST:
+                elif self.type_placement == TypePlacement.LAST:
                     include_type_first = False
                     include_type_last = include_type
                 else:
-                    raise ErrorUtil.enum_value_error(self.type_placement, TypePlacementEnum)
+                    raise ErrorUtil.enum_value_error(self.type_placement, TypePlacement)
             else:
                 include_type_first = False
                 include_type_last = False

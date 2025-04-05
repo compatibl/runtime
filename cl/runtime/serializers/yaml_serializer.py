@@ -30,9 +30,9 @@ from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.type_format_enum import TypeFormatEnum
+from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.type_hints import TypeHints
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
+from cl.runtime.serializers.type_inclusion import TypeInclusion
 
 # Use primitive serializer with default settings to serialize all primitive types to string
 _PRIMITIVE_SERIALIZER = PrimitiveSerializers.DEFAULT
@@ -126,10 +126,10 @@ yaml_reader.Constructor = PrimitiveToStringConstructor
 class YamlSerializer(Data):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    type_inclusion: TypeInclusionEnum = TypeInclusionEnum.AS_NEEDED
+    type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
     """Where to include type information in serialized data."""
 
-    type_format: TypeFormatEnum = TypeFormatEnum.NAME_ONLY
+    type_format: TypeFormat = TypeFormat.NAME_ONLY
     """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
 
     type_field: str = "_type"
@@ -193,7 +193,7 @@ class YamlSerializer(Data):
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Read a YAML string and return the deserialized object if bidirectional flag is set, or dict otherwise."""
 
-        if self.type_inclusion == TypeInclusionEnum.OMIT:
+        if self.type_inclusion == TypeInclusion.OMIT:
             raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
 
         # Use a YAML reader with PrimitiveToStringConstructor to read all values as strings

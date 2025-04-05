@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.serializers.json_output_format_enum import JsonOutputFormatEnum
+from cl.runtime.serializers.json_output_format import JsonOutputFormat
 from cl.runtime.serializers.json_serializer import JsonSerializer
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
+from cl.runtime.serializers.type_inclusion import TypeInclusion
 
 cls = JsonSerializer
 
@@ -25,8 +25,8 @@ class JsonSerializers:
     DEFAULT: cls = cls().build()
     """Include type information as needed, bidirectional, pretty print format."""
 
-    COMPACT: cls = cls(json_output_format=JsonOutputFormatEnum.COMPACT).build()
+    COMPACT: cls = cls(json_output_format=JsonOutputFormat.COMPACT).build()
     """Include type information as needed, bidirectional, compact format."""
 
-    FOR_REPORTING: cls = cls(type_inclusion=TypeInclusionEnum.OMIT).build()
+    FOR_REPORTING: cls = cls(type_inclusion=TypeInclusion.OMIT).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""

@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.view.dag.dag_edge import DagEdge
-from cl.runtime.view.dag.dag_layout_enum import DagLayoutEnum
+from cl.runtime.view.dag.dag_layout import DagLayout
 from cl.runtime.view.dag.dag_node_data import DagNodeData
 from cl.runtime.view.dag.nodes.add_text_node import AddTextNode
 from cl.runtime.view.dag.nodes.text_input_node import TextInputNode
@@ -56,4 +56,4 @@ class StubDagViewers(StubViewers):
             ],
         )
 
-        return Dag.auto_layout_dag(dag, layout_mode=DagLayoutEnum.PLANAR, base_scale=180)
+        return Dag.auto_layout_dag(dag, layout_mode=DagLayout.PLANAR, base_scale=180)

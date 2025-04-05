@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class ContainerKindEnum(IntEnum):
+class ContainerKind(IntEnum):
     """Determines the container API (implementation class will change to immutable after build is invoked)."""
 
     LIST = auto()

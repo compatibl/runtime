@@ -17,8 +17,8 @@ from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_encoders import JsonEncoders
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
-from cl.runtime.serializers.type_placement_enum import TypePlacementEnum
+from cl.runtime.serializers.type_inclusion import TypeInclusion
+from cl.runtime.serializers.type_placement import TypePlacement
 
 cls = DataSerializer
 
@@ -49,7 +49,7 @@ class DataSerializers:
         primitive_serializer=PrimitiveSerializers.FOR_UI,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
-        type_inclusion=TypeInclusionEnum.ALWAYS,
+        type_inclusion=TypeInclusion.ALWAYS,
         type_field="_t",
     ).build()
     """Default bidirectional data serializer settings for UI."""
@@ -67,8 +67,8 @@ class DataSerializers:
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
         data_encoder=JsonEncoders.COMPACT,
-        type_inclusion=TypeInclusionEnum.ALWAYS,  # TODO: Consider changing to AS_NEEDED
-        type_placement=TypePlacementEnum.LAST,  # TODO: Remove after all tests pass
+        type_inclusion=TypeInclusion.ALWAYS,  # TODO: Consider changing to AS_NEEDED
+        type_placement=TypePlacement.LAST,  # TODO: Remove after all tests pass
     ).build()
     """Default bidirectional data serializer settings for UI."""
 

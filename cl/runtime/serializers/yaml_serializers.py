@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.serializers.type_inclusion_enum import TypeInclusionEnum
+from cl.runtime.serializers.type_inclusion import TypeInclusion
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
 
 cls = YamlSerializer
@@ -25,6 +25,6 @@ class YamlSerializers:
     """Include type information as needed, both serialization and deserialization are possible."""
 
     FOR_REPORTING: cls = cls(
-        type_inclusion=TypeInclusionEnum.OMIT,
+        type_inclusion=TypeInclusion.OMIT,
     ).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""

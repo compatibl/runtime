@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class DateFormatEnum(IntEnum):
+class DateFormat(IntEnum):
     """Format used to serialize and deserialize dt.date."""
 
     PASSTHROUGH = auto()

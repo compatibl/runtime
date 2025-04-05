@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class TypePlacementEnum(IntEnum):
+class TypePlacement(IntEnum):
     """Placement of type information in the output dictionary."""
 
     FIRST = auto()

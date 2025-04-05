@@ -25,8 +25,8 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
-from cl.runtime.schema.container_kind_enum import ContainerKindEnum
-from cl.runtime.schema.field_kind_enum import FieldKindEnum
+from cl.runtime.schema.container_kind import ContainerKind
+from cl.runtime.schema.field_kind import FieldKind
 from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 
@@ -50,7 +50,7 @@ class FieldDecl:
     comment: str | None = None
     """Field comment."""
 
-    field_kind: FieldKindEnum = required()
+    field_kind: FieldKind = required()
     """Kind of the element inside the innermost container if the field is a container, otherwise kind of the field."""
 
     field_type_decl: TypeDeclKey = required()
@@ -130,7 +130,7 @@ class FieldDecl:
         supported_containers = [list, tuple, dict]
         while field_origin in supported_containers:
             if field_origin is list:
-                container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+                container = ContainerDecl(container_kind=ContainerKind.LIST)
                 # Perform additional checks for list
                 if len(field_args) != 1:
                     raise RuntimeError(
@@ -140,7 +140,7 @@ class FieldDecl:
                         f"Other list type hint formats are not supported.\n"
                     )
             elif field_origin is tuple:
-                container = ContainerDecl(container_kind=ContainerKindEnum.LIST)
+                container = ContainerDecl(container_kind=ContainerKind.LIST)
                 # Perform additional checks for tuple
                 if len(field_args) == 1 or (len(field_args) > 1 and field_args[1] is not Ellipsis):
                     raise RuntimeError(
@@ -152,7 +152,7 @@ class FieldDecl:
                         f"different element types.\n"
                     )
             elif field_origin is dict:
-                container = ContainerDecl(container_kind=ContainerKindEnum.DICT)
+                container = ContainerDecl(container_kind=ContainerKind.DICT)
                 # Perform additional checks for dict
                 if len(field_args) != 2 and field_args[0] is not str:
                     raise RuntimeError(
@@ -217,16 +217,16 @@ class FieldDecl:
             # Assign field kind
             if field_type in primitive_types:
                 # Indicate that field is one of the supported primitive types
-                result.field_kind = FieldKindEnum.PRIMITIVE
+                result.field_kind = FieldKind.PRIMITIVE
             elif issubclass(field_type, Enum):
                 # Indicate that field is an enum
-                result.field_kind = FieldKindEnum.ENUM
+                result.field_kind = FieldKind.ENUM
             elif is_key(field_type):
                 # Indicate that field is a key
-                result.field_kind = FieldKindEnum.KEY
+                result.field_kind = FieldKind.KEY
             elif hasattr(field_type, "__slots__"):
                 # Indicate that field is a user-defined data with slots
-                result.field_kind = FieldKindEnum.RECORD_OR_DATA
+                result.field_kind = FieldKind.RECORD_OR_DATA
             else:
                 raise RuntimeError(
                     "Field type '{field_type}' for field '{field_name}' is not\n"

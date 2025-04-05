@@ -25,7 +25,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
-from cl.runtime.tasks.task_status_enum import TaskStatusEnum
+from cl.runtime.tasks.task_status import TaskStatus
 
 
 @dataclass(slots=True, kw_only=True)
@@ -47,7 +47,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     queue: TaskQueueKey = required()
     """The queue that will run the task once it is saved."""
 
-    status: TaskStatusEnum = required()
+    status: TaskStatus = required()
     """Begins from Pending, continues to Running or Paused, and ends with Completed, Failed, or Cancelled."""
 
     progress_pct: float = required()
@@ -77,7 +77,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
         # Set status and progress_pct if not yet set
         if self.status is None:
-            self.status = TaskStatusEnum.PENDING
+            self.status = TaskStatus.PENDING
         if self.progress_pct is None:
             self.progress_pct = 0.0
 
@@ -94,7 +94,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
             # Save with Running status
             update = self.clone()
-            update.status = TaskStatusEnum.RUNNING
+            update.status = TaskStatus.RUNNING
             DbContext.save_one(update.build())
 
             # Invoke out-of-process execution of payload
@@ -106,7 +106,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
             # Save with Failed status and execution info
             update = self.clone()
-            update.status = TaskStatusEnum.FAILED
+            update.status = TaskStatus.FAILED
             update.progress_pct = 100.0
             update.elapsed_sec = 0.0  # TODO: Implement
             update.remaining_sec = 0.0
@@ -122,7 +122,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             # Save with Completed status and execution info
             # Save with Failed status and execution info
             update = self.clone()
-            update.status = TaskStatusEnum.COMPLETED
+            update.status = TaskStatus.COMPLETED
             update.progress_pct = 100.0
             update.elapsed_sec = 0.0  # TODO: Implement
             update.remaining_sec = 0.0
@@ -135,7 +135,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
         start_datetime = DatetimeUtil.now()
         while DatetimeUtil.now() < start_datetime + dt.timedelta(seconds=timeout_sec):
             task = DbContext.load_one(Task, task_key)
-            if task.status == TaskStatusEnum.COMPLETED:
+            if task.status == TaskStatus.COMPLETED:
                 # Test success, task has been completed
                 return
             # TODO: Refactor to use queue-specific push communication rather than heartbeat

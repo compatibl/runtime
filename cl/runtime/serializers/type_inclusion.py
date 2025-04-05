@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class TypeInclusionEnum(IntEnum):
+class TypeInclusion(IntEnum):
     """When to include type information in serialized data."""
 
     OMIT = auto()

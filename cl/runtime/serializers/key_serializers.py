@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from cl.runtime.serializers.enum_serializers import EnumSerializers
-from cl.runtime.serializers.key_format_enum import KeyFormatEnum
+from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
@@ -24,7 +24,7 @@ class KeySerializers:
     """Standard key serializers."""
 
     DELIMITED: cls = cls(
-        key_format=KeyFormatEnum.DELIMITED,
+        key_format=KeyFormat.DELIMITED,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
@@ -34,7 +34,7 @@ class KeySerializers:
     """
 
     FOR_SQLITE: cls = cls(
-        key_format=KeyFormatEnum.SEQUENCE,
+        key_format=KeyFormat.SEQUENCE,
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()

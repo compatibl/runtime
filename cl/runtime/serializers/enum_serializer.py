@@ -21,18 +21,18 @@ from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.serializers.enum_format_enum import EnumFormatEnum
-from cl.runtime.serializers.none_format_enum import NoneFormatEnum
+from cl.runtime.serializers.enum_format import EnumFormat
+from cl.runtime.serializers.none_format import NoneFormat
 
 
 @dataclass(slots=True, kw_only=True)
 class EnumSerializer(Data):
     """Helper class for serialization and deserialization of enum types."""
 
-    none_format: NoneFormatEnum = required()
+    none_format: NoneFormat = required()
     """Serialization format for None."""
 
-    enum_format: EnumFormatEnum = required()
+    enum_format: EnumFormat = required()
     """Serialization format for enums that are not None."""
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
@@ -40,10 +40,10 @@ class EnumSerializer(Data):
         if data is None:
             if type_hint is not None and not type_hint.optional:
                 raise RuntimeError(f"Enum {type_hint.schema_type_name} value is None but marked as required.")
-            elif (value_format := self.none_format) == NoneFormatEnum.PASSTHROUGH:
+            elif (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
                 return data
             else:
-                raise ErrorUtil.enum_value_error(value_format, NoneFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, NoneFormat)
         elif isinstance(data, Enum):
             # Check that schema type matches if specified
             if type_hint is not None and type_hint.schema_type_name != (data_type_name := TypeUtil.name(data)):
@@ -51,14 +51,14 @@ class EnumSerializer(Data):
                     f"Enum value type {data_type_name} does not match the schema type {type_hint.schema_type_name}."
                 )
             # Serialize according to settings
-            if (value_format := self.enum_format) == EnumFormatEnum.PASSTHROUGH:
+            if (value_format := self.enum_format) == EnumFormat.PASSTHROUGH:
                 # Pass through the enum instance without changes
                 return data
-            elif value_format == EnumFormatEnum.DEFAULT:
+            elif value_format == EnumFormat.DEFAULT:
                 # Serialize as name without type in PascalCase
                 return CaseUtil.upper_to_pascal_case(data.name) if data is not None else None
             else:
-                raise ErrorUtil.enum_value_error(value_format, EnumFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, EnumFormat)
         else:
             value_type_name = TypeUtil.name(type(data))
             raise RuntimeError(f"Type {value_type_name} provided to {self.__class__.__name__} is not an enum type.")
@@ -72,15 +72,15 @@ class EnumSerializer(Data):
         elif data in [None, "", "null"]:
             if not type_hint.optional:
                 raise RuntimeError(f"Enum {type_hint.schema_type_name} value is None but marked as required.")
-            if (value_format := self.none_format) == NoneFormatEnum.PASSTHROUGH:
+            if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
                 return data
             else:
-                raise ErrorUtil.enum_value_error(value_format, NoneFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, NoneFormat)
         elif issubclass(enum_type := type_hint.schema_class, Enum):
-            if (value_format := self.enum_format) == EnumFormatEnum.PASSTHROUGH:
+            if (value_format := self.enum_format) == EnumFormat.PASSTHROUGH:
                 # Pass through the enum instance without changes
                 return data
-            elif value_format == EnumFormatEnum.DEFAULT:
+            elif value_format == EnumFormat.DEFAULT:
                 try:
                     # Serialized value is name without type in PascalCase, convert to UPPER_CASE
                     return enum_type[CaseUtil.pascal_to_upper_case(data)]
@@ -88,7 +88,7 @@ class EnumSerializer(Data):
                     enum_type_name = TypeUtil.name(enum_type)
                     raise RuntimeError(f"Enum type {enum_type_name} does not include the item {data}.")
             else:
-                raise ErrorUtil.enum_value_error(value_format, EnumFormatEnum)
+                raise ErrorUtil.enum_value_error(value_format, EnumFormat)
         else:
             schema_type_name = TypeUtil.name(enum_type)
             raise RuntimeError(

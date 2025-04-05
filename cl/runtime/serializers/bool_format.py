@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class BoolFormatEnum(IntEnum):
+class BoolFormat(IntEnum):
     """Format used to serialize and deserialize bool."""
 
     PASSTHROUGH = auto()

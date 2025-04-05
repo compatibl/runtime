@@ -21,7 +21,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.view.dag.dag_edge import DagEdge
-from cl.runtime.view.dag.dag_layout_enum import DagLayoutEnum
+from cl.runtime.view.dag.dag_layout import DagLayout
 from cl.runtime.view.dag.dag_node_data import DagNodeData
 from cl.runtime.view.dag.nodes.dag_node import DagNode
 from cl.runtime.views.dag.successor_dag_key import SuccessorDagKey
@@ -86,14 +86,14 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
     @staticmethod
     def build_dag(
         node: "SuccessorDagNode",
-        layout_mode: DagLayoutEnum = DagLayoutEnum.PLANAR,
+        layout_mode: DagLayout = DagLayout.PLANAR,
         ignore_fields: List[str] | None = None,
     ) -> Dag:
         """Build the DAG for the given node.
 
         Args:
             node: The root node to start the DAG from.
-            layout_mode: Layout mode for arranging the DAG. Defaults to DagLayoutEnum.PLANAR.
+            layout_mode: Layout mode for arranging the DAG. Defaults to DagLayout.PLANAR.
             ignore_fields: Fields to ignore during traversal. Defaults to an empty list.
 
         Returns:
