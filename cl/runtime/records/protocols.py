@@ -194,6 +194,11 @@ def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
     return hasattr(instance_or_type, "get_key")
 
 
+def is_abstract(instance_or_type: Any) -> bool:
+    """Return True if the argument is an abstract class."""
+    return bool(getattr(instance_or_type, "__abstractmethods__", None))
+
+
 def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere and review logic
     """Return True if the argument is a singleton key (has no key fields), error if not a key or has no slots."""
     if not is_key(instance_or_type):

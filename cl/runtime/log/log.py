@@ -46,7 +46,7 @@ class Log(LogKey, RecordMixin[LogKey], ABC):
         if Log.__default is None:
             # Create the class specified in settings and invoke its constructor
             context_settings = ContextSettings.instance()
-            log_type = TypeImport.get_class_type(context_settings.log_class)
+            log_type = TypeImport.from_qual_name(context_settings.log_class)
             Log.__default = log_type()
 
         return Log.__default

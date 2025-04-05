@@ -32,7 +32,7 @@ from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
-from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_primitive, is_abstract
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.element_decl import ElementDecl
@@ -242,8 +242,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         result.type_kind = TypeKind.RECORD if is_record else TypeKind.DATA
 
         # Set abstract flag, use None instead of False
-        is_abstract = hasattr(record_type, "__abstractmethods__") and bool(record_type.__abstractmethods__)
-        result.abstract = True if is_abstract else None
+        result.abstract = True if is_abstract(record_type) else None
 
         # Set display kind
         result.display_kind = "Basic"  # TODO: Remove Basic after display_kind is made optional

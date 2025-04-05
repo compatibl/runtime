@@ -13,12 +13,30 @@
 # limitations under the License.
 
 import pytest
+from cl.runtime.records.record_util import RecordUtil
+from stubs.cl.runtime import StubDataclassRecord, StubDataclassDerivedRecord, StubDataclassData, StubDataclassRecordKey
 
 
-@pytest.mark.skip("Add tests for RecordUtil")
-def test_record_util():
-    """Test RecordUtil class."""
-    # TODO: Add tests for RecordUtil
+def test_get_non_abstract_ancestors():
+    """Test getting class path from class."""
+
+    # TODO: Add more test cases
+    key_class = StubDataclassRecordKey
+    base_class = StubDataclassRecord
+    derived_class = StubDataclassDerivedRecord
+
+    # Common base class, returns self and key class
+    assert RecordUtil.get_non_abstract_ancestors(StubDataclassRecord) == [base_class, key_class]
+
+    # Derived class, returns self, common base and key
+    assert RecordUtil.get_non_abstract_ancestors(StubDataclassDerivedRecord) == [derived_class, base_class, key_class]
+
+    # Invoke for a type that does not have a key class
+    with pytest.raises(RuntimeError):
+        RecordUtil.get_non_abstract_ancestors(StubDataclassData)
+
+    # Call one more time and confirm that method results are cached
+    assert RecordUtil.get_non_abstract_ancestors(StubDataclassRecord) == [base_class, key_class]
 
 
 if __name__ == "__main__":

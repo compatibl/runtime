@@ -39,9 +39,9 @@ def test_get_type_by_short_name():
 def test_get_type_by_class_path():
     """Test Schema.get_type_by_class_path() method."""
 
-    assert TypeImport.get_class_type("cl.runtime.schema.type_decl.TypeDecl") is TypeDecl
+    assert TypeImport.from_qual_name("cl.runtime.schema.type_decl.TypeDecl") is TypeDecl
     assert (
-        TypeImport.get_class_type("stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord")
+        TypeImport.from_qual_name("stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord")
         is StubDataclassRecord
     )
 

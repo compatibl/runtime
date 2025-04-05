@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import inspect
+from inspect import isabstract
 from typing import Any
 from typing import Iterable
 from typing import List
 from typing import Type
 from typing import TypeVar
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import RecordProtocol, is_key_or_record
 from cl.runtime.records.protocols import is_record
+from cl.runtime.records.type_util import TypeUtil
 
 T = TypeVar("T")
 
@@ -28,21 +29,35 @@ class RecordUtil:
     """Utilities for working with records."""
 
     @classmethod
-    def is_abstract(cls, record_type: Type) -> bool:
-        """Return True if 'record_type' is abstract."""
-        return bool(inspect.isabstract(record_type))
-
-    @classmethod
     def get_non_abstract_descendants(cls, record_type: Type) -> List[Type]:
-        """Find non-abstract descendants of 'record_type' to all levels and return the list of ClassName."""
+        """Find non-abstract descendants of 'record_type' to all levels and return their types."""
+        # TODO: Add caching, convert to tuple
         subclasses = record_type.__subclasses__()
         result = []
         for subclass in subclasses:
             # Recursively check subclasses
             result.extend(cls.get_non_abstract_descendants(subclass))
             # If the subclass is not abstract, add it to the list
-            if not inspect.isabstract(subclass):
+            if not isabstract(subclass):
                 result.append(subclass)
+        return result
+    
+    @classmethod
+    def get_non_abstract_ancestors(cls, record_type: Type) -> List[Type]:
+        """
+        Return non-abstract record ancestors in the order from derived to base, starting from self and ending with key.
+        """
+        # TODO: Add caching, convert to tuple
+        # Get the list of classes in MRO that are keys or records and are not mixins or abstract
+        result = [
+            x
+            for x in record_type.mro()
+            if is_key_or_record(x) and not isabstract(x) and not x.__name__.endswith("Mixin")
+        ]
+
+        # Make sure there is only one such class in the inheritance chain
+        if len(result) == 0:
+            raise RuntimeError(f"Class {TypeUtil.name(record_type)} is not a record or key.")
         return result
 
     @classmethod
