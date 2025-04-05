@@ -21,14 +21,13 @@ from typing import Type
 from uuid import UUID
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key, PRIMITIVE_CLASSES, is_enum, is_record, is_data
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind import ContainerKind
-from cl.runtime.schema.field_kind import FieldKind
-from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
 from cl.runtime.schema.type_decl_key import TypeDeclKey
+from cl.runtime.schema.type_kind import TypeKind
 
 primitive_types = (str, float, bool, int, dt.date, dt.time, dt.datetime, UUID, bytes)
 """Tuple of primitive types."""
@@ -50,7 +49,7 @@ class FieldDecl:
     comment: str | None = None
     """Field comment."""
 
-    field_kind: FieldKind = required()
+    field_kind: TypeKind = required()
     """Kind of the element inside the innermost container if the field is a container, otherwise kind of the field."""
 
     field_type_decl: TypeDeclKey = required()
@@ -215,22 +214,25 @@ class FieldDecl:
                 dependencies.add(field_type)
 
             # Assign field kind
-            if field_type in primitive_types:
-                # Indicate that field is one of the supported primitive types
-                result.field_kind = FieldKind.PRIMITIVE
-            elif issubclass(field_type, Enum):
-                # Indicate that field is an enum
-                result.field_kind = FieldKind.ENUM
+            if field_type in PRIMITIVE_CLASSES:
+                # Field is one of the supported primitive types
+                result.field_kind = TypeKind.PRIMITIVE
+            elif is_enum(field_type):
+                # Field is an enum
+                result.field_kind = TypeKind.ENUM
             elif is_key(field_type):
-                # Indicate that field is a key
-                result.field_kind = FieldKind.KEY
-            elif hasattr(field_type, "__slots__"):
-                # Indicate that field is a user-defined data with slots
-                result.field_kind = FieldKind.RECORD_OR_DATA
+                # Field is a key (excludes records)
+                result.field_kind = TypeKind.KEY
+            elif is_record(field_type):
+                # Field is a record (excludes keys)
+                result.field_kind = TypeKind.RECORD
+            elif is_data(field_type):
+                # Field is a slotted data type (excludes keys and records)
+                result.field_kind = TypeKind.DATA
             else:
                 raise RuntimeError(
-                    "Field type '{field_type}' for field '{field_name}' is not\n"
-                    "a primitive type, enum, key, record or a class with slots."
+                    f"Field type '{field_type}' for field '{field_name}' is not\n"
+                    f"a primitive type, enum, key, record or a slotted data type."
                 )
         else:
             raise RuntimeError(f"Complex type {field_type} is not supported when building database schema.")

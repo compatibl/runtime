@@ -18,8 +18,8 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.container_kind import ContainerKind
 from cl.runtime.schema.field_decl import FieldDecl
-from cl.runtime.schema.field_kind import FieldKind
 from cl.runtime.schema.member_decl import MemberDecl
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.value_decl import ValueDecl
 
 
@@ -76,14 +76,14 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
 
         # Complex type
         match field_decl.field_kind:
-            case FieldKind.PRIMITIVE:
+            case TypeKind.PRIMITIVE:
                 # Primitive type, create declaration from name
                 result.value = ValueDecl.from_name(field_decl.field_type_decl.name)
-            case FieldKind.ENUM:
+            case TypeKind.ENUM:
                 result.enum = field_decl.field_type_decl
-            case FieldKind.KEY:
+            case TypeKind.KEY:
                 result.key_ = field_decl.field_type_decl
-            case FieldKind.RECORD_OR_DATA:
+            case TypeKind.RECORD | TypeKind.DATA:
                 result.data = field_decl.field_type_decl
             case _:
                 raise RuntimeError(f"Unsupported field kind {field_decl.field_kind.name} for field {field_decl.name}.")
