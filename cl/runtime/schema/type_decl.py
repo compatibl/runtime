@@ -23,7 +23,6 @@ from itertools import tee
 from typing import Any
 from typing import Dict
 from typing import List
-from typing import Literal
 from typing import Set
 from typing import Type
 from typing import get_type_hints  # TODO: Use TypeHint class instead
@@ -42,8 +41,6 @@ from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.type_kind_enum import TypeKindEnum
-
-DisplayKindLiteral = Literal["Basic", "Singleton", "Dashboard"]  # TODO: Review
 
 
 def dict_public_fields_factory(x):
@@ -147,7 +144,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     type_kind: TypeKindEnum = required()  # TODO: ObjectKind or inherit
     """Type kind."""
 
-    display_kind: DisplayKindLiteral = required()  # TODO: Make optional, treat None as Basic
+    display_kind: str = required()  # TODO: Make optional, treat None as Basic
     """Display kind."""
 
     inherit: TypeDeclKey | None = None
@@ -177,6 +174,13 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
     def get_key(self) -> TypeDeclKey:
         return TypeDeclKey(module=self.module, name=self.name).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.display_kind not in (display_kinds := ["Basic", "Singleton", "Dashboard"]):
+            raise RuntimeError(
+                f"Field TypeDecl.display_kind has the value of {self.display_kind}\n"
+                f"Permitted values are {', '.join(display_kinds)}")
 
     def to_type_decl_dict(self) -> Dict[str, Any]:
         """Convert to dictionary using type declaration conventions."""

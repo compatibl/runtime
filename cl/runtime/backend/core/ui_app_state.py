@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from typing import Dict
 from typing import List
-from cl.runtime.backend.core.app_theme import AppTheme
 from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey
 from cl.runtime.backend.core.user_key import UserKey
@@ -45,7 +44,7 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
     read_only: bool | None = None
     """Flag indicating that UI is read-only."""
 
-    application_theme: str | None = None  # TODO: Replace by AppTheme
+    application_theme: str | None = None
     """Application theme (dark, light, etc.)."""
 
     user_secret_identifiers: List[str] | None = None
@@ -60,15 +59,22 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
     def get_key(self) -> UiAppStateKey:
         return UiAppStateKey(user=self.user).build()
 
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.application_theme not in (application_themes := [None, "System", "Dark", "Light", "Blue"]):
+            raise RuntimeError(
+                f"Field UiAppState.application_theme has the value of {self.application_theme}\n"
+                f"Permitted values are {', '.join(application_themes[1:])}")
+
     @classmethod
-    def get_current_user_app_theme(cls) -> AppTheme | None:
+    def get_current_user_app_theme(cls) -> str | None:
         """Get current user app theme."""
 
         default_app_state_key = UiAppStateKey(
             user=UserKey(username="root")
         ).build()  # TODO: Review the use of root default
 
-        default_app_state = DbContext.load_one_or_none(UiAppStateKey, default_app_state_key)
+        default_app_state = DbContext.load_one_or_none(UiAppState, default_app_state_key)
         if default_app_state is not None and default_app_state.application_theme is not None:
             return default_app_state.application_theme
 

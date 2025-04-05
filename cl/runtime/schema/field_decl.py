@@ -17,7 +17,6 @@ import types
 import typing
 from dataclasses import dataclass
 from enum import Enum
-from typing import Literal
 from typing import Type
 from uuid import UUID
 from typing_extensions import Self
@@ -204,11 +203,7 @@ class FieldDecl:
             outer_container = container
 
         # Parse the value itself
-        if field_origin is Literal:
-            # List of literal strings
-            result.field_kind = FieldKindEnum.PRIMITIVE
-            result.field_type_decl = PrimitiveDeclKeys.STR
-        elif field_origin in supported_containers:
+        if field_origin in supported_containers:
             raise RuntimeError("Containers within containers are not supported when building database schema.")
         elif field_origin is None:
 

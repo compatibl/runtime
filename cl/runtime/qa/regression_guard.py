@@ -19,7 +19,6 @@ from enum import Enum
 from typing import Any
 from typing import ClassVar
 from typing import Dict
-from typing import Literal
 from typing_extensions import Self
 from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES
@@ -381,7 +380,9 @@ class RegressionGuard:
             # Get from this guard
             return self.__exception_text
 
-    def _get_file_path(self, file_type: Literal["received", "expected", "diff"]) -> str:
+    def _get_file_path(self, file_type: str) -> str:
         """The diff between received and expected is written to 'channel.diff.ext' located next to the unit test."""
+        if file_type not in (file_types := ["received", "expected", "diff"]):
+            raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
         result = f"{self.output_path}{file_type}.{self.ext}"
         return result
