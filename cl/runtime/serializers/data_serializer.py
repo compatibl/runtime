@@ -101,7 +101,7 @@ class DataSerializer(Data):
                     # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
                     return None
                 else:
-                    raise RuntimeError(f"Data is None but type hint {type_hint[0]} indicates it is required.")
+                    raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
             elif data_class_name in SEQUENCE_CLASS_NAMES:
                 if schema_type_name is None or schema_type_name in SEQUENCE_TYPE_NAMES:
                     return [self.typed_deserialize(v, type_hint) for v in data]
@@ -149,7 +149,7 @@ class DataSerializer(Data):
                 # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
                 return None
             else:
-                raise RuntimeError(f"Data is None but type hint {type_hint[0]} indicates it is required.")
+                raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
         elif data_class_name in PRIMITIVE_CLASS_NAMES:
             if remaining_chain:
                 raise RuntimeError(
@@ -296,7 +296,7 @@ class DataSerializer(Data):
                 # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
                 return None
             else:
-                raise RuntimeError(f"Data is None but type hint {type_hint[0]} indicates it is required.")
+                raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
         elif schema_type_name in PRIMITIVE_TYPE_NAMES:
             # Check that no type chain is remaining
             if remaining_chain:

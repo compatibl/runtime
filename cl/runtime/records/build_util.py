@@ -58,7 +58,7 @@ class BuildUtil:
                 # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
                 return None
             else:
-                raise RuntimeError(f"Data is None but type hint {type_hint[0]} indicates it is required.")
+                raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
         elif data_class_name in PRIMITIVE_CLASS_NAMES:
             if remaining_chain:
                 raise RuntimeError(

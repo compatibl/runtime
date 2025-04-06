@@ -82,7 +82,7 @@ class KeySerializer(Data):
             if is_optional:
                 return None
             else:
-                raise RuntimeError(f"Key is None while its type hint {type_hint[0]} is not optional.")
+                raise RuntimeError(f"Key is None while its type hint {type_hint.to_str()} is not optional.")
         elif is_key(data):
             # Build the key (this has no effect if already frozen)
             data.build()
