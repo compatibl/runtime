@@ -393,9 +393,15 @@ class DataSerializer(Data):
             # Deserialize into a dict
             result_dict = {
                 (snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)): (
-                    self.typed_deserialize(self.data_encoder.decode(v), field_dict[snake_case_k].type_hint)
-                    if self.data_encoder is not None and isinstance(v, str) and len(v) > 0 and v[0] == "{"
-                    else self.typed_deserialize(v, field_dict[snake_case_k].type_hint)
+                    self.typed_deserialize(self.data_encoder.decode(v), field_hint)
+                    if (
+                            (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != 'str' and
+                            self.data_encoder is not None and
+                            isinstance(v, str)
+                            and len(v) > 0 and
+                            v[0] == "{"
+                    )
+                    else self.typed_deserialize(v, field_hint)
                 )
                 for k, v in data.items()
                 if not k.startswith("_") and v is not None
