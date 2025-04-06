@@ -36,6 +36,7 @@ from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.json_encoder import JsonEncoder
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
+from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.type_inclusion import TypeInclusion
@@ -43,7 +44,7 @@ from cl.runtime.serializers.type_placement import TypePlacement
 
 
 @dataclass(slots=True, kw_only=True)
-class DataSerializer(Data):
+class DataSerializer(Serializer):
     """Roundtrip serialization of object to dictionary with optional type information."""
 
     primitive_serializer: PrimitiveSerializer = required()

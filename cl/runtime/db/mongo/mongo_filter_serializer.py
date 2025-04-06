@@ -23,7 +23,7 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class MongoFilterSerializer(Data):
+class MongoFilterSerializer(Data):  # TODO: Standardize API and derive from Serializer
     """Serialize record for use as a MongoDB query filter."""
 
     primitive_type_names: ClassVar[Type] = ["str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"]

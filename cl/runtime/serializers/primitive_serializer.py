@@ -44,6 +44,7 @@ from cl.runtime.serializers.float_format import FloatFormat
 from cl.runtime.serializers.int_format import IntFormat
 from cl.runtime.serializers.long_format import LongFormat
 from cl.runtime.serializers.none_format import NoneFormat
+from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.string_format import StringFormat
 from cl.runtime.serializers.time_format import TimeFormat
 from cl.runtime.serializers.timestamp_format import TimestampFormat
@@ -51,7 +52,7 @@ from cl.runtime.serializers.uuid_format import UuidFormat
 
 
 @dataclass(slots=True, kw_only=True)
-class PrimitiveSerializer(Data):
+class PrimitiveSerializer(Serializer):
     """Helper class for serialization and deserialization of primitive types."""
 
     none_format: NoneFormat = required()

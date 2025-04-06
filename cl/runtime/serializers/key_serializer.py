@@ -40,10 +40,11 @@ from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
+from cl.runtime.serializers.serializer import Serializer
 
 
 @dataclass(slots=True, kw_only=True)
-class KeySerializer(Data):
+class KeySerializer(Serializer):
     """Roundtrip serialization of object to a flattened sequence, object cannot have sequence fields."""
 
     key_format: KeyFormat = required()

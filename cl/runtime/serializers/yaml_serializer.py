@@ -30,6 +30,7 @@ from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.type_hints import TypeHints
 from cl.runtime.serializers.type_inclusion import TypeInclusion
@@ -123,7 +124,7 @@ yaml_reader.Constructor = PrimitiveToStringConstructor
 
 
 @dataclass(slots=True, kw_only=True)
-class YamlSerializer(Data):
+class YamlSerializer(Serializer):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
     type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED

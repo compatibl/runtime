@@ -23,10 +23,11 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.enum_format import EnumFormat
 from cl.runtime.serializers.none_format import NoneFormat
+from cl.runtime.serializers.serializer import Serializer
 
 
 @dataclass(slots=True, kw_only=True)
-class EnumSerializer(Data):
+class EnumSerializer(Serializer):
     """Helper class for serialization and deserialization of enum types."""
 
     none_format: NoneFormat = required()

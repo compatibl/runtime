@@ -22,6 +22,7 @@ from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_output_format import JsonOutputFormat
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.type_inclusion import TypeInclusion
 
@@ -34,7 +35,7 @@ def orjson_default(obj):
 
 
 @dataclass(slots=True, kw_only=True)
-class JsonSerializer(Data):
+class JsonSerializer(Serializer):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
     json_output_format: JsonOutputFormat = JsonOutputFormat.PRETTY_PRINT
