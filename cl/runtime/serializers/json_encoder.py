@@ -38,35 +38,18 @@ class JsonEncoder(Encoder):
     def encode(self, data: Any) -> str | None:
         """Encode to a JSON string."""
 
-        if data is None or data.__class__.__name__ in PRIMITIVE_CLASS_NAMES:
-            # Pass through None and primitive types
-            return data
-        elif is_sequence(data) or is_mapping(data):
-            # Use orjson to serialize the dictionary to JSON string in pretty-print format
-            if self.json_output_format == JsonFormat.PRETTY_PRINT:
-                option = orjson.OPT_INDENT_2
-            elif self.json_output_format == JsonFormat.COMPACT:
-                option = None
-            else:
-                raise ErrorUtil.enum_value_error(self.json_output_format, JsonFormat)
-
-            result = orjson.dumps(data, option=option).decode("utf-8")
-            return result
+        # Use orjson to serialize the dictionary to JSON string in pretty-print format
+        if self.json_output_format == JsonFormat.PRETTY_PRINT:
+            option = orjson.OPT_INDENT_2
+        elif self.json_output_format == JsonFormat.COMPACT:
+            option = None
         else:
-            raise RuntimeError(f"Unsupported type {data.__class__.__name__} for JSON serialization.")
+            raise ErrorUtil.enum_value_error(self.json_output_format, JsonFormat)
+
+        result = orjson.dumps(data, option=option).decode("utf-8")
+        return result
 
     def decode(self, data: str | None) -> Any:  # noqa
         """Decode from a JSON string."""
-
-        if isinstance(data, str) and data.startswith("{"):
-            # Use orjson to parse the JSON string into a dictionary
-            result = orjson.loads(data.encode("utf-8"))
-            return result
-        elif isinstance(data, str) and data.startswith("["):
-            # Parse a sequence
-            print(str(data))
-            tokens = data.removeprefix("[").removesuffix("]").split(",")
-            result = [self.decode(token) for token in tokens]
-            return result
-        else:
-            return data
+        result = orjson.loads(data.encode("utf-8"))
+        return result

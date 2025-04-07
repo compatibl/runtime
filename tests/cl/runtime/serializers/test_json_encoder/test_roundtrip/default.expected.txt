@@ -1,0 +1,61 @@
+"abc"
+1
+1.0
+{
+  "str": "abc",
+  "str_brace": "{",
+  "str_bracket": "[",
+  "str_double_quote": "\"",
+  "str_single_quote": "'",
+  "int": 1,
+  "float": 1.0
+}
+[
+  {
+    "str": "abc",
+    "str_brace": "{",
+    "str_bracket": "[",
+    "str_double_quote": "\"",
+    "str_single_quote": "'",
+    "int": 1,
+    "float": 1.0
+  },
+  {
+    "str": "abc",
+    "str_brace": "{",
+    "str_bracket": "[",
+    "str_double_quote": "\"",
+    "str_single_quote": "'",
+    "int": 1,
+    "float": 1.0
+  }
+]
+[
+  "abc",
+  "{",
+  "[",
+  "\"",
+  "'",
+  1,
+  1.0
+]
+[
+  [
+    "abc",
+    "{",
+    "[",
+    "\"",
+    "'",
+    1,
+    1.0
+  ],
+  [
+    "abc",
+    "{",
+    "[",
+    "\"",
+    "'",
+    1,
+    1.0
+  ]
+]
