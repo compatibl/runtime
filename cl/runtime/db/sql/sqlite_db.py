@@ -22,6 +22,7 @@ from typing import Dict
 from typing import Iterable
 from typing import Tuple
 from typing import Type
+
 from cl.runtime.db.db import Db
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.file.file_util import FileUtil
@@ -31,7 +32,7 @@ from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
-from cl.runtime.schema.schema import Schema
+from cl.runtime import TypeImport
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.project_settings import ProjectSettings

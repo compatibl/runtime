@@ -91,7 +91,7 @@ class FieldDecl:
             dependencies: Set of types used in field or methods of the specified type, populated only if not None
         """
 
-        from cl.runtime.schema.schema import Schema  # TODO: Avoid circular dependency
+        from cl.runtime import TypeImport  # TODO: Avoid circular dependency
 
         result = cls()
         result.name = field_name

@@ -25,6 +25,7 @@ from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.record_request import RecordRequest
 from cl.runtime.schema.field_decl import primitive_types  # TODO: Move definition to a separate module
+from cl.runtime import TypeImport
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -47,7 +48,7 @@ class RecordResponse(BaseModel):
     def get_record(cls, request: RecordRequest) -> RecordResponse:
         """Implements /storage/record route."""
 
-        record_type = Schema.get_type_by_short_name(request.type)
+        record_type = TypeImport.class_from_type_name(request.type)
         type_hint = TypeHint.for_class(record_type.get_key_type(), optional=True)
         deserialized_key = _KEY_SERIALIZER.deserialize(request.key, type_hint).build()
 
@@ -83,7 +84,7 @@ class RecordResponse(BaseModel):
     def _get_default_ui_type_state(cls, ui_type_state_requested_key: UiTypeStateKey) -> UiTypeState:
         """Return default UiTypeState with pinned all handlers."""
 
-        type_state_record_type = Schema.get_type_by_short_name(ui_type_state_requested_key.type_.name)
+        type_state_record_type = TypeImport.class_from_type_name(ui_type_state_requested_key.type_.name)
         type_state_record_type_schema = Schema.for_type(type_state_record_type)
 
         # Iterate over type declarations to get all handlers

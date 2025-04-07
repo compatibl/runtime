@@ -19,7 +19,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.list_panels_request import ListPanelsRequest
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
-from cl.runtime.schema.schema import Schema
+from cl.runtime import TypeImport
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -45,7 +45,7 @@ class ListPanelsResponseItem(BaseModel):
         """Implements /entity/list_panels route."""
 
         # TODO: Return saved view names
-        request_type = Schema.get_type_by_short_name(request.type)
+        request_type = TypeImport.class_from_type_name(request.type)
 
         # Get actual type from record if request.key is not None
         if request.key is not None:

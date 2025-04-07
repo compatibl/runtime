@@ -30,24 +30,6 @@ class Schema:
     """
 
     @classmethod
-    def get_type_by_short_name(cls, short_name: str) -> Type:
-        """Get type from short name (class name with optional package alias)."""
-        return TypeImport.class_from_type_name(short_name)
-
-    @classmethod
-    def for_key(cls, key: TypeDeclKey) -> Self:
-        """Create or return cached object for the specified type declaration key."""
-        class_path = f"{key.module.module_name}.{key.name}"
-        return cls.for_class_path(class_path)
-
-    @classmethod
-    def for_class_path(cls, class_path: str) -> Dict[str, Dict]:
-        """Create or return cached object for the specified class path in module.ClassName format."""
-
-        record_type = TypeImport.class_from_qual_name(class_path)
-        return cls.for_type(record_type)
-
-    @classmethod
     @cached
     def for_type(cls, record_type: Type) -> Dict[str, Dict]:
         """

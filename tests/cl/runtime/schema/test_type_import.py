@@ -32,13 +32,19 @@ def test_get_qual_name():
     derived_path = f"{StubDataclassDerivedRecord.__module__}.{StubDataclassDerivedRecord.__name__}"
     assert TypeImport.qual_name_from_class(StubDataclassDerivedRecord) == derived_path
 
+def test_from_type_name():
+    """Test TypeImport.class_from_type_name() method."""
+
+    assert TypeImport.class_from_type_name("TypeDecl") is TypeDecl
+    assert TypeImport.class_from_type_name("StubDataclassRecord") is StubDataclassRecord
 
 def test_from_qual_name():
     """Test getting class from module and class strings."""
 
-    # Class that is already imported
-    class_info_path = f"{TypeImport.__module__}.{TypeImport.__name__}"
-    assert TypeImport.class_from_qual_name(class_info_path) == TypeImport
+    # Classes that is already imported
+    for imported_class in [TypeImport, TypeDecl, StubDataclassRecord]:
+        class_info_path = f"{imported_class.__module__}.{imported_class.__name__}"
+        assert TypeImport.class_from_qual_name(class_info_path) == imported_class
 
     # Class that is dynamically imported on demand
     do_no_import_class_path = (

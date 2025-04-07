@@ -24,7 +24,7 @@ from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
-from cl.runtime.schema.schema import Schema
+from cl.runtime import TypeImport
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -35,7 +35,7 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[Type, TRecord]:
     """Fetch records from the database and return them."""
 
-    request_type = Schema.get_type_by_short_name(request.type)
+    request_type = TypeImport.class_from_type_name(request.type)
     type_hint = TypeHint.for_class(request_type, optional=True)
 
     key_objs = [_KEY_SERIALIZER.deserialize(key, type_hint) for key in request.keys]

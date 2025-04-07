@@ -15,6 +15,7 @@
 from __future__ import annotations
 from typing import Dict
 from cl.runtime.routers.schema.type_request import TypeRequest
+from cl.runtime import TypeImport
 from cl.runtime.schema.schema import Schema
 
 
@@ -26,7 +27,7 @@ class TypeResponseUtil:
         """Implements /storage/get_datasets route."""
 
         # TODO: Check why empty module is passed, is module the short name prefix?
-        record_type = Schema.get_type_by_short_name(request.name)
+        record_type = TypeImport.class_from_type_name(request.name)
         handler_args_elements = dict()
         result = Schema.for_type(record_type)
 
