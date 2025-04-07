@@ -17,6 +17,7 @@ from typing import Any
 import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.json_output_format import JsonOutputFormat
 
 
@@ -28,7 +29,7 @@ def orjson_default(obj):
 
 
 @dataclass(slots=True, kw_only=True)
-class JsonEncoder(Data):
+class JsonEncoder(Encoder):
     """Encoding of dictionary to and from JSON."""
 
     json_output_format: JsonOutputFormat = JsonOutputFormat.PRETTY_PRINT
@@ -48,9 +49,9 @@ class JsonEncoder(Data):
         result = orjson.dumps(data, option=option).decode("utf-8")
         return result
 
-    def decode(self, json_str: str) -> Any:  # noqa
+    def decode(self, data: str) -> Any:  # noqa
         """Decode from a JSON string."""
 
         # Use orjson to parse the JSON string into a dictionary
-        result = orjson.loads(json_str.encode("utf-8"))
+        result = orjson.loads(data.encode("utf-8"))
         return result
