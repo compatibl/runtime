@@ -53,11 +53,11 @@ class DataSerializer(Serializer):
     key_serializer: Serializer | None = None
     """Use to serialize key fields if specified, otherwise serialize the same way as data fields."""
 
-    data_serializer: Serializer | None = None
+    inner_serializer: Serializer | None = None
     """Use to serialize data fields, if specified the current serializer will only be used at root level."""
 
-    data_encoder: Encoder | None = None
-    """Transformation applied to the data fields after converting them to dict (does not apply to keys)."""
+    inner_encoder: Encoder | None = None
+    """Encode the output of inner serializer if specified."""
 
     type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
     """Where to include type information in serialized data."""
@@ -73,6 +73,14 @@ class DataSerializer(Serializer):
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if (self.inner_serializer is not None) ^ (self.inner_encoder is not None):
+            raise ErrorUtil.mutually_required_fields_error(
+                ["inner_serializer", "inner_encoder"],
+                class_name=self.__class__.__name__
+            )
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize data to a dictionary."""
@@ -263,8 +271,8 @@ class DataSerializer(Serializer):
                                 key_serializer.serialize(v, field_spec.type_hint)
                                 if is_key(v)
                                 else (
-                                    self.data_encoder.encode(self.data_serializer.serialize(v, field_spec.type_hint))
-                                    if self.data_encoder is not None
+                                    self.inner_encoder.encode(self.inner_serializer.serialize(v, field_spec.type_hint))
+                                    if self.inner_encoder is not None
                                     else self.serialize(v, field_spec.type_hint)
                                 )
                             )
@@ -306,10 +314,10 @@ class DataSerializer(Serializer):
             type_hint.validate_for_sequence()
             # Decode if necessary
             # TODO: Eliminate check for the fist character
-            if self.data_encoder is not None and isinstance(data, str) and len(data) > 0 and data[0] == "[":
+            if self.inner_encoder is not None and isinstance(data, str) and len(data) > 0 and data[0] == "[":
                 # Decode and deserialize sequence using data_serializer
-                data = self.data_encoder.decode(data)
-                return list(self.data_serializer.typed_deserialize(v, remaining_chain) for v in data)
+                data = self.inner_encoder.decode(data)
+                return list(self.inner_serializer.typed_deserialize(v, remaining_chain) for v in data)
             else:
                 # Deserialize sequence using self
                 return list(self.typed_deserialize(v, remaining_chain) for v in data)
@@ -329,20 +337,20 @@ class DataSerializer(Serializer):
             if self.key_serializer is not None and is_key(schema_class):
                 if (
                     # TODO: Eliminate check for the fist character
-                    self.data_encoder is not None
+                    self.inner_encoder is not None
                     and len(data) > 0
                     and data[0] == "{"
                 ):  # TODO: Fix for non-JSON encoding
                     # Decode data field using data_encoder if provided and deserialize using self
-                    decoded_data = self.data_encoder.decode(data)
-                    return self.data_serializer.typed_deserialize(decoded_data, type_hint)
+                    decoded_data = self.inner_encoder.decode(data)
+                    return self.inner_serializer.typed_deserialize(decoded_data, type_hint)
                 else:
                     # Otherwise use key serializer to deserialize
                     return self.key_serializer.deserialize(data, type_hint)
-            elif self.data_encoder is not None and is_data(schema_class):
+            elif self.inner_encoder is not None and is_data(schema_class):
                 # Decode data field using data_encoder and deserialize
-                decoded_data = self.data_encoder.decode(data)
-                return self.data_serializer.typed_deserialize(decoded_data, type_hint)
+                decoded_data = self.inner_encoder.decode(data)
+                return self.inner_serializer.typed_deserialize(decoded_data, type_hint)
             elif is_enum(schema_class):
                 # Check that no type chain is remaining
                 if remaining_chain:
@@ -391,10 +399,10 @@ class DataSerializer(Serializer):
             # Deserialize into a dict
             result_dict = {
                 (snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)): (
-                    self.data_serializer.typed_deserialize(self.data_encoder.decode(v), field_hint)
+                    self.inner_serializer.typed_deserialize(self.inner_encoder.decode(v), field_hint)
                     if (
                             (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != 'str' and
-                            self.data_encoder is not None and
+                            self.inner_encoder is not None and
                             isinstance(v, str)
                             and len(v) > 0 and
                             v[0] == "{"
