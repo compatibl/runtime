@@ -71,7 +71,7 @@ class TypeSchema:
             return result
         else:
             # Get class for the specified type name and use it to get type spec
-            class_ = cls.get_class(type_name)
+            class_ = TypeImport.class_from_type_name(type_name)
             return cls.for_class(class_)
 
     @classmethod
@@ -83,7 +83,7 @@ class TypeSchema:
             return result
         else:
             # Get class for the specified type name
-            class_ = cls.get_class(type_name)
+            class_ = TypeImport.class_from_type_name(type_name)
 
             # Get class for the type spec
             if issubclass(class_, Enum):
@@ -101,8 +101,3 @@ class TypeSchema:
             result = spec_class.from_class(class_)
             cls._spec_dict[type_name] = result
             return result
-
-    @classmethod
-    def get_class(cls, type_name) -> Type:
-        """Get class for the specified type name, excludes primitive types."""
-        return TypeImport.class_from_type_name(type_name)
