@@ -14,7 +14,6 @@
 
 import datetime as dt
 from enum import Enum
-from inspect import isclass
 from typing import Any
 from typing import Dict
 from typing import List

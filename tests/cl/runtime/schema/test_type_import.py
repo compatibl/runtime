@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime import TypeImport, RecordMixin
-from cl.runtime.records.protocols import is_record
+from cl.runtime import RecordMixin
+from cl.runtime import TypeImport
 from cl.runtime.records.record_util import is_non_mixin_key_or_record
 from cl.runtime.schema.type_decl import TypeDecl
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -32,11 +32,13 @@ def test_get_qual_name():
     derived_path = f"{StubDataclassDerivedRecord.__module__}.{StubDataclassDerivedRecord.__name__}"
     assert TypeImport.qual_name_from_class(StubDataclassDerivedRecord) == derived_path
 
+
 def test_from_type_name():
     """Test TypeImport.class_from_type_name() method."""
 
     assert TypeImport.class_from_type_name("TypeDecl") is TypeDecl
     assert TypeImport.class_from_type_name("StubDataclassRecord") is StubDataclassRecord
+
 
 def test_from_qual_name():
     """Test getting class from module and class strings."""

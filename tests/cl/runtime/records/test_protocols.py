@@ -13,11 +13,17 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_abstract, is_data, is_key_or_record, is_key, is_record
+from cl.runtime.records.protocols import is_abstract
+from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_or_record
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
-from stubs.cl.runtime import StubDataclassRecord, StubDataclassDerivedRecord, StubDataclassData, StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassData
+from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclassRecordKey
 
 
 def test_functions():
@@ -40,9 +46,7 @@ def test_functions():
         record_class,
         derived_class,
     )
-    abstract_classes = (
-        key_mixin_class,
-    )
+    abstract_classes = (key_mixin_class,)
     data_classes = (
         data_class,
         key_class,
@@ -54,9 +58,7 @@ def test_functions():
         record_class,
         derived_class,
     )
-    key_classes = (
-        key_class,
-    )
+    key_classes = (key_class,)
     record_classes = (
         record_class,
         derived_class,
@@ -76,7 +78,9 @@ def test_functions():
     for class_ in all_classes:
         assert is_key_or_record(class_) == (class_ in key_or_record_classes), f"{class_} is not a key or record class"
         if class_ not in abstract_classes:
-            assert is_key_or_record(class_()) == (class_ in key_or_record_classes), f"{class_} is not a key or record instance"
+            assert is_key_or_record(class_()) == (
+                class_ in key_or_record_classes
+            ), f"{class_} is not a key or record instance"
 
     # Test is_key
     for class_ in all_classes:
@@ -89,7 +93,6 @@ def test_functions():
         assert is_record(class_) == (class_ in record_classes), f"{class_} is not a record class"
         if class_ not in abstract_classes:
             assert is_record(class_()) == (class_ in record_classes), f"{class_} is not a record instance"
-
 
 
 if __name__ == "__main__":

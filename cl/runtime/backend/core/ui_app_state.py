@@ -64,7 +64,8 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
         if self.application_theme not in (application_themes := [None, "System", "Dark", "Light", "Blue"]):
             raise RuntimeError(
                 f"Field UiAppState.application_theme has the value of {self.application_theme}\n"
-                f"Permitted values are {', '.join(application_themes[1:])}")
+                f"Permitted values are {', '.join(application_themes[1:])}"
+            )
 
     @classmethod
     def get_current_user_app_theme(cls) -> str | None:

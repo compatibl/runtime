@@ -16,13 +16,11 @@ from __future__ import annotations
 from typing import List
 from inflection import titleize
 from pydantic import BaseModel
-
 from cl.runtime import TypeImport
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.user_request import UserRequest
-from cl.runtime.schema.type_schema import TypeSchema
 
 
 class TypesResponseItem(BaseModel):

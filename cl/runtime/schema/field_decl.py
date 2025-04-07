@@ -16,13 +16,16 @@ import datetime as dt
 import types
 import typing
 from dataclasses import dataclass
-from enum import Enum
 from typing import Type
 from uuid import UUID
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_key, PRIMITIVE_CLASSES, is_enum, is_record, is_data
+from cl.runtime.records.protocols import PRIMITIVE_CLASSES
+from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind import ContainerKind

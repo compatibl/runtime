@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from typing import Any
 import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.records.protocols import is_sequence, is_mapping, PRIMITIVE_CLASS_NAMES
 from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.json_format import JsonFormat
 

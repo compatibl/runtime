@@ -32,7 +32,8 @@ from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
-from cl.runtime.records.protocols import is_primitive, is_abstract
+from cl.runtime.records.protocols import is_abstract
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.element_decl import ElementDecl
@@ -180,7 +181,8 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         if self.display_kind not in (display_kinds := ["Basic", "Singleton", "Dashboard"]):
             raise RuntimeError(
                 f"Field TypeDecl.display_kind has the value of {self.display_kind}\n"
-                f"Permitted values are {', '.join(display_kinds)}")
+                f"Permitted values are {', '.join(display_kinds)}"
+            )
 
     def to_type_decl_dict(self) -> Dict[str, Any]:
         """Convert to dictionary using type declaration conventions."""
@@ -325,7 +327,6 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
                 result.elements.append(element_decl)
 
         return result
-
 
     @classmethod
     @cached

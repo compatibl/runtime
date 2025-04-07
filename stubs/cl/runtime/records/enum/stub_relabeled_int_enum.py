@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum, auto
+from enum import IntEnum
+from enum import auto
 
 
 class StubRelabeledIntEnum(IntEnum):

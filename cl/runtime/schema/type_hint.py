@@ -21,8 +21,9 @@ from uuid import UUID
 from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.frozen_data_mixin import FrozenDataMixin
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
 

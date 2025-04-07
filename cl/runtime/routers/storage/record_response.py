@@ -18,13 +18,13 @@ from typing import Dict
 from typing import cast
 from pydantic import BaseModel
 from pydantic import Field
+from cl.runtime import TypeImport
 from cl.runtime.backend.core.ui_type_state import UiTypeState
 from cl.runtime.backend.core.ui_type_state_key import UiTypeStateKey
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.record_request import RecordRequest
-from cl.runtime import TypeImport
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers

@@ -17,9 +17,8 @@ from enum import Enum
 from typing import Any
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_mapping
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -78,8 +77,7 @@ class DataSerializer(Serializer):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if (self.inner_serializer is not None) ^ (self.inner_encoder is not None):
             raise ErrorUtil.mutually_required_fields_error(
-                ["inner_serializer", "inner_encoder"],
-                class_name=self.__class__.__name__
+                ["inner_serializer", "inner_encoder"], class_name=self.__class__.__name__
             )
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
@@ -192,7 +190,9 @@ class DataSerializer(Serializer):
             # item in the mapping, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_mapping()
-            return dict((k, self.typed_serialize(v, remaining_chain)) for k, v in data.items())  # TODO: Replace by frozendict
+            return dict(
+                (k, self.typed_serialize(v, remaining_chain)) for k, v in data.items()
+            )  # TODO: Replace by frozendict
         elif is_data(data):
             # Use key serializer for key types if specified
             if self.key_serializer is not None and is_key(data):
@@ -326,8 +326,9 @@ class DataSerializer(Serializer):
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
             return {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k):
-                    self.typed_deserialize(v, remaining_chain)  # TODO: Should data_serializer be used here?
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self.typed_deserialize(
+                    v, remaining_chain
+                )  # TODO: Should data_serializer be used here?
                 for k, v in data.items()
             }
         elif isinstance(data, str):
@@ -401,11 +402,11 @@ class DataSerializer(Serializer):
                 (snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)): (
                     self.inner_serializer.typed_deserialize(self.inner_encoder.decode(v), field_hint)
                     if (
-                            (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != 'str' and
-                            self.inner_encoder is not None and
-                            isinstance(v, str)
-                            and len(v) > 0 and
-                            v[0] == "{"
+                        (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != "str"
+                        and self.inner_encoder is not None
+                        and isinstance(v, str)
+                        and len(v) > 0
+                        and v[0] == "{"
                     )
                     else self.typed_deserialize(v, field_hint)
                 )

@@ -12,29 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from inspect import isabstract
-from typing import Any, Tuple, Dict, Callable
+from typing import Any
 from typing import Iterable
 from typing import List
+from typing import Tuple
 from typing import Type
 from typing import TypeVar
-
 from memoization import cached
-
 from cl.runtime import TypeImport
-from cl.runtime.records.protocols import RecordProtocol, is_key_or_record, is_abstract
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import is_abstract
+from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 
 T = TypeVar("T")
 
+
 def is_non_abstract_key_or_record(class_: Type) -> bool:
     """Check if the class is a non-abstract record."""
     return is_key_or_record(class_) and not is_abstract(class_) and not class_.__name__.endswith("Mixin")
 
+
 def is_non_mixin_key_or_record(class_: Type) -> bool:
     """Check if the class is a non-abstract record."""
     return is_key_or_record(class_) and not class_.__name__.endswith("Mixin")
+
 
 class RecordUtil:
     """Utilities for working with records."""
@@ -45,8 +48,8 @@ class RecordUtil:
         """Return a tuple of subclasses (inclusive of self) that are keys or records, excluding abstract and mixins."""
         if not is_key_or_record(class_):
             raise RuntimeError(
-                f"Expected key or record, got {TypeUtil.name(class_)}\n"
-                f"in '{cls.__name__}.child_records_of' method.")
+                f"Expected key or record, got {TypeUtil.name(class_)}\n" f"in '{cls.__name__}.child_records_of' method."
+            )
         return TypeImport.subclasses_of(class_, predicate=is_non_abstract_key_or_record)
 
     @classmethod
@@ -56,7 +59,8 @@ class RecordUtil:
         if not is_key_or_record(class_):
             raise RuntimeError(
                 f"Expected key or record, got {TypeUtil.name(class_)}\n"
-                f"in '{cls.__name__}.parent_records_of' method.")
+                f"in '{cls.__name__}.parent_records_of' method."
+            )
         return TypeImport.superclasses_of(class_, predicate=is_non_abstract_key_or_record)
 
     @classmethod
@@ -64,8 +68,8 @@ class RecordUtil:
         """Return a tuple of classes sharing key with self (inclusive of self) that match the predicate, not cached."""
         if not is_key_or_record(class_):
             raise RuntimeError(
-                f"Expected key or record, got {TypeUtil.name(class_)}\n"
-                f"in '{cls.__name__}.child_records_of' method.")
+                f"Expected key or record, got {TypeUtil.name(class_)}\n" f"in '{cls.__name__}.child_records_of' method."
+            )
         return TypeImport.records_sharing_key_with(class_, predicate=is_non_abstract_key_or_record)
 
     @classmethod

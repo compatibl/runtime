@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-import datetime as dt
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.json_encoders import JsonEncoders
 
@@ -52,6 +51,7 @@ _ENCODERS = [
     ("default", JsonEncoders.DEFAULT),
     ("compact", JsonEncoders.COMPACT),
 ]
+
 
 def test_roundtrip():
     """Test DataSerializer.to_json method."""

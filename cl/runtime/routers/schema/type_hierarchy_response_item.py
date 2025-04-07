@@ -17,9 +17,9 @@ import inspect
 from typing import List
 from inflection import titleize
 from pydantic import BaseModel
+from cl.runtime import TypeImport
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_hierarchy_request import TypeHierarchyRequest
-from cl.runtime import TypeImport
 
 
 class TypeHierarchyResponseItem(BaseModel):

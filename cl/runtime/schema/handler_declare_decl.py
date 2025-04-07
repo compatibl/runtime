@@ -46,12 +46,15 @@ class HandlerDeclareDecl:
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.type_ not in (handler_types := [
-            "job",  # Job handler is shown as a button, return type must be None, params are allowed
-            "process",  # Process handler, return type is not allowed, params are allowed
-            "viewer",  # Viewer, return type is allowed, params are allowed
-            "content",  # # Viewer, return type is allowed, params not allowed
-        ]):
+        if self.type_ not in (
+            handler_types := [
+                "job",  # Job handler is shown as a button, return type must be None, params are allowed
+                "process",  # Process handler, return type is not allowed, params are allowed
+                "viewer",  # Viewer, return type is allowed, params are allowed
+                "content",  # # Viewer, return type is allowed, params not allowed
+            ]
+        ):
             raise RuntimeError(
                 f"Field TypeDecl.type_ has the value of {self.type_}\n"
-                f"Permitted values are {', '.join(handler_types)}")
+                f"Permitted values are {', '.join(handler_types)}"
+            )

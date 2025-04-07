@@ -14,8 +14,8 @@
 
 from __future__ import annotations
 from typing import Dict
-from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime import TypeImport
+from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.type_decl import TypeDecl
 
 

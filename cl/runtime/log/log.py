@@ -20,8 +20,8 @@ from typing import ClassVar
 from typing import Iterable
 from typing_extensions import Self
 from cl.runtime.log.log_key import LogKey
-from cl.runtime.schema.type_import import TypeImport
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.schema.type_import import TypeImport
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.log_settings import LogSettings
 

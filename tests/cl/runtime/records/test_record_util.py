@@ -14,7 +14,10 @@
 
 import pytest
 from cl.runtime.records.record_util import RecordUtil
-from stubs.cl.runtime import StubDataclassRecord, StubDataclassDerivedRecord, StubDataclassData, StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassData
+from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclassRecordKey
 
 
 def test_get_superclasses():

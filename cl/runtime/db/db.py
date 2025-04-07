@@ -23,7 +23,6 @@ from cl.runtime.contexts.env_util import EnvUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.build_util import BuildUtil
-from cl.runtime.schema.type_import import TypeImport
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -35,6 +34,7 @@ from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_import import TypeImport
 from cl.runtime.settings.context_settings import ContextSettings
 
 

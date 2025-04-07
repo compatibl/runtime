@@ -16,13 +16,17 @@ import importlib
 import os
 import sys
 from importlib import import_module
-from inspect import getmembers, isclass
+from inspect import getmembers
+from inspect import isclass
 from pkgutil import walk_packages
 from types import ModuleType
-from typing import List, Dict, Tuple, Callable
+from typing import Callable
+from typing import Dict
+from typing import Tuple
 from typing import Type
-
-from cl.runtime.records.protocols import is_key_or_record, is_data, is_enum, is_key
+from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -154,11 +158,11 @@ class TypeImport:
         """Return a tuple of classes sharing key with self (inclusive of self) that match the predicate, not cached."""
         # TODO: Add caching, convert to tuple
         # Find key
-        superclasses = cls.superclasses_of(class_,predicate=is_key)
+        superclasses = cls.superclasses_of(class_, predicate=is_key)
         if not superclasses:
             raise RuntimeError(f"Type {TypeUtil.name(class_)} is not derived from a key.")
         elif len(superclasses) != 1:
-            keys_str = "\n".join(f'  - {TypeUtil.name(x)}' for x in superclasses)
+            keys_str = "\n".join(f"  - {TypeUtil.name(x)}" for x in superclasses)
             raise RuntimeError(f"Type {TypeUtil.name(class_)} has multiple keys among its superclasses:\n{keys_str}\n")
         else:
             # Return subclasses of key type, applying the predicate
@@ -240,11 +244,7 @@ class TypeImport:
         cls._module_by_module_name_dict = {module.__name__: module for module in modules}
 
         # Enumerate classes in all modules
-        classes = [
-            class_
-            for module in modules
-            for _, class_ in getmembers(module, is_schema_type)
-        ]
+        classes = [class_ for module in modules for _, class_ in getmembers(module, is_schema_type)]
 
         # Add each class after performing checks for duplicates
         tuple(cls.add_class(class_) for class_ in classes)

@@ -21,7 +21,6 @@ from typing import Tuple
 from typing import Type
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.build_util import BuildUtil
-from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import DataProtocol
@@ -37,9 +36,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
-from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.key_format import KeyFormat
-from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.serializer import Serializer
 
 
