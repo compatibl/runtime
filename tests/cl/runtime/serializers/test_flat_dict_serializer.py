@@ -54,7 +54,7 @@ def test_data_serialization():
         sample = sample_type()
         type_hint = TypeHint.for_class(sample_type)
         serialized = DataSerializers.FOR_SQLITE.serialize(sample)
-        deserialized = DataSerializers.FOR_SQLITE.typed_deserialize(serialized, type_hint)
+        deserialized = DataSerializers.FOR_SQLITE.deserialize(serialized, type_hint)
         assert deserialized == PytestUtil.approx(sample)
 
         # Record in RegressionGuard

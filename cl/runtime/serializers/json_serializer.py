@@ -96,5 +96,5 @@ class JsonSerializer(Serializer):
         json_dict = orjson.loads(data.encode("utf-8"))
 
         # Use self.dict_serializer to deserialize from the dictionary
-        result = self._data_serializer.typed_deserialize(json_dict, type_hint)
+        result = self._data_serializer.deserialize(json_dict, type_hint)
         return result
