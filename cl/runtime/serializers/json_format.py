@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class JsonOutputFormat(IntEnum):
+class JsonFormat(IntEnum):
     """JSON output format (pretty print, compact, etc)."""
 
     PRETTY_PRINT = auto()

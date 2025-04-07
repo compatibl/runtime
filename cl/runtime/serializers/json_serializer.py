@@ -20,7 +20,7 @@ from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
-from cl.runtime.serializers.json_output_format import JsonOutputFormat
+from cl.runtime.serializers.json_format import JsonFormat
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.type_format import TypeFormat
@@ -38,7 +38,7 @@ def orjson_default(obj):
 class JsonSerializer(Serializer):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    json_output_format: JsonOutputFormat = JsonOutputFormat.PRETTY_PRINT
+    json_output_format: JsonFormat = JsonFormat.PRETTY_PRINT
     """JSON output format (pretty print, compact, etc)."""
 
     type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
@@ -74,12 +74,12 @@ class JsonSerializer(Serializer):
         data_dict = self._data_serializer.serialize(data, type_hint)
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
-        if self.json_output_format == JsonOutputFormat.PRETTY_PRINT:
+        if self.json_output_format == JsonFormat.PRETTY_PRINT:
             option = orjson.OPT_INDENT_2
-        elif self.json_output_format == JsonOutputFormat.COMPACT:
+        elif self.json_output_format == JsonFormat.COMPACT:
             option = None
         else:
-            raise ErrorUtil.enum_value_error(self.json_output_format, JsonOutputFormat)
+            raise ErrorUtil.enum_value_error(self.json_output_format, JsonFormat)
 
         result = orjson.dumps(data_dict, option=option).decode("utf-8")
         return result

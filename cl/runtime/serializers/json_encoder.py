@@ -18,7 +18,7 @@ import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.serializers.encoder import Encoder
-from cl.runtime.serializers.json_output_format import JsonOutputFormat
+from cl.runtime.serializers.json_format import JsonFormat
 
 
 def orjson_default(obj):
@@ -32,19 +32,19 @@ def orjson_default(obj):
 class JsonEncoder(Encoder):
     """Encoding of dictionary to and from JSON."""
 
-    json_output_format: JsonOutputFormat = JsonOutputFormat.PRETTY_PRINT
+    json_output_format: JsonFormat = JsonFormat.PRETTY_PRINT
     """JSON output format (pretty print, compact, etc)."""
 
     def encode(self, data: Any) -> str:
         """Encode to a JSON string."""
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
-        if self.json_output_format == JsonOutputFormat.PRETTY_PRINT:
+        if self.json_output_format == JsonFormat.PRETTY_PRINT:
             option = orjson.OPT_INDENT_2
-        elif self.json_output_format == JsonOutputFormat.COMPACT:
+        elif self.json_output_format == JsonFormat.COMPACT:
             option = None
         else:
-            raise ErrorUtil.enum_value_error(self.json_output_format, JsonOutputFormat)
+            raise ErrorUtil.enum_value_error(self.json_output_format, JsonFormat)
 
         result = orjson.dumps(data, option=option).decode("utf-8")
         return result

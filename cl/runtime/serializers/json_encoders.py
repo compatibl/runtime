@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from cl.runtime.serializers.json_encoder import JsonEncoder
-from cl.runtime.serializers.json_output_format import JsonOutputFormat
+from cl.runtime.serializers.json_format import JsonFormat
 
 cls = JsonEncoder
 
@@ -24,5 +24,5 @@ class JsonEncoders:
     DEFAULT: cls = cls().build()
     """Pretty print format."""
 
-    COMPACT: cls = cls(json_output_format=JsonOutputFormat.COMPACT).build()
+    COMPACT: cls = cls(json_output_format=JsonFormat.COMPACT).build()
     """Compact format without line breaks."""
