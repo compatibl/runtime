@@ -23,9 +23,9 @@ class Encoder(Data, ABC):
     """Abstract base class of encoders that convert data to string and back."""
 
     @abstractmethod
-    def encode(self, data: Any) -> str:
-        """Encode to a string."""
+    def encode(self, data: Any) -> str | None:
+        """Encode to a string, pass through None."""
 
     @abstractmethod
-    def decode(self, data: str) -> Any:
-        """Decode from a string."""
+    def decode(self, data: str | None) -> Any:
+        """Decode from a string, pass through None."""
