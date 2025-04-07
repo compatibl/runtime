@@ -58,6 +58,12 @@ class DataSerializers:
         primitive_serializer=PrimitiveSerializers.FOR_CSV,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
+        data_serializer=cls(
+            primitive_serializer=PrimitiveSerializers.FOR_JSON,
+            enum_serializer=EnumSerializers.DEFAULT,
+            key_serializer=KeySerializers.DELIMITED,
+            type_inclusion=TypeInclusion.ALWAYS,  # TODO: Consider changing to AS_NEEDED
+        ).build(),
         data_encoder=JsonEncoders.COMPACT,
     ).build()
     """Default bidirectional data serializer settings for CSV."""
@@ -66,6 +72,13 @@ class DataSerializers:
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
+        data_serializer=cls(
+            primitive_serializer=PrimitiveSerializers.FOR_JSON,
+            enum_serializer=EnumSerializers.DEFAULT,
+            key_serializer=KeySerializers.DELIMITED,
+            type_inclusion=TypeInclusion.ALWAYS,  # TODO: Consider changing to AS_NEEDED
+            type_placement=TypePlacement.LAST,  # TODO: Remove after all tests pass
+        ).build(),
         data_encoder=JsonEncoders.COMPACT,
         type_inclusion=TypeInclusion.ALWAYS,  # TODO: Consider changing to AS_NEEDED
         type_placement=TypePlacement.LAST,  # TODO: Remove after all tests pass

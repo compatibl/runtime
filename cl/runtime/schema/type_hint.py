@@ -21,7 +21,7 @@ from uuid import UUID
 from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.frozen_data_mixin import FrozenDataMixin
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
@@ -59,6 +59,13 @@ class TypeHint(FrozenDataMixin):
                 return f"{self.schema_type_name} | None"
             else:
                 return f"{self.schema_type_name}"
+
+    def validate_for_primitive(self) -> None:
+        """Raise an error if the type hint is not a primitive type."""
+        if not self.schema_type_name in PRIMITIVE_TYPE_NAMES:
+            raise RuntimeError(f"{self.to_str()} is not a supported primitive type.")
+        elif self.remaining:
+            raise RuntimeError(f"The type hint {self.to_str()} is not valid for a primitive type.")
 
     def validate_for_sequence(self) -> None:
         """Raise an error if the type hint is not a sequence."""
