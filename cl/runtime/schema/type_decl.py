@@ -326,6 +326,37 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
         return result
 
+
+    @classmethod
+    @cached
+    def for_type_with_dependencies(cls, record_type: Type) -> Dict[str, Dict]:
+        """
+        Declarations for the specified type and all dependencies, returned as a dictionary.
+
+        Args:
+            record_type: Type of the record for which the schema is created.
+        """
+        dependencies = set()
+
+        # Get or create type declaration the argument class
+        type_decl_obj = cls.for_type(record_type, dependencies=dependencies)
+
+        # Sort the list of dependencies
+        dependencies = sorted(dependencies, key=lambda x: TypeUtil.name(x))
+
+        # TODO: Restore after Enum decl generation is supported
+        dependencies = [dependency_type for dependency_type in dependencies if not issubclass(dependency_type, Enum)]
+
+        # Requested type is always first
+        type_decl_list = [type_decl_obj] + [cls.for_type(dependency_type) for dependency_type in dependencies]
+
+        # TODO: Move pascalize to a helper class
+        result = {
+            f"{type_decl.module.module_name}.{type_decl.name}": type_decl.to_type_decl_dict()
+            for type_decl in type_decl_list
+        }
+        return result
+
     @classmethod
     @cached
     def get_member_comments(cls, record_type: type) -> Dict[str, str]:

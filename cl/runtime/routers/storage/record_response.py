@@ -24,9 +24,8 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.storage.record_request import RecordRequest
-from cl.runtime.schema.field_decl import primitive_types  # TODO: Move definition to a separate module
 from cl.runtime import TypeImport
-from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -85,7 +84,7 @@ class RecordResponse(BaseModel):
         """Return default UiTypeState with pinned all handlers."""
 
         type_state_record_type = TypeImport.class_from_type_name(ui_type_state_requested_key.type_.name)
-        type_state_record_type_schema = Schema.for_type(type_state_record_type)
+        type_state_record_type_schema = TypeDecl.for_type_with_dependencies(type_state_record_type)
 
         # Iterate over type declarations to get all handlers
         all_handlers = []

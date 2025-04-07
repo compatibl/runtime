@@ -16,7 +16,7 @@ from __future__ import annotations
 from typing import Dict
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime import TypeImport
-from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_decl import TypeDecl
 
 
 class TypeResponseUtil:
@@ -29,7 +29,7 @@ class TypeResponseUtil:
         # TODO: Check why empty module is passed, is module the short name prefix?
         record_type = TypeImport.class_from_type_name(request.name)
         handler_args_elements = dict()
-        result = Schema.for_type(record_type)
+        result = TypeDecl.for_type_with_dependencies(record_type)
 
         # TODO: Experimental patch to exclude generated fields from top grid and editor but not the record picker
         # This patch is activated in three cases:
