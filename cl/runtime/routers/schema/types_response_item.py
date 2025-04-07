@@ -13,16 +13,16 @@
 # limitations under the License.
 
 from __future__ import annotations
+from cl.runtime import TypeImport
 from inflection import titleize
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_schema import TypeSchema
 
 
 class TypesResponseItem(BaseModel):
-    """Single item of the list returned by the /data/types route."""
+    """Single item of the list returned by the /schema/types route."""
 
     name: str
     """Class name (may be customized in settings)."""
@@ -38,15 +38,14 @@ class TypesResponseItem(BaseModel):
     def get_types(cls) -> list[TypesResponseItem]:
         """Implements /schema/types route."""
 
-        # Get a dictionary of types indexed by short name
-        class_dict = TypeSchema.get_class_dict()
+        # Get cached classes (does not rebuild cache)
+        record_types = TypeImport.cached_classes(predicate=is_record)
 
         result = [
             TypesResponseItem(
                 name=TypeUtil.name(record_type),
                 label=titleize(TypeUtil.name(record_type)),
             )
-            for record_type in class_dict.values()
-            if is_record(record_type)
+            for record_type in record_types
         ]
         return result

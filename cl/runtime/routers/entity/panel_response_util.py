@@ -20,6 +20,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -39,7 +40,7 @@ class PanelResponseUtil:
         type_ = Schema.get_type_by_short_name(request.type_name)
 
         # Deserialize key from string to object.
-        key_obj = _KEY_SERIALIZER.deserialize(request.key, type_)
+        key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(type_.get_key_type()))
 
         # Get database from the current context.
         db = DbContext.get_db()

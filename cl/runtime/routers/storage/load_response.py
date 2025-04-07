@@ -19,6 +19,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -45,10 +46,11 @@ class LoadResponse(RecordsWithSchemaResponse):
 
         # Expect all keys to be the same key type.
         key_type = Schema.get_type_by_short_name(first_key_item_type).get_key_type()  # noqa
+        key_type_hint = TypeHint.for_class(key_type, optional=True)
 
         # Deserialize keys in request.
         deserialized_keys = tuple(
-            _KEY_SERIALIZER.deserialize(key_item.key, key_type).build() for key_item in request.load_keys or tuple()
+            _KEY_SERIALIZER.deserialize(key_item.key, key_type_hint).build() for key_item in request.load_keys or tuple()
         )
 
         # TODO (Yauheni): Remove temporary workaround of pinning handlers for all requested types.
