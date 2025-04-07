@@ -53,7 +53,7 @@ class JsonSerializer(Serializer):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    _data_serializer: DataSerializer | None = None
+    _data_serializer: Serializer | None = None
     """Serializes data into dictionary from which it is serialized into JSON."""
 
     def __init(self) -> None:
@@ -90,7 +90,7 @@ class JsonSerializer(Serializer):
         # TODO: Validate type_hint
 
         if self.type_inclusion == TypeInclusion.OMIT:
-            raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
+            raise RuntimeError("Deserialization is not supported when type_inclusion=OMIT.")
 
         # Use orjson to parse the JSON string into a dictionary
         json_dict = orjson.loads(data.encode("utf-8"))

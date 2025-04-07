@@ -50,10 +50,10 @@ class KeySerializer(Serializer):
     key_format: KeyFormat = required()
     """Format of the serialized key."""
 
-    primitive_serializer: PrimitiveSerializer = required()
+    primitive_serializer: Serializer = required()
     """Use to serialize primitive types."""
 
-    enum_serializer: EnumSerializer = required()
+    enum_serializer: Serializer = required()
     """Use to serialize enum types."""
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:

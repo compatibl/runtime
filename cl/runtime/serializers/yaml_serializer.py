@@ -139,10 +139,10 @@ class YamlSerializer(Serializer):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    _serializer: DataSerializer = required()
+    _serializer: Serializer = required()
     """Serializes data into dictionary from which it is serialized into YAML."""
 
-    _deserializer: DataSerializer | None = None
+    _deserializer: Serializer | None = None
     """Deserializes the result of YAML parsing, including converting string leaf nodes to primitive types and enums."""
 
     def __init(self) -> None:
@@ -195,7 +195,7 @@ class YamlSerializer(Serializer):
         """Read a YAML string and return the deserialized object if bidirectional flag is set, or dict otherwise."""
 
         if self.type_inclusion == TypeInclusion.OMIT:
-            raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
+            raise RuntimeError("Deserialization is not supported when type_inclusion=OMIT.")
 
         # Use a YAML reader with PrimitiveToStringConstructor to read all values as strings
         yaml_dict = yaml_reader.load(StringIO(data))

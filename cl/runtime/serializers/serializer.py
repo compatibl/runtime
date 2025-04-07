@@ -21,7 +21,7 @@ from cl.runtime.schema.type_hint import TypeHint
 
 @dataclass(slots=True, kw_only=True)
 class Serializer(Data, ABC):
-    """Abstract base class of serializers."""
+    """Abstract base class of serializers that convert from one data representation to another."""
 
     @abstractmethod
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:

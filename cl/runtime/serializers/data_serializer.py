@@ -32,10 +32,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
-from cl.runtime.serializers.enum_serializer import EnumSerializer
-from cl.runtime.serializers.json_encoder import JsonEncoder
-from cl.runtime.serializers.key_serializer import KeySerializer
-from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
+from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.type_format import TypeFormat
@@ -47,16 +44,19 @@ from cl.runtime.serializers.type_placement import TypePlacement
 class DataSerializer(Serializer):
     """Roundtrip serialization of object to dictionary with optional type information."""
 
-    primitive_serializer: PrimitiveSerializer = required()
+    primitive_serializer: Serializer = required()
     """Use to serialize primitive types."""
 
-    enum_serializer: EnumSerializer = required()
+    enum_serializer: Serializer = required()
     """Use to serialize enum types."""
 
-    key_serializer: KeySerializer | None = None
-    """Use to serialize keys to string if specified, otherwise serialize the same way as data fields."""
+    data_serializer: Serializer | None = None
+    """Use to serialize data fields, if specified the current serializer will only be used at root level."""
 
-    data_encoder: JsonEncoder | None = None
+    key_serializer: Serializer | None = None
+    """Use to serialize key fields if specified, otherwise serialize the same way as data fields."""
+
+    data_encoder: Encoder | None = None
     """Transformation applied to the data fields after converting them to dict (does not apply to keys)."""
 
     type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
@@ -130,7 +130,7 @@ class DataSerializer(Serializer):
                     f"{ErrorUtil.wrap(data)}."
                 )
         elif self.type_inclusion == TypeInclusion.OMIT:
-            raise RuntimeError("Deserialization is not supported when type_inclusion=NEVER.")
+            raise RuntimeError("Deserialization is not supported when type_inclusion=OMIT.")
         else:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
