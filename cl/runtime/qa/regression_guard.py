@@ -28,6 +28,7 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.serializers.reporting_serializers import ReportingSerializers
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 
 _supported_extensions = ["txt", "yaml"]
@@ -36,7 +37,7 @@ _supported_extensions = ["txt", "yaml"]
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 """Serializer for keys."""
 
-_YAML_SERIALIZER = YamlSerializers.FOR_REPORTING
+_YAML_SERIALIZER = ReportingSerializers.YAML
 """Serializer for classes and containers."""
 
 

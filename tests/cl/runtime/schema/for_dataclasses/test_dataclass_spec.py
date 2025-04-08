@@ -74,7 +74,7 @@ def test_from_class():
         # Get enum spec and serialize as YAML
         type_spec = DataclassSpec.from_class(test_case)
         type_spec_dict = asdict(type_spec)
-        type_spec_str = YamlSerializers.FOR_REPORTING.serialize(type_spec_dict)
+        type_spec_str = ReportingSerializers.YAML.serialize(type_spec_dict)
 
         # Record in RegressionGuard
         guard = RegressionGuard(channel=type_spec.type_name)

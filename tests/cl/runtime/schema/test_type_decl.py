@@ -17,6 +17,7 @@ from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.serializers.reporting_serializers import ReportingSerializers
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
@@ -67,7 +68,7 @@ def test_type_decl():
         assert type_decl is not None
 
         # Create YAML string for the declaration
-        type_decl_str = YamlSerializers.FOR_REPORTING.serialize(type_decl)
+        type_decl_str = ReportingSerializers.YAML.serialize(type_decl)
 
         # Record in regression guard
         guard = RegressionGuard(channel=type_name)

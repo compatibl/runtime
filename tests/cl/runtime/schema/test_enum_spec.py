@@ -15,6 +15,7 @@
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.enum_spec import EnumSpec
+from cl.runtime.serializers.reporting_serializers import ReportingSerializers
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubIntEnum
@@ -35,7 +36,7 @@ def test_from_class():
 
         # Get enum spec and serialize as YAML
         type_spec = EnumSpec.from_class(test_case)
-        type_spec_str = YamlSerializers.FOR_REPORTING.serialize(type_spec)
+        type_spec_str = ReportingSerializers.YAML.serialize(type_spec)
 
         # Record in RegressionGuard
         guard = RegressionGuard(channel=type_spec.type_name)
