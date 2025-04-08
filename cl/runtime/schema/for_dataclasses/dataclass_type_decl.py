@@ -69,8 +69,11 @@ class DataclassTypeDecl(TypeDecl):
             member_comments = cls.get_member_comments(record_type)
 
             # Add elements
-            result.elements = []
             for field in fields:
+
+                # Create only if there is at least one field
+                if result.elements is None:
+                    result.elements = []
 
                 # Skip protected fields
                 if field.name.startswith("_"):

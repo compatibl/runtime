@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
@@ -68,20 +69,24 @@ class ReportingSerializer(Serializer):
             # Primitive type, serialize using primitive serializer if specified, otherwise return raw data
             return self.primitive_serializer.serialize(data)
         elif data_class_name in SEQUENCE_CLASS_NAMES:
-            # Sequence container, including items that are None in output to preserve item positions
-            result = [
-                (
-                    None
-                    if v is None
-                    else (
-                        self.primitive_serializer.serialize(v)
-                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                        else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._serialize(v))
+            if len(data) == 0:
+                # Consider an empty sequence equivalent to None
+                return None
+            else:
+                # Include items that are None in output to preserve item positions
+                result = [
+                    (
+                        None
+                        if v is None
+                        else (
+                            self.primitive_serializer.serialize(v)
+                            if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                            else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._serialize(v))
+                        )
                     )
-                )
-                for v in data
-            ]
-            return result
+                    for v in data
+                ]
+                return result
         elif data_class_name in MAPPING_CLASS_NAMES:
             # Mapping container, do not include values that are None
             result = {
@@ -90,7 +95,8 @@ class ReportingSerializer(Serializer):
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                     else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._serialize(v))
                 )
-                for k, v in data.items() if v is not None
+                for k, v in data.items()
+                if not DataUtil.is_empty(v)
             }
             return result
         elif isinstance(data, Enum):
@@ -107,7 +113,7 @@ class ReportingSerializer(Serializer):
                     else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._serialize(v))
                 )
                 for k in slots
-                if (v := getattr(data, k)) is not None and not k.startswith("_")
+                if not DataUtil.is_empty(v := getattr(data, k)) and not k.startswith("_")
             }
             return result
         else:

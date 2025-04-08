@@ -17,8 +17,9 @@ from enum import Enum
 from typing import Any
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, SEQUENCE_AND_MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -119,7 +120,11 @@ class DataSerializer(Serializer):
             # item in the sequence, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_sequence()
-            return list(self.serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
+            if len(data) == 0:
+                # Consider an empty sequence equivalent to None
+                return None
+            else:
+                return list(self.serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
@@ -129,7 +134,7 @@ class DataSerializer(Serializer):
             return dict(
                 (self._serialize_key(dict_key), self.serialize(dict_value, remaining_chain))
                 for dict_key, dict_value in data.items()
-                if dict_value is not None
+                if not DataUtil.is_empty(dict_value)
             )  # TODO: Replace by frozendict
         elif is_data(data):
             # Use key serializer for key types if specified
@@ -213,7 +218,7 @@ class DataSerializer(Serializer):
                         )
                     )
                     for field_key, field_spec in data_field_dict.items()
-                    if (field_value := getattr(data, field_key)) is not None
+                    if not DataUtil.is_empty(field_value := getattr(data, field_key))
                 }
             )
 
@@ -280,7 +285,10 @@ class DataSerializer(Serializer):
                 )
             # Decode if necessary
             # TODO: Eliminate check for the fist character
-            if self.inner_encoder is not None and isinstance(data, str) and len(data) > 0 and data[0] == "[":
+            if len(data) == 0:
+                # Consider an empty sequence equivalent to None
+                return None
+            elif self.inner_encoder is not None and isinstance(data, str) and data[0] == "[":
                 # Decode and deserialize sequence using data_serializer
                 data = self.inner_encoder.decode(data)
                 return list(self.inner_serializer.deserialize(v, remaining_chain) for v in data)
@@ -296,7 +304,7 @@ class DataSerializer(Serializer):
                     dict_value, remaining_chain
                 )  # TODO: Should data_serializer be used here?
                 for dict_key, dict_value in data.items()
-                if dict_value is not None
+                if not DataUtil.is_empty(dict_value)
             }
         elif isinstance(data, str):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
@@ -378,7 +386,7 @@ class DataSerializer(Serializer):
                     else self.deserialize(field_value, field_hint)
                 )
                 for field_key, field_value in data.items()
-                if not field_key.startswith("_") and field_value is not None
+                if not field_key.startswith("_") and not DataUtil.is_empty(field_value)
             }
 
             # Construct an instance of the target type
@@ -391,6 +399,11 @@ class DataSerializer(Serializer):
                 f"Cannot deserialize the following data using type hint '{type_hint.to_str()}':\n"
                 f"{ErrorUtil.wrap(data)}"
             )
+
+    @classmethod
+    def _is_empty(cls, data: Any) -> bool:
+        """Check if the data is None, an empty string, or an empty container."""
+        return data in (None, "") or (data.__class__.__name__ in SEQUENCE_AND_MAPPING_CLASS_NAMES and len(data) == 0)
 
     def _serialize_key(self, field_key: str) -> str:
         """Transform the field key for use in serialization"""

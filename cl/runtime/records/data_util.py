@@ -13,12 +13,17 @@
 # limitations under the License.
 
 from typing import Any
-from cl.runtime.records.protocols import MAPPING_CLASSES, SEQUENCE_CLASSES, is_data
+from cl.runtime.records.protocols import MAPPING_CLASSES, SEQUENCE_CLASSES, is_data, SEQUENCE_AND_MAPPING_CLASS_NAMES
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class DataUtil:
     """Helper methods for working with slotted classes."""
+
+    @classmethod
+    def is_empty(cls, data: Any) -> bool:
+        """Check if the data is None, an empty string, or an empty container."""
+        return data in (None, "") or (data.__class__.__name__ in SEQUENCE_AND_MAPPING_CLASS_NAMES and len(data) == 0)
 
     @classmethod
     def remove_none(cls, data: Any) -> Any:

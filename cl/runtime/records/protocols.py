@@ -55,7 +55,7 @@ Pyton classes such as long (uses Python type int) and timestamp (uses Python typ
 SEQUENCE_CLASSES = (list, tuple)
 """Classes that may be used to represent sequences, excluding abstract base classes."""
 
-SEQUENCE_CLASS_NAMES = frozenset(type_.__name__ for type_ in SEQUENCE_CLASSES)
+SEQUENCE_CLASS_NAMES = tuple(type_.__name__ for type_ in SEQUENCE_CLASSES)
 """Names of classes that may be used to represent sequences, excluding abstract base classes."""
 
 SEQUENCE_TYPE_NAMES = ("MutableSequence", "Sequence", "list", "tuple")
@@ -64,12 +64,20 @@ SEQUENCE_TYPE_NAMES = ("MutableSequence", "Sequence", "list", "tuple")
 MAPPING_CLASSES = (dict, frozendict)
 """Classes that may be used to represent mappings, excluding abstract base classes."""
 
-MAPPING_CLASS_NAMES = frozenset(type_.__name__ for type_ in MAPPING_CLASSES)
+MAPPING_CLASS_NAMES = tuple(type_.__name__ for type_ in MAPPING_CLASSES)
 """Names of classes that may be used to represent mappings, excluding abstract base classes."""
 
 MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 """Names of classes that may be used to represent mappings, including abstract base classes."""
 
+SEQUENCE_AND_MAPPING_CLASSES = tuple(x for x in (*SEQUENCE_CLASSES, *MAPPING_CLASSES))
+"""Names of classes that may be used to represent mappings, excluding abstract base classes."""
+
+SEQUENCE_AND_MAPPING_CLASS_NAMES = tuple(x for x in (*SEQUENCE_CLASS_NAMES, *MAPPING_CLASS_NAMES))
+"""Names of classes that may be used to represent mappings, excluding abstract base classes."""
+
+SEQUENCE_AND_MAPPING_TYPE_NAMES = tuple(x for x in (*SEQUENCE_TYPE_NAMES, *MAPPING_TYPE_NAMES))
+"""Names of classes that may be used to represent mappings, excluding abstract base classes."""
 
 class DataProtocol(Protocol):
     """Protocol for a class that has slots and implements the builder pattern."""

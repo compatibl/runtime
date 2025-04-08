@@ -293,8 +293,11 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
                 member_comments = f"Primitive type {record_type.__name__}"
 
             # Add an element for each type hint
-            result.elements = []
             for field_name, field_type in type_aliases.items():
+
+                # Create only if there is at least one field
+                if result.elements is None:
+                    result.elements = []
 
                 # Skip protected fields
                 if field_name.startswith("_"):
