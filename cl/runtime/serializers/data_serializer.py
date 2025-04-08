@@ -127,7 +127,7 @@ class DataSerializer(Serializer):
             if type_hint is not None:
                 type_hint.validate_for_mapping()
             return dict(
-                (k, self.serialize(v, remaining_chain))
+                (self._serialize_key(k), self.serialize(v, remaining_chain))
                 for k, v in data.items()
             )  # TODO: Replace by frozendict
         elif is_data(data):
@@ -198,7 +198,7 @@ class DataSerializer(Serializer):
             key_serializer = self.key_serializer if self.key_serializer is not None else self
             result.update(
                 {
-                    k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): (
+                    self._serialize_key(k): (
                         self.primitive_serializer.serialize(v, field_spec.type_hint)
                         if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                         else (
@@ -295,7 +295,7 @@ class DataSerializer(Serializer):
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
             return {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self.deserialize(
+                self._deserialize_key(k): self.deserialize(
                     v, remaining_chain
                 )  # TODO: Should data_serializer be used here?
                 for k, v in data.items()
@@ -368,7 +368,8 @@ class DataSerializer(Serializer):
 
             # Deserialize into a dict
             result_dict = {
-                (snake_case_k := k if not self.pascalize_keys else CaseUtil.pascal_to_snake_case(k)): (
+                (snake_case_k := self._deserialize_key(k)):
+                (
                     self.inner_serializer.deserialize(self.inner_encoder.decode(v), field_hint)
                     if (
                         (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != "str"
@@ -393,3 +394,19 @@ class DataSerializer(Serializer):
                 f"Cannot deserialize the following data using type hint '{type_hint.to_str()}':\n"
                 f"{ErrorUtil.wrap(data)}"
             )
+
+    def _serialize_key(self, field_key: str) -> str:
+        """Transform the field key for use in serialization"""
+        if self.pascalize_keys:
+            return CaseUtil.snake_to_pascal_case(field_key)
+        else:
+            return field_key
+
+    def _deserialize_key(self, field_key: str) -> str:
+        """Transform the field key for use in deserialization"""
+        if self.pascalize_keys:
+            return CaseUtil.pascal_to_snake_case(field_key)
+        else:
+            return field_key
+
+
