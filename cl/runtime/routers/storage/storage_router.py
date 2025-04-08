@@ -61,7 +61,7 @@ async def post_load(
     load_keys: Annotated[list[KeyRequestItem] | None, Body(description="List of key objects to load.")] = None,
     ignore_not_found: Annotated[
         bool, Query(description="If true, empty response will be returned without error if the record is not found.")
-    ] = False,
+    ] = True,
 ) -> LoadResponse:
     """Bulk load records by list of keys."""
 

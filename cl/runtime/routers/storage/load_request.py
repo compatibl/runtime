@@ -22,5 +22,5 @@ class LoadRequest(ContextRequest):
     load_keys: list[KeyRequestItem] | None = None
     """List of key objects to load."""
 
-    ignore_not_found: bool = False
+    ignore_not_found: bool = True
     """If true, empty response will be returned without error if the record is not found."""
