@@ -24,7 +24,7 @@ from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
 _SERIALIZATION_SAMPLES = [
-    # StubDataclassRecordKey().build(),
+    StubDataclassRecordKey().build(),
     StubDataclassCompositeKey().build(),
     StubDataclassPrimitiveFieldsKey().build(),
 ]

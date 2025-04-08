@@ -17,6 +17,7 @@ import orjson
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializer import DataSerializer
+from cl.runtime.records.data_util import DataUtil
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
@@ -70,7 +71,7 @@ def test_bidirectional():
 
         # Deserialize and compare
         deserialized = serializer.deserialize(serialized)
-        assert obj == deserialized
+        assert deserialized == DataUtil.remove_none(obj)
 
         # Convert serialized data to JSON using orjson to avoid relying on the functionality being tested
         result_str = orjson.dumps(

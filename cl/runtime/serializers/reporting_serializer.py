@@ -90,7 +90,7 @@ class ReportingSerializer(Serializer):
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                     else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._serialize(v))
                 )
-                for k, v in data.items()
+                for k, v in data.items() if v is not None
             }
             return result
         elif isinstance(data, Enum):

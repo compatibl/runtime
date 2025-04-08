@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.serializers.data_serializer import DataSerializer
+from cl.runtime.records.data_util import DataUtil
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from stubs.cl.runtime import StubDataclassComposite
@@ -64,7 +65,7 @@ def test_passthrough():
         obj_2 = serializer.deserialize(serialized_1).build()
         serialized_2 = serializer.serialize(obj_2)
 
-        assert obj_1 == obj_2
+        assert obj_2 == DataUtil.remove_none(obj_1)
         assert serialized_1 == serialized_2
 
 

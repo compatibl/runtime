@@ -17,6 +17,7 @@ from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
+from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -55,7 +56,7 @@ def test_data_serialization():
         type_hint = TypeHint.for_class(sample_type)
         serialized = DataSerializers.FOR_SQLITE.serialize(sample)
         deserialized = DataSerializers.FOR_SQLITE.deserialize(serialized, type_hint)
-        assert deserialized == PytestUtil.approx(sample)
+        assert deserialized == PytestUtil.approx(DataUtil.remove_none(sample))
 
         # Record in RegressionGuard
         guard = RegressionGuard(channel=f"{sample_type.__name__}")

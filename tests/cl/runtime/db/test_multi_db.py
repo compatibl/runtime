@@ -19,6 +19,7 @@ from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
+from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -104,7 +105,7 @@ def test_complex_records(pytest_multi_db):
     sample_keys = [sample.get_key() for sample in _SAMPLES]
     loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
 
-    assert loaded_records == _SAMPLES
+    assert loaded_records == DataUtil.remove_none(_SAMPLES)
 
 
 def test_basic_operations(pytest_multi_db):
@@ -120,12 +121,12 @@ def test_basic_operations(pytest_multi_db):
 
     # Load one by one for all keys because each type is different
     loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
-    assert loaded_records == _SAMPLES
+    assert loaded_records == DataUtil.remove_none(_SAMPLES)
 
     # Delete first and last record
     DbContext.delete_many([sample_keys[0], sample_keys[-1]])
     loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
-    assert loaded_records == [None, *_SAMPLES[1:-1], None]
+    assert loaded_records == DataUtil.remove_none([None, *_SAMPLES[1:-1], None])
 
     # Delete all records
     DbContext.delete_many(sample_keys)

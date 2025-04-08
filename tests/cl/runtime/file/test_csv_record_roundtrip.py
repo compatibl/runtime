@@ -25,6 +25,7 @@ from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
+from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -96,7 +97,7 @@ def test_roundtrip(pytest_default_db):
 
             actual_records = list(DbContext.load_all(entry_type))
 
-            assert actual_records == expected_entries
+            assert actual_records == DataUtil.remove_none(expected_entries)
         finally:
             if file_path is not None:
                 file_path.unlink(missing_ok=True)

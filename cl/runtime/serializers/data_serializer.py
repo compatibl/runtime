@@ -129,6 +129,7 @@ class DataSerializer(Serializer):
             return dict(
                 (self._serialize_key(dict_key), self.serialize(dict_value, remaining_chain))
                 for dict_key, dict_value in data.items()
+                if dict_value is not None
             )  # TODO: Replace by frozendict
         elif is_data(data):
             # Use key serializer for key types if specified
@@ -206,14 +207,8 @@ class DataSerializer(Serializer):
                             if is_enum(field_value)
                             else (
                                 key_serializer.serialize(field_value, field_spec.type_hint)
-                                if is_key(field_value)
-                                else (
-                                    self.inner_encoder.encode(
-                                        self.inner_serializer.serialize(field_value, field_spec.type_hint)
-                                    )
-                                    if self.inner_encoder is not None
-                                    else self.serialize(field_value, field_spec.type_hint)
-                                )
+                                if is_key(field_value) else
+                                self._serialize_inner(field_value, field_spec.type_hint)
                             )
                         )
                     )
@@ -301,6 +296,7 @@ class DataSerializer(Serializer):
                     dict_value, remaining_chain
                 )  # TODO: Should data_serializer be used here?
                 for dict_key, dict_value in data.items()
+                if dict_value is not None
             }
         elif isinstance(data, str):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
@@ -320,9 +316,8 @@ class DataSerializer(Serializer):
                     # Otherwise use key serializer to deserialize
                     return self.key_serializer.deserialize(data, type_hint)
             elif self.inner_encoder is not None and is_data(schema_class):
-                # Decode data field using data_encoder and deserialize
-                decoded_data = self.inner_encoder.decode(data)
-                return self.inner_serializer.deserialize(decoded_data, type_hint)
+                # Deserialize using inner_serializer and inner_encoder if provided, otherwise use self
+                return self._deserialize_inner(data, type_hint)
             elif is_enum(schema_class):
                 # Check that no type chain is remaining
                 if remaining_chain:
@@ -411,4 +406,18 @@ class DataSerializer(Serializer):
         else:
             return field_key
 
+    def _serialize_inner(self, data: Any, type_hint: TypeHint | None = None) -> Any:
+        """Use inner_serializer and inner_encoder if specified, otherwise use current serializer and no encoder."""
+        if self.inner_serializer is not None:
+            return self.inner_encoder.encode(self.inner_serializer.serialize(data, type_hint))
+        else:
+            # If inner serializer is not specified, use the current serializer
+            return self.serialize(data, type_hint)
 
+    def _deserialize_inner(self, data: Any, type_hint: TypeHint | None = None) -> Any:
+        """Use inner_serializer and inner_encoder if specified, otherwise use current serializer and no encoder."""
+        if self.inner_serializer is not None:
+            return self.inner_serializer.deserialize(self.inner_encoder.decode(data), type_hint)
+        else:
+            # If inner serializer is not specified, use the current serializer
+            return self.deserialize(data, type_hint)
