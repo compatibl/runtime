@@ -127,8 +127,8 @@ class DataSerializer(Serializer):
             if type_hint is not None:
                 type_hint.validate_for_mapping()
             return dict(
-                (self._serialize_key(k), self.serialize(v, remaining_chain))
-                for k, v in data.items()
+                (self._serialize_key(dict_key), self.serialize(dict_value, remaining_chain))
+                for dict_key, dict_value in data.items()
             )  # TODO: Replace by frozendict
         elif is_data(data):
             # Use key serializer for key types if specified
@@ -198,25 +198,27 @@ class DataSerializer(Serializer):
             key_serializer = self.key_serializer if self.key_serializer is not None else self
             result.update(
                 {
-                    self._serialize_key(k): (
-                        self.primitive_serializer.serialize(v, field_spec.type_hint)
-                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                    self._serialize_key(field_key): (
+                        self.primitive_serializer.serialize(field_value, field_spec.type_hint)
+                        if field_value.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                         else (
-                            self.enum_serializer.serialize(v, field_spec.type_hint)
-                            if is_enum(v)
+                            self.enum_serializer.serialize(field_value, field_spec.type_hint)
+                            if is_enum(field_value)
                             else (
-                                key_serializer.serialize(v, field_spec.type_hint)
-                                if is_key(v)
+                                key_serializer.serialize(field_value, field_spec.type_hint)
+                                if is_key(field_value)
                                 else (
-                                    self.inner_encoder.encode(self.inner_serializer.serialize(v, field_spec.type_hint))
+                                    self.inner_encoder.encode(
+                                        self.inner_serializer.serialize(field_value, field_spec.type_hint)
+                                    )
                                     if self.inner_encoder is not None
-                                    else self.serialize(v, field_spec.type_hint)
+                                    else self.serialize(field_value, field_spec.type_hint)
                                 )
                             )
                         )
                     )
-                    for k, field_spec in data_field_dict.items()
-                    if (v := getattr(data, k)) is not None
+                    for field_key, field_spec in data_field_dict.items()
+                    if (field_value := getattr(data, field_key)) is not None
                 }
             )
 
@@ -295,10 +297,10 @@ class DataSerializer(Serializer):
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
             return {
-                self._deserialize_key(k): self.deserialize(
-                    v, remaining_chain
+                self._deserialize_key(dict_key): self.deserialize(
+                    dict_value, remaining_chain
                 )  # TODO: Should data_serializer be used here?
-                for k, v in data.items()
+                for dict_key, dict_value in data.items()
             }
         elif isinstance(data, str):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
@@ -368,20 +370,20 @@ class DataSerializer(Serializer):
 
             # Deserialize into a dict
             result_dict = {
-                (snake_case_k := self._deserialize_key(k)):
+                (snake_case_k := self._deserialize_key(field_key)):
                 (
-                    self.inner_serializer.deserialize(self.inner_encoder.decode(v), field_hint)
+                    self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
                     if (
                         (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != "str"
                         and self.inner_encoder is not None
-                        and isinstance(v, str)
-                        and len(v) > 0
-                        and v[0] in ["{", "["]
+                        and isinstance(field_value, str)
+                        and len(field_value) > 0
+                        and field_value[0] in ["{", "["]
                     )
-                    else self.deserialize(v, field_hint)
+                    else self.deserialize(field_value, field_hint)
                 )
-                for k, v in data.items()
-                if not k.startswith("_") and v is not None
+                for field_key, field_value in data.items()
+                if not field_key.startswith("_") and field_value is not None
             }
 
             # Construct an instance of the target type
