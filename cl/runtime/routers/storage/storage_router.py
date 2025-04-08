@@ -158,4 +158,4 @@ async def post_insert(
 ) -> list[KeyRequestItem]:
     """Bulk insert records to DB. The same as /storage/save route but fails if the record already exists."""
     # TODO (Roman): Implement /insert route.
-    raise NotImplementedError("/storage/insert route is not implemented.")
+    return await post_save(context_headers, records)
