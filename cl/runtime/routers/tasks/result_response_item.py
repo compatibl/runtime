@@ -18,6 +18,7 @@ from typing import Iterable
 from typing import cast
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.result_request import ResultRequest
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
@@ -34,6 +35,10 @@ class ResultResponseItem(BaseModel):
 
     result: Any
     """Task result."""
+
+    class Config:
+        alias_generator = CaseUtil.snake_to_pascal_case
+        populate_by_name = True
 
     @classmethod
     def get_response(cls, request: ResultRequest) -> list[ResultResponseItem]:

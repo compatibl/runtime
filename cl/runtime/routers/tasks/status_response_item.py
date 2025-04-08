@@ -17,6 +17,7 @@ from typing import Iterable
 from typing import cast
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.status_request import StatusRequest
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task import Task
@@ -47,6 +48,10 @@ class StatusResponseItem(BaseModel):
 
     user_message: str | None = None
     """Optional user message."""
+
+    class Config:
+        alias_generator = CaseUtil.snake_to_pascal_case
+        populate_by_name = True
 
     @classmethod
     def get_response(cls, request: StatusRequest) -> list[StatusResponseItem]:
