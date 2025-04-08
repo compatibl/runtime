@@ -1,0 +1,32 @@
+{
+  "id": "abc",
+  "optional_str": "xyz",
+  "required_list_of_optional_str": [
+    "abc",
+    null
+  ],
+  "optional_float": 1.23,
+  "required_list_of_optional_float": [
+    1.23,
+    null
+  ],
+  "required_list_of_optional_data": [
+    {
+      "str_field": "abc",
+      "int_field": 123
+    },
+    null
+  ],
+  "required_list_of_optional_key": [
+    {
+      "id": "abc"
+    },
+    null
+  ],
+  "required_list_of_optional_record": [
+    {
+      "id": "abc"
+    },
+    null
+  ]
+}

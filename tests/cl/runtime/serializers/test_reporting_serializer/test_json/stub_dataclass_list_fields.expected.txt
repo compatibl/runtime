@@ -1,0 +1,59 @@
+{
+  "id": "abc",
+  "str_list": [
+    "abc",
+    "def"
+  ],
+  "float_list": [
+    0.0000123456789,
+    0.000123456789,
+    0.00123456789,
+    0.0123456789,
+    0.123456789,
+    1.23456789,
+    12.3456789,
+    123.456789,
+    1234.56789,
+    12345.6789
+  ],
+  "date_list": [
+    "2003-04-21",
+    "2003-05-01"
+  ],
+  "data_list": [
+    {
+      "str_field": "A",
+      "int_field": 0
+    },
+    {
+      "str_field": "B",
+      "int_field": 1
+    }
+  ],
+  "key_list": [
+    {
+      "id": "A"
+    },
+    {
+      "id": "B"
+    }
+  ],
+  "record_list": [
+    {
+      "id": "A"
+    },
+    {
+      "id": "B"
+    }
+  ],
+  "derived_record_list": [
+    {
+      "id": "A",
+      "derived_str_field": "derived"
+    },
+    {
+      "id": "B",
+      "derived_str_field": "derived"
+    }
+  ]
+}
