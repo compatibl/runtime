@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime import TypeImport
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
-from cl.runtime.schema.schema import Schema
-from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -41,7 +40,7 @@ class DeleteResponseUtil:
             raise RuntimeError("Bulk delete records of different key types currently is not supported.")
 
         # Expect all keys to be the same key type.
-        key_type = Schema.get_type_by_short_name(request.delete_keys[0].type).get_key_type()  # noqa
+        key_type = TypeImport.class_from_type_name(request.delete_keys[0].type).get_key_type()  # noqa
         key_type_hint = TypeHint.for_class(key_type)  # noqa
 
         # Deserialize keys in request.

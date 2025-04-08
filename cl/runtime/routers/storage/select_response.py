@@ -15,6 +15,8 @@
 from __future__ import annotations
 from enum import Enum
 from typing import Any
+
+from cl.runtime import TypeImport
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
@@ -23,7 +25,6 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.routers.storage.select_request import SelectRequest
-from cl.runtime.schema.schema import Schema
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -48,7 +49,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         if request.limit is not None:
             raise RuntimeError("Select with 'limit' currently is not supported.")
 
-        select_type = Schema.get_type_by_short_name(request.type_)
+        select_type = TypeImport.class_from_type_name(request.type_)
 
         # Load records for type.
         records = DbContext.get_db().load_all(select_type)  # noqa

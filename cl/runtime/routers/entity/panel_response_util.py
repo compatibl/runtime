@@ -14,11 +14,12 @@
 
 import logging
 from typing import Any
+
+from cl.runtime import TypeImport
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
-from cl.runtime.schema.schema import Schema
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -37,7 +38,7 @@ class PanelResponseUtil:
         """Implements /entity/panel route."""
 
         # Get type of the record.
-        type_ = Schema.get_type_by_short_name(request.type_name)
+        type_ = TypeImport.class_from_type_name(request.type_name)
 
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(type_.get_key_type()))

@@ -13,12 +13,14 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+from cl.runtime import TypeImport
 from cl.runtime.backend.core.ui_type_state import UiTypeState
 from cl.runtime.backend.core.ui_type_state_key import UiTypeStateKey
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
-from cl.runtime.schema.schema import Schema
+from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -45,7 +47,7 @@ class LoadResponse(RecordsWithSchemaResponse):
             raise RuntimeError("Bulk load records of different key types currently is not supported.")
 
         # Expect all keys to be the same key type.
-        key_type = Schema.get_type_by_short_name(first_key_item_type).get_key_type()  # noqa
+        key_type = TypeImport.class_from_type_name(first_key_item_type).get_key_type()  # noqa
         key_type_hint = TypeHint.for_class(key_type, optional=True)
 
         # Deserialize keys in request.
@@ -98,8 +100,8 @@ class LoadResponse(RecordsWithSchemaResponse):
     def _get_default_ui_type_state(cls, ui_type_state_requested_key: UiTypeStateKey) -> UiTypeState:
         """Return default UiTypeState with pinned all handlers."""
 
-        type_state_record_type = Schema.get_type_by_short_name(ui_type_state_requested_key.type_.name)
-        type_state_record_type_schema = Schema.for_type(type_state_record_type)
+        type_state_record_type = TypeImport.class_from_type_name(ui_type_state_requested_key.type_.name)
+        type_state_record_type_schema = TypeDecl.for_type_with_dependencies(type_state_record_type)
 
         # Iterate over type declarations to get all handlers
         all_handlers = []
