@@ -33,7 +33,6 @@ from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.serializer import Serializer
-from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.type_inclusion import TypeInclusion
 from cl.runtime.serializers.type_placement import TypePlacement
@@ -81,19 +80,10 @@ class DataSerializer(Serializer):
             )
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
-        """Serialize data to a dictionary."""
-
-        if self.type_inclusion in [TypeInclusion.AS_NEEDED, TypeInclusion.ALWAYS]:
-            # Use typed serialization if bidirectional flag is on
-            return self.typed_serialize(data, type_hint)
-        elif self.type_inclusion == TypeInclusion.OMIT:
-            # Use untyped serialization
-            return self.untyped_serialize(data)
-        else:
-            raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
-
-    def typed_serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize the argument to a dictionary type_hint and schema."""
+        
+        if self.type_inclusion not in [TypeInclusion.AS_NEEDED, TypeInclusion.ALWAYS, TypeInclusion.OMIT]:
+            raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
         # Get the class of data, which may be NoneType
         data_class_name = TypeUtil.name(data)
@@ -115,11 +105,6 @@ class DataSerializer(Serializer):
                     f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
                     f"{type_hint.to_str()}."
                 )
-            if type_hint is None:
-                raise RuntimeError(
-                    f"An instance of a primitive class {data_class_name} is passed to\n"
-                    f"a typed serializer without specifying a type chain."
-                )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
                 # Deserialize using primitive serializer if a primitive type
@@ -134,7 +119,7 @@ class DataSerializer(Serializer):
             # item in the sequence, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_sequence()
-            return list(self.typed_serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
+            return list(self.serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
@@ -142,7 +127,8 @@ class DataSerializer(Serializer):
             if type_hint is not None:
                 type_hint.validate_for_mapping()
             return dict(
-                (k, self.typed_serialize(v, remaining_chain)) for k, v in data.items()
+                (k, self.serialize(v, remaining_chain))
+                for k, v in data.items()
             )  # TODO: Replace by frozendict
         elif is_data(data):
             # Use key serializer for key types if specified
@@ -407,63 +393,3 @@ class DataSerializer(Serializer):
                 f"Cannot deserialize the following data using type hint '{type_hint.to_str()}':\n"
                 f"{ErrorUtil.wrap(data)}"
             )
-
-    def untyped_serialize(self, data: Any) -> Any:
-        """
-        Serialize slotted classes, primitive types, and supported dict- and list-like containers
-        without using the schema or including _type in output.
-        """
-
-        if data is None:
-            # Pass through None for untyped serialization
-            return None
-        elif (data_class_name := TypeUtil.name(data)) in PRIMITIVE_CLASS_NAMES:
-            # Primitive type, serialize using primitive serializer if specified, otherwise return raw data
-            return self.primitive_serializer.serialize(data)
-        elif data_class_name in SEQUENCE_CLASS_NAMES:
-            # Sequence container, including items that are None in output to preserve item positions
-            result = [
-                (
-                    None
-                    if v is None
-                    else (
-                        self.primitive_serializer.serialize(v)
-                        if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                        else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self.untyped_serialize(v))
-                    )
-                )
-                for v in data
-            ]
-            return result
-        elif data_class_name in MAPPING_CLASS_NAMES:
-            # Mapping container, do not include values that are None
-            result = {
-                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    self.primitive_serializer.serialize(v)
-                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self.untyped_serialize(v))
-                )
-                for k, v in data.items()
-                if v is not None and (not hasattr(v, "__len__") or len(v) > 0)
-            }
-            return result
-        elif isinstance(data, Enum):
-            # Enum type, serialize using enum serializer if specified, otherwise return raw data
-            return self.enum_serializer.serialize(data)
-        elif is_data(data):
-            # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
-            slots = SlotsUtil.get_slots(type(data))
-            # Serialize slot values in the order of declaration except those that are None
-            result = {
-                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    self.primitive_serializer.serialize(v)
-                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self.untyped_serialize(v))
-                )
-                for k in slots
-                if (v := getattr(data, k)) is not None and not k.startswith("_")
-            }
-            return result
-        else:
-            # Did not match a supported data type
-            raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
