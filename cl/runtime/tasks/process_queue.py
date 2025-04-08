@@ -44,7 +44,7 @@ class ProcessQueue(TaskQueue):
         while True:
             # Get pending tasks
             # TODO: Use DB queries with filter by queue field
-            all_tasks = DbContext.load_all(Task)
+            all_tasks = tuple(DbContext.load_all(Task))
             awaiting_tasks = [
                 task for task in all_tasks if task.queue.queue_id == queue_id and task.status == TaskStatus.AWAITING
             ]
