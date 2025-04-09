@@ -88,7 +88,7 @@ class TypeImport:
                 except ModuleNotFoundError:
                     if rebuild_cache:
                         # Rebuild the cache and try again
-                        cls._rebuild_cache()
+                        cls.rebuild_cache()
                         return cls.class_from_qual_name(qual_name, rebuild_cache=False)
                     else:
                         # Previous attempt to rebuild failed, raise error
@@ -99,12 +99,12 @@ class TypeImport:
             # Get class from module
             result = getattr(module, class_name)
             # Add to the qual_name and type_name dictionaries
-            cls.add_class(result)
+            cls._add_class(result)
             return result
         except AttributeError:
             if rebuild_cache:
                 # Rebuild the cache and try again
-                cls._rebuild_cache()
+                cls.rebuild_cache()
                 return cls.class_from_qual_name(qual_name, rebuild_cache=False)
             else:
                 # Previous attempt to rebuild failed, raise error
@@ -128,7 +128,7 @@ class TypeImport:
 
         if rebuild_cache:
             # Rebuild the cache and try again
-            cls._rebuild_cache()
+            cls.rebuild_cache()
             return cls.class_from_type_name(type_name, rebuild_cache=False)
         else:
             # Previous attempt to rebuild failed, raise error
@@ -188,7 +188,7 @@ class TypeImport:
         return result
 
     @classmethod
-    def add_class(cls, class_: Type) -> None:
+    def _add_class(cls, class_: Type) -> None:
         """Add the specified class to the qual_name and type_name dicts without overwriting the existing values."""
         type_name = TypeUtil.name(class_)
         qual_name = cls.qual_name_from_class(class_)
@@ -216,8 +216,8 @@ class TypeImport:
             )
 
     @classmethod
-    def _rebuild_cache(cls) -> None:
-        """Clearing the existing dictionaries and file caches and reload by enumerating classes in packages."""
+    def rebuild_cache(cls) -> None:
+        """Reload classes from packages and save a new imports.txt file."""
 
         # Reinitialize the dictionaries
         cls._type_by_qual_name_dict = {}
@@ -247,7 +247,7 @@ class TypeImport:
         classes = [class_ for module in modules for _, class_ in getmembers(module, is_schema_type)]
 
         # Add each class after performing checks for duplicates
-        tuple(cls.add_class(class_) for class_ in classes)
+        tuple(cls._add_class(class_) for class_ in classes)
 
         # Overwrite the cache file on disk with the new data
         cls._save_cache()
@@ -303,7 +303,6 @@ class TypeImport:
     def _get_cache_filename(cls) -> str:
         """Get the filename for the qual name cache."""
         if cls._cache_filename is None:
-            project_root = ProjectSettings.get_project_root()
-            base_dir = os.path.join(project_root, "types")
-            cls._cache_filename = os.path.join(base_dir, "qualnames.txt")
+            resources_root = ProjectSettings.get_resources_root()
+            cls._cache_filename = os.path.join(resources_root, "imports.txt")
         return cls._cache_filename

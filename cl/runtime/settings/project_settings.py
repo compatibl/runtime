@@ -62,6 +62,11 @@ class ProjectSettings:
         return cls.instance().project_root
 
     @classmethod
+    def get_resources_root(cls) -> str:
+        """Contains resources that persist across multiple code runs."""
+        return os.path.join(cls.instance().project_root, "resources")
+
+    @classmethod
     def get_package_root(cls, package: str) -> str:
         """
         Package root directory for the specified package, same as project root in one-level layout
