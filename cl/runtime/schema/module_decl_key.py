@@ -13,9 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Final
 from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.key import Key
+
+# Temporary global module name, common to all types.
+GLOBAL_MODULE_NAME: Final[str] = "cl"
 
 
 @dataclass(slots=True)
@@ -28,3 +32,17 @@ class ModuleDeclKey(Key):
     @classmethod
     def get_key_type(cls) -> Type:
         return ModuleDeclKey
+
+    def __init(self):
+        # TODO (Roman): Change the schema so that UI does not have to concatenate the module and type name to get the
+        #  key in the schema dict. Sensitive case: drill down polymorphic field when the field value is a derived class,
+        #  but in the declaration it is a base class.
+        if self.module_name is not None and self.module_name != GLOBAL_MODULE_NAME:
+            raise RuntimeError(
+                "Using a real module name leads to schema inconsistency for UI. "
+                "The module name is temporarily global and should not be specified manually. "
+                "Please create ModuleDeclKey without init parameters."
+            )
+
+        # Set global module name.
+        self.module_name = GLOBAL_MODULE_NAME

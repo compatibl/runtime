@@ -234,7 +234,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
         # Create instance of the final type
         result = cls()
 
-        result.module = ModuleDeclKey(module_name=record_type.__module__).build()
+        result.module = ModuleDeclKey().build()
         result.name = TypeUtil.name(record_type)
         result.label = titleize(result.name)  # TODO: Add override from settings
         result.comment = record_type.__doc__
@@ -260,7 +260,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
             ):
                 if not result.inherit:
                     # The first class in MRO sequence other than self is the direct parent
-                    mro_type_module = ModuleDeclKey(module_name=mro_type.__module__).build()
+                    mro_type_module = ModuleDeclKey().build()
                     result.inherit = TypeDeclKey(module=mro_type_module, name=mro_type_name).build()
 
                 # Add all MRO types to dependencies

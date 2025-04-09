@@ -33,7 +33,7 @@ class PrimitiveDeclKeys:
     INT: TypeDeclKey = TypeDeclKey.from_type(int)
     """Int primitive type."""
 
-    LONG: TypeDeclKey = TypeDeclKey(module=ModuleDeclKey(module_name=int.__module__), name="long")
+    LONG: TypeDeclKey = TypeDeclKey(module=ModuleDeclKey(), name="long").build()
     """Long primitive type, use builtins module with name=long"""
 
     DATE: TypeDeclKey = TypeDeclKey.from_type(dt.date)

@@ -37,4 +37,4 @@ class TypeDeclKey(Key):
     @classmethod
     def from_type(cls, type_: Type) -> Self:
         """Create primitive type declaration from Python type."""
-        return TypeDeclKey(module=ModuleDeclKey(module_name=type_.__module__), name=type_.__name__).build()
+        return TypeDeclKey(module=ModuleDeclKey(), name=type_.__name__).build()
