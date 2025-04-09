@@ -37,7 +37,7 @@ class PanelResponseUtil:
         """Implements /entity/panel route."""
 
         # Get type of the record.
-        type_ = TypeImport.class_from_type_name(request.type_name)
+        type_ = TypeImport.get_class_from_type_name(request.type_name)
 
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(type_.get_key_type()))

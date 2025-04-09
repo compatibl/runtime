@@ -38,7 +38,7 @@ class StaticMethodTask(MethodTask):
         """Invoke the specified @staticmethod or @classmethod."""
 
         # Get record type from fully qualified name in module.ClassName format
-        record_type = TypeImport.class_from_qual_name(self.type_str)
+        record_type = TypeImport.get_class_from_qual_name(self.type_str)
 
         # Method callable is already bound to cls, it is not necessary to pass cls as an explicit parameter
         method_name = self.normalized_method_name()

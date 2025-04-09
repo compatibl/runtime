@@ -40,7 +40,7 @@ class DeleteResponseUtil:
             raise RuntimeError("Bulk delete records of different key types currently is not supported.")
 
         # Expect all keys to be the same key type.
-        key_type = TypeImport.class_from_type_name(request.delete_keys[0].type).get_key_type()  # noqa
+        key_type = TypeImport.get_class_from_type_name(request.delete_keys[0].type).get_key_type()  # noqa
         key_type_hint = TypeHint.for_class(key_type)  # noqa
 
         # Deserialize keys in request.

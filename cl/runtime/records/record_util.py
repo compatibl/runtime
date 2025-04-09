@@ -50,7 +50,7 @@ class RecordUtil:
             raise RuntimeError(
                 f"Expected key or record, got {TypeUtil.name(class_)}\n" f"in '{cls.__name__}.child_records_of' method."
             )
-        return TypeImport.subclasses_of(class_, predicate=is_non_abstract_key_or_record)
+        return TypeImport.get_subclasses_of(class_, predicate=is_non_abstract_key_or_record)
 
     @classmethod
     @cached
@@ -61,7 +61,7 @@ class RecordUtil:
                 f"Expected key or record, got {TypeUtil.name(class_)}\n"
                 f"in '{cls.__name__}.parent_records_of' method."
             )
-        return TypeImport.superclasses_of(class_, predicate=is_non_abstract_key_or_record)
+        return TypeImport.get_superclasses_of(class_, predicate=is_non_abstract_key_or_record)
 
     @classmethod
     def records_sharing_key_with(cls, class_: Type) -> Tuple[Type, ...]:
@@ -70,7 +70,7 @@ class RecordUtil:
             raise RuntimeError(
                 f"Expected key or record, got {TypeUtil.name(class_)}\n" f"in '{cls.__name__}.child_records_of' method."
             )
-        return TypeImport.records_sharing_key_with(class_, predicate=is_non_abstract_key_or_record)
+        return TypeImport.get_records_sharing_key_with(class_, predicate=is_non_abstract_key_or_record)
 
     @classmethod
     def sort_records_by_key(cls, records: Iterable[RecordProtocol]) -> List[RecordProtocol]:

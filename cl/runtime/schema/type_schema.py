@@ -67,7 +67,7 @@ class TypeSchema:
             return result
         else:
             # Get class for the specified type name and use it to get type spec
-            class_ = TypeImport.class_from_type_name(type_name)
+            class_ = TypeImport.get_class_from_type_name(type_name)
             return cls.for_class(class_)
 
     @classmethod
@@ -79,7 +79,7 @@ class TypeSchema:
             return result
         else:
             # Get class for the specified type name
-            class_ = TypeImport.class_from_type_name(type_name)
+            class_ = TypeImport.get_class_from_type_name(type_name)
 
             # Get class for the type spec
             if issubclass(class_, Enum):

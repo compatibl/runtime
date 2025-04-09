@@ -48,7 +48,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         if request.limit is not None:
             raise RuntimeError("Select with 'limit' currently is not supported.")
 
-        select_type = TypeImport.class_from_type_name(request.type_)
+        select_type = TypeImport.get_class_from_type_name(request.type_)
 
         # Load records for type.
         records = DbContext.get_db().load_all(select_type)  # noqa

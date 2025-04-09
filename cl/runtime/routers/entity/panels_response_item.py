@@ -44,7 +44,7 @@ class PanelsResponseItem(BaseModel):
         """Implements /entity/panels route."""
 
         # TODO: Return saved view names
-        request_type = TypeImport.class_from_type_name(request.type_name)
+        request_type = TypeImport.get_class_from_type_name(request.type_name)
 
         # Get actual type from record if request.key is not None
         if request.key is not None:

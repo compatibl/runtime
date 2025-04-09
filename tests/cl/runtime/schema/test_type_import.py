@@ -29,18 +29,18 @@ def test_get_qual_name():
 
     # Base class
     base_path = f"{StubDataclassRecord.__module__}.{StubDataclassRecord.__name__}"
-    assert TypeImport.qual_name_from_class(StubDataclassRecord) == base_path
+    assert TypeImport.get_qual_name_from_class(StubDataclassRecord) == base_path
 
     # Derived class
     derived_path = f"{StubDataclassDerivedRecord.__module__}.{StubDataclassDerivedRecord.__name__}"
-    assert TypeImport.qual_name_from_class(StubDataclassDerivedRecord) == derived_path
+    assert TypeImport.get_qual_name_from_class(StubDataclassDerivedRecord) == derived_path
 
 
 def test_from_type_name():
     """Test TypeImport.class_from_type_name() method."""
 
-    assert TypeImport.class_from_type_name("TypeDecl") is TypeDecl
-    assert TypeImport.class_from_type_name("StubDataclassRecord") is StubDataclassRecord
+    assert TypeImport.get_class_from_type_name("TypeDecl") is TypeDecl
+    assert TypeImport.get_class_from_type_name("StubDataclassRecord") is StubDataclassRecord
 
 
 def test_from_qual_name():
@@ -49,30 +49,30 @@ def test_from_qual_name():
     # Classes that is already imported
     for imported_class in [TypeImport, TypeDecl, StubDataclassRecord]:
         class_info_path = f"{imported_class.__module__}.{imported_class.__name__}"
-        assert TypeImport.class_from_qual_name(class_info_path) == imported_class
+        assert TypeImport.get_class_from_qual_name(class_info_path) == imported_class
 
     # Class that is dynamically imported on demand
     do_no_import_class_path = (
         "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.StubDataclassDoNotImport"
     )
-    do_no_import_class = TypeImport.class_from_qual_name(do_no_import_class_path)
+    do_no_import_class = TypeImport.get_class_from_qual_name(do_no_import_class_path)
     assert do_no_import_class_path == f"{do_no_import_class.__module__}.{do_no_import_class.__name__}"
 
     # Module does not exist error
     with pytest.raises(RuntimeError):
         path_with_unknown_module = "unknown_module.StubDataclassDoNotImport"
-        TypeImport.class_from_qual_name(path_with_unknown_module)
+        TypeImport.get_class_from_qual_name(path_with_unknown_module)
 
     # Class does not exist error
     with pytest.raises(RuntimeError):
         path_with_unknown_class = "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.UnknownClass"
-        TypeImport.class_from_qual_name(path_with_unknown_class)
+        TypeImport.get_class_from_qual_name(path_with_unknown_class)
 
 
 def test_cached_classes():
     """Test TypeImport.cached_type_names method."""
 
-    records = TypeImport.cached_classes(predicate=is_non_mixin_key_or_record)
+    records = TypeImport.get_cached_classes(predicate=is_non_mixin_key_or_record)
 
     # Included
     assert TypeDecl in records

@@ -39,7 +39,7 @@ class TypesResponseItem(BaseModel):
         """Implements /schema/types route."""
 
         # Get cached classes (does not rebuild cache)
-        record_types = TypeImport.cached_classes(predicate=is_record)
+        record_types = TypeImport.get_cached_classes(predicate=is_record)
 
         result = [
             TypesResponseItem(
