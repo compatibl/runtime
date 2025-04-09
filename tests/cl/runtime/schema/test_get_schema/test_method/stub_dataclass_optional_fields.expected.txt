@@ -1,6 +1,6 @@
 _t: StubDataclassOptionalFields
 Module:
-  ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields
+  ModuleName: cl
 Name: StubDataclassOptionalFields
 Label: Stub Dataclass Optional Fields
 Comment: Stub derived class.
@@ -8,7 +8,7 @@ TypeKind: Record
 DisplayKind: Basic
 Inherit:
   Module:
-    ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields_key
+    ModuleName: cl
   Name: StubDataclassOptionalFieldsKey
 Elements:
 - Value:
@@ -51,87 +51,81 @@ Elements:
   Vector: true
   Optional: true
   OptionalVectorElement: true
-- _t: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
+- _t: cl.StubDataclassData
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+      ModuleName: cl
     Name: StubDataclassData
   Name: OptionalData
   Comment: Optional data.
   Optional: true
-- _t: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
+- _t: cl.StubDataclassData
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+      ModuleName: cl
     Name: StubDataclassData
   Name: RequiredListOfOptionalData
   Comment: Required list of optional data.
   Vector: true
   OptionalVectorElement: true
-- _t: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
+- _t: cl.StubDataclassData
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+      ModuleName: cl
     Name: StubDataclassData
   Name: OptionalListOfOptionalData
   Comment: Optional list of optional data.
   Vector: true
   Optional: true
   OptionalVectorElement: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
+- _t: cl.StubDataclassRecordKey
   Key:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      ModuleName: cl
     Name: StubDataclassRecordKey
   Name: OptionalKey
   Comment: Optional key.
   Optional: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
+- _t: cl.StubDataclassRecordKey
   Key:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      ModuleName: cl
     Name: StubDataclassRecordKey
   Name: RequiredListOfOptionalKey
   Comment: Required list of optional key.
   Vector: true
   OptionalVectorElement: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
+- _t: cl.StubDataclassRecordKey
   Key:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      ModuleName: cl
     Name: StubDataclassRecordKey
   Name: OptionalListOfOptionalKey
   Comment: Optional list of optional key.
   Vector: true
   Optional: true
   OptionalVectorElement: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
+- _t: cl.StubDataclassRecord
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+      ModuleName: cl
     Name: StubDataclassRecord
   Name: OptionalRecord
   Comment: Optional record.
   Optional: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
+- _t: cl.StubDataclassRecord
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+      ModuleName: cl
     Name: StubDataclassRecord
   Name: RequiredListOfOptionalRecord
   Comment: Required list of optional record.
   Vector: true
   OptionalVectorElement: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
+- _t: cl.StubDataclassRecord
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+      ModuleName: cl
     Name: StubDataclassRecord
   Name: OptionalListOfOptionalRecord
   Comment: Optional list of optional record.

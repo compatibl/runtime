@@ -1,5 +1,5 @@
 module:
-  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite
+  module_name: cl
 name: StubDataclassComposite
 label: Stub Dataclass Composite
 comment: Stub for a composite key that contains other key fields.
@@ -7,7 +7,7 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key
+    module_name: cl
   name: StubDataclassCompositeKey
 elements:
 - value:
@@ -18,7 +18,7 @@ elements:
   optional: false
 - key_:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      module_name: cl
     name: StubDataclassRecordKey
   name: Embedded1
   comment: Embedded key 1.
@@ -26,7 +26,7 @@ elements:
   optional: false
 - key_:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      module_name: cl
     name: StubDataclassRecordKey
   name: Embedded2
   comment: Embedded key 2.

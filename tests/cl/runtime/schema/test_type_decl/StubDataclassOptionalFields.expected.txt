@@ -1,5 +1,5 @@
 module:
-  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields
+  module_name: cl
 name: StubDataclassOptionalFields
 label: Stub Dataclass Optional Fields
 comment: Stub derived class.
@@ -7,7 +7,7 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields_key
+    module_name: cl
   name: StubDataclassOptionalFieldsKey
 elements:
 - value:
@@ -58,7 +58,7 @@ elements:
   optional_vector_element: true
 - data:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+      module_name: cl
     name: StubDataclassData
   name: OptionalData
   comment: Optional data.
@@ -66,7 +66,7 @@ elements:
   optional: true
 - data:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+      module_name: cl
     name: StubDataclassData
   name: RequiredListOfOptionalData
   comment: Required list of optional data.
@@ -75,7 +75,7 @@ elements:
   optional_vector_element: true
 - data:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+      module_name: cl
     name: StubDataclassData
   name: OptionalListOfOptionalData
   comment: Optional list of optional data.
@@ -84,7 +84,7 @@ elements:
   optional_vector_element: true
 - key_:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      module_name: cl
     name: StubDataclassRecordKey
   name: OptionalKey
   comment: Optional key.
@@ -92,7 +92,7 @@ elements:
   optional: true
 - key_:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      module_name: cl
     name: StubDataclassRecordKey
   name: RequiredListOfOptionalKey
   comment: Required list of optional key.
@@ -101,7 +101,7 @@ elements:
   optional_vector_element: true
 - key_:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      module_name: cl
     name: StubDataclassRecordKey
   name: OptionalListOfOptionalKey
   comment: Optional list of optional key.
@@ -110,7 +110,7 @@ elements:
   optional_vector_element: true
 - data:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+      module_name: cl
     name: StubDataclassRecord
   name: OptionalRecord
   comment: Optional record.
@@ -118,7 +118,7 @@ elements:
   optional: true
 - data:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+      module_name: cl
     name: StubDataclassRecord
   name: RequiredListOfOptionalRecord
   comment: Required list of optional record.
@@ -127,7 +127,7 @@ elements:
   optional_vector_element: true
 - data:
     module:
-      module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+      module_name: cl
     name: StubDataclassRecord
   name: OptionalListOfOptionalRecord
   comment: Optional list of optional record.

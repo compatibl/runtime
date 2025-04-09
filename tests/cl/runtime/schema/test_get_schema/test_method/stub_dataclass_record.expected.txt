@@ -1,6 +1,6 @@
 _t: StubDataclassRecord
 Module:
-  ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+  ModuleName: cl
 Name: StubDataclassRecord
 Label: Stub Dataclass Record
 Comment: Stub record base class.
@@ -8,7 +8,7 @@ TypeKind: Record
 DisplayKind: Basic
 Inherit:
   Module:
-    ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    ModuleName: cl
   Name: StubDataclassRecordKey
 Elements:
 - Value:

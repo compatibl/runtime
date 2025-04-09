@@ -1,5 +1,5 @@
 module:
-  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers
+  module_name: cl
 name: StubHandlers
 label: Stub Handlers
 comment: Stub record base class.
@@ -7,7 +7,7 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key
+    module_name: cl
   name: StubHandlersKey
 declare:
   handlers:
@@ -92,7 +92,7 @@ declare:
     params:
     - data:
         module:
-          module_name: cl.runtime.file.file_data
+          module_name: cl
         name: FileData
         label: File Data
         comment: Display the specified embedded binary content.
@@ -100,7 +100,7 @@ declare:
         display_kind: Basic
         inherit:
           module:
-            module_name: cl.runtime.records.for_dataclasses.data
+            module_name: cl
           name: Data
         elements:
         - value:
@@ -117,7 +117,7 @@ declare:
           optional: false
         - enum:
             module:
-              module_name: cl.runtime.file.file_type
+              module_name: cl
             name: FileType
           name: FileType
           comment: Embedded binary content type.
@@ -270,7 +270,7 @@ declare:
     params:
     - data:
         module:
-          module_name: cl.runtime.file.file_data
+          module_name: cl
         name: FileData
         label: File Data
         comment: Display the specified embedded binary content.
@@ -278,7 +278,7 @@ declare:
         display_kind: Basic
         inherit:
           module:
-            module_name: cl.runtime.records.for_dataclasses.data
+            module_name: cl
           name: Data
         elements:
         - value:
@@ -295,7 +295,7 @@ declare:
           optional: false
         - enum:
             module:
-              module_name: cl.runtime.file.file_type
+              module_name: cl
             name: FileType
           name: FileType
           comment: Embedded binary content type.

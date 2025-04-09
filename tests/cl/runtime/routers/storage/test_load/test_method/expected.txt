@@ -1,8 +1,8 @@
 Schema:
-  stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord:
+  cl.StubDataclassRecord:
     _t: StubDataclassRecord
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+      ModuleName: cl
     Name: StubDataclassRecord
     Label: Stub Dataclass Record
     Comment: Stub record base class.
@@ -10,7 +10,7 @@ Schema:
     DisplayKind: Basic
     Inherit:
       Module:
-        ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+        ModuleName: cl
       Name: StubDataclassRecordKey
     Elements:
     - Value:
@@ -19,10 +19,10 @@ Schema:
       Comment: Unique identifier.
     Keys:
     - Id
-  cl.runtime.records.for_dataclasses.data.Data:
+  cl.Data:
     _t: Data
     Module:
-      ModuleName: cl.runtime.records.for_dataclasses.data
+      ModuleName: cl
     Name: Data
     Label: Data
     Comment: |2-
@@ -36,10 +36,10 @@ Schema:
           
     TypeKind: Data
     DisplayKind: Basic
-  cl.runtime.records.for_dataclasses.key.Key:
+  cl.Key:
     _t: Key
     Module:
-      ModuleName: cl.runtime.records.for_dataclasses.key
+      ModuleName: cl
     Name: Key
     Label: Key
     Comment: Base class for keys and records (derived from keys) based on dataclasses
@@ -48,13 +48,13 @@ Schema:
     DisplayKind: Basic
     Inherit:
       Module:
-        ModuleName: cl.runtime.records.for_dataclasses.data
+        ModuleName: cl
       Name: Data
     Abstract: true
-  stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey:
+  cl.StubDataclassRecordKey:
     _t: StubDataclassRecordKey
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      ModuleName: cl
     Name: StubDataclassRecordKey
     Label: Stub Dataclass Record Key
     Comment: Stub record base class.
@@ -62,7 +62,7 @@ Schema:
     DisplayKind: Basic
     Inherit:
       Module:
-        ModuleName: cl.runtime.records.for_dataclasses.key
+        ModuleName: cl
       Name: Key
     Elements:
     - Value:

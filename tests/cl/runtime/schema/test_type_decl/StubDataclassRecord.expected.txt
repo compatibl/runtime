@@ -1,5 +1,5 @@
 module:
-  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+  module_name: cl
 name: StubDataclassRecord
 label: Stub Dataclass Record
 comment: Stub record base class.
@@ -7,7 +7,7 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    module_name: cl
   name: StubDataclassRecordKey
 elements:
 - value:
@@ -20,7 +20,7 @@ keys:
 - Id
 
 module:
-  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+  module_name: cl
 name: StubDataclassRecord
 label: Stub Dataclass Record
 comment: Stub record base class.
@@ -28,7 +28,7 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+    module_name: cl
   name: StubDataclassRecordKey
 elements:
 - value:

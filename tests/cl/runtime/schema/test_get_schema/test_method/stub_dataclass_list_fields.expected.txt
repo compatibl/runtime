@@ -1,6 +1,6 @@
 _t: StubDataclassListFields
 Module:
-  ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields
+  ModuleName: cl
 Name: StubDataclassListFields
 Label: Stub Dataclass List Fields
 Comment: Stub record whose elements are lists.
@@ -8,7 +8,7 @@ TypeKind: Record
 DisplayKind: Basic
 Inherit:
   Module:
-    ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+    ModuleName: cl
   Name: StubDataclassRecord
 Elements:
 - Value:
@@ -29,37 +29,34 @@ Elements:
   Name: DateList
   Comment: Stub field.
   Vector: true
-- _t: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data.StubDataclassData
+- _t: cl.StubDataclassData
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data
+      ModuleName: cl
     Name: StubDataclassData
   Name: DataList
   Comment: Stub field.
   Vector: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key.StubDataclassRecordKey
+- _t: cl.StubDataclassRecordKey
   Key:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record_key
+      ModuleName: cl
     Name: StubDataclassRecordKey
   Name: KeyList
   Comment: Stub field.
   Vector: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record.StubDataclassRecord
+- _t: cl.StubDataclassRecord
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+      ModuleName: cl
     Name: StubDataclassRecord
   Name: RecordList
   Comment: Stub field.
   Vector: true
-- _t: 
-    stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record.StubDataclassDerivedRecord
+- _t: cl.StubDataclassDerivedRecord
   Data:
     Module:
-      ModuleName: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record
+      ModuleName: cl
     Name: StubDataclassDerivedRecord
   Name: DerivedRecordList
   Comment: Stub field.

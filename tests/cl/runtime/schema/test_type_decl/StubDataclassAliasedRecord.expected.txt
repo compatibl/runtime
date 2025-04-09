@@ -1,5 +1,5 @@
 module:
-  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record
+  module_name: cl
 name: StubDataclassAliasedRecord
 label: Stub Dataclass Aliased Record
 comment: Stub record class with typename alias.
@@ -7,7 +7,7 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record_key
+    module_name: cl
   name: StubDataclassAliasedRecordKey
 elements:
 - value:

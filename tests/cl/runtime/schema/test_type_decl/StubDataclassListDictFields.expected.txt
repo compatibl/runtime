@@ -1,5 +1,5 @@
 module:
-  module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_dict_fields
+  module_name: cl
 name: StubDataclassListDictFields
 label: Stub Dataclass List Dict Fields
 comment: Stub record whose elements are dictionaries.
@@ -7,7 +7,7 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record
+    module_name: cl
   name: StubDataclassRecord
 elements:
 - value:

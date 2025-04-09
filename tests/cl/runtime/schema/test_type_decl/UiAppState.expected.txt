@@ -1,5 +1,5 @@
 module:
-  module_name: cl.runtime.backend.core.ui_app_state
+  module_name: cl
 name: UiAppState
 label: Ui App State
 comment: UiAppState.
@@ -7,12 +7,12 @@ type_kind: Record
 display_kind: Basic
 inherit:
   module:
-    module_name: cl.runtime.backend.core.ui_app_state_key
+    module_name: cl
   name: UiAppStateKey
 elements:
 - key_:
     module:
-      module_name: cl.runtime.backend.core.user_key
+      module_name: cl
     name: UserKey
   name: User
   comment: A user the app state is applied for.
@@ -20,7 +20,7 @@ elements:
   optional: false
 - data:
     module:
-      module_name: cl.runtime.backend.core.tab_info
+      module_name: cl
     name: TabInfo
   name: OpenedTabs
   comment: Information about opened tabs.
