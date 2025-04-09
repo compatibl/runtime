@@ -16,9 +16,10 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, Iterable, List
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.type_util import TypeUtil
 
 SETTINGS_FILES_ENVVAR = "CL_SETTINGS_FILES"
 """The name of environment variable used to override the settings file(s) names or locations."""
@@ -192,6 +193,53 @@ class ProjectSettings:
             # Create the directory if does not exist
             os.makedirs(db_dir)
         return db_dir
+
+    @classmethod
+    def normalize_paths(cls, field_name: str, field_value: Iterable[str] | str | None) -> List[str]:
+        """
+        Convert to absolute path if path relative to the location of .env or Dynaconf file is specified
+        and convert to list if single value is specified.
+        """
+
+        # Check that the argument is either None, a string or, an iterable
+        if field_value is None:
+            # Accept None and treat it as an empty list
+            return []
+        elif isinstance(field_value, str):
+            paths = [field_value]
+        elif hasattr(field_value, "__iter__"):
+            paths = list(field_value)
+        else:
+            raise RuntimeError(
+                f"Field '{field_name}' with value '{field_value}' in class '{TypeUtil.name(cls)}' "
+                f"must be a string or an iterable of strings."
+            )
+
+        result = [cls.normalize_path(field_name, path) for path in paths]
+        return result
+
+    @classmethod
+    def normalize_path(cls, field_name: str, field_value: str | None) -> str:
+        """Convert to absolute path if path relative to the location of .env or Dynaconf file is specified."""
+
+        if field_value is None or field_value == "":
+            raise RuntimeError(f"Field '{field_name}' in class '{TypeUtil.name(cls)}' has an empty element.")
+        elif isinstance(field_value, str):
+            # Check that 'field_value' is a string
+            result = field_value
+        else:
+            raise RuntimeError(
+                f"Field '{field_name}' in class '{TypeUtil.name(cls)}' has an element "
+                f"with type {type(field_value)} which is not a string."
+            )
+
+        if not os.path.isabs(result):
+            project_root = cls.get_project_root()
+            result = os.path.join(project_root, result)
+
+        # Return as a normalized path string
+        result = os.path.normpath(result)
+        return result
 
     @classmethod
     def instance(cls) -> Self:

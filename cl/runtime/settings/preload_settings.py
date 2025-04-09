@@ -20,6 +20,7 @@ from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
 
 
@@ -42,7 +43,7 @@ class PreloadSettings(Settings):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
-        self.dirs = self.normalize_paths("dirs", self.dirs)
+        self.dirs = ProjectSettings.instance().normalize_paths("dirs", self.dirs)
 
     @classmethod
     def get_prefix(cls) -> str:

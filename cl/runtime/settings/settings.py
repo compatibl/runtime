@@ -84,16 +84,6 @@ if isinstance(_dynaconf_file_patterns, str):
 _dynaconf_loaded_files = _all_settings._loaded_files  # noqa
 """Loaded dynaconf settings files."""
 
-_dynaconf_dir_path = _all_settings._root_path  # noqa
-"""Absolute path the location of the first Dynaconf file if found, None otherwise."""
-
-_dotenv_file_path = find_dotenv_output if (find_dotenv_output := find_dotenv()) != "" else None
-"""Absolute path to .env file if found, None otherwise."""
-
-_dotenv_dir_path = os.path.dirname(_dotenv_file_path) if _dotenv_file_path is not None else None
-"""Absolute path to .env directory if found, None otherwise."""
-
-
 @dataclass(slots=True, kw_only=True)
 class Settings(Data, ABC):
     """Base class for a singleton settings object."""
@@ -176,7 +166,7 @@ class Settings(Data, ABC):
                     dynaconf_file_list = _dynaconf_loaded_files
                 else:
                     _dynaconf_file_patterns_str = ", ".join(_dynaconf_file_patterns)
-                    dynaconf_file_list = [f"No {_dynaconf_file_patterns_str} file(s) in default search path"]
+                    dynaconf_file_list = [f"No {_dynaconf_file_patterns_str} file(s) in default search path."]
                 sources_list.extend(f"Dynaconf file {dynaconf_msg}: {x}" for x in dynaconf_file_list)
 
                 # Convert to string
@@ -204,68 +194,3 @@ class Settings(Data, ABC):
 
         return result
 
-    @classmethod
-    def get_project_root(cls) -> str:  # TODO: Merge with the version from ProjectSettings
-        """
-        Returns absolute path of the directory containing .env file, and if not present the directory
-        containing the first Dynaconf settings file found. Error message if neither is found.
-        """
-        if _dotenv_dir_path is not None:
-            # Use .env file location if found
-            return _dotenv_dir_path
-        elif _dynaconf_dir_path is not None:
-            # Otherwise use the location of the first Dynaconf file found
-            # TODO: Add a test to confirm the logic when several Dynaconf files are in different locations
-            return _dynaconf_dir_path
-        else:
-            raise RuntimeError(
-                "Cannot get project root because neither .env file nor dynaconf settings file are found. "
-                "Project root is defined based on the location of these two files (with .env having a priority)."
-            )
-
-    @classmethod
-    def normalize_paths(cls, field_name: str, field_value: Iterable[str] | str | None) -> List[str]:
-        """
-        Convert to absolute path if path relative to the location of .env or Dynaconf file is specified
-        and convert to list if single value is specified.
-        """
-
-        # Check that the argument is either None, a string or, an iterable
-        if field_value is None:
-            # Accept None and treat it as an empty list
-            return []
-        elif isinstance(field_value, str):
-            paths = [field_value]
-        elif hasattr(field_value, "__iter__"):
-            paths = list(field_value)
-        else:
-            raise RuntimeError(
-                f"Field '{field_name}' with value '{field_value}' in class '{TypeUtil.name(cls)}' "
-                f"must be a string or an iterable of strings."
-            )
-
-        result = [cls.normalize_path(field_name, path) for path in paths]
-        return result
-
-    @classmethod
-    def normalize_path(cls, field_name: str, field_value: str | None) -> str:
-        """Convert to absolute path if path relative to the location of .env or Dynaconf file is specified."""
-
-        if field_value is None or field_value == "":
-            raise RuntimeError(f"Field '{field_name}' in class '{TypeUtil.name(cls)}' has an empty element.")
-        elif isinstance(field_value, str):
-            # Check that 'field_value' is a string
-            result = field_value
-        else:
-            raise RuntimeError(
-                f"Field '{field_name}' in class '{TypeUtil.name(cls)}' has an element "
-                f"with type {type(field_value)} which is not a string."
-            )
-
-        if not os.path.isabs(result):
-            project_root = cls.get_project_root()
-            result = os.path.join(project_root, result)
-
-        # Return as a normalized path string
-        result = os.path.normpath(result)
-        return result
