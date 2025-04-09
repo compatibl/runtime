@@ -18,7 +18,6 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.reporting_serializers import ReportingSerializers
-from cl.runtime.serializers.yaml_serializers import YamlSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

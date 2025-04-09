@@ -52,6 +52,7 @@ _SAMPLE_TYPES = [
     # TODO: StubDataclassTupleFields,
 ]
 
+
 def test_json():
     """Test DataSerializer.serialize method with bidirectional=None."""
 

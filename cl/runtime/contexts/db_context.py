@@ -30,7 +30,6 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.yaml_serializers import YamlSerializers
 
 
 @dataclass(slots=True, kw_only=True)

@@ -29,7 +29,6 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.reporting_serializers import ReportingSerializers
-from cl.runtime.serializers.yaml_serializers import YamlSerializers
 
 _supported_extensions = ["txt", "yaml"]
 """The list of supported output file extensions (formats)."""

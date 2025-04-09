@@ -14,7 +14,6 @@
 
 import logging
 from typing import Any
-
 from cl.runtime import TypeImport
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.protocols import is_key

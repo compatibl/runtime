@@ -22,10 +22,10 @@ import pandas as pd
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

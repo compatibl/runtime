@@ -19,10 +19,11 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, SEQUENCE_AND_MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import SEQUENCE_AND_MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data
@@ -82,7 +83,7 @@ class DataSerializer(Serializer):
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize the argument to a dictionary type_hint and schema."""
-        
+
         if self.type_inclusion not in [TypeInclusion.AS_NEEDED, TypeInclusion.ALWAYS, TypeInclusion.OMIT]:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
@@ -212,8 +213,8 @@ class DataSerializer(Serializer):
                             if is_enum(field_value)
                             else (
                                 key_serializer.serialize(field_value, field_spec.type_hint)
-                                if is_key(field_value) else
-                                self._serialize_inner(field_value, field_spec.type_hint)
+                                if is_key(field_value)
+                                else self._serialize_inner(field_value, field_spec.type_hint)
                             )
                         )
                     )
@@ -243,17 +244,17 @@ class DataSerializer(Serializer):
         if type_hint is None:
             if data_class_name in MAPPING_CLASS_NAMES:
                 # Attempt to extract type information from the mapping data
-                    if (type_name := data.get(self.type_field, None) if data else None) is not None:
-                        # Type name is specified, look up the class
-                        type_spec = TypeSchema.for_type_name(type_name)
-                        type_hint = TypeHint.for_class(type_spec.get_class())
-                        # Recursive call is needed because of nested containers
-                        return self.deserialize(data, type_hint)
-                    else:
-                        raise RuntimeError(
-                            f"Key '_type' is missing in the serialized data and type hint is not specified, "
-                            f"cannot deserialize."
-                        )
+                if (type_name := data.get(self.type_field, None) if data else None) is not None:
+                    # Type name is specified, look up the class
+                    type_spec = TypeSchema.for_type_name(type_name)
+                    type_hint = TypeHint.for_class(type_spec.get_class())
+                    # Recursive call is needed because of nested containers
+                    return self.deserialize(data, type_hint)
+                else:
+                    raise RuntimeError(
+                        f"Key '_type' is missing in the serialized data and type hint is not specified, "
+                        f"cannot deserialize."
+                    )
             elif data_class_name in SEQUENCE_CLASS_NAMES:
                 # Recursive call is needed because type information may be contained inside items
                 return [self.deserialize(v) for v in data]
@@ -373,8 +374,7 @@ class DataSerializer(Serializer):
 
             # Deserialize into a dict
             result_dict = {
-                (snake_case_k := self._deserialize_key(field_key)):
-                (
+                (snake_case_k := self._deserialize_key(field_key)): (
                     self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
                     if (
                         (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != "str"

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-
 from cl.runtime import TypeImport
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.type_decl import TypeDecl

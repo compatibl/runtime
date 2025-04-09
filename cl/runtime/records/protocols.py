@@ -79,6 +79,7 @@ SEQUENCE_AND_MAPPING_CLASS_NAMES = tuple(x for x in (*SEQUENCE_CLASS_NAMES, *MAP
 SEQUENCE_AND_MAPPING_TYPE_NAMES = tuple(x for x in (*SEQUENCE_TYPE_NAMES, *MAPPING_TYPE_NAMES))
 """Names of classes that may be used to represent mappings, excluding abstract base classes."""
 
+
 class DataProtocol(Protocol):
     """Protocol for a class that has slots and implements the builder pattern."""
 

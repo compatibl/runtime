@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.records.data_util import DataUtil
+from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from stubs.cl.runtime import StubDataclassComposite

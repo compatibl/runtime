@@ -23,17 +23,10 @@ from ruamel.yaml.constructor import SafeConstructor
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.encoder import Encoder
-from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.serializer import Serializer
-from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.type_hints import TypeHints
-from cl.runtime.serializers.type_inclusion import TypeInclusion
 
 # Use primitive serializer with default settings to serialize all primitive types to string
 _PRIMITIVE_SERIALIZER = PrimitiveSerializers.DEFAULT

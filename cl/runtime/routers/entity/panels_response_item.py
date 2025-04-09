@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-
 from cl.runtime import TypeImport
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from __future__ import annotations
-from cl.runtime import TypeImport
 from inflection import titleize
 from pydantic import BaseModel
+from cl.runtime import TypeImport
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil

@@ -13,7 +13,10 @@
 # limitations under the License.
 
 from typing import Any
-from cl.runtime.records.protocols import MAPPING_CLASSES, SEQUENCE_CLASSES, is_data, SEQUENCE_AND_MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import SEQUENCE_AND_MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import SEQUENCE_CLASSES
+from cl.runtime.records.protocols import is_data
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
@@ -29,19 +32,16 @@ class DataUtil:
     def remove_none(cls, data: Any) -> Any:
         """Recursively remove dict (mapping) keys with None values, leave all other instances of None as is."""
         if is_data(data):
-            return type(data)(**{
-                key: cls.remove_none(value)
-                for key in SlotsUtil.get_slots(data)
-                if (value := getattr(data, key, None)) is not None
-            })
-        elif isinstance(data, MAPPING_CLASSES):
             return type(data)(
-                (key, cls.remove_none(value))
-                for key, value in data.items()
-                if value is not None
+                **{
+                    key: cls.remove_none(value)
+                    for key in SlotsUtil.get_slots(data)
+                    if (value := getattr(data, key, None)) is not None
+                }
             )
+        elif isinstance(data, MAPPING_CLASSES):
+            return type(data)((key, cls.remove_none(value)) for key, value in data.items() if value is not None)
         elif isinstance(data, SEQUENCE_CLASSES):
             return type(data)(cls.remove_none(item) for item in data)
         else:
             return data
-

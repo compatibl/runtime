@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-
 from cl.runtime import TypeImport
 from cl.runtime.backend.core.ui_type_state import UiTypeState
 from cl.runtime.backend.core.ui_type_state_key import UiTypeStateKey
@@ -52,7 +51,8 @@ class LoadResponse(RecordsWithSchemaResponse):
 
         # Deserialize keys in request.
         deserialized_keys = tuple(
-            _KEY_SERIALIZER.deserialize(key_item.key, key_type_hint).build() for key_item in request.load_keys or tuple()
+            _KEY_SERIALIZER.deserialize(key_item.key, key_type_hint).build()
+            for key_item in request.load_keys or tuple()
         )
 
         # TODO (Yauheni): Remove temporary workaround of pinning handlers for all requested types.

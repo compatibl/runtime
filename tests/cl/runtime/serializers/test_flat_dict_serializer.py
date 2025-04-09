@@ -15,9 +15,9 @@
 import pytest
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.data_util import DataUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

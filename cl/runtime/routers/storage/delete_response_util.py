@@ -45,7 +45,8 @@ class DeleteResponseUtil:
 
         # Deserialize keys in request.
         deserialized_keys = tuple(
-            _KEY_SERIALIZER.deserialize(key_item.key, key_type_hint).build() for key_item in request.delete_keys or tuple()
+            _KEY_SERIALIZER.deserialize(key_item.key, key_type_hint).build()
+            for key_item in request.delete_keys or tuple()
         )
 
         # Delete records.
