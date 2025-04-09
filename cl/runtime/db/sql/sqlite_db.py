@@ -33,6 +33,7 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.settings.app_settings import AppSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
 _KEY_SERIALIZER = KeySerializers.FOR_SQLITE
@@ -401,8 +402,7 @@ class SqliteDb(Db):
         FileUtil.check_valid_filename(filename)
 
         # Get dir for database
-        db_dir = ProjectSettings.get_databases_dir()
-
+        db_dir = AppSettings.get_deployment_dir()
         result = os.path.join(db_dir, f"{filename}.sqlite")
         return result
 

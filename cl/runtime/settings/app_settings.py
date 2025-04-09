@@ -50,24 +50,16 @@ class AppSettings(Settings):
     """Combines the app env, the app name and (for user-scoped deployments) user into a unique deployment name."""
 
     _deployment_dir: str = required(init=False)
-    """Root directory for the files associated with the current deployment."""
+    """Root directory for the files associated with the current deployment inclusive of deployment name."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-        # Override the default settings inside a test, this permits running testing on deployed apps
-        if EnvUtil.is_inside_test():
-            # Set the environment to TEST and the user to the test module name
-            self.env = AppEnv.TEMP
-            self.name = EnvUtil.get_env_name()
-        else:
-            # Set default values for env, name and user if not provided via Dynaconf
-            if self.env is None:
-                self.env = AppEnv.DEV
-            if self.name is None:
-                self.name = "Runtime"
-
-        # Get the user from the running OS process if not provided via Dynaconf
+        # Set default values for env, name and user if not provided via Dynaconf
+        if self.env is None:
+            self.env = AppEnv.DEV
+        if self.name is None:
+            self.name = "Runtime"
         if self.user is None:
             self.user = getuser()
 
@@ -103,14 +95,9 @@ class AppSettings(Settings):
         else:
             self._deployment_name = f"{env_name};{self.name}"
 
-        # Override deployment directory if inside a test
-        if EnvUtil.is_inside_test():
-            # Unique subdirectory for each test function or method under the test directory
-            self._deployment_dir = EnvUtil.get_env_dir()
-        else:
-            # Unique subdirectory for each deployment under the project root
-            project_root = ProjectSettings.get_project_root()
-            self._deployment_dir = os.path.join(project_root, "deployments", self._deployment_name)
+        # Unique subdirectory for each deployment under the project root
+        project_root = ProjectSettings.get_project_root()
+        self._deployment_dir = os.path.join(project_root, "deployments", self._deployment_name)
 
         # Create deployment directory if it does not exist
         if not os.path.exists(self._deployment_dir):
@@ -138,7 +125,7 @@ class AppSettings(Settings):
 
     @classmethod
     def get_deployment_dir(cls) -> str:
-        """Root directory for the files associated with the current deployment."""
+        """Root directory for the files associated with the current deployment inclusive of deployment name."""
         return cls.instance()._deployment_dir
 
     @classmethod
