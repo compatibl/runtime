@@ -19,21 +19,21 @@ from typing import Iterable
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 from cl.runtime.log.log import Log
 from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.settings.app_settings import AppSettings
 from cl.runtime.settings.log_settings import LogSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
 
-def _get_log_filename() -> str:
+def _get_log_file_path() -> str:
     """Generate log filename during import and use it throughout the session."""
 
-    # TODO: Refactor to use a unique directory name instead
     # Generate log file name
     log_settings = LogSettings.instance()
     log_filename_format = log_settings.filename_format
     match log_filename_format:
         case "prefix":
             # Filename is the prefix with .log extension
-            result = f"{log_settings.filename_prefix}.log"
+            filename = f"{log_settings.filename_prefix}.log"
         case "prefix-timestamp":
             # UTC timestamp to millisecond precision for the log file name
             log_timestamp = DatetimeUtil.now()
@@ -41,35 +41,25 @@ def _get_log_filename() -> str:
             log_timestamp_str = (
                 log_timestamp.strftime("%Y-%m-%d-%H-%M-%S") + f"-{int(round(log_timestamp.microsecond / 1000)):03d}"
             )
-            result = f"{log_settings.filename_prefix}-{log_timestamp_str}.log"
+            filename = f"{log_settings.filename_prefix}-{log_timestamp_str}.log"
         case _:
             valid_choices = ["prefix", "prefix-timestamp"]
             raise RuntimeError(
                 f"Unknown log filename format: {log_filename_format}, " f"valid choices are {', '.join(valid_choices)}"
             )
 
-    # Create log directory and filename relative to project root
-    project_root = ProjectSettings.get_project_root()
-    log_dir = os.path.join(project_root, "logs")
-    result = os.path.join(log_dir, result)
-
     # Create log directory if does not exist
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
+    # Create log directory and filename relative to project root
+    result = os.path.join(AppSettings.get_deployment_dir(), filename)
     return result
-
-
-log_filename = _get_log_filename()
-"""Generate log filename during import and use it throughout the session."""
 
 
 @dataclass(slots=True, kw_only=True)
 class FileLog(Log):
     """File log with concurrency multiprocess write capability."""
 
-    filename: str = log_filename
-    """Log filename with extension is generated on import."""
+    file_path: str = _get_log_file_path()
+    """Log file path with extension is generated on import."""
 
     def get_log_handlers(self) -> Iterable[logging.Handler]:
         """Return an iterable of log handlers to be added to the logger."""
@@ -79,7 +69,7 @@ class FileLog(Log):
 
         # Set up file handler
         file_log_handler = ConcurrentRotatingFileHandler(
-            self.filename,
+            self.file_path,
             maxBytes=max_log_file_size_bytes,
             backupCount=0,  # Do not create backup files because each file has a timestamp
         )
