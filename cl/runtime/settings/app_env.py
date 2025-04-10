@@ -22,8 +22,8 @@ class AppEnv(IntEnum):
     PROD = auto()
     """Production environment, persistent across runs, destructive actions via the API are prohibited."""
 
-    UAT = auto()
-    """User acceptance testing environment, persistent across runs, destructive actions via the API are prohibited."""
+    STAGING = auto()
+    """Staging environment, persistent across runs, destructive actions via the API are permitted."""
 
     DEV = auto()
     """Development environment, initialized on each run, destructive actions via the API are permitted."""

@@ -12,15 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from dataclasses import dataclass
-from getpass import getuser
-from cl.runtime.contexts.env_util import EnvUtil
-from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.records.for_dataclasses.extensions import optional, required
-from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.settings.app_env import AppEnv
-from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
 
 
@@ -28,105 +21,38 @@ from cl.runtime.settings.settings import Settings
 class AppSettings(Settings):
     """Settings for the naming and location of the app data."""
 
-    env: AppEnv = required()
+    env: AppEnv | None = None
     """Determines the default settings for multiuser access and data retention."""
 
-    name: str = required()
+    name: str | None = None
     """Identifies the application or test."""
 
-    user: str = required()
+    user: str | None = None
     """Identifies the application or test user."""
 
-    user_scoped: bool = required()
+    user_scoped: bool | None = None
     """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
-
-    _clear_before: bool = required(init=False)
-    """Clear deployment data (except logs) before each run if true."""
-
-    _clear_after: bool = required(init=False)
-    """Clear deployment data (except logs) after each run if true."""
-
-    _deployment_name: str = required(init=False)
-    """Combines the app env, the app name and (for user-scoped deployments) user into a unique deployment name."""
-
-    _deployment_dir: str = required(init=False)
-    """Root directory for the files associated with the current deployment inclusive of deployment name."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-        # Set default values for env, name and user if not provided via Dynaconf
-        if self.env is None:
-            self.env = AppEnv.DEV
-        if self.name is None:
-            self.name = "Runtime"
-        if self.user is None:
-            self.user = getuser()
-
-        # Default user-scoped setting
-        if self.user_scoped is None:
-            if self.env in (AppEnv.PROD, AppEnv.UAT):
-                # Data is shared between users by default for PROD and UAT environments
-                self.user_scoped = True
-            elif self.env in (AppEnv.DEV, AppEnv.TEMP):
-                # Data is specific to each user by default for DEV and TEMP environments
-                self.user_scoped = False
-            else:
-                raise ErrorUtil.enum_value_error(self.env, AppEnv)
-
-        # Set default values for clear_before and clear_after
-        if self.env in (AppEnv.PROD, AppEnv.UAT):
-            self._clear_before = False
-            self._clear_after = False
-        elif self.env == AppEnv.DEV:
-            self._clear_before = True
-            self._clear_after = False
-        elif self.env == AppEnv.TEMP:
-            self._clear_before = True
-            self._clear_after = True
-        else:
-            raise ErrorUtil.enum_value_error(self.env, AppEnv)
-
-        # Set deployment name and directory
-        # TODO: Add checks to ensure the name does not have invalid characters
-        env_name = EnumSerializers.DEFAULT.serialize(self.env)
-        if self.user_scoped:
-            self._deployment_name = f"{env_name};{self.name};{self.user}"
-        else:
-            self._deployment_name = f"{env_name};{self.name}"
-
-        # Unique subdirectory for each deployment under the project root
-        project_root = ProjectSettings.get_project_root()
-        self._deployment_dir = os.path.join(project_root, "deployments", self._deployment_name)
-
-        # Create deployment directory if it does not exist
-        if not os.path.exists(self._deployment_dir):
-            os.makedirs(self._deployment_dir)
-
-    @classmethod
-    def is_user_scoped(cls) -> bool:
-        """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
-        return bool(cls.instance().user_scoped)
-
-    @classmethod
-    def clear_before(cls) -> bool:
-        """Clear deployment data (except logs) before each run if true."""
-        return bool(cls.instance()._clear_before)
-
-    @classmethod
-    def clear_after(cls) -> bool:
-        """Clear deployment data (except logs) after each run if true."""
-        return bool(cls.instance()._clear_after)
-
-    @classmethod
-    def get_deployment_name(cls) -> str:
-        """Combines the app env, the app name and (for user-scoped deployments) user into a unique deployment name."""
-        return cls.instance()._deployment_name
-
-    @classmethod
-    def get_deployment_dir(cls) -> str:
-        """Root directory for the files associated with the current deployment inclusive of deployment name."""
-        return cls.instance()._deployment_dir
+        if self.env is not None:
+            # Convert from string to AppEnv enum if necessary
+            if isinstance(self.env, str):
+                if self.env.islower():
+                    # Create enum after converting to uppercase if the string is in lowercase
+                    if (item := self.env.upper()) in AppEnv:
+                        self.env = AppEnv[item]  # noqa
+                    else:
+                        valid_items = "\n".join(item.name.lower() for item in AppEnv)
+                        raise RuntimeError(
+                            f"Enum AppEnv does not include the item {str(self.env)}.\n"
+                            f"Valid items are:\n{valid_items}\n"
+                        )
+                else:
+                    raise RuntimeError(f"Invalid environment name {self.env}, it should be lowercase.")
+            elif not isinstance(self.env, AppEnv):
+                raise RuntimeError(f"The value of env should be a string or an instance of AppEnv.")
 
     @classmethod
     def get_prefix(cls) -> str:

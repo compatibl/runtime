@@ -17,6 +17,8 @@ import os
 from dataclasses import dataclass
 from typing import Iterable
 from concurrent_log_handler import ConcurrentRotatingFileHandler
+
+from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.log.log import Log
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.settings.app_settings import AppSettings
@@ -50,7 +52,7 @@ def _get_log_file_path() -> str:
 
     # Create log directory if does not exist
     # Create log directory and filename relative to project root
-    result = os.path.join(AppSettings.get_deployment_dir(), filename)
+    result = os.path.join(AppContext.get_deployment_dir(), filename)
     return result
 
 

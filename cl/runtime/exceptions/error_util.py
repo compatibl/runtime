@@ -120,11 +120,14 @@ class ErrorUtil:
                 )
             else:
                 enum_type_name = TypeUtil.name(value)
-                enum_type_str = f"Enum {enum_type_name}" if not enum_type_name.endswith("Enum") else enum_type_name
                 enum_value_str = value.name if isinstance(value, Enum) else str(value)
-                return RuntimeError(f"{enum_type_str} does not include the item {enum_value_str}.")
+                valid_items = "\n".join(item.name for item in value.__class__)
+                return RuntimeError(
+                    f"Enum {enum_type_name} does not include the item {enum_value_str}.\n"
+                    f"Valid items are:\n{valid_items}\n"
 
-    @classmethod
+
+    @classmethod)
     def mutually_exclusive_fields_error(
         cls,
         fields: List[str],

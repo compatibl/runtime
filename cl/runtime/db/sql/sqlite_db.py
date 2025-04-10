@@ -22,6 +22,8 @@ from typing import Dict
 from typing import Iterable
 from typing import Tuple
 from typing import Type
+
+from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.file.file_util import FileUtil
@@ -402,7 +404,7 @@ class SqliteDb(Db):
         FileUtil.check_valid_filename(filename)
 
         # Get dir for database
-        db_dir = AppSettings.get_deployment_dir()
+        db_dir = AppContext.get_deployment_dir()
         result = os.path.join(db_dir, f"{filename}.sqlite")
         return result
 
