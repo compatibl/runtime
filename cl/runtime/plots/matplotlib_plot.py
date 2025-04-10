@@ -20,7 +20,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 from cl.runtime import View
 from cl.runtime.backend.core.ui_app_state import UiAppState
-from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.plots.plot import Plot
@@ -64,7 +64,7 @@ class MatplotlibPlot(Plot):
         fig = self._create_figure()
 
         # Create directory if does not exist
-        base_dir = EnvUtil.get_env_dir()
+        base_dir = QaUtil.get_env_dir()
         if not os.path.exists(base_dir):
             os.makedirs(base_dir)
 

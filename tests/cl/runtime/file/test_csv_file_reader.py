@@ -15,7 +15,7 @@
 import pytest
 import os
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from stubs.cl.runtime import StubDataclassComposite
@@ -29,7 +29,7 @@ def test_csv_file_reader(pytest_default_db):
     """Test CsvFileReader class."""
 
     # Create a new instance of local cache for the test
-    env_dir = EnvUtil.get_env_dir()
+    env_dir = QaUtil.get_env_dir()
     file_path = os.path.join(env_dir, "StubDataclassDerivedRecord.csv")
     # TODO: Change the API not to take record type or make it optional
     file_reader = CsvFileReader(file_path=file_path)

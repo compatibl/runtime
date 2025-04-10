@@ -18,7 +18,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 
 
-class EnvUtil:
+class QaUtil:
     """Helper methods for environment selection."""
 
     @classmethod

@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Type
 from cl.runtime import KeyUtil
-from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.build_util import BuildUtil
@@ -301,7 +301,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
         # Get DB identifier if not specified
         if db_id is None:
-            env_name = EnvUtil.get_env_name()
+            env_name = QaUtil.get_env_name()
             db_id = env_name.replace(".", ";")
 
         # Create and return a new DB instance

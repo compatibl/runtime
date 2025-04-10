@@ -27,7 +27,7 @@ from dotenv import find_dotenv
 from dotenv import load_dotenv
 from dynaconf import Dynaconf
 from typing_extensions import Self
-from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.type_util import TypeUtil
@@ -41,7 +41,7 @@ _process_timestamp = Timestamp.create()
 """Unique UUIDv7-based timestamp set during the Python process launch."""
 
 # True if we are inside a test, the result is cached in Settings for performance
-_is_inside_test = EnvUtil.is_inside_test()
+_is_inside_test = QaUtil.is_inside_test()
 
 # Select Dynaconf test environment when invoked from the pytest or UnitTest test runner.
 # Other runners not detected automatically, in which case the Dynaconf environment must be

@@ -14,17 +14,17 @@
 
 import pytest
 import os
-from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
 def _test_working_dir(*, actual: str, expected: str):
-    """Test for EnvUtil.env_dir and EnvUtil.env_name."""
+    """Test for QaUtil.env_dir and QaUtil.env_name."""
     dir_name = os.path.dirname(__file__)
     expected_dir = os.path.join(dir_name, expected.replace(".", os.sep))
     assert actual == expected_dir
     assert os.getcwd() == expected_dir
-    assert EnvUtil.get_env_dir() == expected_dir
+    assert QaUtil.get_env_dir() == expected_dir
 
 
 class TestPytestFixtures:

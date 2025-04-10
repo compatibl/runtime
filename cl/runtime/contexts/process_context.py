@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.contexts.context import Context
-from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.settings.settings import Settings
 
@@ -69,7 +69,7 @@ class ProcessContext(Context):
             # Otherwise set based on the current process
             if Settings.is_inside_test:
                 # Return test_module.test_module or test_module.test_class.test_method inside a test
-                return EnvUtil.get_env_name()  # TODO: Move code from EnvUtil
+                return QaUtil.get_env_name()  # TODO: Move code from QaUtil
             else:
                 # Return None outside a test
                 return "main"  # TODO: Use context_id

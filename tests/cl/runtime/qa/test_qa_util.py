@@ -14,15 +14,15 @@
 
 import pytest
 import os
-from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.qa.qa_util import QaUtil
 
 
 def _test_env_dir_and_name(*, expected_name: str):
-    """Test for EnvUtil.env_dir and EnvUtil.env_name."""
+    """Test for QaUtil.env_dir and QaUtil.env_name."""
     dir_name = os.path.dirname(__file__)
     expected_dir = os.path.join(dir_name, expected_name.replace(".", os.sep))
-    assert EnvUtil.get_env_name() == expected_name
-    assert os.path.normpath(EnvUtil.get_env_dir()) == os.path.normpath(expected_dir)
+    assert QaUtil.get_env_name() == expected_name
+    assert os.path.normpath(QaUtil.get_env_dir()) == os.path.normpath(expected_dir)
 
 
 def test_env_util():
@@ -47,7 +47,7 @@ class TestClass:
         _test_env_dir_and_name(expected_name="test_env_util.test_class.test_in_method")
 
 
-class TestEnvUtil:
+class TestQaUtil:
     """Stub pytest class with name matching the module."""
 
     def test_env_util(self):

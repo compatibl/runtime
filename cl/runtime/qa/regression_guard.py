@@ -20,7 +20,7 @@ from typing import Any
 from typing import ClassVar
 from typing import Dict
 from typing_extensions import Self
-from cl.runtime.contexts.env_util import EnvUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_key
@@ -99,7 +99,7 @@ class RegressionGuard:
         """
 
         # Find base path by examining call stack
-        base_path = EnvUtil.get_env_dir(test_function_pattern=test_function_pattern)
+        base_path = QaUtil.get_env_dir(test_function_pattern=test_function_pattern)
 
         # Make channel the filename prefix with dot delimiter if specified
         if channel is not None and channel != "":
