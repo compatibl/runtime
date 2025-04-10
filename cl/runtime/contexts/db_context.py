@@ -53,13 +53,6 @@ class DbContext(Context):
 
     @classmethod
     def get_context_type(cls) -> str:
-        """
-        The lookup of current context for cls will be done using the key returned by cls.get_context_type().
-
-        Notes:
-          - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
-          - By convention, the returned string is the name of the base class for this context type in PascalCase
-        """
         return "Db"
 
     def __init(self) -> None:
