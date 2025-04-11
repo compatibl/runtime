@@ -17,6 +17,7 @@ import os
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.storage.local_storage import LocalStorage
+from cl.runtime.storage.storage_mode import StorageMode
 
 _SAMPLE_REL_PATHS = (
     "sample_file",
@@ -32,10 +33,10 @@ _EXCEPTION_REL_PATHS = (
 def test_local_storage():
     """Test LocalTextFile class."""
 
-    extensions = ("txt", "bin")
     guard = RegressionGuard()
     abs_dir = guard.abs_dir
     rel_dir = os.path.relpath(abs_dir, start=ProjectSettings.get_project_root())
+    extensions = ("txt", "bin")
     with LocalStorage(rel_dir=rel_dir).build() as storage:
         for extension in extensions:
             for index, rel_path in enumerate(_SAMPLE_REL_PATHS):
@@ -83,23 +84,48 @@ def test_local_storage():
                         if extension == "bin":
                             read_result = read_result.decode()
                         guard.write(read_result)
-
-                # Test invalid modes
-                with pytest.raises(Exception):
-                    if extension == "txt":
-                        with open_callable(rel_path, "wb"):
-                            pass
-                    elif extension == "bin":
-                        with open_callable(rel_path, "w"):
-                            pass
-
-            for exception_rel_path in _EXCEPTION_REL_PATHS:
-                rel_path = f"{rel_path}.{extension}"
-                # Test invalid paths
-                with pytest.raises(Exception):
-                    open_callable(exception_rel_path, "w" + mode_suffix)
-
     RegressionGuard().verify_all()
+
+def test_local_storage_exceptions():
+
+    # Test invalid storage modes
+    guard = RegressionGuard()
+    abs_dir = guard.abs_dir
+    rel_dir = os.path.relpath(abs_dir, start=ProjectSettings.get_project_root())
+    extensions = ("txt", "bin")
+    with LocalStorage(rel_dir=rel_dir, storage_mode=StorageMode.READ_ONLY).build() as storage:
+        with pytest.raises(Exception):
+            storage.open_text_file(_SAMPLE_REL_PATHS[0], "w")
+        with pytest.raises(Exception):
+            storage.open_text_file(_SAMPLE_REL_PATHS[0], "a")
+        with pytest.raises(Exception):
+            storage.open_binary_file(_SAMPLE_REL_PATHS[0], "wb")
+        with pytest.raises(Exception):
+            storage.open_binary_file(_SAMPLE_REL_PATHS[0], "ab")
+
+    # Test invalid file modes
+    with LocalStorage(rel_dir=rel_dir).build() as storage:
+        with pytest.raises(Exception):
+            storage.open_binary_file(_SAMPLE_REL_PATHS[0], "r")
+        with pytest.raises(Exception):
+            storage.open_binary_file(_SAMPLE_REL_PATHS[0], "w")
+        with pytest.raises(Exception):
+            storage.open_binary_file(_SAMPLE_REL_PATHS[0], "a")
+        with pytest.raises(Exception):
+            storage.open_text_file(_SAMPLE_REL_PATHS[0], "rb")
+        with pytest.raises(Exception):
+            storage.open_text_file(_SAMPLE_REL_PATHS[0], "wb")
+        with pytest.raises(Exception):
+            storage.open_text_file(_SAMPLE_REL_PATHS[0], "ab")
+
+    # Test invalid paths
+    with LocalStorage(rel_dir=rel_dir).build() as storage:
+        with pytest.raises(Exception):
+            # Absolute paths are not allowed
+            storage.open_text_file("/sample.txt", "r")
+        with pytest.raises(Exception):
+            # Absolute paths are not allowed
+            storage.open_text_file("/sample_dir/sample.txt", "r")
 
 
 if __name__ == "__main__":

@@ -17,10 +17,12 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.contexts.lifecycle_mixin import LifecycleMixin
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.storage.binary_file import BinaryFile
 from cl.runtime.storage.binary_file_mode import BinaryFileMode
 from cl.runtime.storage.storage_key import StorageKey
+from cl.runtime.storage.storage_mode import StorageMode
 from cl.runtime.storage.text_file import TextFile
 from cl.runtime.storage.text_file_mode import TextFileMode
 
@@ -28,6 +30,9 @@ from cl.runtime.storage.text_file_mode import TextFileMode
 @dataclass(slots=True, kw_only=True)
 class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
     """Provides access to a filesystem or cloud blob storage service using a file-based API."""
+
+    storage_mode: StorageMode = StorageMode.READ_WRITE
+    """Determines what operations are permitted."""
 
     def get_key(self) -> StorageKey:
         return StorageKey(storage_id=self.storage_id).build()
@@ -66,14 +71,15 @@ class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
         else:
             raise RuntimeError(f"Not a relative path: {rel_path}")
 
-    @classmethod
-    def _to_text_file_mode_enum(cls, mode: str | TextFileMode) -> TextFileMode:
+    def _to_text_file_mode_enum(self, mode: str | TextFileMode) -> TextFileMode:
         """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
         if mode in ("r", TextFileMode.READ):
             return TextFileMode.READ
         elif mode in ("w", TextFileMode.WRITE):
+            self._check_can_write()
             return TextFileMode.WRITE
         elif mode in ("a", TextFileMode.APPEND):
+            self._check_can_write()
             return TextFileMode.APPEND
         else:
             if isinstance(mode, str):
@@ -87,14 +93,15 @@ class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
                 f"Valid modes are: 'r', 'w', 'a' or TextFileMode enum."
             )
 
-    @classmethod
-    def _to_binary_file_mode_enum(cls, mode: str | BinaryFileMode) -> BinaryFileMode:
+    def _to_binary_file_mode_enum(self, mode: str | BinaryFileMode) -> BinaryFileMode:
         """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
         if mode in ("rb", BinaryFileMode.READ):
             return BinaryFileMode.READ
         elif mode in ("wb", BinaryFileMode.WRITE):
+            self._check_can_write()
             return BinaryFileMode.WRITE
         elif mode in ("ab", BinaryFileMode.APPEND):
+            self._check_can_write()
             return BinaryFileMode.APPEND
         else:
             if isinstance(mode, str):
@@ -107,3 +114,11 @@ class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
                 f"Mode {mode_str} is not supported when opening a binary file.\n"
                 f"Valid modes are: 'rb', 'wb', 'ab' or BinaryFileMode enum."
             )
+
+    def _check_can_write(self) -> None:
+        """Raise an error if the storage is not writable."""
+        if self.storage_mode == StorageMode.READ_ONLY:
+            storage_id_str = f" {self.storage_id}" if self.storage_id else ""
+            raise RuntimeError(f"Cannot write to a read-only storage{storage_id_str}.")
+        elif self.storage_mode != StorageMode.READ_WRITE:
+            raise ErrorUtil.enum_value_error(self.storage_mode, StorageMode)
