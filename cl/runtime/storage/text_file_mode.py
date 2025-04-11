@@ -17,7 +17,7 @@ from enum import auto
 
 
 class TextFileMode(IntEnum):
-    """Can be used instead of text file modes 'r', 'w', and 'a'."""
+    """Enumeration for Python text file modes 'r', 'w', and 'a'."""
 
     READ = auto()
     """Readonly mode, corresponds to text file mode 'r'."""

@@ -28,5 +28,5 @@ class TextFile(Data, LifecycleMixin, ABC):
         """Read text."""
 
     @abstractmethod
-    def write(self, text: str) -> int:
-        """Write or append text, returns the number of characters written to the file."""
+    def write(self, text: str) -> None:
+        """Write or append text."""

@@ -26,7 +26,6 @@ class LifecycleMixin:
     __exited: bool | None = None
     """Set to true after __exit__ is invoked and cannot be unset."""
 
-    @abstractmethod
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource initialization and disposal."""
         if self.__entered:
@@ -39,7 +38,6 @@ class LifecycleMixin:
                 f"when the same instance is used in two separate 'with' clauses.")
         self.__entered = True
 
-    @abstractmethod
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
         if not self.__entered:

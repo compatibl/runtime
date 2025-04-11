@@ -17,7 +17,7 @@ from enum import auto
 
 
 class BinaryFileMode(IntEnum):
-    """Can be used instead of binary file modes 'rb', 'wb', and 'ab'."""
+    """Enumeration for Python binary file modes 'rb', 'wb', and 'ab'."""
 
     READ = auto()
     """Readonly mode, corresponds to binary file mode 'rb'."""

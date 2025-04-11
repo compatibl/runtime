@@ -15,6 +15,8 @@
 import os
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.storage.binary_file import BinaryFile
 from cl.runtime.storage.binary_file_mode import BinaryFileMode
 from cl.runtime.storage.local_binary_file import LocalBinaryFile
@@ -27,66 +29,47 @@ from cl.runtime.storage.text_file_mode import TextFileMode
 
 @dataclass(slots=True, kw_only=True)
 class LocalStorage(Storage):
-    """Provides access to a filesystem or cloud blob storage service using a common API."""
+    """Provides access to a filesystem or cloud blob storage service using a file-based API."""
 
-    root_dir: str = required()
-    """Root directory in local storage relative to which file paths are specified."""
+    rel_dir: str = required()
+    """Storage directory as path relative to project root."""
+
+    _abs_dir: str = required(init=False)
+    """Storage directory as absolute path."""
 
     def get_key(self) -> StorageKey:
         return StorageKey(storage_id=self.storage_id).build()
 
-    def open_text_file(self, file_path: str, mode: str | TextFileMode) -> TextFile:
-        self._check_lifecycle_phase()
-        # Combine with root directory of the storage to get the full path
-        full_path = os.path.join(self.root_dir, file_path)
-        text_mode_str = self._to_text_mode_str(mode)
-        return LocalTextFile(_file=open(full_path, text_mode_str))
-
-    def open_binary_file(self, file_path: str, mode: str | BinaryFileMode) -> BinaryFile:
-        self._check_lifecycle_phase()
-        # Combine with root directory of the storage to get the full path
-        full_path = os.path.join(self.root_dir, file_path)
-        binary_mode_str = self._to_binary_mode_str(mode)
-        return LocalBinaryFile(_file=open(full_path, binary_mode_str))
-
-    @classmethod
-    def _to_text_mode_str(cls, mode: str | TextFileMode) -> str:
-        """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
-        if mode in ("r", TextFileMode.READ):
-            return "r"
-        elif mode in ("w", TextFileMode.WRITE):
-            return "w"
-        elif mode in ("a", TextFileMode.APPEND):
-            return "a"
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        
+        # Combine with project root if a relative path, error otherwise
+        if not os.path.isabs(self.rel_dir):
+            self._abs_dir = os.path.join(ProjectSettings.get_project_root(), self.rel_dir)
         else:
-            if isinstance(mode, TextFileMode):
-                mode_str = mode
-            elif isinstance(mode, TextFileMode):
-                mode_str = mode.name
-            else:
-                raise RuntimeError(f"Invalid type for mode: {type(mode)}, expected str or TextFileMode.")
-            raise RuntimeError(
-                f"Mode {mode_str} is not supported when opening a text file.\n"
-                f"Valid modes are: 'r', 'w', 'a' or TextFileMode enum."
-            )
+            raise RuntimeError(f"{TypeUtil.name(self)}.rel_dir is not a relative path:\n{self.rel_dir}")
+        
+        # Create storage root directory if does not exist
+        if not os.path.exists(self._abs_dir):
+            os.makedirs(self._abs_dir)
 
-    @classmethod
-    def _to_binary_mode_str(cls, mode: str | BinaryFileMode) -> str:
-        """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
-        if mode in ("rb", BinaryFileMode.READ):
-            return "rb"
-        elif mode in ("wb", BinaryFileMode.WRITE):
-            return "wb"
-        elif mode in ("ab", BinaryFileMode.APPEND):
-            return "ab"
+    def open_text_file(self, rel_path: str, mode: str | TextFileMode) -> TextFile:
+        self._check_lifecycle_phase()
+        # Combine with root directory of the storage to get the absolute file path
+        abs_path = self._get_file_abs_path(rel_path)
+        mode_enum = self._to_text_file_mode_enum(mode)
+        return LocalTextFile(abs_path=abs_path, mode=mode_enum).build()
+
+    def open_binary_file(self, rel_path: str, mode: str | BinaryFileMode) -> BinaryFile:
+        self._check_lifecycle_phase()
+        # Combine with root directory of the storage to get the absolute file path
+        abs_path = self._get_file_abs_path(rel_path)
+        mode_enum = self._to_binary_file_mode_enum(mode)
+        return LocalBinaryFile(abs_path=abs_path, mode=mode_enum).build()
+    
+    def _get_file_abs_path(self, rel_path: str) -> str:
+        """Get the absolute path for the file."""
+        if not os.path.isabs(rel_path):
+            return os.path.join(self._abs_dir, rel_path)
         else:
-            if isinstance(mode, str):
-                mode_str = mode
-            elif isinstance(mode, BinaryFileMode):
-                mode_str = mode.name
-            else:
-                raise RuntimeError(f"Invalid type for mode: {type(mode)}, expected str or BinaryFileMode.")
-            raise RuntimeError(
-                f"Mode {mode_str} is not supported when opening a binary file.\n"
-                f"Valid modes are: 'rb', 'wb', 'ab' or BinaryFileMode enum."
-            )
+            raise RuntimeError(f"Parameter rel_path is not a relative path:\nValue: {rel_path}")

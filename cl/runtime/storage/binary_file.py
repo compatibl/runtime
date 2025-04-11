@@ -29,5 +29,5 @@ class BinaryFile(Data, LifecycleMixin, ABC):
         """Read bytes."""
 
     @abstractmethod
-    def write(self, data: bytes) -> int:
-        """Write or append bytes, returns the number of bytes written to the file."""
+    def write(self, data: bytes) -> None:
+        """Write or append bytes."""

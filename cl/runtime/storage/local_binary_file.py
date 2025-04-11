@@ -15,21 +15,36 @@
 from dataclasses import dataclass
 from typing import Any
 from typing_extensions import Self
+
+from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.storage.binary_file import BinaryFile
+from cl.runtime.storage.binary_file_mode import BinaryFileMode
 
 
 @dataclass(slots=True, kw_only=True)
 class LocalBinaryFile(BinaryFile):
     """Provides access to a local text file."""
 
-    _file: Any
+    abs_path: str
+    """The absolute path to the file."""
+
+    mode: BinaryFileMode
+    """Enumeration for Python binary file modes 'rb', 'wb', and 'ab'."""
+
+    _file: Any = required()
     """The object returned by the Python 'open' function."""
+    
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        # Open the file using the specified mode
+        mode_str = self.get_mode_str()
+        self._file = open(self.abs_path, mode_str)
 
     def read(self) -> bytes:
-        """Read text."""
         return self._file.read()
 
-    def write(self, data: bytes) -> int:
+    def write(self, data: bytes) -> None:
         return self._file.write(data)
 
     def __enter__(self) -> Self:
@@ -43,3 +58,13 @@ class LocalBinaryFile(BinaryFile):
         super().__exit__(exc_type, exc_val, exc_tb)
         self._file.__exit__(exc_type, exc_val, exc_tb)
 
+    def get_mode_str(self) -> str:
+        """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
+        if self.mode == BinaryFileMode.READ:
+            return "rb"
+        elif self.mode == BinaryFileMode.WRITE:
+            return "wb"
+        elif self.mode == BinaryFileMode.APPEND:
+            return "ab"
+        else:
+            raise ErrorUtil.enum_value_error(self.mode, BinaryFileMode)

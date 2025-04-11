@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -27,13 +28,13 @@ from cl.runtime.storage.text_file_mode import TextFileMode
 
 @dataclass(slots=True, kw_only=True)
 class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
-    """Provides access to a filesystem or cloud blob storage service using a common API."""
+    """Provides access to a filesystem or cloud blob storage service using a file-based API."""
 
     def get_key(self) -> StorageKey:
         return StorageKey(storage_id=self.storage_id).build()
 
     @abstractmethod
-    def open_text_file(self, file_path: str, mode: str | TextFileMode) -> TextFile:
+    def open_text_file(self, rel_path: str, mode: str | TextFileMode) -> TextFile:
         """
         Open a text file in read, write or append mode.
 
@@ -41,12 +42,12 @@ class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
             The returned object is a context manager that must be used in a 'with' clause.
 
         Args:
-            file_path: Path to the file relative to the storage root.
+            rel_path: Path to the file relative to the storage root.
             mode: Supported modes are 'r', 'w', 'a' strings or TextFileMode enum.
         """
 
     @abstractmethod
-    def open_binary_file(self, file_path: str, mode: str | BinaryFileMode) -> BinaryFile:
+    def open_binary_file(self, rel_path: str, mode: str | BinaryFileMode) -> BinaryFile:
         """
         Open a binary file in read, write or append mode.
 
@@ -54,12 +55,20 @@ class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
             The returned object is a context manager that must be used in a 'with' clause.
 
         Args:
-            file_path: Path to the file relative to the storage root.
+            rel_path: Path to the file relative to the storage root.
             mode: Supported modes are 'rb', 'wb', 'ab' strings or TextFileMode enum.
         """
+        
+    @classmethod
+    def _normalize_rel_path(cls, rel_path: str) -> str:
+        """Normalize relative path to standard format with Unix style separators."""
+        if not os.path.isabs(rel_path):
+            return os.path.normpath(rel_path).replace("\\", "/")
+        else:
+            raise RuntimeError(f"Not a relative path: {rel_path}")
 
     @classmethod
-    def _to_text_mode_enum(cls, mode: str | TextFileMode) -> TextFileMode:
+    def _to_text_file_mode_enum(cls, mode: str | TextFileMode) -> TextFileMode:
         """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
         if mode in ("r", TextFileMode.READ):
             return TextFileMode.READ
@@ -80,7 +89,7 @@ class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
             )
 
     @classmethod
-    def _to_binary_mode_enum(cls, mode: str | BinaryFileMode) -> BinaryFileMode:
+    def _to_binary_file_mode_enum(cls, mode: str | BinaryFileMode) -> BinaryFileMode:
         """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
         if mode in ("rb", BinaryFileMode.READ):
             return BinaryFileMode.READ
