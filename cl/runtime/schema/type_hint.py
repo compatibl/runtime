@@ -36,7 +36,7 @@ class TypeHint(FrozenData):
     schema_type_name: str
     """Type name in the schema."""
 
-    schema_class: Type
+    _schema_class: Type
     """Class if available, if not provided it will be looked up using the type name."""
 
     optional: bool
@@ -47,7 +47,7 @@ class TypeHint(FrozenData):
 
     def get_schema_class_or_none(self) -> Type:
         """Return schema class if available, otherwise return None."""
-        return self.schema_class
+        return self._schema_class
 
     def to_str(self):
         """Serialize as string in type alias format."""
@@ -107,7 +107,7 @@ class TypeHint(FrozenData):
 
         return cls(
             schema_type_name=schema_type_name,
-            schema_class=class_,
+            _schema_class=class_,
             optional=optional,
         )
 
@@ -169,7 +169,7 @@ class TypeHint(FrozenData):
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name="list",
-                            schema_class=list,
+                            _schema_class=list,
                             optional=type_alias_optional,
                         )
                     )
@@ -186,7 +186,7 @@ class TypeHint(FrozenData):
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name="tuple",
-                            schema_class=tuple,
+                            _schema_class=tuple,
                             optional=type_alias_optional,
                         )
                     )
@@ -203,7 +203,7 @@ class TypeHint(FrozenData):
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name="dict",
-                            schema_class=dict,
+                            _schema_class=dict,
                             optional=type_alias_optional,
                         )
                     )
@@ -233,7 +233,7 @@ class TypeHint(FrozenData):
                             type_hint_tokens.append(
                                 TypeHint(
                                     schema_type_name=schema_type_name,
-                                    schema_class=type_alias,
+                                    _schema_class=type_alias,
                                     optional=type_alias_optional,
                                 )
                             )
@@ -242,7 +242,7 @@ class TypeHint(FrozenData):
                                 type_hint_tokens.append(
                                     TypeHint(
                                         schema_type_name="long",
-                                        schema_class=int,
+                                        _schema_class=int,
                                         optional=type_alias_optional,
                                     )
                                 )
@@ -253,7 +253,7 @@ class TypeHint(FrozenData):
                                 type_hint_tokens.append(
                                     TypeHint(
                                         schema_type_name="timestamp",
-                                        schema_class=UUID,
+                                        _schema_class=UUID,
                                         optional=type_alias_optional,
                                     )
                                 )
@@ -292,7 +292,7 @@ class TypeHint(FrozenData):
             head, *tail = type_hints
             return TypeHint(
                 schema_type_name=head.schema_type_name,
-                schema_class=head.schema_class,
+                _schema_class=head._schema_class,
                 optional=head.optional,
                 remaining=cls._link_type_hint_tokens(tail),
             )

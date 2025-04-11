@@ -105,7 +105,7 @@ class KeySerializer(Serializer):
         """Deserialize key from a delimited string or a flattened sequence of primitive types."""
 
         # Get schema class from the type hint
-        schema_class = type_hint.schema_class
+        schema_class = type_hint._schema_class
 
         # Convert to key if a record
         if is_record(schema_class):
