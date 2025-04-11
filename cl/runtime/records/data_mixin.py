@@ -22,7 +22,7 @@ from cl.runtime.records.type_util import TypeUtil
 
 
 class DataMixin:
-    """Mixin adding 'build' method to the class."""
+    """Framework-neutral mixin adding 'build' and related methods to the class."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""

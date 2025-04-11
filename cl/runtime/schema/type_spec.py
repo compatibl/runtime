@@ -18,9 +18,11 @@ from dataclasses import dataclass
 from typing import Type
 from typing_extensions import Self
 
+from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
 
-@dataclass(slots=True, kw_only=True)
-class TypeSpec(ABC):
+
+@dataclass(slots=True, kw_only=True, frozen=True)
+class TypeSpec(FrozenData, ABC):
     """
     Provides information about a type included in schema and its dependencies including data types,
     enums and primitive types.

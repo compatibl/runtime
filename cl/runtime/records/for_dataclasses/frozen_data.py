@@ -12,24 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
 from dataclasses import dataclass
-from typing import Dict
-from typing import List
-from cl.runtime.schema.field_spec import FieldSpec
-from cl.runtime.schema.type_spec import TypeSpec
+from cl.runtime.records.frozen_data_mixin import FrozenDataMixin
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
-class DataSpec(TypeSpec, ABC):
-    """Provides information about a class with fields."""
-
-    fields: List[FieldSpec] | None = None
-    """Fields in class declaration order."""
-
-    _field_dict: Dict[str, FieldSpec] | None = None
-    """Dictionary of field specs indexed by field name."""
-
-    def get_field_dict(self) -> Dict[str, FieldSpec]:
-        """Dictionary of field specs indexed by field name."""
-        return self._field_dict
+class FrozenData(FrozenDataMixin):
+    """Dataclasses base for lightweight classes that do not require validation against the schema."""
+    pass

@@ -21,7 +21,7 @@ from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.field_spec import FieldSpec
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class DataclassSpec(DataSpec):
     """Provides information about a dataclass."""
 
@@ -45,9 +45,10 @@ class DataclassSpec(DataSpec):
             for field in dataclasses.fields(class_)  # noqa: type=ignore, verified it is a dataclass above
             if not field.name.startswith("_")
         ]
+        field_dict = {x.field_name: x for x in fields} if fields is not None else {}
 
         # Create the enum spec
-        result = DataclassSpec(type_name=type_name, _class=class_, fields=fields)
+        result = DataclassSpec(type_name=type_name, _class=class_, fields=fields, _field_dict=field_dict)
         return result
 
     @classmethod

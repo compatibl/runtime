@@ -19,7 +19,7 @@ from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.schema.type_spec import TypeSpec
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class PrimitiveSpec(TypeSpec):
     """Provides information about a primitive type."""
 

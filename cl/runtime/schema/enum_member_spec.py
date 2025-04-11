@@ -13,10 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
 
 
-@dataclass(slots=True, kw_only=True)
-class EnumMemberSpec:
+@dataclass(slots=True, kw_only=True, frozen=True)
+class EnumMemberSpec(FrozenData):
     """Provides information about a single member (item) of an enum."""
 
     member_name: str

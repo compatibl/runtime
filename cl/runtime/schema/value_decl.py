@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Type
 from typing_extensions import Self
+
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 
 _VALUE_DECL_NAME_MAP: Dict[str, str] = {
@@ -34,7 +36,7 @@ _VALUE_DECL_NAME_MAP: Dict[str, str] = {
 
 
 @dataclass(slots=True, kw_only=True)
-class ValueDecl:
+class ValueDecl(Data):
     """Value or atomic element declaration."""
 
     type_: str = required()

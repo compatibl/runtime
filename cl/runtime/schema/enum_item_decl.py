@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class EnumItemDecl:
+class EnumItemDecl(Data):
     """Enum item declaration."""
 
     name: str = required()
