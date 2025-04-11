@@ -61,14 +61,14 @@ class RegressionGuard:
         - File extension 'ext' is determined based on the verify method(s) called
     """
 
-    base_path: str
-    """Base path for the text excluding the channel, 'verify_all' method applies to all subdirs or this dir."""
-
-    output_path: str
-    """Output path for the test and channel, 'verify' method applies to this dir only."""
+    abs_dir: str
+    """Absolute path to the output directory, 'verify_all' method applies everything in this directory."""
 
     ext: str
     """Output file extension (format), defaults to '.txt'"""
+
+    _abs_channel_prefix: str
+    """Combines abs_dir and the channel, 'verify' method applies to file with this prefix only."""
 
     __verified: bool
     """Verify method sets this flag to true, after which further writes raise an error."""
@@ -132,8 +132,8 @@ class RegressionGuard:
             self.__delegate_to = None
             self.__verified = False
             self.__exception_text = None
-            self.base_path = base_path
-            self.output_path = output_path
+            self.abs_dir = base_path
+            self._abs_channel_prefix = output_path
             self.ext = ext
 
             # Delete the existing received file if exists
@@ -200,7 +200,7 @@ class RegressionGuard:
             return self.__delegate_to.verify_all(silent=silent)
 
         # Get inner dictionary using base path
-        inner_dict = self.__guard_dict[self.base_path]
+        inner_dict = self.__guard_dict[self.abs_dir]
 
         # Skip the delegated guards
         inner_dict = {k: v for k, v in inner_dict.items() if v.__delegate_to is None}
@@ -384,5 +384,5 @@ class RegressionGuard:
         """The diff between received and expected is written to 'channel.diff.ext' located next to the unit test."""
         if file_type not in (file_types := ["received", "expected", "diff"]):
             raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
-        result = f"{self.output_path}{file_type}.{self.ext}"
+        result = f"{self._abs_channel_prefix}{file_type}.{self.ext}"
         return result

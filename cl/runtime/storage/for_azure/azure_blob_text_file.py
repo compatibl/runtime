@@ -77,12 +77,12 @@ class AzureBlobTextFile(TextFile):
 
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource initialization and disposal."""
-        super().__enter__()
+        super(self.__class__, self).__enter__()
         self._blob_client.__enter__()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
-        super().__exit__(exc_type, exc_val, exc_tb)
+        super(self.__class__, self).__exit__(exc_type, exc_val, exc_tb)
         self._blob_client.__exit__(exc_type, exc_val, exc_tb)
 

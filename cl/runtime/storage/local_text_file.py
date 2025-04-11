@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os.path
 from dataclasses import dataclass
 from typing import Any
 from typing_extensions import Self
@@ -35,8 +36,25 @@ class LocalTextFile(TextFile):
     _file: Any = required()
     """The object returned by the Python 'open' function."""
 
+    _dir_exists: bool | None = None
+    """True if the directory exists, create on demand for write, error message for read."""
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        # Check if the directory exists
+        if not os.path.exists(abs_dir := os.path.dirname(self.abs_path)):
+            if self.mode in (TextFileMode.WRITE, TextFileMode.APPEND):
+                # Create on demand in WRITE or APPEND mode
+                os.makedirs(abs_dir)
+            elif self.mode == TextFileMode.READ:
+                # Do not create on demand in READ mode
+                file_name = os.path.basename(self.abs_path)
+                raise RuntimeError(
+                    f"Directory does not exist for read operation:\nDirectory: {abs_dir}Filename: {file_name}\n"
+                )
+            else:
+                raise ErrorUtil.enum_value_error(self.mode, TextFileMode)
+
         # Open the file using the specified mode
         mode_str = self.get_mode_str()
         self._file = open(self.abs_path, mode_str)
@@ -51,13 +69,13 @@ class LocalTextFile(TextFile):
 
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource initialization and disposal."""
-        super().__enter__()
+        super(self.__class__, self).__enter__()
         self._file.__enter__()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
-        super().__exit__(exc_type, exc_val, exc_tb)
+        super(self.__class__, self).__exit__(exc_type, exc_val, exc_tb)
         self._file.__exit__(exc_type, exc_val, exc_tb)
 
     def get_mode_str(self) -> str:

@@ -26,7 +26,7 @@ def perform_testing(base_path: str, full: bool = False):
 
     # Guard without channel
     guard_without_channel = RegressionGuard()
-    assert guard_without_channel.output_path == os.path.join(base_path, "")
+    assert guard_without_channel._abs_channel_prefix == os.path.join(base_path, "")
 
     # Write output
     guard_without_channel.write(test_str)

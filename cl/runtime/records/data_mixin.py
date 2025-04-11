@@ -38,6 +38,11 @@ class DataMixin:
         The action of marking the instance frozen cannot be reversed. Can be called more than once.
         """
 
+    def check_frozen(self) -> None:
+        """Raise an error if the instance is not frozen."""
+        if not self.is_frozen():
+            raise RuntimeError(f"{TypeUtil.name(self)} not frozen, invoke build method before first use.")
+
     def __setattr__(self, key, value):
         """Raise an error on attempt to modify a public field for a frozen instance."""
         if getattr(self, "_Data__frozen", False) and not key.startswith("_"):

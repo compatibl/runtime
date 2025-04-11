@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod
 from typing_extensions import Self
 from cl.runtime.records.type_util import TypeUtil
 
@@ -37,6 +36,7 @@ class LifecycleMixin:
                 f"{TypeUtil.name(self)}.__enter__ is called after __exit__, which may happen\n"
                 f"when the same instance is used in two separate 'with' clauses.")
         self.__entered = True
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
@@ -52,6 +52,7 @@ class LifecycleMixin:
 
     def _check_lifecycle_phase(self) -> None:
         """Check that __enter__ has been invoked but __exit__ has not."""
+        self.check_frozen()  # noqa Implemented in DataMixin
         if not self.__entered:
             raise RuntimeError(f"{TypeUtil.name(self)} is used outside of a 'with' clause.")
         if self.__exited:

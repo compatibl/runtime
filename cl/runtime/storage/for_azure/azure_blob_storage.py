@@ -52,7 +52,7 @@ class AzureBlobStorage(Storage):
 
         except Exception as exc:
             # Ensure cleanup if initialization fails
-            super().__exit__(type(exc), exc, exc.__traceback__)
+            super(self.__class__, self).__exit__(type(exc), exc, exc.__traceback__)
             raise RuntimeError(f"Failed to initialize Azure Blob Service client:\nReason: {exc}") from exc
 
         try:
@@ -84,13 +84,13 @@ class AzureBlobStorage(Storage):
 
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource initialization and disposal."""
-        super().__enter__()
+        super(self.__class__, self).__enter__()
         self._container_client.__enter__()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
-        super().__exit__(exc_type, exc_val, exc_tb)
+        super(self.__class__, self).__exit__(exc_type, exc_val, exc_tb)
         self._container_client.__exit__(exc_type, exc_val, exc_tb)
 
     def _get_blob_client(self, *, rel_path: str) -> BlobClient:
