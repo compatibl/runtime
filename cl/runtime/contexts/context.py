@@ -91,7 +91,7 @@ class Context(Data, ABC):
         return result
 
     def __enter__(self) -> Self:
-        """Supports 'with' operator for resource disposal."""
+        """Supports 'with' operator for resource initialization and disposal."""
 
         # Error if not frozen
         if not self.is_frozen():
@@ -113,8 +113,8 @@ class Context(Data, ABC):
         context_stack.append(self)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
-        """Supports 'with' operator for resource disposal."""
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
+        """Supports 'with' operator for resource initialization and disposal."""
 
         # Get context stack for the current asynchronous environment
         context_stack = self.get_context_stack()
@@ -127,9 +127,6 @@ class Context(Data, ABC):
         if current_context is not self:
             class_name = TypeUtil.name(self)
             raise RuntimeError(f"Current {class_name} has been modified inside 'with {class_name}(...)' clause.")
-
-        # Return False to propagate the exception (if any) that occurred inside the 'with' block
-        return False
 
     @classmethod
     def get_context_stack(cls) -> List[Self]:

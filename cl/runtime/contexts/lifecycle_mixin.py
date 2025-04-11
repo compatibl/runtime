@@ -28,7 +28,7 @@ class LifecycleMixin:
 
     @abstractmethod
     def __enter__(self) -> Self:
-        """Supports 'with' operator for resource disposal."""
+        """Supports 'with' operator for resource initialization and disposal."""
         if self.__entered:
             raise RuntimeError(
                 f"{TypeUtil.name(self)}.__enter__ is called twice, which may happen\n"
@@ -40,8 +40,8 @@ class LifecycleMixin:
         self.__entered = True
 
     @abstractmethod
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
-        """Supports 'with' operator for resource disposal."""
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
+        """Supports 'with' operator for resource initialization and disposal."""
         if not self.__entered:
             raise RuntimeError(
                 f"{TypeUtil.name(self)}.__exit__ is called before __enter__, which may happen\n"

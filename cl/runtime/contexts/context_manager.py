@@ -94,7 +94,7 @@ class ContextManager:
                     raise e
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Invoke __exit__ for each item in the 'contexts' field."""
 
         try:
@@ -111,9 +111,6 @@ class ContextManager:
                 self.restore_state(self._token)
             else:
                 raise RuntimeError("Detected ContextManager.__exit__ without a preceding ContextManager.__enter__.")
-
-        # Return False to propagate the exception (if any) that occurred inside the 'with' block
-        return False
 
     @classmethod
     def save_and_clear_state(cls) -> Token:

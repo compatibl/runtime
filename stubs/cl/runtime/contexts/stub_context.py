@@ -53,7 +53,7 @@ class StubContext(Context):
             raise RuntimeError("StubContext.error_on_init is set.")
 
     def __enter__(self) -> Self:
-        """Supports 'with' operator for resource disposal."""
+        """Supports 'with' operator for resource initialization and disposal."""
 
         # Call __enter__ method of base class
         Context.__enter__(self)
@@ -69,8 +69,8 @@ class StubContext(Context):
             raise e
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
-        """Supports 'with' operator for resource disposal."""
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
+        """Supports 'with' operator for resource initialization and disposal."""
 
         try:
             if self.error_on_exit:
@@ -83,4 +83,4 @@ class StubContext(Context):
             raise e
         else:
             # Otherwise delegate to the __exit__ method of base
-            return Context.__exit__(self, exc_type, exc_val, exc_tb)
+            Context.__exit__(self, exc_type, exc_val, exc_tb)

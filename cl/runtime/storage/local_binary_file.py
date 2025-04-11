@@ -33,13 +33,13 @@ class LocalBinaryFile(BinaryFile):
         return self._file.write(data)
 
     def __enter__(self) -> Self:
-        """Supports 'with' operator for resource disposal."""
+        """Supports 'with' operator for resource initialization and disposal."""
         super().__enter__()
         self._file.__enter__()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
-        """Supports 'with' operator for resource disposal."""
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
+        """Supports 'with' operator for resource initialization and disposal."""
         super().__exit__(exc_type, exc_val, exc_tb)
         self._file.__exit__(exc_type, exc_val, exc_tb)
 

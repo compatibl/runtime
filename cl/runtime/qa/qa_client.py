@@ -38,7 +38,7 @@ class QaClient(TestClient):
         self.process_context = ProcessContext().build()
 
     def __enter__(self) -> Self:
-        """Supports 'with' operator for resource disposal."""
+        """Supports 'with' operator for resource initialization and disposal."""
 
         # Call '__enter__' method of base first
         TestClient.__enter__(self)
@@ -49,8 +49,8 @@ class QaClient(TestClient):
         # Return self
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
-        """Supports 'with' operator for resource disposal."""
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
+        """Supports 'with' operator for resource initialization and disposal."""
 
         # Exit ProcessContext
         self.process_context.__exit__(exc_type, exc_val, exc_tb)
@@ -58,5 +58,3 @@ class QaClient(TestClient):
         # Call '__exit___' method of base last
         TestClient.__exit__(self, exc_type, exc_val, exc_tb)
 
-        # Return False to propagate the exception (if any) that occurred inside the 'with' block
-        return False
