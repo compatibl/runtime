@@ -36,19 +36,15 @@ class LocalStorage(Storage):
         return StorageKey(storage_id=self.storage_id).build()
 
     def open_text_file(self, file_path: str, mode: str | TextFileMode) -> TextFile:
-        """
-        Open a text file for reading and/or writing, valid modes are 'r', 'w', and 'a' or the corresponding enums.
-        The returned object is a context manager that automatically closes the file on exit from 'with' block.
-        """
+        self._check_lifecycle_phase()
+        # Combine with root directory of the storage to get the full path
         full_path = os.path.join(self.root_dir, file_path)
         text_mode_str = self._to_text_mode_str(mode)
         return LocalTextFile(_file=open(full_path, text_mode_str))
 
     def open_binary_file(self, file_path: str, mode: str | BinaryFileMode) -> BinaryFile:
-        """
-        Open a binary file for reading and/or writing, valid modes are 'r', 'w', and 'a' or the corresponding enums.
-        The returned object is a context manager that automatically closes the file on exit from 'with' block.
-        """
+        self._check_lifecycle_phase()
+        # Combine with root directory of the storage to get the full path
         full_path = os.path.join(self.root_dir, file_path)
         binary_mode_str = self._to_binary_mode_str(mode)
         return LocalBinaryFile(_file=open(full_path, binary_mode_str))

@@ -15,6 +15,8 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
+
+from cl.runtime.contexts.lifecycle_mixin import LifecycleMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.storage.binary_file import BinaryFile
 from cl.runtime.storage.binary_file_mode import BinaryFileMode
@@ -24,7 +26,7 @@ from cl.runtime.storage.text_file_mode import TextFileMode
 
 
 @dataclass(slots=True, kw_only=True)
-class Storage(StorageKey, RecordMixin[StorageKey], ABC):
+class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
     """Provides access to a filesystem or cloud blob storage service using a common API."""
 
     def get_key(self) -> StorageKey:
@@ -33,15 +35,27 @@ class Storage(StorageKey, RecordMixin[StorageKey], ABC):
     @abstractmethod
     def open_text_file(self, file_path: str, mode: str | TextFileMode) -> TextFile:
         """
-        Open a text file for reading and/or writing, valid modes are 'r', 'w', and 'a' or the corresponding enums.
-        The returned object is a context manager that automatically closes the file on exit from 'with' block.
+        Open a text file in read, write or append mode.
+
+        Note:
+            The returned object is a context manager that must be used in a 'with' clause.
+
+        Args:
+            file_path: Path to the file relative to the storage root.
+            mode: Supported modes are 'r', 'w', 'a' strings or TextFileMode enum.
         """
 
     @abstractmethod
     def open_binary_file(self, file_path: str, mode: str | BinaryFileMode) -> BinaryFile:
         """
-        Open a binary file for reading and/or writing, valid modes are 'r', 'w', and 'a' or the corresponding enums.
-        The returned object is a context manager that automatically closes the file on exit from 'with' block.
+        Open a binary file in read, write or append mode.
+
+        Note:
+            The returned object is a context manager that must be used in a 'with' clause.
+
+        Args:
+            file_path: Path to the file relative to the storage root.
+            mode: Supported modes are 'rb', 'wb', 'ab' strings or TextFileMode enum.
         """
 
     @classmethod

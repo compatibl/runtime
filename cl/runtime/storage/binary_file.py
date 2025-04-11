@@ -15,12 +15,13 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing_extensions import Self
+
+from cl.runtime.contexts.lifecycle_mixin import LifecycleMixin
 from cl.runtime.records.for_dataclasses.data import Data
 
 
 @dataclass(slots=True, kw_only=True)
-class BinaryFile(Data, ABC):
+class BinaryFile(Data, LifecycleMixin, ABC):
     """Provides access to a local binary file or binary data in cloud storage via a common API."""
 
     @abstractmethod
@@ -30,11 +31,3 @@ class BinaryFile(Data, ABC):
     @abstractmethod
     def write(self, data: bytes) -> int:
         """Write or append bytes, returns the number of bytes written to the file."""
-
-    @abstractmethod
-    def __enter__(self) -> Self:
-        """Supports 'with' operator for resource disposal."""
-
-    @abstractmethod
-    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
-        """Supports 'with' operator for resource disposal."""

@@ -23,22 +23,24 @@ class LocalTextFile(TextFile):
     """Provides access to a local text file."""
 
     _file: Any
-    """The object returned by the open() function."""
+    """The object returned by the Python 'open' function."""
 
     def read(self) -> str:
         """Read text."""
+        self._check_lifecycle_phase()
         return self._file.read()
 
     def write(self, text: str) -> int:
+        self._check_lifecycle_phase()
         return self._file.write(text)
 
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource disposal."""
+        super().__enter__()
         self._file.__enter__()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Supports 'with' operator for resource disposal."""
+        super().__exit__(exc_type, exc_val, exc_tb)
         self._file.__exit__(exc_type, exc_val, exc_tb)
-        # Allow exceptions to propagate
-        return False
