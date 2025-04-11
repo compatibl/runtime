@@ -21,7 +21,6 @@ from typing import Final
 from typing import List
 from celery import Celery
 from celery.signals import setup_logging
-
 from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.contexts.context_manager import ContextManager
 from cl.runtime.contexts.db_context import DbContext
@@ -29,9 +28,6 @@ from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.log.log_config import celery_empty_logging_config
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.records.protocols import TDataDict
-from cl.runtime.settings.app_settings import AppSettings
-from cl.runtime.settings.context_settings import ContextSettings
-from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue import TaskQueue
@@ -43,7 +39,7 @@ CELERY_MAX_RETRIES: Final[int] = 3
 CELERY_TIME_LIMIT: Final[int] = 3600 * 2  # TODO: 2 hours (configure)
 
 # Get sqlite file name of celery broker based on database id in settings
-db_dir = AppContext.get_deployment_dir() # TODO: Use separate directories for multiple queues
+db_dir = AppContext.get_deployment_dir()  # TODO: Use separate directories for multiple queues
 celery_file = os.path.join(db_dir, "celery.sqlite")  # TODO: Implement multiple queues
 
 celery_sqlite_uri = f"sqlalchemy+sqlite:///{celery_file}"

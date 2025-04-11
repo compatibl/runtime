@@ -19,9 +19,9 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Type
 from cl.runtime import KeyUtil
-from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import KeyProtocol

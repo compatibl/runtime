@@ -14,8 +14,8 @@
 
 import pytest
 import os
-from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
+from cl.runtime.qa.qa_util import QaUtil
 
 
 def _test_working_dir(*, actual: str, expected: str):

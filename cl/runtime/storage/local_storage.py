@@ -20,8 +20,8 @@ from cl.runtime.storage.binary_file_mode import BinaryFileMode
 from cl.runtime.storage.local_binary_file import LocalBinaryFile
 from cl.runtime.storage.local_text_file import LocalTextFile
 from cl.runtime.storage.storage import Storage
-from cl.runtime.storage.text_file import TextFile
 from cl.runtime.storage.storage_key import StorageKey
+from cl.runtime.storage.text_file import TextFile
 from cl.runtime.storage.text_file_mode import TextFileMode
 
 
@@ -35,7 +35,7 @@ class LocalStorage(Storage):
     def get_key(self) -> StorageKey:
         return StorageKey(storage_id=self.storage_id).build()
 
-    def open_text_file(self, file_path: str, mode: str  | TextFileMode) -> TextFile:
+    def open_text_file(self, file_path: str, mode: str | TextFileMode) -> TextFile:
         """
         Open a text file for reading and/or writing, valid modes are 'r', 'w', and 'a' or the corresponding enums.
         The returned object is a context manager that automatically closes the file on exit from 'with' block.
@@ -44,7 +44,7 @@ class LocalStorage(Storage):
         text_mode_str = self._to_text_mode_str(mode)
         return LocalTextFile(_file=open(full_path, text_mode_str))
 
-    def open_binary_file(self, file_path: str, mode: str  | BinaryFileMode) -> BinaryFile:
+    def open_binary_file(self, file_path: str, mode: str | BinaryFileMode) -> BinaryFile:
         """
         Open a binary file for reading and/or writing, valid modes are 'r', 'w', and 'a' or the corresponding enums.
         The returned object is a context manager that automatically closes the file on exit from 'with' block.
@@ -54,7 +54,7 @@ class LocalStorage(Storage):
         return LocalBinaryFile(_file=open(full_path, binary_mode_str))
 
     @classmethod
-    def _to_text_mode_str(cls, mode: str  | TextFileMode) -> str:
+    def _to_text_mode_str(cls, mode: str | TextFileMode) -> str:
         """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
         if mode in ("r", TextFileMode.READ):
             return "r"
@@ -71,10 +71,11 @@ class LocalStorage(Storage):
                 raise RuntimeError(f"Invalid type for mode: {type(mode)}, expected str or TextFileMode.")
             raise RuntimeError(
                 f"Mode {mode_str} is not supported when opening a text file.\n"
-                f"Valid modes are: 'r', 'w', 'a' or TextFileMode enum.")
+                f"Valid modes are: 'r', 'w', 'a' or TextFileMode enum."
+            )
 
     @classmethod
-    def _to_binary_mode_str(cls, mode: str  | BinaryFileMode) -> str:
+    def _to_binary_mode_str(cls, mode: str | BinaryFileMode) -> str:
         """Convert mode string or enum to the representation that can be passed to the Python 'open' function."""
         if mode in ("rb", BinaryFileMode.READ):
             return "rb"
@@ -91,4 +92,5 @@ class LocalStorage(Storage):
                 raise RuntimeError(f"Invalid type for mode: {type(mode)}, expected str or BinaryFileMode.")
             raise RuntimeError(
                 f"Mode {mode_str} is not supported when opening a binary file.\n"
-                f"Valid modes are: 'rb', 'wb', 'ab' or BinaryFileMode enum.")
+                f"Valid modes are: 'rb', 'wb', 'ab' or BinaryFileMode enum."
+            )

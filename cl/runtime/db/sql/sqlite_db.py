@@ -22,7 +22,6 @@ from typing import Dict
 from typing import Iterable
 from typing import Tuple
 from typing import Type
-
 from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
@@ -35,8 +34,6 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.settings.app_settings import AppSettings
-from cl.runtime.settings.project_settings import ProjectSettings
 
 _KEY_SERIALIZER = KeySerializers.FOR_SQLITE
 _SERIALIZER = DataSerializers.FOR_SQLITE

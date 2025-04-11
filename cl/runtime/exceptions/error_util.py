@@ -124,10 +124,9 @@ class ErrorUtil:
                 valid_items = "\n".join(item.name for item in value.__class__)
                 return RuntimeError(
                     f"Enum {enum_type_name} does not include the item {enum_value_str}.\n"
-                    f"Valid items are:\n{valid_items}\n"
+                    f"Valid items are:\n{valid_items}\n" @ classmethod
+                )
 
-
-    @classmethod)
     def mutually_exclusive_fields_error(
         cls,
         fields: List[str],

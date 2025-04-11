@@ -20,9 +20,11 @@ from cl.runtime.schema.type_decl import TypeDecl
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecord
 
+
 def test_rebuild_cache():
     """Test TypeImport.reload_cache method, this also generates and saves a new imports.txt file."""
     TypeImport.rebuild_cache()
+
 
 def test_get_qual_name():
     """Test getting class path from class."""

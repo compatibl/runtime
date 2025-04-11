@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
-
 from typing_extensions import Self
-
 from cl.runtime.records.for_dataclasses.data import Data
 
 
@@ -39,4 +38,3 @@ class TextFile(Data, ABC):
     @abstractmethod
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Supports 'with' operator for resource disposal."""
-

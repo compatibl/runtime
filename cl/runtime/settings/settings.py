@@ -20,15 +20,13 @@ from dataclasses import MISSING
 from dataclasses import dataclass
 from typing import ClassVar
 from typing import Dict
-from typing import Iterable
-from typing import List
 from typing import Type
 from dotenv import find_dotenv
 from dotenv import load_dotenv
 from dynaconf import Dynaconf
 from typing_extensions import Self
-from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR
@@ -83,6 +81,7 @@ if isinstance(_dynaconf_file_patterns, str):
 
 _dynaconf_loaded_files = _all_settings._loaded_files  # noqa
 """Loaded dynaconf settings files."""
+
 
 @dataclass(slots=True, kw_only=True)
 class Settings(Data, ABC):
@@ -193,4 +192,3 @@ class Settings(Data, ABC):
             cls.__settings_dict[cls] = result
 
         return result
-

@@ -15,7 +15,6 @@
 import os
 from dataclasses import dataclass
 from getpass import getuser
-
 from cl.runtime.contexts.context import Context
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
@@ -54,7 +53,7 @@ class AppContext(Context):
         self.name = self.name if self.name is not None else app_settings.name
         self.user = self.user if self.user is not None else app_settings.user
         self.user_scoped = self.user_scoped if self.user_scoped is not None else app_settings.user_scoped
-            
+
     @classmethod
     def get_env(cls) -> AppEnv:
         """Determines the default settings for multiuser access and data retention."""
@@ -84,13 +83,14 @@ class AppContext(Context):
         else:
             # Default to OS user if not specified
             return getuser()
-        
+
     @classmethod
     def is_user_scoped(cls) -> bool:
         """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
         user_scoped = (
-            context.user_scoped if (context := cls.current_or_none()) is not None else 
-            AppSettings.instance().user_scoped
+            context.user_scoped
+            if (context := cls.current_or_none()) is not None
+            else AppSettings.instance().user_scoped
         )
         if user_scoped is not None:
             return user_scoped
@@ -146,4 +146,3 @@ class AppContext(Context):
         if not os.path.exists(result):
             os.makedirs(result)
         return result
-
