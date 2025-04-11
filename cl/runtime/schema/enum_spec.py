@@ -19,6 +19,7 @@ from typing import Type
 from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.schema.enum_member_spec import EnumMemberSpec
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_spec import TypeSpec
 
 
@@ -52,5 +53,5 @@ class EnumSpec(TypeSpec):
         ]
 
         # Create the enum spec
-        result = EnumSpec(type_name=class_name, _class=class_, members=members)
+        result = EnumSpec(type_name=class_name, type_kind=TypeKind.ENUM, _class=class_, members=members)
         return result

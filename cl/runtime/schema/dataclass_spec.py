@@ -16,9 +16,12 @@ import dataclasses
 from dataclasses import dataclass
 from typing import Type
 from typing_extensions import Self
+
+from cl.runtime.records.protocols import is_key, is_record, is_data
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.field_spec import FieldSpec
+from cl.runtime.schema.type_kind import TypeKind
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
@@ -47,8 +50,25 @@ class DataclassSpec(DataSpec):
         ]
         field_dict = {x.field_name: x for x in fields} if fields is not None else {}
 
+        # Determine type kind
+        if is_key(class_):
+            type_kind = TypeKind.KEY
+        elif is_record(class_):
+            type_kind = TypeKind.RECORD
+        elif is_data(class_):
+            type_kind = TypeKind.DATA
+        else:
+            # This should not happen because this method is only invoked for data types, but just in case
+            raise RuntimeError(f"Dataclass {type_name} is neither key, record or data.")
+
         # Create the enum spec
-        result = DataclassSpec(type_name=type_name, _class=class_, fields=fields, _field_dict=field_dict)
+        result = DataclassSpec(
+            type_name=type_name,
+            type_kind=type_kind,
+            _class=class_,
+            fields=fields,
+            _field_dict=field_dict,
+        )
         return result
 
     @classmethod

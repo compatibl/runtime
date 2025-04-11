@@ -19,6 +19,7 @@ from typing import Type
 from typing_extensions import Self
 
 from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
+from cl.runtime.schema.type_kind import TypeKind
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
@@ -30,6 +31,9 @@ class TypeSpec(FrozenData, ABC):
 
     type_name: str
     """Unique type name (the same as class name except when alias is specified)."""
+
+    type_kind: TypeKind
+    """Type kind (primitive, enum, data, key, record)."""
 
     _class: Type
     """Class where the type is stored (this is not the type hint as it excludes container and optional info)."""

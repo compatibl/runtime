@@ -25,11 +25,11 @@ class TypeKind(IntEnum):
     ENUM = auto()
     """Enum type (must be derived from IntEnum), is_enum returns True."""
 
+    DATA = auto()
+    """Data type other than key or record, is_data returns True, is_key and is_record return False."""
+
     KEY = auto()
     """Key type (excludes records), is_key returns True."""
 
     RECORD = auto()
     """Record type (excludes keys), is_record returns True."""
-
-    DATA = auto()
-    """Data type other than key or record, is_data returns True, is_key and is_record return False."""
