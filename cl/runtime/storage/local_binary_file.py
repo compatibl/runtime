@@ -16,7 +16,6 @@ import os
 from dataclasses import dataclass
 from typing import Any
 from typing_extensions import Self
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.storage.binary_file import BinaryFile
@@ -35,7 +34,7 @@ class LocalBinaryFile(BinaryFile):
 
     _file: Any = required()
     """The object returned by the Python 'open' function."""
-    
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         # Check if the directory exists

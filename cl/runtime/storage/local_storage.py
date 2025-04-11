@@ -42,13 +42,13 @@ class LocalStorage(Storage):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        
+
         # Combine with project root if a relative path, error otherwise
         if not os.path.isabs(self.rel_dir):
             self._abs_dir = os.path.join(ProjectSettings.get_project_root(), self.rel_dir)
         else:
             raise RuntimeError(f"{TypeUtil.name(self)}.rel_dir is not a relative path:\n{self.rel_dir}")
-        
+
         # Create storage root directory if does not exist
         if not os.path.exists(self._abs_dir):
             os.makedirs(self._abs_dir)
@@ -66,7 +66,7 @@ class LocalStorage(Storage):
         abs_path = self._get_file_abs_path(rel_path)
         mode_enum = self._to_binary_file_mode_enum(mode)
         return LocalBinaryFile(abs_path=abs_path, mode=mode_enum).build()
-    
+
     def _get_file_abs_path(self, rel_path: str) -> str:
         """Get the absolute path for the file."""
         if not os.path.isabs(rel_path):

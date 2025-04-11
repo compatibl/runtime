@@ -13,15 +13,15 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Any
-
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob import BlobClient, BlobServiceClient, ContentSettings
+from azure.storage.blob import BlobClient
+from azure.storage.blob import ContentSettings
 from typing_extensions import Self
 from cl.runtime.storage.text_file import TextFile
 
-_CONTENT_SETTINGS = ContentSettings(content_type=f'text/plain; charset=utf-8')
+_CONTENT_SETTINGS = ContentSettings(content_type=f"text/plain; charset=utf-8")
 """Define content settings to specify the UTF-8 encoding in blob metadata."""
+
 
 @dataclass(slots=True, kw_only=True)
 class AzureBlobTextFile(TextFile):
@@ -64,11 +64,7 @@ class AzureBlobTextFile(TextFile):
         try:
             # Encode the string to bytes using the specified encoding
             data_bytes = text.encode()
-            self._blob_client.upload_blob(
-                data=data_bytes,
-                overwrite=self.overwrite,
-                content_settings=_CONTENT_SETTINGS
-            )
+            self._blob_client.upload_blob(data=data_bytes, overwrite=self.overwrite, content_settings=_CONTENT_SETTINGS)
         except Exception as exc:
             raise RuntimeError(
                 f"An error occurred when writing Azure Blob\n."
@@ -85,4 +81,3 @@ class AzureBlobTextFile(TextFile):
         """Supports 'with' operator for resource initialization and disposal."""
         super(self.__class__, self).__exit__(exc_type, exc_val, exc_tb)
         self._blob_client.__exit__(exc_type, exc_val, exc_tb)
-

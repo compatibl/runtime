@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from dataclasses import dataclass
-
 from azure.core.exceptions import ResourceExistsError
-from azure.storage.blob import BlobServiceClient, BlobClient
+from azure.storage.blob import BlobClient
+from azure.storage.blob import BlobServiceClient
 from typing_extensions import Self
-
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.storage.binary_file import BinaryFile
 from cl.runtime.storage.binary_file_mode import BinaryFileMode
@@ -67,7 +65,7 @@ class AzureBlobStorage(Storage):
         # Get and initialize a client for the the blob
         rel_path = self._normalize_rel_path(rel_path)
         mode = self._to_text_file_mode_enum(mode)
-        overwrite = (mode == TextFileMode.WRITE)
+        overwrite = mode == TextFileMode.WRITE
         blob_client = self._get_blob_client(rel_path=rel_path)
         # Create a text file instance
         return AzureBlobTextFile(rel_path=rel_path, overwrite=overwrite, _blob_client=blob_client).build()
@@ -77,7 +75,7 @@ class AzureBlobStorage(Storage):
         # Get and initialize a client for the the blob
         rel_path = self._normalize_rel_path(rel_path)
         mode = self._to_binary_file_mode_enum(mode)
-        overwrite = (mode == BinaryFileMode.WRITE)
+        overwrite = mode == BinaryFileMode.WRITE
         blob_client = self._get_blob_client(rel_path=rel_path)
         # Create a binary file instance
         return AzureBlobBinaryFile(rel_path=rel_path, overwrite=overwrite, _blob_client=blob_client).build()

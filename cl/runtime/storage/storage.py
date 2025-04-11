@@ -16,7 +16,6 @@ import os
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-
 from cl.runtime.contexts.lifecycle_mixin import LifecycleMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.storage.binary_file import BinaryFile
@@ -58,7 +57,7 @@ class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
             rel_path: Path to the file relative to the storage root.
             mode: Supported modes are 'rb', 'wb', 'ab' strings or TextFileMode enum.
         """
-        
+
     @classmethod
     def _normalize_rel_path(cls, rel_path: str) -> str:
         """Normalize relative path to standard format with Unix style separators."""

@@ -28,6 +28,7 @@ _EXCEPTION_REL_PATHS = (
     "/sample_dir/sample_file",  # Absolute path
 )
 
+
 def test_local_storage():
     """Test LocalTextFile class."""
 
@@ -38,59 +39,59 @@ def test_local_storage():
     with LocalStorage(rel_dir=rel_dir).build() as storage:
         for extension in extensions:
             for index, rel_path in enumerate(_SAMPLE_REL_PATHS):
-                    rel_path = f"{rel_path}.{extension}"
+                rel_path = f"{rel_path}.{extension}"
 
-                    # Delete the exiting file
-                    abs_path = os.path.join(abs_dir, rel_path)
-                    if os.path.exists(abs_path):
-                        os.remove(abs_path)
+                # Delete the exiting file
+                abs_path = os.path.join(abs_dir, rel_path)
+                if os.path.exists(abs_path):
+                    os.remove(abs_path)
 
+                if extension == "txt":
+                    open_callable = storage.open_text_file
+                    mode_suffix = ""
+                elif extension == "bin":
+                    open_callable = storage.open_binary_file
+                    mode_suffix = "b"
+                else:
+                    raise ValueError(f"Unsupported file extension in a text: {extension}")
+
+                # Test write and append operations
+                with open_callable(rel_path, "w" + mode_suffix) as f:
+                    data = "Hello, world!"
+                    if extension == "bin":
+                        data = data.encode()
+                    f.write(data)
+                with open_callable(rel_path, "a" + mode_suffix) as f:
+                    data = "Hello again, world!"
+                    if extension == "bin":
+                        data = data.encode()
+                    f.write(data)
+                with open_callable(rel_path, "r" + mode_suffix) as f:
+                    read_result = f.read()
+                    if index == 0:
+                        if extension == "bin":
+                            read_result = read_result.decode()
+                        guard.write(read_result)
+                with open_callable(rel_path, "w" + mode_suffix) as f:
+                    data = "Overwriting the file"
+                    if extension == "bin":
+                        data = data.encode()
+                    f.write(data)
+                with open_callable(rel_path, "r" + mode_suffix) as f:
+                    read_result = f.read()
+                    if index == 0:
+                        if extension == "bin":
+                            read_result = read_result.decode()
+                        guard.write(read_result)
+
+                # Test invalid modes
+                with pytest.raises(Exception):
                     if extension == "txt":
-                        open_callable = storage.open_text_file
-                        mode_suffix = ""
+                        with open_callable(rel_path, "wb"):
+                            pass
                     elif extension == "bin":
-                        open_callable = storage.open_binary_file
-                        mode_suffix = "b"
-                    else:
-                        raise ValueError(f"Unsupported file extension in a text: {extension}")
-
-                    # Test write and append operations
-                    with open_callable(rel_path, "w" + mode_suffix) as f:
-                        data = "Hello, world!"
-                        if extension == "bin":
-                            data = data.encode()
-                        f.write(data)
-                    with open_callable(rel_path, "a" + mode_suffix) as f:
-                        data = "Hello again, world!"
-                        if extension == "bin":
-                            data = data.encode()
-                        f.write(data)
-                    with open_callable(rel_path, "r" + mode_suffix) as f:
-                        read_result = f.read()
-                        if index == 0:
-                            if extension == "bin":
-                                read_result = read_result.decode()
-                            guard.write(read_result)
-                    with open_callable(rel_path, "w" + mode_suffix) as f:
-                        data = "Overwriting the file"
-                        if extension == "bin":
-                            data = data.encode()
-                        f.write(data)
-                    with open_callable(rel_path, "r" + mode_suffix) as f:
-                        read_result = f.read()
-                        if index == 0:
-                            if extension == "bin":
-                                read_result = read_result.decode()
-                            guard.write(read_result)
-
-                    # Test invalid modes
-                    with pytest.raises(Exception):
-                        if extension == "txt":
-                            with open_callable(rel_path, "wb"):
-                                pass
-                        elif extension == "bin":
-                            with open_callable(rel_path, "w"):
-                                pass
+                        with open_callable(rel_path, "w"):
+                            pass
 
             for exception_rel_path in _EXCEPTION_REL_PATHS:
                 rel_path = f"{rel_path}.{extension}"
@@ -99,7 +100,6 @@ def test_local_storage():
                     open_callable(exception_rel_path, "w" + mode_suffix)
 
     RegressionGuard().verify_all()
-
 
 
 if __name__ == "__main__":

@@ -30,11 +30,13 @@ class LifecycleMixin:
         if self.__entered:
             raise RuntimeError(
                 f"{TypeUtil.name(self)}.__enter__ is called twice, which may happen\n"
-                f"when the same instance is used in two nested 'with' clauses.")
+                f"when the same instance is used in two nested 'with' clauses."
+            )
         if self.__exited:
             raise RuntimeError(
                 f"{TypeUtil.name(self)}.__enter__ is called after __exit__, which may happen\n"
-                f"when the same instance is used in two separate 'with' clauses.")
+                f"when the same instance is used in two separate 'with' clauses."
+            )
         self.__entered = True
         return self
 
@@ -43,11 +45,13 @@ class LifecycleMixin:
         if not self.__entered:
             raise RuntimeError(
                 f"{TypeUtil.name(self)}.__exit__ is called before __enter__, which may happen\n"
-                f"when the same instance is used in two interleaved 'with' clauses.")
+                f"when the same instance is used in two interleaved 'with' clauses."
+            )
         if self.__exited:
             raise RuntimeError(
                 f"{TypeUtil.name(self)}.__exit__ is called twice, which may happen\n"
-                f"when the same instance is used in two interleaved 'with' clauses.")
+                f"when the same instance is used in two interleaved 'with' clauses."
+            )
         self.__exited = True
 
     def _check_lifecycle_phase(self) -> None:

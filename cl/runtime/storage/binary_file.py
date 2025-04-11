@@ -15,7 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-
 from cl.runtime.contexts.lifecycle_mixin import LifecycleMixin
 from cl.runtime.records.for_dataclasses.data import Data
 

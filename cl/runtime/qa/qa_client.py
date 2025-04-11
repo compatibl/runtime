@@ -57,4 +57,3 @@ class QaClient(TestClient):
 
         # Call '__exit___' method of base last
         TestClient.__exit__(self, exc_type, exc_val, exc_tb)
-
