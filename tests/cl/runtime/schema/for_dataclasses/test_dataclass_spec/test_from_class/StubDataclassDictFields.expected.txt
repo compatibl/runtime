@@ -1,42 +1,57 @@
 type_name: StubDataclassDictFields
+type_kind: Record
 fields:
 - field_name: id
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: str_dict
-  type_hint: dict[str, str]
-  type_chain:
-  - dict
-  - str
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: str
+      optional: false
 - field_name: float_dict
-  type_hint: dict[str, float]
-  type_chain:
-  - dict
-  - float
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: float
+      optional: false
 - field_name: date_dict
-  type_hint: dict[str, date]
-  type_chain:
-  - dict
-  - date
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: date
+      optional: false
 - field_name: data_dict
-  type_hint: dict[str, StubDataclassData]
-  type_chain:
-  - dict
-  - StubDataclassData
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: StubDataclassData
+      optional: false
 - field_name: key_dict
-  type_hint: dict[str, StubDataclassRecordKey]
-  type_chain:
-  - dict
-  - StubDataclassRecordKey
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: StubDataclassRecordKey
+      optional: false
 - field_name: record_dict
-  type_hint: dict[str, StubDataclassRecord]
-  type_chain:
-  - dict
-  - StubDataclassRecord
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: StubDataclassRecord
+      optional: false
 - field_name: derived_record_dict
-  type_hint: dict[str, StubDataclassDerivedRecord]
-  type_chain:
-  - dict
-  - StubDataclassDerivedRecord
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: StubDataclassDerivedRecord
+      optional: false
 

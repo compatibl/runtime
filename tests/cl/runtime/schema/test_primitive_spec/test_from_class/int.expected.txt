@@ -1,2 +1,3 @@
 type_name: int
+type_kind: Primitive
 

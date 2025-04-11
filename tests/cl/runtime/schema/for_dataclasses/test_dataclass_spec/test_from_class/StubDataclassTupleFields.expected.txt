@@ -1,42 +1,57 @@
 type_name: StubDataclassTupleFields
+type_kind: Record
 fields:
 - field_name: id
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: str_tuple
-  type_hint: tuple[str, Ellipsis]
-  type_chain:
-  - tuple
-  - str
+  type_hint:
+    schema_type_name: tuple
+    optional: false
+    remaining:
+      schema_type_name: str
+      optional: false
 - field_name: float_tuple
-  type_hint: tuple[float, Ellipsis]
-  type_chain:
-  - tuple
-  - float
+  type_hint:
+    schema_type_name: tuple
+    optional: false
+    remaining:
+      schema_type_name: float
+      optional: false
 - field_name: date_tuple
-  type_hint: tuple[date, Ellipsis]
-  type_chain:
-  - tuple
-  - date
+  type_hint:
+    schema_type_name: tuple
+    optional: false
+    remaining:
+      schema_type_name: date
+      optional: false
 - field_name: data_tuple
-  type_hint: tuple[StubDataclassData, Ellipsis]
-  type_chain:
-  - tuple
-  - StubDataclassData
+  type_hint:
+    schema_type_name: tuple
+    optional: false
+    remaining:
+      schema_type_name: StubDataclassData
+      optional: false
 - field_name: key_tuple
-  type_hint: tuple[StubDataclassRecordKey, Ellipsis]
-  type_chain:
-  - tuple
-  - StubDataclassRecordKey
+  type_hint:
+    schema_type_name: tuple
+    optional: false
+    remaining:
+      schema_type_name: StubDataclassRecordKey
+      optional: false
 - field_name: record_tuple
-  type_hint: tuple[StubDataclassRecord, Ellipsis]
-  type_chain:
-  - tuple
-  - StubDataclassRecord
+  type_hint:
+    schema_type_name: tuple
+    optional: false
+    remaining:
+      schema_type_name: StubDataclassRecord
+      optional: false
 - field_name: derived_record_tuple
-  type_hint: tuple[StubDataclassDerivedRecord, Ellipsis]
-  type_chain:
-  - tuple
-  - StubDataclassDerivedRecord
+  type_hint:
+    schema_type_name: tuple
+    optional: false
+    remaining:
+      schema_type_name: StubDataclassDerivedRecord
+      optional: false
 

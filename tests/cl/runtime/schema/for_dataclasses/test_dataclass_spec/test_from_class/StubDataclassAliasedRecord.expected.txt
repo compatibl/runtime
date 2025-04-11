@@ -1,11 +1,12 @@
 type_name: StubDataclassAliasedRecord
+type_kind: Record
 fields:
 - field_name: id
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: a
-  type_hint: int
-  type_chain:
-  - int
+  type_hint:
+    schema_type_name: int
+    optional: false
 

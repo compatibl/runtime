@@ -1,7 +1,8 @@
 type_name: StubDataclassRecord
+type_kind: Record
 fields:
 - field_name: id
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 

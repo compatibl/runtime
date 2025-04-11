@@ -1,49 +1,78 @@
 type_name: StubDataclassListDictFields
+type_kind: Record
 fields:
 - field_name: id
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: float_list_dict
-  type_hint: dict[str, list[float]]
-  type_chain:
-  - dict
-  - list
-  - float
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: list
+      optional: false
+      remaining:
+        schema_type_name: float
+        optional: false
 - field_name: float_or_none_list_dict
-  type_hint: dict[str, list[float | None]]
-  type_chain:
-  - dict
-  - list
-  - float | None
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: list
+      optional: false
+      remaining:
+        schema_type_name: float
+        optional: true
 - field_name: float_list_or_none_dict
-  type_hint: dict[str, Union[list[float], NoneType]]
-  type_chain:
-  - dict
-  - list | None
-  - float
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: list
+      optional: true
+      remaining:
+        schema_type_name: float
+        optional: false
 - field_name: float_list_dict_or_none
-  type_hint: Union[dict[str, list[float]], NoneType]
-  type_chain:
-  - dict | None
-  - list
-  - float
+  type_hint:
+    schema_type_name: dict
+    optional: true
+    remaining:
+      schema_type_name: list
+      optional: false
+      remaining:
+        schema_type_name: float
+        optional: false
 - field_name: date_list_dict
-  type_hint: dict[str, list[date]]
-  type_chain:
-  - dict
-  - list
-  - date
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: list
+      optional: false
+      remaining:
+        schema_type_name: date
+        optional: false
 - field_name: record_list_dict
-  type_hint: dict[str, list[StubDataclassRecord]]
-  type_chain:
-  - dict
-  - list
-  - StubDataclassRecord
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: list
+      optional: false
+      remaining:
+        schema_type_name: StubDataclassRecord
+        optional: false
 - field_name: derived_record_list_dict
-  type_hint: dict[str, list[StubDataclassDerivedRecord]]
-  type_chain:
-  - dict
-  - list
-  - StubDataclassDerivedRecord
+  type_hint:
+    schema_type_name: dict
+    optional: false
+    remaining:
+      schema_type_name: list
+      optional: false
+      remaining:
+        schema_type_name: StubDataclassDerivedRecord
+        optional: false
 

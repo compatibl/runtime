@@ -1,107 +1,108 @@
 type_name: StubDataclassPrimitiveFields
+type_kind: Record
 fields:
 - field_name: key_str_field
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: key_float_field
-  type_hint: float
-  type_chain:
-  - float
+  type_hint:
+    schema_type_name: float
+    optional: false
 - field_name: key_bool_field
-  type_hint: bool
-  type_chain:
-  - bool
+  type_hint:
+    schema_type_name: bool
+    optional: false
 - field_name: key_int_field
-  type_hint: int
-  type_chain:
-  - int
+  type_hint:
+    schema_type_name: int
+    optional: false
 - field_name: key_long_field
-  type_hint: int
-  type_chain:
-  - long
+  type_hint:
+    schema_type_name: long
+    optional: false
 - field_name: key_date_field
-  type_hint: date
-  type_chain:
-  - date
+  type_hint:
+    schema_type_name: date
+    optional: false
 - field_name: key_time_field
-  type_hint: time
-  type_chain:
-  - time
+  type_hint:
+    schema_type_name: time
+    optional: false
 - field_name: key_date_time_field
-  type_hint: datetime
-  type_chain:
-  - datetime
+  type_hint:
+    schema_type_name: datetime
+    optional: false
 - field_name: key_uuid_field
-  type_hint: UUID
-  type_chain:
-  - UUID
+  type_hint:
+    schema_type_name: UUID
+    optional: false
 - field_name: key_bytes_field
-  type_hint: bytes
-  type_chain:
-  - bytes
+  type_hint:
+    schema_type_name: bytes
+    optional: false
 - field_name: key_int_enum_field
-  type_hint: StubIntEnum
-  type_chain:
-  - StubIntEnum
+  type_hint:
+    schema_type_name: StubIntEnum
+    optional: false
 - field_name: obj_str_field
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: obj_str_with_eol_field
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: obj_str_with_trailing_eol_field
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: obj_str_timestamp_field
-  type_hint: str
-  type_chain:
-  - str
+  type_hint:
+    schema_type_name: str
+    optional: false
 - field_name: obj_float_field
-  type_hint: float
-  type_chain:
-  - float
+  type_hint:
+    schema_type_name: float
+    optional: false
 - field_name: obj_bool_field
-  type_hint: bool
-  type_chain:
-  - bool
+  type_hint:
+    schema_type_name: bool
+    optional: false
 - field_name: obj_int_field
-  type_hint: int
-  type_chain:
-  - int
+  type_hint:
+    schema_type_name: int
+    optional: false
 - field_name: obj_long_field
-  type_hint: int
-  type_chain:
-  - long
+  type_hint:
+    schema_type_name: long
+    optional: false
 - field_name: obj_date_field
-  type_hint: date
-  type_chain:
-  - date
+  type_hint:
+    schema_type_name: date
+    optional: false
 - field_name: obj_time_field
-  type_hint: time
-  type_chain:
-  - time
+  type_hint:
+    schema_type_name: time
+    optional: false
 - field_name: obj_date_time_field
-  type_hint: datetime
-  type_chain:
-  - datetime
+  type_hint:
+    schema_type_name: datetime
+    optional: false
 - field_name: obj_uuid_field
-  type_hint: UUID
-  type_chain:
-  - UUID
+  type_hint:
+    schema_type_name: UUID
+    optional: false
 - field_name: obj_bytes_field
-  type_hint: bytes
-  type_chain:
-  - bytes
+  type_hint:
+    schema_type_name: bytes
+    optional: false
 - field_name: obj_bytes_large_field
-  type_hint: bytes
-  type_chain:
-  - bytes
+  type_hint:
+    schema_type_name: bytes
+    optional: false
 - field_name: obj_int_enum_field
-  type_hint: StubIntEnum
-  type_chain:
-  - StubIntEnum
+  type_hint:
+    schema_type_name: StubIntEnum
+    optional: false
 
