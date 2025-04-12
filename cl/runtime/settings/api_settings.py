@@ -122,5 +122,5 @@ class ApiSettings(Settings):
             raise RuntimeError(f"{TypeUtil.name(self)} field 'max_age' must be an int or None.")
 
     @classmethod
-    def get_prefix(cls) -> str:
-        return "runtime_api"
+    def get_base_type(cls) -> type:
+        return ApiSettings

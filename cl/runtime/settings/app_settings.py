@@ -55,5 +55,5 @@ class AppSettings(Settings):
                 raise RuntimeError(f"The value of env should be a string or an instance of AppEnv.")
 
     @classmethod
-    def get_prefix(cls) -> str:
-        return "runtime_app"
+    def get_base_type(cls) -> type:
+        return AppSettings

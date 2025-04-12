@@ -32,17 +32,23 @@ Each asynchronous environment has its own stack dictionary
 
 @dataclass(slots=True, kw_only=True)
 class Context(Data, ABC):
-    """Abstract base of context classes."""
+    """
+    Abstract base of context classes.
+
+    Notes:
+      - Context type is the result of 'get_context_type' method.
+      - Contexts with different types are isolated from each other and have independent 'with' clauses.
+    """
 
     @classmethod
     @abstractmethod
     def get_context_type(cls) -> Type:
         """
-        The lookup of current context is done using the result of 'get_context_type' method.
+        Return context base type even when called from a derived type, do not use type(self).
 
         Notes:
-          - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
-          - By convention, the returned string is the name of the base class for this context type in PascalCase
+          - Context type is the result of 'get_context_type' method.
+          - Contexts with different types are isolated from each other and have independent 'with' clauses.
         """
 
     @classmethod

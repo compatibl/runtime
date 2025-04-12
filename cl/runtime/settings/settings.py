@@ -25,6 +25,8 @@ from dotenv import find_dotenv
 from dotenv import load_dotenv
 from dynaconf import Dynaconf
 from typing_extensions import Self
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.data import Data
@@ -85,7 +87,19 @@ _dynaconf_loaded_files = _all_settings._loaded_files  # noqa
 
 @dataclass(slots=True, kw_only=True)
 class Settings(Data, ABC):
-    """Base class for a singleton settings object."""
+    """
+    Abstract base of settings classes.
+
+    Notes:
+      - Settings lookup is performed by the base type returned by the 'get_base_type' method
+      - Environment variable prefix is the global prefix (CL_ by default) followed
+        by UPPER_CASE settings class name with suffix '_SETTINGS' removed,
+        for example 'CL_APP_USER' for the field 'user' in AppSettings.
+      - Dynaconf (settings.yaml) prefix is snake_case settings class name with suffix '_settings'
+        removed, for example 'app_user' for the field 'user' in AppSettings.
+      - Use CL_APP_SETTINGS_TYPE environment variable or app_settings_type Dynaconf (settings.yaml) key
+        to specify a settings type derived from AppSettings.
+    """
 
     process_timestamp: ClassVar[str] = _process_timestamp
     """Unique UUIDv7-based timestamp set during the Python process launch."""
@@ -98,14 +112,19 @@ class Settings(Data, ABC):
 
     @classmethod
     @abstractmethod
-    def get_prefix(cls) -> str:
+    def get_base_type(cls) -> type:
         """
-        Dynaconf fields will be filtered by 'prefix_' before being passed to the settings class constructor.
+        Return the immediate descendant of Settings class, do not use type(self).
 
         Notes:
-            - The prefix must be lowercase
-            - The prefix must not start or end with underscore but may include underscore separator(s)
-            - The prefix is removed before the fields are provided to the constructor of this settings class
+          - Settings lookup is performed by the base type returned by this method
+          - Environment variable prefix is the global prefix (CL_ by default) followed
+            by UPPER_CASE settings class name with suffix '_SETTINGS' removed,
+            for example 'CL_APP_USER' for the field 'user' in AppSettings.
+          - Dynaconf (settings.yaml) prefix is snake_case settings class name with suffix '_settings'
+            removed, for example 'app_user' for the field 'user' in AppSettings.
+          - Use CL_APP_SETTINGS_TYPE environment variable or app_settings_type Dynaconf (settings.yaml) key
+            to specify a settings type derived from AppSettings.
         """
 
     @classmethod
@@ -115,7 +134,8 @@ class Settings(Data, ABC):
         # Check if cached value exists, load if not found
         if (result := cls.__settings_dict.get(cls, None)) is None:
             # A settings class may specify an optional prefix used to filter dynaconf fields
-            prefix = cls.get_prefix()
+            base_type = cls.get_base_type()
+            prefix = CaseUtil.pascal_to_snake_case(base_type.__name__.removesuffix("Settings"))
 
             # Validate prefix
             prefix_description = f"Dynaconf settings prefix '{prefix}' returned by '{TypeUtil.name(cls)}.get_prefix()'"

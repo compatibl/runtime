@@ -51,5 +51,5 @@ class LogSettings(Settings):
             )
 
     @classmethod
-    def get_prefix(cls) -> str:
-        return "runtime_log"
+    def get_base_type(cls) -> type:
+        return LogSettings

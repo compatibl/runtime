@@ -91,5 +91,5 @@ class ContextSettings(Settings):
             )
 
     @classmethod
-    def get_prefix(cls) -> str:
-        return "runtime_context"
+    def get_base_type(cls) -> type:
+        return ContextSettings
