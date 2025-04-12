@@ -91,7 +91,9 @@ class TypeImport:
                         return cls.get_class_from_qual_name(qual_name, rebuild_cache=False)
                     else:
                         # Previous attempt to rebuild failed, raise error
-                        raise RuntimeError(f"Module not found for module name: {module_name}")
+                        raise RuntimeError(
+                            f"Module not found during type import, run init_import_cache script to rebuild."
+                            f"Path to the missing cached module: {module_name}")
 
         # Get class from module, report error if not found
         try:
