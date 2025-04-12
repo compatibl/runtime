@@ -15,7 +15,6 @@
 from math import log10
 import numpy as np
 from cl.runtime.primitive.limits import check_int_32
-from cl.runtime.primitive.limits import check_int_54
 
 
 class FloatUtil:

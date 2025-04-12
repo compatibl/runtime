@@ -14,8 +14,8 @@
 
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
+from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord

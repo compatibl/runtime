@@ -93,7 +93,8 @@ class TypeImport:
                         # Previous attempt to rebuild failed, raise error
                         raise RuntimeError(
                             f"Module not found during type import, run init_import_cache script to rebuild."
-                            f"Path to the missing cached module: {module_name}")
+                            f"Path to the missing cached module: {module_name}"
+                        )
 
         # Get class from module, report error if not found
         try:

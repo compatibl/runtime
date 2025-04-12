@@ -14,16 +14,16 @@
 
 from typing import Final
 
-_INT_32_MIN: Final[int] = -(2 ** 31)
+_INT_32_MIN: Final[int] = -(2**31)
 """Minimum value of 32-bit signed integer."""
 
-_INT_32_MAX: Final[int] = 2 ** 31 - 1
+_INT_32_MAX: Final[int] = 2**31 - 1
 """Maximum value of 32-bit signed integer."""
 
-_INT_54_MIN: Final[int] = -(2 ** 53)
+_INT_54_MIN: Final[int] = -(2**53)
 """Minimum value of 54-bit signed integer, numbers in this range can be represented as a float exactly."""
 
-_INT_54_MAX: Final[int] = 2 ** 53 - 1
+_INT_54_MAX: Final[int] = 2**53 - 1
 """Maximum value of 54-bit signed integer, numbers in this range can be represented as a float exactly."""
 
 
@@ -39,6 +39,7 @@ def check_int_32(value: int | float | None) -> None:
             f"The value {value} does not fit in the 32-bit signed integer range\n"
             f"from {_INT_32_MIN} to {_INT_32_MAX}, use long type instead."
         )
+
 
 def is_int_54(value: int | float | None) -> bool:
     """True if the value is None or fits in 54-bit signed integer range."""
