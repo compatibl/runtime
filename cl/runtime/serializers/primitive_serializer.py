@@ -128,10 +128,13 @@ class PrimitiveSerializer(Serializer):
 
         # Serialize based on value_class_name, using schema_type_name to distinguish between types that share the same class
         if data is None:
-            if type_hint is None or type_hint.schema_type_name == "NoneType" or is_optional:
-                return None
+            if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
+                if type_hint is None or type_hint.schema_type_name == "NoneType" or is_optional:
+                    return None
+                else:
+                    raise RuntimeError(f"Field value is None but type hint {type_hint.to_str()} does not allow it.")
             else:
-                raise RuntimeError(f"Field value is None but type hint {type_hint.to_str()} does not allow it.")
+                raise ErrorUtil.enum_value_error(value_format, NoneFormat)
         elif data_class_name == "str":
             # Return None for an empty string
             return data if data else None

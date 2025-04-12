@@ -12,32 +12,87 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
-
-from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_util import DataUtil
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data
-from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.enum_format import EnumFormat
-from cl.runtime.serializers.serializer import Serializer
+from cl.runtime.serializers.none_format import NoneFormat
 from cl.runtime.serializers.slots_util import SlotsUtil
+from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.primitive.bool_util import BoolUtil
+from cl.runtime.primitive.date_util import DateUtil
+from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.primitive.float_util import FloatUtil
+from cl.runtime.primitive.int_util import IntUtil
+from cl.runtime.primitive.limits import check_int_32, is_int_32, is_int_54
+from cl.runtime.primitive.limits import check_int_54
+from cl.runtime.primitive.long_util import LongUtil
+from cl.runtime.primitive.time_util import TimeUtil
+from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.primitive.uuid_util import UuidUtil
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.serializers.bool_format import BoolFormat
+from cl.runtime.serializers.bytes_format import BytesFormat
+from cl.runtime.serializers.date_format import DateFormat
+from cl.runtime.serializers.datetime_format import DatetimeFormat
+from cl.runtime.serializers.float_format import FloatFormat
+from cl.runtime.serializers.int_format import IntFormat
+from cl.runtime.serializers.long_format import LongFormat
+from cl.runtime.serializers.serializer import Serializer
+from cl.runtime.serializers.string_format import StringFormat
+from cl.runtime.serializers.time_format import TimeFormat
+from cl.runtime.serializers.timestamp_format import TimestampFormat
+from cl.runtime.serializers.uuid_format import UuidFormat
 
 
 @dataclass(slots=True, kw_only=True)
 class BootstrapSerializer(Serializer):
     """Unidirectional serialization of object to a dictionary without type information."""
 
-    primitive_serializer: Serializer = required()
-    """Use to serialize primitive types."""
+    none_format: NoneFormat = required()
+    """Serialization format for None (pass through without conversion if not set)."""
+
+    string_format: StringFormat = required()
+    """Serialization format for str (pass through without conversion if not set)."""
+
+    float_format: FloatFormat = required()
+    """Serialization format for float (pass through without conversion if not set)."""
+
+    bool_format: BoolFormat = required()
+    """Serialization format for bool (pass through without conversion if not set)."""
+
+    int_format: IntFormat = required()
+    """Serialization format for int (pass through without conversion if not set)."""
+
+    long_format: LongFormat = required()
+    """Serialization format for long (pass through without conversion if not set)."""
+
+    date_format: DateFormat = required()
+    """Serialization format for dt.date (pass through without conversion if not set)."""
+
+    datetime_format: DatetimeFormat = required()
+    """Serialization format for dt.datetime (pass through without conversion if not set)."""
+
+    time_format: TimeFormat = required()
+    """Serialization format for dt.time (pass through without conversion if not set)."""
+
+    uuid_format: UuidFormat = required()
+    """Serialization format for UUID other than UUIDv7 (pass through without conversion if not set)."""
+
+    timestamp_format: TimestampFormat = required()
+    """Serialization format for UUIDv7 unique timestamp (pass through without conversion if not set)."""
+
+    bytes_format: BytesFormat = required()
+    """Serialization format for bytes (pass through without conversion if not set)."""
 
     enum_format: EnumFormat = required()
     """Serialization format for enums that are not None."""
@@ -63,41 +118,122 @@ class BootstrapSerializer(Serializer):
     def _serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize data to a dictionary without encoding."""
 
-        # TODO: Support type hint for validation only
-
+        data_class_name = data.__class__.__name__
         if data is None:
-            # Pass through None for untyped serialization
-            return None
-        elif (data_class_name := TypeUtil.name(data)) in PRIMITIVE_CLASS_NAMES:
-            # Primitive type, serialize using primitive serializer if specified, otherwise return raw data
-            return self.primitive_serializer.serialize(data)
+            if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
+                # Pass through None for untyped serialization
+                return None
+            else:
+                raise ErrorUtil.enum_value_error(value_format, NoneFormat)
+        elif data_class_name == "str":
+            # Return None for an empty string
+            return data if data else None
+        elif data_class_name == "float":
+            if (value_format := self.float_format) == FloatFormat.PASSTHROUGH:
+                return data
+            elif value_format == FloatFormat.DEFAULT:
+                return FloatUtil.format(data)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, FloatFormat)
+        elif data_class_name == "bool":
+            if (value_format := self.bool_format) == BoolFormat.PASSTHROUGH:
+                return data
+            elif value_format == BoolFormat.DEFAULT:
+                return BoolUtil.to_str_or_none(data)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, BoolFormat)
+        elif data_class_name == "int":
+            # Check if the value falls into int32 range
+            if is_int_32(data):
+                # Check that the value fits into 32-bit signed integer range
+                if (value_format := self.int_format) == IntFormat.PASSTHROUGH:
+                    check_int_32(data)
+                    return data
+                elif value_format == IntFormat.DEFAULT:
+                    return IntUtil.to_str(data)
+                else:
+                    raise ErrorUtil.enum_value_error(value_format, IntFormat)
+            elif is_int_54(data):
+                # Check that the value fits into 54-bit signed integer range
+                if (value_format := self.long_format) == LongFormat.PASSTHROUGH:
+                    check_int_54(data)
+                    return data
+                elif value_format == LongFormat.DEFAULT:
+                    return LongUtil.to_str(data)
+                else:
+                    raise ErrorUtil.enum_value_error(value_format, LongFormat)
+            else:
+                raise RuntimeError(f"Value {data} does not fit into 54-bit signed integer range, cannot serialize.")
+        elif data_class_name == "date":
+            if (value_format := self.date_format) == DateFormat.PASSTHROUGH:
+                return data
+            elif value_format == DateFormat.DEFAULT:
+                return DateUtil.to_str(data)
+            elif value_format == DateFormat.ISO_INT:
+                return DateUtil.to_iso_int(data)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, DateFormat)
+        elif data_class_name == "time":
+            if (value_format := self.time_format) == TimeFormat.PASSTHROUGH:
+                return data
+            elif value_format == TimeFormat.DEFAULT:
+                return TimeUtil.to_str(data)
+            elif value_format == TimeFormat.ISO_INT:
+                return TimeUtil.to_iso_int(data)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, TimeFormat)
+        elif data_class_name == "datetime":
+            if (value_format := self.datetime_format) == DatetimeFormat.PASSTHROUGH:
+                return data
+            elif value_format == DatetimeFormat.DEFAULT:
+                return DatetimeUtil.to_str(data)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, DatetimeFormat)
+        elif data_class_name == "UUID":
+            if data.version != 7:
+                # Use UuidFormat for UUID versions other than version 7
+                if (value_format := self.uuid_format) == UuidFormat.PASSTHROUGH:
+                    return data
+                elif value_format == UuidFormat.DEFAULT:
+                    # Use the standard delimited UUID format
+                    return UuidUtil.to_str(data)
+                else:
+                    raise ErrorUtil.enum_value_error(value_format, UuidFormat)
+            else:
+                # Use TimestampFormat for UUID version 7
+                if (value_format := self.timestamp_format) == TimestampFormat.PASSTHROUGH:
+                    return data
+                elif value_format == TimestampFormat.DEFAULT:
+                    # Use timestamp-hex UUIDv7 format
+                    return Timestamp.from_uuid7(data)
+                elif value_format == TimestampFormat.UUID:
+                    # Use the standard delimited UUID format
+                    return UuidUtil.to_str(data)
+                else:
+                    raise ErrorUtil.enum_value_error(value_format, TimestampFormat)
+        elif data_class_name == "bytes":
+            if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
+                return data
+            elif value_format == BytesFormat.DEFAULT:
+                # Base64 encoding for bytes on a single line
+                return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
+            elif value_format == BytesFormat.MIME:
+                # Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL
+                return base64.encodebytes(data).decode("utf-8").rstrip("\n")  # TODO: Create BytesUtil
+            else:
+                raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         elif data_class_name in SEQUENCE_CLASS_NAMES:
             if len(data) == 0:
                 # Consider an empty sequence equivalent to None
                 return None
             else:
                 # Include items that are None in output to preserve item positions
-                result = [
-                    (
-                        None
-                        if v is None
-                        else (
-                            self.primitive_serializer.serialize(v)
-                            if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                            else self._serialize(v)
-                        )
-                    )
-                    for v in data
-                ]
-                return result
+                return [self._serialize(v) if v is not None else None for v in data]
         elif data_class_name in MAPPING_CLASS_NAMES:
-            # Mapping container, do not include values that are None
+            # Mapping container, do not include values that are null or empty
+            # Allow keys that begin from _ in mapping classes, but not slotted classes
             result = {
-                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    self.primitive_serializer.serialize(v)
-                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else self._serialize(v)
-                )
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._serialize(v)
                 for k, v in data.items()
                 if not DataUtil.is_empty(v)
             }
@@ -114,13 +250,10 @@ class BootstrapSerializer(Serializer):
         elif is_data(data):
             # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
             slots = SlotsUtil.get_slots(type(data))
-            # Serialize slot values in the order of declaration except those that are None
+            # Serialize slot values in the order of declaration except those that are null or empty
+            # Allow keys that begin from _ in mapping classes, but not slotted classes
             result = {
-                (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
-                    self.primitive_serializer.serialize(v)
-                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else self._serialize(v)
-                )
+                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._serialize(v)
                 for k in slots
                 if not DataUtil.is_empty(v := getattr(data, k)) and not k.startswith("_")
             }
