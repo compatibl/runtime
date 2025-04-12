@@ -132,8 +132,15 @@ class Settings(Data, ABC):
         # Check if cached value exists, load if not found
         if (result := cls.__settings_dict.get(cls, None)) is None:
             # A settings class may specify an optional prefix used to filter dynaconf fields
-            base_type = cls.get_base_type()
-            prefix = CaseUtil.pascal_to_snake_case(base_type.__name__.removesuffix("Settings"))
+            base_type_name = cls.get_base_type().__name__
+            if base_type_name.endswith("Settings"):
+                prefix = CaseUtil.pascal_to_snake_case(base_type_name.removesuffix("Settings"))
+            else:
+                raise RuntimeError(
+                    f"The method 'get_base_type' of {cls.__name__} returned class {base_type_name}.\n"
+                    f"By convention, classnames of immediate descendants of Settings class\n"
+                    f"returned by 'get_base_type' method must end with 'Settings'."
+                )
 
             # Validate prefix
             prefix_description = f"Dynaconf settings prefix '{prefix}' returned by '{TypeUtil.name(cls)}.get_prefix()'"
