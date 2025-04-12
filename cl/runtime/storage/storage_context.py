@@ -23,5 +23,5 @@ class StorageContext(Context):
     """Provides access to storage."""
 
     @classmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         return StorageContext

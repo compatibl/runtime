@@ -52,7 +52,7 @@ class DbContext(Context):
     """
 
     @classmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         return DbContext
 
     def __init(self) -> None:

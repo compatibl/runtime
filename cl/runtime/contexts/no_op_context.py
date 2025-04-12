@@ -23,5 +23,5 @@ class NoOpContext(Context):
     """Performs no action, use to conditionally substitute for another context."""
 
     @classmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         return NoOpContext

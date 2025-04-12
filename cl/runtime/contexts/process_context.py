@@ -32,7 +32,7 @@ class ProcessContext(Context):
     """Used to set database name and similar parameters (this field is passed to out-of-process tasks)."""
 
     @classmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         return ProcessContext
 
     def __init(self) -> None:

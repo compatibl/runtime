@@ -36,19 +36,19 @@ class Context(Data, ABC):
     Abstract base of context classes.
 
     Notes:
-      - Context type is the result of 'get_context_type' method.
+      - Context type is the result of 'get_base_type' method.
       - Contexts with different types are isolated from each other and have independent 'with' clauses.
     """
 
     @classmethod
     @abstractmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         """
-        Return context base type even when called from a derived type, do not use type(self).
+        Return the immediate descendant of Context class, do not use type(self).
 
         Notes:
-          - Context type is the result of 'get_context_type' method.
-          - Contexts with different types are isolated from each other and have independent 'with' clauses.
+          - Context lookup is performed by the base type returned by this method
+          - Contexts with different base types are isolated from each other and have independent 'with' clauses.
         """
 
     @classmethod
@@ -136,7 +136,7 @@ class Context(Data, ABC):
 
     @classmethod
     def get_context_stack(cls) -> List[Self]:
-        """Return context stack for cls.get_context_type()."""
+        """Return context stack for cls.get_base_type()."""
 
         # Get context stack dict, create if None
         context_stack_dict = _CONTEXT_STACK_DICT_VAR.get()
@@ -145,7 +145,7 @@ class Context(Data, ABC):
             _CONTEXT_STACK_DICT_VAR.set(context_stack_dict)
 
         # Name of base type of the context
-        context_type_name = cls.get_context_type()
+        context_type_name = cls.get_base_type()
 
         # The defaultdict will create an empty list if the key does not exist
         context_stack = context_stack_dict[context_type_name]

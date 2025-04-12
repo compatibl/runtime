@@ -39,7 +39,7 @@ class StubContext(Context):
     """If True, an error will be raised inside __exit__ method for testing purposes."""
 
     @classmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         return StubContext
 
     def __post_init__(self):

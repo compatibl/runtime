@@ -33,7 +33,7 @@ class TrialContext(Context):
     """Tuple of trial identifiers in the trial context stack."""
 
     @classmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         return TrialContext
 
     @classmethod

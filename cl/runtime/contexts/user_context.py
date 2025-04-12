@@ -32,7 +32,7 @@ class UserContext(Context):
     """User secrets specified here take precedence over those defined via Dynaconf."""
 
     @classmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         return UserContext
 
     @classmethod

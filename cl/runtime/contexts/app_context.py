@@ -43,7 +43,7 @@ class AppContext(Context):
     """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
 
     @classmethod
-    def get_context_type(cls) -> Type:
+    def get_base_type(cls) -> Type:
         return AppContext
 
     def __init(self) -> None:
