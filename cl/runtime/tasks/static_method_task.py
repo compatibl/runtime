@@ -15,7 +15,6 @@
 import inspect
 from dataclasses import dataclass
 from typing import Callable
-from typing import Type
 from typing_extensions import Self
 from typing_extensions import override
 from cl.runtime import TypeImport
@@ -52,7 +51,7 @@ class StaticMethodTask(MethodTask):
         cls,
         *,
         queue: TaskQueueKey,
-        record_type: Type,
+        record_type: type,
         method_callable: Callable,
     ) -> Self:
         """Create from @staticmethod callable and record type."""

@@ -15,7 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
 from cl.runtime.schema.type_kind import TypeKind
@@ -34,14 +33,14 @@ class TypeSpec(FrozenData, ABC):
     type_kind: TypeKind
     """Type kind (primitive, enum, data, key, record)."""
 
-    _class: Type
+    _class: type
     """Class where the type is stored (this is not the type hint as it excludes container and optional info)."""
 
-    def get_class(self) -> Type:
+    def get_class(self) -> type:
         """Class where the type is stored."""
         return self._class
 
     @classmethod
     @abstractmethod
-    def from_class(cls, class_: Type, subtype: str | None = None) -> Self:
+    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
         """Create spec from class, specify subtype only when different from class name (e.g., long or timestamp)."""

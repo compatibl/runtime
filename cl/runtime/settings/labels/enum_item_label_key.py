@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.key import Key
 
@@ -32,5 +31,5 @@ class EnumItemLabelKey(Key):
     """Item name without reference to an enum (the setting will apply to this field name in every enum)."""
 
     @classmethod
-    def get_key_type(cls) -> Type:
+    def get_key_type(cls) -> type:
         return EnumItemLabelKey

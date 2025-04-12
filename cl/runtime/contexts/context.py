@@ -17,7 +17,7 @@ from abc import abstractmethod
 from collections import defaultdict
 from contextvars import ContextVar
 from dataclasses import dataclass
-from typing import DefaultDict, Type
+from typing import DefaultDict
 from typing import List
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.data import Data
@@ -42,7 +42,7 @@ class Context(Data, ABC):
 
     @classmethod
     @abstractmethod
-    def get_base_type(cls) -> Type:
+    def get_base_type(cls) -> type:
         """
         Return the immediate descendant of Context class, do not use type(self).
 

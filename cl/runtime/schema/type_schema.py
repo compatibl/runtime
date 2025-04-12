@@ -19,7 +19,6 @@ from types import ModuleType
 from typing import Dict
 from typing import Mapping
 from typing import Tuple
-from typing import Type
 from uuid import UUID
 from cl.runtime import TypeImport
 from cl.runtime.records.type_util import TypeUtil
@@ -50,7 +49,7 @@ class TypeSchema:
     }
     """Dictionary of type specs indexed by type name and initialized with primitive types."""
 
-    _class_dict: Mapping[str, Type] | None = None
+    _class_dict: Mapping[str, type] | None = None
     """Dictionary of types indexed by class name."""
 
     _modules: Tuple[ModuleType, ...] | None = None
@@ -71,7 +70,7 @@ class TypeSchema:
             return cls.for_class(class_)
 
     @classmethod
-    def for_class(cls, class_: Type) -> TypeSpec:
+    def for_class(cls, class_: type) -> TypeSpec:
         """Get or create type spec for the specified class."""
         type_name = TypeUtil.name(class_)
         if (result := cls._spec_dict.get(type_name, None)) is not None:

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from enum import Enum
-from typing import Type
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.string_util import StringUtil
@@ -31,7 +30,7 @@ class EnumUtil:
     @classmethod
     def from_str(
         cls,
-        enum_type: Type[TEnum],
+        enum_type: type[TEnum],
         value: str | None,
         *,
         field_name: str | None = None,
@@ -56,7 +55,7 @@ class EnumUtil:
     @classmethod
     def get_description(
         cls,
-        enum_type: Type[TEnum],
+        enum_type: type[TEnum],
         value: str | None,
         *,
         field_name: str | None = None,

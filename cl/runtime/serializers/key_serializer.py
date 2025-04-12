@@ -18,7 +18,6 @@ from enum import Enum
 from typing import Any
 from typing import Deque
 from typing import Tuple
-from typing import Type
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -209,9 +208,9 @@ class KeySerializer(Serializer):
     def _from_sequence(
         self,
         tokens: Deque[TPrimitive],
-        field_class: Type,
+        field_class: type,
         field_type_hint: TypeHint,
-        root_class: Type,
+        root_class: type,
     ) -> Any:
         """Deserialize key from a flattened sequence of primitive types."""
         if len(tokens) == 0:

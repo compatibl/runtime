@@ -15,7 +15,6 @@
 import datetime as dt
 import re
 from typing import List
-from typing import Type
 from uuid import UUID
 import uuid_utils
 from cl.runtime.exceptions.error_util import ErrorUtil
@@ -103,7 +102,7 @@ class Timestamp:
         *,
         value_name: str | None = None,
         method_name: str | None = None,
-        data_type: Type | str | None = None,
+        data_type: type | str | None = None,
     ) -> dt.datetime:
         """
         Return the UTC datetime component of a UUIDv7 based timestamp time-ordered dash-delimited string format.
@@ -184,7 +183,7 @@ class Timestamp:
         *,
         value_name: str | None = None,
         method_name: str | None = None,
-        data_type: Type | str | None = None,
+        data_type: type | str | None = None,
     ) -> None:
         """
         Validate that the argument is a UUIDv7 based timestamp in time-ordered dash-delimited string format.

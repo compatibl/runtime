@@ -14,7 +14,6 @@
 
 import datetime as dt
 from dataclasses import dataclass
-from typing import Type
 from uuid import UUID
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
@@ -63,5 +62,5 @@ class StubDataclassPrimitiveFieldsKey(Key):
     """Stub field."""
 
     @classmethod
-    def get_key_type(cls) -> Type:
+    def get_key_type(cls) -> type:
         return StubDataclassPrimitiveFieldsKey

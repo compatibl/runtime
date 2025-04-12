@@ -14,7 +14,6 @@
 
 import dataclasses
 from dataclasses import dataclass
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_key
@@ -30,7 +29,7 @@ class DataclassSpec(DataSpec):
     """Provides information about a dataclass."""
 
     @classmethod
-    def from_class(cls, class_: Type, subtype: str | None = None) -> Self:
+    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # Perform checks

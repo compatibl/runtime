@@ -16,7 +16,6 @@ from enum import Enum
 from textwrap import TextWrapper
 from typing import Any
 from typing import List
-from typing import Type
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.string_util import StringUtil
@@ -106,7 +105,7 @@ class ErrorUtil:
         )
 
     @classmethod
-    def enum_value_error(cls, value: Enum | str, schema_type: Type | str | None = None) -> Exception:
+    def enum_value_error(cls, value: Enum | str, schema_type: type | str | None = None) -> Exception:
         """Error message on unknown format enum."""
         schema_type = schema_type if isinstance(schema_type, str) else TypeUtil.name(schema_type)
         if value is None:
@@ -180,7 +179,7 @@ class ErrorUtil:
         *,
         value_name: str | None = None,
         method_name: str | None = None,
-        data_type: Type | str | None = None,
+        data_type: type | str | None = None,
     ) -> Exception:
         """
         Return "The value '{value}' of {description} caused an error."
@@ -219,7 +218,7 @@ class ErrorUtil:
         cls,
         *,
         field_name: str | None = None,
-        data_type: Type | str | None = None,
+        data_type: type | str | None = None,
     ) -> str:
         """
         Return "of field {description}" or the empty string if parameters are None.
@@ -256,7 +255,7 @@ class ErrorUtil:
         *,
         param_name: str | None = None,
         method_name: str | None = None,
-        data_type: Type | str | None = None,
+        data_type: type | str | None = None,
     ) -> str:
         """
         Return "of parameter {description}" or the empty string if parameters are None.

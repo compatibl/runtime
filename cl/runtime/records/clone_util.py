@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Type
 from cl.runtime.records.protocols import TData
 from cl.runtime.serializers.slots_util import SlotsUtil
 
@@ -26,7 +25,7 @@ class CloneUtil:
         return cls.clone_as(obj, type(obj))
 
     @classmethod
-    def clone_as(cls, obj: TData, result_type: Type[TData]) -> TData:
+    def clone_as(cls, obj: TData, result_type: type[TData]) -> TData:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
         result = result_type()  # TODO: Consider using constructor with fields
         slots = SlotsUtil.get_slots(type(obj))

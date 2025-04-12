@@ -14,7 +14,6 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing import Type
 
 
 class KeyMixin(ABC):
@@ -25,5 +24,5 @@ class KeyMixin(ABC):
 
     @classmethod
     @abstractmethod
-    def get_key_type(cls) -> Type:
+    def get_key_type(cls) -> type:
         """Return key type even when called from a record."""

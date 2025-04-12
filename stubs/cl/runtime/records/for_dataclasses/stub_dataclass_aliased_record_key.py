@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.key import Key
 
@@ -25,5 +24,5 @@ class StubDataclassAliasedRecordKey(Key):  # TODO: Specify alias and add derived
     id: str = required()
 
     @classmethod
-    def get_key_type(cls) -> Type:
+    def get_key_type(cls) -> type:
         return StubDataclassAliasedRecordKey

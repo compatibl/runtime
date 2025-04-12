@@ -17,7 +17,6 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Iterable
-from typing import Type
 from cl.runtime import KeyUtil
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
@@ -47,7 +46,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
     def load_one(
         self,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         record_or_key: KeyProtocol | TPrimitive,
         *,
         dataset: str | None = None,
@@ -79,7 +78,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
     def load_one_or_none(
         self,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         record_or_key: KeyProtocol | TPrimitive | None,
         *,
         dataset: str | None = None,
@@ -153,7 +152,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def load_many(
         self,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
@@ -171,7 +170,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def load_all(
         self,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
@@ -186,7 +185,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def load_filter(
         self,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         filter_obj: TRecord,
         *,
         dataset: str | None = None,
@@ -233,7 +232,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def delete_one(
         self,
-        key_type: Type[TKey],
+        key_type: type[TKey],
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,
@@ -291,7 +290,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
             raise RuntimeError("Attempting to get test DB name outside a test.")
 
     @classmethod
-    def create(cls, *, db_type: Type | None = None, db_id: str | None = None):
+    def create(cls, *, db_type: type | None = None, db_id: str | None = None):
         """Create DB of the specified type, or use DB type from context settings if not specified."""
 
         # Get DB type from context settings if not specified

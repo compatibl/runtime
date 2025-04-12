@@ -16,7 +16,6 @@ import ast
 import inspect
 import textwrap
 from typing import List
-from typing import Type
 from cl.runtime.records.protocols import KeyProtocol
 
 
@@ -38,7 +37,7 @@ class KeyUtil:
 
     # TODO: Extract from key class instead
     @classmethod
-    def get_key_fields(cls, record_type: Type) -> List[str] | None:
+    def get_key_fields(cls, record_type: type) -> List[str] | None:
         """
         Get primary key fields by parsing the source of 'get_key' method of 'record_type'.
 

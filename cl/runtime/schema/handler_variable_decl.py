@@ -15,7 +15,6 @@
 import inspect
 import types
 from dataclasses import dataclass
-from typing import Type
 from typing import Union
 from typing import get_args
 from typing import get_origin
@@ -44,7 +43,7 @@ class HandlerVariableDecl(MemberDecl):
 
     @classmethod
     @cached
-    def create(cls, value_type: Type, record_type: Type) -> Self:
+    def create(cls, value_type: type, record_type: type) -> Self:
         """
         Create from field name and type.
 

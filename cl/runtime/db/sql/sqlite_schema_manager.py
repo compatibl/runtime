@@ -19,7 +19,6 @@ from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Tuple
-from typing import Type
 from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.data import Data
@@ -85,7 +84,7 @@ class SqliteSchemaManager(Data):
         cursor.execute(f"DROP TABLE {if_exists_part} '{name}';")
         self.sqlite_connection.commit()
 
-    def table_name_for_type(self, type_: Type) -> str:
+    def table_name_for_type(self, type_: type) -> str:
         """Return table name for the given type."""
 
         # Return key type name inclusive of Key suffix
@@ -99,7 +98,7 @@ class SqliteSchemaManager(Data):
 
         return [select_res["name"] for select_res in cursor.fetchall()]
 
-    def _get_type_fields(self, type_: Type) -> Dict[str, Type]:  # TODO: Consolidate this and similar code in Schema
+    def _get_type_fields(self, type_: type) -> Dict[str, type]:  # TODO: Consolidate this and similar code in Schema
         """Return field name and type of annotation based type declaration."""
         annotations = {}
         for base in reversed(type_.__mro__):
@@ -108,7 +107,7 @@ class SqliteSchemaManager(Data):
         return annotations
 
     # TODO (Roman): make cached but only for key types
-    def get_columns_mapping(self, type_: Type) -> Dict[str, str]:
+    def get_columns_mapping(self, type_: type) -> Dict[str, str]:
         """Collect all types in hierarchy and check type conflicts for fields with the same name."""
 
         types_in_hierarchy = RecordUtil.records_sharing_key_with(type_)
@@ -121,7 +120,7 @@ class SqliteSchemaManager(Data):
         key_fields = self._get_type_fields(key_type)
 
         # {field_name: (subclass_name, field_type)}
-        all_fields: Dict[str, Tuple[str, Type]] = {
+        all_fields: Dict[str, Tuple[str, type]] = {
             key_field_name: (key_fields_class_name, key_field_type)
             for key_field_name, key_field_type in key_fields.items()
         }
@@ -159,7 +158,7 @@ class SqliteSchemaManager(Data):
 
         return columns_mapping
 
-    def get_primary_keys(self, type_: Type) -> Tuple[str, ...]:
+    def get_primary_keys(self, type_: type) -> Tuple[str, ...]:
         """Return list of primary key fields."""
         key_type = cast(KeyProtocol, type_).get_key_type()
         key_fields = self._get_type_fields(key_type)

@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.schema.enum_member_spec import EnumMemberSpec
@@ -31,7 +30,7 @@ class EnumSpec(TypeSpec):
     """List of enum members (use None for a placeholder enum with no members)."""
 
     @classmethod
-    def from_class(cls, class_: Type, subtype: str | None = None) -> Self:
+    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # Perform checks

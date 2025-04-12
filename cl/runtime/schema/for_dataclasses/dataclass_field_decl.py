@@ -14,7 +14,6 @@
 
 from dataclasses import Field
 from dataclasses import dataclass
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
@@ -25,7 +24,7 @@ class DataclassFieldDecl(FieldDecl):
     """Field declaration for a dataclass type."""
 
     @classmethod
-    def create(cls, record_type: Type, field: Field, field_type: Type, field_comment: str) -> Self:
+    def create(cls, record_type: type, field: Field, field_type: type, field_comment: str) -> Self:
         """
         Create from dataclass field definition and field_type obtained from get_type_hints.
 

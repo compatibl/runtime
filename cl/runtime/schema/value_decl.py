@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import Dict
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -42,7 +41,7 @@ class ValueDecl(Data):
     """Primitive type name."""
 
     @classmethod
-    def from_type(cls, record_type: Type | str) -> Self:
+    def from_type(cls, record_type: type | str) -> Self:
         """Create an instance from the specified type."""
         return cls.from_name(record_type.__name__)
 

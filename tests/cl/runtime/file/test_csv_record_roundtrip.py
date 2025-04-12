@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import Iterable
 from typing import List
 from typing import Tuple
-from typing import Type
 import pandas as pd
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
@@ -81,7 +80,7 @@ def save_test_records(entries: List[RecordProtocol]) -> Tuple[List[RecordProtoco
     return entries, file_path
 
 
-def read_records_from_csv(file_path: Path, entry_type: Type[RecordProtocol]):
+def read_records_from_csv(file_path: Path, entry_type: type[RecordProtocol]):
     loader = CsvFileReader(file_path=str(file_path.absolute()))
     loader.csv_to_db()
 

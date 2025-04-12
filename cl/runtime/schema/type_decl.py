@@ -24,7 +24,6 @@ from typing import Any
 from typing import Dict
 from typing import List
 from typing import Set
-from typing import Type
 from typing import get_type_hints  # TODO: Use TypeHint class instead
 from inflection import titleize
 from memoization import cached
@@ -93,9 +92,9 @@ def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict
 
 def for_type_key_maker(
     cls,
-    record_type: Type,
+    record_type: type,
     *,
-    dependencies: Set[Type] | None = None,
+    dependencies: Set[type] | None = None,
     skip_fields: bool = False,
     skip_handlers: bool = False,
 ) -> str:
@@ -173,7 +172,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     permanent: bool | None = None
     """When the record is saved, also save it permanently."""
 
-    def get_key(self) -> TypeDeclKey:
+    def get_key(self) -> typeDeclKey:
         return TypeDeclKey(module=self.module, name=self.name).build()
 
     def __init(self) -> None:
@@ -210,9 +209,9 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
     @cached(custom_key_maker=for_type_key_maker)
     def for_type(
         cls,
-        record_type: Type,
+        record_type: type,
         *,
-        dependencies: Set[Type] | None = None,
+        dependencies: Set[type] | None = None,
         skip_fields: bool = False,
         skip_handlers: bool = False,
     ) -> Self:
@@ -333,7 +332,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
     @classmethod
     @cached
-    def for_type_with_dependencies(cls, record_type: Type) -> Dict[str, Dict]:
+    def for_type_with_dependencies(cls, record_type: type) -> Dict[str, Dict]:
         """
         Declarations for the specified type and all dependencies, returned as a dictionary.
 

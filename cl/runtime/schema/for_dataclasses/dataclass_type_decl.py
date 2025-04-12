@@ -15,7 +15,6 @@
 import dataclasses
 from dataclasses import dataclass
 from typing import Set
-from typing import Type
 from typing import get_type_hints  # TODO: Use TypeHint class instead
 from memoization import cached
 from typing_extensions import Self
@@ -34,9 +33,9 @@ class DataclassTypeDecl(TypeDecl):
     @cached(custom_key_maker=for_type_key_maker)
     def for_type(
         cls,
-        record_type: Type,
+        record_type: type,
         *,
-        dependencies: Set[Type] | None = None,
+        dependencies: Set[type] | None = None,
         skip_fields: bool = False,
         skip_handlers: bool = False,
     ) -> Self:

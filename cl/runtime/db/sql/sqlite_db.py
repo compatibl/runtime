@@ -21,7 +21,6 @@ from typing import Any
 from typing import Dict
 from typing import Iterable
 from typing import Tuple
-from typing import Type
 from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
@@ -103,7 +102,7 @@ class SqliteDb(Db):
 
     def load_many(
         self,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
@@ -178,7 +177,7 @@ class SqliteDb(Db):
 
     def load_all(
         self,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
@@ -220,7 +219,7 @@ class SqliteDb(Db):
 
     def load_filter(
         self,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         filter_obj: TRecord,
         *,
         dataset: str | None = None,
@@ -299,7 +298,7 @@ class SqliteDb(Db):
 
     def delete_one(
         self,
-        key_type: Type[TKey],
+        key_type: type[TKey],
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,

@@ -16,7 +16,6 @@ import pytest
 import os
 import uuid
 from typing import Iterator
-from typing import Type
 from unittest import mock
 from _pytest.fixtures import FixtureRequest
 from bson import UUID_SUBTYPE
@@ -49,7 +48,7 @@ def pytest_work_dir(request: FixtureRequest) -> Iterator[str]:
     os.chdir(request.config.invocation_dir)  # noqa
 
 
-def _pytest_db(request: FixtureRequest, *, db_type: Type | None = None) -> Iterator[Db]:
+def _pytest_db(request: FixtureRequest, *, db_type: type | None = None) -> Iterator[Db]:
     """Setup and teardown a temporary databases in DB of the specified type."""
 
     # Get test DB identifier

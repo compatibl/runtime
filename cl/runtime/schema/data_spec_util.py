@@ -16,7 +16,6 @@ import dataclasses
 import datetime as dt
 from typing import Any
 from typing import Dict
-from typing import Type
 from uuid import UUID
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
@@ -42,7 +41,7 @@ class DataSpecUtil:
     }
     """Dictionary of type specs indexed by type name and initialized with primitive types."""
 
-    _class_dict: Dict[str, Type] | None = None
+    _class_dict: Dict[str, type] | None = None
     """Dictionary of types indexed by class name."""
 
     @classmethod

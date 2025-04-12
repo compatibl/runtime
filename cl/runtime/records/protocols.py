@@ -20,7 +20,6 @@ from typing import List
 from typing import Mapping
 from typing import Protocol
 from typing import Sequence
-from typing import Type
 from typing import TypeGuard
 from typing import TypeVar
 from uuid import UUID
@@ -102,7 +101,7 @@ class KeyProtocol(Protocol):
     """Protocol implemented by both keys and records."""
 
     @classmethod
-    def get_key_type(cls) -> Type["KeyProtocol"]:
+    def get_key_type(cls) -> type["KeyProtocol"]:
         """Return key type even when called from a record."""
         ...
 

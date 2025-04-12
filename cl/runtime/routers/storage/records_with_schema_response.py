@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Type
 from pydantic import BaseModel
 from pydantic import Field
 from cl.runtime.primitive.case_util import CaseUtil
@@ -34,6 +33,6 @@ class RecordsWithSchemaResponse(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def _get_schema_dict(cls, type_: Type | None) -> dict[str, dict]:
+    def _get_schema_dict(cls, type_: type | None) -> dict[str, dict]:
         """Create schema dict for type. If 'type_' is None - return empty dict."""
         return TypeResponseUtil.get_type(TypeRequest(type_name=type_.__name__)) if type_ is not None else dict()

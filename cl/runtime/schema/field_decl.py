@@ -16,7 +16,6 @@ import datetime as dt
 import types
 import typing
 from dataclasses import dataclass
-from typing import Type
 from uuid import UUID
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.data import Data
@@ -77,12 +76,12 @@ class FieldDecl(Data):
     @classmethod
     def create(
         cls,
-        record_type: Type,
+        record_type: type,
         field_name: str,
-        field_type: Type,
+        field_type: type,
         field_comment: str,
         *,
-        dependencies: typing.Set[Type] | None = None,
+        dependencies: typing.Set[type] | None = None,
     ) -> Self:
         """
         Create from field name and type.
@@ -139,7 +138,7 @@ class FieldDecl(Data):
                     raise RuntimeError(
                         f"List type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a list of elements using the syntax 'List[Type]'.\n"
+                        f"because it is not a list of elements using the syntax 'List[type]'.\n"
                         f"Other list type hint formats are not supported.\n"
                     )
             elif field_origin is tuple:
@@ -149,7 +148,7 @@ class FieldDecl(Data):
                     raise RuntimeError(
                         f"Tuple type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]',\n"
+                        f"because it is not a variable-length tuple using the syntax 'Tuple[type, ...]',\n"
                         f"where ellipsis '...' is placed second per the standard convention.\n"
                         f"It cannot be used to specify a fixed size tuple or a tuple with\n"
                         f"different element types.\n"
@@ -161,7 +160,7 @@ class FieldDecl(Data):
                     raise RuntimeError(
                         f"Dict type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'.\n"
+                        f"because it is not a dictionary with string keys using the syntax 'Dict[str, type]'.\n"
                         f"It cannot be used to specify a dictionary with keys of a different type.\n"
                     )
                 # TODO: Support Dict[str, List[x]]

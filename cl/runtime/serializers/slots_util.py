@@ -15,7 +15,6 @@
 import sys
 from collections import Counter
 from typing import Tuple
-from typing import Type
 from memoization import cached
 from cl.runtime.records.type_util import TypeUtil
 
@@ -28,7 +27,7 @@ class SlotsUtil:
 
     @classmethod
     @cached
-    def get_slots(cls, data_type: Type) -> Tuple[str, ...]:
+    def get_slots(cls, data_type: type) -> Tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
 
         if hasattr(data_type, "get_slots"):

@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import Iterable
-from typing import Type
 from cl.runtime import Db
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
@@ -52,7 +51,7 @@ class DbContext(Context):
     """
 
     @classmethod
-    def get_base_type(cls) -> Type:
+    def get_base_type(cls) -> type:
         return DbContext
 
     def __init(self) -> None:
@@ -117,7 +116,7 @@ class DbContext(Context):
     @classmethod
     def load_one(
         cls,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         record_or_key: KeyProtocol | TPrimitive,
         *,
         dataset: str | None = None,
@@ -140,7 +139,7 @@ class DbContext(Context):
     @classmethod
     def load_one_or_none(
         cls,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         record_or_key: KeyProtocol | TPrimitive | None,
         *,
         dataset: str | None = None,
@@ -163,7 +162,7 @@ class DbContext(Context):
     @classmethod
     def load_many(
         cls,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
         *,
         dataset: str | None = None,
@@ -186,7 +185,7 @@ class DbContext(Context):
     @classmethod
     def load_all(
         cls,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
@@ -205,7 +204,7 @@ class DbContext(Context):
     @classmethod
     def load_filter(
         cls,
-        record_type: Type[TRecord],
+        record_type: type[TRecord],
         filter_obj: TRecord,
         *,
         dataset: str | None = None,
@@ -278,7 +277,7 @@ class DbContext(Context):
     @classmethod
     def delete_one(
         cls,
-        key_type: Type[TKey],
+        key_type: type[TKey],
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,

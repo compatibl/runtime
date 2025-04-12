@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import Final
-from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.key import Key
 
@@ -30,7 +29,7 @@ class ModuleDeclKey(Key):
     """Module name in dot-delimited format."""
 
     @classmethod
-    def get_key_type(cls) -> Type:
+    def get_key_type(cls) -> type:
         return ModuleDeclKey
 
     def __init(self):

@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import Callable
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
@@ -39,7 +38,7 @@ class FunctionTask(Callable):
         cls,
         *,
         queue: TaskQueueKey,
-        record_type: Type,
+        record_type: type,
         method: Callable,
     ) -> Self:
         """Create from static or class handler method callable."""

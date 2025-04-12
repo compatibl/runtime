@@ -15,7 +15,6 @@
 import os
 from dataclasses import dataclass
 from typing import List
-from typing import Type
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
@@ -49,7 +48,7 @@ class PreloadSettings(Settings):
     def get_base_type(cls) -> type:
         return PreloadSettings
 
-    def save_and_configure(self, *, final_record_types: List[Type] | None = None) -> None:
+    def save_and_configure(self, *, final_record_types: List[type] | None = None) -> None:
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
 
         # Create a list of CSV preloads

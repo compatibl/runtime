@@ -16,10 +16,9 @@ from types import UnionType
 from typing import Dict
 from typing import List
 from typing import Tuple
-from typing import Type
 from typing import Union
 
-class_hierarchy_annotations_dict: Dict[Type, Dict[str, Type]] = dict()
+class_hierarchy_annotations_dict: Dict[type, Dict[str, type]] = dict()
 """Dictionary of class hierarchy annotations."""
 
 
@@ -27,7 +26,7 @@ class AnnotationsUtil:
     """Util class for type annotations."""
 
     @classmethod
-    def get_class_hierarchy_annotations(cls, data_type) -> Dict[str, Type]:
+    def get_class_hierarchy_annotations(cls, data_type) -> Dict[str, type]:
         """
         Return combined annotations dict for all classes in data_type hierarchy.
         Checks type of fields with the same name and raises RuntimeError if there is a conflict.
@@ -39,7 +38,7 @@ class AnnotationsUtil:
             # Collect all annotations in hierarchy
 
             # Combined annotations for all types in hierarchy {field_name: field_type}
-            hierarchy_annots: Dict[str, Type] = {}
+            hierarchy_annots: Dict[str, type] = {}
 
             for base in reversed(data_type.__mro__):
                 if annot := getattr(base, "__annotations__", None):
@@ -110,7 +109,7 @@ class AnnotationsUtil:
             if len(type_args) == 2:
                 # The second type argument is expected to be an ellipsis.
                 if type_args[1] is not ...:
-                    raise RuntimeError(f"Tuple type annotation format should be Tuple[Type, ...]. Received: {type_}.")
+                    raise RuntimeError(f"Tuple type annotation format should be Tuple[type, ...]. Received: {type_}.")
 
                 # Take first argument as value type
                 return type_args[0]

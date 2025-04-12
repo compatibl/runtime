@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.schema.type_kind import TypeKind
@@ -25,7 +24,7 @@ class PrimitiveSpec(TypeSpec):
     """Provides information about a primitive type."""
 
     @classmethod
-    def from_class(cls, class_: Type, subtype: str | None = None) -> Self:
+    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
         """Create spec from class, set name to subtype after checking compatibility."""
         if (class_name := class_.__name__) not in PRIMITIVE_CLASS_NAMES:
             primitive_class_names_str = ", ".join(PRIMITIVE_CLASS_NAMES)

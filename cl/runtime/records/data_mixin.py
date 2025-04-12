@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from abc import abstractmethod
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.clone_util import CloneUtil
@@ -64,6 +63,6 @@ class DataMixin:
         """Return an unfrozen object of the same type constructed from shallow copies of the public fields of self."""
         return CloneUtil.clone(self)
 
-    def clone_as(self, result_type: Type[TData]) -> TData:
+    def clone_as(self, result_type: type[TData]) -> TData:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields of self."""
         return CloneUtil.clone_as(self, result_type)

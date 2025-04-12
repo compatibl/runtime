@@ -16,7 +16,6 @@ import types
 import typing
 from dataclasses import dataclass
 from typing import List
-from typing import Type
 from uuid import UUID
 from frozendict import frozendict
 from typing_extensions import Self
@@ -35,7 +34,7 @@ class TypeHint(FrozenData):
     schema_type_name: str
     """Type name in the schema."""
 
-    _schema_class: Type
+    _schema_class: type
     """Class if available, if not provided it will be looked up using the type name."""
 
     optional: bool
@@ -44,7 +43,7 @@ class TypeHint(FrozenData):
     remaining: Self | None = None
     """Remaining chain if present, None otherwise."""
 
-    def get_schema_class_or_none(self) -> Type:
+    def get_schema_class_or_none(self) -> type:
         """Return schema class if available, otherwise return None."""
         return self._schema_class
 
@@ -85,7 +84,7 @@ class TypeHint(FrozenData):
     @classmethod
     def for_class(
         cls,
-        class_: Type,
+        class_: type,
         *,
         optional: bool = False,
         schema_type_name: str | None = None,
@@ -161,7 +160,7 @@ class TypeHint(FrozenData):
                         raise RuntimeError(
                             f"List type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"{where_msg} is not supported\n"
-                            f"because it is not a list of elements using the syntax 'List[Type]'\n"
+                            f"because it is not a list of elements using the syntax 'List[type]'\n"
                         )
                     # Populate container data and extract the inner type alias
                     type_alias = type_alias_args[0]
@@ -178,7 +177,7 @@ class TypeHint(FrozenData):
                         raise RuntimeError(
                             f"Tuple type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"{where_msg} is not supported\n"
-                            f"because it is not a variable-length tuple using the syntax 'Tuple[Type, ...]'\n"
+                            f"because it is not a variable-length tuple using the syntax 'Tuple[type, ...]'\n"
                         )
                     # Populate container data and extract the inner type alias
                     type_alias = type_alias_args[0]
@@ -195,7 +194,7 @@ class TypeHint(FrozenData):
                         raise RuntimeError(
                             f"Dict type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"{where_msg} is not supported\n"
-                            f"because it is not a dictionary with string keys using the syntax 'Dict[str, Type]'\n"
+                            f"because it is not a dictionary with string keys using the syntax 'Dict[str, type]'\n"
                         )
                     # Populate container data and extract the inner type alias
                     type_alias = type_alias_args[1]

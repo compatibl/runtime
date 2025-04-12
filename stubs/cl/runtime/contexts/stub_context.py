@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type
-
 from typing_extensions import Self
 from cl.runtime.contexts.context import Context
 
@@ -39,7 +37,7 @@ class StubContext(Context):
     """If True, an error will be raised inside __exit__ method for testing purposes."""
 
     @classmethod
-    def get_base_type(cls) -> Type:
+    def get_base_type(cls) -> type:
         return StubContext
 
     def __post_init__(self):

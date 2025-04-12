@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type
-
 from cl.runtime.contexts.context import Context
 
 
@@ -23,5 +21,5 @@ class StorageContext(Context):
     """Provides access to storage."""
 
     @classmethod
-    def get_base_type(cls) -> Type:
+    def get_base_type(cls) -> type:
         return StorageContext

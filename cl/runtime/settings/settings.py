@@ -20,12 +20,10 @@ from dataclasses import MISSING
 from dataclasses import dataclass
 from typing import ClassVar
 from typing import Dict
-from typing import Type
 from dotenv import find_dotenv
 from dotenv import load_dotenv
 from dynaconf import Dynaconf
 from typing_extensions import Self
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil
@@ -107,7 +105,7 @@ class Settings(Data, ABC):
     is_inside_test: ClassVar[bool] = _is_inside_test
     """True if we are inside a test."""
 
-    __settings_dict: ClassVar[Dict[Type, Settings]] = {}
+    __settings_dict: ClassVar[Dict[type, Settings]] = {}
     """Dictionary of initialized settings objects indexed by the the settings class type."""
 
     @classmethod

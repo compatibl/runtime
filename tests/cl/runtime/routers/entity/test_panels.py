@@ -15,7 +15,6 @@
 import pytest
 import inspect
 from typing import List
-from typing import Type
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
@@ -24,7 +23,7 @@ from cl.runtime.routers.entity.panels_response_item import PanelsResponseItem
 from stubs.cl.runtime import StubDataViewers
 
 
-def _get_viewer_names_in_pascal_case(record_type: Type) -> List[str]:
+def _get_viewer_names_in_pascal_case(record_type: type) -> List[str]:
     """Get methods with name that starts from 'view_'."""
     result = []
     for name, func in inspect.getmembers(record_type, predicate=inspect.isfunction):

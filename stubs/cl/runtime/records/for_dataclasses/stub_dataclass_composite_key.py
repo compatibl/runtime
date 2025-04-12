@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.key import Key
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
@@ -33,5 +32,5 @@ class StubDataclassCompositeKey(Key):
     """Embedded key 2."""
 
     @classmethod
-    def get_key_type(cls) -> Type:
+    def get_key_type(cls) -> type:
         return StubDataclassCompositeKey

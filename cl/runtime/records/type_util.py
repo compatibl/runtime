@@ -14,7 +14,6 @@
 
 from typing import Any
 from typing import Dict
-from typing import Type
 from typing import TypeGuard
 from cl.runtime.records.protocols import TObj
 
@@ -34,7 +33,7 @@ class TypeUtil:
     def check_type(
         cls,
         instance_or_type: Any,
-        expected_type: Type[TObj],
+        expected_type: type[TObj],
         *,
         name: str | None = None,
     ) -> TypeGuard[TObj]:
@@ -65,7 +64,7 @@ class TypeUtil:
     def check_subtype(
         cls,
         instance_or_type: Any,
-        expected_type: Type[TObj],
+        expected_type: type[TObj],
         *,
         name: str | None = None,
     ) -> TypeGuard[TObj]:
@@ -90,7 +89,7 @@ class TypeUtil:
             return True
 
     @classmethod
-    def _get_alias_dict(cls) -> Dict[Type, str]:
+    def _get_alias_dict(cls) -> Dict[type, str]:
         """Get or create a dict of type aliases."""
         # TODO: Implement type aliases
         return {}

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.clone_util import CloneUtil
 from cl.runtime.records.protocols import TData
@@ -60,6 +59,6 @@ class FrozenDataMixin:
                 # Invoke '__init' method if it exists, otherwise do nothing
                 class_init(self)
 
-    def clone_as(self, result_type: Type[TData]) -> TData:
+    def clone_as(self, result_type: type[TData]) -> TData:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields of self."""
         return CloneUtil.clone_as(self, result_type)

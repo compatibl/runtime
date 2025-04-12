@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Type
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.key import Key
@@ -31,10 +30,10 @@ class TypeDeclKey(Key):
     """Type name is unique when combined with module."""
 
     @classmethod
-    def get_key_type(cls) -> Type:
+    def get_key_type(cls) -> type:
         return TypeDeclKey
 
     @classmethod
-    def from_type(cls, type_: Type) -> Self:
+    def from_type(cls, type_: type) -> Self:
         """Create primitive type declaration from Python type."""
         return TypeDeclKey(module=ModuleDeclKey(), name=type_.__name__).build()

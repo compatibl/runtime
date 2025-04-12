@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from typing import Any
 from typing import ClassVar
-from typing import Type
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
@@ -26,7 +25,7 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 class MongoFilterSerializer(Data):  # TODO: Standardize API and derive from Serializer
     """Serialize record for use as a MongoDB query filter."""
 
-    primitive_type_names: ClassVar[Type] = ["str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"]
+    primitive_type_names: ClassVar[type] = ["str", "float", "int", "bool", "date", "time", "datetime", "bytes", "UUID"]
     """
     Detect primitive type by checking if class name is in this list, compare strings rather than types to support 
     detection of custom type definitions that exist in more than one package such as UUID.
