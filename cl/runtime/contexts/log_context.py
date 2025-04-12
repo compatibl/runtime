@@ -14,6 +14,8 @@
 
 import logging
 from dataclasses import dataclass
+from typing import Type
+
 from cl.runtime.contexts.context import Context
 from cl.runtime.records.for_dataclasses.extensions import optional
 
@@ -29,8 +31,8 @@ class LogContext(Context):
     """Type name."""
 
     @classmethod
-    def get_context_type(cls) -> str:
-        return "Log"
+    def get_context_type(cls) -> Type:
+        return LogContext
 
     @classmethod
     def get_logger(

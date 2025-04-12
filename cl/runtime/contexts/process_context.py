@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Type
+
 from cl.runtime.contexts.context import Context
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -30,8 +32,8 @@ class ProcessContext(Context):
     """Used to set database name and similar parameters (this field is passed to out-of-process tasks)."""
 
     @classmethod
-    def get_context_type(cls) -> str:
-        return "Process"
+    def get_context_type(cls) -> Type:
+        return ProcessContext
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

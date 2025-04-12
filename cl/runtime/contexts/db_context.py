@@ -52,8 +52,8 @@ class DbContext(Context):
     """
 
     @classmethod
-    def get_context_type(cls) -> str:
-        return "Db"
+    def get_context_type(cls) -> Type:
+        return DbContext
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

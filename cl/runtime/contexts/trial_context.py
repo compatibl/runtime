@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, Type
 from typing import Tuple
 from typing_extensions import Self
 from cl.runtime.contexts.context import Context
@@ -33,8 +33,8 @@ class TrialContext(Context):
     """Tuple of trial identifiers in the trial context stack."""
 
     @classmethod
-    def get_context_type(cls) -> str:
-        return "TrialContext"
+    def get_context_type(cls) -> Type:
+        return TrialContext
 
     @classmethod
     def append_token(cls, token: TPrimitive | None) -> Self:

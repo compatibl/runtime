@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Type
+
 from cl.runtime.contexts.context import Context
 
 
@@ -21,5 +23,5 @@ class NoOpContext(Context):
     """Performs no action, use to conditionally substitute for another context."""
 
     @classmethod
-    def get_context_type(cls) -> str:
-        return "NoOp"
+    def get_context_type(cls) -> Type:
+        return NoOpContext

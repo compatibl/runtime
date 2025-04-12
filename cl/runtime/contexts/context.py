@@ -17,7 +17,7 @@ from abc import abstractmethod
 from collections import defaultdict
 from contextvars import ContextVar
 from dataclasses import dataclass
-from typing import DefaultDict
+from typing import DefaultDict, Type
 from typing import List
 from typing_extensions import Self
 from cl.runtime.records.for_dataclasses.data import Data
@@ -36,9 +36,9 @@ class Context(Data, ABC):
 
     @classmethod
     @abstractmethod
-    def get_context_type(cls) -> str:
+    def get_context_type(cls) -> Type:
         """
-        The lookup of current context for cls will be done using the key returned by cls.get_context_type().
+        The lookup of current context is done using the result of 'get_context_type' method.
 
         Notes:
           - Contexts that have different key types are isolated from each other and have independent 'with' clauses.
@@ -138,9 +138,9 @@ class Context(Data, ABC):
             context_stack_dict = defaultdict(list)
             _CONTEXT_STACK_DICT_VAR.set(context_stack_dict)
 
-        # Look up in dict using cls.get_context_type() rather than cls itself
-        context_type = cls.get_context_type()
+        # Name of base type of the context
+        context_type_name = cls.get_context_type()
 
         # The defaultdict will create an empty list if the key does not exist
-        context_stack = context_stack_dict[context_type]
+        context_stack = context_stack_dict[context_type_name]
         return context_stack

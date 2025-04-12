@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from getpass import getuser
-from typing import Dict
+from typing import Dict, Type
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
@@ -32,8 +32,8 @@ class UserContext(Context):
     """User secrets specified here take precedence over those defined via Dynaconf."""
 
     @classmethod
-    def get_context_type(cls) -> str:
-        return "User"
+    def get_context_type(cls) -> Type:
+        return UserContext
 
     @classmethod
     def get_user(cls) -> UserKey:

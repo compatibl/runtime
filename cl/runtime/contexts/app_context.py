@@ -15,6 +15,8 @@
 import os
 from dataclasses import dataclass
 from getpass import getuser
+from typing import Type
+
 from cl.runtime.contexts.context import Context
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
@@ -41,8 +43,8 @@ class AppContext(Context):
     """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
 
     @classmethod
-    def get_context_type(cls) -> str:
-        return "App"
+    def get_context_type(cls) -> Type:
+        return AppContext
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
