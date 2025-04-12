@@ -44,9 +44,6 @@ class ContextSettings(Settings):
     db_uri: str | None = None
     """Optional database URI to connect to the database. Required for basic mongo db data source."""
 
-    trial: str | None = None
-    """String identifier of the running trial."""
-
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
