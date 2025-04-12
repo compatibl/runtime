@@ -37,15 +37,6 @@ def test_format():
     assert FloatUtil.format(0.000000000000000000000000123) == "0."
 
 
-def test_is_int():
-    """Test is_int method."""
-
-    assert not FloatUtil.is_int(value=None)
-    assert FloatUtil.is_int(value=1.0)
-    assert FloatUtil.is_int(value=-1.0)
-    assert not FloatUtil.is_int(value=0.5)
-
-
 def test_to_int():
     """Test to_int method."""
 

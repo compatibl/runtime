@@ -14,47 +14,42 @@
 
 from typing import Final
 
-INT32_MIN: Final[int] = -(2**31)
+_INT_32_MIN: Final[int] = -(2 ** 31)
 """Minimum value of 32-bit signed integer."""
 
-INT32_MAX: Final[int] = 2**31 - 1
+_INT_32_MAX: Final[int] = 2 ** 31 - 1
 """Maximum value of 32-bit signed integer."""
 
-LONG_64_MIN: Final[int] = -(2**63)
-"""Minimum value of 64-bit signed integer."""
-
-LONG_64_MAX: Final[int] = 2**63 - 1
-"""Maximum value of 64-bit signed integer."""
-
-LONG_54_MIN: Final[int] = -(2**53)
+_INT_54_MIN: Final[int] = -(2 ** 53)
 """Minimum value of 54-bit signed integer, numbers in this range can be represented as a float exactly."""
 
-LONG_54_MAX: Final[int] = 2**53 - 1
+_INT_54_MAX: Final[int] = 2 ** 53 - 1
 """Maximum value of 54-bit signed integer, numbers in this range can be represented as a float exactly."""
 
 
+def is_int_32(value: int | float | None) -> bool:
+    """True if the value is None or fits in 32-bit signed integer range."""
+    return value is None or _INT_32_MIN <= value <= _INT_32_MAX
+
+
 def check_int_32(value: int | float | None) -> None:
-    """Error message if the value does not fit in 32-bit signed integer range, pass through None."""
-    if value is not None and (value < INT32_MIN or value > INT32_MAX):
+    """Error message if the value is not None and does not fit in 32-bit signed integer range."""
+    if not is_int_32(value):
         raise RuntimeError(
-            f"Integer {value} value does not fit in 32-bit signed integer range, "
-            f"use long (64-bit signed integer) type instead."
+            f"The value {value} does not fit in the 32-bit signed integer range\n"
+            f"from {_INT_32_MIN} to {_INT_32_MAX}, use long type instead."
         )
 
-
-def check_int_64(value: int | float | None) -> None:
-    """Error message if the value does not fit in 32-bit signed integer range, pass through None."""
-    if value is not None and (value < LONG_64_MIN or value > LONG_64_MAX):
-        raise RuntimeError(
-            f"The value {value} does not fit in 64-bit signed integer (signed long) range\n"
-            f"from {LONG_64_MIN} to {LONG_64_MAX}."
-        )
+def is_int_54(value: int | float | None) -> bool:
+    """True if the value is None or fits in 54-bit signed integer range."""
+    return value is None or _INT_54_MIN <= value <= _INT_54_MAX
 
 
 def check_int_54(value: int | float | None) -> None:
-    """Error message if the value does not fit in 54-bit signed integer range, pass through None."""
-    if value is not None and (value < LONG_54_MIN or value > LONG_54_MAX):
+    """Error message if the value is not None and does not fit in 54-bit signed integer range."""
+    if not is_int_54(value):
         raise RuntimeError(
-            f"The value {value} cannot be represented as a float exactly because it does not fit\n"
-            f"in 54-bit signed integer range from {LONG_54_MIN} to {LONG_54_MAX}."
+            f"The value {value} cannot be assigned type 'long' because it does not fit\n"
+            f"in the 54-bit signed integer range from {_INT_54_MIN} to {_INT_54_MAX}\n"
+            f"that can be represented as a float exactly."
         )

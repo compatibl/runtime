@@ -86,20 +86,6 @@ class FloatUtil:
         return value_1 > value_2 - cls.tolerance
 
     @classmethod
-    def is_int(cls, value: float | None) -> bool:
-        """
-        True if value is not None and is within tolerance from int, False otherwise.
-        Verifies that the value fits in 32-bit signed integer range.
-        """
-        check_int_32(value)
-        if value is None:
-            return False
-        else:
-            rounded_value = round(value)
-            result = cls.equal(rounded_value, value)
-            return result
-
-    @classmethod
     def to_int(cls, value: float | None) -> int | None:
         """
         Check that float value is within roundoff tolerance from an int and return the int, error otherwise.
@@ -126,20 +112,6 @@ class FloatUtil:
             return result
         else:
             return value
-
-    @classmethod
-    def is_long(cls, value: float | None) -> bool:
-        """
-        True if value is not None and is within tolerance from a long, False otherwise.
-        Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
-        """
-        check_int_54(value)
-        if value is None:
-            return False
-        else:
-            rounded_value = round(value)
-            result = cls.equal(rounded_value, value)
-            return result
 
     @classmethod
     def to_long(cls, value: float | None) -> int | None:
