@@ -26,6 +26,7 @@ from cl.runtime.serializers.none_format import NoneFormat
 from cl.runtime.serializers.string_format import StringFormat
 from cl.runtime.serializers.time_format import TimeFormat
 from cl.runtime.serializers.timestamp_format import TimestampFormat
+from cl.runtime.serializers.type_inclusion import TypeInclusion
 from cl.runtime.serializers.uuid_format import UuidFormat
 from cl.runtime.serializers.yaml_encoders import YamlEncoders
 
@@ -70,3 +71,24 @@ class BootstrapSerializers:
         encoder=JsonEncoders.DEFAULT,
     ).build()
     """Default settings with JSON output."""
+
+    FOR_UI: cls = cls(
+        none_format=NoneFormat.PASSTHROUGH,
+        string_format=StringFormat.PASSTHROUGH,
+        float_format=FloatFormat.PASSTHROUGH,
+        bool_format=BoolFormat.PASSTHROUGH,
+        int_format=IntFormat.DEFAULT,  # TODO: Review, should be passthrough
+        long_format=LongFormat.DEFAULT,  # TODO: Review, should be passthrough
+        date_format=DateFormat.DEFAULT,
+        time_format=TimeFormat.DEFAULT,
+        datetime_format=DatetimeFormat.DEFAULT,
+        uuid_format=UuidFormat.DEFAULT,
+        timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
+        bytes_format=BytesFormat.DEFAULT,
+        enum_format=EnumFormat.DEFAULT,
+        # key_serializer=KeySerializers.DELIMITED,
+        type_inclusion=TypeInclusion.ALWAYS,
+        type_field="_t",
+        pascalize_keys=True,
+    ).build()
+    """Default bidirectional data serializer settings for UI."""

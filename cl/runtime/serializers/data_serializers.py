@@ -45,12 +45,12 @@ class DataSerializers:
     """Default bidirectional data serializer settings for JSON."""
 
     FOR_UI: cls = cls(
-        pascalize_keys=True,
         primitive_serializer=PrimitiveSerializers.FOR_UI,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
         type_inclusion=TypeInclusion.ALWAYS,
         type_field="_t",
+        pascalize_keys=True,
     ).build()
     """Default bidirectional data serializer settings for UI."""
 

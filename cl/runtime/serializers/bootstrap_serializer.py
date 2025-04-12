@@ -53,6 +53,9 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.string_format import StringFormat
 from cl.runtime.serializers.time_format import TimeFormat
 from cl.runtime.serializers.timestamp_format import TimestampFormat
+from cl.runtime.serializers.type_format import TypeFormat
+from cl.runtime.serializers.type_inclusion import TypeInclusion
+from cl.runtime.serializers.type_placement import TypePlacement
 from cl.runtime.serializers.uuid_format import UuidFormat
 
 
@@ -101,6 +104,18 @@ class BootstrapSerializer(Serializer):
 
     encoder: Encoder | None = None
     """Use to encode the output of serialize method if specified."""
+
+    type_inclusion: TypeInclusion = TypeInclusion.OMIT
+    """Where to include type information in serialized data."""
+
+    type_format: TypeFormat = TypeFormat.NAME_ONLY
+    """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
+
+    type_placement: TypePlacement = TypePlacement.FIRST
+    """Placement of type information in the output dictionary (optional, do not provide if type_inclusion=OMIT)."""
+
+    type_field: str = "_type"
+    """Dictionary key under which type information is stored (optional, defaults to '_type')."""
 
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
@@ -250,19 +265,69 @@ class BootstrapSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormat)
         elif is_data(data):
+
+            # Data type name taking into account aliases
+            data_type_name = TypeUtil.name(data)
+
+            # Include type in output according to the type_inclusion setting
+            if self.type_inclusion == TypeInclusion.ALWAYS:
+                include_type = True
+            elif self.type_inclusion == TypeInclusion.AS_NEEDED:
+                raise RuntimeError(f"TypeInclusion.AS_NEEDED is not supported for {data_type_name}\n"
+                                   f"because it does not use a schema.")
+            elif self.type_inclusion == TypeInclusion.OMIT:
+                include_type = False
+            else:
+                raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
+
+            # Parse type_format field
+            if self.type_inclusion not in (None, TypeInclusion.OMIT):
+                if self.type_format == TypeFormat.NAME_ONLY:
+                    type_field = data_type_name
+                elif self.type_format == TypeFormat.FULL_PATH:
+                    raise RuntimeError("TypeFormat.FULL_PATH is not supported.")
+                else:
+                    raise ErrorUtil.enum_value_error(self.type_format, TypeFormat)
+            else:
+                type_field = None
+
+            # Parse type_placement field
+            if self.type_inclusion not in (None, TypeInclusion.OMIT):
+                if self.type_placement == TypePlacement.FIRST:
+                    include_type_first = include_type
+                    include_type_last = False
+                elif self.type_placement == TypePlacement.LAST:
+                    include_type_first = False
+                    include_type_last = include_type
+                else:
+                    raise ErrorUtil.enum_value_error(self.type_placement, TypePlacement)
+            else:
+                include_type_first = False
+                include_type_last = False
+
             # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
             slots = SlotsUtil.get_slots(type(data))
+
+            # Include type information first based on include_type_first flag
+            result = {self.type_field: type_field} if include_type_first else {}
+
             # Serialize slot values in the order of declaration except those that are null or empty
             # Allow keys that begin from _ in mapping classes, but not slotted classes
-            result = {
-                k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._serialize(v)
-                for k in slots
-                if not DataUtil.is_empty(v := getattr(data, k)) and not k.startswith("_")
-            }
+            result.update(
+                {
+                    k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._serialize(v)
+                    for k in slots
+                    if not DataUtil.is_empty(v := getattr(data, k)) and not k.startswith("_")
+                }
+            )
+
+            if include_type_last:
+                # Include type information last based on include_type_last flag
+                result[self.type_field] = type_field
             return result
         else:
             # Did not match a supported data type
-            raise RuntimeError(f"Cannot serialize data of type '{type(data)}'.")
+            raise RuntimeError(f"Cannot serialize data of type '{TypeUtil.name(data)}'.")
 
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
