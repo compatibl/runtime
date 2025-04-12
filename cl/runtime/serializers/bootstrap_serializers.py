@@ -15,13 +15,13 @@
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_encoders import JsonEncoders
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.reporting_serializer import ReportingSerializer
+from cl.runtime.serializers.bootstrap_serializer import BootstrapSerializer
 from cl.runtime.serializers.yaml_encoders import YamlEncoders
 
-cls = ReportingSerializer
+cls = BootstrapSerializer
 
 
-class ReportingSerializers:
+class BootstrapSerializers:
     """Serialization without including or relying on type information, deserialization is not possible."""
 
     YAML: cls = cls(

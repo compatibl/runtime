@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.serializers.reporting_serializers import ReportingSerializers
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -55,7 +55,7 @@ def test_data_serialization():
         assert deserialized == sample
 
         # Record in RegressionGuard
-        result_str = ReportingSerializers.YAML.serialize(serialized)
+        result_str = BootstrapSerializers.YAML.serialize(serialized)
         guard = RegressionGuard(channel=sample_type.__name__)
         guard.write(result_str)
     RegressionGuard().verify_all()

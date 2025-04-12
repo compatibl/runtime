@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.dataclass_spec import DataclassSpec
-from cl.runtime.serializers.reporting_serializers import ReportingSerializers
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -71,7 +71,7 @@ def test_from_class():
 
         # Get enum spec and serialize as YAML
         type_spec = DataclassSpec.from_class(test_case)
-        type_spec_str = ReportingSerializers.YAML.serialize(type_spec)
+        type_spec_str = BootstrapSerializers.YAML.serialize(type_spec)
 
         # Record in RegressionGuard
         guard = RegressionGuard(channel=type_spec.type_name)

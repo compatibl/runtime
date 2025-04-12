@@ -30,7 +30,7 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class ReportingSerializer(Serializer):
+class BootstrapSerializer(Serializer):
     """Unidirectional serialization of object to a dictionary without type information."""
 
     primitive_serializer: Serializer = required()

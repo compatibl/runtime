@@ -333,7 +333,7 @@ class DbContext(Context):
             if not KeySerializers.DELIMITED.serialize(key := record.get_key()):
                 # Error only if not a singleton
                 if not is_singleton_key(key):
-                    record_data_str = ReportingSerializers.YAML.serialize(record)
+                    record_data_str = BootstrapSerializers.YAML.serialize(record)
                     raise RuntimeError(
                         f"Attempting to save a record with empty key, invoke build before saving.\n"
                         f"Values of other fields:\n{record_data_str}"
