@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.serializers.enum_format import EnumFormat
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_encoders import JsonEncoders
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
@@ -26,14 +27,14 @@ class BootstrapSerializers:
 
     YAML: cls = cls(
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
-        enum_serializer=EnumSerializers.DEFAULT,
+        enum_format=EnumFormat.DEFAULT,
         encoder=YamlEncoders.DEFAULT,
     ).build()
     """Default settings with YAML output."""
 
     JSON: cls = cls(
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
-        enum_serializer=EnumSerializers.DEFAULT,
+        enum_format=EnumFormat.DEFAULT,
         encoder=JsonEncoders.DEFAULT,
     ).build()
     """Default settings with JSON output."""

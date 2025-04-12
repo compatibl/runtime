@@ -15,6 +15,8 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
+
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -25,6 +27,7 @@ from cl.runtime.records.protocols import is_data
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.encoder import Encoder
+from cl.runtime.serializers.enum_format import EnumFormat
 from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.slots_util import SlotsUtil
 
@@ -36,8 +39,8 @@ class BootstrapSerializer(Serializer):
     primitive_serializer: Serializer = required()
     """Use to serialize primitive types."""
 
-    enum_serializer: Serializer = required()
-    """Use to serialize enum types."""
+    enum_format: EnumFormat = required()
+    """Serialization format for enums that are not None."""
 
     encoder: Encoder | None = None
     """Use to encode the output of serialize method if specified."""
@@ -81,7 +84,7 @@ class BootstrapSerializer(Serializer):
                         else (
                             self.primitive_serializer.serialize(v)
                             if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                            else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._serialize(v))
+                            else self._serialize(v)
                         )
                     )
                     for v in data
@@ -93,15 +96,21 @@ class BootstrapSerializer(Serializer):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     self.primitive_serializer.serialize(v)
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._serialize(v))
+                    else self._serialize(v)
                 )
                 for k, v in data.items()
                 if not DataUtil.is_empty(v)
             }
             return result
         elif isinstance(data, Enum):
-            # Enum type, serialize using enum serializer if specified, otherwise return raw data
-            return self.enum_serializer.serialize(data)
+            if (value_format := self.enum_format) == EnumFormat.PASSTHROUGH:
+                # Pass through the enum instance without changes
+                return data
+            elif value_format == EnumFormat.DEFAULT:
+                # Serialize as name without type in PascalCase
+                return CaseUtil.upper_to_pascal_case(data.name)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, EnumFormat)
         elif is_data(data):
             # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
             slots = SlotsUtil.get_slots(type(data))
@@ -110,7 +119,7 @@ class BootstrapSerializer(Serializer):
                 (k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k)): (
                     self.primitive_serializer.serialize(v)
                     if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (self.enum_serializer.serialize(v) if isinstance(v, Enum) else self._serialize(v))
+                    else self._serialize(v)
                 )
                 for k in slots
                 if not DataUtil.is_empty(v := getattr(data, k)) and not k.startswith("_")
