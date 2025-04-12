@@ -35,11 +35,9 @@ class FrozenDataMixin:
     @classmethod
     def mark_frozen(cls) -> None:
         """Frozen on construction, do nothing."""
-        pass
 
     def check_frozen(self) -> None:
         """Frozen on construction, do nothing."""
-        pass
 
     def build(self) -> Self:
         """

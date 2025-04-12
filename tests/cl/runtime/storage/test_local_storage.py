@@ -86,6 +86,7 @@ def test_local_storage():
                         guard.write(read_result)
     RegressionGuard().verify_all()
 
+
 def test_local_storage_exceptions():
 
     # Test invalid storage modes

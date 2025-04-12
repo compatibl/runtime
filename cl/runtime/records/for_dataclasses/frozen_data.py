@@ -19,4 +19,3 @@ from cl.runtime.records.frozen_data_mixin import FrozenDataMixin
 @dataclass(slots=True, kw_only=True, frozen=True)
 class FrozenData(FrozenDataMixin):
     """Dataclasses base for lightweight classes that do not require validation against the schema."""
-    pass

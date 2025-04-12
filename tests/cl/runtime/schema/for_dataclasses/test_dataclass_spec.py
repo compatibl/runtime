@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from dataclasses import asdict
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.dataclass_spec import DataclassSpec

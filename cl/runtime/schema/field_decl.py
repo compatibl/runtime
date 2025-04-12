@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from typing import Type
 from uuid import UUID
 from typing_extensions import Self
-
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES

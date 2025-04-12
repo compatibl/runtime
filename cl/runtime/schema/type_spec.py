@@ -17,7 +17,6 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Type
 from typing_extensions import Self
-
 from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
 from cl.runtime.schema.type_kind import TypeKind
 

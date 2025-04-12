@@ -20,7 +20,6 @@ from typing import Type
 from uuid import UUID
 from frozendict import frozendict
 from typing_extensions import Self
-
 from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
