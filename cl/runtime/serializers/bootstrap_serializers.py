@@ -26,7 +26,6 @@ from cl.runtime.serializers.none_format import NoneFormat
 from cl.runtime.serializers.string_format import StringFormat
 from cl.runtime.serializers.time_format import TimeFormat
 from cl.runtime.serializers.timestamp_format import TimestampFormat
-from cl.runtime.serializers.type_inclusion import TypeInclusion
 from cl.runtime.serializers.uuid_format import UuidFormat
 from cl.runtime.serializers.yaml_encoders import YamlEncoders
 
@@ -86,9 +85,6 @@ class BootstrapSerializers:
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
         bytes_format=BytesFormat.DEFAULT,
         enum_format=EnumFormat.DEFAULT,
-        # key_serializer=KeySerializers.DELIMITED,
-        type_inclusion=TypeInclusion.ALWAYS,
-        type_field="_t",
         pascalize_keys=True,
     ).build()
     """Default bidirectional data serializer settings for UI."""

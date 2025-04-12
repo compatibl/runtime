@@ -273,8 +273,10 @@ class BootstrapSerializer(Serializer):
             if self.type_inclusion == TypeInclusion.ALWAYS:
                 include_type = True
             elif self.type_inclusion == TypeInclusion.AS_NEEDED:
-                raise RuntimeError(f"TypeInclusion.AS_NEEDED is not supported for {data_type_name}\n"
-                                   f"because it does not use a schema.")
+                raise RuntimeError(
+                    f"TypeInclusion.AS_NEEDED is not supported for {data_type_name}\n"
+                    f"because it does not use a schema."
+                )
             elif self.type_inclusion == TypeInclusion.OMIT:
                 include_type = False
             else:

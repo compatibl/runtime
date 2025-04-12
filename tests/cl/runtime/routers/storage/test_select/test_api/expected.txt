@@ -1,6 +1,5 @@
 Schema:
   cl.StubDataclassRecord:
-    _t: StubDataclassRecord
     Module:
       ModuleName: cl
     Name: StubDataclassRecord
@@ -17,10 +16,11 @@ Schema:
         Type: String
       Name: Id
       Comment: Unique identifier.
+      Vector: false
+      Optional: false
     Keys:
     - Id
   cl.Data:
-    _t: Data
     Module:
       ModuleName: cl
     Name: Data
@@ -37,7 +37,6 @@ Schema:
     TypeKind: Data
     DisplayKind: Basic
   cl.Key:
-    _t: Key
     Module:
       ModuleName: cl
     Name: Key
@@ -52,7 +51,6 @@ Schema:
       Name: Data
     Abstract: true
   cl.StubDataclassRecordKey:
-    _t: StubDataclassRecordKey
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
@@ -69,6 +67,8 @@ Schema:
         Type: String
       Name: Id
       Comment: Unique identifier.
+      Vector: false
+      Optional: false
 Data:
 - Id: test_select
   _t: StubDataclassRecord

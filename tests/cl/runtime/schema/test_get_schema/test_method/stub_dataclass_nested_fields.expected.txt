@@ -1,4 +1,3 @@
-_t: StubDataclassNestedFields
 Module:
   ModuleName: cl
 Name: StubDataclassNestedFields
@@ -14,55 +13,64 @@ Elements:
 - Value:
     Type: String
   Name: Id
-- _t: cl.StubDataclassData
-  Data:
+  Vector: false
+  Optional: false
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassData
   Name: BaseField
   Comment: Stub field.
-- _t: cl.StubDataclassDerivedData
-  Data:
+  Vector: false
+  Optional: false
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassDerivedData
   Name: DerivedField
   Comment: Stub field.
-- _t: cl.StubDataclassDerivedFromDerivedData
-  Data:
+  Vector: false
+  Optional: false
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassDerivedFromDerivedData
   Name: DerivedFromDerivedField
   Comment: Stub field.
-- _t: cl.StubDataclassData
-  Data:
+  Vector: false
+  Optional: false
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassData
   Name: PolymorphicField
   Comment: Declared StubDataclassData but provided an instance of StubDataclassDerivedData.
-- _t: cl.StubDataclassDerivedData
-  Data:
+  Vector: false
+  Optional: false
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassDerivedData
   Name: PolymorphicDerivedField
   Comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData.
-- _t: cl.StubDataclassRecordKey
-  Key:
+  Vector: false
+  Optional: false
+- Key:
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
   Name: KeyField
   Comment: Stub field.
-- _t: cl.StubDataclassRecordKey
-  Key:
+  Vector: false
+  Optional: false
+- Key:
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
   Name: RecordAsKeyField
   Comment: Stub field with key type initialized to record type instance.
+  Vector: false
+  Optional: false
 Keys:
 - Id
 

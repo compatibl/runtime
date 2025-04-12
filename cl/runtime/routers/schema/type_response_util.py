@@ -28,7 +28,7 @@ class TypeResponseUtil:
         # TODO: Check why empty module is passed, is module the short name prefix?
         record_type = TypeImport.get_class_from_type_name(request.type_name)
         handler_args_elements = dict()
-        result = TypeDecl.for_type_with_dependencies(record_type)
+        result = TypeDecl.as_dict_with_dependencies(record_type)
 
         # TODO: Experimental patch to exclude generated fields from top grid and editor but not the record picker
         # This patch is activated in three cases:

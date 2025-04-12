@@ -16,11 +16,9 @@ from __future__ import annotations
 import ast
 import dataclasses
 import inspect
-from dataclasses import asdict
 from dataclasses import dataclass
 from enum import Enum
 from itertools import tee
-from typing import Any
 from typing import Dict
 from typing import List
 from typing import Set
@@ -41,53 +39,7 @@ from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.type_kind import TypeKind
-
-
-def dict_public_fields_factory(x):
-    """Factory for a dictionary with only public fields."""
-    return {k: v for (k, v) in x if not k.startswith("_")}
-
-
-# TODO (Roman): Replace this function with a serializer
-# TODO: Move this and other functions to helper class
-def to_type_decl_dict(node: Dict[str, Any] | List[Dict[str, Any]] | str) -> Dict[str, Any] | List[Dict[str, Any]] | str:
-    """Recursively apply type declaration dictionary conventions to the argument dictionary."""
-
-    if isinstance(node, dict):
-        # For type declarations only, skip nodes that have the value of None or False
-        # Remove suffix _ from field names if present
-        # pascalized_values = {k: (CaseUtil.snake_to_pascal_case(v) if k in ['module_name', 'name'] else v) for k, v in node.items() if (k == "_t" or not k.startswith("_")) and v is not None}
-        # Searching for the name of given type declaration
-        result: Dict[str, Any] = {}
-        if (_t := get_name_of_type_decl_dict(node)) is not None:
-            result["_t"] = _t
-        result.update(
-            {
-                CaseUtil.snake_to_pascal_case(k.removesuffix("_")): to_type_decl_dict(v)
-                for k, v in node.items()
-                if (k == "_t" or not k.startswith("_"))
-                and v not in [None, False]  # TODO: Review the exclusion of False
-            }
-        )
-        return result
-    elif isinstance(node, list):
-        # For type declarations only, skip nodes that have the value of None or False
-        return [to_type_decl_dict(v) for v in node if v not in [None, False]]
-    elif isinstance(node, tuple):
-        # The first element of key node tuple is type, the remaining elements are primary key fields
-        # Remove suffix _ from field names if present
-        key_field_names = node[0].get_key_fields()
-        key_field_values = [to_type_decl_dict(v) for v in node[1:]]
-        return {
-            CaseUtil.snake_to_pascal_case(k.removesuffix("_")): v for k, v in zip(key_field_names, key_field_values)
-        }
-    elif isinstance(node, Enum):
-        # Process Enum value by converting to value name
-        return CaseUtil.upper_to_pascal_case(node.name)
-    elif isinstance(node, str):
-        return node
-    else:
-        return node
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 
 
 def for_type_key_maker(
@@ -182,17 +134,6 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
                 f"Field TypeDecl.display_kind has the value of {self.display_kind}\n"
                 f"Permitted values are {', '.join(display_kinds)}"
             )
-
-    def to_type_decl_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary using type declaration conventions."""
-
-        # Convert to standard dictionary format
-        # TODO (Roman): Consider selecting target fields based on metadata.
-        standard_dict = asdict(self, dict_factory=dict_public_fields_factory)
-
-        # Apply type declaration dictionary conventions
-        result = to_type_decl_dict(standard_dict)
-        return result
 
     @classmethod
     def for_key(cls, key: TypeDeclKey) -> Self:  # TODO: Rename for_key for clarity
@@ -332,7 +273,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
     @classmethod
     @cached
-    def for_type_with_dependencies(cls, record_type: type) -> Dict[str, Dict]:
+    def as_dict_with_dependencies(cls, record_type: type) -> Dict[str, Dict]:
         """
         Declarations for the specified type and all dependencies, returned as a dictionary.
 
@@ -355,7 +296,7 @@ class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
 
         # TODO: Move pascalize to a helper class
         result = {
-            f"{type_decl.module.module_name}.{type_decl.name}": type_decl.to_type_decl_dict()
+            f"{type_decl.module.module_name}.{type_decl.name}": BootstrapSerializers.FOR_UI.serialize(type_decl)
             for type_decl in type_decl_list
         }
         return result

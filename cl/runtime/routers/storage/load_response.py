@@ -101,7 +101,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         """Return default UiTypeState with pinned all handlers."""
 
         type_state_record_type = TypeImport.get_class_from_type_name(ui_type_state_requested_key.type_.name)
-        type_state_record_type_schema = TypeDecl.for_type_with_dependencies(type_state_record_type)
+        type_state_record_type_schema = TypeDecl.as_dict_with_dependencies(type_state_record_type)
 
         # Iterate over type declarations to get all handlers
         all_handlers = []

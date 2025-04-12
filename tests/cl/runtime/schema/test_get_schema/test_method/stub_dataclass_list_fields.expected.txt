@@ -1,4 +1,3 @@
-_t: StubDataclassListFields
 Module:
   ModuleName: cl
 Name: StubDataclassListFields
@@ -14,53 +13,58 @@ Elements:
 - Value:
     Type: String
   Name: Id
+  Vector: false
+  Optional: false
 - Value:
     Type: String
   Name: StrList
   Comment: Stub field.
   Vector: true
+  Optional: false
 - Value:
     Type: Double
   Name: FloatList
   Comment: Stub field.
   Vector: true
+  Optional: false
 - Value:
     Type: Date
   Name: DateList
   Comment: Stub field.
   Vector: true
-- _t: cl.StubDataclassData
-  Data:
+  Optional: false
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassData
   Name: DataList
   Comment: Stub field.
   Vector: true
-- _t: cl.StubDataclassRecordKey
-  Key:
+  Optional: false
+- Key:
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
   Name: KeyList
   Comment: Stub field.
   Vector: true
-- _t: cl.StubDataclassRecord
-  Data:
+  Optional: false
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassRecord
   Name: RecordList
   Comment: Stub field.
   Vector: true
-- _t: cl.StubDataclassDerivedRecord
-  Data:
+  Optional: false
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassDerivedRecord
   Name: DerivedRecordList
   Comment: Stub field.
   Vector: true
+  Optional: false
 Keys:
 - Id
 

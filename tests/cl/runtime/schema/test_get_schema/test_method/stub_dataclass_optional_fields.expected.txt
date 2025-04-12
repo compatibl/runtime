@@ -1,4 +1,3 @@
-_t: StubDataclassOptionalFields
 Module:
   ModuleName: cl
 Name: StubDataclassOptionalFields
@@ -15,16 +14,20 @@ Elements:
     Type: String
   Name: Id
   Comment: Unique identifier.
+  Vector: false
+  Optional: false
 - Value:
     Type: String
   Name: OptionalStr
   Comment: Optional string.
+  Vector: false
   Optional: true
 - Value:
     Type: String
   Name: RequiredListOfOptionalStr
   Comment: Required list of optional strings.
   Vector: true
+  Optional: false
   OptionalVectorElement: true
 - Value:
     Type: String
@@ -37,12 +40,14 @@ Elements:
     Type: Double
   Name: OptionalFloat
   Comment: Optional float.
+  Vector: false
   Optional: true
 - Value:
     Type: Double
   Name: RequiredListOfOptionalFloat
   Comment: Required list of optional floats.
   Vector: true
+  Optional: false
   OptionalVectorElement: true
 - Value:
     Type: Double
@@ -51,25 +56,24 @@ Elements:
   Vector: true
   Optional: true
   OptionalVectorElement: true
-- _t: cl.StubDataclassData
-  Data:
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassData
   Name: OptionalData
   Comment: Optional data.
+  Vector: false
   Optional: true
-- _t: cl.StubDataclassData
-  Data:
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassData
   Name: RequiredListOfOptionalData
   Comment: Required list of optional data.
   Vector: true
+  Optional: false
   OptionalVectorElement: true
-- _t: cl.StubDataclassData
-  Data:
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassData
@@ -78,25 +82,24 @@ Elements:
   Vector: true
   Optional: true
   OptionalVectorElement: true
-- _t: cl.StubDataclassRecordKey
-  Key:
+- Key:
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
   Name: OptionalKey
   Comment: Optional key.
+  Vector: false
   Optional: true
-- _t: cl.StubDataclassRecordKey
-  Key:
+- Key:
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
   Name: RequiredListOfOptionalKey
   Comment: Required list of optional key.
   Vector: true
+  Optional: false
   OptionalVectorElement: true
-- _t: cl.StubDataclassRecordKey
-  Key:
+- Key:
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
@@ -105,25 +108,24 @@ Elements:
   Vector: true
   Optional: true
   OptionalVectorElement: true
-- _t: cl.StubDataclassRecord
-  Data:
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassRecord
   Name: OptionalRecord
   Comment: Optional record.
+  Vector: false
   Optional: true
-- _t: cl.StubDataclassRecord
-  Data:
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassRecord
   Name: RequiredListOfOptionalRecord
   Comment: Required list of optional record.
   Vector: true
+  Optional: false
   OptionalVectorElement: true
-- _t: cl.StubDataclassRecord
-  Data:
+- Data:
     Module:
       ModuleName: cl
     Name: StubDataclassRecord

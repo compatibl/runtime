@@ -1,5 +1,4 @@
 cl.UiAppState:
-  _t: UiAppState
   Module:
     ModuleName: cl
   Name: UiAppState
@@ -12,15 +11,15 @@ cl.UiAppState:
       ModuleName: cl
     Name: UiAppStateKey
   Elements:
-  - _t: cl.UserKey
-    Key:
+  - Key:
       Module:
         ModuleName: cl
       Name: UserKey
     Name: User
     Comment: A user the app state is applied for.
-  - _t: cl.TabInfo
-    Data:
+    Vector: false
+    Optional: false
+  - Data:
       Module:
         ModuleName: cl
       Name: TabInfo
@@ -32,11 +31,13 @@ cl.UiAppState:
       Type: Int
     Name: ActiveTabIndex
     Comment: Index of active opened tab.
+    Vector: false
     Optional: true
   - Value:
       Type: String
     Name: BackendVersion
     Comment: DEPRECATED. Use versions instead.
+    Vector: false
     Optional: true
   - Value:
       Type: Dict
@@ -47,16 +48,19 @@ cl.UiAppState:
       Type: String
     Name: ApplicationName
     Comment: Application name.
+    Vector: false
     Optional: true
   - Value:
       Type: Bool
     Name: ReadOnly
     Comment: Flag indicating that UI is read-only.
+    Vector: false
     Optional: true
   - Value:
       Type: String
     Name: ApplicationTheme
     Comment: Application theme (dark, light, etc.).
+    Vector: false
     Optional: true
   - Value:
       Type: String
@@ -72,7 +76,6 @@ cl.UiAppState:
   Keys:
   - User
 cl.BaseTypeInfo:
-  _t: BaseTypeInfo
   Module:
     ModuleName: cl
   Name: BaseTypeInfo
@@ -89,16 +92,21 @@ cl.BaseTypeInfo:
       Type: String
     Name: Name
     Comment: Name of type.
+    Vector: false
+    Optional: false
   - Value:
       Type: String
     Name: Module
     Comment: Module of type.
+    Vector: false
+    Optional: false
   - Value:
       Type: String
     Name: Label
     Comment: Label of type.
+    Vector: false
+    Optional: false
 cl.Data:
-  _t: Data
   Module:
     ModuleName: cl
   Name: Data
@@ -115,7 +123,6 @@ cl.Data:
   TypeKind: Data
   DisplayKind: Basic
 cl.Key:
-  _t: Key
   Module:
     ModuleName: cl
   Name: Key
@@ -130,7 +137,6 @@ cl.Key:
     Name: Data
   Abstract: true
 cl.TabInfo:
-  _t: TabInfo
   Module:
     ModuleName: cl
   Name: TabInfo
@@ -143,15 +149,15 @@ cl.TabInfo:
       ModuleName: cl
     Name: Data
   Elements:
-  - _t: cl.BaseTypeInfo
-    Data:
+  - Data:
       Module:
         ModuleName: cl
       Name: BaseTypeInfo
     Name: Type
     Comment: Type.
+    Vector: false
+    Optional: false
 cl.UiAppStateKey:
-  _t: UiAppStateKey
   Module:
     ModuleName: cl
   Name: UiAppStateKey
@@ -164,15 +170,15 @@ cl.UiAppStateKey:
       ModuleName: cl
     Name: Key
   Elements:
-  - _t: cl.UserKey
-    Key:
+  - Key:
       Module:
         ModuleName: cl
       Name: UserKey
     Name: User
     Comment: A user the app state is applied for.
+    Vector: false
+    Optional: false
 cl.UserKey:
-  _t: UserKey
   Module:
     ModuleName: cl
   Name: UserKey
@@ -189,4 +195,6 @@ cl.UserKey:
       Type: String
     Name: Username
     Comment: Unique user identifier.
+    Vector: false
+    Optional: false
 

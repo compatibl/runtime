@@ -1,4 +1,3 @@
-_t: StubDataclassComposite
 Module:
   ModuleName: cl
 Name: StubDataclassComposite
@@ -15,20 +14,24 @@ Elements:
     Type: String
   Name: Primitive
   Comment: String key element.
-- _t: cl.StubDataclassRecordKey
-  Key:
+  Vector: false
+  Optional: false
+- Key:
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
   Name: Embedded1
   Comment: Embedded key 1.
-- _t: cl.StubDataclassRecordKey
-  Key:
+  Vector: false
+  Optional: false
+- Key:
     Module:
       ModuleName: cl
     Name: StubDataclassRecordKey
   Name: Embedded2
   Comment: Embedded key 2.
+  Vector: false
+  Optional: false
 Keys:
 - Primitive
 - Embedded1

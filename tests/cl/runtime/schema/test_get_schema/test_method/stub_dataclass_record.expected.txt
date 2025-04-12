@@ -1,4 +1,3 @@
-_t: StubDataclassRecord
 Module:
   ModuleName: cl
 Name: StubDataclassRecord
@@ -15,6 +14,8 @@ Elements:
     Type: String
   Name: Id
   Comment: Unique identifier.
+  Vector: false
+  Optional: false
 Keys:
 - Id
 

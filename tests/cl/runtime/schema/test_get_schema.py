@@ -15,6 +15,7 @@
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.for_dataclasses.dataclass_type_decl import DataclassTypeDecl
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
@@ -37,7 +38,7 @@ def test_method():
 
     for sample_type in sample_types:
         result_obj = DataclassTypeDecl.for_type(sample_type)
-        result_dict = result_obj.to_type_decl_dict()
+        result_dict = BootstrapSerializers.FOR_UI.serialize(result_obj)
 
         guard = RegressionGuard(channel=sample_type.__module__.rsplit(".", maxsplit=1)[1])
         guard.write(result_dict)
