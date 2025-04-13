@@ -11,23 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from abc import ABC
+
 from dataclasses import dataclass
-from typing import List
-
-from cl.runtime.experiments.experiment import Experiment
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.key import Key
 
 
-@dataclass(slots=True, kw_only=True)
-class ClassifierExperiment(Experiment, ABC):
-    """Run and analyze the results of multiple classification (category assignment) trials, result type is str."""
+@dataclass(slots=True)
+class TrialKey(Key):
+    """Result and supporting data for a single trial of an experiment."""
 
-    categories: List[str] = required()
-    """List of categories the classifier chooses from."""
+    timestamp: str = required()
+    """Unique trial timestamp."""
 
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        # Result has string type
-        self.result_type = str.__name__
-
+    @classmethod
+    def get_key_type(cls) -> type:
+        return TrialKey

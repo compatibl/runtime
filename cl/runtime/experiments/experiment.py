@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from cl.runtime.experiments.experiment_key import ExperimentKey
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
 
@@ -22,5 +23,28 @@ from cl.runtime.records.record_mixin import RecordMixin
 class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
     """Run and analyze the results of multiple trials."""
 
+    supervised: bool = required()
+    """True if the experiment is supervised (expected results are provided)."""
+
+    max_trials: int | None = None
+    """Maximum number of trials to run (optional)."""
+
+    result_type: str | None = None
+    """Type name of the result (e.g., 'bool' for binary experiments), 'str' by default."""
+
+    result_serializer: str | None = None
+    """Serializer for the result, used only if the type is not str."""
+
     def get_key(self) -> ExperimentKey:
         return ExperimentKey(experiment_id=self.experiment_id).build()
+
+    @abstractmethod
+    def run_one(self) -> None:
+        """Run one trial."""
+
+    def run_many(self, num_trials: int) -> None:
+        """Run the specified number of trials, error if the total after the run will exceed max_trials."""
+
+    def run_all(self) -> None:
+        """Run trials until the specified total number (max_trials) is reached."""
+

@@ -11,23 +11,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from abc import ABC
-from dataclasses import dataclass
-from typing import List
 
-from cl.runtime.experiments.experiment import Experiment
-from cl.runtime.records.for_dataclasses.extensions import required
+from dataclasses import dataclass
+
+from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
+from cl.runtime.experiments.trial import Trial
 
 
 @dataclass(slots=True, kw_only=True)
-class ClassifierExperiment(Experiment, ABC):
-    """Run and analyze the results of multiple classification (category assignment) trials, result type is str."""
+class StubClassifierExperiment(ClassifierExperiment):
+    """Stub implementation of ClassifierExperiment."""
 
-    categories: List[str] = required()
-    """List of categories the classifier chooses from."""
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        # Result has string type
-        self.result_type = str.__name__
+    def run_one(self) -> None:
+        # Create a trial record with random result
+        trial = Trial(
+            experiment=self.get_key(),
+            result="abc",
+            expected="def"
+        )
+        DbContext.save_one(trial)
 

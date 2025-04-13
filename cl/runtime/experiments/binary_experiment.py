@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.experiments.experiment import Experiment
 
 
 @dataclass(slots=True, kw_only=True)
-class BinaryExperiment(Experiment):
-    """Run and analyze the results of multiple binary (pass/fail) trials."""
+class BinaryExperiment(Experiment, ABC):
+    """Run and analyze the results of multiple binary (true/false) trials, result type is bool."""
+    
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        # Result has boolean type (true/false)
+        self.result_type = bool.__name__

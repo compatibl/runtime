@@ -12,19 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
-from cl.runtime.experiments.binary_experiment import BinaryExperiment
-from cl.runtime.experiments.trial import Trial
-from cl.runtime.serializers.yaml_serializers import YamlSerializers
+import pytest
+from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
-@dataclass(slots=True, kw_only=True)
-class StubBinaryExperiment(BinaryExperiment):
-    """Stub implementation of BinaryExperiment."""
+def test_supervised(pytest_work_dir):
+    """Test for BinaryExperiment class with supervised=True."""
 
-    def run_one(self) -> None:
-        # Create a trial record with random result
-        trial = Trial(
-            result=YamlSerializers.DEFAULT.serialize(True),
-        )
+    # Create and run the experiment
+    experiment = StubBinaryExperiment(
+        experiment_id="binary_experiment",
+        supervised=True,
+        max_trials=5,
+    )
+    experiment.run_all()
 
+
+if __name__ == "__main__":
+    pytest.main([__file__])
