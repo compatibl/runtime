@@ -14,9 +14,6 @@
 
 from abc import ABC
 from dataclasses import dataclass
-
-from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.experiments.experiment import Experiment
 from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.primitive.timestamp import Timestamp
@@ -46,9 +43,3 @@ class Trial(TrialKey, RecordMixin[TrialKey], ABC):
         # Assign timestamp to the trial if not already set
         if self.timestamp is None:
             self.timestamp = Timestamp.create()
-
-        # Load the experiment object
-        experiment = DbContext.load_one(Experiment, self.experiment)
-
-        # Validate the result based on the experiment.result_type and convert it to string
-

@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.binary_experiment import BinaryExperiment
 from cl.runtime.experiments.trial import Trial
+from cl.runtime.serializers.type_hints import TypeHints
 from cl.runtime.serializers.yaml_serializers import YamlSerializers
 
 
@@ -24,7 +27,10 @@ class StubBinaryExperiment(BinaryExperiment):
 
     def run_one(self) -> None:
         # Create a trial record with random result
+        self.check_remaining()
         trial = Trial(
-            result=YamlSerializers.DEFAULT.serialize(True),
-        )
+            experiment=self.get_key(),
+            result=YamlSerializers.DEFAULT.serialize(True, TypeHints.BOOL),
+        ).build()
+        DbContext.save_one(trial)
 
