@@ -60,7 +60,7 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
 
     @abstractmethod
     def run_one(self) -> None:
-        """Run one trial, error message if max_trials is already reached or exceeded."""
+        """Run one trial, skip if max_trials is already reached or exceeded."""
 
     def run_many(self, *, num_trials: int) -> None:
         """Run up to the specified number of trials, stop when max_trials is reached or exceeded."""
@@ -120,19 +120,6 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
                 # The maximum number of trials has been reached or exceeded
                 return 0
 
-    def check_remaining_trials(self) -> None:
-        """Error message if the maximum number of trials has been reached."""
-        # This call will raise an error if the maximum number of trials has been reached
-        if self.max_trials is not None:
-            num_existing_trials = self.count_existing_trials()
-            if num_existing_trials == self.max_trials:
-                raise RuntimeError(
-                    f"Cannot run more trials for experiment {self.experiment_id} because\n"
-                    f"the maximum number of trials is {self.max_trials} has been reached."
-                )
-            elif num_existing_trials > self.max_trials:
-                    raise RuntimeError(
-                        f"Cannot run more trials for experiment {self.experiment_id} because\n"
-                        f"the maximum number of trials is {self.max_trials} has been exceeded.\n"
-                        f"Number of existing trials: {num_existing_trials} > {self.max_trials}."
-                    )
+    def is_max_trials_reached_or_exceeded(self, *, num_trials: int | None = None) -> bool:
+        """Return True if max_trials has been reached or exceeded, False otherwise or if max_trials is not set."""
+        return self.max_trials is not None and self.count_existing_trials() >= self.max_trials

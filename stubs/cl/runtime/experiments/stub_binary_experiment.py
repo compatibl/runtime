@@ -27,8 +27,9 @@ class StubBinaryExperiment(BinaryExperiment):
 
     def run_one(self) -> None:
 
-        # Check that there are remaining trials
-        self.check_remaining_trials()
+        # Exit if there are no remaining trials
+        if self.is_max_trials_reached_or_exceeded():
+            return
 
         # Create a trial record with random result
         trial = Trial(
@@ -36,4 +37,3 @@ class StubBinaryExperiment(BinaryExperiment):
             result=YamlSerializers.DEFAULT.serialize(True, TypeHints.BOOL),
         ).build()
         DbContext.save_one(trial)
-
