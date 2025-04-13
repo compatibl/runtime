@@ -21,7 +21,7 @@ from pymongo import MongoClient
 from pymongo.database import Database
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol, is_key
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
@@ -135,12 +135,14 @@ class BasicMongoDb(Db):
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord]:
-        # Confirm record_type is a record type
-        if not is_record(record_type):
-            raise RuntimeError(f"Type {TypeUtil.name(record_type)} is not a record.")
+        # Get collection name from key type
+        if is_record(record_type):
+            key_type = record_type.get_key_type()
+        elif is_key(record_type):
+            key_type = record_type
+        else:
+            raise RuntimeError(f"Type {TypeUtil.name(record_type)} is not a record or key.")
 
-        # Key, get collection name from key type by removing Key suffix if present
-        key_type = record_type.get_key_type()
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_db()
         collection = db[collection_name]
