@@ -29,22 +29,29 @@ def test_run(pytest_basic_mongo_mock_db):
     )
 
     # Run the experiment in stages
-    assert experiment.get_num_remaining() == 10
+    assert experiment.count_existing_trials() == 0
+    assert experiment.count_remaining_trials() == 10
     experiment.run_one()
-    assert experiment.get_num_remaining() == 9
+    assert experiment.count_remaining_trials() == 9
     experiment.run_many(num_trials=3)
-    assert experiment.get_num_remaining() == 6
+    assert experiment.count_remaining_trials() == 6
     experiment.run_one()
-    assert experiment.get_num_remaining() == 5
+    assert experiment.count_remaining_trials() == 5
     experiment.run_all()
-    with pytest.raises(RuntimeError):
-        experiment.get_num_remaining()
+    assert experiment.count_existing_trials() == 10
+    assert experiment.count_remaining_trials() == 0
+
+    # Error for run_one when no trials are remaining
     with pytest.raises(RuntimeError):
         experiment.run_one()
-    with pytest.raises(RuntimeError):
-        experiment.run_many(num_trials=3)
-    with pytest.raises(RuntimeError):
-        experiment.run_all()
+
+    experiment.run_many(num_trials=3)
+    assert experiment.count_existing_trials() == 10
+    assert experiment.count_remaining_trials() == 0
+
+    experiment.run_all()
+    assert experiment.count_existing_trials() == 10
+    assert experiment.count_remaining_trials() == 0
 
 
 if __name__ == "__main__":

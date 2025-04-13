@@ -26,8 +26,11 @@ class StubBinaryExperiment(BinaryExperiment):
     """Stub implementation of BinaryExperiment."""
 
     def run_one(self) -> None:
+
+        # Check that there are remaining trials
+        self.check_remaining_trials()
+
         # Create a trial record with random result
-        self.check_remaining()
         trial = Trial(
             experiment=self.get_key(),
             result=YamlSerializers.DEFAULT.serialize(True, TypeHints.BOOL),
