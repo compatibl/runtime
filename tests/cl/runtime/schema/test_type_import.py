@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime import RecordMixin
 from cl.runtime import TypeImport
-from cl.runtime.records.record_util import is_non_mixin_key_or_record
+from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.schema.type_decl import TypeDecl
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecord
@@ -74,7 +74,7 @@ def test_from_qual_name():
 def test_cached_classes():
     """Test TypeImport.cached_type_names method."""
 
-    records = TypeImport.get_cached_classes(predicate=is_non_mixin_key_or_record)
+    records = TypeImport.get_cached_classes(predicate=is_key_or_record)
 
     # Included
     assert TypeDecl in records

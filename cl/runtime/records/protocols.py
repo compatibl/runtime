@@ -186,8 +186,8 @@ def is_abstract(instance_or_type: Any) -> bool:
     return bool(getattr(type_, "__abstractmethods__", None)) or type_.__name__.endswith("Mixin")
 
 
-def is_data(instance_or_type: Any) -> TypeGuard[TData]:
-    """True if the argument has 'build' method and is not a mixin."""
+def is_data(instance_or_type: Any) -> TypeGuard[TData]:  # TODO: Rename to is_data_key_or_record
+    """True if the argument has 'build' method and is not a mixin (includes data, keys and records)."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return hasattr(type_, "build") and not type_.__name__.endswith("Mixin")
 

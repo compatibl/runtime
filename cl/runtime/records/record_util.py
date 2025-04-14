@@ -25,18 +25,6 @@ from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 
-T = TypeVar("T")
-
-
-def is_non_abstract_key_or_record(class_: type) -> bool:
-    """Check if the class is a non-abstract record."""
-    return is_key_or_record(class_) and not is_abstract(class_) and not class_.__name__.endswith("Mixin")
-
-
-def is_non_mixin_key_or_record(class_: type) -> bool:
-    """Check if the class is a non-abstract record."""
-    return is_key_or_record(class_) and not class_.__name__.endswith("Mixin")
-
 
 class RecordUtil:
     """Utilities for working with records."""
@@ -49,7 +37,7 @@ class RecordUtil:
             raise RuntimeError(
                 f"Expected key or record, got {TypeUtil.name(class_)}\n" f"in '{cls.__name__}.child_records_of' method."
             )
-        return TypeImport.get_subclasses_of(class_, predicate=is_non_abstract_key_or_record)
+        return TypeImport.get_subclasses_of(class_, predicate=is_key_or_record)
 
     @classmethod
     @cached
@@ -60,7 +48,7 @@ class RecordUtil:
                 f"Expected key or record, got {TypeUtil.name(class_)}\n"
                 f"in '{cls.__name__}.parent_records_of' method."
             )
-        return TypeImport.get_superclasses_of(class_, predicate=is_non_abstract_key_or_record)
+        return TypeImport.get_superclasses_of(class_, predicate=is_key_or_record)
 
     @classmethod
     def records_sharing_key_with(cls, class_: type) -> Tuple[type, ...]:
@@ -69,7 +57,7 @@ class RecordUtil:
             raise RuntimeError(
                 f"Expected key or record, got {TypeUtil.name(class_)}\n" f"in '{cls.__name__}.child_records_of' method."
             )
-        return TypeImport.get_records_sharing_key_with(class_, predicate=is_non_abstract_key_or_record)
+        return TypeImport.get_records_sharing_key_with(class_, predicate=is_key_or_record)
 
     @classmethod
     def sort_records_by_key(cls, records: Iterable[RecordProtocol]) -> List[RecordProtocol]:
