@@ -42,25 +42,19 @@ _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildN
 """Headers of TypeInfo preload file."""
 
 class TypeInfoCache:
-    """Helper methods for Record."""
+    """Cache of TypeInfo for the specified packages."""
 
-    _type_info_dict: Dict[str, TypeInfo] = {}
+    _type_info_dict: Dict[str, TypeInfo] | None = None
     """Dictionary of TypeInfo indexed by type name."""
     
-    _type_by_type_name_dict: Dict[str, type] = {}
+    _type_by_type_name_dict: Dict[str, type] | None = None
     """Dictionary of classes indexed by type name."""
     
-    _type_by_qual_name_dict: Dict[str, type] = {}
+    _type_by_qual_name_dict: Dict[str, type] | None = None
     """Dictionary of classes indexed by qual name."""
 
-    _module_dict: Dict[str, ModuleType] = {}
+    _module_dict: Dict[str, ModuleType] | None = None
     """Dictionary of modules indexed by module name in dot-delimited format."""
-
-    _cache_filename: str | None = None
-    """Filename of the cache file used to store the qual name cache."""
-
-    _initialized: bool = False
-    """Set to True when the cache is loaded from TypeInfo preload."""
 
     @classmethod
     def get_qual_name_from_class(cls, class_: type) -> str:
@@ -70,10 +64,6 @@ class TypeInfoCache:
     @classmethod
     def get_class_from_qual_name(cls, qual_name: str) -> type:
         """Get class from fully qualified name in module.ClassName format."""
-
-        # Load from disk if not yet initialized
-        if not cls._initialized:
-            cls.load_cache()
 
         # Return cached value if found
         if (result := cls._type_by_qual_name_dict.get(qual_name, None)) is not None:
@@ -122,10 +112,6 @@ class TypeInfoCache:
         ClassName except when alias is defined to resolve a name collision.
         """
 
-        # Load from disk if not yet initialized
-        if not cls._initialized:
-            cls.load_cache()
-
         # Return cached type if found
         if (result := cls._type_by_type_name_dict.get(type_name, None)) is not None:
             return result
@@ -167,9 +153,8 @@ class TypeInfoCache:
     def rebuild_cache(cls) -> None:
         """Reload classes from packages and save a new TypeInfo.csv file to the bootstrap resources directory."""
 
-        # Init dictionaries
-        cls._module_dict = {}
-        cls._type_info_dict = {}
+        # Clear the existing data
+        cls._clear_cache()
 
         # Add each class after performing checks for duplicates
         consume(cls._add_class(class_) for class_ in cls._get_package_classes())
@@ -373,9 +358,6 @@ class TypeInfoCache:
                         f"Use TypeAlias to resolve the name collision.\n"
                     )
 
-        # Mark initialized
-        cls._initialized = True
-
     @classmethod
     def _save_cache(cls) -> None:
         """Save qual name cache to disk (overwrites the existing file)."""
@@ -405,15 +387,13 @@ class TypeInfoCache:
         cls._type_by_qual_name_dict = {}
         cls._module_dict = {}
         cls._cache_filename = None
-        cls._initialized = False
 
     @classmethod
     def _get_cache_filename(cls) -> str:
         """Get the filename for the qual name cache."""
-        if cls._cache_filename is None:
-            resources_root = ProjectSettings.get_resources_root()
-            cls._cache_filename = os.path.join(resources_root, "bootstrap/TypeInfo.csv")
-        return cls._cache_filename
+        resources_root = ProjectSettings.get_resources_root()
+        result = os.path.join(resources_root, "bootstrap/TypeInfo.csv")
+        return result
 
     @classmethod
     def _get_type_name_not_found_error(cls, type_name: str) -> RuntimeError:
