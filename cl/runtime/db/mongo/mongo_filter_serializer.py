@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 from typing import ClassVar
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import RecordProtocol, PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serializers.slots_util import SlotsUtil
 
@@ -47,9 +47,9 @@ class MongoFilterSerializer(Data):  # TODO: Standardize API and derive from Seri
     @classmethod
     def _not_primitive_field_error(cls, data: RecordProtocol, k: str, v: Any) -> None:
         """Error indicating only primitive field names are supported."""
+        supported_types = ", ".join(PRIMITIVE_CLASS_NAMES)
         raise RuntimeError(
-            f"Field '{k}' in '{data.__class__.__name__}' has type '{type(v)}'. This field cannot "
-            f"be used in a database filter because it is not one of the supported primitive types: "
-            + ", ".join(f"'{cls.primitive_type_names}'")
-            + "."
+            f"Field '{k}' in '{data.__class__.__name__}' has type '{type(v)}'.\n"
+            f"This field cannot be used in a database filter because it is not one of the\n"
+            f"supported primitive class names: {supported_types}."
         )

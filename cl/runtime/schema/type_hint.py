@@ -43,8 +43,8 @@ class TypeHint(FrozenData):
     remaining: Self | None = None
     """Remaining chain if present, None otherwise."""
 
-    def get_schema_class_or_none(self) -> type:
-        """Return schema class if available, otherwise return None."""
+    def get_schema_class(self) -> type:
+        """Return schema class."""
         return self._schema_class
 
     def to_str(self):

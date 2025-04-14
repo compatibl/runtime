@@ -113,6 +113,7 @@ class DataSerializer(Serializer):
                 return self.primitive_serializer.serialize(data, type_hint)
             else:
                 # Otherwise assume it is an enum
+                # TODO: Check for type_kind in TypeHint instead
                 result = self.enum_serializer.serialize(data, type_hint)
                 return result
         elif data_class_name in SEQUENCE_TYPE_NAMES:
