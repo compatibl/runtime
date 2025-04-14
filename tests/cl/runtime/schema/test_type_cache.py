@@ -23,7 +23,7 @@ from stubs.cl.runtime import StubDataclassRecord
 
 def test_rebuild_cache():
     """Test TypeInfoCache.reload_cache method, this also generates and saves a new TypeInfo.csv file."""
-    TypeInfoCache.rebuild_cache()
+    TypeInfoCache.rebuild()
 
 
 def test_get_qual_name():

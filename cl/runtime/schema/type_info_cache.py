@@ -36,8 +36,6 @@ from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
-# Class method TypeInfoCache.load_cache is invoked on import of this module (see below after class definition)
-
 
 def is_schema_type(class_: type) -> bool:
     """Return true if the type should be included in schema, includes data classes and enums."""
@@ -51,16 +49,16 @@ _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildN
 class TypeInfoCache:
     """Cache of TypeInfo for the specified packages."""
 
-    _type_info_dict: Dict[str, TypeInfo] | None = None
+    _type_info_dict: Dict[str, TypeInfo] = {}
     """Dictionary of TypeInfo indexed by type name."""
 
-    _type_by_type_name_dict: Dict[str, type] | None = None
+    _type_by_type_name_dict: Dict[str, type] = {}
     """Dictionary of classes indexed by type name."""
 
-    _type_by_qual_name_dict: Dict[str, type] | None = None
+    _type_by_qual_name_dict: Dict[str, type] = {}
     """Dictionary of classes indexed by qual name."""
 
-    _module_dict: Dict[str, ModuleType] | None = None
+    _module_dict: Dict[str, ModuleType] = {}
     """Dictionary of modules indexed by module name in dot-delimited format."""
 
     @classmethod
@@ -71,6 +69,9 @@ class TypeInfoCache:
     @classmethod
     def get_class_from_qual_name(cls, qual_name: str) -> type:
         """Get class from fully qualified name in module.ClassName format."""
+
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
 
         # Return cached value if found
         if (result := cls._type_by_qual_name_dict.get(qual_name, None)) is not None:
@@ -119,6 +120,9 @@ class TypeInfoCache:
         ClassName except when alias is defined to resolve a name collision.
         """
 
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
         # Return cached type if found
         if (result := cls._type_by_type_name_dict.get(type_name, None)) is not None:
             return result
@@ -127,47 +131,60 @@ class TypeInfoCache:
         if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
             return cls.get_class_from_qual_name(type_info.qual_name)
         else:
-            raise cls._get_type_name_not_found_error(type_name)
+            raise cls._type_name_not_found_error(type_name)
 
     @classmethod
     def get_parent_names(cls, class_: type) -> Tuple[str, ...] | None:
         """Return a tuple of type names for parent classes (inclusive of self) that match the predicate."""
+
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
+        # Get from cached TypeInfo
         type_name = TypeUtil.name(class_)
         if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
             return type_info.parent_names
         else:
-            raise cls._get_type_name_not_found_error(type_name)
+            raise cls._type_name_not_found_error(type_name)
 
     @classmethod
     def get_child_names(cls, class_: type) -> Tuple[str, ...] | None:
         """Return a tuple of type names for child classes (inclusive of self) that match the predicate."""
+
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
+        # Get from cached TypeInfo
         type_name = TypeUtil.name(class_)
         if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
             return type_info.child_names
         else:
-            raise cls._get_type_name_not_found_error(type_name)
+            raise cls._type_name_not_found_error(type_name)
 
     @classmethod
     def get_classes(cls, *, type_kinds: Sequence[TypeKind]) -> Tuple[type, ...]:
         """Return already cached classes that match the predicate (does not rebuild cache)."""
 
-        # Get the list of qual names for all loaded classes
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
+        # Get from cached TypeInfo
         qual_names = [x.qual_name for x in cls._type_info_dict.values() if x.type_kind in type_kinds]
         result = tuple(cls.get_class_from_qual_name(qual_name) for qual_name in qual_names)
         return result
 
     @classmethod
-    def rebuild_cache(cls) -> None:
+    def rebuild(cls) -> None:
         """Reload classes from packages and save a new TypeInfo.csv file to the bootstrap resources directory."""
 
         # Clear the existing data
-        cls._clear_cache()
+        cls._clear()
 
         # Add each class after performing checks for duplicates
         consume(cls._add_class(class_) for class_ in cls._get_package_classes())
 
         # Overwrite the cache file on disk with the new data
-        cls._save_cache()
+        cls._save()
 
     @classmethod
     def _get_packages(cls) -> Tuple[str, ...]:
@@ -297,14 +314,21 @@ class TypeInfoCache:
             )
 
     @classmethod
-    def load_cache(cls) -> None:
-        """Load type cache from disk."""
+    def _ensure_loaded(cls):
+        """Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded."""
+        if not cls._type_info_dict:
+            # Load the type cache from TypeInfo.csv
+            cls._load()
+
+    @classmethod
+    def _load(cls) -> None:
+        """Load type cache from TypeInfo.csv."""
 
         # Clear cache before loading
-        cls._clear_cache()
+        cls._clear()
 
         # Read from the cache file
-        cache_filename = cls._get_cache_filename()
+        cache_filename = cls._get_preload_filename()
         if os.path.exists(cache_filename):
             with open(cache_filename, "r") as file:
                 rows = file.readlines()
@@ -366,10 +390,10 @@ class TypeInfoCache:
                     )
 
     @classmethod
-    def _save_cache(cls) -> None:
+    def _save(cls) -> None:
         """Save qual name cache to disk (overwrites the existing file)."""
         # Tuples of (type_name, qual_name) sorted by type name
-        cache_filename = cls._get_cache_filename()
+        cache_filename = cls._get_preload_filename()
         os.makedirs(os.path.dirname(cache_filename), exist_ok=True)
         with open(cache_filename, "w") as file:
             # Write header row
@@ -387,7 +411,7 @@ class TypeInfoCache:
                 file.write(f"{type_name},{type_kind_str},{qual_name},{parent_names_str},{child_names_str}\n")
 
     @classmethod
-    def _clear_cache(cls) -> None:
+    def _clear(cls) -> None:
         """Clear cache before loading or rebuilding."""
         cls._type_info_dict = {}
         cls._type_by_type_name_dict = {}
@@ -396,20 +420,16 @@ class TypeInfoCache:
         cls._cache_filename = None
 
     @classmethod
-    def _get_cache_filename(cls) -> str:
+    def _get_preload_filename(cls) -> str:
         """Get the filename for the qual name cache."""
         resources_root = ProjectSettings.get_resources_root()
         result = os.path.join(resources_root, "bootstrap/TypeInfo.csv")
         return result
 
     @classmethod
-    def _get_type_name_not_found_error(cls, type_name: str) -> RuntimeError:
+    def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:
         """Return error message for type name not found."""
         return RuntimeError(
             f"Type {type_name} is not found in TypeInfo preload,\n"
             f"run init_import_cache to regenerate the preload file."
         )
-
-
-# Load type cache from TypeInfo preload on import of this module
-TypeInfoCache.load_cache()

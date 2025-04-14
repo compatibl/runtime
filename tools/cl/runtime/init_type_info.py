@@ -17,4 +17,4 @@ from cl.runtime.schema.type_info_cache import TypeInfoCache
 if __name__ == '__main__':
 
     # Rebuild type cache and save TypeInfo.csv file to the bootstrap resources directory
-    TypeInfoCache.rebuild_cache()
+    TypeInfoCache.rebuild()
