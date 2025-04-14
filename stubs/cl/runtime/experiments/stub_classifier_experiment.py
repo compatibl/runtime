@@ -29,6 +29,6 @@ class StubClassifierExperiment(ClassifierExperiment):
             experiment=self.get_key(),
             result="abc",
             expected="def"
-        )
+        ).build()
         DbContext.save_one(trial)
 

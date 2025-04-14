@@ -14,10 +14,11 @@
 
 import pytest
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_mock_db  # noqa
 
 
-def test_supervised(pytest_work_dir):
+def test_supervised(pytest_basic_mongo_mock_db):
     """Test for BinaryExperiment class with supervised=True."""
 
     # Create and run the experiment

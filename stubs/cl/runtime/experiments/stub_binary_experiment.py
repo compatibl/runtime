@@ -34,6 +34,6 @@ class StubBinaryExperiment(BinaryExperiment):
         # Create a trial record with random result
         trial = Trial(
             experiment=self.get_key(),
-            result=YamlSerializers.DEFAULT.serialize(True, TypeHints.BOOL),
+            result=YamlSerializers.DEFAULT.serialize(True, TypeHints.BOOL_OR_NONE),
         ).build()
         DbContext.save_one(trial)
