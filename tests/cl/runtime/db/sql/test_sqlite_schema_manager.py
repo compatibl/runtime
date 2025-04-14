@@ -101,7 +101,7 @@ def test_get_columns_mapping():
 
     guard = RegressionGuard()
     resolved_columns = SqliteSchemaManager().get_columns_mapping(test_type)
-    tuple(guard.write(f"key={key} value={value}") for key, value in resolved_columns.items())
+    tuple(guard.write(f"{key},{value}") for key, value in resolved_columns.items())
     guard.verify()
 
 

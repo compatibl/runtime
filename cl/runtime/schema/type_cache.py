@@ -198,15 +198,15 @@ class TypeCache:
                 # Import the submodule using its full name
                 submodule = importlib.import_module(module_name)
                 modules.append(submodule)
-        return tuple(modules)
+        return tuple(sorted(modules, key=lambda x: x.__name__))
 
     @classmethod
     def _get_package_classes(cls) -> Tuple[type, ...]:
         """Get the list of classes in the packages specified in settings."""
         # Enumerate classes in all modules that match is_schema_type predicate
         modules = cls._get_package_modules()
-        result = tuple(class_ for module in modules for _, class_ in getmembers(module, is_schema_type))
-        return result
+        classes = tuple(class_ for module in modules for _, class_ in getmembers(module, is_schema_type))
+        return tuple(sorted(classes, key=lambda x: x.__name__))
 
     @classmethod
     def _get_type_kind(cls, class_: type) -> TypeKind | None:
@@ -227,15 +227,15 @@ class TypeCache:
 
     @classmethod
     def _build_child_names(cls, class_: type) -> Tuple[str, ...]:
-        """Return a tuple subclasses (inclusive of self) that match the predicate, not cached."""
+        """Return a tuple subclasses (inclusive of self) that match the predicate, sorted by type name."""
         # This must run after all classes are loaded
         subclasses = [TypeUtil.name(class_)] if is_data(class_) else [] # Include self in subclasses
         for subclass in class_.__subclasses__():
             # Exclude self from subclasses
             if subclass is not class_:
-                # Recurse into the subclass hierarchy even if subclass does not match the predicate itself
-                subclasses.extend(cls._build_child_names(subclass))
-        return tuple(set(subclasses))
+                # Recurse into the subclass hierarchy, avoid adding duplicates
+                subclasses.extend(x for x in cls._build_child_names(subclass) if x not in subclasses)
+        return tuple(sorted(subclasses, key=TypeUtil.name))
 
     @classmethod
     def _build_parent_names(cls, class_: type) -> Tuple[str, ...]:
