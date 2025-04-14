@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime.experiments.stub_classifier_experiment import StubClassifierExperiment
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_mock_db  # noqa
+from stubs.cl.runtime.experiments.stub_classifier_experiment import StubClassifierExperiment
 
 
 def test_supervised(pytest_basic_mongo_mock_db):

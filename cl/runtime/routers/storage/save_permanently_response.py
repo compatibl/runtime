@@ -18,13 +18,13 @@ from typing import DefaultDict
 from typing import Iterable
 import pandas as pd
 from pydantic import BaseModel
-from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 

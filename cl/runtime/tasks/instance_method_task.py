@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from typing import Callable
 from typing_extensions import Self
 from typing_extensions import override
-from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -24,6 +23,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey

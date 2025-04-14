@@ -16,9 +16,9 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing_extensions import Self
-
 from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
 from cl.runtime.schema.type_kind import TypeKind
+
 
 @dataclass(slots=True, kw_only=True, frozen=True)
 class TypeSpec(FrozenData, ABC):

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from __future__ import annotations
-from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 
 
 class TypeResponseUtil:

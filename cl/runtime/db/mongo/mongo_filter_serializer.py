@@ -16,7 +16,8 @@ from dataclasses import dataclass
 from typing import Any
 from typing import ClassVar
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.protocols import RecordProtocol, PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.serializers.slots_util import SlotsUtil
 

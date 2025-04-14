@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
 from cl.runtime.experiments.trial import Trial
@@ -28,7 +27,6 @@ class StubClassifierExperiment(ClassifierExperiment):
         trial = Trial(
             experiment=self.get_key(),
             result="abc",
-            expected="def"
+            expected="def",
         ).build()
         DbContext.save_one(trial)
-

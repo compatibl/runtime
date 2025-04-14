@@ -14,9 +14,8 @@
 
 import pytest
 from cl.runtime import RecordMixin
-from cl.runtime.schema.type_info_cache import TypeInfoCache
-from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.schema.type_kind import TypeKind
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassRecord
@@ -75,7 +74,12 @@ def test_from_qual_name():
 def test_get_classes():
     """Test TypeInfoCache.get_classes method."""
 
-    records = TypeInfoCache.get_classes(type_kinds=(TypeKind.KEY, TypeKind.RECORD,))
+    records = TypeInfoCache.get_classes(
+        type_kinds=(
+            TypeKind.KEY,
+            TypeKind.RECORD,
+        )
+    )
 
     # Included
     assert TypeDecl in records

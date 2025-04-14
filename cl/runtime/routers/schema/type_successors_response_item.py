@@ -16,9 +16,9 @@ from __future__ import annotations
 import inspect
 from inflection import titleize
 from pydantic import BaseModel
-from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 
 
 class TypeSuccessorsResponseItem(BaseModel):

@@ -20,11 +20,11 @@ from typing import Dict
 from typing import Mapping
 from typing import Tuple
 from uuid import UUID
-from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.schema.type_spec import TypeSpec
 
 

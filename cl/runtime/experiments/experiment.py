@@ -12,16 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
-from itertools import count
-
 from more_itertools import consume
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial import Trial
-from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
@@ -53,10 +50,12 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.max_trials is not None and self.max_trials <= 0:
             raise RuntimeError(
-                f"{TypeUtil.name(self)}.max_trials={self.max_trials}. It must be None or a positive number.")
+                f"{TypeUtil.name(self)}.max_trials={self.max_trials}. It must be None or a positive number."
+            )
         if self.max_parallel is not None and self.max_parallel <= 0:
             raise RuntimeError(
-                f"{TypeUtil.name(self)}.max_parallel={self.max_parallel}. It must be None or a positive number.")
+                f"{TypeUtil.name(self)}.max_parallel={self.max_parallel}. It must be None or a positive number."
+            )
 
     @abstractmethod
     def run_one(self) -> None:
@@ -77,8 +76,10 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
         """Run trials until the specified total number (max_trials) is reached or exceeded."""
 
         if (num_remaining := self.count_remaining_trials()) is None:
-            raise RuntimeError(f"Cannot invoke run_all for experiment {self.experiment_id}\n"
-                               f"because max_trials is not set, use run_one or run_many instead.")
+            raise RuntimeError(
+                f"Cannot invoke run_all for experiment {self.experiment_id}\n"
+                f"because max_trials is not set, use run_one or run_many instead."
+            )
 
         if self.max_parallel is None or self.max_parallel <= 1:
             # Run sequentially

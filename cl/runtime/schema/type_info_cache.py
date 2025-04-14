@@ -20,36 +20,43 @@ from inspect import getmembers
 from inspect import isclass
 from pkgutil import walk_packages
 from types import ModuleType
-from typing import Callable, Sequence
 from typing import Dict
+from typing import Sequence
 from typing import Tuple
 from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
+from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_record
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info import TypeInfo
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.project_settings import ProjectSettings
-from cl.runtime.records.protocols import is_key, is_record, is_data, is_primitive, is_enum
-from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_kind import TypeKind
 
 # Class method TypeInfoCache.load_cache is invoked on import of this module (see below after class definition)
+
 
 def is_schema_type(class_: type) -> bool:
     """Return true if the type should be included in schema, includes data classes and enums."""
     return isclass(class_) and (is_data(class_) or is_enum(class_)) and not class_.__name__.endswith("Mixin")
 
+
 _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildNames")
 """Headers of TypeInfo preload file."""
+
 
 class TypeInfoCache:
     """Cache of TypeInfo for the specified packages."""
 
     _type_info_dict: Dict[str, TypeInfo] | None = None
     """Dictionary of TypeInfo indexed by type name."""
-    
+
     _type_by_type_name_dict: Dict[str, type] | None = None
     """Dictionary of classes indexed by type name."""
-    
+
     _type_by_qual_name_dict: Dict[str, type] | None = None
     """Dictionary of classes indexed by qual name."""
 
@@ -214,7 +221,7 @@ class TypeInfoCache:
     def _build_child_names(cls, class_: type) -> Tuple[str, ...]:
         """Return a tuple subclasses (inclusive of self) that match the predicate, sorted by type name."""
         # This must run after all classes are loaded
-        subclasses = [TypeUtil.name(class_)] if is_data(class_) else [] # Include self in subclasses
+        subclasses = [TypeUtil.name(class_)] if is_data(class_) else []  # Include self in subclasses
         for subclass in class_.__subclasses__():
             # Exclude self from subclasses
             if subclass is not class_:
@@ -368,14 +375,14 @@ class TypeInfoCache:
             # Write header row
             file.write(",".join(_TYPE_INFO_HEADERS) + "\n")
             for type_info in cls._type_info_dict.values():
-                
+
                 # Format fields for writing
                 type_name = type_info.type_name
                 type_kind_str = EnumUtil.to_str(type_info.type_kind)
                 qual_name = type_info.qual_name
                 parent_names_str = ";".join(type_info.parent_names) if type_info.parent_names else ""
                 child_names_str = ";".join(type_info.child_names) if type_info.child_names else ""
-                
+
                 # Write comma-separated values for each token, with semicolons-separated lists
                 file.write(f"{type_name},{type_kind_str},{qual_name},{parent_names_str},{child_names_str}\n")
 
@@ -402,6 +409,7 @@ class TypeInfoCache:
             f"Type {type_name} is not found in TypeInfo preload,\n"
             f"run init_import_cache to regenerate the preload file."
         )
+
 
 # Load type cache from TypeInfo preload on import of this module
 TypeInfoCache.load_cache()

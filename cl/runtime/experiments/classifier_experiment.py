@@ -15,7 +15,6 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import List
-
 from cl.runtime.experiments.experiment import Experiment
 from cl.runtime.records.for_dataclasses.extensions import required
 
@@ -31,4 +30,3 @@ class ClassifierExperiment(Experiment, ABC):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         # Result has string type
         self.result_type = str.__name__
-

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.binary_experiment import BinaryExperiment
 from cl.runtime.experiments.trial import Trial

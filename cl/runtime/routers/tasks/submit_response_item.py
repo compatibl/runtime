@@ -14,12 +14,12 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.static_method_task import StaticMethodTask
