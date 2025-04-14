@@ -14,7 +14,7 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.primitive.case_util import CaseUtil
@@ -61,7 +61,7 @@ class SubmitResponseItem(BaseModel):
                     # Key is not None, this is an instance method
 
                     # Get key type based on table in request
-                    key_type = TypeCache.get_class_from_type_name(request.type).get_key_type()  # noqa
+                    key_type = TypeInfoCache.get_class_from_type_name(request.type).get_key_type()  # noqa
 
                     key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
                     method_name_pascal_case = CaseUtil.snake_to_pascal_case(request.method)
@@ -76,7 +76,7 @@ class SubmitResponseItem(BaseModel):
                     ).build()
                 else:
                     # Key is None, this is a @classmethod or @staticmethod
-                    record_type = TypeCache.get_class_from_type_name(request.type)
+                    record_type = TypeInfoCache.get_class_from_type_name(request.type)
                     record_type_str = f"{record_type.__module__}.{TypeUtil.name(record_type)}"
                     method_name_pascal_case = CaseUtil.snake_to_pascal_case(request.method)
                     label = f"{TypeUtil.name(record_type)};{method_name_pascal_case}"

@@ -18,7 +18,7 @@ from typing import List
 from typing import Tuple
 from typing import TypeVar
 from memoization import cached
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_key_or_record

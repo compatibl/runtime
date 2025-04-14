@@ -20,7 +20,7 @@ from typing import Dict
 from typing import Mapping
 from typing import Tuple
 from uuid import UUID
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
@@ -66,7 +66,7 @@ class TypeSchema:
             return result
         else:
             # Get class for the specified type name and use it to get type spec
-            class_ = TypeCache.get_class_from_type_name(type_name)
+            class_ = TypeInfoCache.get_class_from_type_name(type_name)
             return cls.for_class(class_)
 
     @classmethod
@@ -78,7 +78,7 @@ class TypeSchema:
             return result
         else:
             # Get class for the specified type name
-            class_ = TypeCache.get_class_from_type_name(type_name)
+            class_ = TypeInfoCache.get_class_from_type_name(type_name)
 
             # Get class for the type spec
             if issubclass(class_, Enum):

@@ -32,7 +32,7 @@ from cl.runtime.records.protocols import is_key, is_record, is_data, is_primitiv
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_kind import TypeKind
 
-# Class method TypeCache.load_cache is invoked on import of this module (see below after class definition)
+# Class method TypeInfoCache.load_cache is invoked on import of this module (see below after class definition)
 
 def is_schema_type(class_: type) -> bool:
     """Return true if the type should be included in schema, includes data classes and enums."""
@@ -41,7 +41,7 @@ def is_schema_type(class_: type) -> bool:
 _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildNames")
 """Headers of TypeInfo preload file."""
 
-class TypeCache:
+class TypeInfoCache:
     """Helper methods for Record."""
 
     _type_info_dict: Dict[str, TypeInfo] = {}
@@ -165,7 +165,7 @@ class TypeCache:
 
     @classmethod
     def rebuild_cache(cls) -> None:
-        """Reload classes from packages and save a new imports.txt file."""
+        """Reload classes from packages and save a new TypeInfo.csv file to the bootstrap resources directory."""
 
         # Init dictionaries
         cls._module_dict = {}
@@ -412,7 +412,7 @@ class TypeCache:
         """Get the filename for the qual name cache."""
         if cls._cache_filename is None:
             resources_root = ProjectSettings.get_resources_root()
-            cls._cache_filename = os.path.join(resources_root, "imports.txt")
+            cls._cache_filename = os.path.join(resources_root, "bootstrap/TypeInfo.csv")
         return cls._cache_filename
 
     @classmethod
@@ -424,4 +424,4 @@ class TypeCache:
         )
 
 # Load type cache from TypeInfo preload on import of this module
-TypeCache.load_cache()
+TypeInfoCache.load_cache()

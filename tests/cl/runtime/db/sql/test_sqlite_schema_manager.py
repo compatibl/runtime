@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.record_util import RecordUtil
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
 from stubs.cl.runtime import StubDataclassDictFields
@@ -32,7 +32,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import
 
 # TODO (Roman): move to Schema tests
 def test_get_subtypes_in_hierarchy():
-    result = TypeCache.get_child_names(StubDataclassRecordKey)
+    result = TypeInfoCache.get_child_names(StubDataclassRecordKey)
     expected_classes = {
         StubDataclassRecordKey,
         StubDataclassRecord,

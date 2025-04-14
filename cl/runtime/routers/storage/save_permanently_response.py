@@ -18,7 +18,7 @@ from typing import DefaultDict
 from typing import Iterable
 import pandas as pd
 from pydantic import BaseModel
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.protocols import TRecord
@@ -34,7 +34,7 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[type, TRecord]:
     """Fetch records from the database and return them."""
 
-    request_type = TypeCache.get_class_from_type_name(request.type)
+    request_type = TypeInfoCache.get_class_from_type_name(request.type)
     type_hint = TypeHint.for_class(request_type, optional=True)
 
     key_objs = [_KEY_SERIALIZER.deserialize(key, type_hint) for key in request.keys]

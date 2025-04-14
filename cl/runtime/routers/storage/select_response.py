@@ -15,7 +15,7 @@
 from __future__ import annotations
 from enum import Enum
 from typing import Any
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
@@ -48,7 +48,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         if request.limit is not None:
             raise RuntimeError("Select with 'limit' currently is not supported.")
 
-        select_type = TypeCache.get_class_from_type_name(request.type_)
+        select_type = TypeInfoCache.get_class_from_type_name(request.type_)
 
         # Load records for type.
         records = DbContext.get_db().load_all(select_type)  # noqa

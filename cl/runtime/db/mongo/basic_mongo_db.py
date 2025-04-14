@@ -28,7 +28,7 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -118,7 +118,7 @@ class BasicMongoDb(Db):
         db = self._get_db()
         collection = db[collection_name]
 
-        subtype_names = TypeCache.get_child_names(record_type)
+        subtype_names = TypeInfoCache.get_child_names(record_type)
         serialized_records = collection.find({"_type": {"$in": subtype_names}})
         result = []
         for serialized_record in serialized_records:
