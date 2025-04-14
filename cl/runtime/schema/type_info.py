@@ -13,19 +13,15 @@
 # limitations under the License.
 
 from abc import ABC
-from abc import abstractmethod
 from dataclasses import dataclass
-from typing_extensions import Self
-
+from typing import Tuple
 from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
 from cl.runtime.schema.type_kind import TypeKind
 
+
 @dataclass(slots=True, kw_only=True, frozen=True)
-class TypeSpec(FrozenData, ABC):
-    """
-    Provides information about a type included in schema and its dependencies including data types,
-    enums and primitive types.
-    """
+class TypeInfo(FrozenData, ABC):
+    """Information about a type stored in the type cache."""
 
     type_name: str
     """Unique type name (the same as class name except when alias is specified)."""
@@ -33,14 +29,11 @@ class TypeSpec(FrozenData, ABC):
     type_kind: TypeKind
     """Type kind (primitive, enum, data, key, record)."""
 
-    _class: type
-    """Class where the type is stored (this is not the type hint as it excludes container and optional info)."""
+    qual_name: str
+    """Fully qualified name in module.ClassName format."""
 
-    def get_class(self) -> type:
-        """Class where the type is stored."""
-        return self._class
+    parent_names: Tuple[str, ...] | None
+    """Tuple of parent (superclass) type names or None if none exist."""
 
-    @classmethod
-    @abstractmethod
-    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
-        """Create spec from class, specify subtype only when different from class name (e.g., long or timestamp)."""
+    child_names: Tuple[str, ...] | None
+    """Tuple of child (subclass) type names or None if none exist or not yet populated."""

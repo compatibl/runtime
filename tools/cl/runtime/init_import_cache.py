@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime import TypeImport
+from cl.runtime.schema.type_cache import TypeCache
 
 if __name__ == '__main__':
 
-    # Rebuild TypeImport cache and save imports.txt file to the resources directory
-    TypeImport.rebuild_cache()
+    # Rebuild type cache and save imports.txt file to the resources directory
+    TypeCache.rebuild_cache()

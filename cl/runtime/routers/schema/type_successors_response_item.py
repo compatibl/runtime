@@ -16,7 +16,7 @@ from __future__ import annotations
 import inspect
 from inflection import titleize
 from pydantic import BaseModel
-from cl.runtime import TypeImport
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 
@@ -41,7 +41,7 @@ class TypeSuccessorsResponseItem(BaseModel):
         base_type_name = request.type_name
 
         # Getting type's successor names
-        base_type = TypeImport.get_class_from_type_name(base_type_name)
+        base_type = TypeCache.get_class_from_type_name(base_type_name)
         # TODO: Modify the method for removing types to also cover non-abstract Mixins
         successor_types = [t for t in base_type.__subclasses__() if not inspect.isabstract(t)]
         all_type_names = list(set([s_type.__name__ for s_type in successor_types]))

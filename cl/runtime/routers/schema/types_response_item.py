@@ -15,10 +15,12 @@
 from __future__ import annotations
 from inflection import titleize
 from pydantic import BaseModel
-from cl.runtime import TypeImport
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_kind import TypeKind
 
 
 class TypesResponseItem(BaseModel):
@@ -39,7 +41,7 @@ class TypesResponseItem(BaseModel):
         """Implements /schema/types route."""
 
         # Get cached classes (does not rebuild cache)
-        record_types = TypeImport.get_cached_classes(predicate=is_record)
+        record_types = TypeCache.get_classes(type_kinds=(TypeKind.RECORD,))
 
         result = [
             TypesResponseItem(

@@ -31,6 +31,7 @@ from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -194,7 +195,7 @@ class SqliteDb(Db):
         sort_columns = ", ".join(pk_cols)
 
         # get subtypes for record_type and use them in match condition
-        subtype_names = tuple(t.__name__ for t in RecordUtil.child_records_of(record_type))
+        subtype_names = TypeCache.get_child_names(record_type)
         value_placeholders = ", ".join(["?"] * len(subtype_names))
         sql_statement = f'SELECT * FROM "{table_name}" WHERE _type in ({value_placeholders})'
 
@@ -263,6 +264,9 @@ class SqliteDb(Db):
                 for k in all_fields
             )
 
+            if key_type.__name__ == "LlmKey":
+                pass
+
             columns_mapping = schema_manager.get_columns_mapping(key_type)
             quoted_columns = [f'"{columns_mapping[field]}"' for field in all_fields]
             columns_str = ", ".join(quoted_columns)
@@ -292,7 +296,10 @@ class SqliteDb(Db):
             try:
                 cursor.execute(sql_statement, sql_values)
             except Exception as e:
-                raise RuntimeError(str(sql_values))
+                raise RuntimeError(
+                    f"An exception occurred during SQL command execution for save_many: {e}\n"
+                    f"SQL values: {sql_values}\n"
+                ) from e
 
             connection.commit()
 

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from __future__ import annotations
-from cl.runtime import TypeImport
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.type_decl import TypeDecl
 
@@ -26,7 +26,7 @@ class TypeResponseUtil:
         """Implements /storage/get_datasets route."""
 
         # TODO: Check why empty module is passed, is module the short name prefix?
-        record_type = TypeImport.get_class_from_type_name(request.type_name)
+        record_type = TypeCache.get_class_from_type_name(request.type_name)
         handler_args_elements = dict()
         result = TypeDecl.as_dict_with_dependencies(record_type)
 

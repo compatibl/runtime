@@ -14,7 +14,7 @@
 
 import logging
 from typing import Any
-from cl.runtime import TypeImport
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
@@ -37,7 +37,7 @@ class PanelResponseUtil:
         """Implements /entity/panel route."""
 
         # Get type of the record.
-        type_ = TypeImport.get_class_from_type_name(request.type_name)
+        type_ = TypeCache.get_class_from_type_name(request.type_name)
 
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(type_.get_key_type()))

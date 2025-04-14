@@ -17,7 +17,7 @@ import os
 from dataclasses import dataclass
 from typing import Any
 from typing import Dict
-from cl.runtime import TypeImport
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.reader import Reader
 from cl.runtime.primitive.case_util import CaseUtil
@@ -80,7 +80,7 @@ class CsvFileReader(Reader):
             )
 
         # Get record type
-        record_type = TypeImport.get_class_from_type_name(filename_without_extension)
+        record_type = TypeCache.get_class_from_type_name(filename_without_extension)
 
         # Normalize chars and set None for empty strings
         row_dict = {CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()}

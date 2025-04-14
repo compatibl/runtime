@@ -33,7 +33,7 @@ from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_import import TypeImport
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.settings.context_settings import ContextSettings
 
 
@@ -296,7 +296,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         # Get DB type from context settings if not specified
         if db_type is None:
             context_settings = ContextSettings.instance()
-            db_type = TypeImport.get_class_from_qual_name(context_settings.db_class)
+            db_type = TypeCache.get_class_from_qual_name(context_settings.db_class)
 
         # Get DB identifier if not specified
         if db_id is None:

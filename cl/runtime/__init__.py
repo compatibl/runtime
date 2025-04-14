@@ -1,4 +1,4 @@
-from cl.runtime.schema.type_import import TypeImport
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.db.db import Db
