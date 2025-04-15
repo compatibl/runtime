@@ -106,6 +106,14 @@ def get_rounding_samples() -> List[Tuple[dt.datetime, dt.datetime]]:
             dt.datetime(2003, 5, 1, 10, 15, 30, microsecond=999501, tzinfo=dt.timezone.utc),
             dt.datetime(2003, 5, 1, 10, 15, 31, microsecond=0, tzinfo=dt.timezone.utc),
         ),
+        (
+            dt.datetime(2000, 10, 17, 3, 12, 59, microsecond=999001, tzinfo=dt.timezone.utc),
+            dt.datetime(2000, 10, 17, 3, 12, 59, microsecond=999000, tzinfo=dt.timezone.utc),
+        ),
+        (
+            dt.datetime(2000, 10, 17, 23, 59, 59, microsecond=999501, tzinfo=dt.timezone.utc),
+            dt.datetime(2000, 10, 18, 0, 0, 0, microsecond=0, tzinfo=dt.timezone.utc),
+        )
     ]
 
 

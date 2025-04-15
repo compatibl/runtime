@@ -247,30 +247,10 @@ class DatetimeUtil:
                 f"Only UTC timezone is accepted and must be specified explicitly."
             )
 
-        if value.microsecond % 1_000 == 0:
-            # Already whole milliseconds
-            rounded_milliseconds = 1_000 * value.second + value.microsecond // 1_000
-        else:
-            # Round to whole milliseconds
-            fractional_milliseconds_float = 1_000 * value.second + value.microsecond / 1_000
-            rounded_milliseconds = rounding_function(fractional_milliseconds_float)
+        total_ms: float = value.second * 1_000 + value.microsecond / 1_000
+        rounded_ms: int = rounding_function(total_ms)
 
-        second: int = rounded_milliseconds // 1_000
-        rounded_milliseconds -= second * 1_000
-        if second > 59 or second < 0:
-            raise RuntimeError(f"Invalid second {second} for datetime {value} after rounding.")
+        delta_ms = rounded_ms - total_ms
+        rounded_dt = value + dt.timedelta(milliseconds=delta_ms)
 
-        if rounded_milliseconds > 999 or rounded_milliseconds < 0:
-            raise RuntimeError(f"Invalid millisecond {rounded_milliseconds} for datetime {value} after rounding.")
-
-        result = dt.datetime(
-            value.year,
-            value.month,
-            value.day,
-            value.hour,
-            value.minute,
-            second,  # New value from rounding
-            1_000 * rounded_milliseconds,
-            dt.timezone.utc,  # New value from rounding
-        )
-        return result
+        return rounded_dt
