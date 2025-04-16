@@ -14,7 +14,7 @@
 
 import io
 import os
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from dataclasses import dataclass
 import matplotlib
 from matplotlib import pyplot as plt
@@ -31,7 +31,7 @@ matplotlib.use("Agg")
 
 
 @dataclass(slots=True, kw_only=True)
-class MatplotlibPlot(Plot):
+class MatplotlibPlot(Plot, ABC):
     """Base class for plot objects created using Matplotlib package."""
 
     @abstractmethod
