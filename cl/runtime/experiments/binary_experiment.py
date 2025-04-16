@@ -19,9 +19,7 @@ from cl.runtime.experiments.experiment import Experiment
 
 @dataclass(slots=True, kw_only=True)
 class BinaryExperiment(Experiment, ABC):
-    """Run and analyze the results of multiple binary (true/false) trials, result type is bool."""
+    """An unsupervised experiment that records the outcome of multiple binary trials."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        # Result has boolean type (true/false)
-        self.result_type = bool.__name__

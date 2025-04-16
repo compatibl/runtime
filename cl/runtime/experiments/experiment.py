@@ -26,22 +26,13 @@ from cl.runtime.records.type_util import TypeUtil
 
 @dataclass(slots=True, kw_only=True)
 class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
-    """Run and analyze the results of multiple trials."""
-
-    supervised: bool = required()
-    """True if the experiment is supervised (expected results are provided)."""
+    """Run and analyze the results of a statistical experiment that involves multiple trials."""
 
     max_trials: int | None = None
     """Maximum number of trials to run (optional)."""
 
     max_parallel: int | None = None
     """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
-
-    result_type: str | None = None
-    """Type name of the result (e.g., 'bool' for binary experiments), 'str' by default."""
-
-    result_serializer: str | None = None
-    """Serializer for the result, used only if the type is not str."""
 
     def get_key(self) -> ExperimentKey:
         return ExperimentKey(experiment_id=self.experiment_id).build()

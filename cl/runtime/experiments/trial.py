@@ -26,13 +26,7 @@ class Trial(TrialKey, RecordMixin[TrialKey], ABC):
     """Result and supporting data for a single trial of an experiment."""
 
     experiment: ExperimentKey = required()
-    """Experiment for which the trial is performed."""
-
-    result: str = required()
-    """Trial result serialized as YAML."""
-
-    expected: str | None = None
-    """Expected result serialized as YAML for supervised experiments only, None otherwise."""
+    """Experiment for which the trial is recorded."""
 
     def get_key(self) -> TrialKey:
         return TrialKey(timestamp=self.timestamp).build()

@@ -12,22 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
-from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_mock_db  # noqa
-from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
+from dataclasses import dataclass
+from cl.runtime.experiments.trial import Trial
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
-def test_supervised(pytest_basic_mongo_mock_db):
-    """Test for BinaryExperiment class."""
+@dataclass(slots=True, kw_only=True)
+class BinaryTrial(Trial):
+    """Single trial of a binary experiment, the outcome is a boolean flag."""
 
-    # Create and run the experiment
-    experiment = StubBinaryExperiment(
-        experiment_id="binary_experiment",
-        max_trials=5,
-    )
-    experiment.run_all()
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])
+    flag: bool = required()
+    """Outcome of a binary experiment is a boolean flag."""

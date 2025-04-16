@@ -19,7 +19,7 @@ from cl.runtime.records.for_dataclasses.key import Key
 
 @dataclass(slots=True)
 class ExperimentKey(Key):
-    """Run and analyze the results of multiple trials."""
+    """Run and analyze the results of a statistical experiment that involves multiple trials."""
 
     experiment_id: str = required()
     """Unique experiment identifier."""
