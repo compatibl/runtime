@@ -13,13 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.binary_trial import BinaryTrial
+from cl.runtime.experiments.trial import Trial
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class SupervisedBinaryTrial(BinaryTrial):
-    """Single trial of a supervised binary experiment, the actual and expected results are boolean flags."""
+class ClassifierTrial(Trial):
+    """Single trial of a classifier experiment, the result is a string label."""
 
-    expected_flag: bool = required()
-    """Expected result of the trial (boolean flag)."""
+    label: str = required()
+    """Actual result of the classifier trial (string label)."""

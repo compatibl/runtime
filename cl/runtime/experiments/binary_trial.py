@@ -19,7 +19,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 
 @dataclass(slots=True, kw_only=True)
 class BinaryTrial(Trial):
-    """Single trial of a binary experiment, the outcome is a boolean flag."""
+    """Single trial of a binary experiment, the result is a boolean flag."""
 
     flag: bool = required()
-    """Outcome of a binary experiment is a boolean flag."""
+    """Actual result of the trial (boolean flag)."""

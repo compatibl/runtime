@@ -24,7 +24,6 @@ def test_run_many(pytest_basic_mongo_mock_db):
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
         experiment_id="test_run_many.max_trials_not_set",
-        supervised=True,
     )
 
     # Run the experiment in stages
@@ -41,7 +40,6 @@ def test_run_many(pytest_basic_mongo_mock_db):
     # Create and run the experiment with max_trials set to 5
     max_trials_set = StubBinaryExperiment(
         experiment_id="test_run_many.max_trials_set",
-        supervised=True,
         max_trials=5,
     )
 
@@ -76,7 +74,6 @@ def test_run_all(pytest_basic_mongo_mock_db):
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
         experiment_id="test_run_all.max_trials_not_set",
-        supervised=True,
     )
 
     assert not max_trials_not_set.is_max_trials_reached_or_exceeded()
@@ -87,7 +84,6 @@ def test_run_all(pytest_basic_mongo_mock_db):
     # Create and run the experiment with max_trials set to 5
     max_trials_set = StubBinaryExperiment(
         experiment_id="test_run_all.max_trials_set",
-        supervised=True,
         max_trials=5,
     )
 

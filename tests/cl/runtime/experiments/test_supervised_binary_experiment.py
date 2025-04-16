@@ -23,7 +23,7 @@ def test_smoke(pytest_basic_mongo_mock_db):
 
     # Create and run the experiment
     experiment = StubSupervisedBinaryExperiment(
-        experiment_id="supervised_binary_experiment",
+        experiment_id="test_supervised_binary_experiment.test_smoke",
         max_trials=5,
     )
     experiment.run_all()

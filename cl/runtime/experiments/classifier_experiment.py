@@ -21,12 +21,11 @@ from cl.runtime.records.for_dataclasses.extensions import required
 
 @dataclass(slots=True, kw_only=True)
 class ClassifierExperiment(Experiment, ABC):
-    """Run and analyze the results of multiple classification (category assignment) trials, result type is str."""
+    """Run and analyze the results of multiple classifier trials, the result of each trial is a string label."""
 
-    categories: List[str] = required()
-    """List of categories the classifier chooses from."""
+    labels: List[str] = required()
+    """List of labels the classifier chooses from."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        # Result has string type
-        self.result_type = str.__name__
+

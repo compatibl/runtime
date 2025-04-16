@@ -14,12 +14,13 @@
 
 from dataclasses import dataclass
 from cl.runtime.experiments.binary_trial import BinaryTrial
+from cl.runtime.experiments.classifier_trial import ClassifierTrial
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class SupervisedBinaryTrial(BinaryTrial):
-    """Single trial of a supervised binary experiment, the actual and expected results are boolean flags."""
+class SupervisedClassifierTrial(ClassifierTrial):
+    """Single trial of a supervised classifier experiment, the actual and expected results are string labels."""
 
-    expected_flag: bool = required()
-    """Expected result of the trial (boolean flag)."""
+    expected_label: str = required()
+    """Expected result of the classifier trial (string label)."""

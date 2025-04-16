@@ -18,12 +18,12 @@ from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_mock_db  # n
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 
 
-def test_supervised(pytest_basic_mongo_mock_db):
+def test_smoke(pytest_basic_mongo_mock_db):
     """Test for BinaryExperiment class."""
 
     # Create and run the experiment
     experiment = StubBinaryExperiment(
-        experiment_id="binary_experiment",
+        experiment_id="test_binary_experiment.test_smoke",
         max_trials=5,
     )
     experiment.run_all()

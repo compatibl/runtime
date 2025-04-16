@@ -19,7 +19,10 @@ from cl.runtime.experiments.experiment import Experiment
 
 @dataclass(slots=True, kw_only=True)
 class SupervisedBinaryExperiment(Experiment, ABC):
-    """A supervised experiment that records the outcome and expected outcome of multiple binary trials."""
+    """
+    Run and analyze the results of multiple supervised binary trials, the actual and expected results
+    of each trial are a boolean flags.
+    """
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

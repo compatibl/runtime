@@ -19,7 +19,7 @@ from cl.runtime.experiments.experiment import Experiment
 
 @dataclass(slots=True, kw_only=True)
 class BinaryExperiment(Experiment, ABC):
-    """An unsupervised experiment that records the outcome of multiple binary trials."""
+    """Run and analyze the results of multiple binary trials, the result of each trial is a boolean flag."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

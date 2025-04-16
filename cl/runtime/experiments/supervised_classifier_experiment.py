@@ -12,14 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.binary_trial import BinaryTrial
-from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.experiments.experiment import Experiment
 
 
 @dataclass(slots=True, kw_only=True)
-class SupervisedBinaryTrial(BinaryTrial):
-    """Single trial of a supervised binary experiment, the actual and expected results are boolean flags."""
+class SupervisedClassifierExperiment(Experiment, ABC):
+    """
+    Run and analyze the results of multiple supervised classifier trials, the actual and expected results
+    of each trial are a string labels.
+    """
 
-    expected_flag: bool = required()
-    """Expected result of the trial (boolean flag)."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

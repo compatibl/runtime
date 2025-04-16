@@ -15,18 +15,20 @@
 from dataclasses import dataclass
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
-from cl.runtime.experiments.classifier_trial import ClassifierTrial
+from cl.runtime.experiments.supervised_classifier_experiment import SupervisedClassifierExperiment
+from cl.runtime.experiments.supervised_classifier_trial import SupervisedClassifierTrial
 from cl.runtime.experiments.trial import Trial
 
 
 @dataclass(slots=True, kw_only=True)
-class StubClassifierExperiment(ClassifierExperiment):
-    """Stub implementation of ClassifierExperiment."""
+class StubSupervisedClassifierExperiment(SupervisedClassifierExperiment):
+    """Stub implementation of SupervisedClassifierExperiment."""
 
     def run_one(self) -> None:
         # Create a trial record with random result
-        trial = ClassifierTrial(
+        trial = SupervisedClassifierTrial(
             experiment=self.get_key(),
             label="abc",
+            expected_label="def",
         ).build()
         DbContext.save_one(trial)
