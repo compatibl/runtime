@@ -244,12 +244,14 @@ class TypeInfoCache:
             if subclass is not class_:
                 # Recurse into the subclass hierarchy, avoid adding duplicates
                 subclasses.extend(x for x in cls._build_child_names(subclass) if x not in subclasses)
-        return tuple(sorted(subclasses, key=TypeUtil.name))
+        # Eliminate duplicates (they should not be present but just to be sure) and sort the names
+        return tuple(sorted(set(subclasses)))
 
     @classmethod
     def _build_parent_names(cls, class_: type) -> Tuple[str, ...]:
         """Return a tuple superclasses (inclusive of self) that match the predicate, not cached."""
-        return tuple(TypeUtil.name(x) for x in class_.mro() if is_data(x))
+        # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
+        return tuple(sorted(set(TypeUtil.name(x) for x in class_.mro() if is_data(x))))
 
     @classmethod
     def _add_class(cls, class_: type, subtype: str | None = None) -> None:
@@ -398,14 +400,19 @@ class TypeInfoCache:
         with open(cache_filename, "w") as file:
             # Write header row
             file.write(",".join(_TYPE_INFO_HEADERS) + "\n")
-            for type_info in cls._type_info_dict.values():
+
+            # Sort the TypeInfo dictionary by type name and iterate
+            sorted_type_info_list = sorted(cls._type_info_dict.values(), key=lambda x: x.type_name)
+            for type_info in sorted_type_info_list:
 
                 # Format fields for writing
                 type_name = type_info.type_name
                 type_kind_str = EnumUtil.to_str(type_info.type_kind)
                 qual_name = type_info.qual_name
-                parent_names_str = ";".join(type_info.parent_names) if type_info.parent_names else ""
-                child_names_str = ";".join(type_info.child_names) if type_info.child_names else ""
+
+                # Sort parent and child names (they should already be sorted, just to be sure)
+                parent_names_str = ";".join(sorted(type_info.parent_names)) if type_info.parent_names else ""
+                child_names_str = ";".join(sorted(type_info.child_names)) if type_info.child_names else ""
 
                 # Write comma-separated values for each token, with semicolons-separated lists
                 file.write(f"{type_name},{type_kind_str},{qual_name},{parent_names_str},{child_names_str}\n")
