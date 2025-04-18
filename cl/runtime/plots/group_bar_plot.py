@@ -46,6 +46,13 @@ class GroupBarPlot(MatplotlibPlot):
     value_ticks: List[float] | None = None
     """Custom ticks for the value axis."""
 
+    xtick_rotation: float = 0.0
+    """Rotation angle for x-axis tick labels (degrees). Default is 0 (horizontal)."""
+
+    xtick_ha: str = 'center'
+    """Horizontal alignment for rotated x-axis tick labels ('center', 'right', 'left').
+       Usually 'right' for positive rotation (e.g., 45), 'center' for 0/90."""
+
     def _create_figure(self) -> plt.Figure:
         # Load style object or create with default settings if not specified
         theme = self._get_pyplot_theme()
@@ -84,8 +91,15 @@ class GroupBarPlot(MatplotlibPlot):
 
             axes.set_xticks(x_ticks, data.index.tolist())
 
+            if self.xtick_rotation != 0.0:
+                plt.setp(axes.get_xticklabels(), rotation=self.xtick_rotation, ha=self.xtick_ha)
+
             if self.value_ticks is not None:
                 axes.set_yticks(self.value_ticks)
+
+            min_value_in_plot = data.min().min()
+            if min_value_in_plot < 0:
+                axes.axhline(0, color='grey', linestyle='--', linewidth=0.8, zorder=1)
 
             # Set figure and axes labels
             axes.set_xlabel(self.bar_axis_label)
