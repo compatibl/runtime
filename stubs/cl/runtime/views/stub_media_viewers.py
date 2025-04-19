@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import io
+import os
 from dataclasses import dataclass
+from PIL import Image
+
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.view.dag.dag_edge import DagEdge
 from cl.runtime.view.dag.dag_layout import DagLayout
@@ -20,12 +24,50 @@ from cl.runtime.view.dag.dag_node_data import DagNodeData
 from cl.runtime.view.dag.nodes.add_text_node import AddTextNode
 from cl.runtime.view.dag.nodes.text_input_node import TextInputNode
 from cl.runtime.view.dag.nodes.text_output_node import TextOutputNode
+from cl.runtime.views.pdf_view import PdfView
+from cl.runtime.views.png_view import PngView
+from cl.runtime.views.script import Script
+from cl.runtime.views.script_language import ScriptLanguage
 from stubs.cl.runtime.views.stub_viewers import StubViewers
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDagViewers(StubViewers):
-    """Stub viewers for DAGs."""
+class StubMediaViewers(StubViewers):
+    """Stub viewers for media types (images, files, text, etc.)."""
+
+    def view_png(self) -> PngView:
+        """Stub viewer returning a PngView of a simple generated image."""
+
+        # Create a new 300x300 image with RGB mode
+        width, height = 100, 100
+        sample_image = Image.new('RGB', (width, height))
+
+        # Get pixel access object
+        pixels = sample_image.load()
+
+        # Create gradient
+        for x in range(width):
+            for y in range(height):
+                # Calculate color transition
+                r = int(103 + (255 - 103) * (x / width))  # Red: 103 to 255
+                g = int(255 + (103 - 255) * (x / width))  # Green: 255 to 103
+                b = int(255 + (103 - 255) * (x / width))  # Blue: 255 to 103
+                pixels[x, y] = (r, g, b)
+
+        # Save to buffer
+        png_buffer = io.BytesIO()
+        sample_image.save(png_buffer, format='PNG')
+
+        # Get the PNG image bytes and wrap in PngView
+        png_bytes = png_buffer.getvalue()
+        return PngView(png_bytes=png_bytes)
+
+    def view_pdf(self) -> PdfView:
+        """Stub viewer returning a PdfView of a pdf file."""
+        file_path = os.path.join(os.path.dirname(__file__), "stub_media_viewers_pdf_sample.pdf")
+        with open(file_path, mode="rb") as file:
+            content = file.read()
+        return PdfView(pdf_bytes=content)
 
     def view_dag(self) -> Dag:
         """Stub viewer returning a DAG."""
@@ -57,3 +99,12 @@ class StubDagViewers(StubViewers):
         )
 
         return Dag.auto_layout_dag(dag, layout_mode=DagLayout.PLANAR, base_scale=180)
+
+    def view_markdown(self) -> Script:
+        """Stub viewer returning a Markdown text."""
+
+        return Script(
+            name="Stub markdown text.",
+            language=ScriptLanguage.MARKDOWN,
+            body=["# Successfully rendered.", "### `THIS TEXT SHOULD BE COLOURED`."]
+        )
