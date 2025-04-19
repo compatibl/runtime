@@ -28,18 +28,18 @@ class LegacyResponseUtil:
             return data_dict
 
         if _t == "PngView":
-            return {"Content": data_dict.get("PngBytes"), "ContentType": "Png", "_t": "BinaryContent"}
+            return {"FileBytes": data_dict.get("PngBytes"), "FileType": "Png", "_t": "FileData"}
         elif _t == "HtmlView":
             return {
-                "Content": data_dict.get("HtmlBytes"),
-                "ContentType": "Html",
-                "_t": "BinaryContent",
+                "FileBytes": data_dict.get("HtmlBytes"),
+                "FileType": "Html",
+                "_t": "FileData",
             }
         elif _t == "PdfView":
             return {
-                "Content": data_dict.get("PdfBytes"),
-                "ContentType": "Pdf",
-                "_t": "BinaryContent",
+                "FileBytes": data_dict.get("PdfBytes"),
+                "FileType": "Pdf",
+                "_t": "FileData",
             }
         elif _t == "Dag":
             return {**data_dict, "_t": "DAG"}

@@ -409,14 +409,14 @@ class DataSerializer(Serializer):
     def _serialize_key(self, field_key: str) -> str:
         """Transform the field key for use in serialization"""
         if self.pascalize_keys:
-            return CaseUtil.snake_to_pascal_case(field_key)
+            return CaseUtil.snake_to_pascal_case_keep_trailing_underscore(field_key)
         else:
             return field_key
 
     def _deserialize_key(self, field_key: str) -> str:
         """Transform the field key for use in deserialization"""
         if self.pascalize_keys:
-            return CaseUtil.pascal_to_snake_case(field_key)
+            return CaseUtil.pascale_to_snake_case_keep_trailing_underscore(field_key)
         else:
             return field_key
 

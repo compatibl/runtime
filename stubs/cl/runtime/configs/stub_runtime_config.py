@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.plots.group_bar_plot import GroupBarPlot
-from stubs.cl.runtime import StubDagViewers
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -31,9 +30,9 @@ from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataViewers
-from stubs.cl.runtime import StubFileViewers
-from stubs.cl.runtime import StubHandlers
+from stubs.cl.runtime import StubMediaViewers
 from stubs.cl.runtime import StubPlotViewers
+from stubs.cl.runtime import StubHandlers
 
 
 @dataclass(slots=True, kw_only=True)
@@ -67,9 +66,8 @@ class StubRuntimeConfig(Config):
         # Records with stub viewers
         stub_viewers_records = [
             StubDataViewers(stub_id=f"StubDataViewers"),
-            StubFileViewers(stub_id=f"StubFileViewers"),
-            StubDagViewers(stub_id=f"StubDagViewers"),
             StubPlotViewers(stub_id=f"StubPlotViewers"),
+            StubMediaViewers(stub_id=f"StubMediaViewers")
         ]
 
         all_records = [
