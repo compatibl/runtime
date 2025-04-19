@@ -159,17 +159,17 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
 
 
 def is_enum(instance_or_type: Any) -> TypeGuard[TEnum]:
-    """Returns true if the argument is an enum."""
+    """
+    Returns true if the argument is an enum.
+    Excludes classes whose name starts from underscore.
+    """
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
 
     # Ensure the argument is not one of the base enum classes such as Enum, IntEnum, etc.
-    not_base_enum = (
-        instance_or_type if isinstance(instance_or_type, type) else instance_or_type.__class__
-    ).__module__ != "enum"
+    not_base_enum = type_.__module__ != "enum"
 
     # Derived from Enum but not one of the base enum classes
-    return not_base_enum and (
-        issubclass(instance_or_type, Enum) if isinstance(instance_or_type, type) else isinstance(instance_or_type, Enum)
-    )
+    return issubclass(type_, Enum) and not type_.__name__.startswith("_") and not_base_enum
 
 
 def is_sequence(instance_or_type: Any) -> TypeGuard[TSequence]:
@@ -194,29 +194,46 @@ def is_abstract(instance_or_type: Any) -> bool:
 
 
 def is_data(instance_or_type: Any) -> TypeGuard[TData]:  # TODO: Rename to is_data_key_or_record
-    """True if the argument has 'build' method and is not a mixin (includes data, keys and records)."""
+    """
+    True if the argument has 'build' method and is not a mixin (includes data, keys and records).
+    Excludes classes whose name starts from underscore.
+    """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "build") and not type_.__name__.endswith("Mixin")
+    return hasattr(type_, "build") and not type_.__name__.startswith("_") and not type_.__name__.endswith("Mixin")
 
 
 def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
-    """True if the argument has 'get_key_type' method and is not a mixin."""
+    """
+    True if the argument has 'get_key_type' method and is not a mixin.
+    Excludes classes whose name starts from underscore.
+    """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_key_type") and not type_.__name__.endswith("Mixin")
+    return (
+            hasattr(type_, "get_key_type") and
+            not type_.__name__.startswith("_") and
+            not type_.__name__.endswith("Mixin")
+    )
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
     """
     True if the argument has 'get_key_type' method but not 'get_key' method and is not abstract or a mixin.
+    Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not is_abstract(type_)
+    return (
+            hasattr(type_, "get_key_type") and
+            not type_.__name__.startswith("_") and
+            not hasattr(type_, "get_key") and not is_abstract(type_)
+    )
 
 
 def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
-    """Return True if the argument has 'get_key' method and is not a mixin."""
+    """Return True if the argument has 'get_key' method and is not a mixin.
+       Excludes classes whose name starts from underscore.
+    """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_key") and not type_.__name__.endswith("Mixin")
+    return hasattr(type_, "get_key") and not type_.__name__.startswith("_") and not type_.__name__.endswith("Mixin")
 
 
 def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere and review logic

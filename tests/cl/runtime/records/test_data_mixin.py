@@ -13,107 +13,55 @@
 # limitations under the License.
 
 import pytest
-from dataclasses import dataclass
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.for_dataclasses.data import Data
-
-
-@dataclass(slots=True, kw_only=True)
-class Base(Data):
-    _protected_base_field: str | None = None
-    public_base_field_1: str | None = None
-    public_base_field_2: str | None = None
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        RegressionGuard().write("> Base.init")
-
-
-@dataclass(slots=True, kw_only=True)
-class Derived(Base):
-    public_derived_field: str | None = None
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        RegressionGuard().write(">> Derived.init")
-
-
-@dataclass(slots=True, kw_only=True)
-class DerivedFromDerivedWithInit(Derived):
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        RegressionGuard().write(">>> DerivedFromDerivedWithInit.init")
-
-
-@dataclass(slots=True, kw_only=True)
-class DerivedFromDerivedWithoutInit(Derived):
-    pass
-
-
-@dataclass(slots=True, kw_only=True)
-class _OneLeadingUnderscore(Data):
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        RegressionGuard().write("> _OneLeadingUnderscore.init")
-
-
-@dataclass(slots=True, kw_only=True)
-class __TwoLeadingUnderscores(Data):
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        RegressionGuard().write("> __TwoLeadingUnderscores.init")
-
+from stubs.cl.runtime import StubDataclassData, StubDataclassDerivedData, StubDataclassDerivedFromDerivedData
 
 def test_build():
     """Test DataMixin.build method."""
 
     guard = RegressionGuard()
     guard.write("Testing Base:")
-    Base().build()
+    StubDataclassData(_regression_guard=guard).build()
     guard.write("Testing Derived:")
-    Derived().build()
+    StubDataclassDerivedData(_regression_guard=guard).build()
     guard.write("Testing DerivedFromDerivedWithInit:")
-    DerivedFromDerivedWithInit().build()
-    guard.write("Testing DerivedFromDerivedWithoutInit:")
-    DerivedFromDerivedWithoutInit().build()
-    guard.write("Testing _OneLeadingUnderscore:")
-    _OneLeadingUnderscore().build()
-    guard.write("Testing __TwoLeadingUnderscores:")
-    __TwoLeadingUnderscores().build()
-    RegressionGuard().verify_all()
+    StubDataclassDerivedFromDerivedData(_regression_guard=guard).build()
+    guard.verify()
 
 
 def test_clone():
     """Test DataMixin.clone method."""
 
     # Create target from source
-    source = Base(public_base_field_1="public_base_field_1")
+    guard = RegressionGuard()
+    source = StubDataclassData(str_field="xyz", _regression_guard=guard)
     target = source.clone()
 
     # Public fields in source, only one is set
-    assert target.public_base_field_1 == source.public_base_field_1
-    assert target.public_base_field_2 is None
+    assert target.str_field == source.str_field
+    assert target.int_field == 123  # Takes its default value when not set in source
 
     # Protected fields in source, not set
-    assert target._protected_base_field is None
+    assert target._regression_guard is None
+    guard.verify()
 
 
 def test_clone_as():
     """Test DataMixin.clone_as method."""
 
     # Create target from source
-    source = Base(public_base_field_1="public_base_field_1")
-    target = source.clone_as(Derived)
+    guard = RegressionGuard()
+    source = StubDataclassData(str_field="xyz", int_field=789, _regression_guard=guard)
+    target = source.clone_as(StubDataclassDerivedData)
 
     # Public fields in source, only one is set
-    assert target.public_base_field_1 == source.public_base_field_1
-    assert target.public_base_field_2 is None
+    assert target.str_field == source.str_field
+    assert target.int_field == source.int_field
+    assert target.derived_str_field is "derived" # Takes its default value when not present in source class
 
     # Protected fields in source, not set
-    assert target._protected_base_field is None
-
-    # Public fields in derived, not set
-    assert target.public_derived_field is None
+    assert target._regression_guard is None
+    guard.verify()
 
 
 if __name__ == "__main__":

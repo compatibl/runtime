@@ -12,13 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from enum import Enum, IntEnum
+
 import pytest
 from cl.runtime import RecordMixin
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.schema.type_kind import TypeKind
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDerivedRecord, StubIntEnum
 from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_one_leading_underscore_data import \
+    _StubDataclassOneLeadingUnderscoreData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_two_leading_underscores_data import \
+    __StubDataclassTwoLeadingUnderscoresData
 
 
 def test_rebuild_cache():
@@ -74,19 +80,35 @@ def test_from_qual_name():
 def test_get_classes():
     """Test TypeInfoCache.get_classes method."""
 
-    records = TypeInfoCache.get_classes(
+    data_types = TypeInfoCache.get_classes(
         type_kinds=(
+            TypeKind.DATA,
             TypeKind.KEY,
             TypeKind.RECORD,
         )
     )
 
-    # Included
-    assert TypeDecl in records
-    assert StubDataclassRecord in records
+    # Included data types
+    assert TypeDecl in data_types
+    assert StubDataclassRecord in data_types
 
-    # Excluded
-    assert RecordMixin not in records
+    # Excluded data types
+    assert RecordMixin not in data_types
+    assert _StubDataclassOneLeadingUnderscoreData not in data_types
+    assert __StubDataclassTwoLeadingUnderscoresData not in data_types
+
+    enum_types = TypeInfoCache.get_classes(
+        type_kinds=(
+            TypeKind.ENUM,
+        )
+    )
+
+    # Included enum types
+    assert StubIntEnum in enum_types
+
+    # Excluded enum types
+    assert Enum not in enum_types
+    assert IntEnum not in enum_types
 
 
 if __name__ == "__main__":

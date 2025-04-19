@@ -12,27 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pytest
 from dataclasses import dataclass
-
-from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.for_dataclasses.data import Data
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassData(Data):
-    """Stub base data type."""
-
-    str_field: str = "abc"
-    """Stub field."""
-
-    int_field: int = 123
-    """Stub field."""
-
-    _regression_guard: RegressionGuard | None = None
-    """Optional regression guard for testing."""
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self._regression_guard:
-            self._regression_guard.write("StubDataclassData.__init")
-
+class _StubDataclassOneLeadingUnderscoreData(Data):
+    """Class name has one leading underscore."""

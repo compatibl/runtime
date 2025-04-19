@@ -61,6 +61,9 @@ class TypeInfoCache:
     _module_dict: Dict[str, ModuleType] = {}
     """Dictionary of modules indexed by module name in dot-delimited format."""
 
+    _packages: Tuple[str, ...] = None
+    """List of packages to include in the cache."""
+
     @classmethod
     def get_qual_name_from_class(cls, class_: type) -> str:
         """Get fully qualified name in module.ClassName format from the class."""
@@ -105,7 +108,7 @@ class TypeInfoCache:
             # Get class from module
             result = getattr(module, class_name)
             # Add to the qual_name and type_name dictionaries
-            cls._add_class(result, packages=cls._get_packages())
+            cls._add_class(result)
             return result
         except AttributeError:
             raise RuntimeError(
@@ -181,7 +184,7 @@ class TypeInfoCache:
         cls._clear()
 
         # Add each class after performing checks for duplicates
-        consume(cls._add_class(class_, packages=cls._get_packages()) for class_ in cls._get_package_classes())
+        consume(cls._add_class(class_) for class_ in cls._get_package_classes())
 
         # Overwrite the cache file on disk with the new data
         cls._save()
@@ -189,7 +192,10 @@ class TypeInfoCache:
     @classmethod
     def _get_packages(cls) -> Tuple[str, ...]:
         """Get the list of packages specified in settings."""
-        return ContextSettings.instance().packages
+        if cls._packages is None:
+            # Get the list of packages from settings
+            cls._packages = tuple(ContextSettings.instance().packages)
+        return cls._packages
 
     @classmethod
     def _get_package_modules(cls) -> Tuple[ModuleType, ...]:
@@ -235,6 +241,21 @@ class TypeInfoCache:
             return None
 
     @classmethod
+    def _check_class(cls, class_: type) -> None:
+        """Check that the class is in the package list."""
+
+        # Error if the class is imported from a module that is not in the package list
+        packages = cls._get_packages()
+        if not any(class_.__module__.startswith(package) for package in packages):
+            packages_str = "\n".join(f"  - {package}" for package in packages)
+            raise RuntimeError(
+                f"Buildable class {class_.__name__} is declared in module {class_.__module__}\n"
+                f"which is not in one of the imported packages. Move the class to an imported package\n"
+                f"so it can always be loaded from databases and storage, or exclude it via TypeExclude.csv.\n"
+                f"Imported packages:\n{packages_str}"
+            )
+
+    @classmethod
     def _build_child_names(cls, class_: type) -> Tuple[str, ...]:
         """Return a tuple subclasses (inclusive of self) that match the predicate, sorted by type name."""
         # This must run after all classes are loaded
@@ -242,6 +263,8 @@ class TypeInfoCache:
         for subclass in class_.__subclasses__():
             # Exclude self from subclasses
             if subclass is not class_:
+                # Check that the subclass is in the package list
+                cls._check_class(subclass)
                 # Recurse into the subclass hierarchy, avoid adding duplicates
                 subclasses.extend(x for x in cls._build_child_names(subclass) if x not in subclasses)
         # Eliminate duplicates (they should not be present but just to be sure) and sort the names
@@ -254,16 +277,13 @@ class TypeInfoCache:
         return tuple(sorted(set(TypeUtil.name(x) for x in class_.mro() if is_data(x))))
 
     @classmethod
-    def _add_class(cls, class_: type, *, packages: Tuple[str, ...], subtype: str | None = None) -> None:
+    def _add_class(cls, class_: type, *, subtype: str | None = None) -> None:
         """Add the specified class to the qual_name and type_name dicts without overwriting the existing values."""
 
+        # TODO: Exclude classes in TypeExclude.csv
+
         # Error if the class is imported from a module that is not in the package list
-        if not any(class_.__module__.startswith(package) for package in packages):
-            packages_str = "\n".join(f"  - {package}" for package in packages)
-            raise RuntimeError(
-                f"Class {class_.__name__} is declared in module {class_.__module__}\n"
-                f"which is not in one of the imported packages.\nImported packages:\n{packages_str}"
-            )
+        cls._check_class(class_)
 
         type_kind = cls._get_type_kind(class_)
         if type_kind is None:

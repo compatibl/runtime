@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 
 
@@ -22,3 +24,11 @@ class StubDataclassDerivedData(StubDataclassData):
 
     derived_str_field: str = "derived"
     """Stub field."""
+
+    _regression_guard: RegressionGuard | None = None
+    """Optional regression guard for testing."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self._regression_guard:
+            self._regression_guard.write("StubDataclassDerivedData.__init")

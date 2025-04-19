@@ -1,16 +1,9 @@
 Testing Base:
-> Base.init
+StubDataclassData.__init
 Testing Derived:
-> Base.init
->> Derived.init
+StubDataclassData.__init
+StubDataclassDerivedData.__init
 Testing DerivedFromDerivedWithInit:
-> Base.init
->> Derived.init
->>> DerivedFromDerivedWithInit.init
-Testing DerivedFromDerivedWithoutInit:
-> Base.init
->> Derived.init
-Testing _OneLeadingUnderscore:
-> _OneLeadingUnderscore.init
-Testing __TwoLeadingUnderscores:
-> __TwoLeadingUnderscores.init
+StubDataclassData.__init
+StubDataclassDerivedData.__init
+StubDataclassDerivedFromDerivedData.__init
