@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class BaseTypeInfo(Data):
+class BaseTypeInfo(Data):  # TODO: Rename to avoid confusion with TypeInfo which is not derived from this class
     """Base type info."""
 
     name: str = required()

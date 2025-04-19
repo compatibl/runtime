@@ -160,7 +160,14 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
 
 def is_enum(instance_or_type: Any) -> TypeGuard[TEnum]:
     """Returns true if the argument is an enum."""
-    return (
+
+    # Ensure the argument is not one of the base enum classes such as Enum, IntEnum, etc.
+    not_base_enum = (
+        instance_or_type if isinstance(instance_or_type, type) else instance_or_type.__class__
+    ).__module__ != "enum"
+
+    # Derived from Enum but not one of the base enum classes
+    return not_base_enum and (
         issubclass(instance_or_type, Enum) if isinstance(instance_or_type, type) else isinstance(instance_or_type, Enum)
     )
 
