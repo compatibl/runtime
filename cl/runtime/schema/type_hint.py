@@ -272,6 +272,12 @@ class TypeHint(FrozenData):
                     result = cls._link_type_hint_tokens(type_hint_tokens)
                     return result
 
+                else:
+                    raise RuntimeError(
+                        f"Type hint {type_alias} is not supported. If neither optional nor a container,\n"
+                        f"the type hint must be a genuine type rather than TypeAlias."
+                    )
+
     @classmethod
     def _serialize_type_alias(cls, alias: typing.Any) -> str:
         """Serialize a type alias without namespaces."""
