@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.plots.group_bar_plot import GroupBarPlot
+from cl.runtime.plots.line_plot import LinePlot
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -33,6 +34,8 @@ from stubs.cl.runtime import StubDataViewers
 from stubs.cl.runtime import StubMediaViewers
 from stubs.cl.runtime import StubPlotViewers
 from stubs.cl.runtime import StubHandlers
+from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
+from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 
 
 @dataclass(slots=True, kw_only=True)
@@ -40,6 +43,11 @@ class StubRuntimeConfig(Config):
     """Save stub records to storage."""
 
     def run_configure(self) -> None:
+        self.configure_records()
+        self.configure_plots()
+
+    @classmethod
+    def configure_records(cls) -> None:
         """Populate the current or default database with stub records."""
 
         # Create stub instances
@@ -91,11 +99,13 @@ class StubRuntimeConfig(Config):
         # Build and save to DB
         DbContext.save_many(record.build() for record in all_records)
 
-    def run_configure_plots(self) -> None:
+    def configure_plots(self) -> None:
         """Configure plots."""
 
-        bar_plot = GroupBarPlot()
-        bar_plot.group_labels = ["Single Group"] * 2
-        bar_plot.bar_labels = ["Bar 1", "Bar 2"]
-        bar_plot.values = [85.5, 92]
-        DbContext.save_one(bar_plot)
+        # HeatMapPlot
+        DbContext.save_one(StubHeatMapPlots.get_basic_plot(self.config_id + "stub_heat_map_plots.basic"))
+
+        # LinePlot
+        DbContext.save_one(StubLinePlots.get_one_line_plot(self.config_id + "stub_line_plots.one_line"))
+        DbContext.save_one(StubLinePlots.get_two_line_plot(self.config_id + "stub_line_plots.two_line"))
+

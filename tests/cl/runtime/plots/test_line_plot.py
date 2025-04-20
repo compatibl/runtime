@@ -13,27 +13,16 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.plots.group_bar_plot import GroupBarPlot
-from cl.runtime.plots.line_plot import LinePlot
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
+from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 
 
 def test_one_line(pytest_work_dir):
-    plot = LinePlot(plot_id="line_plot.test_one_line")
-    plot.x_values = [1, 2, 3]
-    plot.lines = {
-        "line_1": [4,3,7]
-    }
-    plot.save_png()
+    StubLinePlots.get_one_line_plot(plot_id="line_plot.test_one_line").save_png()
+
 
 def test_two_lines(pytest_work_dir):
-    plot = LinePlot(plot_id="line_plot.test_two_lines")
-    plot.x_values = [1, 2, 3]
-    plot.lines = {
-        "line_1": [4, 3, 7],
-        "line_2": [5, 6, 1]
-    }
-    plot.save_png()
+    StubLinePlots.get_two_line_plot(plot_id="line_plot.test_two_line").save_png()
 
 
 if __name__ == "__main__":
