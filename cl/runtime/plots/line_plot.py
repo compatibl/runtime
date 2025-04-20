@@ -35,7 +35,7 @@ class LinePlot(MatplotlibPlot):
        The order of Y-values must correspond to the order of x_values.
        NaN values in Y-coordinates will create gaps in the lines."""
 
-    line_options: Dict[str, Dict[str, Any]] | None = None
+    line_options: Dict[str, Dict[str, str]] | None = None
     """Optional dictionary mapping line labels to their specific plotting options
        (e.g., {'color': 'red', 'marker': 'x', 'linestyle': '--'}). Keys in the inner
        dictionary correspond to matplotlib.pyplot.plot arguments."""
@@ -46,10 +46,10 @@ class LinePlot(MatplotlibPlot):
     y_axis_label: str | None = None
     """Y-axis label."""
 
-    y_lim: Tuple[float | None, float | None] | None = None
+    y_lim: Tuple[float | None, ...] | None = None
     """Y-axis limits (min, max). Set elements to None for autoscaling respective end."""
 
-    figsize: Tuple[float, float] = (10, 6)
+    figsize: Tuple[float, ...] = (10, 6)
     """Figure size in inches (width, height)."""
 
     grid: bool = True
