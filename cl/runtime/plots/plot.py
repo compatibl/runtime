@@ -26,9 +26,13 @@ class Plot(PlotKey, RecordMixin[PlotKey], ABC):
     def get_key(self) -> PlotKey:
         return PlotKey(plot_id=self.plot_id).build()
 
+    def view_plot(self):
+        """Default plot viewer."""
+        return self.get_view()
+
     @abstractmethod
     def get_view(self) -> None:
-        """Return a view object for the plot."""
+        """Return a view object for the plot."""  # TODO: Refactor and fix return type hint
 
     @abstractmethod
     def save_png(self) -> None:
