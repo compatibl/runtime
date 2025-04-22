@@ -1,0 +1,4 @@
+{
+  "_type": "StubDataclassSingleton",
+  "str_field": "abc"
+}

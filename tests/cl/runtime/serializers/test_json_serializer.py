@@ -50,15 +50,14 @@ _SAMPLE_TYPES = [
     StubDataclassTupleFields,
 ]
 
-
-def test_to_json():
+def test_default():
     """Test DataSerializer.to_json method."""
 
     for sample_type in _SAMPLE_TYPES:
 
         # Serialize to JSON
         obj = sample_type().build()
-        result_str = JsonSerializers.FOR_REPORTING.serialize(obj)
+        result_str = JsonSerializers.DEFAULT.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
@@ -67,20 +66,30 @@ def test_to_json():
 
     RegressionGuard().verify_all()
 
-
-def test_to_json_pascalize_keys():
-    """Test DataSerializer.to_json method with pascalize_keys flag."""
-
-    # Create the serializer with pascalize_keys flag set
-    serializer = JsonSerializer(
-        type_inclusion=TypeInclusion.OMIT,
-        pascalize_keys=True,
-    ).build()
+def test_compact():
+    """Test DataSerializer.to_json method."""
 
     for sample_type in _SAMPLE_TYPES:
+
         # Serialize to JSON
         obj = sample_type().build()
-        result_str = serializer.serialize(obj)
+        result_str = JsonSerializers.COMPACT.serialize(obj)
+
+        # Write to regression guard
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
+        guard = RegressionGuard(channel=snake_case_type_name)
+        guard.write(result_str)
+
+    RegressionGuard().verify_all()
+
+def test_for_reporting():
+    """Test DataSerializer.to_json method."""
+
+    for sample_type in _SAMPLE_TYPES:
+
+        # Serialize to JSON
+        obj = sample_type().build()
+        result_str = JsonSerializers.FOR_REPORTING.serialize(obj)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
