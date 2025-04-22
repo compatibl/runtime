@@ -5,15 +5,15 @@
     "abc",
     null
   ],
-  "optional_float": "1.23",
+  "optional_float": 1.23,
   "required_list_of_optional_float": [
-    "1.23",
+    1.23,
     null
   ],
   "required_list_of_optional_data": [
     {
       "str_field": "abc",
-      "int_field": "123"
+      "int_field": 123
     },
     null
   ],
