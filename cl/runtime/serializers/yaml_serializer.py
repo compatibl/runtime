@@ -34,6 +34,8 @@ from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.type_hints import TypeHints
 from cl.runtime.serializers.type_inclusion import TypeInclusion
 
+# TODO: Reuse YamlEncoder or avoid duplicated code in another way
+
 # Use primitive serializer with default settings to serialize all primitive types to string
 _PRIMITIVE_SERIALIZER = PrimitiveSerializers.DEFAULT
 
@@ -122,59 +124,21 @@ yaml_reader = YAML(typ="safe")
 yaml_reader.Constructor = PrimitiveToStringConstructor
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class YamlSerializer(Serializer):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
-    """Where to include type information in serialized data."""
-
-    type_format: TypeFormat = TypeFormat.NAME_ONLY
-    """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
-
-    type_field: str = "_type"
-    """Dictionary key under which type information is stored (optional, defaults to '_type')."""
-
-    pascalize_keys: bool | None = None
-    """Pascalize keys during serialization if set."""
-
-    _serializer: Serializer = required()
+    data_serializer: Serializer = required()
     """Serializes data into dictionary from which it is serialized into YAML."""
 
-    _deserializer: Serializer | None = None
+    data_deserializer: Serializer | None = None
     """Deserializes the result of YAML parsing, including converting string leaf nodes to primitive types and enums."""
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-
-        # Serializer passes through primitive types during serialization,
-        # the conversions are done by the Ruamel YAML representers
-        self._serializer = DataSerializer(
-            type_inclusion=self.type_inclusion,
-            type_format=self.type_format,
-            type_field=self.type_field,
-            pascalize_keys=self.pascalize_keys,
-            primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
-            enum_serializer=EnumSerializers.DEFAULT,
-        ).build()
-
-        if self.type_format:
-            # Create deserializer only if bidirectional flag is set
-            # Deserializer uses default settings for deserializing primitive types from string
-            self._deserializer = DataSerializer(
-                type_inclusion=self.type_inclusion,
-                type_format=self.type_format,
-                type_field=self.type_field,
-                pascalize_keys=self.pascalize_keys,
-                primitive_serializer=PrimitiveSerializers.DEFAULT,
-                enum_serializer=EnumSerializers.DEFAULT,
-            ).build()
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize a slots-based object to a YAML string."""
 
         # Serialize to dict using self.dict_serializer
-        serialized = self._serializer.serialize(data, type_hint)
+        serialized = self.data_serializer.serialize(data, type_hint)
 
         if serialized is None:
             return ""
@@ -193,12 +157,12 @@ class YamlSerializer(Serializer):
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Read a YAML string and return the deserialized object if bidirectional flag is set, or dict otherwise."""
 
-        if self.type_inclusion == TypeInclusion.OMIT:
-            raise RuntimeError("Deserialization is not supported when type_inclusion=OMIT.")
+        if self.data_deserializer is None:
+            raise RuntimeError("YAML data deserializer is not specified.")
 
         # Use a YAML reader with PrimitiveToStringConstructor to read all values as strings
         yaml_dict = yaml_reader.load(StringIO(data))
 
         # Deserialized from dict using self.dict_serializer
-        result = self._deserializer.deserialize(yaml_dict, type_hint)
+        result = self.data_deserializer.deserialize(yaml_dict, type_hint)
         return result

@@ -12,18 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import orjson
 from dataclasses import dataclass
 from typing import Any
-import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.serializers.data_serializer import DataSerializer
-from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_format import JsonFormat
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.serializer import Serializer
-from cl.runtime.serializers.type_format import TypeFormat
-from cl.runtime.serializers.type_inclusion import TypeInclusion
 
 
 def orjson_default(obj):
@@ -33,44 +28,21 @@ def orjson_default(obj):
     raise RuntimeError(f"Object of type {obj.__class__.__name__} is not JSON serializable.")
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class JsonSerializer(Serializer):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 
-    json_output_format: JsonFormat = JsonFormat.PRETTY_PRINT
-    """JSON output format (pretty print, compact, etc)."""
-
-    type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
-    """Where to include type information in serialized data."""
-
-    type_format: TypeFormat = TypeFormat.NAME_ONLY
-    """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
-
-    type_field: str = "_type"
-    """Dictionary key under which type information is stored (optional, defaults to '_type')."""
-
-    pascalize_keys: bool | None = None
-    """Pascalize keys during serialization if set."""
-
-    _data_serializer: Serializer | None = None
+    data_serializer: Serializer | None = None
     """Serializes data into dictionary from which it is serialized into JSON."""
 
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        self._data_serializer = DataSerializer(
-            type_inclusion=self.type_inclusion,
-            type_format=self.type_format,
-            type_field=self.type_field,
-            pascalize_keys=self.pascalize_keys,
-            primitive_serializer=PrimitiveSerializers.DEFAULT,
-            enum_serializer=EnumSerializers.DEFAULT,
-        ).build()
+    json_output_format: JsonFormat = JsonFormat.PRETTY_PRINT
+    """JSON output format (pretty print, compact, etc)."""
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize to a JSON string."""
 
         # Use self.dict_serializer to serialize the data to a dictionary
-        data_dict = self._data_serializer.serialize(data, type_hint)
+        data_dict = self.data_serializer.serialize(data, type_hint)
 
         # Use orjson to serialize the dictionary to JSON string in pretty-print format
         if self.json_output_format == JsonFormat.PRETTY_PRINT:
@@ -88,12 +60,9 @@ class JsonSerializer(Serializer):
 
         # TODO: Validate type_hint
 
-        if self.type_inclusion == TypeInclusion.OMIT:
-            raise RuntimeError("Deserialization is not supported when type_inclusion=OMIT.")
-
         # Use orjson to parse the JSON string into a dictionary
         json_dict = orjson.loads(data.encode("utf-8"))
 
         # Use self.dict_serializer to deserialize from the dictionary
-        result = self._data_serializer.deserialize(json_dict, type_hint)
+        result = self.data_serializer.deserialize(json_dict, type_hint)
         return result

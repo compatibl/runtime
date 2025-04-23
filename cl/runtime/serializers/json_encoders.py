@@ -15,14 +15,12 @@
 from cl.runtime.serializers.json_encoder import JsonEncoder
 from cl.runtime.serializers.json_format import JsonFormat
 
-cls = JsonEncoder
-
 
 class JsonEncoders:
     """Standard combinations of primitive formats."""
 
-    DEFAULT: cls = cls().build()
+    DEFAULT = JsonEncoder()
     """Pretty print format."""
 
-    COMPACT: cls = cls(json_output_format=JsonFormat.COMPACT).build()
+    COMPACT = JsonEncoder(json_output_format=JsonFormat.COMPACT)
     """Compact format without line breaks."""

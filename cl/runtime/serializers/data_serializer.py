@@ -40,7 +40,7 @@ from cl.runtime.serializers.type_inclusion import TypeInclusion
 from cl.runtime.serializers.type_placement import TypePlacement
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class DataSerializer(Serializer):
     """Roundtrip serialization of object to dictionary with optional type information."""
 
@@ -74,8 +74,8 @@ class DataSerializer(Serializer):
     pascalize_keys: bool | None = None
     """Pascalize keys during serialization if set."""
 
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+    def __validate(self) -> None:
+        """Perform checks without changing the data."""
         if (self.inner_serializer is not None) ^ (self.inner_encoder is not None):
             raise ErrorUtil.mutually_required_fields_error(
                 ["inner_serializer", "inner_encoder"], class_name=self.__class__.__name__

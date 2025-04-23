@@ -14,11 +14,9 @@
 
 from cl.runtime.serializers.yaml_encoder import YamlEncoder
 
-cls = YamlEncoder
-
 
 class YamlEncoders:
     """Standard combinations of primitive formats."""
 
-    DEFAULT: cls = cls().build()
+    DEFAULT = YamlEncoder()
     """Default YAML format."""

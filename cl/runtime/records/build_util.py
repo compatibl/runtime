@@ -26,6 +26,7 @@ from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.data_spec_util import DataSpecUtil
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
 class BuildUtil:
@@ -72,9 +73,8 @@ class BuildUtil:
                 )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
-                # Check that the class matches the type specified in schema
-                PrimitiveUtil.check_type(data, schema_type_name)
-                return data
+                # Convert data to the type name specified in schema, error message if conversion is not possible
+                return PrimitiveSerializers.PASSTHROUGH.deserialize(data, type_hint)
             else:
                 # Error if not an enum
                 if not isinstance(data, EnumSpec):

@@ -16,19 +16,17 @@ from cl.runtime.serializers.enum_format import EnumFormat
 from cl.runtime.serializers.enum_serializer import EnumSerializer
 from cl.runtime.serializers.none_format import NoneFormat
 
-cls = EnumSerializer
-
 
 class EnumSerializers:
     """Standard combinations of primitive formats."""
 
-    PASSTHROUGH: cls = cls(
+    PASSTHROUGH = EnumSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         enum_format=EnumFormat.PASSTHROUGH,
     ).build()
     """Do not perform any conversion but validate against type information if provided."""
 
-    DEFAULT: cls = cls(
+    DEFAULT = EnumSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         enum_format=EnumFormat.DEFAULT,
     ).build()

@@ -58,6 +58,7 @@ class FrozenDataMixin:
                 invoked.add(qualname)
                 # Invoke '__init' method if it exists, otherwise do nothing
                 class_init(self)
+        return self
 
     def clone_as(self, result_type: type[TData]) -> TData:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields of self."""

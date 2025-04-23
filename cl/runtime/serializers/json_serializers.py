@@ -12,21 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.json_format import JsonFormat
 from cl.runtime.serializers.json_serializer import JsonSerializer
-from cl.runtime.serializers.type_inclusion import TypeInclusion
-
-cls = JsonSerializer
 
 
 class JsonSerializers:
     """Standard combinations of primitive formats."""
 
-    DEFAULT: cls = cls().build()
+    DEFAULT = JsonSerializer(
+        data_serializer=DataSerializers.FOR_JSON,
+    ).build()
     """Include type information as needed, bidirectional, pretty print format."""
 
-    COMPACT: cls = cls(json_output_format=JsonFormat.COMPACT).build()
+    COMPACT = JsonSerializer(
+        data_serializer=DataSerializers.FOR_JSON,
+        json_output_format=JsonFormat.COMPACT,
+    ).build()
     """Include type information as needed, bidirectional, compact format."""
 
-    FOR_REPORTING: cls = cls(type_inclusion=TypeInclusion.OMIT).build()
+    FOR_REPORTING = JsonSerializer(
+        data_serializer=DataSerializers.FOR_JSON_REPORTING,
+    ).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""

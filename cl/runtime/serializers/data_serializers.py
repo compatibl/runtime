@@ -20,31 +20,62 @@ from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_inclusion import TypeInclusion
 from cl.runtime.serializers.type_placement import TypePlacement
 
-cls = DataSerializer
-
 
 class DataSerializers:
     """Standard combinations of primitive formats."""
 
-    PASSTHROUGH: cls = cls(
+    PASSTHROUGH = DataSerializer(
         primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
         enum_serializer=EnumSerializers.PASSTHROUGH,
     ).build()
     """Bidirectional conversion of classes to dicts and back without any conversion of primitive types or enums."""
 
-    DEFAULT: cls = cls(
+    DEFAULT = DataSerializer(
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional data serializer with default serialization for primitive types and enums."""
 
-    FOR_JSON: cls = cls(
+    FOR_REPORTING = DataSerializer(
+        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        enum_serializer=EnumSerializers.DEFAULT,
+        type_inclusion=TypeInclusion.OMIT,
+    ).build()
+    """Omit type information when the output is used for reporting, deserialization is not possible."""
+
+    FOR_JSON = DataSerializer(
         primitive_serializer=PrimitiveSerializers.FOR_JSON,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional data serializer settings for JSON."""
 
-    FOR_UI: cls = cls(
+    FOR_JSON_REPORTING = DataSerializer(
+        primitive_serializer=PrimitiveSerializers.FOR_JSON,
+        enum_serializer=EnumSerializers.DEFAULT,
+        type_inclusion=TypeInclusion.OMIT,
+    ).build()
+    """Default bidirectional data serializer settings for JSON."""
+
+    FOR_YAML_SERIALIZATION = DataSerializer(
+        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        enum_serializer=EnumSerializers.DEFAULT,
+    ).build()
+    """Default bidirectional data serializer settings for JSON."""
+
+    FOR_YAML_DESERIALIZATION = DataSerializer(
+        primitive_serializer=PrimitiveSerializers.DEFAULT,
+        enum_serializer=EnumSerializers.DEFAULT,
+    ).build()
+    """Default bidirectional data serializer settings for JSON."""
+
+    FOR_YAML_REPORTING = DataSerializer(
+        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        enum_serializer=EnumSerializers.DEFAULT,
+        type_inclusion=TypeInclusion.OMIT,
+    ).build()
+    """Default bidirectional data serializer settings for JSON."""
+
+    FOR_UI = DataSerializer(
         primitive_serializer=PrimitiveSerializers.FOR_UI,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
@@ -54,11 +85,11 @@ class DataSerializers:
     ).build()
     """Default bidirectional data serializer settings for UI."""
 
-    FOR_CSV: cls = cls(
+    FOR_CSV = DataSerializer(
         primitive_serializer=PrimitiveSerializers.FOR_CSV,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
-        inner_serializer=cls(
+        inner_serializer=DataSerializer(
             primitive_serializer=PrimitiveSerializers.FOR_JSON,
             enum_serializer=EnumSerializers.DEFAULT,
             key_serializer=KeySerializers.DELIMITED,
@@ -68,11 +99,11 @@ class DataSerializers:
     ).build()
     """Default bidirectional data serializer settings for CSV."""
 
-    FOR_SQLITE: cls = cls(
+    FOR_SQLITE = DataSerializer(
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
-        inner_serializer=cls(
+        inner_serializer=DataSerializer(
             primitive_serializer=PrimitiveSerializers.FOR_JSON,
             enum_serializer=EnumSerializers.DEFAULT,
             key_serializer=KeySerializers.DELIMITED,
@@ -85,7 +116,7 @@ class DataSerializers:
     ).build()
     """Default bidirectional data serializer settings for UI."""
 
-    FOR_MONGO: cls = cls(
+    FOR_MONGO = DataSerializer(
         primitive_serializer=PrimitiveSerializers.FOR_MONGO,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()

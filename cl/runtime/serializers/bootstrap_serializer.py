@@ -59,7 +59,7 @@ from cl.runtime.serializers.type_placement import TypePlacement
 from cl.runtime.serializers.uuid_format import UuidFormat
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class BootstrapSerializer(Serializer):
     """Unidirectional serialization of object to a dictionary without type information."""
 

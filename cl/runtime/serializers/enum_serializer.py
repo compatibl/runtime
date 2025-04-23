@@ -25,7 +25,7 @@ from cl.runtime.serializers.none_format import NoneFormat
 from cl.runtime.serializers.serializer import Serializer
 
 
-@dataclass(slots=True, kw_only=True)
+@dataclass(slots=True, kw_only=True, frozen=True)
 class EnumSerializer(Serializer):
     """Helper class for serialization and deserialization of enum types."""
 

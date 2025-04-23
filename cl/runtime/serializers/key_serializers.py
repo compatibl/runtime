@@ -17,13 +17,11 @@ from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
-cls = KeySerializer
-
 
 class KeySerializers:
     """Standard key serializers."""
 
-    DELIMITED: cls = cls(
+    DELIMITED = KeySerializer(
         key_format=KeyFormat.DELIMITED,
         primitive_serializer=PrimitiveSerializers.DEFAULT,
         enum_serializer=EnumSerializers.DEFAULT,
@@ -33,7 +31,7 @@ class KeySerializers:
     primitive_serializer and enum_serializer respectively. The default delimiter is semicolon.
     """
 
-    FOR_SQLITE: cls = cls(
+    FOR_SQLITE = KeySerializer(
         key_format=KeyFormat.SEQUENCE,
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,

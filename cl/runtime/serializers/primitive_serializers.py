@@ -26,13 +26,11 @@ from cl.runtime.serializers.time_format import TimeFormat
 from cl.runtime.serializers.timestamp_format import TimestampFormat
 from cl.runtime.serializers.uuid_format import UuidFormat
 
-cls = PrimitiveSerializer
-
 
 class PrimitiveSerializers:
     """Standard combinations of primitive formats."""
 
-    PASSTHROUGH: cls = cls(
+    PASSTHROUGH = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,
@@ -48,7 +46,7 @@ class PrimitiveSerializers:
     ).build()
     """Do not perform any conversion but validate against type information if provided."""
 
-    DEFAULT: cls = cls(
+    DEFAULT = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.DEFAULT,
@@ -64,23 +62,23 @@ class PrimitiveSerializers:
     ).build()
     """Pass through None and string, serialize all other primitive types to string using default format."""
 
-    FOR_JSON: cls = cls(
+    FOR_JSON = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,
         bool_format=BoolFormat.PASSTHROUGH,
         int_format=IntFormat.PASSTHROUGH,
         long_format=LongFormat.PASSTHROUGH,
-        date_format=DateFormat.PASSTHROUGH,
-        time_format=TimeFormat.PASSTHROUGH,
-        datetime_format=DatetimeFormat.PASSTHROUGH,
-        uuid_format=UuidFormat.PASSTHROUGH,
-        timestamp_format=TimestampFormat.PASSTHROUGH,
-        bytes_format=BytesFormat.PASSTHROUGH,
+        date_format=DateFormat.DEFAULT,
+        time_format=TimeFormat.DEFAULT,
+        datetime_format=DatetimeFormat.DEFAULT,
+        uuid_format=UuidFormat.DEFAULT,
+        timestamp_format=TimestampFormat.DEFAULT,
+        bytes_format=BytesFormat.DEFAULT,
     ).build()
     """Default primitive serializer settings for JSON."""
 
-    FOR_UI: cls = cls(
+    FOR_UI = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,
@@ -96,7 +94,7 @@ class PrimitiveSerializers:
     ).build()
     """Default primitive serializer settings for UI."""
 
-    FOR_CSV: cls = cls(
+    FOR_CSV = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,
@@ -112,7 +110,7 @@ class PrimitiveSerializers:
     ).build()
     """Default primitive serializer settings for UI."""
 
-    FOR_SQLITE: cls = cls(
+    FOR_SQLITE = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,
@@ -128,7 +126,7 @@ class PrimitiveSerializers:
     ).build()
     """Default primitive serializer settings for UI."""
 
-    FOR_MONGO: cls = cls(
+    FOR_MONGO = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,

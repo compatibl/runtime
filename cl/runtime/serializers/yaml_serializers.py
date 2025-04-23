@@ -12,19 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.serializers.type_inclusion import TypeInclusion
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.yaml_serializer import YamlSerializer
-
-cls = YamlSerializer
 
 
 class YamlSerializers:
     """Standard combinations of primitive formats."""
 
-    DEFAULT: cls = cls().build()
+    DEFAULT = YamlSerializer(
+        data_serializer=DataSerializers.FOR_YAML_SERIALIZATION,
+        data_deserializer=DataSerializers.FOR_YAML_DESERIALIZATION,
+    ).build()
     """Include type information as needed, both serialization and deserialization are possible."""
 
-    FOR_REPORTING: cls = cls(
-        type_inclusion=TypeInclusion.OMIT,
+    FOR_REPORTING = YamlSerializer(
+        data_serializer=DataSerializers.FOR_YAML_REPORTING,
+        data_deserializer=DataSerializers.FOR_YAML_DESERIALIZATION,
     ).build()
     """Omit type information when the output is used for reporting, deserialization is not possible."""

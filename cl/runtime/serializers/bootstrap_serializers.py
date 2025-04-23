@@ -29,13 +29,11 @@ from cl.runtime.serializers.timestamp_format import TimestampFormat
 from cl.runtime.serializers.uuid_format import UuidFormat
 from cl.runtime.serializers.yaml_encoders import YamlEncoders
 
-cls = BootstrapSerializer
-
 
 class BootstrapSerializers:
     """Serialization without including or relying on type information, deserialization is not possible."""
 
-    YAML: cls = cls(
+    YAML = BootstrapSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,
@@ -53,7 +51,7 @@ class BootstrapSerializers:
     ).build()
     """Default settings with YAML output."""
 
-    JSON: cls = cls(
+    JSON = BootstrapSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,
@@ -71,7 +69,7 @@ class BootstrapSerializers:
     ).build()
     """Default settings with JSON output."""
 
-    FOR_UI: cls = cls(
+    FOR_UI = BootstrapSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
         float_format=FloatFormat.PASSTHROUGH,
