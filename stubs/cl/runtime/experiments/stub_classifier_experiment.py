@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
 from cl.runtime.experiments.classifier_trial import ClassifierTrial
-from cl.runtime.experiments.trial import Trial
 
 
 @dataclass(slots=True, kw_only=True)

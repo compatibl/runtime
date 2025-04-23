@@ -15,8 +15,6 @@
 from dataclasses import dataclass
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.plots.group_bar_plot import GroupBarPlot
-from cl.runtime.plots.line_plot import LinePlot
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -31,9 +29,9 @@ from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataViewers
+from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime import StubMediaViewers
 from stubs.cl.runtime import StubPlotViewers
-from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 
@@ -75,7 +73,7 @@ class StubRuntimeConfig(Config):
         stub_viewers_records = [
             StubDataViewers(stub_id=f"StubDataViewers"),
             StubPlotViewers(stub_id=f"StubPlotViewers"),
-            StubMediaViewers(stub_id=f"StubMediaViewers")
+            StubMediaViewers(stub_id=f"StubMediaViewers"),
         ]
 
         all_records = [
@@ -108,4 +106,3 @@ class StubRuntimeConfig(Config):
         # LinePlot
         DbContext.save_one(StubLinePlots.get_one_line_plot(self.config_id + "stub_line_plots.one_line"))
         DbContext.save_one(StubLinePlots.get_two_line_plot(self.config_id + "stub_line_plots.two_line"))
-

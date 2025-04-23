@@ -13,7 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Any
+from typing import Dict
+from typing import List
+from typing import Tuple
 import numpy as np
 from matplotlib import pyplot as plt
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
@@ -59,7 +61,7 @@ class LinePlot(MatplotlibPlot):
         # Load style object or create with default settings if not specified
         theme = self._get_pyplot_theme()
 
-        default_marker_cycle = ['o', 'x', 's', '^', 'v', 'd', '<', '>']
+        default_marker_cycle = ["o", "x", "s", "^", "v", "d", "<", ">"]
 
         with plt.style.context(theme):
             fig = plt.figure(figsize=self.figsize)
@@ -67,14 +69,14 @@ class LinePlot(MatplotlibPlot):
 
             line_num = 0
             for label, y_values in self.lines.items():
-                plot_kwargs = {'label': label}
+                plot_kwargs = {"label": label}
 
                 specific_options = self.line_options.get(label, {}) if self.line_options else {}
                 plot_kwargs.update(specific_options)
 
-                if 'marker' not in plot_kwargs:
+                if "marker" not in plot_kwargs:
                     if len(self.lines) > 1:
-                        plot_kwargs['marker'] = default_marker_cycle[line_num % len(default_marker_cycle)]
+                        plot_kwargs["marker"] = default_marker_cycle[line_num % len(default_marker_cycle)]
 
                 y_values_np = np.array(y_values, dtype=float)
                 axes.plot(self.x_values, y_values_np, **plot_kwargs)
@@ -92,12 +94,12 @@ class LinePlot(MatplotlibPlot):
                 current_ylim = axes.get_ylim()
                 final_ylim = (
                     self.y_lim[0] if self.y_lim[0] is not None else current_ylim[0],
-                    self.y_lim[1] if self.y_lim[1] is not None else current_ylim[1]
+                    self.y_lim[1] if self.y_lim[1] is not None else current_ylim[1],
                 )
                 axes.set_ylim(*final_ylim)
 
             if self.grid:
-                axes.grid(True, which='both', linestyle='--', linewidth=0.5)
+                axes.grid(True, which="both", linestyle="--", linewidth=0.5)
 
             axes.legend()
 

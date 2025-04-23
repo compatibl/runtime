@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.data import Data
 

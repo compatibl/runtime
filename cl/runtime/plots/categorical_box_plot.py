@@ -13,9 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List, Dict, Optional, Tuple
-import seaborn as sns
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
 import pandas as pd
+import seaborn as sns
 from matplotlib import pyplot as plt
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -77,18 +80,18 @@ class CategoricalBoxPlot(MatplotlibPlot):
                 palette=self.palette,
                 legend=False,
                 ax=ax,
-                width=self.box_width
+                width=self.box_width,
             )
 
             ax.set_title(self.title, fontsize=14, pad=15)
-            ax.set_ylabel(self.ylabel if self.ylabel else self.y_col.replace('_', ' ').title())
-            ax.set_xlabel(self.xlabel if self.xlabel else self.x_col.replace('_', ' ').title())
+            ax.set_ylabel(self.ylabel if self.ylabel else self.y_col.replace("_", " ").title())
+            ax.set_xlabel(self.xlabel if self.xlabel else self.x_col.replace("_", " ").title())
 
             if self.ylim != (None, None):
                 ax.set_ylim(*self.ylim)
 
             if self.show_grid:
-                ax.grid(axis='y', linestyle='--', alpha=0.7)
+                ax.grid(axis="y", linestyle="--", alpha=0.7)
             else:
                 ax.grid(False)
 

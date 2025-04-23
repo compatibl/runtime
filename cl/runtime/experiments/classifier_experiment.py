@@ -28,4 +28,3 @@ class ClassifierExperiment(Experiment, ABC):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-

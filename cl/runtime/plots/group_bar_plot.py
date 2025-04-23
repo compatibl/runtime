@@ -49,7 +49,7 @@ class GroupBarPlot(MatplotlibPlot):
     xtick_rotation: float = 0.0
     """Rotation angle for x-axis tick labels (degrees). Default is 0 (horizontal)."""
 
-    xtick_ha: str = 'center'
+    xtick_ha: str = "center"
     """Horizontal alignment for rotated x-axis tick labels ('center', 'right', 'left').
        Usually 'right' for positive rotation (e.g., 45), 'center' for 0/90."""
 
@@ -99,7 +99,7 @@ class GroupBarPlot(MatplotlibPlot):
 
             min_value_in_plot = data.min().min()
             if min_value_in_plot < 0:
-                axes.axhline(0, color='grey', linestyle='--', linewidth=0.8, zorder=1)
+                axes.axhline(0, color="grey", linestyle="--", linewidth=0.8, zorder=1)
 
             # Set figure and axes labels
             axes.set_xlabel(self.bar_axis_label)

@@ -70,6 +70,7 @@ _RECEIVED_VALUES = [
 ]
 """Received values."""
 
+
 class StubHeatMapPlots:
     """Create HeatMapPlot stubs."""
 
@@ -94,5 +95,3 @@ class StubHeatMapPlots:
         result.y_label = "Metrics"
 
         return result.build()
-
-    

@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import orjson
 from dataclasses import dataclass
 from typing import Any
+import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.json_format import JsonFormat

@@ -19,7 +19,6 @@ from more_itertools import consume
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial import Trial
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 

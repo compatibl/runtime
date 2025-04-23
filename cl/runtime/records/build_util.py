@@ -14,20 +14,17 @@
 
 from enum import Enum
 from typing import Any
-
 from frozendict import frozendict
-
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_enum
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.data_spec_util import DataSpecUtil
-from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 

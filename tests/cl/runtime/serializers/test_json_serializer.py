@@ -15,9 +15,7 @@
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.serializers.json_serializer import JsonSerializer
 from cl.runtime.serializers.json_serializers import JsonSerializers
-from cl.runtime.serializers.type_inclusion import TypeInclusion
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
 from stubs.cl.runtime import StubDataclassDerivedRecord
@@ -50,6 +48,7 @@ _SAMPLE_TYPES = [
     StubDataclassTupleFields,
 ]
 
+
 def test_default():
     """Test DataSerializer.to_json method."""
 
@@ -66,6 +65,7 @@ def test_default():
 
     RegressionGuard().verify_all()
 
+
 def test_compact():
     """Test DataSerializer.to_json method."""
 
@@ -81,6 +81,7 @@ def test_compact():
         guard.write(result_str)
 
     RegressionGuard().verify_all()
+
 
 def test_for_reporting():
     """Test DataSerializer.to_json method."""

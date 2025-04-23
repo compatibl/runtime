@@ -17,7 +17,6 @@ from typing import Dict
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import TPrimitive
 
 
 @dataclass(slots=True, kw_only=True)

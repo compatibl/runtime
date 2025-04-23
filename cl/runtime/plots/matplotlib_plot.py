@@ -14,7 +14,8 @@
 
 import io
 import os
-from abc import abstractmethod, ABC
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
 import matplotlib
 from matplotlib import pyplot as plt

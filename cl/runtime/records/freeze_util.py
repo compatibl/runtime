@@ -15,7 +15,9 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
-from cl.runtime.records.protocols import PRIMITIVE_CLASSES, SEQUENCE_CLASSES, MAPPING_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import PRIMITIVE_CLASSES
+from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.slots_util import SlotsUtil
 
@@ -44,4 +46,5 @@ class FreezeUtil:
         else:
             raise RuntimeError(
                 f"Cannot freeze data of type {TypeUtil.name(data)} because it is not a\n"
-                f"primitive type, enum, sequence, mapping or a freezable class.")
+                f"primitive type, enum, sequence, mapping or a freezable class."
+            )

@@ -209,9 +209,7 @@ def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return (
-            hasattr(type_, "get_key_type") and
-            not type_.__name__.startswith("_") and
-            not type_.__name__.endswith("Mixin")
+        hasattr(type_, "get_key_type") and not type_.__name__.startswith("_") and not type_.__name__.endswith("Mixin")
     )
 
 
@@ -222,15 +220,16 @@ def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return (
-            hasattr(type_, "get_key_type") and
-            not type_.__name__.startswith("_") and
-            not hasattr(type_, "get_key") and not is_abstract(type_)
+        hasattr(type_, "get_key_type")
+        and not type_.__name__.startswith("_")
+        and not hasattr(type_, "get_key")
+        and not is_abstract(type_)
     )
 
 
 def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
     """Return True if the argument has 'get_key' method and is not a mixin.
-       Excludes classes whose name starts from underscore.
+    Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return hasattr(type_, "get_key") and not type_.__name__.startswith("_") and not type_.__name__.endswith("Mixin")

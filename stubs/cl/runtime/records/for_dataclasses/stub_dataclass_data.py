@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.for_dataclasses.data import Data
 
@@ -35,4 +34,3 @@ class StubDataclassData(Data):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self._regression_guard:
             self._regression_guard.write("StubDataclassData.__init")
-

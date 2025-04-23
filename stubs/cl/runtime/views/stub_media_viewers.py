@@ -16,7 +16,6 @@ import io
 import os
 from dataclasses import dataclass
 from PIL import Image
-
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.view.dag.dag_edge import DagEdge
 from cl.runtime.view.dag.dag_layout import DagLayout
@@ -40,7 +39,7 @@ class StubMediaViewers(StubViewers):
 
         # Create a new 300x300 image with RGB mode
         width, height = 100, 100
-        sample_image = Image.new('RGB', (width, height))
+        sample_image = Image.new("RGB", (width, height))
 
         # Get pixel access object
         pixels = sample_image.load()
@@ -56,7 +55,7 @@ class StubMediaViewers(StubViewers):
 
         # Save to buffer
         png_buffer = io.BytesIO()
-        sample_image.save(png_buffer, format='PNG')
+        sample_image.save(png_buffer, format="PNG")
 
         # Get the PNG image bytes and wrap in PngView
         png_bytes = png_buffer.getvalue()
@@ -106,5 +105,5 @@ class StubMediaViewers(StubViewers):
         return Script(
             name="Stub markdown text.",
             language=ScriptLanguage.MARKDOWN,
-            body=["# Successfully rendered.", "### `THIS TEXT SHOULD BE COLOURED`."]
+            body=["# Successfully rendered.", "### `THIS TEXT SHOULD BE COLOURED`."],
         )

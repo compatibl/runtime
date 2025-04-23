@@ -15,4 +15,5 @@
 
 class PrimitiveUtil:
     """Helper methods for primitive types."""
+
     # TODO: Add methods or remove class

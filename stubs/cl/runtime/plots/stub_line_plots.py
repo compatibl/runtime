@@ -35,8 +35,5 @@ class StubLinePlots:
         """Get basic plot."""
         result = LinePlot(plot_id=plot_id)
         result.x_values = [1.0, 2.0, 3.0]
-        result.lines = {
-            "line_1": [4.0, 3.0, 7.0],
-            "line_2": [5.0, 6.0, 1.0]
-        }
+        result.lines = {"line_1": [4.0, 3.0, 7.0], "line_2": [5.0, 6.0, 1.0]}
         return result.build()
