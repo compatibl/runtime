@@ -31,9 +31,9 @@ class DataMixin:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
 
     @abstractmethod
-    def mark_frozen(self) -> None:
+    def mark_frozen(self) -> Self:
         """
-        Mark the instance as frozen without actually freezing it,which is the responsibility of build method.
+        Mark the instance as frozen without actually freezing it, which is the responsibility of build method.
         The action of marking the instance frozen cannot be reversed. Can be called more than once.
         """
 

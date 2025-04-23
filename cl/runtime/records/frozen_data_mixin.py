@@ -26,14 +26,13 @@ class FrozenDataMixin:
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
 
-    @classmethod
-    def is_frozen(cls) -> bool:
+    def is_frozen(self) -> bool:
         """Frozen on construction, always true."""
         return True
 
-    @classmethod
-    def mark_frozen(cls) -> None:
+    def mark_frozen(self) -> Self:
         """Frozen on construction, do nothing."""
+        return self
 
     def check_frozen(self) -> None:
         """Frozen on construction, do nothing."""

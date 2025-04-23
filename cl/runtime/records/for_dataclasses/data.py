@@ -14,6 +14,9 @@
 
 from abc import ABC
 from dataclasses import dataclass
+
+from typing_extensions import Self
+
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
@@ -36,9 +39,10 @@ class Data(DataMixin, ABC):
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         return bool(self.__frozen)
 
-    def mark_frozen(self) -> None:
+    def mark_frozen(self) -> Self:
         """
         Mark the instance as frozen without actually freezing it,which is the responsibility of build method.
         The action of marking the instance frozen cannot be reversed. Can be called more than once.
         """
         object.__setattr__(self, "_Data__frozen", True)
+        return self
