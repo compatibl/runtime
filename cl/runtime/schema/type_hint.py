@@ -15,6 +15,7 @@
 import types
 import typing
 from dataclasses import dataclass
+from enum import Enum
 from typing import List
 from uuid import UUID
 from frozendict import frozendict
@@ -66,6 +67,13 @@ class TypeHint(FrozenData):
             raise RuntimeError(f"{self.to_str()} is not a supported primitive type.")
         elif self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is not valid for a primitive type.")
+
+    def validate_for_enum(self) -> None:
+        """Raise an error if the type hint is not an enum."""
+        if not issubclass(self._schema_class, Enum):
+            raise RuntimeError(f"{self.to_str()} is not compatible with enum value.")
+        elif self.remaining:
+            raise RuntimeError(f"The type hint {self.to_str()} is not valid for an enum.")
 
     def validate_for_sequence(self) -> None:
         """Raise an error if the type hint is not a sequence."""

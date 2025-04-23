@@ -14,9 +14,12 @@
 
 from enum import Enum
 from typing import Any
+
+from frozendict import frozendict
+
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_enum
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -76,21 +79,19 @@ class BuildUtil:
                 # Convert data to the type name specified in schema, error message if conversion is not possible
                 return PrimitiveSerializers.PASSTHROUGH.deserialize(data, type_hint)
             else:
-                # Error if not an enum
-                if not isinstance(data, EnumSpec):
-                    raise RuntimeError(
-                        f"Type hint '{type_hint.to_str()}' is not a primitive type or enum while"
-                        f"the data is an instance of primitive class {data_class_name}:\n"
-                        f"{ErrorUtil.wrap(data)}."
-                    )
+                raise RuntimeError(
+                    f"The data has primitive type {data_class_name} which is not compatible "
+                    f"with type hint '{type_hint.to_str()}'.\n{ErrorUtil.wrap(data)}."
+                )
         elif data_class_name in SEQUENCE_TYPE_NAMES:
             type_hint.validate_for_sequence()
-            # TODO: Use tuple instead of list
-            return list(cls.typed_build(v, remaining_chain) for v in data)
+            return tuple(cls.typed_build(v, remaining_chain) for v in data)
         elif data_class_name in MAPPING_TYPE_NAMES:
             type_hint.validate_for_mapping()
-            # TODO: Use frozendict instead of dict
-            return dict((k, cls.typed_build(v, remaining_chain)) for k, v in data.items())
+            return frozendict((k, cls.typed_build(v, remaining_chain)) for k, v in data.items())
+        elif is_enum(data):
+            type_hint.validate_for_enum()
+            return data
         elif is_data(data):
 
             # Has slots, process as data, key or record
@@ -145,8 +146,7 @@ class BuildUtil:
             )
 
             # Mark as frozen to prevent further modifications
-            data.mark_frozen()
-            return data
+            return data.mark_frozen()
         else:
             raise cls._unsupported_object_error(data)
 
@@ -155,8 +155,8 @@ class BuildUtil:
         obj_type_name = TypeUtil.name(obj)
         return RuntimeError(
             f"Class {obj_type_name} cannot be a record or its field. Supported types include:\n"
-            f"  1. Classes that implement DataProtocol;\n"
-            f"  2. Tuples where all values are supported types;\n"
-            f"  3. Dictionaries with string keys where all values are supported types; and\n"
-            f"  4. Primitive types from the following list: {', '.join(PRIMITIVE_CLASS_NAMES)}"
+            f"  1. Classes that implement 'build' method;\n"
+            f"  2. Sequence types (list, tuple, etc.) where all values are supported types;\n"
+            f"  3. Mapping types (dict, frozendict, etc.) with string keys where all values are supported types;\n"
+            f"  4. Enums; and\n5. Primitive types from the following list:\n{', '.join(PRIMITIVE_CLASS_NAMES)}"
         )
