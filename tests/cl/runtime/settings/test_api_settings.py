@@ -23,8 +23,8 @@ def test_defaults():
     assert api_settings.hostname == "localhost"
     assert api_settings.port == 7008
     assert api_settings.allow_credentials
-    assert api_settings.allow_methods == ["*"]
-    assert api_settings.allow_headers == ["*"]
+    assert api_settings.allow_methods == ("*",)
+    assert api_settings.allow_headers == ("*",)
 
 
 if __name__ == "__main__":

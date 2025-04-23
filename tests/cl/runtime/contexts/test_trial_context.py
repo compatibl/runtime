@@ -23,17 +23,17 @@ def test_append_token():
     assert TrialContext.get_trial() is None
     with TrialContext.append_token("abc") as trial_context_1:
         # One token in chain
-        assert trial_context_1.trial_chain == ["abc"]
+        assert trial_context_1.trial_chain == ("abc",)
         assert TrialContext.get_trial() == "abc"
         with TrialContext.append_token(123) as trial_context_2:
             # Two tokens in chain
-            assert trial_context_2.trial_chain == ["abc", "123"]
+            assert trial_context_2.trial_chain == ("abc", "123",)
             assert TrialContext.get_trial() == "abc\\123"
-        assert trial_context_1.trial_chain == ["abc"]
+        assert trial_context_1.trial_chain == ("abc",)
         assert TrialContext.get_trial() == "abc"
         with TrialContext.append_token(None) as trial_context_3:
             # One token in chain, None is ignored
-            assert trial_context_3.trial_chain == ["abc"]
+            assert trial_context_3.trial_chain == ("abc",)
             assert TrialContext.get_trial() == "abc"
 
 

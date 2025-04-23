@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubDataclassComposite
@@ -52,7 +53,7 @@ def test_data_serialization():
         sample = sample_type()
         serialized = DataSerializers.FOR_UI.serialize(sample)
         deserialized = DataSerializers.FOR_UI.deserialize(serialized)
-        assert deserialized == sample
+        assert deserialized == FreezeUtil.freeze(sample)
 
         # Record in RegressionGuard
         result_str = BootstrapSerializers.YAML.serialize(serialized)
