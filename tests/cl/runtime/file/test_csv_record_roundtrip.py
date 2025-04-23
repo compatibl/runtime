@@ -22,6 +22,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -93,10 +94,8 @@ def test_roundtrip(pytest_default_db):
             entry_type = type(expected_entries[0])
 
             read_records_from_csv(file_path, entry_type)
-
-            actual_records = list(DbContext.load_all(entry_type))
-
-            assert actual_records == DataUtil.remove_none(expected_entries)
+            actual_records = tuple(DbContext.load_all(entry_type))
+            assert actual_records == FreezeUtil.freeze(DataUtil.remove_none(expected_entries))
         finally:
             if file_path is not None:
                 file_path.unlink(missing_ok=True)
