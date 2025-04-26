@@ -32,6 +32,7 @@ from stubs.cl.runtime import StubDataViewers
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime import StubMediaViewers
 from stubs.cl.runtime import StubPlotViewers
+from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 
@@ -100,9 +101,21 @@ class StubRuntimeConfig(Config):
     def configure_plots(self) -> None:
         """Configure plots."""
 
+        # GroupBarPlot
+        DbContext.save_many((
+            StubGroupBarPlots.get_single_group_plot(self.config_id + "stub_group_bar_plots.single_group"),
+            StubGroupBarPlots.get_4_groups_2_bars_plot(self.config_id + "stub_group_bar_plots.4_groups_2_bars"),
+            StubGroupBarPlots.get_4_groups_5_bars(self.config_id + "stub_group_bar_plots.4_groups_5_bars"),
+        ))
+
         # HeatMapPlot
-        DbContext.save_one(StubHeatMapPlots.get_basic_plot(self.config_id + "stub_heat_map_plots.basic"))
+        DbContext.save_many((
+            StubHeatMapPlots.get_basic_plot(self.config_id + "stub_heat_map_plots.basic"),
+        ))
 
         # LinePlot
-        DbContext.save_one(StubLinePlots.get_one_line_plot(self.config_id + "stub_line_plots.one_line"))
-        DbContext.save_one(StubLinePlots.get_two_line_plot(self.config_id + "stub_line_plots.two_line"))
+        DbContext.save_many((
+            StubLinePlots.get_one_line_plot(self.config_id + "stub_line_plots.one_line"),
+            StubLinePlots.get_two_line_plot(self.config_id + "stub_line_plots.two_line"),
+        ))
+
