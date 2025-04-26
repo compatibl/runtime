@@ -18,11 +18,11 @@ from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 
 
 def test_one_line(pytest_work_dir):
-    StubLinePlots.get_one_line_plot(plot_id="line_plot.test_one_line").save_png()
+    StubLinePlots.get_one_line_plot(plot_id="test_line_plot.test_one_line").save_png()
 
 
-def test_two_lines(pytest_work_dir):
-    StubLinePlots.get_two_line_plot(plot_id="line_plot.test_two_line").save_png()
+def test_two_line(pytest_work_dir):
+    StubLinePlots.get_two_line_plot(plot_id="test_line_plot.test_two_line").save_png()
 
 
 if __name__ == "__main__":

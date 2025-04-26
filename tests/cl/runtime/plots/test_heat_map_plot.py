@@ -19,7 +19,7 @@ from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 
 def test_basic(pytest_work_dir):
     """Test a basic heat map plot"""
-    StubHeatMapPlots.get_basic_plot("stub_heat_map_plots.basic").save_png()
+    StubHeatMapPlots.get_basic_plot("test_heat_map_plot.test_basic").save_png()
 
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
