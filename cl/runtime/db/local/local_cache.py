@@ -92,32 +92,25 @@ class LocalCache(Db):
     ) -> Iterable[TRecord]:
         raise NotImplementedError()
 
-    def save_one(
-        self,
-        record: RecordProtocol,
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        # Try to retrieve table dictionary using 'key_type' as key, insert if it does not yet exist
-        key_type = record.get_key_type()
-        key_type_name = TypeUtil.name(key_type)
-        table_cache = self.__cache.setdefault(key_type_name, {})
-
-        # Serialize both key and record
-        key = record.get_key()
-        serialized_key = _KEY_SERIALIZER.serialize(key)
-
-        # Add record to cache, overwriting an existing record if present
-        table_cache[serialized_key] = record
-
     def save_many(
         self,
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
     ) -> None:
-        # TODO: Provide a separate implementation for save_many
-        [self.save_one(x, dataset=dataset) for x in records]
+        # TODO: Provide a more performant implementation
+        for record in records:
+            # Try to retrieve table dictionary using 'key_type' as key, insert if it does not yet exist
+            key_type = record.get_key_type()
+            key_type_name = TypeUtil.name(key_type)
+            table_cache = self.__cache.setdefault(key_type_name, {})
+
+            # Serialize both key and record
+            key = record.get_key()
+            serialized_key = _KEY_SERIALIZER.serialize(key)
+
+            # Add record to cache, overwriting an existing record if present
+            table_cache[serialized_key] = record
 
     def delete_one(
         self,

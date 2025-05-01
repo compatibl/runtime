@@ -241,8 +241,8 @@ class DbContext(Context):
         cls._pre_save_check(record)
 
         # Invoke DB method with combined dataset
-        cls.get_db().save_one(  # noqa
-            record,
+        cls.get_db().save_many(  # noqa
+            [record],
             dataset=cls.get_dataset(dataset),
         )
 

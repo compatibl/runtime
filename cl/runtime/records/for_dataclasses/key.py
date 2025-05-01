@@ -20,4 +20,4 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 @dataclass(slots=True)
 class Key(Data, KeyMixin, ABC):
-    """Base class for keys and records (which are derived from keys) based on dataclasses framework."""
+    """Base class for keys and records (derived from keys) based on dataclasses framework."""

@@ -226,14 +226,6 @@ class SqliteDb(Db):
     ) -> Iterable[TRecord]:
         raise NotImplementedError()
 
-    def save_one(
-        self,
-        record: RecordProtocol,
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        return self.save_many([record], dataset=dataset)
-
     def save_many(
         self,
         records: Iterable[RecordProtocol],

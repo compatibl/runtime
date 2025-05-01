@@ -200,21 +200,6 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         """
 
     @abstractmethod
-    def save_one(
-        self,
-        record: RecordProtocol,
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        """
-        Save records to storage.
-
-        Args:
-            record: Record or None.
-            dataset: Dataset as backslash-delimited string
-        """
-
-    @abstractmethod
     def save_many(
         self,
         records: Iterable[RecordProtocol],

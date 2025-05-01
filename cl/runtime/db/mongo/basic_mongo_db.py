@@ -160,38 +160,31 @@ class BasicMongoDb(Db):
             result.append(record)
         return result
 
-    def save_one(
-        self,
-        record: RecordProtocol,
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        # Get collection name from key type by removing Key suffix if present
-        key_type = record.get_key_type()
-        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-        db = self._get_db()
-        collection = db[collection_name]
-
-        # Serialize data, this also executes 'init_all' method
-        serialized_record = data_serializer.serialize(record)
-
-        # Serialize key
-        # TODO: Consider getting the key first instead of serializing the entire record
-        serialized_key = _KEY_SERIALIZER.serialize(record.get_key())
-
-        # Use update_one with upsert=True to insert if not present or update if present
-        # TODO (Roman): update_one does not affect fields not presented in record. Changed to replace_one
-        serialized_record["_key"] = serialized_key
-        collection.replace_one({"_key": serialized_key}, serialized_record, upsert=True)
-
     def save_many(
         self,
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
     ) -> None:
-        # TODO: Provide a separate implementation for save_many
-        [self.save_one(x, dataset=dataset) for x in records]
+        # TODO: Provide a more performant implementation
+        for record in records:
+            # Get collection name from key type by removing Key suffix if present
+            key_type = record.get_key_type()
+            collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
+            db = self._get_db()
+            collection = db[collection_name]
+
+            # Serialize data, this also executes 'init_all' method
+            serialized_record = data_serializer.serialize(record)
+
+            # Serialize key
+            # TODO: Consider getting the key first instead of serializing the entire record
+            serialized_key = _KEY_SERIALIZER.serialize(record.get_key())
+
+            # Use update_one with upsert=True to insert if not present or update if present
+            # TODO (Roman): update_one does not affect fields not presented in record. Changed to replace_one
+            serialized_record["_key"] = serialized_key
+            collection.replace_one({"_key": serialized_key}, serialized_record, upsert=True)
 
     def delete_one(
         self,
