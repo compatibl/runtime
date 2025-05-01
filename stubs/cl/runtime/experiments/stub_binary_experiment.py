@@ -31,6 +31,6 @@ class StubBinaryExperiment(BinaryExperiment):
         # Create a trial record with random result
         trial = BinaryTrial(
             experiment=self.get_key(),
-            flag=True,
+            outcome=True,
         ).build()
         DbContext.save_one(trial)

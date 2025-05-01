@@ -31,7 +31,7 @@ class StubSupervisedBinaryExperiment(SupervisedBinaryExperiment):
         # Create a trial record with random result
         trial = SupervisedBinaryTrial(
             experiment=self.get_key(),
-            flag=True,
-            expected_flag=True,
+            actual_outcome=True,
+            expected_outcome=True,
         ).build()
         DbContext.save_one(trial)

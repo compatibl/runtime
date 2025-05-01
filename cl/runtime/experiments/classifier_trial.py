@@ -19,7 +19,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 
 @dataclass(slots=True, kw_only=True)
 class ClassifierTrial(Trial):
-    """Single trial of a classifier experiment, the result is a string label."""
+    """Single trial of an unsupervised classifier experiment, the result is a string class label."""
 
     label: str = required()
-    """Actual result of the classifier trial (string label)."""
+    """The result of this unsupervised classifier trial (string class label)."""

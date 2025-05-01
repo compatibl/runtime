@@ -26,7 +26,7 @@ class StubSupervisedClassifierExperiment(SupervisedClassifierExperiment):
         # Create a trial record with random result
         trial = SupervisedClassifierTrial(
             experiment=self.get_key(),
-            label="abc",
+            actual_label="abc",
             expected_label="def",
         ).build()
         DbContext.save_one(trial)

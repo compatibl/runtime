@@ -13,13 +13,16 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.classifier_trial import ClassifierTrial
+from cl.runtime.experiments.trial import Trial
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class SupervisedClassifierTrial(ClassifierTrial):
-    """Single trial of a supervised classifier experiment, the actual and expected results are string labels."""
+class SupervisedClassifierTrial(Trial):
+    """Single trial of a supervised classifier experiment, the actual and expected results are string class labels."""
+
+    actual_label: str = required()
+    """Actual result of this supervised classifier trial (string class label)."""
 
     expected_label: str = required()
-    """Expected result of the classifier trial (string label)."""
+    """Expected result of this supervised classifier trial (string class label)."""
