@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Iterable
-from cl.runtime import Db
+from cl.runtime import Db, KeyUtil
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
@@ -130,11 +130,21 @@ class DbContext(Context):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls._get_db().load_one(
-            record_type,
-            record_or_key,
-            dataset=cls.get_dataset(dataset),
-        )
+        if record_or_key is not None:
+            result = cls.load_one_or_none(record_type, record_or_key, dataset=dataset)
+            if result is None:
+                raise RuntimeError(
+                    f"Record not found for key {KeyUtil.format(record_or_key)} when loading type "
+                    f"{TypeUtil.name(record_type)}.\n"
+                    f"Use 'load_one_or_none' method to return None instead of raising an error."
+                )
+            return result
+        else:
+            raise RuntimeError(
+                f"Parameter 'record_or_key' is None for load_one method when loading type "
+                f"{TypeUtil.name(record_type)}.\n"
+                f"Use 'load_one_or_none' method to return None instead of raising an error."
+            )
 
     @classmethod
     def load_one_or_none(

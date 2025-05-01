@@ -44,9 +44,6 @@ def test_smoke():
     assert loaded_records[1] is record  # In case of local cache only, also the same object
     assert loaded_records[2] is None
 
-    assert cache.load_one(StubDataclassRecord, record) is record  # Same object is returned without lookup
-    assert cache.load_one(StubDataclassRecord, key) is record  # In case of local cache only, also the same object
-
 
 if __name__ == "__main__":
     pytest.main([__file__])

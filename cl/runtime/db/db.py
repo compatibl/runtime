@@ -44,38 +44,6 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id).build()
 
-    def load_one(
-        self,
-        record_type: type[TRecord],
-        record_or_key: KeyProtocol | TPrimitive,
-        *,
-        dataset: str | None = None,
-    ) -> TRecord:
-        """
-        Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
-        Error message if 'record_or_key' is None or the record is not found in DB.
-
-        Args:
-            record_type: Record type to load, error if the result is not this type or its subclass
-            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-        """
-        if record_or_key is not None:
-            result = self.load_one_or_none(record_type, record_or_key, dataset=dataset)
-            if result is None:
-                raise RuntimeError(
-                    f"Record not found for key {KeyUtil.format(record_or_key)} when loading type "
-                    f"{TypeUtil.name(record_type)}.\n"
-                    f"Use 'load_one_or_none' method to return None instead of raising an error."
-                )
-            return result
-        else:
-            raise RuntimeError(
-                f"Parameter 'record_or_key' is None for load_one method when loading type "
-                f"{TypeUtil.name(record_type)}.\n"
-                f"Use 'load_one_or_none' method to return None instead of raising an error."
-            )
-
     def load_one_or_none(
         self,
         record_type: type[TRecord],
