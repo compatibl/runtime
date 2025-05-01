@@ -33,7 +33,7 @@ class MethodTask(CallableTask, ABC):
     method_name: str = required()
     """The name of @staticmethod in snake_case or PascalCase format."""
 
-    method_params: Dict[str, str] | None = optional(default_factory=dict)  # TODO: Allow values other than string
+    method_params: Dict[str, str] | None = optional(default_factory=lambda: {})  # TODO: Allow values other than string
     """Values for task arguments, if any."""
 
     def normalized_method_name(self) -> str:

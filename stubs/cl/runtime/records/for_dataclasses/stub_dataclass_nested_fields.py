@@ -27,21 +27,21 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubD
 class StubDataclassNestedFields(StubDataclassRecord):
     """Stub derived class."""
 
-    base_field: StubDataclassData = required(default_factory=StubDataclassData)
+    base_field: StubDataclassData = required(default_factory=lambda: StubDataclassData())
     """Stub field."""
 
-    derived_field: StubDataclassDerivedData = required(default_factory=StubDataclassDerivedData)
+    derived_field: StubDataclassDerivedData = required(default_factory=lambda: StubDataclassDerivedData())
     """Stub field."""
 
     derived_from_derived_field: StubDataclassDerivedFromDerivedData = required(
-        default_factory=StubDataclassDerivedFromDerivedData
+        default_factory=lambda: StubDataclassDerivedFromDerivedData()
     )
     """Stub field."""
 
-    polymorphic_field: StubDataclassData = required(default_factory=StubDataclassDerivedData)
+    polymorphic_field: StubDataclassData = required(default_factory=lambda: StubDataclassDerivedData())
     """Declared StubDataclassData but provided an instance of StubDataclassDerivedData."""
 
-    polymorphic_derived_field: StubDataclassDerivedData = required(default_factory=StubDataclassDerivedFromDerivedData)
+    polymorphic_derived_field: StubDataclassDerivedData = required(default_factory=lambda: StubDataclassDerivedFromDerivedData())
     """Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData."""
 
     key_field: StubDataclassRecordKey = required(default_factory=lambda: StubDataclassRecordKey(id="uvw"))
