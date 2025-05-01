@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
-from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.key_mixin import KeyMixin
+from abc import abstractmethod
+from typing import Generic
+from cl.runtime.records.protocols import TKey
 
 
-@dataclass(slots=True)
-class Key(Data, KeyMixin, ABC):
-    """Base class for keys and records (which are derived from keys) based on dataclasses framework."""
+class QueryMixin(Generic[TKey]):
+    """
+    Optional generic mixin for a query parameterized by the record's key.
+    Derive MyQuery from base Query for the chosen data class framework and QueryMixin parameterized by MyKey
+    as in MyQuery(Query, QueryMixin[MyKey]).
+    """
+
+    __slots__ = ()
+    """To prevent creation of __dict__ in derived types."""

@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
-from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.serializers.data_serializer import DataSerializer
+from cl.runtime.serializers.enum_serializers import EnumSerializers
+from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
-@dataclass(slots=True)
-class Key(Data, KeyMixin, ABC):
-    """Base class for keys and records (which are derived from keys) based on dataclasses framework."""
+class MongoQuerySerializers:
+    """Serialization for MongoDB query."""
+
+    FOR_MONGO = DataSerializer(
+        primitive_serializer=PrimitiveSerializers.FOR_MONGO,
+        enum_serializer=EnumSerializers.DEFAULT,
+    ).build()
+    """Default unidirectional data serializer settings for MongoDB query."""

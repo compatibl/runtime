@@ -15,9 +15,9 @@
 from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.query_mixin import QueryMixin
 
 
 @dataclass(slots=True)
-class Key(Data, KeyMixin, ABC):
-    """Base class for keys and records (which are derived from keys) based on dataclasses framework."""
+class Query(Data, QueryMixin, ABC):
+    """Base class for queries based on dataclasses framework."""

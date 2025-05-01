@@ -14,10 +14,18 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.experiments.experiment_key import ExperimentKey
+from cl.runtime.experiments.trial_key import TrialKey
+from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.query import Query
+from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.record_mixin import RecordMixin
 
 
-@dataclass(slots=True)
-class Key(Data, KeyMixin, ABC):
-    """Base class for keys and records (which are derived from keys) based on dataclasses framework."""
+@dataclass(slots=True, kw_only=True)
+class TrialQuery(Query, QueryMixin[TrialKey], ABC):
+    """Query for a single trial of an experiment."""
+
+    experiment: ExperimentKey = required()
+    """Experiment for which the trial is recorded."""
