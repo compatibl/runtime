@@ -42,11 +42,8 @@ class PanelResponseUtil:
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(type_.get_key_type()))
 
-        # Get database from the current context.
-        db = DbContext.get_db()
-
         # Load record from the database.
-        record = db.load_one(type_, key_obj, dataset=request.dataset)
+        record = DbContext.load_one(type_, key_obj, dataset=request.dataset)
         if record is None:
             raise RuntimeError(
                 f"Record with type {request.type_name} and key {request.key} is not found in dataset {request.dataset}."

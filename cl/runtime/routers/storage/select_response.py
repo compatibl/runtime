@@ -51,7 +51,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         select_type = TypeInfoCache.get_class_from_type_name(request.type_)
 
         # Load records for type.
-        records = DbContext.get_db().load_all(select_type)  # noqa
+        records = DbContext.load_all(select_type)  # noqa
 
         # Serialize records for table.
         serialized_records = [cls._serialize_record_for_table(record) for record in records]

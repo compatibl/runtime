@@ -59,7 +59,7 @@ class DbContext(Context):
 
         # Initialize from the current context
         if self.db is None:
-            self.db = self.get_db()
+            self.db = self._get_db()
 
         # TODO: !!! Currently, only the latest context is reproduced in celery workers
         #       This may cause problems with the current design and has to be reviewed
@@ -82,7 +82,7 @@ class DbContext(Context):
             self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
 
     @classmethod
-    def get_db(cls) -> Db:
+    def _get_db(cls) -> Db:
         """
         Return DB for the current DbContext inside the 'with DbContext(...)' clause.
         Return the default DB from settings outside the outermost 'with DbContext(...)' clause.
@@ -130,7 +130,7 @@ class DbContext(Context):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls.get_db().load_one(
+        return cls._get_db().load_one(
             record_type,
             record_or_key,
             dataset=cls.get_dataset(dataset),
@@ -153,7 +153,7 @@ class DbContext(Context):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls.get_db().load_one_or_none(
+        return cls._get_db().load_one_or_none(
             record_type,
             record_or_key,
             dataset=cls.get_dataset(dataset),
@@ -176,7 +176,7 @@ class DbContext(Context):
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls.get_db().load_many(
+        return cls._get_db().load_many(
             record_type,
             records_or_keys,
             dataset=cls.get_dataset(dataset),
@@ -196,7 +196,7 @@ class DbContext(Context):
             record_type: Type of the records to load
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls.get_db().load_all(  # noqa
+        return cls._get_db().load_all(  # noqa
             record_type,
             dataset=cls.get_dataset(dataset),
         )
@@ -217,7 +217,7 @@ class DbContext(Context):
             filter_obj: Instance of 'record_type' whose fields are used for the query
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls.get_db().load_filter(  # noqa
+        return cls._get_db().load_filter(  # noqa
             record_type,
             filter_obj,
             dataset=cls.get_dataset(dataset),
@@ -241,7 +241,7 @@ class DbContext(Context):
         cls._pre_save_check(record)
 
         # Invoke DB method with combined dataset
-        cls.get_db().save_many(  # noqa
+        cls._get_db().save_many(  # noqa
             [record],
             dataset=cls.get_dataset(dataset),
         )
@@ -269,7 +269,7 @@ class DbContext(Context):
         [cls._pre_save_check(record) for record in records]
 
         # Invoke save_many method of DB implementation
-        cls.get_db().save_many(  # noqa
+        cls._get_db().save_many(  # noqa
             records,
             dataset=cls.get_dataset(dataset),
         )
@@ -290,7 +290,7 @@ class DbContext(Context):
             key: Key in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        cls.get_db().delete_one(  # noqa
+        cls._get_db().delete_one(  # noqa
             key_type,
             key,
             dataset=cls.get_dataset(dataset),
@@ -310,7 +310,7 @@ class DbContext(Context):
             keys: Iterable of keys.
             dataset: Target dataset as a delimited string, list of levels, or None
         """
-        cls.get_db().delete_many(  # noqa
+        cls._get_db().delete_many(  # noqa
             keys,
             dataset=cls.get_dataset(dataset),
         )
