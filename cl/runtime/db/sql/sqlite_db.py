@@ -90,7 +90,7 @@ class SqliteDb(Db):
         flattened_tuple = tuple(item for group in key_tuples for item in group)
         return flattened_tuple  # TODO(Roman): Review why it should be flattened
 
-    def load_many(
+    def load_many_unsorted(
         self,
         record_type: type[TRecord],
         keys: Sequence[tuple],

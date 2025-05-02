@@ -39,7 +39,7 @@ class LocalCache(Db):
     __cache: Dict[str, Dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
-    def load_many(
+    def load_many_unsorted(
         self,
         record_type: type[TRecord],
         keys: Sequence[tuple],

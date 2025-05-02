@@ -250,7 +250,7 @@ class DbContext(Context):
         queried_tuple_keys = [x for x in tuple_keys_or_records if isinstance(x, tuple)]
 
         # Get records from DB, the result is unsorted
-        queried_records = cls._get_db().load_many(record_type, queried_tuple_keys, dataset=dataset)
+        queried_records = cls._get_db().load_many_unsorted(record_type, queried_tuple_keys, dataset=dataset)
 
         # Create a dictionary with pairs consisting of key in tuple format and the record for this key
         queried_records_dict = {_KEY_SERIALIZER.serialize(x.get_key()): x for x in queried_records}

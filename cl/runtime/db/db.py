@@ -45,7 +45,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         return DbKey(db_id=self.db_id).build()
 
     @abstractmethod
-    def load_many(
+    def load_many_unsorted(
         self,
         record_type: type[TRecord],
         keys: Sequence[tuple],
