@@ -82,7 +82,7 @@ class StubGroupBarPlots:
         result.bar_labels = ["Bar 1", "Bar 2"]
         result.values = [85.5, 92]
         return result.build()
-    
+
     @classmethod
     def get_4_groups_2_bars_plot(cls, plot_id: str) -> Plot:
         """Get GroupBarPlot plot with 4 groups and 2 bars."""

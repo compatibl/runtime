@@ -41,7 +41,9 @@ class StubDataclassNestedFields(StubDataclassRecord):
     polymorphic_field: StubDataclassData = required(default_factory=lambda: StubDataclassDerivedData())
     """Declared StubDataclassData but provided an instance of StubDataclassDerivedData."""
 
-    polymorphic_derived_field: StubDataclassDerivedData = required(default_factory=lambda: StubDataclassDerivedFromDerivedData())
+    polymorphic_derived_field: StubDataclassDerivedData = required(
+        default_factory=lambda: StubDataclassDerivedFromDerivedData()
+    )
     """Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData."""
 
     key_field: StubDataclassRecordKey = required(default_factory=lambda: StubDataclassRecordKey(id="uvw"))

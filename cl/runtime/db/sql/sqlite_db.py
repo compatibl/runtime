@@ -16,10 +16,10 @@ import os
 import sqlite3
 from collections import defaultdict
 from dataclasses import dataclass
-from itertools import groupby
-from typing import Any, Sequence
+from typing import Any
 from typing import Dict
 from typing import Iterable
+from typing import Sequence
 from typing import Tuple
 from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db import Db
@@ -29,7 +29,6 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.records.protocols import is_key
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -111,9 +110,7 @@ class SqliteDb(Db):
 
         # if keys_group don't support "in" or "len" operator convert it to tuple
         sql_statement = f'SELECT * FROM "{table_name}"'
-        sql_statement = self._add_where_keys_in_clause(
-            sql_statement, key_fields, columns_mapping, len(keys)
-        )
+        sql_statement = self._add_where_keys_in_clause(sql_statement, key_fields, columns_mapping, len(keys))
         sql_statement += ";"
 
         # TODO: Check the logic for multiple keys when the tuple is flattened

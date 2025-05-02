@@ -14,8 +14,9 @@
 
 import re
 from dataclasses import dataclass
-from typing import Dict, Sequence
+from typing import Dict
 from typing import Iterable
+from typing import Sequence
 from mongomock import MongoClient as MongoClientMock
 from pymongo import MongoClient
 from pymongo.database import Database

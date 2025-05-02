@@ -93,12 +93,17 @@ class KeySerializer(Serializer):
                 invalid_tokens_str = "\n".join(str(x) for x in invalid_tokens)
                 raise RuntimeError(
                     f"Tuple argument of {TypeUtil.name(self)}.serialize includes non-primitive/non-enum tokens:\n"
-                    f"{invalid_tokens_str}")
+                    f"{invalid_tokens_str}"
+                )
             # The input is already a flattened sequence
             sequence = tuple(
-                self.primitive_serializer.serialize(v) if is_primitive(v)
-                else self.enum_serializer.serialize(self._checked_value(v)) if is_enum(v)
-                else self._checked_value(v)  # Will raise an error if not a primitive type or enum
+                (
+                    self.primitive_serializer.serialize(v)
+                    if is_primitive(v)
+                    else (
+                        self.enum_serializer.serialize(self._checked_value(v)) if is_enum(v) else self._checked_value(v)
+                    )
+                )  # Will raise an error if not a primitive type or enum
                 for v in data
             )
         else:

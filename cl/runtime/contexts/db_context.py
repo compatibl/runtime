@@ -13,28 +13,26 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Iterable, Sequence
-
-from more_itertools import consume
-
-from cl.runtime import Db, KeyUtil
+from typing import Iterable
+from typing import Sequence
+from cl.runtime import Db
+from cl.runtime import KeyUtil
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
-from cl.runtime.records.build_util import BuildUtil
-from cl.runtime.records.protocols import KeyProtocol, is_primitive, PRIMITIVE_CLASS_NAMES, is_key_or_record
+from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-
 
 _KEY_SERIALIZER = KeySerializers.TUPLE
 """Serializer for keys used in cache lookup."""
@@ -202,14 +200,14 @@ class DbContext(Context):
 
         # Check that the input list consists of only None, records, or keys in object or tuple format
         invalid_inputs = [
-            x for x in records_or_keys
-            if x is not None and not isinstance(x, tuple) and not is_key_or_record(x)
+            x for x in records_or_keys if x is not None and not isinstance(x, tuple) and not is_key_or_record(x)
         ]
         if len(invalid_inputs) > 0:
             invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
             raise RuntimeError(
                 f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following items that are not None, key, or record:\n{invalid_inputs_str}")
+                f"the following items that are not None, key, or record:\n{invalid_inputs_str}"
+            )
 
         # Check that the keys in the input list have type record_type.get_key_type()
         key_type = record_type.get_key_type()
@@ -218,7 +216,8 @@ class DbContext(Context):
             invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
             raise RuntimeError(
                 f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following keys whose type is not {TypeUtil.name(key_type)}:\n{invalid_keys_str}")
+                f"the following keys whose type is not {TypeUtil.name(key_type)}:\n{invalid_keys_str}"
+            )
 
         # Check that the records in the input list are derived from record_type
         invalid_records = [x for x in records_or_keys if is_record(x) and not isinstance(x, record_type)]
@@ -226,24 +225,23 @@ class DbContext(Context):
             invalid_records_str = "\n".join(str(x) for x in invalid_records)
             raise RuntimeError(
                 f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following records that are not derived from {TypeUtil.name(record_type)}:\n{invalid_records_str}")
+                f"the following records that are not derived from {TypeUtil.name(record_type)}:\n{invalid_records_str}"
+            )
 
         # Check that all records or keys in object format are frozen
         unfrozen_inputs = [
-            x for x in records_or_keys
-            if x is not None and not isinstance(x, tuple) and not x.is_frozen()
+            x for x in records_or_keys if x is not None and not isinstance(x, tuple) and not x.is_frozen()
         ]
         if len(unfrozen_inputs) > 0:
             unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_inputs)
             raise RuntimeError(
                 f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following items that are not frozen:\n{unfrozen_inputs_str}")
+                f"the following items that are not frozen:\n{unfrozen_inputs_str}"
+            )
 
         # Convert keys to tuple unless already a tuple, pass through all other item types
         tuple_keys_or_records = [
-            _KEY_SERIALIZER.serialize(x)
-            if x is not None and is_key(x) else x
-            for x in records_or_keys
+            _KEY_SERIALIZER.serialize(x) if x is not None and is_key(x) else x for x in records_or_keys
         ]
 
         # Keys only, skip None and records
