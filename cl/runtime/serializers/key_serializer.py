@@ -85,7 +85,7 @@ class KeySerializer(Serializer):
             # Build the key (this has no effect if already frozen)
             data.build()
             # Perform checks and convert to a sequence
-            sequence = self._to_sequence(data)
+            sequence = self._to_tuple(data)
         elif type(data) is tuple:
             # Check that all tokens are primitive types
             invalid_tokens = [x for x in data if not is_primitive(x) and not is_enum(x)]
@@ -110,7 +110,7 @@ class KeySerializer(Serializer):
         if (key_format := self.key_format) == KeyFormat.DELIMITED:
             # Convert sequence to a semicolon-delimited string
             return ";".join(sequence)
-        if key_format == KeyFormat.SEQUENCE:
+        if key_format == KeyFormat.TUPLE:
             # Sequence format
             return sequence
         else:
@@ -142,7 +142,7 @@ class KeySerializer(Serializer):
                     f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
                 )
             sequence = data.split(";")
-        elif key_format == KeyFormat.SEQUENCE:
+        elif key_format == KeyFormat.TUPLE:
             # Check the argument is a sequence
             if not is_sequence(data):
                 raise RuntimeError(
@@ -168,7 +168,7 @@ class KeySerializer(Serializer):
             )
         return result
 
-    def _to_sequence(self, data: DataProtocol | KeyProtocol) -> Tuple[TPrimitive, ...]:
+    def _to_tuple(self, data: DataProtocol | KeyProtocol) -> Tuple[TPrimitive, ...]:
         """Serialize key into a flattened sequence of primitive types."""
 
         # Check that the argument is a key
@@ -202,7 +202,7 @@ class KeySerializer(Serializer):
                         self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
                     ]
                     if isinstance(v, Enum)
-                    else self._to_sequence(v)
+                    else self._to_tuple(v)
                 )
             )
             for k, field_spec in field_dict.items()

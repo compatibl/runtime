@@ -32,7 +32,7 @@ class KeySerializers:
     """
 
     TUPLE = KeySerializer(
-        key_format=KeyFormat.SEQUENCE,
+        key_format=KeyFormat.TUPLE,
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,  # TODO: Review settings, rename or change from FOR_SQLITE
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
@@ -41,7 +41,7 @@ class KeySerializers:
     """
 
     FOR_SQLITE = KeySerializer(
-        key_format=KeyFormat.SEQUENCE,
+        key_format=KeyFormat.TUPLE,
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()

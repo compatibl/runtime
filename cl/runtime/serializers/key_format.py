@@ -25,8 +25,8 @@ class KeyFormat(IntEnum):
     primitive_serializer and enum_serializer respectively. The default delimiter is semicolon.
     """
 
-    SEQUENCE = auto()
+    TUPLE = auto()
     """
-    Flattened sequence of primitive and enum tokens serialized using
+    Flattened tuple of primitive and enum tokens serialized using
     primitive_serializer and enum_serializer respectively.
     """
