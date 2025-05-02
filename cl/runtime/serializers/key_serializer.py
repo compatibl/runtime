@@ -64,14 +64,15 @@ class KeySerializer(Serializer):
         remaining_chain = type_hint.remaining if type_hint is not None else None
 
         # Ensure data type is the same as schema type if type chain is specified
-        if schema_type_name is not None and data_class_name != schema_type_name:
+        if schema_type_name is not None and data_class_name != "tuple" and data_class_name != schema_type_name:
             raise RuntimeError(
                 f"Key is an instance of type {data_class_name} while schema type is {schema_type_name}.\n"
                 f"Substituting records for keys is allowed, but deriving one key type from another is not."
             )
         if remaining_chain:
+            key_type_name = "key in tuple format" if data_class_name == "tuple" else f"key class {data_class_name}"
             raise RuntimeError(
-                f"Data is an instance of a key class {data_class_name} that is incompatible with\n"
+                f"Data is an instance of a {key_type_name} that is incompatible with\n"
                 f"a composite type hint: {type_hint.to_str()}."
             )
 
@@ -83,13 +84,28 @@ class KeySerializer(Serializer):
         elif is_key(data):
             # Build the key (this has no effect if already frozen)
             data.build()
+            # Perform checks and convert to a sequence
+            sequence = self._to_sequence(data)
+        elif type(data) is tuple:
+            # Check that all tokens are primitive types
+            invalid_tokens = [x for x in data if not is_primitive(x) and not is_enum(x)]
+            if len(invalid_tokens) > 0:
+                invalid_tokens_str = "\n".join(str(x) for x in invalid_tokens)
+                raise RuntimeError(
+                    f"Tuple argument of {TypeUtil.name(self)}.serialize includes non-primitive/non-enum tokens:\n"
+                    f"{invalid_tokens_str}")
+            # The input is already a flattened sequence
+            sequence = tuple(
+                self.primitive_serializer.serialize(v) if is_primitive(v)
+                else self.enum_serializer.serialize(self._checked_value(v)) if is_enum(v)
+                else self._checked_value(v)  # Will raise an error if not a primitive type or enum
+                for v in data
+            )
         else:
             raise RuntimeError(
-                f"Type {TypeUtil.name(data)} passed to {TypeUtil.name(self)} is not a key, cannot serialize."
+                f"Type {TypeUtil.name(data)} passed to {TypeUtil.name(self)} is not a key\n"
+                f"in object or tuple format, cannot serialize."
             )
-
-        # Perform checks and convert to a sequence
-        sequence = self._to_sequence(data)
 
         if (key_format := self.key_format) == KeyFormat.DELIMITED:
             # Convert sequence to a semicolon-delimited string

@@ -14,7 +14,7 @@
 
 import re
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Sequence
 from typing import Iterable
 from mongomock import MongoClient as MongoClientMock
 from pymongo import MongoClient
@@ -64,43 +64,32 @@ class BasicMongoDb(Db):
     client_uri: str = "mongodb://localhost:27017/"
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
 
-    def _load_one_or_none(
-        self,
-        key: KeyProtocol,
-        *,
-        dataset: str | None = None,
-    ) -> RecordProtocol | None:
-        # Key, get collection name from key type
-        collection_name = TypeUtil.name(key)
-        db = self._get_db()
-        collection = db[collection_name]
-
-        serialized_key = _KEY_SERIALIZER.serialize(key)
-        serialized_record = collection.find_one({"_key": serialized_key})
-        if serialized_record is not None:
-            del serialized_record["_id"]
-            del serialized_record["_key"]
-            result = data_serializer.deserialize(serialized_record)
-            return result
-        else:
-            return None
-
     def load_many(
         self,
         record_type: type[TRecord],
-        records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
+        keys: Sequence[tuple],
         *,
         dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
-        # TODO: Implement directly for better performance
-        result = [
-            self.load_one_or_none(
-                record_type,
-                x,
-                dataset=dataset,
-            )
-            for x in records_or_keys
-        ]
+    ) -> Sequence[TRecord]:
+
+        # Get collection name from key type
+        key_type = record_type.get_key_type()
+        collection_name = TypeUtil.name(key_type)
+        db = self._get_db()
+        collection = db[collection_name]
+
+        result = []
+        for key in keys:
+            # TODO: Implement using a more performant approach
+            serialized_key = _KEY_SERIALIZER.serialize(key)
+            serialized_record = collection.find_one({"_key": serialized_key})
+
+            # Do not include None if the record is not found, skip instead
+            if serialized_record is not None:
+                del serialized_record["_id"]
+                del serialized_record["_key"]
+                record = data_serializer.deserialize(serialized_record)
+                result.append(record)
         return result
 
     def load_all(

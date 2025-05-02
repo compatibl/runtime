@@ -13,13 +13,17 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Iterable, Sequence
+
+from more_itertools import consume
+
 from cl.runtime import Db, KeyUtil
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.build_util import BuildUtil
+from cl.runtime.records.protocols import KeyProtocol, is_primitive, PRIMITIVE_CLASS_NAMES, is_key_or_record
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TPrimitive
@@ -28,7 +32,12 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+
+
+_KEY_SERIALIZER = KeySerializers.TUPLE
+"""Serializer for keys used in cache lookup."""
 
 
 @dataclass(slots=True, kw_only=True)
@@ -163,20 +172,20 @@ class DbContext(Context):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls._get_db().load_one_or_none(
-            record_type,
-            record_or_key,
-            dataset=cls.get_dataset(dataset),
-        )
+        result = cls.load_many(record_type, [record_or_key], dataset=dataset)
+        if len(result) == 1:
+            return result[0]
+        else:
+            raise RuntimeError("DbContext.load_many returned more records than requested.")
 
     @classmethod
     def load_many(
         cls,
         record_type: type[TRecord],
-        records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
+        records_or_keys: Sequence[TRecord | TKey | tuple | None] | None,
         *,
         dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
+    ) -> Sequence[TRecord | None] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
         the result must have the same order as 'records_or_keys'.
@@ -186,11 +195,69 @@ class DbContext(Context):
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls._get_db().load_many(
-            record_type,
-            records_or_keys,
-            dataset=cls.get_dataset(dataset),
-        )
+
+        # Pass through None or an empty sequence
+        if not records_or_keys:
+            return records_or_keys
+
+        # Check that the input list consists of only None, records, or keys in object or tuple format
+        invalid_inputs = [
+            x for x in records_or_keys
+            if x is not None and not isinstance(x, tuple) and not is_key_or_record(x)
+        ]
+        if len(invalid_inputs) > 0:
+            invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
+            raise RuntimeError(
+                f"Parameter 'records_or_keys' of load_many method includes\n"
+                f"the following items that are not None, key, or record:\n{invalid_inputs_str}")
+
+        # Check that the keys in the input list have type record_type.get_key_type()
+        key_type = record_type.get_key_type()
+        invalid_keys = [x for x in records_or_keys if is_key(x) and type(x) is not key_type]
+        if len(invalid_keys) > 0:
+            invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
+            raise RuntimeError(
+                f"Parameter 'records_or_keys' of load_many method includes\n"
+                f"the following keys whose type is not {TypeUtil.name(key_type)}:\n{invalid_keys_str}")
+
+        # Check that the records in the input list are derived from record_type
+        invalid_records = [x for x in records_or_keys if is_record(x) and not isinstance(x, record_type)]
+        if len(invalid_records) > 0:
+            invalid_records_str = "\n".join(str(x) for x in invalid_records)
+            raise RuntimeError(
+                f"Parameter 'records_or_keys' of load_many method includes\n"
+                f"the following records that are not derived from {TypeUtil.name(record_type)}:\n{invalid_records_str}")
+
+        # Check that all records or keys in object format are frozen
+        unfrozen_inputs = [
+            x for x in records_or_keys
+            if x is not None and not isinstance(x, tuple) and not x.is_frozen()
+        ]
+        if len(unfrozen_inputs) > 0:
+            unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_inputs)
+            raise RuntimeError(
+                f"Parameter 'records_or_keys' of load_many method includes\n"
+                f"the following items that are not frozen:\n{unfrozen_inputs_str}")
+
+        # Convert keys to tuple unless already a tuple, pass through all other item types
+        tuple_keys_or_records = [
+            _KEY_SERIALIZER.serialize(x)
+            if x is not None and is_key(x) else x
+            for x in records_or_keys
+        ]
+
+        # Keys only, skip None and records
+        queried_tuple_keys = [x for x in tuple_keys_or_records if isinstance(x, tuple)]
+
+        # Get records from DB, the result is unsorted
+        queried_records = cls._get_db().load_many(record_type, queried_tuple_keys, dataset=dataset)
+
+        # Create a dictionary with pairs consisting of key in tuple format and the record for this key
+        queried_records_dict = {_KEY_SERIALIZER.serialize(x.get_key()): x for x in queried_records}
+
+        # Populate the result with records queried using input keys, pass through None and input records
+        result = [queried_records_dict.get(x, None) if isinstance(x, tuple) else x for x in tuple_keys_or_records]
+        return result
 
     @classmethod
     def load_all(

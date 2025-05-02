@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Sequence
 from typing import Iterable
 from typing_extensions import Self
 from cl.runtime import Db
@@ -25,7 +25,7 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-_KEY_SERIALIZER = KeySerializers.DELIMITED
+_KEY_SERIALIZER = KeySerializers.TUPLE
 """Serializer for keys used in cache lookup."""
 
 _local_cache_instance = None
@@ -36,44 +36,30 @@ _local_cache_instance = None
 class LocalCache(Db):
     """In-memory cache for objects without serialization."""
 
-    __cache: Dict[str, Dict[str, RecordProtocol]] = required(default_factory=lambda: {})
+    __cache: Dict[str, Dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
-
-    def _load_one_or_none(
-        self,
-        key: KeyProtocol,
-        *,
-        dataset: str | None = None,
-    ) -> RecordProtocol | None:
-        # Serialize key in semicolon-delimited format
-        serialized_key = _KEY_SERIALIZER.serialize(key)
-        # Try to retrieve table dictionary
-        key_type_name = TypeUtil.name(key)
-        if (table_cache := self.__cache.get(key_type_name, None)) is not None:
-            # Look up the record, defaults to None
-            result = table_cache.get(serialized_key, None)
-            return result
-        else:
-            # Return None if no table cache is found for the key type
-            return None
 
     def load_many(
         self,
         record_type: type[TRecord],
-        records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
+        keys: Sequence[tuple],
         *,
         dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
-        # TODO: Implement directly for better performance
-        result = [
-            self.load_one_or_none(
-                record_type,
-                x,
-                dataset=dataset,
-            )
-            for x in records_or_keys
-        ]
-        return result
+    ) -> Sequence[TRecord]:
+        # Try to retrieve table dictionary
+        key_type = record_type.get_key_type()
+        key_type_name = TypeUtil.name(key_type)
+        if (table_cache := self.__cache.get(key_type_name, None)) is not None:
+            result = []
+            for key in keys:
+                # Look up the record, defaults to None
+                serialized_key = _KEY_SERIALIZER.serialize(key)
+                record = table_cache.get(serialized_key, None)
+                result.append(record)
+            return result
+        else:
+            # Tables are created on demand, table not found means no records with this key type are stored
+            return []
 
     def load_all(
         self,

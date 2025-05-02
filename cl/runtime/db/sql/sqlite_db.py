@@ -17,7 +17,7 @@ import sqlite3
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import groupby
-from typing import Any
+from typing import Any, Sequence
 from typing import Dict
 from typing import Iterable
 from typing import Tuple
@@ -90,90 +90,56 @@ class SqliteDb(Db):
         flattened_tuple = tuple(item for group in key_tuples for item in group)
         return flattened_tuple  # TODO(Roman): Review why it should be flattened
 
-    def _load_one_or_none(
-        self,
-        key: KeyProtocol,
-        *,
-        dataset: str | None = None,
-    ) -> RecordProtocol | None:
-        # Delegate to load_many
-        result = next(iter(self.load_many(type(key), [key], dataset=dataset)))
-        return result
-
     def load_many(
         self,
         record_type: type[TRecord],
-        records_or_keys: Iterable[TRecord | KeyProtocol | tuple | str | None] | None,
+        keys: Sequence[tuple],
         *,
         dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
+    ) -> Sequence[TRecord]:
         schema_manager = self._get_schema_manager()
+        key_type = record_type.get_key_type()
+        table_name = schema_manager.table_name_for_type(key_type)
 
-        # Use itertools.groupby to preserve the original order of records_or_keys
-        # Group by key type and then by it is record or key, if records rather than keys return without lookup
-        for key_type, records_or_keys_group in groupby(records_or_keys, lambda x: x.get_key_type() if x else None):
-            # handle None records_or_keys
-            if key_type is None:
-                yield from records_or_keys_group
-                continue
+        # Return an empty list if the table does not exist for the derived type
+        existing_tables = schema_manager.existing_tables()
+        if table_name not in existing_tables:
+            return []
 
-            for is_key_group, keys_group in groupby(records_or_keys_group, lambda x: is_key(x)):
-                # return directly if input is record
-                if not is_key_group:
-                    yield from keys_group
-                    continue
+        key_fields = schema_manager.get_primary_keys(key_type)
+        columns_mapping = schema_manager.get_columns_mapping(key_type)
 
-                table_name = schema_manager.table_name_for_type(key_type)
+        # if keys_group don't support "in" or "len" operator convert it to tuple
+        sql_statement = f'SELECT * FROM "{table_name}"'
+        sql_statement = self._add_where_keys_in_clause(
+            sql_statement, key_fields, columns_mapping, len(keys)
+        )
+        sql_statement += ";"
 
-                # if keys_group don't support "in" or "len" operator convert it to tuple
-                if not hasattr(keys_group, "__contains__") or not hasattr(keys_group, "__len__"):
-                    keys_group = tuple(keys_group)
+        # TODO: Check the logic for multiple keys when the tuple is flattened
+        serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
+        flattened_tuple = tuple(item for group in keys for item in group)
 
-                # return None for all keys in group if table doesn't exist
-                existing_tables = schema_manager.existing_tables()
-                if table_name not in existing_tables:
-                    yield from (None for _ in range(len(keys_group)))
-                    continue
+        cursor = self._get_connection().cursor()
+        try:
+            cursor.execute(sql_statement, flattened_tuple)
+        except Exception as e:
+            raise RuntimeError(str(keys))
 
-                key_fields = schema_manager.get_primary_keys(key_type)
-                columns_mapping = schema_manager.get_columns_mapping(key_type)
+        reversed_columns_mapping = {v: k for k, v in columns_mapping.items()}
 
-                # if keys_group don't support "in" or "len" operator convert it to tuple
-                sql_statement = f'SELECT * FROM "{table_name}"'
-                sql_statement = self._add_where_keys_in_clause(
-                    sql_statement, key_fields, columns_mapping, len(keys_group)
-                )
-                sql_statement += ";"
+        # TODO (Roman): investigate performance impact from this ordering approach
+        # bulk load from db returns records in any order so we need to check all records in group before return
+        # collect db result to dictionary to return it according to input keys order
+        result = []
+        for data in cursor.fetchall():
+            # TODO (Roman): select only needed columns on db side.
+            data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
+            deserialized_data = _SERIALIZER.deserialize(data)
 
-                # serialize keys to tuple
-                query_values = self._serialize_keys_to_flat_tuple(keys_group)
-
-                cursor = self._get_connection().cursor()
-                try:
-                    cursor.execute(sql_statement, query_values)
-                except Exception as e:
-                    raise RuntimeError(str(query_values))
-
-                reversed_columns_mapping = {v: k for k, v in columns_mapping.items()}
-
-                # TODO (Roman): investigate performance impact from this ordering approach
-                # bulk load from db returns records in any order so we need to check all records in group before return
-                # collect db result to dictionary to return it according to input keys order
-                result = {}
-                for data in cursor.fetchall():
-                    # TODO (Roman): select only needed columns on db side.
-                    data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
-                    deserialized_data = _SERIALIZER.deserialize(data)
-
-                    # TODO (Roman): make key hashable and remove conversion of key to str
-                    result[str(deserialized_data.get_key())] = deserialized_data
-
-                # yield records according to input keys order
-                for key in keys_group:
-                    record = result.get(str(key))
-                    if record:
-                        record.build()
-                    yield record
+            # TODO (Roman): make key hashable and remove conversion of key to str
+            result.append(deserialized_data)
+        return result
 
     def load_all(
         self,

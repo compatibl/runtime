@@ -31,6 +31,15 @@ class KeySerializers:
     primitive_serializer and enum_serializer respectively. The default delimiter is semicolon.
     """
 
+    TUPLE = KeySerializer(
+        key_format=KeyFormat.SEQUENCE,
+        primitive_serializer=PrimitiveSerializers.FOR_SQLITE,  # TODO: Review settings, rename or change from FOR_SQLITE
+        enum_serializer=EnumSerializers.DEFAULT,
+    ).build()
+    """
+    Flattened sequence of passthrough primitive and enum tokens.
+    """
+
     FOR_SQLITE = KeySerializer(
         key_format=KeyFormat.SEQUENCE,
         primitive_serializer=PrimitiveSerializers.FOR_SQLITE,

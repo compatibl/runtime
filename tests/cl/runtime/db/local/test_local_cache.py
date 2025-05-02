@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.local.local_cache import LocalCache
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
 
@@ -20,29 +22,28 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubD
 def test_smoke():
     """Smoke test."""
 
-    # Create an instance of record cache
-    cache = LocalCache.instance()
+    with DbContext(db=LocalCache.instance()).build():
 
-    # Create test record and populate with sample data
-    record = StubDataclassRecord().build()
-    key = record.get_key()
+        # Create test record and populate with sample data
+        record = StubDataclassRecord().build()
+        key = record.get_key()
 
-    # Test saving and loading
-    dataset = None  # TODO: Support datasets "\\sample_dataset"
+        # Test saving and loading
+        dataset = None  # TODO: Support datasets "\\sample_dataset"
 
-    # Save a single record
-    cache.save_many([record], dataset=dataset)
+        # Save a single record
+        DbContext.save_many([record], dataset=dataset)
 
-    loaded_records = list(
-        cache.load_many(
-            StubDataclassRecord,
-            [record, key, None],
-            dataset=dataset,
+        loaded_records = list(
+            DbContext.load_many(
+                StubDataclassRecord,
+                [record, key, None],
+                dataset=dataset,
+            )
         )
-    )
-    assert loaded_records[0] is record  # Same object is returned without lookup
-    assert loaded_records[1] is record  # In case of local cache only, also the same object
-    assert loaded_records[2] is None
+        assert loaded_records[0] is record  # Same object is returned without lookup
+        assert loaded_records[1] is record  # In case of local cache only, also the same object
+        assert loaded_records[2] is None
 
 
 if __name__ == "__main__":
