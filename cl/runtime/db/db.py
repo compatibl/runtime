@@ -25,6 +25,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.settings.context_settings import ContextSettings
@@ -67,6 +68,24 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
         Args:
             record_type: Record type to load, error if the result is not this type or its subclass
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+        """
+
+    @abstractmethod
+    def query(
+        self,
+        record_type: type[TRecord],
+        query: QueryMixin[TRecord],  # TODO: Use QueryProtocol?
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
+        """
+        Load all records of the specified type and its subtypes that match the query
+        (excludes other types in the same DB table).
+
+        Args:
+            record_type: Type of the records to load
+            query: Query used to select the records
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
 

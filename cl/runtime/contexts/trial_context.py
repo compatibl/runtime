@@ -27,7 +27,7 @@ from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 @dataclass(slots=True, kw_only=True)
 class TrialContext(Context):
-    """Context for a single trial in an experiment."""
+    """Context for a trial in an experiment."""
 
     trial_chain: Tuple[str, ...]
     """Tuple of trial identifiers in the trial context stack."""

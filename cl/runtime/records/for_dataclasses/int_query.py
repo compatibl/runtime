@@ -12,12 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.data import Data
-from cl.runtime.records.query_mixin import QueryMixin
+from typing import Sequence, List
+from cl.runtime.records.for_dataclasses.primitive_query import PrimitiveQuery
 
 
 @dataclass(slots=True, kw_only=True)
-class Query(Data, QueryMixin, ABC):
-    """Base class for queries based on dataclasses framework."""
+class IntQuery(PrimitiveQuery):
+    """Query for an integer field."""
+
+    exists: bool | None = None
+    """Matches values other than None if exists=True, matches None if exists=False."""
+
+    eq: int | None = None
+    """Equal."""
+
+    in_: List[int] | None = None
+    """Equal to at least one item in the sequence."""
+
+    lt: int | None = None
+    """Less than."""
+
+    lte: int | None = None
+    """Less than or equal."""
+
+    gt: int | None = None
+    """Greater than."""
+
+    gte: int | None = None
+    """Greater than or equal."""

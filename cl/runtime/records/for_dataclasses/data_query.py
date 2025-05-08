@@ -12,23 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.records.for_dataclasses.extensions import optional
-from cl.runtime.records.for_dataclasses.key_query import KeyQuery
+from typing import Sequence, Generic, List
 from cl.runtime.records.for_dataclasses.query import Query
-from cl.runtime.records.for_dataclasses.timestamp_query import TimestampQuery
-from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.protocols import TData
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialQuery(Query, QueryMixin[TrialKey], ABC):
-    """Query for a trial of an experiment."""
+class DataQuery(Query, Generic[TData]):
+    """Query for a data field."""
 
-    timestamp: TimestampQuery | None = None
-    """Unique trial timestamp."""
+    exists: bool | None = None
+    """Matches values other than None if exists=True, matches None if exists=False."""
 
-    experiment: KeyQuery[ExperimentKey] | None = None
-    """Experiment for which the trial is recorded."""
+    eq: TData | None = None
+    """All data fields are equal."""
+
+    in_: List[TData] | None = None
+    """All data fields are equal to at least one item in the sequence."""

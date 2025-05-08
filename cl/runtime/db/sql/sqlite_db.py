@@ -29,6 +29,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -179,6 +180,15 @@ class SqliteDb(Db):
             # TODO (Roman): Select only needed columns on db side.
             data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
             yield _SERIALIZER.deserialize(data)
+
+    def query(
+        self,
+        record_type: type[TRecord],
+        query: QueryMixin[TRecord],  # TODO: Use QueryProtocol?
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
+        raise NotImplementedError()
 
     def load_filter(
         self,

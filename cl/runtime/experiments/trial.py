@@ -23,7 +23,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 @dataclass(slots=True, kw_only=True)
 class Trial(TrialKey, RecordMixin[TrialKey], ABC):
-    """Result and supporting data for a single trial of an experiment."""
+    """Result and supporting data for a trial of an experiment."""
 
     experiment: ExperimentKey = required()
     """Experiment for which the trial is recorded."""
@@ -33,7 +33,6 @@ class Trial(TrialKey, RecordMixin[TrialKey], ABC):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-
-        # Assign timestamp to the trial if not already set
+        # Set timestamp
         if self.timestamp is None:
             self.timestamp = Timestamp.create()

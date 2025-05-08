@@ -13,17 +13,19 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.key import Key
+from typing import Sequence, List
+from cl.runtime.records.for_dataclasses.primitive_query import PrimitiveQuery
 
 
-@dataclass(slots=True)
-class TrialKey(Key):
-    """Result and supporting data for a trial of an experiment."""
+@dataclass(slots=True, kw_only=True)
+class StringQuery(PrimitiveQuery):
+    """Query for a string field, all comparisons are case-sensitive unless stated otherwise."""
 
-    timestamp: str = required()
-    """Unique trial timestamp."""
+    exists: bool | None = None
+    """Matches values other than None if exists=True, matches None if exists=False."""
 
-    @classmethod
-    def get_key_type(cls) -> type:
-        return TrialKey
+    eq: str | None = None
+    """Equal."""
+
+    in_: List[str] | None = None
+    """Equal to at least one item in the sequence."""

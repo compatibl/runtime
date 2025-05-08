@@ -30,6 +30,7 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
+from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -273,6 +274,29 @@ class DbContext(Context):
         """
         return cls._get_db().load_all(  # noqa
             record_type,
+            dataset=cls.get_dataset(dataset),
+        )
+
+    @classmethod
+    def query(
+        cls,
+        record_type: type[TRecord],
+        query: QueryMixin[TRecord],  # TODO: Use QueryProtocol?
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
+        """
+        Load all records of the specified type and its subtypes that match the query
+        (excludes other types in the same DB table).
+
+        Args:
+            record_type: Type of the records to load
+            query: Query used to select the records
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+        """
+        return cls._get_db().query(  # noqa
+            record_type,
+            query,
             dataset=cls.get_dataset(dataset),
         )
 

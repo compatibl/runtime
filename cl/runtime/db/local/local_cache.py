@@ -23,6 +23,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -68,6 +69,15 @@ class LocalCache(Db):
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
+        raise NotImplementedError()
+
+    def query(
+        self,
+        record_type: type[TRecord],
+        query: QueryMixin[TRecord],  # TODO: Use QueryProtocol?
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
         raise NotImplementedError()
 
     def load_filter(

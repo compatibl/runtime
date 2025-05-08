@@ -12,23 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.records.for_dataclasses.extensions import optional
-from cl.runtime.records.for_dataclasses.key_query import KeyQuery
 from cl.runtime.records.for_dataclasses.query import Query
-from cl.runtime.records.for_dataclasses.timestamp_query import TimestampQuery
+from cl.runtime.records.for_dataclasses.string_query import StringQuery
 from cl.runtime.records.query_mixin import QueryMixin
+from stubs.cl.runtime import StubDataclassRecord
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialQuery(Query, QueryMixin[TrialKey], ABC):
-    """Query for a trial of an experiment."""
+class StubDataclassRecordQuery(Query, QueryMixin[StubDataclassRecord]):
+    """Query class for StubDataclassRecord."""
 
-    timestamp: TimestampQuery | None = None
-    """Unique trial timestamp."""
-
-    experiment: KeyQuery[ExperimentKey] | None = None
-    """Experiment for which the trial is recorded."""
+    id: StringQuery | None = None
+    """Unique identifier."""
