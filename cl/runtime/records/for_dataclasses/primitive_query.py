@@ -14,11 +14,9 @@
 
 from abc import ABC
 from dataclasses import dataclass
-
 from cl.runtime.records.for_dataclasses.query import Query
 
 
 @dataclass(slots=True, kw_only=True)
 class PrimitiveQuery(Query, ABC):
     """Query for a primitive field."""
-

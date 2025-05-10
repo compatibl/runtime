@@ -16,7 +16,6 @@ from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.for_dataclasses.key_query import KeyQuery
 from cl.runtime.records.for_dataclasses.query import Query
 from cl.runtime.records.for_dataclasses.timestamp_query import TimestampQuery

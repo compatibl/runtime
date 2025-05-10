@@ -14,7 +14,7 @@
 
 import datetime as dt
 from dataclasses import dataclass
-from typing import Sequence, List
+from typing import List
 from cl.runtime.records.for_dataclasses.primitive_query import PrimitiveQuery
 
 

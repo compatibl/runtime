@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Sequence, Generic, List
+from typing import Generic
+from typing import List
 from cl.runtime.records.for_dataclasses.query import Query
 from cl.runtime.records.protocols import TKey
 

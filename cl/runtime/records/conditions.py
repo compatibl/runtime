@@ -14,15 +14,16 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Generic, Sequence, Tuple
-
+from typing import Generic
+from typing import Sequence
+from typing import Tuple
 from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.protocols import TObj
+
 
 @dataclass(slots=True)
 class Condition(Data, Generic[TObj], ABC):
     """Common base class to query conditions."""
-    pass
 
 
 @dataclass(slots=True, init=False)
@@ -71,6 +72,7 @@ class Exists(Condition[TObj], Generic[TObj]):
     def __init__(self, value: bool):
         """Matches not None if True, matches None if false."""
         self.value = value
+
 
 @dataclass(slots=True, init=False)
 class Eq(Condition[TObj], Generic[TObj]):
