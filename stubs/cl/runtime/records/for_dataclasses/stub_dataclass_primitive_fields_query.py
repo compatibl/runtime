@@ -18,6 +18,7 @@ from uuid import UUID
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
+from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.extensions import required, optional
 from cl.runtime.records.for_dataclasses.query import Query
 from cl.runtime.records.for_dataclasses.string_query import StringQuery
@@ -30,80 +31,80 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_ke
 class StubDataclassPrimitiveFieldsQuery(Query):
     """Stub record whose elements are primitive types."""
 
-    key_str_field: StringQuery | None = None
+    key_str_field: Condition[str] | None = None
     """Stub field."""
 
-    key_float_field: float | None = None
+    key_float_field: Condition[float] | None = None
     """Stub field."""
 
-    key_bool_field: bool | None = None
+    key_bool_field: Condition[bool] | None = None
     """Stub field."""
 
-    key_int_field: int | None = None
+    key_int_field: Condition[int] | None = None
     """Stub field."""
 
-    key_long_field: int | None = None
+    key_long_field: Condition[int] | None = None
     """The default is maximum safe signed int for JSON: 2^53 - 1."""
 
-    key_date_field: dt.date | None = None
+    key_date_field: Condition[dt.date] | None = None
     """Stub field."""
 
-    key_time_field: dt.time | None = None
+    key_time_field: Condition[dt.time] | None = None
     """Stub field."""
 
-    key_date_time_field: dt.datetime | None = None
+    key_date_time_field: Condition[dt.datetime] | None = None
     """Stub field."""
 
-    key_uuid_field: UUID | None = None
+    key_uuid_field: Condition[UUID] | None = None
     """Stub field."""
 
-    key_bytes_field: bytes | None = None
+    key_bytes_field: Condition[bytes] | None = None
     """Stub field."""
 
-    key_int_enum_field: StubIntEnum | None = None
+    key_int_enum_field: Condition[StubIntEnum] | None = None
     """Stub field."""
 
-    obj_str_field: StringQuery | None = None
+    obj_str_field: Condition[StringQuery] | None = None
     """Stub field."""
 
-    obj_str_with_eol_field: StringQuery | None = None
+    obj_str_with_eol_field: Condition[StringQuery] | None = None
     """Stub field."""
 
-    obj_str_with_trailing_eol_field: StringQuery | None = None
+    obj_str_with_trailing_eol_field: Condition[StringQuery] | None = None
     """Stub field."""
 
-    obj_str_timestamp_field: StringQuery | None = None
+    obj_str_timestamp_field: Condition[StringQuery] | None = None
     """Stub field."""
 
-    obj_float_field: float | None = None
+    obj_float_field: Condition[float] | None = None
     """Stub field."""
 
-    obj_bool_field: bool | None = None
+    obj_bool_field: Condition[bool] | None = None
     """Stub field."""
 
-    obj_int_field: int | None = None
+    obj_int_field: Condition[int] | None = None
     """Stub field."""
 
-    obj_long_field: int | None = None
+    obj_long_field: Condition[int] | None = None
     """The default is maximum safe signed int for JSON: 2^53 - 1."""
 
-    obj_date_field: dt.date | None = None
+    obj_date_field: Condition[dt.date] | None = None
     """Stub field."""
 
-    obj_time_field: dt.time | None = None
+    obj_time_field: Condition[dt.time] | None = None
     """Stub field."""
 
-    obj_date_time_field: dt.datetime | None = None
+    obj_date_time_field: Condition[dt.datetime] | None = None
     """Stub field."""
 
-    obj_uuid_field: UUID | None = None
+    obj_uuid_field: Condition[UUID] | None = None
     """Stub field."""
 
-    obj_bytes_field: bytes | None = None
+    obj_bytes_field: Condition[bytes] | None = None
     """Stub field."""
 
-    obj_bytes_large_field: bytes | None = None
+    obj_bytes_large_field: Condition[bytes] | None = None
     """Stub field."""
 
-    obj_int_enum_field: StubIntEnum | None = None
+    obj_int_enum_field: Condition[StubIntEnum] | None = None
     """Stub field."""

@@ -14,9 +14,7 @@
 
 from dataclasses import dataclass
 
-from cl.runtime.records.for_dataclasses.data_query import DataQuery
-from cl.runtime.records.for_dataclasses.key_query import KeyQuery
-from cl.runtime.records.for_dataclasses.query import Query
+from cl.runtime.records.conditions import Condition
 from cl.runtime.records.query_mixin import QueryMixin
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
@@ -24,31 +22,31 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data import (
     StubDataclassDerivedFromDerivedData,
 )
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassRecordQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassNestedFieldsQuery(Query, QueryMixin[StubDataclassNestedFields]):
+class StubDataclassNestedFieldsQuery(StubDataclassRecordQuery, QueryMixin[StubDataclassNestedFields]):
     """Stub derived class."""
 
-    base_field: DataQuery[StubDataclassData] | None = None
+    base_field: Condition[StubDataclassData] | None = None
     """Stub field."""
 
-    derived_field: DataQuery[StubDataclassDerivedData] | None = None
+    derived_field: Condition[StubDataclassDerivedData] | None = None
     """Stub field."""
 
-    derived_from_derived_field: DataQuery[StubDataclassDerivedFromDerivedData] | None = None
+    derived_from_derived_field: Condition[StubDataclassDerivedFromDerivedData] | None = None
     """Stub field."""
 
-    polymorphic_field: DataQuery[StubDataclassData] | None = None
+    polymorphic_field: Condition[StubDataclassData] | None = None
     """Declared StubDataclassData but provided an instance of StubDataclassDerivedData."""
 
-    polymorphic_derived_field: DataQuery[StubDataclassDerivedData] | None = None
+    polymorphic_derived_field: Condition[StubDataclassDerivedData] | None = None
     """Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData."""
 
-    key_field: KeyQuery[StubDataclassRecordKey] | None = None
+    key_field: Condition[StubDataclassRecordKey] | None = None
     """Stub field."""
 
-    record_as_key_field: KeyQuery[StubDataclassRecordKey] | None = None
+    record_as_key_field: Condition[StubDataclassRecordKey] | None = None
     """Stub field with key type initialized to record type instance."""
