@@ -17,7 +17,6 @@ from dataclasses import dataclass
 from uuid import UUID
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.query import Query
-from cl.runtime.records.for_dataclasses.string_query import StringQuery
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 
 
@@ -58,16 +57,16 @@ class StubDataclassPrimitiveFieldsQuery(Query):
     key_int_enum_field: Condition[StubIntEnum] | None = None
     """Stub field."""
 
-    obj_str_field: Condition[StringQuery] | None = None
+    obj_str_field: Condition[str] | None = None
     """Stub field."""
 
-    obj_str_with_eol_field: Condition[StringQuery] | None = None
+    obj_str_with_eol_field: Condition[str] | None = None
     """Stub field."""
 
-    obj_str_with_trailing_eol_field: Condition[StringQuery] | None = None
+    obj_str_with_trailing_eol_field: Condition[str] | None = None
     """Stub field."""
 
-    obj_str_timestamp_field: Condition[StringQuery] | None = None
+    obj_str_timestamp_field: Condition[str] | None = None
     """Stub field."""
 
     obj_float_field: Condition[float] | None = None

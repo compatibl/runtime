@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.query import Query
-from cl.runtime.records.for_dataclasses.string_query import StringQuery
 from cl.runtime.records.query_mixin import QueryMixin
 from stubs.cl.runtime import StubDataclassRecord
 
@@ -23,5 +23,5 @@ from stubs.cl.runtime import StubDataclassRecord
 class StubDataclassRecordQuery(Query, QueryMixin[StubDataclassRecord]):
     """Query class for StubDataclassRecord."""
 
-    id: StringQuery | None = None
+    id: Condition[str] | None = None
     """Unique identifier."""
