@@ -27,7 +27,7 @@ from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -84,7 +84,7 @@ _dynaconf_loaded_files = _all_settings._loaded_files  # noqa
 
 
 @dataclass(slots=True, kw_only=True)
-class Settings(Data, ABC):
+class Settings(DataMixin, ABC):
     """
     Abstract base of settings classes.
 

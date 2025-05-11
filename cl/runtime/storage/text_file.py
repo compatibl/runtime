@@ -16,11 +16,11 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.contexts.lifecycle_mixin import LifecycleMixin
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class TextFile(Data, LifecycleMixin, ABC):
+class TextFile(DataMixin, LifecycleMixin, ABC):
     """Provides access to a local text file or text data in cloud storage via a common API."""
 
     @abstractmethod

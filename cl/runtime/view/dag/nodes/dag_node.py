@@ -15,14 +15,14 @@
 from dataclasses import dataclass
 from typing import Any
 from typing import Dict
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.view.dag.dag_node_data import DagNodeData
 from cl.runtime.view.dag.dag_node_position import DagNodePosition
 
 
 @dataclass(slots=True, kw_only=True)
-class DagNode(Data):
+class DagNode(DataMixin):
     """Directed acyclic graph (DAG) node."""
 
     id_: str = required()

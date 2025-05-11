@@ -14,13 +14,13 @@
 
 from dataclasses import dataclass
 from typing import List
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.index_decl import IndexDecl
 
 
 @dataclass(slots=True, kw_only=True)
-class TypeIndexDecl(Data):
+class TypeIndexDecl(DataMixin):
     """Type index declaration."""
 
     name: str | None = None

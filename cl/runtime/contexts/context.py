@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from typing import DefaultDict
 from typing import List
 from typing_extensions import Self
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.type_util import TypeUtil
 
 _CONTEXT_STACK_DICT_VAR: ContextVar[DefaultDict[str, List] | None] = ContextVar("_CONTEXT_STACK_DICT_VAR", default=None)
@@ -31,7 +31,7 @@ Each asynchronous environment has its own stack dictionary
 
 
 @dataclass(slots=True, kw_only=True)
-class Context(Data, ABC):
+class Context(DataMixin, ABC):
     """
     Abstract base of context classes.
 

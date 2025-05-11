@@ -21,14 +21,14 @@ from typing import List
 from typing import Tuple
 from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 
 
 @dataclass(slots=True, kw_only=True)
-class SqliteSchemaManager(Data):
+class SqliteSchemaManager(DataMixin):
     """Class to manage the sqlite schema (table names, columns mapping etc.)."""
 
     sqlite_connection: sqlite3.Connection = None

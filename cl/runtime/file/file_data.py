@@ -14,12 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.file.file_type import FileType
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class FileData(Data):
+class FileData(DataMixin):
     """Display the specified embedded binary content."""
 
     name: str | None = None

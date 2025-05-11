@@ -14,11 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassData(Data):
+class StubDataclassData(DataMixin):
     """Stub base data type."""
 
     str_field: str = "abc"

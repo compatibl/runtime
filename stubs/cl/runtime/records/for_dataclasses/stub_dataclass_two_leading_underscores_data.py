@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class __StubDataclassTwoLeadingUnderscoresData(Data):
+class __StubDataclassTwoLeadingUnderscoresData(DataMixin):
     """Class name has two leading underscores."""

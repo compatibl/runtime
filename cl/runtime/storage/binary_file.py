@@ -16,11 +16,11 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.contexts.lifecycle_mixin import LifecycleMixin
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class BinaryFile(Data, LifecycleMixin, ABC):
+class BinaryFile(DataMixin, LifecycleMixin, ABC):
     """Provides access to a local binary file or binary data in cloud storage via a common API."""
 
     @abstractmethod

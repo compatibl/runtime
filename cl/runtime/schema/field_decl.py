@@ -18,7 +18,7 @@ import typing
 from dataclasses import dataclass
 from uuid import UUID
 from typing_extensions import Self
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import is_data
@@ -40,7 +40,7 @@ primitive_modules = ["builtins", "datetime", "uuid"]
 
 
 @dataclass(slots=True, kw_only=True)
-class FieldDecl(Data):
+class FieldDecl(DataMixin):
     """Field declaration."""
 
     name: str = required()

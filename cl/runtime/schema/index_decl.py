@@ -13,13 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.index_sort_order import IndexSortOrder
 
 
 @dataclass(slots=True, kw_only=True)
-class IndexDecl(Data):
+class IndexDecl(DataMixin):
     """Index declaration."""
 
     name: str = required()

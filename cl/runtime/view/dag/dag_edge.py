@@ -15,12 +15,12 @@
 from dataclasses import dataclass
 from typing import Any
 from typing import Dict
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class DagEdge(Data):
+class DagEdge(DataMixin):
     """Directed acyclic graph (DAG) node edge."""
 
     id_: str = required()

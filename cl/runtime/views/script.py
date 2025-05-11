@@ -14,13 +14,13 @@
 
 from dataclasses import dataclass
 from typing import List
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.views.script_language import ScriptLanguage
 
 
 @dataclass(slots=True, kw_only=True)
-class Script(Data):
+class Script(DataMixin):
     """Script body element."""
 
     name: str = required()
