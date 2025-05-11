@@ -14,12 +14,14 @@
 
 from abc import ABC
 from abc import abstractmethod
+from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 
-class KeyMixin(ABC):
+class KeyMixin(DataMixin, ABC):
     """Mixin class for a key."""
 
-    __slots__ = ()
+    __slots__ = SlotsUtil.merge_slots(DataMixin)
     """To prevent creation of __dict__ in derived types."""
 
     @classmethod

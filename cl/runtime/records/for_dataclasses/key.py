@@ -14,10 +14,9 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.data import Data
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class Key(Data, KeyMixin, ABC):
+class Key(KeyMixin, ABC):
     """Base class for keys and records (derived from keys) based on dataclasses framework."""
