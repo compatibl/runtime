@@ -15,14 +15,14 @@
 from dataclasses import dataclass
 from typing import Final
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.key import Key
+from cl.runtime.records.key_mixin import KeyMixin
 
 # Temporary global module name, common to all types.
 GLOBAL_MODULE_NAME: Final[str] = "cl"
 
 
 @dataclass(slots=True)
-class ModuleDeclKey(Key):
+class ModuleDeclKey(KeyMixin):
     """Specifies module path in dot-delimited format."""
 
     module_name: str = required()

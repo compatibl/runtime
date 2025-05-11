@@ -17,7 +17,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
-class StubSlottedRecordKey(KeyMixin, DataMixin):
+class StubSlottedRecordKey(KeyMixin):
     """Stub record base class not using any dataclass framework."""
 
     __slots__ = SlotsUtil.merge_slots(DataMixin, "record_id")

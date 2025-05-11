@@ -14,11 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.key import Key
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StorageKey(Key):
+class StorageKey(KeyMixin):
     """Access filesystem or blob storage using a common filesystem-like API."""
 
     storage_id: str = required()

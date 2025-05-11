@@ -15,11 +15,11 @@
 from dataclasses import dataclass
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.key import Key
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class UiAppStateKey(Key):
+class UiAppStateKey(KeyMixin):
     """UiAppState."""
 
     user: UserKey = required()

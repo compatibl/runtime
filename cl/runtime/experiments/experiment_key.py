@@ -14,11 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.key import Key
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ExperimentKey(Key):
+class ExperimentKey(KeyMixin):
     """Run and analyze the results of a statistical experiment that involves multiple trials."""
 
     experiment_id: str = required()

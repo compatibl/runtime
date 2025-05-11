@@ -14,11 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.key import Key
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ViewKey(Key):
+class ViewKey(KeyMixin):
     """This type is returned from a viewer method as object or key."""
 
     view_for: str = required()

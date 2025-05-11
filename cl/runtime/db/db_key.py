@@ -14,11 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.key import Key
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class DbKey(Key):
+class DbKey(KeyMixin):
     """Polymorphic data storage with dataset isolation."""
 
     db_id: str = required()

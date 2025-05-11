@@ -14,12 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.key import Key
+from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
 
 
 @dataclass(slots=True)
-class StubDataclassCompositeKey(Key):
+class StubDataclassCompositeKey(KeyMixin):
     """Stub for a composite key that contains other key fields."""
 
     primitive: str = "abc"

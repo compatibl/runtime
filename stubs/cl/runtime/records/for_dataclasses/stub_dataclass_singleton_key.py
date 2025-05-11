@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.key import Key
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassSingletonKey(Key):
+class StubDataclassSingletonKey(KeyMixin):
     """Singleton record has no key fields."""
 
     @classmethod
