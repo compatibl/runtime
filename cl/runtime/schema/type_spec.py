@@ -16,7 +16,11 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing_extensions import Self
+
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
+from cl.runtime.records.protocols import is_key, is_record, is_data, is_primitive, is_enum
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_kind import TypeKind
 
 
@@ -27,14 +31,37 @@ class TypeSpec(FrozenData, ABC):
     enums and primitive types.
     """
 
-    type_name: str
-    """Unique type name (the same as class name except when alias is specified)."""
-
-    type_kind: TypeKind
-    """Type kind (primitive, enum, data, key, record)."""
-
     _class: type
     """Class where the type is stored (this is not the type hint as it excludes container and optional info)."""
+
+    type_name: str = required()
+    """Unique type name (the same as class name except when alias is specified), initialized from _class if not set."""
+
+    type_kind: TypeKind = required()
+    """Type kind (primitive, enum, data, key, record), initialized from _class if not set."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        # Set type name unless already set
+        if self.type_name is None:
+            object.__setattr__(self, "type_name", TypeUtil.name(self._class))
+
+        # Set type kind
+        if is_primitive(self._class):
+            type_kind = TypeKind.PRIMITIVE
+        elif is_enum(self._class):
+            type_kind = TypeKind.ENUM
+        elif is_key(self._class):
+            type_kind = TypeKind.KEY
+        elif is_record(self._class):
+            type_kind = TypeKind.RECORD
+        elif is_data(self._class):
+            type_kind = TypeKind.DATA
+        else:
+            # This should not happen because this method is only invoked for data types, but just in case
+            raise RuntimeError(f"Dataclass {self.type_name} is neither a primitive type, enum, key, record or data.")
+        object.__setattr__(self, "type_kind", type_kind)
 
     def get_class(self) -> type:
         """Class where the type is stored."""

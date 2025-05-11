@@ -48,27 +48,13 @@ class DataclassSpec(DataSpec):
             for field in dataclasses.fields(class_)  # noqa: type=ignore, verified it is a dataclass above
             if not field.name.startswith("_")
         ]
-        field_dict = {x.field_name: x for x in fields} if fields is not None else {}
-
-        # Determine type kind
-        if is_key(class_):
-            type_kind = TypeKind.KEY
-        elif is_record(class_):
-            type_kind = TypeKind.RECORD
-        elif is_data(class_):
-            type_kind = TypeKind.DATA
-        else:
-            # This should not happen because this method is only invoked for data types, but just in case
-            raise RuntimeError(f"Dataclass {type_name} is neither key, record or data.")
 
         # Create the enum spec
         result = DataclassSpec(
             type_name=type_name,
-            type_kind=type_kind,
             _class=class_,
             fields=fields,
-            _field_dict=field_dict,
-        )
+        ).build()
         return result
 
     @classmethod
