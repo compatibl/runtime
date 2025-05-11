@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
-from cl.runtime.records.for_slotted.key import Key
 
 
-class StubSlottedRecordKey(Key):
+class StubSlottedRecordKey(KeyMixin, DataMixin):
     """Stub record base class not using any dataclass framework."""
 
-    __slots__ = SlotsUtil.merge_slots(Key, "record_id")
+    __slots__ = SlotsUtil.merge_slots(DataMixin, "record_id")
 
     record_id: str
     """Unique identifier."""
