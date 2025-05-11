@@ -17,82 +17,88 @@ from dataclasses import dataclass
 from typing import Generic
 from typing import Sequence
 from typing import Tuple
-from cl.runtime.records.for_dataclasses.data import Data
+from cl.runtime.records.frozen_data_mixin import FrozenDataMixin
 from cl.runtime.records.protocols import TObj
 
 
-@dataclass(slots=True)
-class Condition(Data, Generic[TObj], ABC):
+class Condition(Generic[TObj], FrozenDataMixin, ABC):
     """Common base class to query conditions."""
 
 
-@dataclass(slots=True, init=False)
-class And(Condition[TObj], Generic[TObj]):
+class And(Generic[TObj], Condition[TObj]):
     """Matches when all of the conditions match."""
 
+    __slots__ = ("conditions",)
+
     conditions: Tuple[Condition[TObj], ...]
     """The sequence of conditions to match"""
 
     def __init__(self, *args: Condition[TObj]):
         """Create from the sequence of conditions to match."""
-        self.conditions = tuple(args)
+        object.__setattr__(self, "conditions", tuple(args))
 
 
-@dataclass(slots=True, init=False)
-class Or(Condition[TObj], Generic[TObj]):
+class Or(Generic[TObj], Condition[TObj]):
     """Matches when at least one of the conditions matches."""
 
+    __slots__ = ("conditions",)
+
     conditions: Tuple[Condition[TObj], ...]
     """The sequence of conditions to match"""
 
     def __init__(self, *args: Condition[TObj]):
         """Create from the sequence of conditions to match."""
-        self.conditions = tuple(args)
+        object.__setattr__(self, "conditions", tuple(args))
 
 
-@dataclass(slots=True, init=False)
-class Not(Condition[TObj], Generic[TObj]):
+class Not(Generic[TObj], Condition[TObj]):
     """Matches when the argument does not match and vice versa."""
+
+    __slots__ = ("condition",)
 
     condition: Condition[TObj]
     """Matches when the argument does not match and vice versa."""
 
     def __init__(self, condition: Condition):
         """Matches when the argument does not match and vice versa."""
-        self.condition = condition
+        object.__setattr__(self, "condition", condition)
 
 
-@dataclass(slots=True, init=False)
-class Exists(Condition[TObj], Generic[TObj]):
-    """Matches not None if True, matches None if false."""
+class Exists(Generic[TObj], Condition[TObj]):
+    """Matches not None if true, matches None if false."""
+
+    __slots__ = ("value",)
 
     value: bool
-    """Matches not None if True, matches None if false."""
+    """Matches not None if true, matches None if false."""
 
     def __init__(self, value: bool):
-        """Matches not None if True, matches None if false."""
-        self.value = value
+        """Matches not None if true, matches None if false."""
+        object.__setattr__(self, "value", value)
 
 
-@dataclass(slots=True, init=False)
-class Eq(Condition[TObj], Generic[TObj]):
+class Eq(Generic[TObj], Condition[TObj]):
     """Matches when the argument is equal to the value."""
+
+    __slots__ = ("value",)
 
     value: TObj
     """Value to compare to."""
 
     def __init__(self, value: TObj):
         """Create from the value to compare to."""
-        self.value = value
+        object.__setattr__(self, "value", value)
 
 
-@dataclass(slots=True, init=False)
-class In(Condition[TObj], Generic[TObj]):
+class In(Generic[TObj], Condition[TObj]):
     """Matches when the argument is equal to one of the values."""
+
+    __slots__ = ("values",)
 
     values: Tuple[TObj, ...]
     """Sequence of values to compare to."""
 
     def __init__(self, values: Sequence[TObj]):
         """Create from the sequence of values to compare to."""
-        self.values = values if isinstance(values, tuple) else tuple(values)
+        if not isinstance(values, tuple):
+            object.__setattr__(self, "values", tuple(values))
