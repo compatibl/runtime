@@ -100,7 +100,7 @@ class TypeInfoCache:
                 except ModuleNotFoundError:
                     raise RuntimeError(
                         f"Module {module_name} is not found in TypeInfo preload, "
-                        f"run init_import_cache to regenerate the preload file."
+                        f"run fix_type_info to regenerate the preload file."
                     )
 
         # Get class from module, report error if not found
@@ -113,7 +113,7 @@ class TypeInfoCache:
         except AttributeError:
             raise RuntimeError(
                 f"Class {qual_name} is not found in TypeInfo preload,\n"
-                f"run init_import_cache to regenerate the preload file."
+                f"run fix_type_info to regenerate the preload file."
             )
 
     @classmethod
@@ -364,7 +364,7 @@ class TypeInfoCache:
                 rows = file.readlines()
         else:
             # Cache file does not exist, error message
-            raise RuntimeError(f"Cache file is not found at {cache_filename}\n, run init_import_cache to regenerate.")
+            raise RuntimeError(f"Cache file is not found at {cache_filename}\n, run fix_type_info to regenerate.")
 
         # Iterate over the rows of TypeInfo preload
         for row_index, row in enumerate(rows):
@@ -466,5 +466,5 @@ class TypeInfoCache:
         """Return error message for type name not found."""
         return RuntimeError(
             f"Type {type_name} is not found in TypeInfo preload,\n"
-            f"run init_import_cache to regenerate the preload file."
+            f"run fix_type_info to regenerate the preload file."
         )
