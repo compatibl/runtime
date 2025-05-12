@@ -50,7 +50,7 @@ from cl.runtime.serializers.timestamp_format import TimestampFormat
 from cl.runtime.serializers.uuid_format import UuidFormat
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class PrimitiveSerializer(Serializer):
     """Helper class for serialization and deserialization of primitive types."""
 

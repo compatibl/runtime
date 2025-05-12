@@ -20,7 +20,7 @@ from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.schema.type_hint import TypeHint
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class Serializer(BootstrapMixin, ABC):
     """Abstract base class of serializers that convert from one data representation to another."""
 

@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class EnumMemberSpec(BootstrapMixin):
     """Provides information about a single member (item) of an enum."""
 

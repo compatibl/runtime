@@ -22,7 +22,7 @@ from cl.runtime.schema.field_spec import FieldSpec
 from cl.runtime.schema.type_spec import TypeSpec
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class DataSpec(TypeSpec, ABC):
     """Provides information about a class with fields."""
 
@@ -34,8 +34,7 @@ class DataSpec(TypeSpec, ABC):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        field_dict = {x.field_name: x for x in self.fields} if self.fields is not None else {}
-        object.__setattr__(self, "_field_dict", field_dict)
+        self._field_dict = {x.field_name: x for x in self.fields} if self.fields is not None else {}
 
     def get_field_dict(self) -> Dict[str, FieldSpec]:
         """Dictionary of field specs indexed by field name."""

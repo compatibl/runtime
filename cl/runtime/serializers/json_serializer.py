@@ -28,7 +28,7 @@ def orjson_default(obj):
     raise RuntimeError(f"Object of type {obj.__class__.__name__} is not JSON serializable.")
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class JsonSerializer(Serializer):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 

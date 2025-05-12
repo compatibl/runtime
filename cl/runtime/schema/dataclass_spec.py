@@ -24,7 +24,7 @@ from cl.runtime.schema.field_spec import FieldSpec
 from cl.runtime.schema.type_kind import TypeKind
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class DataclassSpec(DataSpec):
     """Provides information about a dataclass."""
 

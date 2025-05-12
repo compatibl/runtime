@@ -19,7 +19,7 @@ from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.schema.type_kind import TypeKind
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class TypeInfo(BootstrapMixin, ABC):
     """Information about a type stored in the type cache."""
 

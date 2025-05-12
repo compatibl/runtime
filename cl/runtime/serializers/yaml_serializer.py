@@ -120,7 +120,7 @@ yaml_reader = YAML(typ="safe")
 yaml_reader.Constructor = PrimitiveToStringConstructor
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class YamlSerializer(Serializer):
     """Serialization without using the schema or retaining type information, not suitable for deserialization."""
 

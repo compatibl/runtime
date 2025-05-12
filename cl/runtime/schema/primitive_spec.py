@@ -19,7 +19,7 @@ from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_spec import TypeSpec
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class PrimitiveSpec(TypeSpec):
     """Provides information about a primitive type."""
 

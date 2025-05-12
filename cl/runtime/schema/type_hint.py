@@ -28,7 +28,7 @@ from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.type_util import TypeUtil
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class TypeHint(BootstrapMixin):
     """Provides information about a type hint."""
 

@@ -19,7 +19,7 @@ from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.schema.type_hint import TypeHint
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class FieldSpec(BootstrapMixin):
     """Provides information about a field in DataSpec, use frozen attribute."""
 

@@ -39,7 +39,7 @@ from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.serializer import Serializer
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class KeySerializer(Serializer):
     """Roundtrip serialization of object to a flattened sequence, object cannot have sequence fields."""
 

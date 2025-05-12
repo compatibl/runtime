@@ -40,7 +40,7 @@ from cl.runtime.serializers.type_inclusion import TypeInclusion
 from cl.runtime.serializers.type_placement import TypePlacement
 
 
-@dataclass(slots=True, kw_only=True, frozen=True)
+@dataclass(slots=True, kw_only=True)
 class DataSerializer(Serializer):
     """Roundtrip serialization of object to dictionary with optional type information."""
 
