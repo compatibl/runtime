@@ -33,15 +33,9 @@ class BuildUtil:
     """Helper methods for build functionality in DataMixin."""
 
     @classmethod
-    def check_frozen(cls, obj: Any) -> None:
-        """Error message if the object is not yet frozen."""
-        if not obj.is_frozen():
-            raise RuntimeError(f"An instance of {TypeUtil.name(obj)} is not yet frozen, call 'build' method first.")
-
-    @classmethod
     def typed_build(cls, data: Any, type_hint: TypeHint | None = None) -> Any:  # TODO: Rename to build?
         """
-        This method performs the following steps:
+        The implementation of the build method in BuildUtil performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Validates root level object against the schema and calls its 'mark_frozen' method

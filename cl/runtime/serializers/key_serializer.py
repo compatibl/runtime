@@ -183,7 +183,7 @@ class KeySerializer(Serializer):
             raise RuntimeError(f"Type {TypeUtil.name(data)} inside key is not a primitive type, enum, or another key.")
 
         # Check that the argument is frozen
-        BuildUtil.check_frozen(data)
+        data.check_frozen()
 
         # Get type spec
         type_spec = TypeSchema.for_class(type(data))
