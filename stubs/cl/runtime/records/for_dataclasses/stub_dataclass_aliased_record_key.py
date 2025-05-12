@@ -22,6 +22,7 @@ class StubDataclassAliasedRecordKey(KeyMixin):  # TODO: Specify alias and add de
     """Stub record class with typename alias."""
 
     id: str = required()
+    """Unique identifier."""
 
     @classmethod
     def get_key_type(cls) -> type:
