@@ -17,11 +17,11 @@ from dataclasses import dataclass
 from typing import Generic
 from typing import Sequence
 from typing import Tuple
-from cl.runtime.records.frozen_data_mixin import FrozenDataMixin
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import TObj
 
 
-class Condition(Generic[TObj], FrozenDataMixin, ABC):
+class Condition(Generic[TObj], BootstrapMixin, ABC):
     """Common base class to query conditions."""
 
 

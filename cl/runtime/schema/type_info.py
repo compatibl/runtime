@@ -15,12 +15,12 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import Tuple
-from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.schema.type_kind import TypeKind
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
-class TypeInfo(FrozenData, ABC):
+class TypeInfo(BootstrapMixin, ABC):
     """Information about a type stored in the type cache."""
 
     type_name: str

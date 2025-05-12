@@ -18,14 +18,14 @@ from dataclasses import dataclass
 from typing_extensions import Self
 
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import is_key, is_record, is_data, is_primitive, is_enum
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_kind import TypeKind
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
-class TypeSpec(FrozenData, ABC):
+class TypeSpec(BootstrapMixin, ABC):
     """
     Provides information about a type included in schema and its dependencies including data types,
     enums and primitive types.

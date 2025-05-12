@@ -20,7 +20,7 @@ from typing import List
 from uuid import UUID
 from frozendict import frozendict
 from typing_extensions import Self
-from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -29,7 +29,7 @@ from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
-class TypeHint(FrozenData):
+class TypeHint(BootstrapMixin):
     """Provides information about a type hint."""
 
     schema_type_name: str

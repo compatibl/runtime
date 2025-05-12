@@ -16,12 +16,12 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any
-from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.schema.type_hint import TypeHint
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
-class Serializer(FrozenData, ABC):
+class Serializer(BootstrapMixin, ABC):
     """Abstract base class of serializers that convert from one data representation to another."""
 
     @abstractmethod

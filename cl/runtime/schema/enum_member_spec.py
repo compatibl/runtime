@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
-class EnumMemberSpec(FrozenData):
+class EnumMemberSpec(BootstrapMixin):
     """Provides information about a single member (item) of an enum."""
 
     member_name: str

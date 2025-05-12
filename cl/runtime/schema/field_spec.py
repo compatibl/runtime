@@ -15,12 +15,12 @@
 import typing
 from dataclasses import dataclass
 from typing_extensions import Self
-from cl.runtime.records.for_dataclasses.frozen_data import FrozenData
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.schema.type_hint import TypeHint
 
 
 @dataclass(slots=True, kw_only=True, frozen=True)
-class FieldSpec(FrozenData):
+class FieldSpec(BootstrapMixin):
     """Provides information about a field in DataSpec, use frozen attribute."""
 
     field_name: str
