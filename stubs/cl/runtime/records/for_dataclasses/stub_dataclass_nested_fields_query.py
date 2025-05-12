@@ -26,7 +26,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubD
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassNestedFieldsQuery(StubDataclassRecordQuery, QueryMixin[StubDataclassNestedFields]):
+class StubDataclassNestedFieldsQuery(StubDataclassRecordQuery):
     """Stub derived class."""
 
     base_field: Condition[StubDataclassData] | None = None

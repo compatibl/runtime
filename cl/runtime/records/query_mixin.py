@@ -13,15 +13,13 @@
 # limitations under the License.
 
 from typing import Generic
+
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import TKey
 
 
-class QueryMixin(Generic[TKey]):
-    """
-    Optional generic mixin for a query parameterized by the record's key.
-    Derive MyQuery from base Query for the chosen data class framework and QueryMixin parameterized by MyKey
-    as in MyQuery(Query, QueryMixin[MyKey]).
-    """
+class QueryMixin(Generic[TKey], DataMixin):
+    """Optional generic mixin for a query parameterized by the record's key as in MyQuery(QueryMixin[MyKey])."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""

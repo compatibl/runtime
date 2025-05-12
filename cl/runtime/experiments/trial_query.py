@@ -18,12 +18,11 @@ from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.conditions import Condition
-from cl.runtime.records.for_dataclasses.query import Query
 from cl.runtime.records.query_mixin import QueryMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialQuery(Query, QueryMixin[TrialKey], ABC):
+class TrialQuery(QueryMixin[TrialKey], ABC):
     """Query for a trial of an experiment."""
 
     timestamp: Condition[Timestamp] | None = None

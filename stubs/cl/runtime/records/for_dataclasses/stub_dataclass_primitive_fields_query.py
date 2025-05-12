@@ -16,12 +16,13 @@ import datetime as dt
 from dataclasses import dataclass
 from uuid import UUID
 from cl.runtime.records.conditions import Condition
-from cl.runtime.records.for_dataclasses.query import Query
+from cl.runtime.records.query_mixin import QueryMixin
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPrimitiveFieldsQuery(Query):
+class StubDataclassPrimitiveFieldsQuery(QueryMixin[StubDataclassPrimitiveFieldsKey]):
     """Stub record whose elements are primitive types."""
 
     key_str_field: Condition[str] | None = None
