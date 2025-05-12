@@ -83,10 +83,6 @@ cl.BaseTypeInfo:
   Comment: Base type info.
   TypeKind: Data
   DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl
-    Name: Data
   Elements:
   - Value:
       Type: String
@@ -106,36 +102,6 @@ cl.BaseTypeInfo:
     Comment: Label of type.
     Vector: false
     Optional: false
-cl.Data:
-  Module:
-    ModuleName: cl
-  Name: Data
-  Label: Data
-  Comment: |2-
-
-        Base for slotted classes other than keys or records based on dataclasses framework.
-        Once frozen, the instance cannot be unfrozen. This affects only the speed of setters but not of getters.
-
-        Notes:
-            - This base should be used for dataclasses, use the appropriate import of Data for other frameworks
-            - Use tuple which is immutable instead of list when deriving from this class
-        
-  TypeKind: Data
-  DisplayKind: Basic
-cl.Key:
-  Module:
-    ModuleName: cl
-  Name: Key
-  Label: Key
-  Comment: Base class for keys and records (derived from keys) based on dataclasses
-    framework.
-  TypeKind: Data
-  DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl
-    Name: Data
-  Abstract: true
 cl.TabInfo:
   Module:
     ModuleName: cl
@@ -144,10 +110,6 @@ cl.TabInfo:
   Comment: Tab info.
   TypeKind: Data
   DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl
-    Name: Data
   Elements:
   - Data:
       Module:
@@ -165,10 +127,6 @@ cl.UiAppStateKey:
   Comment: UiAppState.
   TypeKind: Data
   DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl
-    Name: Key
   Elements:
   - Key:
       Module:
@@ -186,10 +144,6 @@ cl.UserKey:
   Comment: User which is allowed to log in.
   TypeKind: Data
   DisplayKind: Basic
-  Inherit:
-    Module:
-      ModuleName: cl
-    Name: Key
   Elements:
   - Value:
       Type: String

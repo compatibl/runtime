@@ -98,10 +98,6 @@ declare:
         comment: Display the specified embedded binary content.
         type_kind: Data
         display_kind: Basic
-        inherit:
-          module:
-            module_name: cl
-          name: Data
         elements:
         - value:
             type_: String
@@ -276,10 +272,6 @@ declare:
         comment: Display the specified embedded binary content.
         type_kind: Data
         display_kind: Basic
-        inherit:
-          module:
-            module_name: cl
-          name: Data
         elements:
         - value:
             type_: String
