@@ -19,6 +19,7 @@ from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 
 FROZEN_MESSAGE_SUBSTR = "because the instance is frozen"
+TUPLE_MESSAGE_SUBSTR = "'tuple' object does not support item assignment"
 NON_FREEZABLE_MESSAGE_SUBSTR = "does not support DataProtocol"
 
 
@@ -43,22 +44,21 @@ def test_nested_fields():
         record.key_field = StubDataclassRecordKey(id="abc")
 
 
-@pytest.mark.skip(reason="TODO: Not yet implemented, will fix")  # TODO: Implement freezable for containers
 def test_container_fields():
     """Test for freezing of data inside containers."""
 
-    record = StubDataclassListDictFields().build()
-    record.float_list_dict["a"][0] = 4.56
+    # Building before freezing
+    StubDataclassListDictFields(float_list_dict={"a": [1.23]}).build()
 
     # Attempt to set fields after freezing
-    with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
-        record = StubDataclassListDictFields().build()
+    with pytest.raises(TypeError, match=TUPLE_MESSAGE_SUBSTR):
+        record = StubDataclassListDictFields(float_list_dict={"a": [1.23]}).build()
         record.float_list_dict["a"][0] = 4.56
     with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
-        record = StubDataclassListDictFields().build()
+        record = StubDataclassListDictFields(float_list_dict={"a": [1.23]}).build()
         record.record_list_dict["a"][0].id = "xyz"
-    with pytest.raises(RuntimeError, match=FROZEN_MESSAGE_SUBSTR):
-        record = StubDataclassListDictFields().build()
+    with pytest.raises(TypeError, match=TUPLE_MESSAGE_SUBSTR):
+        record = StubDataclassListDictFields(float_list_dict={"a": [1.23]}).build()
         record.record_list_dict["a"][0] = StubDataclassRecord(id="xyz")
 
 
