@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.serializers.slots_util import SlotsUtil
 from stubs.cl.runtime.records.for_slotted.stub_slotted_record_key import StubSlottedRecordKey
 
 

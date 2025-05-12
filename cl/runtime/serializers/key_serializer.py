@@ -19,7 +19,6 @@ from typing import Any
 from typing import Deque
 from typing import Tuple
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import DataProtocol

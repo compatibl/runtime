@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from abc import ABC
-
 from typing_extensions import Self
 from cl.runtime.records.freezable_mixin import FreezableMixin
 from cl.runtime.serializers.slots_util import SlotsUtil

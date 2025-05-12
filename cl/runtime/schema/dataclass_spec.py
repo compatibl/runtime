@@ -15,13 +15,9 @@
 import dataclasses
 from dataclasses import dataclass
 from typing_extensions import Self
-from cl.runtime.records.protocols import is_data
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.field_spec import FieldSpec
-from cl.runtime.schema.type_kind import TypeKind
 
 
 @dataclass(slots=True, kw_only=True)

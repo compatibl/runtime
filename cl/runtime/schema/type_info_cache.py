@@ -465,6 +465,5 @@ class TypeInfoCache:
     def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:
         """Return error message for type name not found."""
         return RuntimeError(
-            f"Type {type_name} is not found in TypeInfo preload,\n"
-            f"run fix_type_info to regenerate the preload file."
+            f"Type {type_name} is not found in TypeInfo preload,\n" f"run fix_type_info to regenerate the preload file."
         )

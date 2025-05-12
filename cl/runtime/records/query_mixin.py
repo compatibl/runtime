@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import Generic
-
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import TKey
 

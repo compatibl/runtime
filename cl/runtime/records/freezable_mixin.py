@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import weakref
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from typing_extensions import Self
 from cl.runtime.records.clone_util import CloneUtil
 from cl.runtime.records.protocols import TData
