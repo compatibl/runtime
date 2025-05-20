@@ -96,16 +96,19 @@ class BasicMongoDb(Db):
 
     def load_all(
         self,
-        record_type: type[TRecord],
+        record_type: type[TKey],
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
-        # Confirm record_type is a record type
-        if not is_record(record_type):
-            raise RuntimeError(f"Type {TypeUtil.name(record_type)} is not a record.")
+        # Get key type
+        if is_record(record_type):
+            key_type = record_type.get_key_type()
+        elif is_key(record_type):
+            key_type = record_type
+        else:
+            raise RuntimeError(f"Type {TypeUtil.name(record_type)} passed to load_all method is not a record or key.")
 
-        # Key, get collection name from key type by removing Key suffix if present
-        key_type = record_type.get_key_type()
+        # Get collection name from key type
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_db()
         collection = db[collection_name]
@@ -136,14 +139,15 @@ class BasicMongoDb(Db):
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord]:
-        # Get collection name from key type
+        # Get key type
         if is_record(record_type):
             key_type = record_type.get_key_type()
         elif is_key(record_type):
             key_type = record_type
         else:
-            raise RuntimeError(f"Type {TypeUtil.name(record_type)} is not a record or key.")
+            raise RuntimeError(f"Type {TypeUtil.name(record_type)} passed to load_filter is not a record or key.")
 
+        # Get collection name from key type
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_db()
         collection = db[collection_name]
