@@ -22,7 +22,7 @@ from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.views.stub_viewers import StubViewers
 
-nested_fields_key = StubDataclassRecordKey(id="nested_1").build()
+nested_fields_key = StubDataclassRecordKey(id="B0").build()
 """Key returned by the viewer."""
 
 nested_fields_record = StubDataclassNestedFields().build()
@@ -31,7 +31,7 @@ nested_fields_record = StubDataclassNestedFields().build()
 list_fields_record = StubDataclassListFields().build()
 """Record returned by the viewer."""
 
-composite_key = StubDataclassCompositeKey().build()
+composite_key = StubDataclassCompositeKey(primitive="abc0").build()
 """Record returned by the viewer."""
 
 composite_record = StubDataclassComposite().build()
@@ -42,7 +42,7 @@ composite_record = StubDataclassComposite().build()
 class StubDataViewers(StubViewers):
     """Stub viewers for data."""
 
-    def view_self(self) -> Self:
+    def view_self(self) -> StubDataclassRecordKey:
         """This viewer will open by default instead of the editor."""
         return nested_fields_key
 

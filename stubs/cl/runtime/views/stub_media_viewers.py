@@ -105,5 +105,5 @@ class StubMediaViewers(StubViewers):
         return Script(
             name="Stub markdown text.",
             language=ScriptLanguage.MARKDOWN,
-            body=["# Successfully rendered.", "### `THIS TEXT SHOULD BE COLOURED`."],
+            body=["# Successfully rendered.", "### `This text should be purple`."],
         )
