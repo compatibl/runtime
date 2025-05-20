@@ -97,7 +97,7 @@ async def post_select(
             env=context_headers.env,
             dataset=context_headers.dataset,
             type_=select_body.type,
-            query_dict=select_body.query_dict,
+            query_dict=select_body.query_dict if select_body.query_dict else None,
             limit=limit,
             skip=skip,
             table_format=table_format,

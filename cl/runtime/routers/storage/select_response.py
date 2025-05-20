@@ -36,7 +36,7 @@ class SelectResponse(RecordsWithSchemaResponse):
     def get_response(cls, request: SelectRequest) -> SelectResponse:
         """Implements /storage/select route."""
 
-        if request.query_dict is not None:
+        if request.query_dict:
             raise RuntimeError("Select with 'query_dict' currently is not supported.")
 
         if request.table_format is False:
