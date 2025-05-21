@@ -100,6 +100,13 @@ class PanelResponseUtil:
             and is_key(first_elem := viewer_result[0])
         ):
             # Load many if it is list or tuple of keys.
-            return tuple(x for x in DbContext.load_many(first_elem.get_key_type(), viewer_result) if x is not None)
+            loaded = tuple(DbContext.load_many(first_elem.get_key_type(), viewer_result))
+            missing = [(i, viewer_result[i]) for i, x in enumerate(loaded) if x is None]
+            if missing:
+                details = ", ".join(f"index {i}: {repr(key)}" for i, key in missing)
+                raise RuntimeError(
+                    f"Failed to load records for keys at {details} in the provided list."
+                )
+            return loaded
         else:
             return viewer_result
