@@ -74,6 +74,16 @@ class StubDataViewers(StubViewers):
         """Stub viewer returning a list of keys."""
         return 3 * [nested_fields_key]
 
+    def view_key_list_no_record(self) -> List[StubDataclassRecordKey]:
+        """
+        Stub viewer returning a list of keys, including some keys
+        that do not correspond to any existing record in DB.
+        """
+        views = 3 * [nested_fields_key]
+        views.append(StubDataclassRecordKey(id="A000").build())
+        views.append(StubDataclassRecordKey(id="B000").build())
+        return views
+
     def view_record_list(self) -> List[StubDataclassNestedFields]:
         """Stub viewer returning a list of records."""
         return 3 * [nested_fields_record]
