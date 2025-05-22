@@ -116,12 +116,12 @@ class PrimitiveSerializer(Serializer):
             if schema_type_name == "long":
                 if data_class_name != "int":
                     raise RuntimeError(
-                        f"Type {schema_type_name} can only be stored using int class, " f"not {data_class_name} class."
+                        f"Type {schema_type_name} can only be stored using int class, not {data_class_name} class."
                     )
             elif schema_type_name == "timestamp":
                 if data_class_name != "UUID":
                     raise RuntimeError(
-                        f"Type {schema_type_name} can only be stored using UUID class, " f"not {data_class_name} class."
+                        f"Type {schema_type_name} can only be stored using UUID class, not {data_class_name} class."
                     )
             elif data is not None and data_class_name != schema_type_name:
                 raise RuntimeError(f"Type {schema_type_name} cannot be stored as {data_class_name} class.")
