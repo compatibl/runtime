@@ -42,7 +42,7 @@ class FreezeUtil:
             return frozendict((k, cls.freeze(v)) for k, v in data.items())
         elif hasattr(data, "mark_frozen"):
             # Recreate with frozen fields and freeze the result
-            return type(data)(**{k: cls.freeze(getattr(data, k)) for k in SlotsUtil.get_slots(data)}).mark_frozen()
+            return type(data)(**{k: cls.freeze(getattr(data, k)) for k in SlotsUtil.get_slots(type(data))}).mark_frozen()
         else:
             raise RuntimeError(
                 f"Cannot freeze data of type {TypeUtil.name(data)} because it is not a\n"

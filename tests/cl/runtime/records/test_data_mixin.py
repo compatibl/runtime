@@ -60,7 +60,7 @@ def test_clone_as():
     # Public fields in source, only one is set
     assert target.str_field == source.str_field
     assert target.int_field == source.int_field
-    assert target.derived_str_field is "derived"  # Takes its default value when not present in source class
+    assert target.derived_str_field == "derived"  # Takes its default value when not present in source class
 
     # Protected fields in source, not set
     assert target._regression_guard is None

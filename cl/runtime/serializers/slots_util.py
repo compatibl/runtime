@@ -18,8 +18,10 @@ from typing import Tuple
 from memoization import cached
 from cl.runtime.records.type_util import TypeUtil
 
-_COLLECT_SLOTS = sys.version_info.major > 3 or sys.version_info.major == 3 and sys.version_info.minor >= 11
-"""For Python 3.11 and later, __slots__ includes fields for this class only, use MRO to include base class slots."""
+_INHERITED_SLOTS = sys.version_info >= (3, 11)
+"""
+In Python 3.11+, slots are automatically inherited from base classes. Child classes only need to declare new slots.
+"""
 
 
 class SlotsUtil:
@@ -36,7 +38,7 @@ class SlotsUtil:
             return data_type.get_slots()
         elif hasattr(data_type, "__slots__"):
             # Traverse the class hierarchy from base to derived (reverse MRO order) collecting slots as specified
-            if _COLLECT_SLOTS:
+            if _INHERITED_SLOTS:
                 # For v3.11 and later, __slots__ includes fields for this class only, use MRO to collect
                 # slots by traversing the entire class hierarchy, exclude None or empty __slots__ (both are falsy)
                 class_hierarchy_slots = [
@@ -79,12 +81,14 @@ class SlotsUtil:
         and base in a way that works for Python 3.10 where slots are not inherited
         and Python 3.11+ where they are.
         """
-        if _COLLECT_SLOTS:
+        if not _INHERITED_SLOTS:
             # Slots from base must be combined with the current class slots,
             # which must be present to avoid __dict__ but may be empty, e.g. ()
             base_slots = getattr(base, "__slots__")
+            # __weakref__ should be explicitly filtered out(allowed only once in inheritance chain)
+            filtered_base_slots = tuple(s for s in base_slots if s != "__weakref__")
             # Combine in the order of declaration from base to derived
-            result = tuple(base_slots + slots)
+            result = tuple(filtered_base_slots + slots)
         else:
             # Slots are merged automatically
             result = tuple(slots)

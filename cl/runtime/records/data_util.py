@@ -35,7 +35,7 @@ class DataUtil:
             return type(data)(
                 **{
                     key: cls.remove_none(value)
-                    for key in SlotsUtil.get_slots(data)
+                    for key in SlotsUtil.get_slots(type(data))
                     if (value := getattr(data, key, None)) is not None
                 }
             )
