@@ -20,10 +20,14 @@ from dateutil.parser import parse
 class CsvUtil:
     """Utilities for CSV serialization."""
 
-    # Precompiled Regex
+    # Precompiled Regex, months are valid for Anglophone locales only
     _NUMERIC_RE = re.compile(r"[0-9]")
     _ALPHA_RE = re.compile(r"[A-Za-z]")
-
+    _MONTH_RE = re.compile(
+        r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|"
+        r"aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b",
+        re.IGNORECASE
+    )
     @classmethod
     def should_wrap(cls, value: str) -> bool:
         """Return True if Excel will reformat the value on save (e.g., for numbers or dates)."""
@@ -36,17 +40,25 @@ class CsvUtil:
         # Remove leading and trailing quotes
         value = value.strip().strip('"')
 
-        # Wrap if is a string representation of a date
-        try:
-            parse(value, fuzzy=False)
-            return True
-        except:  # noqa
-            # Not a date
-            pass
-
-        # Wrap if purely numeric (or percent-formatted) string without letters
-        if cls._NUMERIC_RE.search(value) and not cls._ALPHA_RE.search(value):
-            return True
+        # Wrap if purely numeric (or percent-formatted) string that either has no letters at all, or has months
+        if cls._NUMERIC_RE.search(value):
+            x = bool(cls._MONTH_RE.search(value, re.IGNORECASE))
+            y = bool(cls._ALPHA_RE.search(value))
+            if not cls._ALPHA_RE.search(value):
+                # No letters, return True
+                return True
+            elif cls._MONTH_RE.search(value):
+                # Has months, check if date parsing succeeds
+                try:
+                    parse(value, fuzzy=False)
+                    # Recognized as a pure date
+                    return True
+                except:  # noqa
+                    # Not a pure date even though it has the substrings
+                    return False
+            else:
+                # Not a pure number or date, return False
+                return False
 
         # Do not wrap if none of the above criteria are met
         return False
