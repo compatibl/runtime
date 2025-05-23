@@ -181,6 +181,32 @@ class ProjectSettings:
                 return None
 
     @classmethod
+    def get_preloads_root(cls, package: str) -> str | None:
+        """
+        Preloads root directory for the specified package.
+
+        Notes:
+            The presence of __init__.py is not required for preloads
+
+        Args:
+            package: Dot-delimited package root, e.g. 'cl.runtime'
+        """
+        package_tokens = package.split(".")
+        package_tokens_len = len(package_tokens)
+        source_root = cls.get_source_root(package)
+        common_root = str(Path(source_root).parents[package_tokens_len - 1])
+        if package_tokens[0] == "preloads":
+            # Preloads directory is specified directly in module format
+            return source_root
+        else:
+            # Look for tests package relative to source, return if exists
+            preloads_root = os.path.normpath(os.path.join(common_root, "preloads", *package_tokens))
+            if os.path.exists(preloads_root):
+                return preloads_root
+            else:
+                return None
+
+    @classmethod
     def get_wwwroot(cls) -> str:
         """Class method returning path to wwwroot directory under project root directory."""
         project_root = cls.get_project_root()

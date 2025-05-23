@@ -20,16 +20,14 @@ from cl.runtime.settings.project_settings import ProjectSettings
 
 def check_init_files(
     *,
-    source_dirs: List[str] | None = None,
     apply_fix: bool,
     verbose: bool = False,
 ) -> None:
     """
-    Check that __init__.py is present in all subdirectories of 'root_path'.
+    Check that __init__.py is present in all source directories.
     Optionally create when missing.
 
     Args:
-        source_dirs: Directories under which files will be checked
         apply_fix: If True, create an empty __init__.py file when missing
         verbose: Print messages about fixes to stdout if specified
     """
