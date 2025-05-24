@@ -13,44 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.prebuild.csv_preloads import check_csv_preloads, should_wrap
-
-
-def test_should_wrap():
-    """Test for the method to determine which CSV fields should be wrapped."""
-
-    # Negative test cases: should NOT be wrapped
-    negative_cases = [
-        '"""[Begins from bracket, already wrapped',
-        '"""{Begins from brace, already wrapped',
-        '"""123"""',
-        "Hello, world!",
-        "",
-        "Not a date 123abc",
-        "prefix March 5, 2022",
-        "prefix 3.14",
-        "prefix 99%",
-    ]
-
-    # Positive test cases: should be wrapped
-    positive_cases = [
-        "[Begins from bracket",
-        "{Begins from brace",
-        "42",
-        "3.14",
-        "99%",
-        "99.0%",
-        "2023-05-21",
-        "March 5, 2022"
-    ]
-
-    for case in negative_cases:
-        assert not should_wrap(case), f"Expected should_wrap to return False for: {case}"
-
-    for case in positive_cases:
-        assert should_wrap(case), f"Expected should_wrap to return True for: {case}"
-        assert should_wrap('"' + case), f'Expected should_wrap to return True for: "{case}'
-        assert should_wrap('""' + case), f'Expected should_wrap to return True for: ""{case}'
+from cl.runtime.prebuild.csv_preloads import check_csv_preloads
 
 
 def test_csv_preloads():

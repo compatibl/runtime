@@ -37,7 +37,7 @@ class FileType(IntEnum):
     SVG = auto()
     """SVG image type."""
 
-    CSV = auto()
+    FOR_CSV = auto()
     """Csv type."""
 
     ZIP = auto()

@@ -13,63 +13,12 @@
 # limitations under the License.
 
 import os
-import csv
-import re
 from fnmatch import fnmatch
-from dateutil.parser import parse
 from typing import List
+
+from cl.runtime.csv_util import CsvUtil
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.project_settings import ProjectSettings
-
-def should_wrap(value: str) -> bool:
-    """Return True if the value begins from [{ or is a number or date and is not already wrapped in triple quotes."""
-    if value.startswith('"""'):
-        # Do not modify if already at least three quotes at start
-        return False
-    else:
-        # Strip whitespace first and then any existing quotes
-        value = value.strip()
-        value = value.strip('"')
-        if value and value[0] in ("[", "{"):
-            # Begins from [ or {
-            return True
-        elif re.fullmatch(r"\d+(\.\d+)?%?", value):
-            # Numbers and percentages Excel will interpret as numeric
-            return True
-        else:
-            # Try parsing as date (including with words like "March", "Dec", etc.)
-            try:
-                parse(value, fuzzy=False)
-                return True
-            except Exception:  # noqa
-                return False
-
-
-def wrap_special_values(file_path: str):
-    """Read a CSV file, wrap values if they should be wrapped, and return true if the file was modified."""
-
-    is_modified = False
-    updated_rows = []
-    with open(file_path, 'r', newline='', encoding='utf-8') as input_file:
-        reader = csv.reader(input_file)
-        for row in reader:
-            new_row = []
-            for value in row:
-                if should_wrap(value):
-                    is_modified = True
-                    value = value.strip('"')
-                    wrapped_val = f'"""{value} """'
-                    new_row.append(wrapped_val)
-                else:
-                    new_row.append(value)
-            updated_rows.append(new_row)
-
-    # Overwrite only if modified
-    if is_modified:
-        with open(file_path, 'w', newline='', encoding='utf-8') as output_file:
-            writer = csv.writer(output_file, quoting=csv.QUOTE_NONE, escapechar='\\')
-            writer.writerows(updated_rows)
-    return is_modified
 
 
 def check_csv_preloads(
@@ -81,7 +30,7 @@ def check_csv_preloads(
 ) -> None:
     """
     Check csv preload files in all subdirectories of 'root_path' to ensure that each field that
-    begins from [{ or is a number or date is surrounded by double quotes ". This will prevent Excel modifying
+    is a number or date is surrounded by double quotes ". This will prevent Excel modifying
     these fields on save (e.g., using locale-specific format for dates) or triggering JSON loading.
 
     Args:
@@ -128,18 +77,18 @@ def check_csv_preloads(
 
             for filename in filenames:
                 # Load the file
-                file_path = os.path.join(dir_path, filename)
-                is_modified = wrap_special_values(file_path)
+                file_path = str(os.path.join(dir_path, filename))
+                is_modified = CsvUtil.check_file(file_path, apply_fix=apply_fix)
                 if is_modified:
                     files_with_error.append(file_path)
 
     if files_with_error:
-        raise RuntimeError(
-            "Field that begins from [{ or is a number or date not escaped by quotes in CSV preload(s):\n"
-            + "".join([f"    {file}\n" for file in files_with_error])
-        )
+        files_list = "".join([f"    {file}\n" for file in files_with_error])
+        msg = f"Found fields that should be wrapped in the following CSV preload(s):\n{files_list}"
+        if not apply_fix:
+            raise RuntimeError(msg)
+        elif verbose:
+            print(msg)
     elif verbose:
-        print(
-            "Verified CSV preloads format under directory root(s):\n"
-            + "".join([f"    {x}\n" for x in sorted(all_root_paths)])
-        )
+        files_list = "".join([f"    {x}\n" for x in sorted(all_root_paths)])
+        print(f"Verified field wrapping in the following CSV preload(s):\n{files_list}")

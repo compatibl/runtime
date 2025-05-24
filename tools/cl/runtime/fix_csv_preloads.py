@@ -17,4 +17,4 @@ from cl.runtime.prebuild.csv_preloads import check_csv_preloads
 if __name__ == '__main__':
 
     # Create __init__.py files in subdirectories except for tests
-    check_csv_preloads(apply_fix=False, verbose=True)
+    check_csv_preloads(apply_fix=True, verbose=True)
