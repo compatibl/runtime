@@ -19,6 +19,8 @@ from enum import IntEnum
 from typing import Any
 from uuid import UUID
 from bson import Int64
+
+from cl.runtime.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.date_util import DateUtil
@@ -136,8 +138,11 @@ class PrimitiveSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
         elif data_class_name == "str":
-            # Return None for an empty string
-            return data if data else None
+            if (value_format := self.string_format) == StringFormat.PASSTHROUGH:
+                # Return None for an empty string
+                return data if data else None
+            else:
+                raise ErrorUtil.enum_value_error(value_format, StringFormat)
         elif data_class_name == "float":
             if (value_format := self.float_format) == FloatFormat.PASSTHROUGH:
                 return data
@@ -284,7 +289,7 @@ class PrimitiveSerializer(Serializer):
                 else:
                     if isinstance(data, str):
                         # Deserialize from string, strip leading and trailing triple quotes if present
-                        data = data.strip('"""')
+                        data = CsvUtil.strip_quotes(data)
                         return data
                     else:
                         raise self._deserialization_error(data, schema_type_name, self.string_format)
@@ -298,7 +303,7 @@ class PrimitiveSerializer(Serializer):
                     return None
                 elif isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = data.strip('"""')
+                    data = CsvUtil.strip_quotes(data)
                     return float(data)  # TODO: !!! Use FloatUtil
                 elif isinstance(data, float):
                     # Also accept float
@@ -336,7 +341,7 @@ class PrimitiveSerializer(Serializer):
                     return None
                 elif isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = data.strip('"""')
+                    data = CsvUtil.strip_quotes(data)
                     # Checks that value is within 32-bit signed integer range
                     return IntUtil.from_str(data)
                 elif isinstance(data, int):
@@ -358,7 +363,7 @@ class PrimitiveSerializer(Serializer):
                     return None
                 elif isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = data.strip('"""')
+                    data = CsvUtil.strip_quotes(data)
                     # Checks that value is within 54-bit signed integer range
                     return LongUtil.from_str(data)
                 elif isinstance(data, int):
@@ -390,7 +395,7 @@ class PrimitiveSerializer(Serializer):
                     return None
                 elif isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = data.strip('"""')
+                    data = CsvUtil.strip_quotes(data)
                     # Date as string in ISO-8601 string format ("yyyy-mm-dd")
                     return DateUtil.from_str(data)
                 elif isinstance(data, dt.date):
@@ -404,7 +409,7 @@ class PrimitiveSerializer(Serializer):
                     return None
                 elif isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = data.strip('"""')
+                    data = CsvUtil.strip_quotes(data)
                     # Date as string in ISO int format without separators ("yyyymmdd")
                     return DateUtil.from_iso_int(int(data))
                 elif isinstance(data, int):
@@ -422,7 +427,7 @@ class PrimitiveSerializer(Serializer):
                     return None
                 elif isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = data.strip('"""')
+                    data = CsvUtil.strip_quotes(data)
                     # Convert from string in ISO-8601 format with milliseconds ("hh:mm:ss.fff")
                     return TimeUtil.from_str(data)
                 elif isinstance(data, dt.time):
@@ -452,7 +457,7 @@ class PrimitiveSerializer(Serializer):
                     return None
                 elif isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = data.strip('"""')
+                    data = CsvUtil.strip_quotes(data)
                     # Convert from string in ISO-8601 format with milliseconds in UTC ("yyyy-mm-ddThh:mm:ss.fffZ")
                     return DatetimeUtil.from_str(data)
                 elif isinstance(data, dt.datetime):
