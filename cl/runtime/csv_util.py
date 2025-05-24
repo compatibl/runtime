@@ -16,29 +16,40 @@ import csv
 import re
 from dateutil.parser import parse
 
+
 class CsvUtil:
     """Utilities for CSV serialization."""
+
+    # Precompiled Regex
+    _NUMERIC_RE = re.compile(r"[0-9]")
+    _ALPHA_RE = re.compile(r"[A-Za-z]")
 
     @classmethod
     def should_wrap(cls, value: str) -> bool:
         """Return True if Excel will reformat the value on save (e.g., for numbers or dates)."""
-        if not value or value.startswith('"""'):
-            # Do not modify if None, empty or already at least three quotes at start
+
+        # Check if already properly wrapped in triple quotes
+        if not value or (value.startswith('"""') and value.endswith('"""')):
+            # Do not modify if None, empty, or already wrapped in triple quotes
             return False
-        else:
-            # Strip whitespace first and then any existing quotes
-            value = value.strip()
-            value = value.strip('"')
-            if re.fullmatch(r"\d+(\.\d+)?%?", value):
-                # Numbers and percentages Excel will interpret as numeric
-                return True
-            else:
-                # Try parsing as date (including with words like "March", "Dec", etc.)
-                try:
-                    parse(value, fuzzy=False)
-                    return True
-                except Exception:  # noqa
-                    return False
+
+        # Remove leading and trailing quotes
+        value = value.strip().strip('"')
+
+        # Wrap if is a string representation of a date
+        try:
+            parse(value, fuzzy=False)
+            return True
+        except:  # noqa
+            # Not a date
+            pass
+
+        # Wrap if purely numeric (or percent-formatted) string without letters
+        if cls._NUMERIC_RE.search(value) and not cls._ALPHA_RE.search(value):
+            return True
+
+        # Do not wrap if none of the above criteria are met
+        return False
 
     @classmethod
     def wrap_string(cls, value: str) -> str:

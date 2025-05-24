@@ -33,6 +33,7 @@ def test_should_wrap():
         "prefix March 5, 2022",
         "prefix 3.14",
         "prefix 99%",
+        "1m",
     ]
 
     # Positive test cases: should be wrapped
@@ -41,6 +42,7 @@ def test_should_wrap():
         "3.14",
         "99%",
         "99.0%",
+        "$1",
         "2023-05-21",
         "March 5, 2022"
     ]
