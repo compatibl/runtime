@@ -20,40 +20,51 @@ from cl.runtime.csv_util import CsvUtil
 def test_should_wrap():
     """Test for the method to determine which CSV fields should be wrapped."""
 
-    # Negative test cases: should NOT be wrapped
-    negative_cases = [
-        '"""[Begins from bracket, already wrapped',
-        '"""{Begins from brace, already wrapped',
-        '"""123"""',
+    # Should not be wrapped
+    zero_quote_cases = [
+        '"""[Begins from bracket and already wrapped in 3"""',
+        '"""{Begins from brace and already wrapped in 3"""',
+        '"[Begins from bracket and already wrapped in 1"',
+        '"{Begins from brace and already wrapped in 1"',
         "[Begins from bracket",
         "{Begins from brace",
-        "Hello, world!",
         "",
         "Not a date 123abc",
-        "prefix March 5, 2022",
+        "prefix 05/01/2023",
         "prefix 3.14",
         "prefix 99%",
         "1m",
     ]
 
-    # Positive test cases: should be wrapped
-    positive_cases = [
+    # Should be wrapped in 1
+    one_quote_cases = [
+        "Hello, world!",  # Comma
+        'Hello"world!',  # Quote
+        "Hello\nworld!",  # \n
+        "Hello\rworld!",  # \r
+        "prefix May 1, 2003",  # Not a pure date but has comma
+        '"""Trial: 0\nDec 31, 2020"""',  # Not a pure date but has \n
+    ]
+
+    # Should be wrapped in 3
+    three_quote_cases = [
         "42",
         "3.14",
         "99%",
         "99.0%",
         "$1",
         "2023-05-21",
-        "March 5, 2022"
+        "May 1, 2003"
     ]
 
-    for case in negative_cases:
-        assert not CsvUtil.should_wrap(case), f"Expected should_wrap to return False for: {case}"
+    for case in zero_quote_cases:
+        assert CsvUtil.required_quotes(case) == 0, f"Expected num_quotes to return 0 for: {case}"
 
-    for case in positive_cases:
-        assert CsvUtil.should_wrap(case), f"Expected should_wrap to return True for: {case}"
-        assert CsvUtil.should_wrap('"' + case), f'Expected should_wrap to return True for: "{case}'
-        assert CsvUtil.should_wrap('""' + case), f'Expected should_wrap to return True for: ""{case}'
+    for case in one_quote_cases:
+        assert CsvUtil.required_quotes(case) == 1, f"Expected num_quotes to return 1 for: {case}"
+
+    for case in three_quote_cases:
+        assert CsvUtil.required_quotes(case) == 3, f"Expected num_quotes to return 3 for: {case}"
 
 
 if __name__ == "__main__":

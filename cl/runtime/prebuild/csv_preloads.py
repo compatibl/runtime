@@ -71,14 +71,13 @@ def check_csv_preloads(
         for dir_path, dir_names, filenames in os.walk(root_path):
             # Apply exclude patterns
             filenames = [x for x in filenames if not any(fnmatch(x, y) for y in exclude_patterns)]
-
             # Apply include patterns
             filenames = [x for x in filenames if any(fnmatch(x, y) for y in include_patterns)]
-
+            # Iterate over filenames
             for filename in filenames:
                 # Load the file
                 file_path = str(os.path.join(dir_path, filename))
-                is_modified = CsvUtil.check_file(file_path, apply_fix=apply_fix)
+                is_modified = CsvUtil.check_or_fix_file(file_path, apply_fix=apply_fix)
                 if is_modified:
                     files_with_error.append(file_path)
 
