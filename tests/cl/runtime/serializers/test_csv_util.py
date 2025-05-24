@@ -13,12 +13,12 @@
 # limitations under the License.
 
 import pytest
-
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from cl.runtime.csv_util import CsvUtil
 
 
-def test_should_wrap():
-    """Test for the method to determine which CSV fields should be wrapped."""
+def test_required_quotes():
+    """Test CsvUtil.required_quotes() method."""
 
     # Should not be wrapped
     zero_quote_cases = [
@@ -66,6 +66,13 @@ def test_should_wrap():
     for case in three_quote_cases:
         assert CsvUtil.required_quotes(case) == 3, f"Expected num_quotes to return 3 for: {case}"
 
+
+def test_check_or_fix_file(pytest_work_dir):
+    """Test CsvUtil.check_or_fix_file() method."""
+
+    assert CsvUtil.check_or_fix_file("valid.csv", apply_fix=False)
+    assert not CsvUtil.check_or_fix_file("unescaped_date.csv", apply_fix=False)
+    assert not CsvUtil.check_or_fix_file("unescaped_float.csv", apply_fix=False)
 
 if __name__ == "__main__":
     pytest.main([__file__])
