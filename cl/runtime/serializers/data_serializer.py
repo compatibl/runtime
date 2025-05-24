@@ -290,7 +290,7 @@ class DataSerializer(Serializer):
             if len(data) == 0:
                 # Consider an empty sequence equivalent to None
                 return None
-            elif self.inner_encoder is not None and isinstance(data, str) and data[0] == "[":
+            elif self.inner_encoder is not None and isinstance(data, str) and data.startswith('['):
                 # Decode and deserialize sequence using data_serializer
                 data = self.inner_encoder.decode(data)
                 return list(self.inner_serializer.deserialize(v, remaining_chain) for v in data)
@@ -317,7 +317,7 @@ class DataSerializer(Serializer):
                     # TODO: Eliminate check for the fist character
                     self.inner_encoder is not None
                     and len(data) > 0
-                    and data[0] == "{"
+                    and data.startswith('{"')
                 ):  # TODO: Fix for non-JSON encoding
                     # Decode data field using data_encoder if provided and deserialize using self
                     decoded_data = self.inner_encoder.decode(data)
@@ -382,7 +382,8 @@ class DataSerializer(Serializer):
                         and self.inner_encoder is not None
                         and isinstance(field_value, str)
                         and len(field_value) > 0
-                        and field_value[0] in ["{", "["]
+                        # TODO: Improve detection of embedded JSON
+                        and (field_value.startswith('{"') or field_value.startswith('['))
                     )
                     else self.deserialize(field_value, field_hint)
                 )
