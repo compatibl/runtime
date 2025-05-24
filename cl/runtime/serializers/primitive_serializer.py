@@ -169,8 +169,8 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise ErrorUtil.enum_value_error(value_format, IntFormat)
             elif schema_type_name is not None and schema_type_name == "long":
-                # Use methods that check that the value is in 32-bit signed integer range
-                # if schema_type_name is specified and is int rather than long
+                # Use methods that check that the value is in 54-bit signed integer range
+                # if schema_type_name is specified and is long
                 if (value_format := self.long_format) == LongFormat.PASSTHROUGH:
                     check_int_54(data)
                     return data
@@ -179,7 +179,8 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise ErrorUtil.enum_value_error(value_format, LongFormat)
             else:
-                # Otherwise do not perform range checks
+                # Otherwise do not perform range checks and use the convention for long
+                # TODO: Use conventions depending on value instead?
                 if (value_format := self.long_format) == LongFormat.PASSTHROUGH:
                     return data
                 elif value_format == LongFormat.DEFAULT:
