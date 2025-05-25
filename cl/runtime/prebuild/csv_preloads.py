@@ -25,8 +25,8 @@ def check_csv_preloads(
     *,
     apply_fix: bool,
     verbose: bool = False,
-    include_patterns: List[str] | None = None,
-    exclude_patterns: List[str] | None = None,
+    file_include_patterns: List[str] | None = None,
+    file_exclude_patterns: List[str] | None = None,
 ) -> None:
     """
     Check csv preload files in all subdirectories of 'root_path' to ensure that each field that
@@ -36,8 +36,8 @@ def check_csv_preloads(
     Args:
         apply_fix: If True, modify CSV so each field containing numbers or symbols is surrounded by quotes
         verbose: Print messages about fixes to stdout if specified
-        include_patterns: Optional list of filename glob patterns to include, use the defaults in code if not specified
-        exclude_patterns: Optional list of filename glob patterns to exclude, use the defaults in code if not specified
+        file_include_patterns: Optional list of filename glob patterns to include
+        file_exclude_patterns: Optional list of filename glob patterns to exclude
     """
 
     # The list of packages from context settings
@@ -57,12 +57,12 @@ def check_csv_preloads(
             all_root_paths.add(x)
 
     # Use default include patterns if not specified by the caller
-    if include_patterns is None:
-        include_patterns = ["*.csv"]
+    if file_include_patterns is None:
+        file_include_patterns = ["*.csv"]
 
     # Use default exclude patterns if not specified by the caller
-    if exclude_patterns is None:
-        exclude_patterns = []
+    if file_exclude_patterns is None:
+        file_exclude_patterns = []
 
     # Apply to each element of root_paths
     files_with_error = []
@@ -70,9 +70,9 @@ def check_csv_preloads(
         # Walk the directory tree
         for dir_path, dir_names, filenames in os.walk(root_path):
             # Apply exclude patterns
-            filenames = [x for x in filenames if not any(fnmatch(x, y) for y in exclude_patterns)]
+            filenames = [x for x in filenames if not any(fnmatch(x, y) for y in file_exclude_patterns)]
             # Apply include patterns
-            filenames = [x for x in filenames if any(fnmatch(x, y) for y in include_patterns)]
+            filenames = [x for x in filenames if any(fnmatch(x, y) for y in file_include_patterns)]
             # Iterate over filenames
             for filename in filenames:
                 # Load the file

@@ -48,8 +48,8 @@ def check_copyright_headers(
     *,
     fix_trailing_blank_line: bool = False,
     verbose: bool = False,
-    include_patterns: List[str] | None = None,
-    exclude_patterns: List[str] | None = None,
+    file_include_patterns: List[str] | None = None,
+    file_exclude_patterns: List[str] | None = None,
 ) -> None:
     """
     Check that the correct copyright header (Apache or default, based on the presence of Apache LICENSE file at
@@ -58,8 +58,8 @@ def check_copyright_headers(
     Args:
         fix_trailing_blank_line: If specified, add a trailing blank line after the copyright header if missing
         verbose: Print messages about fixes to stdout if specified
-        include_patterns: Optional list of filename glob patterns to include, use the defaults in code if not specified
-        exclude_patterns: Optional list of filename glob patterns to exclude, use the defaults in code if not specified
+        file_include_patterns: Optional list of filename glob patterns to include
+        file_exclude_patterns: Optional list of filename glob patterns to exclude
     """
 
     # The list of packages from context settings
@@ -104,22 +104,22 @@ def check_copyright_headers(
         copyright_header_md5 = StringUtil.md5_hex(copyright_header)
 
         # Use default include patterns if not specified by the caller
-        if include_patterns is None:
-            include_patterns = ["*.py"]
+        if file_include_patterns is None:
+            file_include_patterns = ["*.py"]
 
         # Use default exclude patterns if not specified by the caller
-        if exclude_patterns is None:
-            exclude_patterns = ["__init__.py", "_version.py"]
+        if file_exclude_patterns is None:
+            file_exclude_patterns = ["__init__.py", "_version.py"]
 
         # Apply to each element of root_paths
         for root_path in package_root_paths:
             # Walk the directory tree
             for dir_path, dir_names, filenames in os.walk(root_path):
                 # Apply exclude patterns
-                filenames = [x for x in filenames if not any(fnmatch(x, y) for y in exclude_patterns)]
+                filenames = [x for x in filenames if not any(fnmatch(x, y) for y in file_exclude_patterns)]
 
                 # Apply include patterns
-                filenames = [x for x in filenames if any(fnmatch(x, y) for y in include_patterns)]
+                filenames = [x for x in filenames if any(fnmatch(x, y) for y in file_include_patterns)]
 
                 for filename in filenames:
                     # Load the file
