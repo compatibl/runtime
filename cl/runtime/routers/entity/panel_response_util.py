@@ -104,9 +104,7 @@ class PanelResponseUtil:
             missing = [(i, viewer_result[i]) for i, x in enumerate(loaded) if x is None]
             if missing:
                 details = ", ".join(f"index {i}: {repr(key)}" for i, key in missing)
-                raise RuntimeError(
-                    f"Failed to load records for keys at {details} in the provided list."
-                )
+                raise RuntimeError(f"Failed to load records for keys at {details} in the provided list.")
             return loaded
         else:
             return viewer_result

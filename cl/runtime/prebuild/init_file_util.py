@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import os
-from typing import List
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.project_settings import ProjectSettings
+
 
 class InitFileUtil:
     """Helper class for working with __init__.py files."""

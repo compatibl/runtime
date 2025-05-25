@@ -14,7 +14,8 @@
 
 import pytest
 from cl.runtime.templates.basic_template_engine import BasicTemplateEngine
-from stubs.cl.runtime import StubDataclassPrimitiveFields, StubDataclassNestedFields
+from stubs.cl.runtime import StubDataclassNestedFields
+from stubs.cl.runtime import StubDataclassPrimitiveFields
 
 
 def test_primitive_fields():
@@ -63,6 +64,7 @@ def test_primitive_fields():
     result = engine.render(body, data)
     assert result == expected_result
 
+
 def test_nested_fields():
     """Test rendering StubDataclassPrimitiveFields."""
 
@@ -84,6 +86,7 @@ def test_nested_fields():
     # Render and validate
     result = engine.render(body, data)
     assert result == expected_result
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

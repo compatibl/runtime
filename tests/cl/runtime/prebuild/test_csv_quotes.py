@@ -26,7 +26,7 @@ def test_csv_quotes():
         file_exclude_patterns=[
             "unescaped_date.csv",
             "unescaped_float.csv",
-        ]
+        ],
     )
 
 

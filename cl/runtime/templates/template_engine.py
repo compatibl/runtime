@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
-from cl.runtime.templates.template_engine_key import TemplateEngineKey
 from cl.runtime import RecordMixin
 from cl.runtime.records.protocols import TData
+from cl.runtime.templates.template_engine_key import TemplateEngineKey
 
 
 @dataclass(slots=True, kw_only=True)

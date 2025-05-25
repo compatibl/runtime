@@ -38,14 +38,14 @@ class TimestampFormatUtil:
     @classmethod
     def update_file(cls, file_path: str) -> None:
         """Update Timestamp format in file."""
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
 
         # Replace the target string with the replacement
         content = cls.update_text(content)
 
         # Write back to the file
-        with open(file_path, 'w', encoding='utf-8') as file:
+        with open(file_path, "w", encoding="utf-8") as file:
             file.write(content)
 
     @classmethod

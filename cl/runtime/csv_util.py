@@ -15,8 +15,6 @@
 import csv
 import os
 import re
-from typing import Tuple
-
 from dateutil.parser import parse
 
 
@@ -29,7 +27,7 @@ class CsvUtil:
     _MONTH_RE = re.compile(
         r"\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|"
         r"aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b",
-        re.IGNORECASE
+        re.IGNORECASE,
     )
 
     @classmethod
@@ -93,7 +91,7 @@ class CsvUtil:
 
         is_valid = True
         updated_rows = []
-        with open(file_path, 'r', newline='', encoding='utf-8') as input_file:
+        with open(file_path, "r", newline="", encoding="utf-8") as input_file:
             reader = csv.reader(input_file)
             for row in reader:
                 updated_row = []
@@ -107,7 +105,7 @@ class CsvUtil:
 
         # Overwrite only if apply_fix is True and is_valid is False
         if apply_fix and not is_valid:
-            with open(file_path, 'w', newline='', encoding='utf-8') as output_file:
+            with open(file_path, "w", newline="", encoding="utf-8") as output_file:
                 writer = csv.writer(
                     output_file,
                     delimiter=",",

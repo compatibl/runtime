@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import List
-from typing_extensions import Self
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassListFields

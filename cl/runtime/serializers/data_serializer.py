@@ -290,7 +290,7 @@ class DataSerializer(Serializer):
             if len(data) == 0:
                 # Consider an empty sequence equivalent to None
                 return None
-            elif self.inner_encoder is not None and isinstance(data, str) and data.startswith('['):
+            elif self.inner_encoder is not None and isinstance(data, str) and data.startswith("["):
                 # Decode and deserialize sequence using data_serializer
                 data = self.inner_encoder.decode(data)
                 return list(self.inner_serializer.deserialize(v, remaining_chain) for v in data)
@@ -383,7 +383,7 @@ class DataSerializer(Serializer):
                         and isinstance(field_value, str)
                         and len(field_value) > 0
                         # TODO: Improve detection of embedded JSON
-                        and (field_value.startswith('{"') or field_value.startswith('['))
+                        and (field_value.startswith('{"') or field_value.startswith("["))
                     )
                     else self.deserialize(field_value, field_hint)
                 )

@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from cl.runtime.csv_util import CsvUtil
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
 def test_requires_quotes():
@@ -47,15 +47,7 @@ def test_requires_quotes():
     ]
 
     # Should be wrapped in 3
-    requires_quotes_cases = [
-        "42",
-        "3.14",
-        "99%",
-        "99.0%",
-        "$1",
-        "2023-05-21",
-        "May 1, 2003"
-    ]
+    requires_quotes_cases = ["42", "3.14", "99%", "99.0%", "$1", "2023-05-21", "May 1, 2003"]
 
     for case in no_quote_cases:
         assert not CsvUtil.requires_quotes(case), f"Expected requires_quotes to return False for: {case}"
@@ -73,6 +65,7 @@ def test_check_or_fix_file(pytest_work_dir):
     assert CsvUtil.check_or_fix_quotes("valid.csv", apply_fix=False)
     assert not CsvUtil.check_or_fix_quotes("unescaped_date.csv", apply_fix=False)
     assert not CsvUtil.check_or_fix_quotes("unescaped_float.csv", apply_fix=False)
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
