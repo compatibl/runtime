@@ -13,19 +13,19 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from box import Box
-from cl.runtime.records.protocols import TData
-from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.templates.template_engine import TemplateEngine
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.templates.template_engine_key import TemplateEngineKey
+from cl.runtime.templates.template_mixin import TemplateMixin
+from stubs.cl.runtime import StubDataclassNestedFields
+from stubs.cl.runtime.templates.stub_template_key import StubTemplateKey
 
 
 @dataclass(slots=True, kw_only=True)
-class FstringTemplateEngine(TemplateEngine):
-    """Uses Python f-string engine to render the template."""
+class StubTemplate(StubTemplateKey, TemplateMixin[StubTemplateKey, StubDataclassNestedFields]):
+    """Interest rate swap trade template."""
 
-    def render(self, text: str, data: TData) -> str:
-        """Render the template text by taking parameters from the data."""
-        # TODO: Add validation
-        data_dict = Box(DataSerializers.DEFAULT.serialize(data))
-        result = str.format(text.format_map(data_dict))
-        return result
+    engine: TemplateEngineKey = required()
+    """Template engine used for rendering."""
+
+    def get_key(self) -> StubTemplateKey:
+        return StubTemplateKey(body=self.body).build()

@@ -12,20 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod
-from typing import Generic
-from cl.runtime.records.protocols import TKey
+from dataclasses import dataclass
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 
 
-class RecordMixin(Generic[TKey]):
-    """
-    Optional generic mixin for a record parameterized by its key.
-    Derive MyRecord from MyRecord(MyKey, RecordMixin[MyKey]).
-    """
+@dataclass(slots=True)
+class StubTemplateKey(KeyMixin):
+    """Interest rate swap trade template."""
 
-    __slots__ = ()
-    """To prevent creation of __dict__ in derived types."""
+    body: str = required()
+    """Template body before parameter substitution."""
 
-    @abstractmethod
-    def get_key(self) -> TKey:
-        """Return a new key object whose fields populated from self, do not return self."""
+    @classmethod
+    def get_key_type(cls) -> type:
+        return StubTemplateKey

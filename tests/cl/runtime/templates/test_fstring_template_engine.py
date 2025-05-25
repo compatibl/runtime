@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.templates.basic_template_engine import BasicTemplateEngine
+from cl.runtime.templates.fstring_template_engine import FstringTemplateEngine
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 
@@ -21,7 +21,7 @@ from stubs.cl.runtime import StubDataclassPrimitiveFields
 def test_primitive_fields():
     """Test rendering StubDataclassPrimitiveFields."""
 
-    engine = BasicTemplateEngine()
+    engine = FstringTemplateEngine()
     data = StubDataclassPrimitiveFields()
     body = (
         "obj_str_field: {obj_str_field}\n"
@@ -68,7 +68,7 @@ def test_primitive_fields():
 def test_nested_fields():
     """Test rendering StubDataclassPrimitiveFields."""
 
-    engine = BasicTemplateEngine()
+    engine = FstringTemplateEngine()
     data = StubDataclassNestedFields()
     body = (
         "base_field.str_field: {base_field.str_field}\n"
