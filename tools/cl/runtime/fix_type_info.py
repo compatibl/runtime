@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.prebuild.init_file_util import InitFileUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 
 if __name__ == '__main__':
+
+    # Create __init__.py files first to avoid missing classes in directories without __init__.py
+    InitFileUtil.check_init_files(apply_fix=True, verbose=False)
 
     # Rebuild type cache and save TypeInfo.csv file to the bootstrap resources directory
     TypeInfoCache.rebuild()
