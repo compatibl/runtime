@@ -17,11 +17,11 @@ from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from cl.runtime.csv_util import CsvUtil
 
 
-def test_required_quotes():
-    """Test CsvUtil.required_quotes() method."""
+def test_requires_quotes():
+    """Test CsvUtil.requires_quotes() method."""
 
     # Should not be wrapped
-    zero_quote_cases = [
+    no_quote_cases = [
         '"""[Begins from bracket and already wrapped in 3"""',
         '"""{Begins from brace and already wrapped in 3"""',
         '"[Begins from bracket and already wrapped in 1"',
@@ -37,7 +37,7 @@ def test_required_quotes():
     ]
 
     # Should be wrapped in 1
-    one_quote_cases = [
+    automatic_quotes_cases = [
         "Hello, world!",  # Comma
         'Hello"world!',  # Quote
         "Hello\nworld!",  # \n
@@ -47,7 +47,7 @@ def test_required_quotes():
     ]
 
     # Should be wrapped in 3
-    three_quote_cases = [
+    requires_quotes_cases = [
         "42",
         "3.14",
         "99%",
@@ -57,14 +57,14 @@ def test_required_quotes():
         "May 1, 2003"
     ]
 
-    for case in zero_quote_cases:
-        assert CsvUtil.required_quotes(case) == 0, f"Expected num_quotes to return 0 for: {case}"
+    for case in no_quote_cases:
+        assert not CsvUtil.requires_quotes(case), f"Expected requires_quotes to return False for: {case}"
 
-    for case in one_quote_cases:
-        assert CsvUtil.required_quotes(case) == 1, f"Expected num_quotes to return 1 for: {case}"
+    for case in automatic_quotes_cases:
+        assert not CsvUtil.requires_quotes(case), f"Expected requires_quotes to return False for: {case}"
 
-    for case in three_quote_cases:
-        assert CsvUtil.required_quotes(case) == 3, f"Expected num_quotes to return 3 for: {case}"
+    for case in requires_quotes_cases:
+        assert CsvUtil.requires_quotes(case), f"Expected requires_quotes to return True for: {case}"
 
 
 def test_check_or_fix_file(pytest_work_dir):

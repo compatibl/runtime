@@ -34,104 +34,79 @@ class CsvUtil:
 
     @classmethod
     def strip_quotes(cls, value: str) -> str:
-        """Strip the existing surrounding triple quotes or single quotes."""
-        if value.startswith('"""') and value.endswith('"""'):
-            return value[3:-3]
-        elif value.startswith('"') and value.endswith('"'):
+        """Strip the surrounding single quotes if present, return the argument if not present."""
+        if value.startswith('"') and value.endswith('"'):
+            # Only if both leading and trailing quote is present
             return value[1:-1]
         else:
             return value
 
     @classmethod
-    def existing_quotes(cls, value: str) -> int:
-        """Count the existing surrounding triple quotes or single quotes."""
-        if value.startswith('"""') and value.endswith('"""'):
-            return 3
-        elif value.startswith('"') and value.endswith('"'):
-            return 1
-        else:
-            return 0
+    def has_quotes(cls, value: str) -> bool:
+        """Return True if surrounded by quotes, both leading and trailing quote must be present."""
+        return value.startswith('"') and value.endswith('"')
 
     @classmethod
-    def required_quotes(cls, value: str) -> int:
+    def requires_quotes(cls, value: str) -> bool:
         """
-        Return the number of surrounding quotes required to prevent Excel from reformatting the data on save.
-
-        Returns:
-          - 3 if the value contains dates or numbers
-          - 1 if the value contains commas, quotes, or newlines (following RFC 4180)
-          - 0 if the value does not need to be escaped
+        Return True if quotes are required to prevent Excel from reformatting the value on save, namely
+        dates (including with month in words), ints, floats and percentages. The result is the same
+        irrespective of whether or not the value is already surrounded by quotes.
+        surrounded by quotes.
         """
 
-        # Strip the existing surrounding triple quotes or single quotes
+        # Strip the existing surrounding quotes if present, pass through the argument if not present
         value = cls.strip_quotes(value)
 
-        # Return 3 if the value contains dates or numbers
+        # True if the value contains dates or numbers
         if cls._NUMERIC_RE.search(value):
             if not cls._ALPHA_RE.search(value):
                 # No letters, return True
-                return 3
+                return True
             elif cls._MONTH_RE.search(value):
                 # Has months, check if date parsing succeeds
                 try:
                     parse(value, fuzzy=False)
                     # Recognized as a pure date
-                    return 3
+                    return True
                 except:  # noqa
-                    # Not a pure date even though it has the substrings
-                    pass
+                    # Not a pure date even though it has month substrings, return False
+                    return False
             else:
-                # Not a pure number or date
-                pass
-
-        # Return 1 if the value contains commas, quotes, or newlines (following RFC 4180)
-        if any(c in value for c in [',', '"', '\n', '\r']):
-            return 1
-
-        # Otherwise return 0
-        return 0
+                # Not a pure number or date, return False
+                return False
+        else:
+            # Otherwise return False
+            return False
 
     @classmethod
-    def wrap_value(cls, value: str) -> Tuple[str, bool]:
-        """Wrap value to the correct number of quotes, return (new_value, is_modified)."""
-
-        required_quotes = cls.required_quotes(value)
-        existing_quotes = cls.existing_quotes(value)
-        is_modified = required_quotes != existing_quotes
-        if is_modified:
-            # Strip the existing surrounding triple quotes or single quotes
-            value = cls.strip_quotes(value)
-            if required_quotes == 3:
-                pre_save_quotes = 1
-            else:
-                pre_save_quotes = 0
-            quotes = pre_save_quotes * '"'
-            new_value = f"{quotes}{value}{quotes}"
-        else:
-            new_value = value
-        return new_value, is_modified
+    def should_wrap(cls, value: str) -> bool:
+        """Return True if quotes are required but not present, False in all other cases."""
+        requires_quotes = cls.requires_quotes(value)
+        has_quotes = cls.has_quotes(value)
+        result = requires_quotes and not has_quotes
+        return result
 
     @classmethod
     def check_or_fix_file(cls, file_path: str, *, apply_fix: bool) -> bool:
         """Return true if the file has values that must be wrapped, save the modified file is apply_fix is True."""
 
-        is_modified = False
+        is_valid = True
         updated_rows = []
         with open(file_path, 'r', newline='', encoding='utf-8') as input_file:
             reader = csv.reader(input_file)
             for row in reader:
-                if apply_fix:
-                    new_row = []
+                updated_row = []
                 for value in row:
-                    new_value, is_value_modified = cls.wrap_value(value)
-                    is_modified = is_modified or is_value_modified
-                    if apply_fix:
-                        new_row.append(new_value)
-                if apply_fix:
-                    updated_rows.append(new_row)
+                    # Valid only if none of the values should be wrapped
+                    should_wrap = cls.should_wrap(value)
+                    is_valid = is_valid and not should_wrap
+                    # Wrap value if required
+                    updated_row.append(f'"{value}"' if should_wrap else value)
+                updated_rows.append(updated_row)
 
-        # Overwrite only if apply_fix is True and the data has been modified
-        if apply_fix and is_modified:
+        # Overwrite only if apply_fix is True and is_valid is False
+        if apply_fix and not is_valid:
             with open(file_path, 'w', newline='', encoding='utf-8') as output_file:
                 writer = csv.writer(
                     output_file,
@@ -142,4 +117,4 @@ class CsvUtil:
                     lineterminator=os.linesep,
                 )
                 writer.writerows(updated_rows)
-        return is_modified
+        return is_valid
