@@ -46,20 +46,20 @@ DEFAULT_HEADER = """# Copyright (C) 2003-present CompatibL. All rights reserved.
 
 def check_copyright_headers(
     *,
-    include_patterns: List[str] | None = None,
-    exclude_patterns: List[str] | None = None,
     fix_trailing_blank_line: bool = False,
     verbose: bool = False,
+    include_patterns: List[str] | None = None,
+    exclude_patterns: List[str] | None = None,
 ) -> None:
     """
     Check that the correct copyright header (Apache or default, based on the presence of Apache LICENSE file at
     package root) is present and followed by a blank line in all files with the specified glob filename pattern.
 
     Args:
-        include_patterns: Optional list of filename glob patterns to include, use the defaults in code if not specified
-        exclude_patterns: Optional list of filename glob patterns to exclude, use the defaults in code if not specified
         fix_trailing_blank_line: If specified, add a trailing blank line after the copyright header if missing
         verbose: Print messages about fixes to stdout if specified
+        include_patterns: Optional list of filename glob patterns to include, use the defaults in code if not specified
+        exclude_patterns: Optional list of filename glob patterns to exclude, use the defaults in code if not specified
     """
 
     # The list of packages from context settings

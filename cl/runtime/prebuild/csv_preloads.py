@@ -23,10 +23,10 @@ from cl.runtime.settings.project_settings import ProjectSettings
 
 def check_csv_preloads(
     *,
-    include_patterns: List[str] | None = None,
-    exclude_patterns: List[str] | None = None,
     apply_fix: bool,
     verbose: bool = False,
+    include_patterns: List[str] | None = None,
+    exclude_patterns: List[str] | None = None,
 ) -> None:
     """
     Check csv preload files in all subdirectories of 'root_path' to ensure that each field that
@@ -34,10 +34,10 @@ def check_csv_preloads(
     these fields on save (e.g., using locale-specific format for dates) or triggering JSON loading.
 
     Args:
-        include_patterns: Optional list of filename glob patterns to include, use the defaults in code if not specified
-        exclude_patterns: Optional list of filename glob patterns to exclude, use the defaults in code if not specified
         apply_fix: If True, modify CSV so each field containing numbers or symbols is surrounded by quotes
         verbose: Print messages about fixes to stdout if specified
+        include_patterns: Optional list of filename glob patterns to include, use the defaults in code if not specified
+        exclude_patterns: Optional list of filename glob patterns to exclude, use the defaults in code if not specified
     """
 
     # The list of packages from context settings
