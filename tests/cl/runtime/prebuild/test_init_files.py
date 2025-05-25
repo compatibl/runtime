@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.prebuild.init_files import check_init_files
+from cl.runtime.prebuild.init_file_util import InitFileUtil
 
 
 def test_init_files():
     """Prebuild test to check that __init__.py is present in all code directories."""
 
     # Check that init files are present in each source directory except for tests, report an error if not found
-    check_init_files(apply_fix=False)
+    InitFileUtil.check_init_files(apply_fix=False)
 
 
 if __name__ == "__main__":

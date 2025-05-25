@@ -13,14 +13,21 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.prebuild.csv_preloads import check_csv_preloads
+from cl.runtime.prebuild.csv_file_util import CsvFileUtil
 
 
 def test_csv_preloads():
     """Prebuild test to check that CSV preloads follow the format rules."""
 
     # Get the list files where copyright header is missing, incorrect, or not followed by a blank line
-    check_csv_preloads(apply_fix=False)
+    CsvFileUtil.check_or_fix_quotes(
+        apply_fix=False,
+        # Prevent fixing of the unit test samples
+        file_exclude_patterns=[
+            "unescaped_date.csv",
+            "unescaped_float.csv",
+        ]
+    )
 
 
 if __name__ == "__main__":

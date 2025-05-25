@@ -88,7 +88,7 @@ class CsvUtil:
         return result
 
     @classmethod
-    def check_or_fix_file(cls, file_path: str, *, apply_fix: bool) -> bool:
+    def check_or_fix_quotes(cls, file_path: str, *, apply_fix: bool) -> bool:
         """Return true if the file has values that must be wrapped, save the modified file is apply_fix is True."""
 
         is_valid = True

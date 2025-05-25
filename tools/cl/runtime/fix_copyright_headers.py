@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.prebuild.copyright_header import check_copyright_headers
+from cl.runtime.prebuild.copyright_util import CopyrightUtil
 
-# Check copyright headers and fix missing trailing blank line
-# All other copyright header errors cause an exception
 if __name__ == '__main__':
 
     # Fix or report errors where copyright header is missing, incorrect, or not followed by a blank line
-    check_copyright_headers(fix_trailing_blank_line=True, verbose=True)
+    CopyrightUtil.check_copyright_headers(fix_trailing_blank_line=True, verbose=True)

@@ -17,60 +17,64 @@ from typing import List
 from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
+class InitFileUtil:
+    """Helper class for working with __init__.py files."""
 
-def check_init_files(
-    *,
-    apply_fix: bool,
-    verbose: bool = False,
-) -> None:
-    """
-    Check that __init__.py is present in all source directories.
-    Optionally create when missing.
+    @classmethod
+    def check_init_files(
+        cls,
+        *,
+        apply_fix: bool,
+        verbose: bool = False,
+    ) -> None:
+        """
+        Check that __init__.py is present in all source directories.
+        Optionally create when missing.
 
-    Args:
-        apply_fix: If True, create an empty __init__.py file when missing
-        verbose: Print messages about fixes to stdout if specified
-    """
+        Args:
+            apply_fix: If True, create an empty __init__.py file when missing
+            verbose: Print messages about fixes to stdout if specified
+        """
 
-    # The list of packages from context settings
-    packages = ContextSettings.instance().packages
+        # The list of packages from context settings
+        packages = ContextSettings.instance().packages
 
-    missing_files = []
-    all_root_paths = set()
-    for package in packages:
-        # Add paths to source and stubs directories
-        if (x := ProjectSettings.get_source_root(package)) is not None and x not in all_root_paths:
-            all_root_paths.add(x)
-        if (x := ProjectSettings.get_stubs_root(package)) is not None and x not in all_root_paths:
-            all_root_paths.add(x)
+        missing_files = []
+        all_root_paths = set()
+        for package in packages:
+            # Add paths to source and stubs directories
+            if (x := ProjectSettings.get_source_root(package)) is not None and x not in all_root_paths:
+                all_root_paths.add(x)
+            if (x := ProjectSettings.get_stubs_root(package)) is not None and x not in all_root_paths:
+                all_root_paths.add(x)
 
-    # Apply to each element of root_paths
-    for root_path in all_root_paths:
-        # Walk the directory tree
-        for dir_path, dir_names, filenames in os.walk(root_path):
-            # Check for .py files in the directory
-            # This will not check if there are .py files in subdirectories
-            # to avoid adding __init__.py files to namespace package root
-            if any(filename.endswith(".py") for filename in filenames):
-                # Check if __init__.py is missing
-                init_file_path = os.path.join(dir_path, "__init__.py")
-                if not os.path.exists(init_file_path):
-                    missing_files.append(str(init_file_path))
-                    if apply_fix:
-                        # Create an empty __init__.py file if it is missing but other .py files are present
-                        with open(init_file_path, "w") as f:
-                            pass
+        # Apply to each element of root_paths
+        for root_path in all_root_paths:
+            # Walk the directory tree
+            for dir_path, dir_names, filenames in os.walk(root_path):
+                # Check for .py files in the directory
+                # This will not check if there are .py files in subdirectories
+                # to avoid adding __init__.py files to namespace package root
+                if any(filename.endswith(".py") for filename in filenames):
+                    # Check if __init__.py is missing
+                    init_file_path = os.path.join(dir_path, "__init__.py")
+                    if not os.path.exists(init_file_path):
+                        missing_files.append(str(init_file_path))
+                        if apply_fix:
+                            # Create an empty __init__.py file if it is missing but other .py files are present
+                            with open(init_file_path, "w") as f:
+                                pass
 
-    if missing_files:
-        missing_files_msg = "__init__.py file(s):\n" + "".join(
-            [f"    {missing_file}\n" for missing_file in missing_files]
-        )
-        if not apply_fix:
-            raise RuntimeError(f"Found missing {missing_files_msg}")
+        if missing_files:
+            missing_files_msg = "__init__.py file(s):\n" + "".join(
+                [f"    {missing_file}\n" for missing_file in missing_files]
+            )
+            if not apply_fix:
+                raise RuntimeError(f"Found missing {missing_files_msg}")
+            elif verbose:
+                print(f"Created {missing_files_msg}")
         elif verbose:
-            print(f"Created {missing_files_msg}")
-    elif verbose:
-        print(
-            "Verified that all __init__.py files are present under directory root(s):\n"
-            + "".join([f"    {root_path}\n" for root_path in sorted(all_root_paths)])
-        )
+            print(
+                "Verified that all __init__.py files are present under directory root(s):\n"
+                + "".join([f"    {root_path}\n" for root_path in sorted(all_root_paths)])
+            )

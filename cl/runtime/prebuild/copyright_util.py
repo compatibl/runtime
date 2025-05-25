@@ -44,128 +44,133 @@ DEFAULT_HEADER = """# Copyright (C) 2003-present CompatibL. All rights reserved.
 """
 
 
-def check_copyright_headers(
-    *,
-    fix_trailing_blank_line: bool = False,
-    verbose: bool = False,
-    file_include_patterns: List[str] | None = None,
-    file_exclude_patterns: List[str] | None = None,
-) -> None:
-    """
-    Check that the correct copyright header (Apache or default, based on the presence of Apache LICENSE file at
-    package root) is present and followed by a blank line in all files with the specified glob filename pattern.
+class CopyrightUtil:
+    """Helper class for working with copyright headers and files."""
 
-    Args:
-        fix_trailing_blank_line: If specified, add a trailing blank line after the copyright header if missing
-        verbose: Print messages about fixes to stdout if specified
-        file_include_patterns: Optional list of filename glob patterns to include
-        file_exclude_patterns: Optional list of filename glob patterns to exclude
-    """
+    @classmethod
+    def check_copyright_headers(
+        cls,
+        *,
+        fix_trailing_blank_line: bool = False,
+        verbose: bool = False,
+        file_include_patterns: List[str] | None = None,
+        file_exclude_patterns: List[str] | None = None,
+    ) -> None:
+        """
+        Check that the correct copyright header (Apache or default, based on the presence of Apache LICENSE file at
+        package root) is present and followed by a blank line in all files with the specified glob filename pattern.
 
-    # The list of packages from context settings
-    packages = ContextSettings.instance().packages
+        Args:
+            fix_trailing_blank_line: If specified, add a trailing blank line after the copyright header if missing
+            verbose: Print messages about fixes to stdout if specified
+            file_include_patterns: Optional list of filename glob patterns to include
+            file_exclude_patterns: Optional list of filename glob patterns to exclude
+        """
 
-    files_with_copyright_header_error = []
-    files_with_trailing_line_error = []
-    all_root_paths = set()
-    for package in packages:
+        # The list of packages from context settings
+        packages = ContextSettings.instance().packages
 
-        # Check if the LICENSE file at package root is Apache 2.0
-        package_root = ProjectSettings.get_package_root(package)
-        license_file_path = os.path.join(package_root, "LICENSE")
-        if os.path.exists(license_file_path):
-            with open(license_file_path, "r") as license_file:
-                # LICENSE file found, check it is Apache 2.0 license
-                license_str = license_file.read()
-                license_md5 = StringUtil.md5_hex(license_str)
-                is_apache = license_md5 == APACHE_LICENSE_MD5
-        else:
-            # LICENSE file not found, assume commercial license
-            is_apache = False
+        files_with_copyright_header_error = []
+        files_with_trailing_line_error = []
+        all_root_paths = set()
+        for package in packages:
 
-        # Add paths to source, stubs, and test directories
-        package_root_paths = []
-        if (x := ProjectSettings.get_source_root(package)) is not None and x not in all_root_paths:
-            package_root_paths.append(x)
-            all_root_paths.add(x)
-        if (x := ProjectSettings.get_stubs_root(package)) is not None and x not in all_root_paths:
-            package_root_paths.append(x)
-            all_root_paths.add(x)
-        if (x := ProjectSettings.get_tests_root(package)) is not None and x not in all_root_paths:
-            package_root_paths.append(x)
-            all_root_paths.add(x)
+            # Check if the LICENSE file at package root is Apache 2.0
+            package_root = ProjectSettings.get_package_root(package)
+            license_file_path = os.path.join(package_root, "LICENSE")
+            if os.path.exists(license_file_path):
+                with open(license_file_path, "r") as license_file:
+                    # LICENSE file found, check it is Apache 2.0 license
+                    license_str = license_file.read()
+                    license_md5 = StringUtil.md5_hex(license_str)
+                    is_apache = license_md5 == APACHE_LICENSE_MD5
+            else:
+                # LICENSE file not found, assume commercial license
+                is_apache = False
 
-        # Go to the next package if no paths are added
-        if len(package_root_paths) == 0:
-            continue
+            # Add paths to source, stubs, and test directories
+            package_root_paths = []
+            if (x := ProjectSettings.get_source_root(package)) is not None and x not in all_root_paths:
+                package_root_paths.append(x)
+                all_root_paths.add(x)
+            if (x := ProjectSettings.get_stubs_root(package)) is not None and x not in all_root_paths:
+                package_root_paths.append(x)
+                all_root_paths.add(x)
+            if (x := ProjectSettings.get_tests_root(package)) is not None and x not in all_root_paths:
+                package_root_paths.append(x)
+                all_root_paths.add(x)
 
-        # If not specified by the user, select APACHE_HEADER or DEFAULT_HEADER
-        copyright_header = APACHE_HEADER if is_apache else DEFAULT_HEADER
-        copyright_header_md5 = StringUtil.md5_hex(copyright_header)
+            # Go to the next package if no paths are added
+            if len(package_root_paths) == 0:
+                continue
 
-        # Use default include patterns if not specified by the caller
-        if file_include_patterns is None:
-            file_include_patterns = ["*.py"]
+            # If not specified by the user, select APACHE_HEADER or DEFAULT_HEADER
+            copyright_header = APACHE_HEADER if is_apache else DEFAULT_HEADER
+            copyright_header_md5 = StringUtil.md5_hex(copyright_header)
 
-        # Use default exclude patterns if not specified by the caller
-        if file_exclude_patterns is None:
-            file_exclude_patterns = ["__init__.py", "_version.py"]
+            # Use default include patterns if not specified by the caller
+            if file_include_patterns is None:
+                file_include_patterns = ["*.py"]
 
-        # Apply to each element of root_paths
-        for root_path in package_root_paths:
-            # Walk the directory tree
-            for dir_path, dir_names, filenames in os.walk(root_path):
-                # Apply exclude patterns
-                filenames = [x for x in filenames if not any(fnmatch(x, y) for y in file_exclude_patterns)]
+            # Use default exclude patterns if not specified by the caller
+            if file_exclude_patterns is None:
+                file_exclude_patterns = ["__init__.py", "_version.py"]
 
-                # Apply include patterns
-                filenames = [x for x in filenames if any(fnmatch(x, y) for y in file_include_patterns)]
+            # Apply to each element of root_paths
+            for root_path in package_root_paths:
+                # Walk the directory tree
+                for dir_path, dir_names, filenames in os.walk(root_path):
+                    # Apply exclude patterns
+                    filenames = [x for x in filenames if not any(fnmatch(x, y) for y in file_exclude_patterns)]
 
-                for filename in filenames:
-                    # Load the file
-                    file_path = os.path.join(dir_path, filename)
-                    remaining_lines = None
-                    with open(file_path, "r") as file:
-                        # Check for the correct copyright header (disregard the trailing blank line)
-                        file_header = file.read(len(copyright_header))
-                        file_header_md5 = StringUtil.md5_hex(file_header)
+                    # Apply include patterns
+                    filenames = [x for x in filenames if any(fnmatch(x, y) for y in file_include_patterns)]
 
-                        if file_header_md5 != copyright_header_md5:
-                            # Add to the list of results if it does not start from the copyright header
-                            files_with_copyright_header_error.append(str(file_path))
-                        else:
-                            # Otherwise check if trailing blank line is present
-                            # Read the next line and check if it is a blank line or it consists only of whitespace
-                            next_line = file.readline()
-                            if next_line.strip(" ") != "\n":
-                                # Add to the list for information purposes even if the error will be fixed
-                                files_with_trailing_line_error.append(str(file_path))
-                                if fix_trailing_blank_line:
-                                    # Read the remaining lines only if the error is being fixed
-                                    remaining_lines = file.readlines()
+                    for filename in filenames:
+                        # Load the file
+                        file_path = os.path.join(dir_path, filename)
+                        remaining_lines = None
+                        with open(file_path, "r") as file:
+                            # Check for the correct copyright header (disregard the trailing blank line)
+                            file_header = file.read(len(copyright_header))
+                            file_header_md5 = StringUtil.md5_hex(file_header)
 
-                    if remaining_lines is not None:
-                        # Combine the copyright header with trailing blank line with
-                        # 'next_line' and 'remaining_lines' and write back to the file
-                        updated_text = copyright_header + "\n" + next_line + "".join(remaining_lines)
-                        with open(file_path, "w") as file:
-                            file.write(updated_text)
+                            if file_header_md5 != copyright_header_md5:
+                                # Add to the list of results if it does not start from the copyright header
+                                files_with_copyright_header_error.append(str(file_path))
+                            else:
+                                # Otherwise check if trailing blank line is present
+                                # Read the next line and check if it is a blank line or it consists only of whitespace
+                                next_line = file.readline()
+                                if next_line.strip(" ") != "\n":
+                                    # Add to the list for information purposes even if the error will be fixed
+                                    files_with_trailing_line_error.append(str(file_path))
+                                    if fix_trailing_blank_line:
+                                        # Read the remaining lines only if the error is being fixed
+                                        remaining_lines = file.readlines()
 
-    if files_with_copyright_header_error:
-        raise RuntimeError(
-            "Invalid copyright header in file(s):\n"
-            + "".join([f"    {file}\n" for file in files_with_copyright_header_error])
-        )
-    elif files_with_trailing_line_error:
-        files_with_trailing_line_msg = "missing blank line(s) after copyright header in file(s):\n" + "".join(
-            [f"    {file}\n" for file in files_with_trailing_line_error]
-        )
-        if not fix_trailing_blank_line:
-            raise RuntimeError(f"Found {files_with_trailing_line_msg}")
+                        if remaining_lines is not None:
+                            # Combine the copyright header with trailing blank line with
+                            # 'next_line' and 'remaining_lines' and write back to the file
+                            updated_text = copyright_header + "\n" + next_line + "".join(remaining_lines)
+                            with open(file_path, "w") as file:
+                                file.write(updated_text)
+
+        if files_with_copyright_header_error:
+            raise RuntimeError(
+                "Invalid copyright header in file(s):\n"
+                + "".join([f"    {file}\n" for file in files_with_copyright_header_error])
+            )
+        elif files_with_trailing_line_error:
+            files_with_trailing_line_msg = "missing blank line(s) after copyright header in file(s):\n" + "".join(
+                [f"    {file}\n" for file in files_with_trailing_line_error]
+            )
+            if not fix_trailing_blank_line:
+                raise RuntimeError(f"Found {files_with_trailing_line_msg}")
+            elif verbose:
+                print(f"Fixed {files_with_trailing_line_msg}")
         elif verbose:
-            print(f"Fixed {files_with_trailing_line_msg}")
-    elif verbose:
-        print(
-            "Verified copyright header and trailing blank line under directory root(s):\n"
-            + "".join([f"    {x}\n" for x in sorted(all_root_paths)])
-        )
+            print(
+                "Verified copyright header and trailing blank line under directory root(s):\n"
+                + "".join([f"    {x}\n" for x in sorted(all_root_paths)])
+            )

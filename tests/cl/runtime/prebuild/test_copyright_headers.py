@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.prebuild.copyright_header import check_copyright_headers
+from cl.runtime.prebuild.copyright_util import CopyrightUtil
 
 
 def test_copyright_headers():
     """Prebuild test to check that the specified copyright header is present in all code directories."""
 
     # Get the list files where copyright header is missing, incorrect, or not followed by a blank line
-    check_copyright_headers()
+    CopyrightUtil.check_copyright_headers()
 
 
 if __name__ == "__main__":

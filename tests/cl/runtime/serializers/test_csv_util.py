@@ -70,9 +70,9 @@ def test_requires_quotes():
 def test_check_or_fix_file(pytest_work_dir):
     """Test CsvUtil.check_or_fix_file() method."""
 
-    assert CsvUtil.check_or_fix_file("valid.csv", apply_fix=False)
-    assert not CsvUtil.check_or_fix_file("unescaped_date.csv", apply_fix=False)
-    assert not CsvUtil.check_or_fix_file("unescaped_float.csv", apply_fix=False)
+    assert CsvUtil.check_or_fix_quotes("valid.csv", apply_fix=False)
+    assert not CsvUtil.check_or_fix_quotes("unescaped_date.csv", apply_fix=False)
+    assert not CsvUtil.check_or_fix_quotes("unescaped_float.csv", apply_fix=False)
 
 if __name__ == "__main__":
     pytest.main([__file__])
