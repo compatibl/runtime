@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.prebuild.csv_file_util import CsvFileUtil
 
 
-def test_csv_preloads():
+def test_csv_quotes():
     """Prebuild test to check that CSV preloads follow the format rules."""
 
     # Get the list files where copyright header is missing, incorrect, or not followed by a blank line

@@ -12,52 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import re
-
-
-def update_text(text: str) -> str:
-    """Update Timestamp format in text."""
-    # Pattern for the legacy format
-    legacy_pattern = r"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z-([a-fA-F0-9]{20})"
-    # Replace delimiters to match new format
-    new_format = r"\1-\2-\3-\4-\5-\6-\7-\8"
-
-    # Perform the substitution
-    updated_text = re.sub(legacy_pattern, new_format, text)
-    return updated_text
-
-
-def update_file(file_path: str):
-    """Update Timestamp format in file."""
-    with open(file_path, 'r', encoding='utf-8') as file:
-        content = file.read()
-
-    # Replace the target string with the replacement
-    content = update_text(content)
-
-    # Write back to the file
-    with open(file_path, 'w', encoding='utf-8') as file:
-        file.write(content)
-
-
-def update_dir(dir_path: str):
-    """Update Timestamp format in text in all directories under the specified root."""
-    for root, dirs, files in os.walk(dir_path):
-        for file in files:
-            if file.endswith(".completions.csv"):
-                file_path = os.path.join(root, file)
-                update_file(file_path)
-                print(f"Timestamp format updated in: {file_path}")
-
+from cl.runtime.prebuild.timestamp_format_util import TimestampFormatUtil
 
 if __name__ == '__main__':
 
-    # Replace by the desired root
-    root_dir = None
-
-    if root_dir is None:
-        raise RuntimeError("Specify root directory for Timestamp format update.")
-
     # Update Timestamp format in text in all directories under the specified root.
-    update_dir(root_dir)  # noqa
+    TimestampFormatUtil.update_timestamps(
+        file_include_patterns=["*.completions.csv"],
+    )
