@@ -20,7 +20,7 @@ from stubs.cl.runtime.templates.stub_template import StubTemplate
 
 
 def test_template_mixin(pytest_default_db):
-    """Test rendering StubDataclassPrimitiveFields."""
+    """Test rendering TemplateMixin."""
 
     engine = FstringTemplateEngine()
     data = StubDataclassNestedFields()
