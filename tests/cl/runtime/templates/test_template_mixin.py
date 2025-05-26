@@ -39,7 +39,7 @@ def test_template_mixin(pytest_default_db):
     )
 
     # Render and validate
-    template = StubTemplate(body=body,engine=engine).build()
+    template = StubTemplate(body=body, engine=engine).build()
     result = template.render(data)
     assert result == expected_result
 

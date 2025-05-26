@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic
+from typing import TypeVar
 from cl.runtime import RecordMixin
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.records.protocols import TKey, TData
+from cl.runtime.records.protocols import TKey
 from cl.runtime.templates.template_engine import TemplateEngine
 from cl.runtime.templates.template_engine_key import TemplateEngineKey
 
