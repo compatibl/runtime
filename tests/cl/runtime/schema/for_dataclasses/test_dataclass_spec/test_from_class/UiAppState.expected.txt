@@ -46,4 +46,8 @@ fields:
     remaining:
       schema_type_name: str
       optional: false
+- field_name: full_screen_mode
+  type_hint:
+    schema_type_name: bool
+    optional: true
 

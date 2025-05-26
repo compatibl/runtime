@@ -73,6 +73,14 @@ cl.UiAppState:
           - The secret names should be in snake_case, for example ["openai_api_key", "anthropic_api_key"] 
     Vector: true
     Optional: true
+  - Value:
+      Type: Bool
+    Name: FullScreenMode
+    Comment: |-
+      Flag indicating whether the UI is in full-screen mode (e.g., only a single active tab is visible with a 
+      minimalistic interface).
+    Vector: false
+    Optional: true
   Keys:
   - User
 cl.BaseTypeInfo:

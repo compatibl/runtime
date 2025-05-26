@@ -72,6 +72,14 @@ elements:
         - The secret names should be in snake_case, for example ["openai_api_key", "anthropic_api_key"] 
   vector: true
   optional: true
+- value:
+    type_: Bool
+  name: FullScreenMode
+  comment: |-
+    Flag indicating whether the UI is in full-screen mode (e.g., only a single active tab is visible with a 
+    minimalistic interface).
+  vector: false
+  optional: true
 keys:
 - User
 

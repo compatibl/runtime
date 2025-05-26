@@ -19,6 +19,7 @@ from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.record_mixin import RecordMixin
 
 
@@ -26,34 +27,40 @@ from cl.runtime.records.record_mixin import RecordMixin
 class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
     """UiAppState."""
 
-    opened_tabs: List[TabInfo] | None = None
+    opened_tabs: List[TabInfo] | None = optional()
     """Information about opened tabs."""
 
-    active_tab_index: int | None = None
+    active_tab_index: int | None = optional()
     """Index of active opened tab."""
 
-    backend_version: str | None = None
+    backend_version: str | None = optional()
     """DEPRECATED. Use versions instead."""
 
-    versions: Dict[str, str] | None = None
+    versions: Dict[str, str] | None = optional()
     """Component versions."""
 
-    application_name: str | None = None
+    application_name: str | None = optional()
     """Application name."""
 
-    read_only: bool | None = None
+    read_only: bool | None = optional()
     """Flag indicating that UI is read-only."""
 
-    application_theme: str | None = None
+    application_theme: str | None = optional()
     """Application theme (dark, light, etc.)."""
 
-    user_secret_identifiers: List[str] | None = None
+    user_secret_identifiers: List[str] | None = optional()
     """
     Suggested key names in My Keys section of the head and shoulders dialog.
 
     Notes:
         - This is a list of suggestions, no restriction on entering secrets with other names
         - The secret names should be in snake_case, for example ["openai_api_key", "anthropic_api_key"] 
+    """
+
+    full_screen_mode: bool | None = optional()
+    """
+    Flag indicating whether the UI is in full-screen mode (e.g., only a single active tab is visible with a 
+    minimalistic interface).
     """
 
     def get_key(self) -> UiAppStateKey:
