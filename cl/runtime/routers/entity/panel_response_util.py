@@ -13,9 +13,13 @@
 # limitations under the License.
 
 import logging
-from typing import Any
+from cl.runtime import RecordListView
+from cl.runtime import RecordView
+from cl.runtime import View
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.schema.type_decl import TypeDecl
@@ -23,6 +27,11 @@ from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.views.empty_view import EmptyView
+from cl.runtime.views.key_list_view import KeyListView
+from cl.runtime.views.key_view import KeyView
+from cl.runtime.views.script import Script
+from cl.runtime.views.script_language import ScriptLanguage
 
 # Create serializers
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -33,7 +42,7 @@ class PanelResponseUtil:
     """Response util for the /entity/panel route."""
 
     @classmethod
-    def _get_content(cls, request: PanelRequest) -> dict[str, Any]:
+    def _get_content(cls, request: PanelRequest):
         """Implements /entity/panel route."""
 
         # Get type of the record.
@@ -50,7 +59,6 @@ class PanelResponseUtil:
             )
 
         # Check if the selected type has the needed viewer and get its name (only viewer's label is provided).
-
         # Get handlers from TypeDecl.
         handlers = declare.handlers if (declare := TypeDecl.for_type(type(record)).declare) is not None else None
 
@@ -59,17 +67,22 @@ class PanelResponseUtil:
         ):
             raise RuntimeError(f"Type {TypeUtil.name(record)} has no view named '{request.panel_id}'.")
 
-        # Call the viewer and get the result.
+        # Call viewer method and get the result.
         viewer = getattr(record, viewer_name)
-        view = viewer()
+        viewer_result = viewer()
 
-        # Load record if view result is a key.
-        view = cls._load_keys(view)
+        # Get View object for viewer result.
+        view_for_key = _KEY_SERIALIZER.serialize(record.get_key())
+        view = cls._process_viewer_result(viewer_result, view_for=view_for_key, view_name=viewer_name)
 
-        return _UI_SERIALIZER.serialize(view)
+        # Load nested keys and perform custom View object transformations.
+        view = view.materialize()
+
+        # TODO (Roman): Remove custom serialization method when Generics is supported in base serialization.
+        return cls._serialize_view(view)
 
     @classmethod
-    def get_response(cls, request: PanelRequest) -> dict[str, Any]:
+    def get_response(cls, request: PanelRequest):
 
         try:
             return cls._get_content(request)
@@ -78,33 +91,83 @@ class PanelResponseUtil:
             logger = logging.getLogger(__name__)
             logger.error(str(e), exc_info=True)
 
+            error_view = RecordView(
+                view_for=request.key,
+                view_name=request.panel_id,
+                record=Script(  # noqa
+                    name="Error message",
+                    language=ScriptLanguage.MARKDOWN,
+                    body=["## The following error occurred during the rendering of this view:\n", f"{str(e)}"],
+                    word_wrap=True,
+                ),
+            )
             # Return custom error response.
-            return {  # TODO: Refactor
-                "_t": "Script",
-                "Name": None,
-                "Language": "Markdown",
-                "Body": ["## The following error occurred during the rendering of this view:\n", f"{str(e)}"],
-                "WordWrap": True,
-            }
+            return cls._serialize_view(error_view)
 
     @classmethod
-    def _load_keys(cls, viewer_result):
-        """Check if viewer result is key or list of keys and load records for them."""
+    def _process_viewer_result(cls, viewer_result, view_for: str, view_name: str) -> View:
+        """
+        Convert supported viewer result to the corresponding View object.
 
-        if is_key(viewer_result):
-            # Load one if it is single key.
-            return DbContext.load_one(viewer_result.get_key_type(), viewer_result)
-        elif (
-            isinstance(viewer_result, (list, tuple))
-            and len(viewer_result) > 0
-            and is_key(first_elem := viewer_result[0])
-        ):
-            # Load many if it is list or tuple of keys.
-            loaded = tuple(DbContext.load_many(first_elem.get_key_type(), viewer_result))
-            missing = [(i, viewer_result[i]) for i, x in enumerate(loaded) if x is None]
-            if missing:
-                details = ", ".join(f"index {i}: {repr(key)}" for i, key in missing)
-                raise RuntimeError(f"Failed to load records for keys at {details} in the provided list.")
-            return loaded
-        else:
+        The following viewer results are supported:
+            - Record or list of records;
+            - Key or list of keys;
+            - Any View object;
+            - None value.
+        """
+
+        # Handle empty result.
+        if not viewer_result:
+            return EmptyView(view_for=view_for, view_name=view_name)
+
+        # If the result is a View object, fill in the missing key fields.
+        elif isinstance(viewer_result, View):
+            if viewer_result.view_for is None:
+                viewer_result.view_for = view_for
+
+            if viewer_result.view_name is None:
+                viewer_result.view_name = view_name
+
             return viewer_result
+
+        # If the result is a Key, convert it to a KeyView.
+        elif is_key(viewer_result):
+            return KeyView(view_for=view_for, view_name=view_name, key=viewer_result)
+
+        # If the result is a Record, convert it to a RecordView.
+        elif is_data(viewer_result):
+            return RecordView(view_for=view_for, view_name=view_name, record=viewer_result)
+
+        # If the result is a list of keys or list of records, convert it to an appropriate View.
+        elif isinstance(viewer_result, (list, tuple)):
+
+            # Check iterable value type by first item.
+            if is_key(viewer_result[0]):
+                return KeyListView(view_for=view_for, view_name=view_name, keys=viewer_result)
+            elif is_record(viewer_result[0]):
+                return RecordListView(view_for=view_for, view_name=view_name, records=viewer_result)
+            else:
+                raise RuntimeError(
+                    f"If the viewer result is iterable it must be a list of keys or a list of records. "
+                    f"Other is not supported. Received: {viewer_result}."
+                )
+        else:
+            raise RuntimeError(f"Unsupported viewer result of type '{type(viewer_result)}': {viewer_result}.")
+
+    @classmethod
+    def _serialize_view(cls, view: View):
+        """
+        Serialize View object with custom transformation for generic fields.
+        Should be removed when supported Generics in base serialization.
+        """
+
+        if isinstance(view, RecordView):
+            result = _UI_SERIALIZER.serialize(RecordView(view_for=view.view_for, view_name=view.view_name))
+            result["Record"] = _UI_SERIALIZER.serialize(view.record)
+            return result
+        elif isinstance(view, RecordListView):
+            result = _UI_SERIALIZER.serialize(RecordListView(view_for=view.view_for, view_name=view.view_name))
+            result["Records"] = [_UI_SERIALIZER.serialize(record) for record in view.records if record is not None]
+            return result
+        else:
+            return _UI_SERIALIZER.serialize(view)

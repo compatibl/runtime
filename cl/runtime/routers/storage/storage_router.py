@@ -18,7 +18,6 @@ from fastapi import Body
 from fastapi import Depends
 from fastapi import Header
 from fastapi import Query
-from cl.runtime.legacy.legacy_request_util import LegacyRequestUtil
 from cl.runtime.routers.dependencies.context_headers import ContextHeaders
 from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
@@ -126,12 +125,11 @@ async def post_save(
 ) -> list[KeyRequestItem]:
     """Bulk save records to DB. Don't check if the record already exists."""
 
-    save_request = SaveRequest(
-        user=context_headers.user, env=context_headers.env, dataset=context_headers.dataset, records=records
+    return SaveResponseUtil.save_records(
+        SaveRequest(
+            user=context_headers.user, env=context_headers.env, dataset=context_headers.dataset, records=records
+        )
     )
-
-    save_request = LegacyRequestUtil.format_save_request(save_request)
-    return SaveResponseUtil.save_records(save_request)
 
 
 @router.post("/update", response_model=list[KeyRequestItem])

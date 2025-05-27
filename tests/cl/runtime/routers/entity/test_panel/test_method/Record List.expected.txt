@@ -1,0 +1,101 @@
+_t: RecordListView
+ViewFor: data_viewers
+ViewName: view_record_list
+Records:
+- _t: StubDataclassNestedFields
+  Id: abc
+  BaseField:
+    _t: StubDataclassData
+    StrField: abc
+    IntField: '123'
+  DerivedField:
+    _t: StubDataclassDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+  DerivedFromDerivedField:
+    _t: StubDataclassDerivedFromDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+    DerivedFromDerivedStrField: derived_from_derived
+  PolymorphicField:
+    _t: StubDataclassDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+  PolymorphicDerivedField:
+    _t: StubDataclassDerivedFromDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+    DerivedFromDerivedStrField: derived_from_derived
+  KeyField: uvw
+  RecordAsKeyField:
+    _t: StubDataclassRecord
+    Id: abc
+- _t: StubDataclassNestedFields
+  Id: abc
+  BaseField:
+    _t: StubDataclassData
+    StrField: abc
+    IntField: '123'
+  DerivedField:
+    _t: StubDataclassDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+  DerivedFromDerivedField:
+    _t: StubDataclassDerivedFromDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+    DerivedFromDerivedStrField: derived_from_derived
+  PolymorphicField:
+    _t: StubDataclassDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+  PolymorphicDerivedField:
+    _t: StubDataclassDerivedFromDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+    DerivedFromDerivedStrField: derived_from_derived
+  KeyField: uvw
+  RecordAsKeyField:
+    _t: StubDataclassRecord
+    Id: abc
+- _t: StubDataclassNestedFields
+  Id: abc
+  BaseField:
+    _t: StubDataclassData
+    StrField: abc
+    IntField: '123'
+  DerivedField:
+    _t: StubDataclassDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+  DerivedFromDerivedField:
+    _t: StubDataclassDerivedFromDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+    DerivedFromDerivedStrField: derived_from_derived
+  PolymorphicField:
+    _t: StubDataclassDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+  PolymorphicDerivedField:
+    _t: StubDataclassDerivedFromDerivedData
+    StrField: abc
+    IntField: '123'
+    DerivedStrField: derived
+    DerivedFromDerivedStrField: derived_from_derived
+  KeyField: uvw
+  RecordAsKeyField:
+    _t: StubDataclassRecord
+    Id: abc
+

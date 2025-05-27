@@ -23,6 +23,7 @@ from cl.runtime.view.dag.dag_node_data import DagNodeData
 from cl.runtime.view.dag.nodes.add_text_node import AddTextNode
 from cl.runtime.view.dag.nodes.text_input_node import TextInputNode
 from cl.runtime.view.dag.nodes.text_output_node import TextOutputNode
+from cl.runtime.views.html_view import HtmlView
 from cl.runtime.views.pdf_view import PdfView
 from cl.runtime.views.png_view import PngView
 from cl.runtime.views.script import Script
@@ -68,6 +69,28 @@ class StubMediaViewers(StubViewers):
             content = file.read()
         return PdfView(pdf_bytes=content)
 
+    def view_html(self) -> HtmlView:
+        """Stub viewer returning a HtmlView."""
+        title = "HTML Title"
+        heading = "HTML Heading"
+        paragraph = "Stub text."
+
+        html_content = f"""<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{title}</title>
+        </head>
+        <body>
+            <h1>{heading}</h1>
+            <p>{paragraph}</p>
+        </body>
+        </html>"""
+
+        html_bytes = html_content.encode("utf-8")
+        return HtmlView(html_bytes=html_bytes)
+
     def view_dag(self) -> Dag:
         """Stub viewer returning a DAG."""
 
@@ -105,5 +128,25 @@ class StubMediaViewers(StubViewers):
         return Script(
             name="Stub markdown text.",
             language=ScriptLanguage.MARKDOWN,
-            body=["# Successfully rendered.", "### `This text should be purple`."],
+            body=[
+                "# Test markdown.",
+                "",
+                "Welcome to this **Markdown** document.",
+                "## Introduction",
+                "This is a paragraph explaining the purpose of this document.",
+                "## Features",
+                "",
+                "- Easy to read",
+                "- Easy to write",
+                "- Supports **bold** and *italic* text",
+                "- Allows inserting [links](https://example.com)",
+                "",
+                "### Code Example",
+                "",
+                "Here’s a code snippet:",
+                "",
+                "```python",
+                "def say_hello():",
+                "    print('Hello, Markdown!')",
+            ],
         )

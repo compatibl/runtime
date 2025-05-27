@@ -1,0 +1,28 @@
+_t: RecordView
+ViewFor: media_viewers
+ViewName: view_markdown
+Record:
+  _t: Script
+  Name: Stub markdown text.
+  Language: Markdown
+  Body:
+  - '# Test markdown.'
+  - 
+  - Welcome to this **Markdown** document.
+  - '## Introduction'
+  - This is a paragraph explaining the purpose of this document.
+  - '## Features'
+  - 
+  - '- Easy to read'
+  - '- Easy to write'
+  - '- Supports **bold** and *italic* text'
+  - '- Allows inserting [links](https://example.com)'
+  - 
+  - '### Code Example'
+  - 
+  - 'Here’s a code snippet:'
+  - 
+  - '```python'
+  - 'def say_hello():'
+  - "    print('Hello, Markdown!')"
+

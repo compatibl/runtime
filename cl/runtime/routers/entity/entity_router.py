@@ -17,7 +17,6 @@ from typing import Any
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Query
-from cl.runtime.legacy.legacy_response_util import LegacyResponseUtil
 from cl.runtime.routers.dependencies.context_headers import ContextHeaders
 from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.routers.entity.panel_request import PanelRequest
@@ -46,16 +45,16 @@ async def get_panels(
     )
 
 
-@router.get("/panel", response_model=dict[str, Any])
+@router.get("/panel", response_model=Any)
 async def get_panel(
     context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     type_name: Annotated[str, Query(description="Class name")],
     panel_id: Annotated[str, Query(description="View name")],
     key: Annotated[str | None, Query(description="Primary key fields in semicolon-delimited format")] = None,
-) -> dict[str, Any]:
+) -> Any:
     """Return panel content by its displayed name."""
 
-    response = PanelResponseUtil.get_response(
+    return PanelResponseUtil.get_response(
         PanelRequest(
             user=context_headers.user,
             env=context_headers.env,
@@ -65,4 +64,3 @@ async def get_panel(
             key=key,
         )
     )
-    return LegacyResponseUtil.format_panel_response(response)

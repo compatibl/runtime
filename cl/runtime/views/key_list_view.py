@@ -14,7 +14,9 @@
 
 from dataclasses import dataclass
 from typing import List
+from cl.runtime import RecordListView
 from cl.runtime import View
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
@@ -22,5 +24,11 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class KeyListView(View):
     """List of generic keys in ClassName;key_field_1;key_field_2 format, records are loaded and displayed."""
 
-    key_list: List[str] = required()
+    keys: List[str] = required()
     """List of generic keys in ClassName;key_field_1;key_field_2 format, records are loaded and displayed."""
+
+    def materialize(self) -> RecordListView:
+        """Load records and return RecordListView object. KeyListView is used only for storage in the DB."""
+
+        records = DbContext.load_many(self.keys[0].get_key_type(), self.keys) if self.keys else []
+        return RecordListView(view_for=self.view_for, view_name=self.view_name, records=records)

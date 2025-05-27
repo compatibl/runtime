@@ -13,15 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import final
-from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.views.view import View
+from cl.runtime import View
 
 
-@final
 @dataclass(slots=True, kw_only=True)
-class RecordView(View):
-    """View that displays another record specified via its primary key."""
-
-    record: str = required()
-    """Primary key of the displayed record."""
+class EmptyView(View):
+    """View class for empty viewer method result."""

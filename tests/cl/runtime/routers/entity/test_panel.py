@@ -14,64 +14,71 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.legacy.legacy_response_util import LegacyResponseUtil
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
+from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataViewers
+from stubs.cl.runtime import StubMediaViewers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
-
-def get_requests(key_str: str):
-    """Get requests for testing."""
-    return [
-        # TODO (Roman): Add more test requests.
-        {"type_name": "StubDataViewers", "panel_id": "None", "key": key_str},
-    ]
+_stub_data_viewers = StubDataViewers(stub_id="data_viewers").build()
+_stub_media_viewers = StubMediaViewers(stub_id="media_viewers").build()
 
 
-def get_expected_results(key_str: str):
-    """Get expected_results for testing."""
-    return [
-        {"ViewOf": None},
-    ]
+_data_key = _KEY_SERIALIZER.serialize(_stub_data_viewers.get_key())
+_media_key = _KEY_SERIALIZER.serialize(_stub_media_viewers.get_key())
+
+panel_requests = [
+    {"type_name": "StubDataViewers", "panel_id": "None", "key": _data_key},
+    {"type_name": "StubDataViewers", "panel_id": "Nested Fields Record", "key": _data_key},
+    {"type_name": "StubDataViewers", "panel_id": "Record List", "key": _data_key},
+    {"type_name": "StubMediaViewers", "panel_id": "Png", "key": _media_key},
+    {"type_name": "StubMediaViewers", "panel_id": "Pdf", "key": _media_key},
+    {"type_name": "StubMediaViewers", "panel_id": "Html", "key": _media_key},
+    {"type_name": "StubMediaViewers", "panel_id": "Dag", "key": _media_key},
+    {"type_name": "StubMediaViewers", "panel_id": "Markdown", "key": _media_key},
+]
 
 
 def test_method(pytest_default_db):
     """Test coroutine for /entity/panel route."""
 
-    stub_viewers = StubDataViewers().build()
-    key_str = _KEY_SERIALIZER.serialize(stub_viewers.get_key())
-    DbContext.save_one(stub_viewers)
+    DbContext.save_one(_stub_data_viewers)
+    DbContext.save_one(_stub_media_viewers)
 
-    for request, expected_result in zip(get_requests(key_str), get_expected_results(key_str)):
+    for request in panel_requests:
         request_object = PanelRequest(**request)
-        result = LegacyResponseUtil.format_panel_response(PanelResponseUtil.get_response(request_object))
+        result = PanelResponseUtil.get_response(request_object)
 
-        assert isinstance(result, dict)
-        assert result == expected_result
+        result = BootstrapSerializers.YAML.serialize(result)
+        RegressionGuard(channel=request_object.panel_id).write(result)
+
+    RegressionGuard().verify_all()
 
 
 def test_api(pytest_default_db):
     """Test REST API for /entity/panel route."""
 
-    stub_viewers = StubDataViewers().build()
-    key_str = _KEY_SERIALIZER.serialize(stub_viewers.get_key())
-    DbContext.save_one(stub_viewers)
+    DbContext.save_one(_stub_data_viewers)
+    DbContext.save_one(_stub_media_viewers)
 
     with QaClient() as test_client:
-        for request, expected_result in zip(get_requests(key_str), get_expected_results(key_str)):
+        for request in panel_requests:
 
             # Get response
             response = test_client.get("/entity/panel", params=request)
             assert response.status_code == 200
             result = response.json()
 
-            # Check result
-            assert result == expected_result
+            result = BootstrapSerializers.YAML.serialize(result)
+            RegressionGuard(channel=request["panel_id"]).write(result)
+
+    RegressionGuard().verify_all()
 
 
 if __name__ == "__main__":

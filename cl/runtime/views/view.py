@@ -24,3 +24,12 @@ class View(ViewKey, RecordMixin, ABC):
 
     def get_key(self) -> ViewKey:
         return ViewKey(view_for=self.view_for, view_name=self.view_name).build()
+
+    def materialize(self) -> "View":
+        """
+        Method called before returning the View to the UI.
+
+        For example, if View is a reference object, we need to load the key fields before returning the View to the UI.
+        Can return Self type or another View.
+        """
+        return self
