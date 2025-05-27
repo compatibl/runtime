@@ -85,7 +85,7 @@ class TypeHint(BootstrapMixin):
     def validate_for_mapping(self) -> None:
         """Raise an error if the type hint is not a mapping."""
         if not self.schema_type_name in MAPPING_TYPE_NAMES:
-            raise RuntimeError(f"The data is a mapping but type hint {self.to_str()} does not.")
+            raise RuntimeError(f"The data is a mapping but the type hint {self.to_str()} is not.")
         elif not self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is a mapping but does not specify item type.")
 
