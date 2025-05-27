@@ -34,7 +34,7 @@ class StubPlotViewers(StubViewers):
         matrix_plot.title = "Confusion Matrix"
         matrix_plot.expected_categories = raw_data["True Category"].values.tolist()
         matrix_plot.received_categories = raw_data["Predicted"].values.tolist()
-        return matrix_plot
+        return matrix_plot.build()
 
     def view_confusion_matrix_plot_png(self):
         """Png viewer for MatplotlibPlot with theme."""
