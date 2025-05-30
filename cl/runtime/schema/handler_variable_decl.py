@@ -20,7 +20,7 @@ from typing import get_args
 from typing import get_origin
 from memoization import cached
 from typing_extensions import Self
-from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_primitive, is_sequence
 from cl.runtime.schema.member_decl import MemberDecl
 from cl.runtime.schema.value_decl import ValueDecl
 
@@ -77,7 +77,7 @@ class HandlerVariableDecl(MemberDecl):
             result.optional = False
 
         # Check for one of the supported container types
-        if type_origin is list:
+        if is_sequence(type_origin):
             # Get the type of value inside the container
             result.vector = True
             value_type_ = type_args[0]
