@@ -13,19 +13,29 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
-from cl.runtime.experiments.classifier_trial import ClassifierTrial
+from cl.runtime.experiments.classifier_experiment_mixin import ClassifierExperimentMixin
+from stubs.cl.runtime.experiments.stub_classifier_experiment_key import StubClassifierExperimentKey
+from stubs.cl.runtime.experiments.stub_classifier_trial import StubClassifierTrial
 
 
 @dataclass(slots=True, kw_only=True)
-class StubClassifierExperiment(ClassifierExperiment):
-    """Stub implementation of ClassifierExperiment."""
+class StubClassifierExperiment(StubClassifierExperimentKey, ClassifierExperimentMixin[StubClassifierExperimentKey, StubClassifierTrial]):
+    """Stub implementation of ClassifierExperimentMixin."""
 
-    def run_one(self) -> None:
-        # Create a trial record with random result
-        trial = ClassifierTrial(
+    max_trials: int | None = None
+    """Maximum number of trials to run (optional)."""
+
+    max_parallel: int | None = None
+    """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
+
+    def get_key(self) -> StubClassifierExperimentKey:
+        return StubClassifierExperimentKey(experiment_id=self.experiment_id).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+    def create_trial(self) -> StubClassifierTrial:
+        return StubClassifierTrial(
             experiment=self.get_key(),
-            label="abc",
+            result="A",
         ).build()
-        DbContext.save_one(trial)

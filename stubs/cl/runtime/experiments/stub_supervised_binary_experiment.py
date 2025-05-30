@@ -13,21 +13,30 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.experiments.supervised_binary_experiment import SupervisedBinaryExperiment
-from cl.runtime.experiments.supervised_binary_trial import SupervisedBinaryTrial
+from cl.runtime.experiments.supervised_binary_experiment_mixin import SupervisedBinaryExperimentMixin
+from stubs.cl.runtime.experiments.stub_supervised_binary_experiment_key import StubSupervisedBinaryExperimentKey
+from stubs.cl.runtime.experiments.stub_supervised_binary_trial import StubSupervisedBinaryTrial
 
 
 @dataclass(slots=True, kw_only=True)
-class StubSupervisedBinaryExperiment(SupervisedBinaryExperiment):
-    """Stub implementation of SupervisedBinaryExperiment."""
+class StubSupervisedBinaryExperiment(StubSupervisedBinaryExperimentKey, SupervisedBinaryExperimentMixin[StubSupervisedBinaryExperimentKey, StubSupervisedBinaryTrial]):
+    """Stub implementation of SupervisedBinaryExperimentMixin."""
 
-    def run_one(self) -> None:
+    max_trials: int | None = None
+    """Maximum number of trials to run (optional)."""
 
-        # Create a trial record with random result
-        trial = SupervisedBinaryTrial(
+    max_parallel: int | None = None
+    """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
+
+    def get_key(self) -> StubSupervisedBinaryExperimentKey:
+        return StubSupervisedBinaryExperimentKey(experiment_id=self.experiment_id).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+    def create_trial(self) -> StubSupervisedBinaryTrial:
+        return StubSupervisedBinaryTrial(
             experiment=self.get_key(),
-            actual_outcome=True,
-            expected_outcome=True,
+            result=True,
+            expected=True,
         ).build()
-        DbContext.save_one(trial)

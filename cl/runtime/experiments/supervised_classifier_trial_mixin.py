@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
-from typing import Generic, Sequence
-from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.experiments.experiment_mixin import ExperimentMixin, TTrial
+from abc import ABC, abstractmethod
+from typing import Generic
+from cl.runtime.experiments.classifier_trial_mixin import ClassifierTrialMixin
+from cl.runtime.experiments.trial_mixin import TExperimentKey
 from cl.runtime.records.protocols import TKey
 
 
-class BinaryExperimentMixin(Generic[TKey, TTrial], ExperimentMixin[TKey, TTrial], ABC):
-    """Mixin class for an unsupervised statistical experiment where each trial has True or False outcome."""
+class SupervisedClassifierTrialMixin(Generic[TKey, TExperimentKey], ClassifierTrialMixin[TKey, TExperimentKey], ABC):
+    """Single trial of a supervised experiment where each trial has True or False outcome."""
 
-    __slots__ = ()
-    """To prevent creation of __dict__ in derived types."""
-
+    @property
+    @abstractmethod
+    def expected(self) -> str:
+        """Expected result of the trial (class label)."""

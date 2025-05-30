@@ -14,7 +14,7 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Sequence
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import TKey
@@ -69,6 +69,15 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
         """The actual type passed as TTrial argument to the generic definition of this class or its descendants."""
         # Second argument of ExperimentMixin[TKey, TTrial]
         return GenericUtil.get_generic_args(cls, ExperimentMixin)["TTrial"]
+
+    def view_trials(self) -> Sequence[TTrial]:
+        """View trials of the experiment."""
+        # Get trial type at runtime
+        trial_type = self.get_trial_type()
+        # TODO: Use query
+        all_trials = DbContext.load_all(trial_type)
+        trials = [trial for trial in all_trials if trial.experiment.experiment_id == self.experiment_id]
+        return trials
 
     def save_trial(self) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""

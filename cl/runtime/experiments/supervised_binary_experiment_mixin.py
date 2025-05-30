@@ -13,15 +13,13 @@
 # limitations under the License.
 
 from abc import ABC
-from typing import Generic, Sequence
-from cl.runtime.contexts.db_context import DbContext
+from typing import Generic
 from cl.runtime.experiments.experiment_mixin import ExperimentMixin, TTrial
 from cl.runtime.records.protocols import TKey
 
 
-class BinaryExperimentMixin(Generic[TKey, TTrial], ExperimentMixin[TKey, TTrial], ABC):
+class SupervisedBinaryExperimentMixin(Generic[TKey, TTrial], ExperimentMixin[TKey, TTrial], ABC):
     """Mixin class for an unsupervised statistical experiment where each trial has True or False outcome."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
-

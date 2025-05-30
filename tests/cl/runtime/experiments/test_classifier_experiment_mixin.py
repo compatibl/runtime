@@ -19,7 +19,7 @@ from stubs.cl.runtime.experiments.stub_classifier_experiment import StubClassifi
 
 
 def test_smoke(pytest_basic_mongo_mock_db):
-    """Test for BinaryExperiment class with supervised=True."""
+    """Test for ClassifierExperimentMixin."""
 
     # Create and run the experiment
     experiment = StubClassifierExperiment(

@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
-from typing import Generic, Sequence
-from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.experiments.experiment_mixin import ExperimentMixin, TTrial
-from cl.runtime.records.protocols import TKey
+from dataclasses import dataclass
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 
 
-class BinaryExperimentMixin(Generic[TKey, TTrial], ExperimentMixin[TKey, TTrial], ABC):
-    """Mixin class for an unsupervised statistical experiment where each trial has True or False outcome."""
+@dataclass(slots=True)
+class StubSupervisedClassifierExperimentKey(KeyMixin):
+    """Unsupervised experiment where each trial has True or False outcome."""
 
-    __slots__ = ()
-    """To prevent creation of __dict__ in derived types."""
+    experiment_id: str = required()
+    """Unique experiment identifier."""
 
+    @classmethod
+    def get_key_type(cls) -> type:
+        return StubSupervisedClassifierExperimentKey
