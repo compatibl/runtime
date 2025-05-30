@@ -16,12 +16,13 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Generic, TypeVar, Sequence
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.experiments.trial_mixin import TrialMixin
 from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 
-TTrial = TypeVar("TTrial")
+TTrial = TypeVar("TTrial", bound=TrialMixin)
 """Generic type parameter for the trial record."""
 
 
@@ -70,7 +71,7 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
         # Second argument of ExperimentMixin[TKey, TTrial]
         return GenericUtil.get_generic_args(cls, ExperimentMixin)["TTrial"]
 
-    def view_trials(self) -> Sequence[TTrial]:
+    def view_trials(self) -> Sequence[TrialMixin]:
         """View trials of the experiment."""
         # Get trial type at runtime
         trial_type = self.get_trial_type()
