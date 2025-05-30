@@ -19,9 +19,7 @@ from memoization import cached
 from cl.runtime.records.type_util import TypeUtil
 
 _INHERITED_SLOTS = sys.version_info >= (3, 11)
-"""
-In Python 3.11+, slots are automatically inherited from base classes. Child classes only need to declare new slots.
-"""
+"""In Python 3.11+, __slots__ from base are included in __slots__ of descendants."""
 
 
 class SlotsUtil:
