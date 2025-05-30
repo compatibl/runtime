@@ -78,7 +78,7 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
     def run_one(self) -> None:
         """Run one trial, error if max_trials is already reached or exceeded."""
         # This will raise an error if the maximum number of trials has been reached
-        self.count_remaining_trials()
+        self._query_remaining_trials_and_check_limit()
         # Create and save one trial
         self.save_trial()
 
@@ -86,7 +86,7 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
         """Run up to the specified number of trials, stop when max_trials is reached or exceeded."""
 
         # This will raise an error if the maximum number of trials has been reached
-        num_remaining = self.count_remaining_trials(num_trials=num_trials)
+        num_remaining = self._query_remaining_trials_and_check_limit(num_trials=num_trials)
 
         # Create and save up to num_trials but not exceeding max_trials if set
         if self.max_parallel is None or self.max_parallel <= 1:
@@ -101,7 +101,7 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
         """Run trials until the specified total number (max_trials) is reached or exceeded."""
 
         # This will raise an error if the maximum number of trials has been reached
-        if (num_remaining := self.count_remaining_trials()) is None:
+        if (num_remaining := self._query_remaining_trials_and_check_limit()) is None:
             raise RuntimeError(
                 f"Cannot invoke run_all for experiment {self.experiment_id}\n"
                 f"because max_trials is not set, use run_one or run_many instead."
@@ -115,7 +115,7 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
             # TODO: Implement parallel execution of trials
             raise RuntimeError(f"Cannot run trials in parallel for experiment {self.experiment_id}.")
 
-    def count_existing_trials(self) -> int:
+    def query_existing_trials(self) -> int:
         """Get the remaining of existing trials."""
         # TODO: !! Implement DbContext.count method
         # Load trials for this experiment
@@ -125,8 +125,14 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
         num_existing_trials = len(tuple(x for x in trial_keys if x.experiment.experiment_id == self.experiment_id))
         return num_existing_trials
 
-    def count_remaining_trials(self, *, num_trials: int | None = None) -> int | None:
-        """Get the remaining number of trials to run, given the current number of completed trials."""
+    def query_remaining_trials(self, *, num_trials: int | None = None) -> int | None:
+        """
+        Get the remaining number of trials to run, given the current number of completed trials.
+
+        Notes:
+            - Requires a DB query and may be slow, cache the result if possible
+            - Returns None if both max_trials and num_trials are None.
+        """
 
         if num_trials is not None and num_trials <= 0:
             raise RuntimeError(f"Parameter num_trials={num_trials} must be None or a positive number.")
@@ -138,13 +144,27 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
                 # Return None if both max_trials and num_trials are None
                 return None
         else:
-            if (num_existing_trials := self.count_existing_trials()) < self.max_trials:
+            if (num_existing_trials := self.query_existing_trials()) < self.max_trials:
                 if num_trials is not None:
                     # The result does not exceed num_trials if specified,
                     return min(self.max_trials - num_existing_trials, num_trials)
                 else:
                     return self.max_trials - num_existing_trials
             else:
-                # The maximum number of trials has been reached or exceeded
-                raise RuntimeError(f"The maximum number of trials ({self.max_trials}) has already been reached\n"
-                                   f"for {TypeUtil.name(self)} with experiment_id={self.experiment_id}.")
+                # The maximum number of trials has been reached or exceeded, return 0
+                return 0
+
+    def _query_remaining_trials_and_check_limit(self, *, num_trials: int | None = None) -> int:
+        """
+        Error message if the maximum number of trials has been reached or exceeded, otherwise the number
+        of remaining trials to run, given the current number of completed trials.
+
+        Notes:
+            - Requires a DB query and may be slow, cache the result if possible
+            - Returns None if both max_trials and num_trials are None.
+        """
+        result = self.query_remaining_trials(num_trials=num_trials)
+        if result == 0:
+            raise RuntimeError(f"The maximum number of trials ({self.max_trials}) has already been reached\n"
+                               f"for {TypeUtil.name(self)} with experiment_id={self.experiment_id}.")
+        return result

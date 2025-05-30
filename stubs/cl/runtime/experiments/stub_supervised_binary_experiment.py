@@ -24,10 +24,6 @@ class StubSupervisedBinaryExperiment(SupervisedBinaryExperiment):
 
     def run_one(self) -> None:
 
-        # Exit if there are no remaining trials
-        if self.is_max_trials_reached_or_exceeded():
-            return
-
         # Create a trial record with random result
         trial = SupervisedBinaryTrial(
             experiment=self.get_key(),

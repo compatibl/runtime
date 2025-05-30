@@ -56,7 +56,7 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
 
         if self.max_parallel is None or self.max_parallel <= 1:
             # Run sequentially
-            num_remaining = self.count_remaining_trials(num_trials=num_trials)
+            num_remaining = self.query_remaining_trials(num_trials=num_trials)
             consume(self.run_one() for _ in range(num_remaining))
         else:
             # TODO: Implement parallel execution of trials
@@ -65,7 +65,7 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
     def run_all(self) -> None:
         """Run trials until the specified total number (max_trials) is reached or exceeded."""
 
-        if (num_remaining := self.count_remaining_trials()) is None:
+        if (num_remaining := self.query_remaining_trials()) is None:
             raise RuntimeError(
                 f"Cannot invoke run_all for experiment {self.experiment_id}\n"
                 f"because max_trials is not set, use run_one or run_many instead."
@@ -78,7 +78,7 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
             # TODO: Implement parallel execution of trials
             raise RuntimeError(f"Cannot run trials in parallel for experiment {self.experiment_id}.")
 
-    def count_existing_trials(self) -> int:
+    def query_existing_trials(self) -> int:
         """Get the remaining of existing trials."""
         # TODO: !! Implement DbContext.count method
         # Load trials for this experiment
@@ -88,7 +88,7 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
         num_existing_trials = len(tuple(x for x in trial_keys if x.experiment == experiment_key))
         return num_existing_trials
 
-    def count_remaining_trials(self, *, num_trials: int | None = None) -> int | None:
+    def query_remaining_trials(self, *, num_trials: int | None = None) -> int | None:
         """Get the remaining number of trials to run, given the current number of completed trials."""
 
         if num_trials is not None and num_trials <= 0:
@@ -101,7 +101,7 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
                 # Return None if both max_trials and num_trials are None
                 return None
         else:
-            if (num_existing_trials := self.count_existing_trials()) < self.max_trials:
+            if (num_existing_trials := self.query_existing_trials()) < self.max_trials:
                 if num_trials is not None:
                     # The result does not exceed num_trials if specified,
                     return min(self.max_trials - num_existing_trials, num_trials)
@@ -110,7 +110,3 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
             else:
                 # The maximum number of trials has been reached or exceeded
                 return 0
-
-    def is_max_trials_reached_or_exceeded(self, *, num_trials: int | None = None) -> bool:
-        """Return True if max_trials has been reached or exceeded, False otherwise or if max_trials is not set."""
-        return self.max_trials is not None and self.count_existing_trials() >= self.max_trials

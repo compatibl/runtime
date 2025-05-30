@@ -27,15 +27,14 @@ def test_run_many(pytest_basic_mongo_mock_db):
     )
 
     # Run the experiment in stages
-    assert max_trials_not_set.count_existing_trials() == 0
-    assert max_trials_not_set.count_remaining_trials() is None
-    assert not max_trials_not_set.is_max_trials_reached_or_exceeded()
+    assert max_trials_not_set.query_existing_trials() == 0
+    assert max_trials_not_set.query_remaining_trials() is None
 
     max_trials_not_set.run_one()
-    assert max_trials_not_set.count_existing_trials() == 1
+    assert max_trials_not_set.query_existing_trials() == 1
 
     max_trials_not_set.run_many(num_trials=3)
-    assert max_trials_not_set.count_existing_trials() == 4
+    assert max_trials_not_set.query_existing_trials() == 4
 
     # Create and run the experiment with max_trials set to 5
     max_trials_set = StubBinaryExperiment(
@@ -44,28 +43,27 @@ def test_run_many(pytest_basic_mongo_mock_db):
     )
 
     # Run the experiment in stages
-    assert max_trials_set.count_existing_trials() == 0
-    assert max_trials_set.count_remaining_trials() == 5
-    assert not max_trials_set.is_max_trials_reached_or_exceeded()
+    assert max_trials_set.query_existing_trials() == 0
+    assert max_trials_set.query_remaining_trials() == 5
 
     max_trials_set.run_one()
-    assert max_trials_set.count_existing_trials() == 1
-    assert max_trials_set.count_remaining_trials() == 4
+    assert max_trials_set.query_existing_trials() == 1
+    assert max_trials_set.query_remaining_trials() == 4
 
     max_trials_set.run_many(num_trials=3)
-    assert max_trials_set.count_existing_trials() == 4
-    assert max_trials_set.count_remaining_trials() == 1
+    assert max_trials_set.query_existing_trials() == 4
+    assert max_trials_set.query_remaining_trials() == 1
 
     # Stop when max_trials is reached
     max_trials_set.run_many(num_trials=3)
-    assert max_trials_set.count_existing_trials() == 5
-    assert max_trials_set.count_remaining_trials() == 0
-    assert max_trials_set.is_max_trials_reached_or_exceeded()
+    assert max_trials_set.query_existing_trials() == 5
+    assert max_trials_set.query_remaining_trials() == 0
 
-    # No trials remaining
-    max_trials_set.run_many(num_trials=3)
-    assert max_trials_set.count_existing_trials() == 5
-    assert max_trials_set.count_remaining_trials() == 0
+    # No trials remaining, error message
+    with pytest.raises(RuntimeError, match="has already been reached"):
+        max_trials_set.run_many(num_trials=3)
+    assert max_trials_set.query_existing_trials() == 5
+    assert max_trials_set.query_remaining_trials() == 0
 
 
 def test_run_all(pytest_basic_mongo_mock_db):
@@ -76,7 +74,6 @@ def test_run_all(pytest_basic_mongo_mock_db):
         experiment_id="test_run_all.max_trials_not_set",
     )
 
-    assert not max_trials_not_set.is_max_trials_reached_or_exceeded()
     with pytest.raises(RuntimeError):
         # Cannot run_all if max_trials is not set
         max_trials_not_set.run_all()
@@ -88,23 +85,22 @@ def test_run_all(pytest_basic_mongo_mock_db):
     )
 
     # Run the experiment in stages
-    assert max_trials_set.count_existing_trials() == 0
-    assert max_trials_set.count_remaining_trials() == 5
-    assert not max_trials_set.is_max_trials_reached_or_exceeded()
+    assert max_trials_set.query_existing_trials() == 0
+    assert max_trials_set.query_remaining_trials() == 5
 
     max_trials_set.run_one()
-    assert max_trials_set.count_existing_trials() == 1
-    assert max_trials_set.count_remaining_trials() == 4
+    assert max_trials_set.query_existing_trials() == 1
+    assert max_trials_set.query_remaining_trials() == 4
 
     max_trials_set.run_all()
-    assert max_trials_set.count_existing_trials() == 5
-    assert max_trials_set.count_remaining_trials() == 0
-    assert max_trials_set.is_max_trials_reached_or_exceeded()
+    assert max_trials_set.query_existing_trials() == 5
+    assert max_trials_set.query_remaining_trials() == 0
 
-    # No trials remaining
-    max_trials_set.run_all()
-    assert max_trials_set.count_existing_trials() == 5
-    assert max_trials_set.count_remaining_trials() == 0
+    # No trials remaining, error message
+    with pytest.raises(RuntimeError, match="has already been reached"):
+        max_trials_set.run_all()
+    assert max_trials_set.query_existing_trials() == 5
+    assert max_trials_set.query_remaining_trials() == 0
 
 
 if __name__ == "__main__":
