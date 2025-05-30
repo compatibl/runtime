@@ -21,6 +21,9 @@ from cl.runtime.records.protocols import TKey
 class BinaryTrialMixin(Generic[TKey, TExperimentKey], TrialMixin[TKey, TExperimentKey], ABC):
     """Single trial of an unsupervised experiment where each trial has True or False outcome."""
 
+    __slots__ = ()
+    """To prevent creation of __dict__ in derived types."""
+
     @property
     @abstractmethod
     def result(self) -> bool:

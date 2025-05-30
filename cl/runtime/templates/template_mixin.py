@@ -26,12 +26,14 @@ from cl.runtime.templates.template_engine_key import TemplateEngineKey
 TParams = TypeVar("TParams")
 
 
-@dataclass(slots=True, kw_only=True)
 class TemplateMixin(Generic[TKey, TParams], RecordMixin[TKey], ABC):
     """
     Optional generic mixin for a template parameterized by its key and the parameters data type.
     Derive MyTemplate from MyTemplate(MyKey, TemplateMixin[MyKey, TParams]).
     """
+
+    __slots__ = ()
+    """To prevent creation of __dict__ in derived types."""
 
     @property
     @abstractmethod
