@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from abc import ABC
-from typing import Generic, Sequence
-from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.experiments.experiment_mixin import ExperimentMixin, TTrial
+from typing import Generic
+from cl.runtime.experiments.experiment_mixin import ExperimentMixin
+from cl.runtime.experiments.experiment_mixin import TTrial
 from cl.runtime.records.protocols import TKey
 
 

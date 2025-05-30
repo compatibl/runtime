@@ -14,7 +14,9 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing import Generic, TypeVar, Sequence
+from typing import Generic
+from typing import Sequence
+from typing import TypeVar
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.trial_mixin import TrialMixin
 from cl.runtime.records.generic_util import GenericUtil
@@ -175,6 +177,8 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
         """
         result = self.query_remaining_trials(num_trials=num_trials)
         if result == 0:
-            raise RuntimeError(f"The maximum number of trials ({self.max_trials}) has already been reached\n"
-                               f"for {TypeUtil.name(self)} with experiment_id={self.experiment_id}.")
+            raise RuntimeError(
+                f"The maximum number of trials ({self.max_trials}) has already been reached\n"
+                f"for {TypeUtil.name(self)} with experiment_id={self.experiment_id}."
+            )
         return result

@@ -20,7 +20,10 @@ from stubs.cl.runtime.experiments.stub_supervised_binary_trial_key import StubSu
 
 
 @dataclass(slots=True, kw_only=True)
-class StubSupervisedBinaryTrial(StubSupervisedBinaryTrialKey, SupervisedBinaryTrialMixin[StubSupervisedBinaryTrialKey, StubSupervisedBinaryExperimentKey]):
+class StubSupervisedBinaryTrial(
+    StubSupervisedBinaryTrialKey,
+    SupervisedBinaryTrialMixin[StubSupervisedBinaryTrialKey, StubSupervisedBinaryExperimentKey],
+):
     """Single trial of an unsupervised experiment where each trial has True or False outcome."""
 
     experiment: StubSupervisedBinaryExperimentKey = required()

@@ -19,7 +19,10 @@ from stubs.cl.runtime.experiments.stub_supervised_binary_trial import StubSuperv
 
 
 @dataclass(slots=True, kw_only=True)
-class StubSupervisedBinaryExperiment(StubSupervisedBinaryExperimentKey, SupervisedBinaryExperimentMixin[StubSupervisedBinaryExperimentKey, StubSupervisedBinaryTrial]):
+class StubSupervisedBinaryExperiment(
+    StubSupervisedBinaryExperimentKey,
+    SupervisedBinaryExperimentMixin[StubSupervisedBinaryExperimentKey, StubSupervisedBinaryTrial],
+):
     """Stub implementation of SupervisedBinaryExperimentMixin."""
 
     max_trials: int | None = None

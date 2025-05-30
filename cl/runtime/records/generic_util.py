@@ -14,10 +14,11 @@
 
 import sys
 import types
-from typing import Tuple, get_origin, get_args, TypeVar, Mapping
-
-from frozendict import frozendict
-
+from typing import Mapping
+from typing import Tuple
+from typing import TypeVar
+from typing import get_args
+from typing import get_origin
 from cl.runtime.records.type_util import TypeUtil
 
 _HAS_GET_ORIGINAL_BASES = sys.version_info >= (3, 12)
@@ -38,7 +39,8 @@ class GenericUtil:
 
         if not cls.is_generic(generic_base):
             raise RuntimeError(
-                f"Argument generic_base={TypeUtil.name(generic_base)} of GenericUtil.get_generic_args is not generic.")
+                f"Argument generic_base={TypeUtil.name(generic_base)} of GenericUtil.get_generic_args is not generic."
+            )
 
         if (result := cls._get_generic_args_recursive(type_, generic_base, {})) is not None:
             # Return if found
@@ -46,7 +48,8 @@ class GenericUtil:
         else:
             # Raise an error if not found
             raise RuntimeError(
-                f"Generic class {TypeUtil.name(generic_base)} is not a base class of {TypeUtil.name(type_)}")
+                f"Generic class {TypeUtil.name(generic_base)} is not a base class of {TypeUtil.name(type_)}"
+            )
 
     @classmethod
     def _get_generic_args_recursive(

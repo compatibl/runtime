@@ -19,7 +19,9 @@ from stubs.cl.runtime.experiments.stub_classifier_trial import StubClassifierTri
 
 
 @dataclass(slots=True, kw_only=True)
-class StubClassifierExperiment(StubClassifierExperimentKey, ClassifierExperimentMixin[StubClassifierExperimentKey, StubClassifierTrial]):
+class StubClassifierExperiment(
+    StubClassifierExperimentKey, ClassifierExperimentMixin[StubClassifierExperimentKey, StubClassifierTrial]
+):
     """Stub implementation of ClassifierExperimentMixin."""
 
     max_trials: int | None = None

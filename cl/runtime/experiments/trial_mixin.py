@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
+from abc import ABC
+from abc import abstractmethod
+from typing import Generic
+from typing import TypeVar
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.record_mixin import RecordMixin
@@ -36,7 +38,6 @@ class TrialMixin(Generic[TKey, TExperimentKey], RecordMixin[TKey], ABC):
     @abstractmethod
     def timestamp(self, value: str) -> None:
         """Unique trial timestamp."""
-        pass
 
     @property
     @abstractmethod

@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from typing import Generic
-from cl.runtime.experiments.trial_mixin import TExperimentKey, TrialMixin
+from cl.runtime.experiments.trial_mixin import TExperimentKey
+from cl.runtime.experiments.trial_mixin import TrialMixin
 from cl.runtime.records.protocols import TKey
 
 

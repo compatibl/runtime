@@ -19,7 +19,10 @@ from stubs.cl.runtime.experiments.stub_supervised_classifier_trial import StubSu
 
 
 @dataclass(slots=True, kw_only=True)
-class StubSupervisedClassifierExperiment(StubSupervisedClassifierExperimentKey, SupervisedClassifierExperimentMixin[StubSupervisedClassifierExperimentKey, StubSupervisedClassifierTrial]):
+class StubSupervisedClassifierExperiment(
+    StubSupervisedClassifierExperimentKey,
+    SupervisedClassifierExperimentMixin[StubSupervisedClassifierExperimentKey, StubSupervisedClassifierTrial],
+):
     """Stub implementation of SupervisedClassifierExperimentMixin."""
 
     max_trials: int | None = None

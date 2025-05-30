@@ -20,7 +20,10 @@ from stubs.cl.runtime.experiments.stub_supervised_classifier_trial_key import St
 
 
 @dataclass(slots=True, kw_only=True)
-class StubSupervisedClassifierTrial(StubSupervisedClassifierTrialKey, SupervisedClassifierTrialMixin[StubSupervisedClassifierTrialKey, StubSupervisedClassifierExperimentKey]):
+class StubSupervisedClassifierTrial(
+    StubSupervisedClassifierTrialKey,
+    SupervisedClassifierTrialMixin[StubSupervisedClassifierTrialKey, StubSupervisedClassifierExperimentKey],
+):
     """Single trial of an unsupervised experiment where each trial has True or False outcome."""
 
     experiment: StubSupervisedClassifierExperimentKey = required()
