@@ -12,14 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment import Experiment
+from cl.runtime.experiments.binary_experiment_key import BinaryExperimentKey
+from cl.runtime.experiments.binary_experiment_mixin import BinaryExperimentMixin
+from cl.runtime.experiments.binary_trial import BinaryTrial
 
 
 @dataclass(slots=True, kw_only=True)
-class BinaryExperiment(Experiment, ABC):
-    """Run and analyze the results of multiple binary trials, the result of each trial is a boolean flag."""
+class BinaryExperiment(BinaryExperimentKey, BinaryExperimentMixin[BinaryExperimentKey, BinaryTrial]):
+    """Unsupervised statistical experiment where each trial has True or False outcome."""
+
+    max_trials: int | None = None
+    """Maximum number of trials to run (optional)."""
+
+    max_parallel: int | None = None
+    """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

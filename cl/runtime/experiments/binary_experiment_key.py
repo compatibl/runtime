@@ -13,15 +13,17 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime import RecordMixin
-from cl.runtime.experiments.binary_trial_key import BinaryTrialKey
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True, kw_only=True)
-class BinaryTrial(BinaryTrialKey, RecordMixin[BinaryTrialKey]):
-    """Single trial of an unsupervised experiment where each trial has True or False outcome."""
+@dataclass(slots=True)
+class BinaryExperimentKey(KeyMixin):
+    """Unsupervised experiment where each trial has True or False outcome."""
 
-    outcome: bool = required()
-    """True or False outcome of the trial."""
+    experiment_id: str = required()
+    """Unique experiment identifier."""
 
+    @classmethod
+    def get_key_type(cls) -> type:
+        return BinaryExperimentKey

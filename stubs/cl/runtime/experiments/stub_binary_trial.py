@@ -13,15 +13,21 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime import RecordMixin
-from cl.runtime.experiments.binary_trial_key import BinaryTrialKey
+from cl.runtime.experiments.binary_trial_mixin import BinaryTrialMixin
 from cl.runtime.records.for_dataclasses.extensions import required
+from stubs.cl.runtime.experiments.stub_binary_experiment_key import StubBinaryExperimentKey
+from stubs.cl.runtime.experiments.stub_binary_trial_key import StubBinaryTrialKey
 
 
 @dataclass(slots=True, kw_only=True)
-class BinaryTrial(BinaryTrialKey, RecordMixin[BinaryTrialKey]):
+class StubBinaryTrial(StubBinaryTrialKey, BinaryTrialMixin[StubBinaryTrialKey, StubBinaryExperimentKey]):
     """Single trial of an unsupervised experiment where each trial has True or False outcome."""
 
-    outcome: bool = required()
-    """True or False outcome of the trial."""
+    experiment: StubBinaryExperimentKey = required()
+    """Experiment for which the trial is recorded."""
 
+    result: bool = required()
+    """Result of the trial (True or False)."""
+
+    def get_key(self) -> StubBinaryTrialKey:
+        return StubBinaryTrialKey(timestamp=self.timestamp).build()

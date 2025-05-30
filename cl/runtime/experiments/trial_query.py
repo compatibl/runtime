@@ -16,7 +16,6 @@ from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.query_mixin import QueryMixin
 
@@ -25,7 +24,7 @@ from cl.runtime.records.query_mixin import QueryMixin
 class TrialQuery(QueryMixin[TrialKey], ABC):
     """Query for a trial of an experiment."""
 
-    timestamp: Condition[Timestamp] | None = None
+    timestamp: Condition[str] | None = None
     """Unique trial timestamp."""
 
     experiment: Condition[ExperimentKey] | None = None

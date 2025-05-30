@@ -26,24 +26,44 @@ class GenericUtil:
 
     @classmethod
     def get_generic_args(cls, type_, generic_base: type) -> Tuple[type, ...]:
-        """The actual types passed as arguments to the generic base class 'generic_base' of 'type_'."""
+        """Return a tuple of types passed as generic arguments to 'generic_base' of 'type_', error if not found."""
+
+        if not cls.is_generic(generic_base):
+            raise RuntimeError(
+                f"Argument generic_base={TypeUtil.name(generic_base)} of GenericUtil.get_generic_args is not generic.")
+
+        if (result := cls.get_generic_args_or_none(type_, generic_base)) is not None:
+            # Return if found
+            return result
+        else:
+            # Raise the appropriate error if not found
+            raise RuntimeError(
+                f"Generic class {TypeUtil.name(generic_base)} is not a base class of {TypeUtil.name(type_)}")
+
+    @classmethod
+    def get_generic_args_or_none(cls, type_, generic_base: type) -> Tuple[type, ...] | None:
+        """Return a tuple of types passed as generic arguments to 'generic_base' of 'type_', None if not found."""
 
         # Get bases with generic parameter types that can be resolved at runtime
         orig_bases = cls._get_original_bases(type_)
 
         # Iterate until generic_base is found
         for base in orig_bases:
-            if get_origin(base) is generic_base:
+            if (origin := get_origin(base)) is generic_base:
+                # Matched one of immediate bases of type_
                 result = get_args(base)
                 return result
+            elif (result := cls.get_generic_args_or_none(base, generic_base)) is not None:
+                # Invoke recursively for the next level ancestors
+                return result
 
-        # Error message if not found
-        if not hasattr(generic_base, "__parameters__"):
-            raise RuntimeError(
-                f"Argument generic_base={TypeUtil.name(generic_base)} of GenericUtil.get_generic_args is not generic.")
-        else:
-            raise RuntimeError(
-                f"Generic class {TypeUtil.name(generic_base)} is not a base class of {TypeUtil.name(type_)}")
+        # Return None if not found
+        return None
+
+    @classmethod
+    def is_generic(cls, type_: type) -> bool:
+        """Return true if the argument is a generic type."""
+        return hasattr(type_, "__parameters__")
 
     @classmethod
     def _get_original_bases(cls, type_: type) -> Tuple[type, ...]:
@@ -55,10 +75,14 @@ class GenericUtil:
             return types.get_original_bases(type_)
         else:
             # Use the old API
-            if orig_bases := getattr(type_, "__orig_bases__", None):
+            try:
                 # Has generic bases, return
-                return orig_bases
-            else:
-                # Return __bases__ if __orig_bases__ is not available to match
-                # the behavior of types.get_original_bases(type_)
-                return type_.__bases__
+                return type_.__orig_bases__
+            except AttributeError:
+                try:
+                    # Return __bases__ if __orig_bases__ is not available to match
+                    # the behavior of types.get_original_bases(type_)
+                    return type_.__bases__
+                except AttributeError:
+                    return tuple()
+

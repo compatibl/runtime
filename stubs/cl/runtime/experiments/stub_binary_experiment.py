@@ -15,22 +15,27 @@
 from dataclasses import dataclass
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.binary_experiment import BinaryExperiment
+from cl.runtime.experiments.binary_experiment_mixin import BinaryExperimentMixin
 from cl.runtime.experiments.binary_trial import BinaryTrial
+from stubs.cl.runtime.experiments.stub_binary_experiment_key import StubBinaryExperimentKey
+from stubs.cl.runtime.experiments.stub_binary_trial import StubBinaryTrial
 
 
 @dataclass(slots=True, kw_only=True)
-class StubBinaryExperiment(BinaryExperiment):
-    """Stub implementation of BinaryExperiment."""
+class StubBinaryExperiment(StubBinaryExperimentKey, BinaryExperimentMixin[StubBinaryExperimentKey, BinaryTrial]):
+    """Stub implementation of BinaryExperimentMixin."""
 
-    def run_one(self) -> None:
+    max_trials: int | None = None
+    """Maximum number of trials to run (optional)."""
 
-        # Exit if there are no remaining trials
-        if self.is_max_trials_reached_or_exceeded():
-            return
+    max_parallel: int | None = None
+    """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
 
-        # Create a trial record with random result
-        trial = BinaryTrial(
-            experiment=self.get_key(),
-            outcome=True,
-        ).build()
-        DbContext.save_one(trial)
+    def get_key(self) -> StubBinaryExperimentKey:
+        return StubBinaryExperimentKey(experiment_id=self.experiment_id).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+    def create_trial(self) -> StubBinaryTrial:
+        return StubBinaryTrial(experiment=self.get_key(), result=True).build()

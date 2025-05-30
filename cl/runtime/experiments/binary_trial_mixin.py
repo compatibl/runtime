@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
-from cl.runtime import RecordMixin
-from cl.runtime.experiments.binary_trial_key import BinaryTrialKey
-from cl.runtime.records.for_dataclasses.extensions import required
+from abc import ABC, abstractmethod
+from typing import Generic
+from cl.runtime.experiments.trial_mixin import TExperimentKey, TrialMixin
+from cl.runtime.records.protocols import TKey
 
 
-@dataclass(slots=True, kw_only=True)
-class BinaryTrial(BinaryTrialKey, RecordMixin[BinaryTrialKey]):
+class BinaryTrialMixin(Generic[TKey, TExperimentKey], TrialMixin[TKey, TExperimentKey], ABC):
     """Single trial of an unsupervised experiment where each trial has True or False outcome."""
 
-    outcome: bool = required()
-    """True or False outcome of the trial."""
-
+    @property
+    @abstractmethod
+    def result(self) -> bool:
+        """Result of the trial (True or False)."""
