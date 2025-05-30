@@ -22,7 +22,7 @@ from stubs.cl.runtime.experiments.stub_binary_trial import StubBinaryTrial
 
 
 @dataclass(slots=True, kw_only=True)
-class StubBinaryExperiment(StubBinaryExperimentKey, BinaryExperimentMixin[StubBinaryExperimentKey, BinaryTrial]):
+class StubBinaryExperiment(StubBinaryExperimentKey, BinaryExperimentMixin[StubBinaryExperimentKey, StubBinaryTrial]):
     """Stub implementation of BinaryExperimentMixin."""
 
     max_trials: int | None = None

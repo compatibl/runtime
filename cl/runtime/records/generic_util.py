@@ -14,7 +14,10 @@
 
 import sys
 import types
-from typing import Tuple, get_origin, get_args
+from typing import Tuple, get_origin, get_args, TypeVar, Mapping
+
+from frozendict import frozendict
+
 from cl.runtime.records.type_util import TypeUtil
 
 _HAS_GET_ORIGINAL_BASES = sys.version_info >= (3, 12)
@@ -25,64 +28,71 @@ class GenericUtil:
     """Helper methods for generic classes."""
 
     @classmethod
-    def get_generic_args(cls, type_, generic_base: type) -> Tuple[type, ...]:
-        """Return a tuple of types passed as generic arguments to 'generic_base' of 'type_', error if not found."""
-
-        if not cls.is_generic(generic_base):
-            raise RuntimeError(
-                f"Argument generic_base={TypeUtil.name(generic_base)} of GenericUtil.get_generic_args is not generic.")
-
-        if (result := cls.get_generic_args_or_none(type_, generic_base)) is not None:
-            # Return if found
-            return result
-        else:
-            # Raise the appropriate error if not found
-            raise RuntimeError(
-                f"Generic class {TypeUtil.name(generic_base)} is not a base class of {TypeUtil.name(type_)}")
-
-    @classmethod
-    def get_generic_args_or_none(cls, type_, generic_base: type) -> Tuple[type, ...] | None:
-        """Return a tuple of types passed as generic arguments to 'generic_base' of 'type_', None if not found."""
-
-        # Get bases with generic parameter types that can be resolved at runtime
-        orig_bases = cls._get_original_bases(type_)
-
-        # Iterate until generic_base is found
-        for base in orig_bases:
-            if (origin := get_origin(base)) is generic_base:
-                # Matched one of immediate bases of type_
-                result = get_args(base)
-                return result
-            elif (result := cls.get_generic_args_or_none(base, generic_base)) is not None:
-                # Invoke recursively for the next level ancestors
-                return result
-
-        # Return None if not found
-        return None
-
-    @classmethod
     def is_generic(cls, type_: type) -> bool:
         """Return true if the argument is a generic type."""
         return hasattr(type_, "__parameters__")
 
     @classmethod
-    def _get_original_bases(cls, type_: type) -> Tuple[type, ...]:
-        """Same as types.get_original_bases with backward compatibility to Python 3.10."""
+    def get_generic_args(cls, type_, generic_base: type) -> Mapping[str, type]:
+        """Return generic argument types passed to the specified generic_base of type_, error if not found."""
 
-        # Get bases with generic parameter types that can be resolved at runtime
+        if not cls.is_generic(generic_base):
+            raise RuntimeError(
+                f"Argument generic_base={TypeUtil.name(generic_base)} of GenericUtil.get_generic_args is not generic.")
+
+        if (result := cls._get_generic_args_recursive(type_, generic_base, {})) is not None:
+            # Return if found
+            return result
+        else:
+            # Raise an error if not found
+            raise RuntimeError(
+                f"Generic class {TypeUtil.name(generic_base)} is not a base class of {TypeUtil.name(type_)}")
+
+    @classmethod
+    def _get_generic_args_recursive(
+        cls,
+        type_: type,
+        generic_base: type,
+        arg_map: dict[TypeVar, type],
+    ) -> Mapping[str, type] | None:
+        """
+        Return generic argument types passed to the specified generic_base of type_, or None if not found.
+        Accumulates the intermediate results in arg_map.
+        """
+
+        for base in cls._get_original_bases(type_):
+            origin = get_origin(base) or base  # Works for both generic and non-generic types
+            args = get_args(base)
+
+            # Extend the substitution map with bindings visible at this level
+            if args and hasattr(origin, "__parameters__"):
+                params = origin.__parameters__
+                new_map = arg_map.copy()
+                for param, arg in zip(params, args):
+                    # If the arg is still a TypeVar, try to resolve via the map
+                    if isinstance(arg, TypeVar):
+                        arg = arg_map.get(arg, arg)
+                    new_map[param] = arg
+            else:
+                new_map = arg_map
+
+            # If we have reached the target, resolve its parameters and return
+            if origin is generic_base:
+                return {p.__name__: new_map.get(p, p) for p in generic_base.__parameters__}  # noqa
+
+            # Otherwise, keep searching the hierarchy
+            resolved = cls._get_generic_args_recursive(origin, generic_base, new_map)
+            if resolved is not None:
+                return resolved
+
+        return None  # Not found along this branch
+
+    @classmethod
+    def _get_original_bases(cls, type_: type) -> Tuple[type, ...]:
+        """Return bases with generic type arguments passed at runtime."""
         if _HAS_GET_ORIGINAL_BASES:
-            # Use the new API
+            # Python >= 3.12
             return types.get_original_bases(type_)
         else:
-            # Use the old API
-            try:
-                # Has generic bases, return
-                return type_.__orig_bases__
-            except AttributeError:
-                try:
-                    # Return __bases__ if __orig_bases__ is not available to match
-                    # the behavior of types.get_original_bases(type_)
-                    return type_.__bases__
-                except AttributeError:
-                    return tuple()
-
+            # Python < 3.12 fallback
+            return getattr(type_, "__orig_bases__", ()) or getattr(type_, "__bases__", ())

@@ -29,6 +29,8 @@ def test_smoke(pytest_basic_mongo_mock_db):
         max_trials=5,
     )
     experiment.run_all()
+    trials = experiment.view_trials()
+    assert len(trials) == 5
 
 
 if __name__ == "__main__":

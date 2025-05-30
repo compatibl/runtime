@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from abc import ABC
-from typing import Generic
+from typing import Generic, Sequence
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_mixin import ExperimentMixin, TTrial
 from cl.runtime.records.protocols import TKey
@@ -25,7 +25,7 @@ class BinaryExperimentMixin(Generic[TKey, TTrial], ExperimentMixin[TKey, TTrial]
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
 
-    def view_trials(self) -> TTrial:
+    def view_trials(self) -> Sequence[TTrial]:
         """View trials of the experiment."""
         # Get trial type at runtime
         trial_type = self.get_trial_type()

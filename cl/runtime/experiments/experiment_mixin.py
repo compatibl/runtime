@@ -68,7 +68,7 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
     def get_trial_type(cls):
         """The actual type passed as TTrial argument to the generic definition of this class or its descendants."""
         # Second argument of ExperimentMixin[TKey, TTrial]
-        return GenericUtil.get_generic_args(cls, ExperimentMixin)[1]
+        return GenericUtil.get_generic_args(cls, ExperimentMixin)["TTrial"]
 
     def save_trial(self) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
