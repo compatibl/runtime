@@ -24,18 +24,26 @@ from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 from stubs.cl.runtime.experiments.stub_binary_experiment_key import StubBinaryExperimentKey
 from stubs.cl.runtime.experiments.stub_binary_trial import StubBinaryTrial
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey, \
+    TArg1
 
 
 def test_get_concrete_type():
     """Test for GenericUtil.get_concrete_type method."""
 
-    # Found
+    # Declared class
     assert GenericUtil.get_concrete_type(StubDataclassRecord, TKey) == StubDataclassRecordKey
 
-    # TODO: Error message when generic parameters are not resolved
-    # with pytest.raises(RuntimeError, match="no generic parameter"):
-    #    GenericUtil.get_concrete_type(StubDataclassRecordKey, TKey)
+    # Generic alias
+    assert GenericUtil.get_concrete_type(StubDataclassGenericRecordKey[int], TArg1) == int
+
+    # Error message when the class is not generic
+    with pytest.raises(RuntimeError, match="no generic parameter"):
+        GenericUtil.get_concrete_type(StubDataclassRecordKey, TKey)
+
+    # Error message when the class is generic base without concrete type substitution
+    with pytest.raises(RuntimeError, match="no generic parameter"):
+        GenericUtil.get_concrete_type(StubDataclassGenericRecordKey, TKey)
 
 def test_get_concrete_type_dict():
     """Test for GenericUtil.get_concrete_type_dict method."""
@@ -51,6 +59,9 @@ def test_get_concrete_type_dict():
         "TKey": StubBinaryExperimentKey,
         "TTrial": StubBinaryTrial,
     }
+
+    # Generic alias
+    assert GenericUtil.get_concrete_type_dict(StubDataclassGenericRecordKey[int]) == {"TArg1": int}
 
     # Not a generic class, the result is empty
     assert GenericUtil.get_concrete_type_dict(StubDataclassRecordKey) == {}

@@ -55,7 +55,7 @@ class GenericUtil:
         return frozendict(result)
 
     @classmethod
-    def _collect_generic_args_recursive(          # ← new name, no generic_base
+    def _collect_generic_args_recursive(
         cls,
         type_: type,
         *,
@@ -82,6 +82,34 @@ class GenericUtil:
 
         seen_types.add(type_)
         result: dict[str, type] = {}
+
+        # Handle parameterised generic aliases
+        origin = get_origin(type_)
+        if origin is not None and hasattr(origin, "__parameters__"):
+            params = origin.__parameters__
+            args = get_args(type_)
+
+            # build a level-local substitution map
+            level_map = arg_map.copy()
+            for param, arg in zip(params, args):
+                if isinstance(arg, TypeVar):
+                    arg = arg_map.get(arg, arg)
+                level_map[param] = arg
+                result[param.__name__] = arg      # record the concrete type
+
+            # keep walking the hierarchy starting from the underlying class
+            sub = cls._collect_generic_args_recursive(
+                origin, arg_map=level_map, seen_types=seen_types
+            )
+            for name, resolved in sub.items():
+                if name in result and result[name] is not resolved:
+                    raise RuntimeError(
+                        "Not all TypeVar names are unique across "
+                        f"the class hierarchy (duplicate {name!r})"
+                    )
+                result.setdefault(name, resolved)
+
+            return result
 
         for base in cls._get_original_bases(type_):
             origin = get_origin(base) or base
