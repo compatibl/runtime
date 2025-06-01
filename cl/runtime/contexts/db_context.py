@@ -21,6 +21,7 @@ from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
+from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -212,7 +213,7 @@ class DbContext(Context):
 
         # Check that the keys in the input list have type record_type.get_key_type()
         key_type = record_type.get_key_type()
-        invalid_keys = [x for x in records_or_keys if is_key(x) and type(x) is not key_type]
+        invalid_keys = [x for x in records_or_keys if is_key(x) and not GenericUtil.is_instance(x, key_type)]
         if len(invalid_keys) > 0:
             invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
             raise RuntimeError(

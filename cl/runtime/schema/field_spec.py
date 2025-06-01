@@ -16,6 +16,7 @@ import typing
 from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
 
 
@@ -50,7 +51,7 @@ class FieldSpec(BootstrapMixin):
         field_alias: str | None = None,
         field_label: str | None = None,
         field_formatter: str | None = None,
-        containing_type_name: str,
+        containing_type: type,
     ) -> Self:
         """
         Create type spec by parsing the type hint.
@@ -63,14 +64,15 @@ class FieldSpec(BootstrapMixin):
             field_alias: Optional name alias from field metadata, field name is used when not specified
             field_label: Optional label from field metadata, CaseUtil.titleize is used when not specified
             field_formatter: Optional formatter from field metadata, standard formatting is used when not specified
-            containing_type_name: Name of the class that contains the field
+            containing_type: Type that contains the field, use to resolve the generic args at runtime
         """
 
         # Create type hint object from type alias
         type_hint = TypeHint.for_type_alias(
             type_alias=type_alias,
             field_subtype=field_subtype,
-            where_msg=f"for field {field_name} in {containing_type_name}",
+            field_name=field_name,
+            containing_type=containing_type,
         )
 
         if field_alias is not None:
@@ -84,12 +86,12 @@ class FieldSpec(BootstrapMixin):
         if field_optional is not None and field_optional != type_hint.optional:
             if field_optional is True:
                 raise RuntimeError(
-                    f"Field {containing_type_name}.{field_name} uses '= optional()'\n"
+                    f"Field {TypeUtil.name(containing_type)}.{field_name} uses '= optional()'\n"
                     f"but type hint is not a union with None: {type_hint.to_str()}"
                 )
             if field_optional is False:
                 raise RuntimeError(
-                    f"Field {containing_type_name}.{field_name} uses '= required()'\n"
+                    f"Field {TypeUtil.name(containing_type)}.{field_name} uses '= required()'\n"
                     f"but type hint is a union with None: {type_hint.to_str()}"
                 )
 

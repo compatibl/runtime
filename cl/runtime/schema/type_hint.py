@@ -21,6 +21,7 @@ from uuid import UUID
 from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
+from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -123,7 +124,8 @@ class TypeHint(BootstrapMixin):
         *,
         type_alias: typing.TypeAlias,
         field_subtype: str | None = None,
-        where_msg: str,
+        field_name: str,
+        containing_type: type,
     ) -> Self:
         """
         Create type spec by parsing the type alias.
@@ -131,7 +133,8 @@ class TypeHint(BootstrapMixin):
         Args:
             type_alias: Type of the field obtained from get_type_hints where ForwardRefs are resolved
             field_subtype: Optional subtype such as long or timestamp, validated against type alias if provided
-            where_msg: Description of where the type alias is encountered for error messages only
+            field_name: Name of the field, used for error messages only and recorded into the output
+            containing_type: Type that contains the field, use to resolve the generic args at runtime
         """
 
         # Variables to store the result of type hint parsing
@@ -151,7 +154,7 @@ class TypeHint(BootstrapMixin):
                 if len(type_alias_args) != 2 or type_alias_args[1] is not type(None):
                     raise RuntimeError(
                         f"Union type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                        f"{where_msg} is not supported\n"
+                        f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
                         f"because it is not an optional value using the syntax 'Type | None'\n"
                     )
 
@@ -167,7 +170,7 @@ class TypeHint(BootstrapMixin):
                     if len(type_alias_args) != 1:
                         raise RuntimeError(
                             f"List type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                            f"{where_msg} is not supported\n"
+                            f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
                             f"because it is not a list of elements using the syntax 'List[type]'\n"
                         )
                     # Populate container data and extract the inner type alias
@@ -184,7 +187,7 @@ class TypeHint(BootstrapMixin):
                     if len(type_alias_args) != 2 or type_alias_args[1] is not Ellipsis:
                         raise RuntimeError(
                             f"Tuple type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                            f"{where_msg} is not supported\n"
+                            f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
                             f"because it is not a variable-length tuple using the syntax 'Tuple[type, ...]'\n"
                         )
                     # Populate container data and extract the inner type alias
@@ -201,7 +204,7 @@ class TypeHint(BootstrapMixin):
                     if len(type_alias_args) != 2 or type_alias_args[0] is not str:
                         raise RuntimeError(
                             f"Dict type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                            f"{where_msg} is not supported\n"
+                            f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
                             f"because it is not a dictionary with string keys using the syntax 'Dict[str, type]'\n"
                         )
                     # Populate container data and extract the inner type alias
@@ -225,6 +228,10 @@ class TypeHint(BootstrapMixin):
                 type_alias_args = typing.get_args(type_alias)
 
             else:
+                # Resolve if type_alias is a TypeVar
+                if isinstance(type_alias, typing.TypeVar):
+                    type_alias = GenericUtil.get_concrete_type(containing_type, type_alias)
+
                 # If not optional and not a container, the remaining part of the type hint
                 # must be a genuine inner type remains without wrappers from typing.
                 # Check using isinstance(type_alias, type) which will return False for a type alias.

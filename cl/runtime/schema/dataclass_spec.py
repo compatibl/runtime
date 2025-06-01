@@ -40,7 +40,7 @@ class DataclassSpec(DataSpec):
 
         # Create the list of enum members
         fields = [
-            cls._create_field_spec(field, containing_type_name=type_name)
+            cls._create_field_spec(field, containing_type=class_)
             for field in dataclasses.fields(class_)  # noqa: type=ignore, verified it is a dataclass above
             if not field.name.startswith("_")
         ]
@@ -54,7 +54,7 @@ class DataclassSpec(DataSpec):
         return result
 
     @classmethod
-    def _create_field_spec(cls, field: dataclasses.Field, containing_type_name: str) -> FieldSpec:
+    def _create_field_spec(cls, field: dataclasses.Field, containing_type: type) -> FieldSpec:
         """Create field spec from dataclasses field definition."""
 
         # Convert dataclasses metadata to dict
@@ -63,7 +63,7 @@ class DataclassSpec(DataSpec):
         result = FieldSpec.create(
             field_name=field.name,
             type_alias=field.type,
-            containing_type_name=containing_type_name,
+            containing_type=containing_type,
             field_optional=metadata.pop("optional", None),
             field_subtype=metadata.pop("subtype", None),
             field_alias=metadata.pop("name", None),

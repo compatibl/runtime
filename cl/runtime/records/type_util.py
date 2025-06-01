@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, get_origin
 from typing import Dict
 from typing import TypeGuard
 from cl.runtime.records.protocols import TObj
@@ -25,7 +25,11 @@ class TypeUtil:
     @classmethod
     def name(cls, instance_or_type: Any) -> str:
         """Returns TypeAlias.alias if specified and type.name otherwise."""
+        # Get generic type origin if the type is generic
+        instance_or_type = origin if (origin := get_origin(instance_or_type)) is not None else instance_or_type
+        # Accept instance or type
         type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+        # Handle renames
         result = cls._get_alias_dict().get(type_, type_.__name__)
         return result
 
