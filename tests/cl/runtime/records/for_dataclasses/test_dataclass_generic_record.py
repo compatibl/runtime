@@ -23,7 +23,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_2 impor
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
 
 
-@pytest.mark.skip("Temporarily disabled during refactoring.")
+#@pytest.mark.skip("Temporarily disabled during refactoring.")
 def test_smoke(pytest_default_db):
     """Smoke test."""
 

@@ -71,7 +71,7 @@ class ExperimentMixin(Generic[TKey, TTrial], RecordMixin[TKey], ABC):
     def get_trial_type(cls):
         """The actual type passed as TTrial argument to the generic definition of this class or its descendants."""
         # Second argument of ExperimentMixin[TKey, TTrial]
-        return GenericUtil.get_generic_args(cls, ExperimentMixin)["TTrial"]
+        return GenericUtil.get_concrete_type_dict(cls, ExperimentMixin)["TTrial"]
 
     def view_trials(self) -> Sequence[TrialMixin]:
         """View trials of the experiment."""

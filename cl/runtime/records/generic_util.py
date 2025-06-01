@@ -14,6 +14,8 @@
 
 import sys
 import types
+from frozendict import frozendict
+from memoization import cached
 from typing import Mapping
 from typing import Tuple
 from typing import TypeVar
@@ -29,66 +31,98 @@ class GenericUtil:
     """Helper methods for generic classes."""
 
     @classmethod
+    @cached
     def is_generic(cls, type_: type) -> bool:
         """Return true if the argument is a generic type."""
         return hasattr(type_, "__parameters__")
 
     @classmethod
-    def get_generic_args(cls, type_, generic_base: type) -> Mapping[str, type]:
-        """Return generic argument types passed to the specified generic_base of type_, error if not found."""
-
-        if not cls.is_generic(generic_base):
-            raise RuntimeError(
-                f"Argument generic_base={TypeUtil.name(generic_base)} of GenericUtil.get_generic_args is not generic."
-            )
-
-        if (result := cls._get_generic_args_recursive(type_, generic_base, {})) is not None:
-            # Return if found
+    @cached
+    def get_concrete_type(cls, type_: type, type_var: TypeVar) -> type:
+        """Get concrete type for the specified generic type and TypeVar in its inheritance hierarchy."""
+        concrete_type_dict = cls.get_concrete_type_dict(type_)
+        if (result := concrete_type_dict.get(type_var.__name__, None)) is not None:
             return result
         else:
-            # Raise an error if not found
-            raise RuntimeError(
-                f"Generic class {TypeUtil.name(generic_base)} is not a base class of {TypeUtil.name(type_)}"
-            )
+            raise RuntimeError(f"Type {TypeUtil.name(type_)} and its ancestors have "
+                               f"no generic parameter (TypeVar) with name {type_var.__name__}.")
 
     @classmethod
-    def _get_generic_args_recursive(
+    @cached
+    def get_concrete_type_dict(cls, type_: type) -> Mapping[str, type]:
+        """Walk the inheritance tree of type_ and return a mapping of TypeVar name to concrete_type."""
+        result = cls._collect_generic_args_recursive(type_)
+        return frozendict(result)
+
+    @classmethod
+    def _collect_generic_args_recursive(          # ← new name, no generic_base
         cls,
         type_: type,
-        generic_base: type,
-        arg_map: dict[TypeVar, type],
-    ) -> Mapping[str, type] | None:
+        *,
+        arg_map: dict[TypeVar, type] | None = None,
+        seen_types: set[type] | None = None,
+    ) -> Mapping[str, type]:
         """
-        Return generic argument types passed to the specified generic_base of type_, or None if not found.
-        Accumulates the intermediate results in arg_map.
+        Recursive helper to walk the inheritance tree of type_ and return a mapping of TypeVar name to concrete_type.
+
+        Args:
+            type_: The type to inspect
+            arg_map: The mapping where results are collected, use for recursion only
+            seen_types: Protect against diamonds in inheritance graph, use for recursion only
+
+        Notes:
+            Error message if the same TypeVar name occurs more than once.
         """
+        if arg_map is None:
+            arg_map = {}
+        if seen_types is None:
+            seen_types = set()
+        if type_ in seen_types:
+            return {}
+
+        seen_types.add(type_)
+        result: dict[str, type] = {}
 
         for base in cls._get_original_bases(type_):
-            origin = get_origin(base) or base  # Works for both generic and non-generic types
+            origin = get_origin(base) or base
             args = get_args(base)
 
-            # Extend the substitution map with bindings visible at this level
+            # Build a substitution map visible at this level
             if args and hasattr(origin, "__parameters__"):
                 params = origin.__parameters__
-                new_map = arg_map.copy()
+                level_map = arg_map.copy()
                 for param, arg in zip(params, args):
-                    # If the arg is still a TypeVar, try to resolve via the map
                     if isinstance(arg, TypeVar):
                         arg = arg_map.get(arg, arg)
-                    new_map[param] = arg
+                    level_map[param] = arg
             else:
-                new_map = arg_map
+                level_map = arg_map
 
-            # If we have reached the target, resolve its parameters and return
-            if origin is generic_base:
-                return {p.__name__: new_map.get(p, p) for p in generic_base.__parameters__}  # noqa
+            # Record resolved parameters for origin
+            if hasattr(origin, "__parameters__"):
+                for p in origin.__parameters__:
+                    resolved = level_map.get(p, p)
+                    name = p.__name__
+                    # Error message if the same name refers to different things
+                    if name in result and result[name] is not resolved:
+                        raise RuntimeError(
+                            "Not all TypeVar names are unique across "
+                            "the class hierarchy (duplicate {!r})".format(name)
+                        )
+                    result[name] = resolved
 
-            # Otherwise, keep searching the hierarchy
-            resolved = cls._get_generic_args_recursive(origin, generic_base, new_map)
-            if resolved is not None:
-                return resolved
+            # Call recursively for ancestor types
+            sub = cls._collect_generic_args_recursive(origin, arg_map=level_map, seen_types=seen_types)
+            for name, resolved in sub.items():
+                if name in result and result[name] is not resolved:
+                    raise RuntimeError(
+                        "Not all TypeVar names are unique across "
+                        "the class hierarchy (duplicate {!r})".format(name)
+                    )
+                result.setdefault(name, resolved)
 
-        return None  # Not found along this branch
+        return result
+
 
     @classmethod
     def _get_original_bases(cls, type_: type) -> Tuple[type, ...]:

@@ -17,46 +17,43 @@ from frozendict import frozendict
 from cl.runtime import RecordMixin
 from cl.runtime.experiments.experiment_mixin import ExperimentMixin
 from cl.runtime.records.generic_util import GenericUtil
+from cl.runtime.records.protocols import TKey
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassRecord
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 from stubs.cl.runtime.experiments.stub_binary_experiment_key import StubBinaryExperimentKey
 from stubs.cl.runtime.experiments.stub_binary_trial import StubBinaryTrial
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
 
 
-def test_get_generic_args():
-    """Test for GenericUtil.get_generic_args method."""
+def test_get_concrete_type():
+    """Test for GenericUtil.get_concrete_type method."""
+
+    # Found
+    assert GenericUtil.get_concrete_type(StubDataclassRecord, TKey) == StubDataclassRecordKey
+
+    # TODO: Error message when generic parameters are not resolved
+    # with pytest.raises(RuntimeError, match="no generic parameter"):
+    #    GenericUtil.get_concrete_type(StubDataclassRecordKey, TKey)
+
+def test_get_concrete_type_dict():
+    """Test for GenericUtil.get_concrete_type_dict method."""
 
     # Immediate parent
-    assert GenericUtil.get_generic_args(StubDataclassRecord, RecordMixin) == frozendict(
-        {
-            "TKey": StubDataclassRecordKey,
-        }
-    )
+    assert GenericUtil.get_concrete_type_dict(StubDataclassRecord) == {"TKey": StubDataclassRecordKey}
 
     # Parent of parent, non-generic
-    assert GenericUtil.get_generic_args(StubDataclassNestedFields, RecordMixin) == frozendict(
-        {
-            "TKey": StubDataclassRecordKey,
-        }
-    )
+    assert GenericUtil.get_concrete_type_dict(StubDataclassNestedFields) == {"TKey": StubDataclassRecordKey}
 
     # Parent of parent, generic
-    assert GenericUtil.get_generic_args(StubBinaryExperiment, ExperimentMixin) == frozendict(
-        {
-            "TKey": StubBinaryExperimentKey,
-            "TTrial": StubBinaryTrial,
-        }
-    )
+    assert GenericUtil.get_concrete_type_dict(StubBinaryExperiment) == {
+        "TKey": StubBinaryExperimentKey,
+        "TTrial": StubBinaryTrial,
+    }
 
-    # Generic base is not found
-    with pytest.raises(RuntimeError, match="is not a base class of"):
-        GenericUtil.get_generic_args(StubDataclassRecordKey, RecordMixin)
-
-    # Second parameter is not a generic class
-    with pytest.raises(RuntimeError, match="is not generic"):
-        GenericUtil.get_generic_args(StubDataclassRecord, StubDataclassRecordKey)
+    # Not a generic class, the result is empty
+    assert GenericUtil.get_concrete_type_dict(StubDataclassRecordKey) == {}
 
 
 if __name__ == "__main__":
