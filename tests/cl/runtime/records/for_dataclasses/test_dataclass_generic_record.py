@@ -13,17 +13,17 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from stubs.cl.runtime import StubDataclassRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_generic_record import \
-    StubDataclassDerivedGenericRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_generic_record import (
+    StubDataclassDerivedGenericRecord,
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
 
 
-#@pytest.mark.skip("Temporarily disabled during refactoring.")
+# @pytest.mark.skip("Temporarily disabled during refactoring.")
 def test_smoke(pytest_default_db):
     """Smoke test."""
 
@@ -41,7 +41,6 @@ def test_smoke(pytest_default_db):
     # Get record from DB using key
     loaded_record = DbContext.load_one(StubDataclassDerivedGenericRecord, key)
     assert loaded_record == record
-    pass
 
 
 if __name__ == "__main__":

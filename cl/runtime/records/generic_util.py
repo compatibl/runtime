@@ -14,15 +14,14 @@
 
 import sys
 import types
-from frozendict import frozendict
-from memoization import cached
-from typing import Mapping, Any
+from typing import Any
+from typing import Mapping
 from typing import Tuple
 from typing import TypeVar
 from typing import get_args
 from typing import get_origin
-
-from cl.runtime.records.protocols import is_data
+from frozendict import frozendict
+from memoization import cached
 from cl.runtime.records.type_util import TypeUtil
 
 _HAS_GET_ORIGINAL_BASES = sys.version_info >= (3, 12)
@@ -41,7 +40,7 @@ class GenericUtil:
     @classmethod
     def is_instance(cls, obj: Any, type_: type | types.GenericAlias) -> bool:
         """Return True if the object is an instance of type or GenericAlias."""
-        if (origin := get_origin(type_)) is not None: # or isinstance(type_, types.GenericAlias):
+        if (origin := get_origin(type_)) is not None:  # or isinstance(type_, types.GenericAlias):
             return isinstance(obj, origin)
         elif isinstance(type_, type):
             return isinstance(obj, type_)
@@ -56,8 +55,10 @@ class GenericUtil:
         if (result := concrete_type_dict.get(type_var.__name__, None)) is not None:
             return result
         else:
-            raise RuntimeError(f"Type {TypeUtil.name(type_)} and its ancestors have "
-                               f"no generic parameter (TypeVar) with name {type_var.__name__}.")
+            raise RuntimeError(
+                f"Type {TypeUtil.name(type_)} and its ancestors have "
+                f"no generic parameter (TypeVar) with name {type_var.__name__}."
+            )
 
     @classmethod
     @cached
@@ -129,14 +130,11 @@ class GenericUtil:
                 result[param.__name__] = arg
 
             # keep walking the hierarchy starting from the underlying class
-            sub = cls._collect_generic_args_recursive(
-                origin, arg_map=level_map, seen_types=seen_types
-            )
+            sub = cls._collect_generic_args_recursive(origin, arg_map=level_map, seen_types=seen_types)
             for name, resolved in sub.items():
                 if name in result and result[name] is not resolved:
                     raise RuntimeError(
-                        "Not all TypeVar names are unique across "
-                        f"the class hierarchy (duplicate {name!r})"
+                        "Not all TypeVar names are unique across " f"the class hierarchy (duplicate {name!r})"
                     )
                 result.setdefault(name, resolved)
 
@@ -175,8 +173,7 @@ class GenericUtil:
             for name, resolved in sub.items():
                 if name in result and result[name] is not resolved:
                     raise RuntimeError(
-                        "Not all TypeVar names are unique across "
-                        "the class hierarchy (duplicate {!r})".format(name)
+                        "Not all TypeVar names are unique across " "the class hierarchy (duplicate {!r})".format(name)
                     )
                 result.setdefault(name, resolved)
 
@@ -200,4 +197,5 @@ class GenericUtil:
         else:
             raise RuntimeError(
                 f"TypeVar {type_var.__name__} does not specify 'bound' parameter.\n"
-                f"To be used in generic records, TypeVars must be bound to a key, record, or slotted type.")
+                f"To be used in generic records, TypeVars must be bound to a key, record, or slotted type."
+            )

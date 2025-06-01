@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import types
 import pytest
 from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import TKey
@@ -23,8 +22,9 @@ from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperi
 from stubs.cl.runtime.experiments.stub_binary_experiment_key import StubBinaryExperimentKey
 from stubs.cl.runtime.experiments.stub_binary_trial import StubBinaryTrial
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey, \
-    TKeyArg
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import TKeyArg
+
 
 def test_is_generic():
     """Test for GenericUtil.is_generic_or_subclass method."""
@@ -44,7 +44,7 @@ def test_is_generic():
     # Non-generic type
     assert not GenericUtil.is_generic_or_subclass(StubDataclassRecordKey)
 
-    
+
 def test_is_instance():
     """Test for GenericUtil.is_instance method."""
 
@@ -52,14 +52,16 @@ def test_is_instance():
     assert GenericUtil.is_instance(StubDataclassNestedFields(), StubDataclassNestedFields)
 
     # Generic alias with a concrete type argument
-    assert GenericUtil.is_instance(StubDataclassGenericRecordKey(), StubDataclassGenericRecordKey[StubDataclassGenericArg1])
+    assert GenericUtil.is_instance(
+        StubDataclassGenericRecordKey(), StubDataclassGenericRecordKey[StubDataclassGenericArg1]
+    )
 
     # Generic type without a concrete type argument, should return TypeVar.__bound__
     assert GenericUtil.is_instance(StubDataclassGenericRecordKey(), StubDataclassGenericRecordKey)
 
     # Non-generic type
     assert GenericUtil.is_instance(StubDataclassRecordKey(), StubDataclassRecordKey)
-    
+
 
 def test_get_concrete_type():
     """Test for GenericUtil.get_concrete_type method."""
@@ -71,7 +73,10 @@ def test_get_concrete_type():
     assert GenericUtil.get_concrete_type(StubDataclassNestedFields, TKey) == StubDataclassRecordKey
 
     # Generic alias with a concrete type argument
-    assert GenericUtil.get_concrete_type(StubDataclassGenericRecordKey[StubDataclassGenericArg1], TKeyArg) == StubDataclassGenericArg1
+    assert (
+        GenericUtil.get_concrete_type(StubDataclassGenericRecordKey[StubDataclassGenericArg1], TKeyArg)
+        == StubDataclassGenericArg1
+    )
 
     # Generic type without a concrete type argument, should return TypeVar.__bound__
     assert GenericUtil.get_concrete_type(StubDataclassGenericRecordKey, TKeyArg) == TKeyArg.__bound__

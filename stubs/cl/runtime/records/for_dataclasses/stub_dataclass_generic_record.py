@@ -13,17 +13,23 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Generic, TypeVar
-
+from typing import Generic
+from typing import TypeVar
 from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey, TKeyArg
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import TKeyArg
 
 TRecordArg = TypeVar("TRecordArg", bound=StubDataclassGenericArg)
 
+
 @dataclass(slots=True, kw_only=True)
-class StubDataclassGenericRecord(Generic[TKeyArg, TRecordArg], StubDataclassGenericRecordKey[TKeyArg], RecordMixin[StubDataclassGenericRecordKey[TKeyArg]]):
+class StubDataclassGenericRecord(
+    Generic[TKeyArg, TRecordArg],
+    StubDataclassGenericRecordKey[TKeyArg],
+    RecordMixin[StubDataclassGenericRecordKey[TKeyArg]],
+):
     """Stub dataclass-based generic record."""
 
     record_field: TRecordArg | None = None

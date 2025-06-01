@@ -13,12 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import TypeVar, Generic
-
+from typing import Generic
+from typing import TypeVar
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 TKeyArg = TypeVar("TKeyArg", bound=KeyMixin)
+
 
 @dataclass(slots=True)
 class StubDataclassGenericRecordKey(Generic[TKeyArg], KeyMixin):
@@ -30,4 +31,3 @@ class StubDataclassGenericRecordKey(Generic[TKeyArg], KeyMixin):
     @classmethod
     def get_key_type(cls) -> type:
         return StubDataclassGenericRecordKey[TKeyArg]
-

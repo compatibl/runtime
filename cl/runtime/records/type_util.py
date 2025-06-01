@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, get_origin
+from typing import Any
 from typing import Dict
 from typing import TypeGuard
+from typing import get_origin
 from cl.runtime.records.protocols import TObj
 
 
