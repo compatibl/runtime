@@ -16,7 +16,7 @@ import sys
 import types
 from frozendict import frozendict
 from memoization import cached
-from typing import Mapping
+from typing import Mapping, Any
 from typing import Tuple
 from typing import TypeVar
 from typing import get_args
@@ -34,9 +34,19 @@ class GenericUtil:
 
     @classmethod
     @cached
-    def is_generic(cls, type_: type) -> bool:
-        """Return true if the argument is a generic type."""
+    def is_generic_or_subclass(cls, type_: type) -> bool:
+        """Return True if the type or its ancestor has generic parameters, even if concrete types were substituted."""
         return hasattr(type_, "__parameters__")
+
+    @classmethod
+    def is_instance(cls, obj: Any, type_: type | types.GenericAlias) -> bool:
+        """Return True if the object is an instance of type or GenericAlias."""
+        if (origin := get_origin(type_)) is not None: # or isinstance(type_, types.GenericAlias):
+            return isinstance(obj, origin)
+        elif isinstance(type_, type):
+            return isinstance(obj, type_)
+        else:
+            raise RuntimeError(f"Type parameter {type_} of GenericUtil.is_instance is not a type or GenericAlias.")
 
     @classmethod
     @cached
@@ -186,12 +196,7 @@ class GenericUtil:
     def _get_required_bound(cls, type_var: TypeVar) -> type:
         """Get 'bound' parameter of TypeVar, error message if not specified."""
         if (result := type_var.__bound__) is not None:
-            if is_data(result):
-                return result
-            else:
-                raise RuntimeError(
-                    f"TypeVar {type_var.__name__} specifies bound={TypeUtil.name(result)}.\n"
-                    f"To be used in generic records, TypeVars must be bound to a key, record, or slotted type.")
+            return result
         else:
             raise RuntimeError(
                 f"TypeVar {type_var.__name__} does not specify 'bound' parameter.\n"
