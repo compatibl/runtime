@@ -13,9 +13,6 @@
 # limitations under the License.
 
 import pytest
-from frozendict import frozendict
-from cl.runtime import RecordMixin
-from cl.runtime.experiments.experiment_mixin import ExperimentMixin
 from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import TKey
 from stubs.cl.runtime import StubDataclassNestedFields
@@ -24,8 +21,10 @@ from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 from stubs.cl.runtime.experiments.stub_binary_experiment_key import StubBinaryExperimentKey
 from stubs.cl.runtime.experiments.stub_binary_trial import StubBinaryTrial
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey, \
-    TArg1
+    TKeyArg
 
 
 def test_get_concrete_type():
@@ -34,16 +33,20 @@ def test_get_concrete_type():
     # Declared class
     assert GenericUtil.get_concrete_type(StubDataclassRecord, TKey) == StubDataclassRecordKey
 
-    # Generic alias
-    assert GenericUtil.get_concrete_type(StubDataclassGenericRecordKey[int], TArg1) == int
+    # Generic alias with concrete type argument
+    assert GenericUtil.get_concrete_type(StubDataclassGenericRecordKey[StubDataclassGenericArg1], TKeyArg) == StubDataclassGenericArg1
+
+    # Generic type without concrete type argument, should return the TypeVar bound parameter
+    assert GenericUtil.get_concrete_type(StubDataclassGenericRecordKey, TKeyArg) == StubDataclassGenericArg
 
     # Error message when the class is not generic
     with pytest.raises(RuntimeError, match="no generic parameter"):
         GenericUtil.get_concrete_type(StubDataclassRecordKey, TKey)
 
-    # Error message when the class is generic base without concrete type substitution
+    # Error message when type var with this name is not found
     with pytest.raises(RuntimeError, match="no generic parameter"):
         GenericUtil.get_concrete_type(StubDataclassGenericRecordKey, TKey)
+
 
 def test_get_concrete_type_dict():
     """Test for GenericUtil.get_concrete_type_dict method."""
@@ -60,8 +63,13 @@ def test_get_concrete_type_dict():
         "TTrial": StubBinaryTrial,
     }
 
-    # Generic alias
-    assert GenericUtil.get_concrete_type_dict(StubDataclassGenericRecordKey[int]) == {"TArg1": int}
+    # Generic alias with concrete type argument
+    assert GenericUtil.get_concrete_type_dict(StubDataclassGenericRecordKey[StubDataclassGenericArg1]) == {
+        "TKeyArg": StubDataclassGenericArg1
+    }
+
+    # Generic type without concrete type argument, should return the TypeVar bound parameter
+    assert GenericUtil.get_concrete_type_dict(StubDataclassGenericRecordKey) == {"TKeyArg": StubDataclassGenericArg}
 
     # Not a generic class, the result is empty
     assert GenericUtil.get_concrete_type_dict(StubDataclassRecordKey) == {}

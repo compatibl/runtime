@@ -21,6 +21,8 @@ from typing import Tuple
 from typing import TypeVar
 from typing import get_args
 from typing import get_origin
+
+from cl.runtime.records.protocols import is_data
 from cl.runtime.records.type_util import TypeUtil
 
 _HAS_GET_ORIGINAL_BASES = sys.version_info >= (3, 12)
@@ -50,8 +52,26 @@ class GenericUtil:
     @classmethod
     @cached
     def get_concrete_type_dict(cls, type_: type) -> Mapping[str, type]:
-        """Walk the inheritance tree of type_ and return a mapping of TypeVar name to concrete_type."""
+        """
+        Walk the inheritance tree of type_ and return a mapping of TypeVar name to concrete_type.
+        If a TypeVar remains unresolved after the walk, it is replaced by its 'bound' parameter.
+        """
+
+        # Collect concrete types from the inheritance chain
         result = cls._collect_generic_args_recursive(type_)
+
+        # Substitute bound for any TypeVars that remain unresolved
+        result = {
+            name: (cls._get_required_bound(value) if isinstance(value, TypeVar) else value)
+            for name, value in result.items()
+        }
+
+        # Also include any TypeVars from the class parameters that were not in the result
+        if hasattr(type_, "__parameters__"):
+            for param in type_.__parameters__:
+                if param.__name__ not in result:
+                    result[param.__name__] = cls._get_required_bound(param)
+
         return frozendict(result)
 
     @classmethod
@@ -95,7 +115,8 @@ class GenericUtil:
                 if isinstance(arg, TypeVar):
                     arg = arg_map.get(arg, arg)
                 level_map[param] = arg
-                result[param.__name__] = arg      # record the concrete type
+                # Record the concrete type
+                result[param.__name__] = arg
 
             # keep walking the hierarchy starting from the underlying class
             sub = cls._collect_generic_args_recursive(
@@ -151,7 +172,6 @@ class GenericUtil:
 
         return result
 
-
     @classmethod
     def _get_original_bases(cls, type_: type) -> Tuple[type, ...]:
         """Return bases with generic type arguments passed at runtime."""
@@ -161,3 +181,18 @@ class GenericUtil:
         else:
             # Python < 3.12 fallback
             return getattr(type_, "__orig_bases__", ()) or getattr(type_, "__bases__", ())
+
+    @classmethod
+    def _get_required_bound(cls, type_var: TypeVar) -> type:
+        """Get 'bound' parameter of TypeVar, error message if not specified."""
+        if (result := type_var.__bound__) is not None:
+            if is_data(result):
+                return result
+            else:
+                raise RuntimeError(
+                    f"TypeVar {type_var.__name__} specifies bound={TypeUtil.name(result)}.\n"
+                    f"To be used in generic records, TypeVars must be bound to a key, record, or slotted type.")
+        else:
+            raise RuntimeError(
+                f"TypeVar {type_var.__name__} does not specify 'bound' parameter.\n"
+                f"To be used in generic records, TypeVars must be bound to a key, record, or slotted type.")
