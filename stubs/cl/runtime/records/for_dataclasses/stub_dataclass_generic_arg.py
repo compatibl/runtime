@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from abc import ABC
 from dataclasses import dataclass
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
+from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassGenericArg1(StubDataclassGenericArg):
-    """Stub argument for a generic dataclass."""
+class StubDataclassGenericArg(DataMixin, ABC):
+    """Abstract base class for a stub argument for a generic dataclass."""
+
+    id: str = "arg1"
+    """Unique identifier."""

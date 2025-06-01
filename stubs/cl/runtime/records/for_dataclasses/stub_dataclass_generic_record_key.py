@@ -18,16 +18,16 @@ from typing import TypeVar, Generic
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
-TArg1 = TypeVar("TArg1")
+TKeyArg = TypeVar("TKeyArg", bound=KeyMixin)
 
 @dataclass(slots=True)
-class StubDataclassGenericRecordKey(Generic[TArg1], KeyMixin):
+class StubDataclassGenericRecordKey(Generic[TKeyArg], KeyMixin):
     """Stub record base class."""
 
-    arg_1: TArg1 = required()
+    key_field: TKeyArg = required()
     """Required field with generic type."""
 
     @classmethod
     def get_key_type(cls) -> type:
-        return StubDataclassGenericRecordKey[TArg1]
+        return StubDataclassGenericRecordKey[TKeyArg]
 

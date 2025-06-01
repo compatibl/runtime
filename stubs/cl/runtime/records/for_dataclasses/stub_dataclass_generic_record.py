@@ -16,16 +16,18 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey, TArg1
+from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey, TKeyArg
 
-TArg2 = TypeVar("TArg2")
+TRecordArg = TypeVar("TRecordArg", bound=StubDataclassGenericArg)
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassGenericRecord(Generic[TArg1, TArg2], StubDataclassGenericRecordKey[TArg1], RecordMixin[StubDataclassGenericRecordKey[TArg1]]):
+class StubDataclassGenericRecord(Generic[TKeyArg, TRecordArg], StubDataclassGenericRecordKey[TKeyArg], RecordMixin[StubDataclassGenericRecordKey[TKeyArg]]):
     """Stub dataclass-based generic record."""
 
-    arg_2: TArg2 | None = None
+    record_field: TRecordArg | None = None
     """Optional field with generic type."""
 
-    def get_key(self) -> StubDataclassGenericRecordKey[TArg1]:
-        return StubDataclassGenericRecordKey(arg_1=self.arg_1).build()
+    def get_key(self) -> StubDataclassGenericRecordKey[TKeyArg]:
+        return StubDataclassGenericRecordKey(key_field=StubDataclassRecordKey()).build()

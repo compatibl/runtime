@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class StubDataclassGenericArg2:
+from dataclasses import dataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
+
+
+@dataclass(slots=True, kw_only=True)
+class StubDataclassGenericArg2(StubDataclassGenericArg):
     """Stub argument for a generic dataclass."""
-
-    id: str = "arg2"
-    """Unique identifier."""
-
-    __slots__ = ()
-    """To prevent creation of __dict__ in derived types."""

@@ -13,14 +13,15 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_2 import StubDataclassGenericArg2
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record import StubDataclassGenericRecord
 
 
 @dataclass(slots=True, kw_only=True)
 class StubDataclassDerivedGenericRecord(StubDataclassGenericRecord[
+                                            StubDataclassRecordKey,
                                             StubDataclassGenericArg1,
-                                            StubDataclassGenericArg2,
                                         ]):
     """Stub dataclass-based derived generic record."""
