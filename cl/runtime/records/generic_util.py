@@ -71,18 +71,22 @@ class GenericUtil:
         # Collect concrete types from the inheritance chain
         result = cls._collect_generic_args_recursive(type_)
 
-        # Substitute bound for any TypeVars that remain unresolved
+        # Replace any TypeVars that remain unresolved by their 'bound' argument
         result = {
-            name: (cls._get_required_bound(value) if isinstance(value, TypeVar) else value)
+            name: (cls._bind_type_var(value) if isinstance(value, TypeVar) else value)
             for name, value in result.items()
         }
 
-        # Also include any TypeVars from the class parameters that were not in the result
+        # Include any TypeVars from the class parameters that were not in the result
         if hasattr(type_, "__parameters__"):
             for param in type_.__parameters__:
                 if param.__name__ not in result:
-                    result[param.__name__] = cls._get_required_bound(param)
+                    result[param.__name__] = cls._bind_type_var(param)
 
+        # Finally, substitute any concrete types for generic params defined using other generic params
+        result = {name: cls._resolve_generic_alias(result, value) for name, value in result.items()}
+
+        # Wrap in frozendict
         return frozendict(result)
 
     @classmethod
@@ -190,12 +194,27 @@ class GenericUtil:
             return getattr(type_, "__orig_bases__", ()) or getattr(type_, "__bases__", ())
 
     @classmethod
-    def _get_required_bound(cls, type_var: TypeVar) -> type:
+    def _bind_type_var(cls, type_var: TypeVar) -> type:
         """Get 'bound' parameter of TypeVar, error message if not specified."""
         if (result := type_var.__bound__) is not None:
             return result
         else:
             raise RuntimeError(
                 f"TypeVar {type_var.__name__} does not specify 'bound' parameter.\n"
-                f"To be used in generic records, TypeVars must be bound to a key, record, or slotted type."
+                f"To serialize a generic record, every TypeVar must specify the 'bound' argument."
             )
+
+    @classmethod
+    def _resolve_generic_alias(cls, type_dict: Mapping[str, Any], type_or_alias: Any) -> type:
+        """Substitute concrete type for the generic alias by looking it up in type_dict."""
+        if (origin := get_origin(type_or_alias)) is not None:
+            concrete_types = [
+                concrete_arg
+                if ((concrete_arg := type_dict.get(type_var.__name__, None)) is not None)
+                else cls._bind_type_var(type_var)
+                for type_var in get_args(type_or_alias)
+            ]
+            # Use __class_getitem__ because in Python 3.10 unpacking is not supported inside []
+            return origin.__class_getitem__(tuple(concrete_types))
+        else:
+            return type_or_alias

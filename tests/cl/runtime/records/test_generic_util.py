@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.records.generic_util import GenericUtil
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import TKey
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassRecord
@@ -21,7 +22,14 @@ from stubs.cl.runtime import StubDataclassRecordKey
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 from stubs.cl.runtime.experiments.stub_binary_experiment_key import StubBinaryExperimentKey
 from stubs.cl.runtime.experiments.stub_binary_trial import StubBinaryTrial
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_concrete_record import StubDataclassConcreteRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_concrete_record_key import StubDataclassConcreteRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_generic_record import \
+    StubDataclassDerivedGenericRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record import TRecordArg, \
+    StubDataclassGenericRecord
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import TKeyArg
 
@@ -79,7 +87,7 @@ def test_get_concrete_type():
     )
 
     # Generic type without a concrete type argument, should return TypeVar.__bound__
-    assert GenericUtil.get_concrete_type(StubDataclassGenericRecordKey, TKeyArg) == TKeyArg.__bound__
+    assert GenericUtil.get_concrete_type(StubDataclassGenericRecordKey, TKeyArg) == KeyMixin
 
     # Error message when the class is not generic
     with pytest.raises(RuntimeError, match="no generic parameter"):
@@ -99,10 +107,25 @@ def test_get_concrete_type_dict():
     # Parent of parent of a generic type, no generic params
     assert GenericUtil.get_concrete_type_dict(StubDataclassNestedFields) == {"TKey": StubDataclassRecordKey}
 
-    # Parent of parent, generic
-    assert GenericUtil.get_concrete_type_dict(StubBinaryExperiment) == {
-        "TKey": StubBinaryExperimentKey,
-        "TTrial": StubBinaryTrial,
+    # Full concrete type substitution, two params
+    assert GenericUtil.get_concrete_type_dict(StubDataclassConcreteRecord) == {
+        "TKeyArg": StubDataclassRecordKey,
+        "TRecordArg": StubDataclassGenericArg1,
+        "TKey": StubDataclassGenericRecordKey[StubDataclassRecordKey],
+    }
+
+    # Partial concrete type substitution, two params
+    assert GenericUtil.get_concrete_type_dict(StubDataclassDerivedGenericRecord) == {
+        "TKeyArg": StubDataclassRecordKey,
+        "TRecordArg": StubDataclassGenericArg,
+        "TKey": StubDataclassGenericRecordKey[StubDataclassRecordKey],
+    }
+
+    # No concrete type substitution, two params
+    assert GenericUtil.get_concrete_type_dict(StubDataclassGenericRecord) == {
+        "TKeyArg": KeyMixin,
+        "TRecordArg": StubDataclassGenericArg,
+        "TKey": StubDataclassGenericRecordKey[KeyMixin],
     }
 
     # Generic alias with a concrete type argument
