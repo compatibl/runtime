@@ -23,6 +23,8 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.sse.event_type import EventType
+from cl.runtime.sse.task_event import TaskEvent
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from cl.runtime.tasks.task_status import TaskStatus
@@ -90,7 +92,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
         logger = LogContext.get_logger(module_name=__name__)
         try:
-            logger.info("Start task execution.")
+            logger.info("Start task execution.", extra={"event": TaskEvent(event_type=EventType.TASK_STARTED)})
 
             # Save with Running status
             update = self.clone()
@@ -102,7 +104,11 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
         except Exception as e:  # noqa
 
-            logger.error("Task failed with exception.", exc_info=True)
+            logger.error(
+                "Task failed with exception.",
+                exc_info=True,
+                extra={"event": TaskEvent(event_type=EventType.TASK_FINISHED)},
+            )
 
             # Save with Failed status and execution info
             update = self.clone()
@@ -114,7 +120,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             DbContext.save_one(update.build())
         else:
 
-            logger.info("Task completed successfully.")
+            logger.info("Task completed successfully.", extra={"event": TaskEvent(event_type=EventType.TASK_FINISHED)})
 
             # Record the end time
             end_time = DatetimeUtil.now()

@@ -20,6 +20,7 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.user_log_message import UserLogMessage
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.primitive.timestamp import Timestamp
 
 
 class DbLogHandler(logging.Handler):
@@ -41,19 +42,23 @@ class DbLogHandler(logging.Handler):
             log_message_class = LogMessage
 
         # If exc_info is available add it to message. Limit traceback length.
-        add_to_message = ""
         if exc and traceback_:
             # TODO (Roman): Configure max traceback length in the settings.
             # Join last 5 traceback lines.
             traceback_str = "".join(traceback.format_tb(traceback_)[-5:])
-            add_to_message = f"{repr(exc)}. Traceback: \n{traceback_str}"
-
+        else:
+            traceback_str = None
+        timestamp = Timestamp.create()
         return log_message_class(
-            timestamp=str(record.created * 1e6),  # timestamp in microseconds
+            timestamp=timestamp,
             level=CaseUtil.upper_to_pascal_case(record.levelname),
-            message=record.getMessage() + add_to_message,
+            message=record.getMessage(),
             logger_name=record.name,
-            readable_time=record.asctime,
+            readable_time=Timestamp.to_datetime(timestamp).isoformat(),
+            traceback=traceback_str,
+            record_type=getattr(record, "type", None),
+            handler_name=getattr(record, "handler", None),
+            task_run_id=getattr(record, "task_run_id", None),
         ).build()
 
     def emit(self, record):

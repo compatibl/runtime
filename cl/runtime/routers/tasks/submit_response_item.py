@@ -90,7 +90,8 @@ class SubmitResponseItem(BaseModel):
 
                 # Save and submit task
                 DbContext.save_one(handler_task)
-                handler_queue.submit_task(handler_task)  # TODO: Rely on query instead
-                response_items.append(SubmitResponseItem(key=serialized_key, task_run_id=handler_task.task_id))
+                with LogContext(type=request.type, handler=request.method, task_run_id=handler_task.task_id).build():
+                    handler_queue.submit_task(handler_task)  # TODO: Rely on query instead
+                    response_items.append(SubmitResponseItem(key=serialized_key, task_run_id=handler_task.task_id))
 
         return response_items

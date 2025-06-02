@@ -18,9 +18,13 @@ from cl.runtime import TypeInfoCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_record
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
 
-_SQLITE_SERIALIZER = DataSerializers.FOR_SQLITE
+_sqlite_serializer = DataSerializers.FOR_SQLITE
+_mongo_serializer = DataSerializers.FOR_MONGO
 
 
 class SseQueryUtil:
@@ -45,6 +49,10 @@ class SseQueryUtil:
 
         if isinstance(db, SqliteDb):
             return cls._load_from_timestamp_sqlite(
+                db, record_type, from_timestamp=from_timestamp, limit=limit, timestamp_field_name=timestamp_field_name
+            )
+        elif isinstance(db, BasicMongoDb):
+            return cls._load_from_timestamp_mongo(
                 db, record_type, from_timestamp=from_timestamp, limit=limit, timestamp_field_name=timestamp_field_name
             )
         else:
@@ -100,7 +108,7 @@ class SseQueryUtil:
 
         for data in cursor.fetchall():
             data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
-            yield _SQLITE_SERIALIZER.deserialize(data)
+            yield _sqlite_serializer.deserialize(data)
 
         return None
 
@@ -113,5 +121,37 @@ class SseQueryUtil:
         from_timestamp: str | None,
         limit: int | None,
         timestamp_field_name: str,
-    ) -> Iterable[TRecord] | None:
-        raise NotImplementedError
+    ) -> Iterable[TRecord]:
+        """Load records of 'record_type' using timestamp and limit for Mongo DB. Ordered by descending timestamp."""
+
+        if is_record(record_type):
+            key_type = record_type.get_key_type()
+        elif is_key(record_type):
+            key_type = record_type
+        else:
+            raise RuntimeError(f"Type {TypeUtil.name(record_type)} passed to load_all method is not a record or key.")
+
+        # Get collection name from key type
+        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
+        db_obj = db._get_db()
+        collection = db_obj[collection_name]
+
+        subtype_names = TypeInfoCache.get_child_names(record_type)
+        query_conditions = {"_type": {"$in": subtype_names}}
+
+        if from_timestamp is not None:
+            query_conditions[timestamp_field_name] = {"$gt": from_timestamp}
+
+        serialized_records = collection.find(query_conditions).sort(timestamp_field_name, -1)
+
+        if limit is not None:
+            serialized_records = serialized_records.limit(limit)
+
+        result = []
+        for serialized_record in serialized_records:
+            del serialized_record["_id"]
+            del serialized_record["_key"]
+            record = _mongo_serializer.deserialize(serialized_record)  # TODO: Convert to comprehension for performance
+            result.append(record)
+
+        return result

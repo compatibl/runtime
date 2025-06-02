@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.sse.event import Event
 
@@ -26,3 +27,12 @@ class LogEvent(Event):
 
     message: str = required()
     """A descriptive message providing details about the logging event."""
+
+    record_type: str | None = optional()
+    """Type on which the handler is running."""
+
+    handler_name: str | None = optional()
+    """Handler name."""
+
+    task_run_id: str | None = optional()
+    """Unique task run identifier."""

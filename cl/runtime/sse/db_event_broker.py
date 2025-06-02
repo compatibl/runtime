@@ -26,7 +26,15 @@ from cl.runtime.sse.sse_query_util import SseQueryUtil
 _PULL_EVENTS_DELAY = 5.0
 """Delay in seconds to check new events in DB."""
 
-_logger = logging.getLogger(__name__)
+
+def _handle_async_task_exception(task: asyncio.Task):
+    """Log error if pull events task failed."""
+    _logger = logging.getLogger(__name__)
+
+    try:
+        task.result()
+    except Exception:
+        _logger.error("DB SSE pull events task failed.", exc_info=True)
 
 
 class DbEventBroker(EventBroker):
@@ -56,7 +64,9 @@ class DbEventBroker(EventBroker):
 
         # Start pulling events from db in parallel async task
         if self._pull_events_task is None:
-            self._pull_events_task = asyncio.create_task(self._pull_events())
+            pull_events_task = asyncio.create_task(self._pull_events())
+            pull_events_task.add_done_callback(_handle_async_task_exception)
+            self._pull_events_task = pull_events_task
 
         # Yield events from base subscribe() implementation
         async for event in super(DbEventBroker, self).subscribe(topic=topic, request=request):
@@ -67,6 +77,9 @@ class DbEventBroker(EventBroker):
         return await self._event_queue.get()
 
     async def publish(self, topic: str, event: Event) -> None:
+        return self.sync_publish(topic, event)
+
+    def sync_publish(self, topic: str, event: Event) -> None:
         # Publish event by just saving to DB
         DbContext.save_one(event)
 
@@ -76,7 +89,8 @@ class DbEventBroker(EventBroker):
             self._pull_events_task.cancel()
 
     async def _pull_events(self):
-        _logger.info("SSE: Start pulling events from DB.")
+        _logger = logging.getLogger(__name__)
+
         while True:
             # Get events from the DB saved after the last sent timestamp, sorted by descending timestamp
             # TODO (Roman): Replace with DbContext.query() when supported
@@ -85,12 +99,11 @@ class DbEventBroker(EventBroker):
             )
 
             if new_events:
-                _logger.info(f"SSE: Found {len(new_events)} events in DB.")
+                _logger.debug(f"SSE: Found {len(new_events)} events in DB.")
 
             # Put events to queue in reversed (historical) order
             for event in reversed(new_events):
                 await self._event_queue.put(event)
                 self._last_sent_event_timestamp = event.timestamp
 
-            _logger.info("SSE: Wait event pulling delay.")
             await asyncio.sleep(_PULL_EVENTS_DELAY)

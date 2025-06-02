@@ -28,6 +28,9 @@ class LogContext(Context):
     type: str | None = optional()
     """Type name."""
 
+    task_run_id: str | None = optional()
+    """Task run id."""
+
     @classmethod
     def get_base_type(cls) -> type:
         return LogContext

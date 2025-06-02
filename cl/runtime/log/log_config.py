@@ -84,25 +84,10 @@ def _make_filter_above_level(above_level):
     return filter_
 
 
-def _make_filter_add_contextual_info_for_file():
-    """Add contextual attributes to log record. Fill with default empty value if None."""
+def _make_filter_add_contextual_info():
+    """Add contextual attributes to log record."""
+
     _default_empty = "."
-
-    def filter_(record):
-        log_context = LogContext.current_or_none()
-        record.handler = log_context.handler if log_context else _default_empty
-        record.type = log_context.type if log_context else _default_empty
-        record.pid = os.getpid()
-        return True
-
-    return filter_
-
-
-def _make_filter_add_contextual_info_for_console():
-    """
-    Add contextual info to log record as single combined attribute 'type_and_handler'.
-    'type_and_handler' will be empty string if both type and handler are None.
-    """
 
     def filter_(record):
         log_context = LogContext.current_or_none()
@@ -114,8 +99,31 @@ def _make_filter_add_contextual_info_for_console():
             if log_context.handler is not None:
                 type_and_handler += f" - {log_context.handler}"
 
+        # Type on which the handler is running
+        record.type = log_context.type if log_context else _default_empty
+
+        # Name of running handler
+        record.handler = log_context.handler if log_context else _default_empty
+
+        # Combined type and handler name as single field in short format
         record.type_and_handler = type_and_handler
+
+        # Task run id
+        record.task_run_id = log_context.task_run_id if log_context else _default_empty
+
+        # PID of process
+        record.pid = os.getpid()
+
         return True
+
+    return filter_
+
+
+def _make_filter_third_party_logs():
+    """Filter out third-party lib logs."""
+
+    def filter_(record):
+        return not record.name.startswith(("uvicorn", "celery"))
 
     return filter_
 
@@ -156,12 +164,8 @@ logging_config = {
             "()": "cl.runtime.log.log_config._make_filter_above_level",
             "above_level": "ERROR",
         },
-        "add_contextual_info_for_file_filter": {
-            "()": "cl.runtime.log.log_config._make_filter_add_contextual_info_for_file"
-        },
-        "add_contextual_info_for_console_filter": {
-            "()": "cl.runtime.log.log_config._make_filter_add_contextual_info_for_console"
-        },
+        "add_contextual_info_filter": {"()": "cl.runtime.log.log_config._make_filter_add_contextual_info"},
+        "third_party_logs_filter": {"()": "cl.runtime.log.log_config._make_filter_third_party_logs"},
     },
     "handlers": {
         "file_handler": {
@@ -170,25 +174,36 @@ logging_config = {
             "filename": get_log_filename(),
             "maxBytes": max_log_file_size_bytes,
             "backupCount": 0,  # Do not create backup files because each file has a timestamp.
-            "filters": ["add_contextual_info_for_file_filter"],
+            "filters": ["add_contextual_info_filter"],
             "formatter": "file_formatter",
         },
         "stderr_handler": {
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stderr",
-            "filters": ["add_contextual_info_for_console_filter", "above_error_level_filter"],
+            "filters": ["add_contextual_info_filter", "above_error_level_filter"],
             "formatter": "console_formatter",
         },
         "stdout_handler": {
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stdout",
-            "filters": ["add_contextual_info_for_console_filter", "below_error_level_filter"],
+            "filters": ["add_contextual_info_filter", "below_error_level_filter"],
             "formatter": "console_formatter",
         },
         "db_handler": {
-            "level": "ERROR",
+            "level": "INFO",
+            "filters": ["add_contextual_info_filter", "third_party_logs_filter"],
             "class": "cl.runtime.log.db_log_handler.DbLogHandler",
         },
+        "event_handler": {
+            "level": "INFO",
+            "filters": ["add_contextual_info_filter", "third_party_logs_filter"],
+            "class": "cl.runtime.log.event_log_handler.EventLogHandler",
+        },
     },
-    "loggers": {"": {"handlers": ["file_handler", "stderr_handler", "stdout_handler", "db_handler"], "level": "INFO"}},
+    "loggers": {
+        "": {
+            "handlers": ["file_handler", "stderr_handler", "stdout_handler", "db_handler", "event_handler"],
+            "level": "INFO",
+        }
+    },
 }

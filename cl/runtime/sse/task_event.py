@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.sse.event import Event
 
@@ -21,5 +22,17 @@ from cl.runtime.sse.event import Event
 class TaskEvent(Event):
     """Event type with info about Task."""
 
-    run_id: str = required()
+    task_run_id: str = required()
     """Unique task run identifier."""
+
+    def __init(self):
+        if self.task_run_id is None:
+            log_context = LogContext.current_or_none()
+
+            if log_context is None:
+                raise RuntimeError("TaskEvent can only be created inside a LogContext.")
+
+            if log_context.task_run_id is None:
+                raise RuntimeError("LogContext.task_run_id is required to create TaskEvent.")
+
+            self.task_run_id = log_context.task_run_id

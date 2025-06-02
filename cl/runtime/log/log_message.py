@@ -40,6 +40,18 @@ class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
     readable_time: str | None = None
     """Human-readable time when the log record was created in UTC."""
 
+    traceback: str | None = None
+    """Traceback."""
+
+    record_type: str | None = None
+    """Type on which the handler is running."""
+
+    handler_name: str | None = None
+    """Handler name."""
+
+    task_run_id: str | None = None
+    """Task run id."""
+
     def get_key(self) -> LogMessageKey:
         return LogMessageKey(timestamp=self.timestamp).build()
 
