@@ -73,8 +73,7 @@ class GenericUtil:
 
         # Replace any TypeVars that remain unresolved by their 'bound' argument
         result = {
-            name: (cls._bind_type_var(value) if isinstance(value, TypeVar) else value)
-            for name, value in result.items()
+            name: (cls._bind_type_var(value) if isinstance(value, TypeVar) else value) for name, value in result.items()
         }
 
         # Include any TypeVars from the class parameters that were not in the result
@@ -209,9 +208,11 @@ class GenericUtil:
         """Substitute concrete type for the generic alias by looking it up in type_dict."""
         if (origin := get_origin(type_or_alias)) is not None:
             concrete_types = [
-                concrete_arg
-                if ((concrete_arg := type_dict.get(type_var.__name__, None)) is not None)
-                else cls._bind_type_var(type_var)
+                (
+                    concrete_arg
+                    if ((concrete_arg := type_dict.get(type_var.__name__, None)) is not None)
+                    else cls._bind_type_var(type_var)
+                )
                 for type_var in get_args(type_or_alias)
             ]
             # Use __class_getitem__ because in Python 3.10 unpacking is not supported inside []

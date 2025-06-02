@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_generic_record import \
-    StubDataclassDerivedGenericRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_generic_record import (
+    StubDataclassDerivedGenericRecord,
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
 
 
 @dataclass(slots=True, kw_only=True)
 class StubDataclassConcreteRecord(StubDataclassDerivedGenericRecord[StubDataclassGenericArg1]):
     """Stub dataclass-based record with all generic parameters replaced by concrete types."""
-

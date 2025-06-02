@@ -15,15 +15,16 @@
 from dataclasses import dataclass
 from typing import Generic
 from stubs.cl.runtime import StubDataclassRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_concrete_record_key import StubDataclassConcreteRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record import StubDataclassGenericRecord, \
-    TRecordArg
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record import StubDataclassGenericRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record import TRecordArg
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassDerivedGenericRecord(Generic[TRecordArg], StubDataclassGenericRecord[
-    StubDataclassRecordKey,
-    TRecordArg,
-]):
+class StubDataclassDerivedGenericRecord(
+    Generic[TRecordArg],
+    StubDataclassGenericRecord[
+        StubDataclassRecordKey,
+        TRecordArg,
+    ],
+):
     """Stub dataclass-based generic record with one generic parameter replaced by a concrete type."""
-

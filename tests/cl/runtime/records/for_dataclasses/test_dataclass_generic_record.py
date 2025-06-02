@@ -39,5 +39,6 @@ def test_concrete_record(pytest_default_db):
     loaded_record = DbContext.load_one(StubDataclassConcreteRecord, key)
     assert loaded_record == record
 
+
 if __name__ == "__main__":
     pytest.main([__file__])
