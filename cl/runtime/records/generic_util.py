@@ -33,14 +33,30 @@ class GenericUtil:
 
     @classmethod
     @cached
-    def is_generic_or_subclass(cls, type_: type) -> bool:
-        """Return True if the type or its ancestor has generic parameters, even if concrete types were substituted."""
+    def is_generic(cls, type_: type | types.GenericAlias) -> bool:
+        """
+        Return True if the type is bound or unbound generic or a generic alias.
+
+        Notes:
+            - Bound generic means concrete types are specified for all generic params of its base
+            - Unbound generic means concrete type is not specified for one or more generic params of its base
+            - Generic alias is created using GenericClass[Param1,Param2] syntax without deriving from GenericClass
+        """
         return hasattr(type_, "__parameters__")
 
     @classmethod
     def is_instance(cls, obj: Any, type_: type | types.GenericAlias) -> bool:
-        """Return True if the object is an instance of type or GenericAlias."""
-        if (origin := get_origin(type_)) is not None:  # or isinstance(type_, types.GenericAlias):
+        """
+        Return True if the object is an instance bound or unbound generic or a generic alias.
+        Due to type the erasure in Python, this method cannot check the type of generic parameter
+        and will only validate that the object is an instance of generic class origin.
+
+        Notes:
+            - Bound generic means concrete types are specified for all generic params of its base
+            - Unbound generic means concrete type is not specified for one or more generic params of its base
+            - Generic alias is created using GenericClass[Param1,Param2] syntax without deriving from GenericClass
+        """
+        if (origin := get_origin(type_)) is not None:
             return isinstance(obj, origin)
         elif isinstance(type_, type):
             return isinstance(obj, type_)
@@ -49,9 +65,12 @@ class GenericUtil:
 
     @classmethod
     @cached
-    def get_concrete_type(cls, type_: type, type_var: TypeVar) -> type:
-        """Get concrete type for the specified generic type and TypeVar in its inheritance hierarchy."""
-        concrete_type_dict = cls.get_concrete_type_dict(type_)
+    def get_bound_type(cls, type_: type, type_var: TypeVar) -> type:
+        """
+        Get the concrete type bound to type_var in the definition of generic type_ or its ancestors.
+        If type_var remains unbound in the definition of type_, return type_var.__bound__ instead.
+        """
+        concrete_type_dict = cls.get_bound_type_dict(type_)
         if (result := concrete_type_dict.get(type_var.__name__, None)) is not None:
             return result
         else:
@@ -62,14 +81,14 @@ class GenericUtil:
 
     @classmethod
     @cached
-    def get_concrete_type_dict(cls, type_: type) -> Mapping[str, type]:
+    def get_bound_type_dict(cls, type_: type) -> Mapping[str, type]:
         """
-        Walk the inheritance tree of type_ and return a mapping of TypeVar name to concrete_type.
-        If a TypeVar remains unresolved after the walk, it is replaced by its 'bound' parameter.
+        Return a mapping of TypeVars to concrete types they are bound to in the generic type_ or its ancestors.
+        If any TypeVar remains unbound in the definition of type_, map to TypeVar.__bound__ instead.
         """
 
         # Collect concrete types from the inheritance chain
-        result = cls._collect_generic_args_recursive(type_)
+        result = cls._collect_bound_types(type_)
 
         # Replace any TypeVars that remain unresolved by their 'bound' argument
         result = {
@@ -89,7 +108,7 @@ class GenericUtil:
         return frozendict(result)
 
     @classmethod
-    def _collect_generic_args_recursive(
+    def _collect_bound_types(
         cls,
         type_: type,
         *,
@@ -97,7 +116,7 @@ class GenericUtil:
         seen_types: set[type] | None = None,
     ) -> Mapping[str, type]:
         """
-        Recursive helper to walk the inheritance tree of type_ and return a mapping of TypeVar name to concrete_type.
+        Recursive helper to walk the inheritance tree of type_ and return a mapping of TypeVar name to concrete type.
 
         Args:
             type_: The type to inspect
@@ -133,7 +152,7 @@ class GenericUtil:
                 result[param.__name__] = arg
 
             # keep walking the hierarchy starting from the underlying class
-            sub = cls._collect_generic_args_recursive(origin, arg_map=level_map, seen_types=seen_types)
+            sub = cls._collect_bound_types(origin, arg_map=level_map, seen_types=seen_types)
             for name, resolved in sub.items():
                 if name in result and result[name] is not resolved:
                     raise RuntimeError(
@@ -172,7 +191,7 @@ class GenericUtil:
                     result[name] = resolved
 
             # Call recursively for ancestor types
-            sub = cls._collect_generic_args_recursive(origin, arg_map=level_map, seen_types=seen_types)
+            sub = cls._collect_bound_types(origin, arg_map=level_map, seen_types=seen_types)
             for name, resolved in sub.items():
                 if name in result and result[name] is not resolved:
                     raise RuntimeError(

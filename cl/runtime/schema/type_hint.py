@@ -230,7 +230,7 @@ class TypeHint(BootstrapMixin):
             else:
                 # Resolve if type_alias is a TypeVar
                 if isinstance(type_alias, typing.TypeVar):
-                    type_alias = GenericUtil.get_concrete_type(containing_type, type_alias)
+                    type_alias = GenericUtil.get_bound_type(containing_type, type_alias)
 
                 # If not optional and not a container, the remaining part of the type hint
                 # must be a genuine inner type remains without wrappers from typing.
