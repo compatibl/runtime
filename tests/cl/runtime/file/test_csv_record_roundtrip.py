@@ -26,18 +26,18 @@ from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDoubleDerived
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
+from stubs.cl.runtime import StubDataclassDoubleDerived
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclass
 
 _CSV_SERIALIZER = DataSerializers.FOR_CSV
 """Serializer for CSV serialization."""

@@ -16,14 +16,14 @@ import pytest
 from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import TKey
-from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_bound_generic import StubDataclassBoundGeneric
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_generic import StubDataclassDerivedGeneric
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic import StubDataclassGeneric
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic import StubDataclassGeneric
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_key import StubDataclassGenericKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_key import TKeyArg
 
@@ -54,9 +54,7 @@ def test_is_instance():
     assert GenericUtil.is_instance(StubDataclassNestedFields(), StubDataclassNestedFields)
 
     # Generic alias with a concrete type argument
-    assert GenericUtil.is_instance(
-        StubDataclassGenericKey(), StubDataclassGenericKey[StubDataclassGenericArg1]
-    )
+    assert GenericUtil.is_instance(StubDataclassGenericKey(), StubDataclassGenericKey[StubDataclassGenericArg1])
 
     # Generic type without a concrete type argument, should return TypeVar.__bound__
     assert GenericUtil.is_instance(StubDataclassGenericKey(), StubDataclassGenericKey)

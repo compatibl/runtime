@@ -14,8 +14,8 @@
 
 import pytest
 from cl.runtime.records.type_util import TypeUtil
-from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassDerived
 
 
 def test_check_type():

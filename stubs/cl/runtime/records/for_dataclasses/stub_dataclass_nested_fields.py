@@ -14,13 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived_data import (
-    StubDataclassDoubleDerivedData,
-)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived_data import StubDataclassDoubleDerivedData
 
 
 @dataclass(slots=True, kw_only=True)

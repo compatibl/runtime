@@ -20,18 +20,18 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.records.data_util import DataUtil
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDoubleDerived
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
+from stubs.cl.runtime import StubDataclassDoubleDerived
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
@@ -215,9 +215,7 @@ def test_load_filter(pytest_multi_db):
     offset = 0
     matching_records = [StubDataclassDerived(id=str(offset + i), derived_str_field="a").build() for i in range(2)]
     offset = len(matching_records)
-    non_matching_records = [
-        StubDataclassDerived(id=str(offset + i), derived_str_field="b").build() for i in range(2)
-    ]
+    non_matching_records = [StubDataclassDerived(id=str(offset + i), derived_str_field="b").build() for i in range(2)]
     DbContext.save_many(matching_records + non_matching_records)
 
     filter_obj = StubDataclassDerived(id=None, derived_str_field="a").build()  # TODO: Check why id=None is needed

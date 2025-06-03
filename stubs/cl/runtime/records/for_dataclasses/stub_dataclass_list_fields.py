@@ -17,10 +17,10 @@ from dataclasses import dataclass
 from typing import List
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 
 
 def stub_dataclass_str_list_factory() -> List[str]:
@@ -115,7 +115,5 @@ class StubDataclassListFields(StubDataclass):
     record_list: List[StubDataclass] = required(default_factory=stub_dataclass_record_list_factory)
     """Stub field."""
 
-    derived_list: List[StubDataclassDerived] = required(
-        default_factory=stub_dataclass_derived_list_factory
-    )
+    derived_list: List[StubDataclassDerived] = required(default_factory=stub_dataclass_derived_list_factory)
     """Stub field."""

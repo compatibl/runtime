@@ -17,10 +17,10 @@ from dataclasses import dataclass
 from typing import Tuple
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 
 
 def stub_dataclass_str_tuple_factory() -> Tuple[str, ...]:
@@ -106,7 +106,5 @@ class StubDataclassTupleFields(StubDataclass):
     record_tuple: Tuple[StubDataclass, ...] = required(default_factory=stub_dataclass_record_tuple_factory)
     """Stub field."""
 
-    derived_tuple: Tuple[StubDataclassDerived, ...] = required(
-        default_factory=stub_dataclass_derived_tuple_factory
-    )
+    derived_tuple: Tuple[StubDataclassDerived, ...] = required(default_factory=stub_dataclass_derived_tuple_factory)
     """Stub field."""

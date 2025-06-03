@@ -22,9 +22,9 @@ from cl.runtime.records.conditions import Exists
 from cl.runtime.records.conditions import In
 from cl.runtime.records.conditions import Not
 from cl.runtime.records.conditions import Or
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields_query import StubDataclassNestedFieldsQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
     StubDataclassPrimitiveFieldsQuery,

@@ -17,17 +17,15 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import List
 from cl.runtime.records.for_dataclasses.extensions import required
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_data_dict_factory
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_date_dict_factory
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import (
-    stub_dataclass_derived_dict_factory,
-)
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_derived_dict_factory
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_key_dict_factory
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_record_dict_factory
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 
 
 def stub_dataclass_str_dict_list_factory() -> List[str]:
@@ -93,9 +91,7 @@ class StubDataclassDictListFields(StubDataclass):
     date_dict_list: List[Dict[str, dt.date]] = required(default_factory=stub_dataclass_date_dict_list_factory)
     """Stub field."""
 
-    record_dict_list: List[Dict[str, StubDataclass]] = required(
-        default_factory=stub_dataclass_record_dict_list_factory
-    )
+    record_dict_list: List[Dict[str, StubDataclass]] = required(default_factory=stub_dataclass_record_dict_list_factory)
     """Stub field."""
 
     derived_dict_list: List[Dict[str, StubDataclassDerived]] = required(

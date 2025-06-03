@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime import StubDataclassListDictFields
-from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime import StubDataclassListDictFields
+from stubs.cl.runtime import StubDataclassNestedFields
 
 FROZEN_MESSAGE_SUBSTR = "because the instance is frozen"
 TUPLE_MESSAGE_SUBSTR = "'tuple' object does not support item assignment"

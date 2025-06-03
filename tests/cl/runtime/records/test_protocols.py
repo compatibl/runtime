@@ -20,9 +20,9 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived
-from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassKey
 
 

@@ -16,11 +16,11 @@ import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.for_dataclasses.dataclass_type_decl import DataclassTypeDecl
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields import StubDataclassOptionalFields
 
 

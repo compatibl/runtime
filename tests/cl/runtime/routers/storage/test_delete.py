@@ -54,14 +54,11 @@ def test_api(pytest_default_db):
     """Test REST API for /storage/delete route."""
     with QaClient() as test_client:
         existing_records = [
-            StubDataclassDerived(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build()
-            for i in range(5)
+            StubDataclassDerived(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build() for i in range(5)
         ]
         DbContext.save_many(existing_records)
 
-        delete_records_payload = [
-            {"Key": record.id, "Type": "StubDataclassDerived"} for record in existing_records[:3]
-        ]
+        delete_records_payload = [{"Key": record.id, "Type": "StubDataclassDerived"} for record in existing_records[:3]]
 
         delete_records_response = test_client.post(
             "/storage/delete",

@@ -16,9 +16,9 @@ from dataclasses import dataclass
 from typing import List
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassCompositeKey
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.views.stub_viewers import StubViewers
 
 nested_fields_key = StubDataclassKey(id="B0").build()

@@ -19,9 +19,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_key import 
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassAliased(
-    StubDataclassAliasedKey, RecordMixin[StubDataclassAliasedKey]
-):  # TODO: Specify alias
+class StubDataclassAliased(StubDataclassAliasedKey, RecordMixin[StubDataclassAliasedKey]):  # TODO: Specify alias
     """Stub record class with typename alias."""
 
     a: int = required()

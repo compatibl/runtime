@@ -17,15 +17,15 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDoubleDerived
 from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclassDoubleDerived
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassSingleton
 
 

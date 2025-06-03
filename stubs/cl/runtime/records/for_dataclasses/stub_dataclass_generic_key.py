@@ -39,4 +39,3 @@ class StubDataclassGenericKey(Generic[TKeyArg], KeyMixin):
         """A separate table for each TKeyArg."""
         key_arg_type = GenericUtil.get_bound_type(cls, TKeyArg)
         return f"StubDataclassGenericKey[{TypeUtil.name(key_arg_type)}]"
-

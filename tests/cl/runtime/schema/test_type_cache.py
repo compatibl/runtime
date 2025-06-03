@@ -19,8 +19,8 @@ from cl.runtime import RecordMixin
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.schema.type_kind import TypeKind
-from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_one_leading_underscore_data import (
     _StubDataclassOneLeadingUnderscoreData,

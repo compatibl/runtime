@@ -17,10 +17,10 @@ from dataclasses import dataclass
 from typing import Dict
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 
 
 def stub_dataclass_str_dict_factory() -> Dict[str, str]:
@@ -106,7 +106,5 @@ class StubDataclassDictFields(StubDataclass):
     record_dict: Dict[str, StubDataclass] = required(default_factory=stub_dataclass_record_dict_factory)
     """Stub field."""
 
-    derived_dict: Dict[str, StubDataclassDerived] = required(
-        default_factory=stub_dataclass_derived_dict_factory
-    )
+    derived_dict: Dict[str, StubDataclassDerived] = required(default_factory=stub_dataclass_derived_dict_factory)
     """Stub field."""
