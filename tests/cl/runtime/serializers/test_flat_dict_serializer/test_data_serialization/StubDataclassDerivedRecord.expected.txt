@@ -1,4 +1,4 @@
 id: abc
 derived_str_field: derived
-_type: StubDataclassDerivedRecord
+_type: StubDataclassDerived
 

@@ -14,31 +14,31 @@
 
 import pytest
 from cl.runtime.records.type_util import TypeUtil
-from stubs.cl.runtime import StubDataclassDerivedRecord
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclass
 
 
 def test_check_type():
     """Test for TypeCheck.check_type method."""
     TypeUtil.check_type(int, int)
-    TypeUtil.check_type(StubDataclassRecord, StubDataclassRecord)
+    TypeUtil.check_type(StubDataclass, StubDataclass)
     with pytest.raises(Exception):
         TypeUtil.check_type(int, float)
     with pytest.raises(Exception):
-        TypeUtil.check_type(int, StubDataclassRecord)
+        TypeUtil.check_type(int, StubDataclass)
     with pytest.raises(Exception):
-        TypeUtil.check_type(StubDataclassDerivedRecord, StubDataclassRecord)
+        TypeUtil.check_type(StubDataclassDerived, StubDataclass)
 
 
 def test_check_subtype():
     """Test for TypeCheck.check_subtype method."""
     TypeUtil.check_subtype(int, int)
-    TypeUtil.check_subtype(StubDataclassRecord, StubDataclassRecord)
-    TypeUtil.check_subtype(StubDataclassDerivedRecord, StubDataclassRecord)
+    TypeUtil.check_subtype(StubDataclass, StubDataclass)
+    TypeUtil.check_subtype(StubDataclassDerived, StubDataclass)
     with pytest.raises(Exception):
         TypeUtil.check_subtype(int, float)
     with pytest.raises(Exception):
-        TypeUtil.check_subtype(int, StubDataclassRecord)
+        TypeUtil.check_subtype(int, StubDataclass)
 
 
 if __name__ == "__main__":

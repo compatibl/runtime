@@ -18,10 +18,10 @@ from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.views.stub_viewers import StubViewers
 
-nested_fields_key = StubDataclassRecordKey(id="B0").build()
+nested_fields_key = StubDataclassKey(id="B0").build()
 """Key returned by the viewer."""
 
 nested_fields_record = StubDataclassNestedFields().build()
@@ -41,7 +41,7 @@ composite_record = StubDataclassComposite().build()
 class StubDataViewers(StubViewers):
     """Stub viewers for data."""
 
-    def view_self(self) -> StubDataclassRecordKey:
+    def view_self(self) -> StubDataclassKey:
         """This viewer will open by default instead of the editor."""
         return nested_fields_key
 
@@ -49,7 +49,7 @@ class StubDataViewers(StubViewers):
         """Viewer with optional return type returning None."""
         return None
 
-    def view_nested_fields_key(self) -> StubDataclassRecordKey:
+    def view_nested_fields_key(self) -> StubDataclassKey:
         """Viewer returning a key."""
         return nested_fields_key
 
@@ -69,18 +69,18 @@ class StubDataViewers(StubViewers):
         """Viewer returning a key."""
         return composite_record
 
-    def view_key_list(self) -> List[StubDataclassRecordKey]:
+    def view_key_list(self) -> List[StubDataclassKey]:
         """Stub viewer returning a list of keys."""
         return 3 * [nested_fields_key]
 
-    def view_key_list_no_record(self) -> List[StubDataclassRecordKey]:
+    def view_key_list_no_record(self) -> List[StubDataclassKey]:
         """
         Stub viewer returning a list of keys, including some keys
         that do not correspond to any existing record in DB.
         """
         views = 3 * [nested_fields_key]
-        views.append(StubDataclassRecordKey(id="A000").build())
-        views.append(StubDataclassRecordKey(id="B000").build())
+        views.append(StubDataclassKey(id="A000").build())
+        views.append(StubDataclassKey(id="B000").build())
         return views
 
     def view_record_list(self) -> List[StubDataclassNestedFields]:

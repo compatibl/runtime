@@ -13,9 +13,9 @@ fields:
   type_hint:
     schema_type_name: StubDataclassDerivedData
     optional: false
-- field_name: derived_from_derived_field
+- field_name: double_derived_field
   type_hint:
-    schema_type_name: StubDataclassDerivedFromDerivedData
+    schema_type_name: StubDataclassDoubleDerivedData
     optional: false
 - field_name: polymorphic_field
   type_hint:
@@ -27,10 +27,10 @@ fields:
     optional: false
 - field_name: key_field
   type_hint:
-    schema_type_name: StubDataclassRecordKey
+    schema_type_name: StubDataclassKey
     optional: false
 - field_name: record_as_key_field
   type_hint:
-    schema_type_name: StubDataclassRecordKey
+    schema_type_name: StubDataclassKey
     optional: false
 

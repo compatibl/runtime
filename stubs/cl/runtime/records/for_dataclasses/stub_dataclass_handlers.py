@@ -222,6 +222,6 @@ class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
     # TODO (Roman): Uncomment for tasks/test_submit.
     # def run_save_to_db(self):
     #     """Stub method."""
-    #     record_to_save = StubDataclassRecord(id="saved_from_handler").build()
+    #     record_to_save = StubDataclass(id="saved_from_handler").build()
     #     DbContext.save_one(record_to_save)
     #     LogContext.get_logger(module_name=__name__).info(f"Record {record_to_save} has been saved to db from handler.")

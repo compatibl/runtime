@@ -24,7 +24,7 @@ TKeyArg = TypeVar("TKeyArg", bound=KeyMixin)
 
 
 @dataclass(slots=True)
-class StubDataclassGenericRecordKey(Generic[TKeyArg], KeyMixin):
+class StubDataclassGenericKey(Generic[TKeyArg], KeyMixin):
     """Stub record base class."""
 
     key_field: TKeyArg = required()
@@ -32,11 +32,11 @@ class StubDataclassGenericRecordKey(Generic[TKeyArg], KeyMixin):
 
     @classmethod
     def get_key_type(cls) -> type:
-        return StubDataclassGenericRecordKey[TKeyArg]
+        return StubDataclassGenericKey[TKeyArg]
 
     @classmethod
     def get_table(cls) -> str:
         """A separate table for each TKeyArg."""
         key_arg_type = GenericUtil.get_bound_type(cls, TKeyArg)
-        return f"StubDataclassGenericRecordKey[{TypeUtil.name(key_arg_type)}]"
+        return f"StubDataclassGenericKey[{TypeUtil.name(key_arg_type)}]"
 

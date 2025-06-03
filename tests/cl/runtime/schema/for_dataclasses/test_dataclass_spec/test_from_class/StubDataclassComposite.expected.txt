@@ -7,10 +7,10 @@ fields:
     optional: false
 - field_name: embedded_1
   type_hint:
-    schema_type_name: StubDataclassRecordKey
+    schema_type_name: StubDataclassKey
     optional: false
 - field_name: embedded_2
   type_hint:
-    schema_type_name: StubDataclassRecordKey
+    schema_type_name: StubDataclassKey
     optional: false
 

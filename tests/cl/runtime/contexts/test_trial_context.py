@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.contexts.trial_context import TrialContext
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 
 
 def test_append_token():
@@ -45,7 +45,7 @@ def test_exceptions():
 
     with pytest.raises(RuntimeError, match="A TrialContext must be one of the following primitive classes"):
         # Not a primitive type
-        TrialContext.append_token(StubDataclassRecord())
+        TrialContext.append_token(StubDataclass())
     with pytest.raises(RuntimeError, match="empty string"):
         # Empty string
         TrialContext.append_token("")

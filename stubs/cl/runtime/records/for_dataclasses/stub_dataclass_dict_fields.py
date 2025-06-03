@@ -18,9 +18,9 @@ from typing import Dict
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 
 
 def stub_dataclass_str_dict_factory() -> Dict[str, str]:
@@ -60,32 +60,32 @@ def stub_dataclass_data_dict_factory() -> Dict[str, StubDataclassData]:
     }
 
 
-def stub_dataclass_key_dict_factory() -> Dict[str, StubDataclassRecordKey]:
+def stub_dataclass_key_dict_factory() -> Dict[str, StubDataclassKey]:
     """Create stub values."""
     return {
-        "a": StubDataclassRecordKey(id="A"),
-        "b": StubDataclassRecordKey(id="B"),
+        "a": StubDataclassKey(id="A"),
+        "b": StubDataclassKey(id="B"),
     }
 
 
-def stub_dataclass_record_dict_factory() -> Dict[str, StubDataclassRecord]:
+def stub_dataclass_record_dict_factory() -> Dict[str, StubDataclass]:
     """Create stub values."""
     return {
-        "a": StubDataclassRecord(id="A"),
-        "b": StubDataclassRecord(id="B"),
+        "a": StubDataclass(id="A"),
+        "b": StubDataclass(id="B"),
     }
 
 
-def stub_dataclass_derived_record_dict_factory() -> Dict[str, StubDataclassDerivedRecord]:
+def stub_dataclass_derived_record_dict_factory() -> Dict[str, StubDataclassDerived]:
     """Create stub values."""
     return {
-        "a": StubDataclassDerivedRecord(id="A"),
-        "b": StubDataclassDerivedRecord(id="B"),
+        "a": StubDataclassDerived(id="A"),
+        "b": StubDataclassDerived(id="B"),
     }
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassDictFields(StubDataclassRecord):
+class StubDataclassDictFields(StubDataclass):
     """Stub record whose elements are dictionaries."""
 
     str_dict: Dict[str, str] = required(default_factory=stub_dataclass_str_dict_factory)
@@ -100,13 +100,13 @@ class StubDataclassDictFields(StubDataclassRecord):
     data_dict: Dict[str, StubDataclassData] = required(default_factory=stub_dataclass_data_dict_factory)
     """Stub field."""
 
-    key_dict: Dict[str, StubDataclassRecordKey] = required(default_factory=stub_dataclass_key_dict_factory)
+    key_dict: Dict[str, StubDataclassKey] = required(default_factory=stub_dataclass_key_dict_factory)
     """Stub field."""
 
-    record_dict: Dict[str, StubDataclassRecord] = required(default_factory=stub_dataclass_record_dict_factory)
+    record_dict: Dict[str, StubDataclass] = required(default_factory=stub_dataclass_record_dict_factory)
     """Stub field."""
 
-    derived_record_dict: Dict[str, StubDataclassDerivedRecord] = required(
+    derived_record_dict: Dict[str, StubDataclassDerived] = required(
         default_factory=stub_dataclass_derived_record_dict_factory
     )
     """Stub field."""

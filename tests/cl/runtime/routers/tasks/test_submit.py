@@ -22,7 +22,7 @@ from cl.runtime.routers.tasks.submit_response_item import SubmitResponseItem
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubHandlers
 
 
@@ -77,7 +77,7 @@ def test_method(pytest_default_db, pytest_celery_queue):
                 assert result_item.key is not None
                 assert result_item.key in request_object.keys
 
-    expected_records_in_db = [[StubDataclassRecord(id="saved_from_handler")]]
+    expected_records_in_db = [[StubDataclass(id="saved_from_handler")]]
     for request, expected_records in zip(get_save_to_db_requests(key_str), expected_records_in_db):
         expected_keys = [rec.get_key() for rec in expected_records]
 
@@ -87,7 +87,7 @@ def test_method(pytest_default_db, pytest_celery_queue):
             Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build())
             for response_item in response_items
         ]
-        actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
+        actual_records = list(DbContext.load_many(StubDataclass, expected_keys))
         assert actual_records == expected_records
 
 
@@ -117,7 +117,7 @@ def test_api(pytest_celery_queue):
                     assert item.get("Key") is not None
                     assert item.get("Key") in request["keys"]
 
-        expected_records_in_db = [[StubDataclassRecord(id="saved_from_handler")]]
+        expected_records_in_db = [[StubDataclass(id="saved_from_handler")]]
         for request, expected_records in zip(get_save_to_db_requests(key_str), expected_records_in_db):
             expected_keys = [rec.get_key() for rec in expected_records]
 
@@ -125,7 +125,7 @@ def test_api(pytest_celery_queue):
             request_object = SubmitRequest(**request)
             response_items = SubmitResponseItem.run_tasks(request_object)
             [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
-            actual_records = list(DbContext.load_many(StubDataclassRecord, expected_keys))
+            actual_records = list(DbContext.load_many(StubDataclass, expected_keys))
             assert actual_records == expected_records
 
 

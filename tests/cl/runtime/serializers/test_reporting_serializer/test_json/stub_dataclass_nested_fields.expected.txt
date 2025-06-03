@@ -9,11 +9,11 @@
     "int_field": 123,
     "derived_str_field": "derived"
   },
-  "derived_from_derived_field": {
+  "double_derived_field": {
     "str_field": "abc",
     "int_field": 123,
     "derived_str_field": "derived",
-    "derived_from_derived_str_field": "derived_from_derived"
+    "double_derived_str_field": "double_derived"
   },
   "polymorphic_field": {
     "str_field": "abc",
@@ -24,7 +24,7 @@
     "str_field": "abc",
     "int_field": 123,
     "derived_str_field": "derived",
-    "derived_from_derived_str_field": "derived_from_derived"
+    "double_derived_str_field": "double_derived"
   },
   "key_field": {
     "id": "uvw"

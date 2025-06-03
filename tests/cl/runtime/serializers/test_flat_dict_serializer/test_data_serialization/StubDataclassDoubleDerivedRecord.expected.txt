@@ -1,5 +1,5 @@
 id: abc
 derived_str_field: derived
-derived_from_derived_str_field: derived_from_derived
-_type: StubDataclassDerivedFromDerivedRecord
+double_derived_str_field: double_derived
+_type: StubDataclassDoubleDerived
 

@@ -65,17 +65,17 @@ class StatusResponseItem(BaseModel):
             # TODO: Add support message depending on exception type.
             user_message = task.error_message
 
-            record_key = None
+            key = None
 
             # Only InstanceMethodTask has `key_str` attribute.
             if isinstance(task, InstanceMethodTask):
-                record_key = task.key_str
+                key = task.key_str
 
             response_items.append(
                 StatusResponseItem(
                     status_code=LEGACY_TASK_STATUS_NAMES_MAP.get(task.status.name),
                     task_run_id=str(task.task_id),
-                    key=record_key,
+                    key=key,
                     user_message=user_message,
                 ),
             )

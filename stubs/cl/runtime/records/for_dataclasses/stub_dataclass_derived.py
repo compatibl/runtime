@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassDerivedRecord(StubDataclassRecord):
+class StubDataclassDerived(StubDataclass):
     """Stub derived class."""
 
     derived_str_field: str = "derived"

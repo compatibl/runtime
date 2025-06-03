@@ -19,7 +19,7 @@ from uuid import UUID
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubIntEnum
 
 _FROM_CLASS_VALID_CASES = [
@@ -39,7 +39,7 @@ _FROM_CLASS_VALID_CASES = [
 _FROM_CLASS_EXCEPTION_CASES = [
     NoneType,
     type,
-    StubDataclassRecord,
+    StubDataclass,
     StubIntEnum,
     (int, "int64"),
     (float, "long"),

@@ -17,7 +17,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassVersionedRecordKey(KeyMixin):
+class StubDataclassVersionedKey(KeyMixin):
     """Stub record base class."""
 
     id: str = "abc"
@@ -25,4 +25,4 @@ class StubDataclassVersionedRecordKey(KeyMixin):
 
     @classmethod
     def get_key_type(cls) -> type:
-        return StubDataclassVersionedRecordKey
+        return StubDataclassVersionedKey

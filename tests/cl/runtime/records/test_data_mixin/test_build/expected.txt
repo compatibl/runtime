@@ -3,7 +3,7 @@ StubDataclassData.__init
 Testing Derived:
 StubDataclassData.__init
 StubDataclassDerivedData.__init
-Testing DerivedFromDerivedWithInit:
+Testing DoubleDerivedWithInit:
 StubDataclassData.__init
 StubDataclassDerivedData.__init
-StubDataclassDerivedFromDerivedData.__init
+StubDataclassDoubleDerivedData.__init

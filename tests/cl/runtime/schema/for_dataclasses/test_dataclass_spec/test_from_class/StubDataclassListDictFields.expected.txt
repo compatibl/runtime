@@ -63,7 +63,7 @@ fields:
       schema_type_name: list
       optional: false
       remaining:
-        schema_type_name: StubDataclassRecord
+        schema_type_name: StubDataclass
         optional: false
 - field_name: derived_record_list_dict
   type_hint:
@@ -73,6 +73,6 @@ fields:
       schema_type_name: list
       optional: false
       remaining:
-        schema_type_name: StubDataclassDerivedRecord
+        schema_type_name: StubDataclassDerived
         optional: false
 

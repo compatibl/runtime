@@ -1,4 +1,4 @@
-type_name: StubDataclassDerivedFromDerivedRecord
+type_name: StubDataclassDoubleDerived
 type_kind: Record
 fields:
 - field_name: id
@@ -9,7 +9,7 @@ fields:
   type_hint:
     schema_type_name: str
     optional: false
-- field_name: derived_from_derived_str_field
+- field_name: double_derived_str_field
   type_hint:
     schema_type_name: str
     optional: false

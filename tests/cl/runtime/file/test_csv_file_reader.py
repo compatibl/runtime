@@ -19,10 +19,10 @@ from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_util import QaUtil
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassKey
 
 
 def test_csv_file_reader(pytest_default_db):
@@ -30,7 +30,7 @@ def test_csv_file_reader(pytest_default_db):
 
     # Create a new instance of local cache for the test
     env_dir = QaUtil.get_env_dir()
-    file_path = os.path.join(env_dir, "StubDataclassDerivedRecord.csv")
+    file_path = os.path.join(env_dir, "StubDataclassDerived.csv")
     # TODO: Change the API not to take record type or make it optional
     file_reader = CsvFileReader(file_path=file_path)
     file_reader.csv_to_db()
@@ -46,11 +46,11 @@ def test_csv_file_reader(pytest_default_db):
     # Verify
     # TODO: Check count using load_all or count method of Db when created
     for i in range(1, 3):
-        expected_record = StubDataclassDerivedRecord(
+        expected_record = StubDataclassDerived(
             id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
         ).build()
-        key = StubDataclassRecordKey(id=f"derived_id_{i}").build()
-        record = DbContext.load_one(StubDataclassRecord, key)
+        key = StubDataclassKey(id=f"derived_id_{i}").build()
+        record = DbContext.load_one(StubDataclass, key)
         assert record == expected_record
 
     for i in range(1, 4):
@@ -61,8 +61,8 @@ def test_csv_file_reader(pytest_default_db):
     for i in range(1, 4):
         expected_record = StubDataclassComposite(
             primitive=f"nested_primitive_{i}",
-            embedded_1=StubDataclassRecordKey(id=f"embedded_key_id_{i}a"),
-            embedded_2=StubDataclassRecordKey(id=f"embedded_key_id_{i}b"),
+            embedded_1=StubDataclassKey(id=f"embedded_key_id_{i}a"),
+            embedded_2=StubDataclassKey(id=f"embedded_key_id_{i}b"),
         ).build()
         record = DbContext.load_one(StubDataclassComposite, expected_record.get_key())
         assert record == expected_record

@@ -1,10 +1,10 @@
 id: abc
 base_field: '{"str_field":"abc","int_field":123,"_type":"StubDataclassData"}'
 derived_field: '{"str_field":"abc","int_field":123,"derived_str_field":"derived","_type":"StubDataclassDerivedData"}'
-derived_from_derived_field: '{"str_field":"abc","int_field":123,"derived_str_field":"derived","derived_from_derived_str_field":"derived_from_derived","_type":"StubDataclassDerivedFromDerivedData"}'
+double_derived_field: '{"str_field":"abc","int_field":123,"derived_str_field":"derived","double_derived_str_field":"double_derived","_type":"StubDataclassDoubleDerivedData"}'
 polymorphic_field: '{"str_field":"abc","int_field":123,"derived_str_field":"derived","_type":"StubDataclassDerivedData"}'
-polymorphic_derived_field: '{"str_field":"abc","int_field":123,"derived_str_field":"derived","derived_from_derived_str_field":"derived_from_derived","_type":"StubDataclassDerivedFromDerivedData"}'
+polymorphic_derived_field: '{"str_field":"abc","int_field":123,"derived_str_field":"derived","double_derived_str_field":"double_derived","_type":"StubDataclassDoubleDerivedData"}'
 key_field: uvw
-record_as_key_field: '{"id":"abc","_type":"StubDataclassRecord"}'
+record_as_key_field: '{"id":"abc","_type":"StubDataclass"}'
 _type: StubDataclassNestedFields
 

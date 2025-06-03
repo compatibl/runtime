@@ -18,10 +18,10 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassDerivedFromDerivedData(StubDataclassDerivedData):
+class StubDataclassDoubleDerivedData(StubDataclassDerivedData):
     """Two levels in inheritance hierarchy away from StubDataclassData."""
 
-    derived_from_derived_str_field: str = "derived_from_derived"
+    double_derived_str_field: str = "double_derived"
     """Stub field."""
 
     _regression_guard: RegressionGuard | None = None
@@ -30,4 +30,4 @@ class StubDataclassDerivedFromDerivedData(StubDataclassDerivedData):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self._regression_guard:
-            self._regression_guard.write("StubDataclassDerivedFromDerivedData.__init")
+            self._regression_guard.write("StubDataclassDoubleDerivedData.__init")

@@ -15,12 +15,12 @@
 from dataclasses import dataclass
 from typing import TypeVar
 from cl.runtime.records.key_mixin import KeyMixin
-from stubs.cl.runtime import StubDataclassRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
+from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_key import StubDataclassGenericKey
 
 TKeyArg = TypeVar("TKeyArg", bound=KeyMixin)
 
 
 @dataclass(slots=True)
-class StubDataclassConcreteRecordKey(StubDataclassGenericRecordKey[StubDataclassRecordKey]):
+class StubDataclassConcreteKey(StubDataclassGenericKey[StubDataclassKey]):
     """Stub concrete key class."""

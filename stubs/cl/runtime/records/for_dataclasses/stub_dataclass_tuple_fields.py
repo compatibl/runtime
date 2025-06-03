@@ -18,9 +18,9 @@ from typing import Tuple
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 
 
 def stub_dataclass_str_tuple_factory() -> Tuple[str, ...]:
@@ -60,32 +60,32 @@ def stub_dataclass_data_tuple_factory() -> Tuple[StubDataclassData, ...]:
     )
 
 
-def stub_dataclass_key_tuple_factory() -> Tuple[StubDataclassRecordKey, ...]:
+def stub_dataclass_key_tuple_factory() -> Tuple[StubDataclassKey, ...]:
     """Create stub values."""
     return (
-        StubDataclassRecordKey(id="A"),
-        StubDataclassRecordKey(id="B"),
+        StubDataclassKey(id="A"),
+        StubDataclassKey(id="B"),
     )
 
 
-def stub_dataclass_record_tuple_factory() -> Tuple[StubDataclassRecord, ...]:
+def stub_dataclass_record_tuple_factory() -> Tuple[StubDataclass, ...]:
     """Create stub values."""
     return (
-        StubDataclassRecord(id="A"),
-        StubDataclassRecord(id="B"),
+        StubDataclass(id="A"),
+        StubDataclass(id="B"),
     )
 
 
-def stub_dataclass_derived_record_tuple_factory() -> Tuple[StubDataclassDerivedRecord, ...]:
+def stub_dataclass_derived_record_tuple_factory() -> Tuple[StubDataclassDerived, ...]:
     """Create stub values."""
     return (
-        StubDataclassDerivedRecord(id="A"),
-        StubDataclassDerivedRecord(id="B"),
+        StubDataclassDerived(id="A"),
+        StubDataclassDerived(id="B"),
     )
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassTupleFields(StubDataclassRecord):
+class StubDataclassTupleFields(StubDataclass):
     """Stub record whose elements are tuples."""
 
     str_tuple: Tuple[str, ...] = required(default_factory=stub_dataclass_str_tuple_factory)
@@ -100,13 +100,13 @@ class StubDataclassTupleFields(StubDataclassRecord):
     data_tuple: Tuple[StubDataclassData, ...] = required(default_factory=stub_dataclass_data_tuple_factory)
     """Stub field."""
 
-    key_tuple: Tuple[StubDataclassRecordKey, ...] = required(default_factory=stub_dataclass_key_tuple_factory)
+    key_tuple: Tuple[StubDataclassKey, ...] = required(default_factory=stub_dataclass_key_tuple_factory)
     """Stub field."""
 
-    record_tuple: Tuple[StubDataclassRecord, ...] = required(default_factory=stub_dataclass_record_tuple_factory)
+    record_tuple: Tuple[StubDataclass, ...] = required(default_factory=stub_dataclass_record_tuple_factory)
     """Stub field."""
 
-    derived_record_tuple: Tuple[StubDataclassDerivedRecord, ...] = required(
+    derived_record_tuple: Tuple[StubDataclassDerived, ...] = required(
         default_factory=stub_dataclass_derived_record_tuple_factory
     )
     """Stub field."""

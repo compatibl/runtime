@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 
 
 @dataclass(slots=True)
@@ -25,10 +25,10 @@ class StubDataclassCompositeKey(KeyMixin):
     primitive: str = "abc"
     """String key element."""
 
-    embedded_1: StubDataclassRecordKey = required(default_factory=lambda: StubDataclassRecordKey(id="def"))
+    embedded_1: StubDataclassKey = required(default_factory=lambda: StubDataclassKey(id="def"))
     """Embedded key 1."""
 
-    embedded_2: StubDataclassRecordKey = required(default_factory=lambda: StubDataclassRecordKey(id="xyz"))
+    embedded_2: StubDataclassKey = required(default_factory=lambda: StubDataclassKey(id="xyz"))
     """Embedded key 2."""
 
     @classmethod

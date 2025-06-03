@@ -18,8 +18,8 @@ from typing import List
 from cl.runtime import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.record_mixin import TKey
-from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_any_fields_key import StubDataclassAnyFieldsKey
 
 
@@ -29,14 +29,14 @@ class StubDataclassAnyFields(StubDataclassAnyFieldsKey, RecordMixin[StubDataclas
     any_str: Any = "any_str"
     """Any str value."""
 
-    any_key: Any = optional(default_factory=lambda: StubDataclassRecordKey())
+    any_key: Any = optional(default_factory=lambda: StubDataclassKey())
     """Any key value."""
 
-    any_record: Any = optional(default_factory=lambda: StubDataclassRecord())
+    any_record: Any = optional(default_factory=lambda: StubDataclass())
     """Any record value."""
 
     list_of_any: List[Any] = optional(
-        default_factory=lambda: ["any_str", 1, 1.1, StubDataclassRecordKey(), StubDataclassRecord()]
+        default_factory=lambda: ["any_str", 1, 1.1, StubDataclassKey(), StubDataclass()]
     )
     """List of any values."""
 

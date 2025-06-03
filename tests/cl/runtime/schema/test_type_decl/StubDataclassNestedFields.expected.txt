@@ -8,7 +8,7 @@ display_kind: Basic
 inherit:
   module:
     module_name: cl
-  name: StubDataclassRecord
+  name: StubDataclass
 elements:
 - value:
     type_: String
@@ -34,8 +34,8 @@ elements:
 - data:
     module:
       module_name: cl
-    name: StubDataclassDerivedFromDerivedData
-  name: DerivedFromDerivedField
+    name: StubDataclassDoubleDerivedData
+  name: DoubleDerivedField
   comment: Stub field.
   vector: false
   optional: false
@@ -52,13 +52,13 @@ elements:
       module_name: cl
     name: StubDataclassDerivedData
   name: PolymorphicDerivedField
-  comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData.
+  comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDoubleDerivedData.
   vector: false
   optional: false
 - key_:
     module:
       module_name: cl
-    name: StubDataclassRecordKey
+    name: StubDataclassKey
   name: KeyField
   comment: Stub field.
   vector: false
@@ -66,7 +66,7 @@ elements:
 - key_:
     module:
       module_name: cl
-    name: StubDataclassRecordKey
+    name: StubDataclassKey
   name: RecordAsKeyField
   comment: Stub field with key type initialized to record type instance.
   vector: false

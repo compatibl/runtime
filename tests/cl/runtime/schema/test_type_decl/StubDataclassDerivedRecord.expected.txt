@@ -1,6 +1,6 @@
 module:
   module_name: cl
-name: StubDataclassDerivedRecord
+name: StubDataclassDerived
 label: Stub Dataclass Derived Record
 comment: Stub derived class.
 type_kind: Record
@@ -8,7 +8,7 @@ display_kind: Basic
 inherit:
   module:
     module_name: cl
-  name: StubDataclassRecord
+  name: StubDataclass
 elements:
 - value:
     type_: String

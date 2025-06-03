@@ -4,7 +4,7 @@ float_list: '[0.0000123456789,0.000123456789,0.00123456789,0.0123456789,0.123456
 date_list: '["2003-04-21","2003-05-01"]'
 data_list: '[{"str_field":"A","int_field":0,"_type":"StubDataclassData"},{"str_field":"B","int_field":1,"_type":"StubDataclassData"}]'
 key_list: '["A","B"]'
-record_list: '[{"id":"A","_type":"StubDataclassRecord"},{"id":"B","_type":"StubDataclassRecord"}]'
-derived_record_list: '[{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerivedRecord"},{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerivedRecord"}]'
+record_list: '[{"id":"A","_type":"StubDataclass"},{"id":"B","_type":"StubDataclass"}]'
+derived_record_list: '[{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}]'
 _type: StubDataclassListFields
 

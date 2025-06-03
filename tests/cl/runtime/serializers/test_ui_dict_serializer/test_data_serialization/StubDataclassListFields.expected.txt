@@ -28,15 +28,15 @@ KeyList:
 - A
 - B
 RecordList:
-- _t: StubDataclassRecord
+- _t: StubDataclass
   Id: A
-- _t: StubDataclassRecord
+- _t: StubDataclass
   Id: B
-DerivedRecordList:
-- _t: StubDataclassDerivedRecord
+DerivedList:
+- _t: StubDataclassDerived
   Id: A
   DerivedStrField: derived
-- _t: StubDataclassDerivedRecord
+- _t: StubDataclassDerived
   Id: B
   DerivedStrField: derived
 

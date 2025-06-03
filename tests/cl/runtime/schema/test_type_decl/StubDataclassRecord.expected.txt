@@ -1,6 +1,6 @@
 module:
   module_name: cl
-name: StubDataclassRecord
+name: StubDataclass
 label: Stub Dataclass Record
 comment: Stub record base class.
 type_kind: Record
@@ -8,7 +8,7 @@ display_kind: Basic
 inherit:
   module:
     module_name: cl
-  name: StubDataclassRecordKey
+  name: StubDataclassKey
 elements:
 - value:
     type_: String
@@ -21,7 +21,7 @@ keys:
 
 module:
   module_name: cl
-name: StubDataclassRecord
+name: StubDataclass
 label: Stub Dataclass Record
 comment: Stub record base class.
 type_kind: Record
@@ -29,7 +29,7 @@ display_kind: Basic
 inherit:
   module:
     module_name: cl
-  name: StubDataclassRecordKey
+  name: StubDataclassKey
 elements:
 - value:
     type_: String

@@ -19,16 +19,16 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.routers.storage.save_request import SaveRequest
 from cl.runtime.routers.storage.save_response_util import SaveResponseUtil
-from stubs.cl.runtime import StubDataclassDerivedRecord
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclassKey
 
 # Test save record payloads
-create_record_payload = {"Id": "new_record", "DerivedStrField": "test", "_t": "StubDataclassDerivedRecord"}
+create_record_payload = {"Id": "new_record", "DerivedStrField": "test", "_t": "StubDataclassDerived"}
 
 update_record_payload = {
     "Id": "existing_record",
     "DerivedStrField": "new_value",
-    "_t": "StubDataclassDerivedRecord",
+    "_t": "StubDataclassDerived",
 }
 
 
@@ -46,9 +46,9 @@ def test_method(pytest_default_db):
     assert len(save_new_record_result) == 1
     assert save_new_record_result[0].key == "new_record"
 
-    new_record_key = StubDataclassRecordKey(id="new_record").build()
-    new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, new_record_key)
-    records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
+    new_key = StubDataclassKey(id="new_record").build()
+    new_record_in_db = DbContext.load_one(StubDataclassDerived, new_key)
+    records_count = len(list(DbContext.load_all(StubDataclassDerived)))
 
     assert new_record_in_db is not None
     assert new_record_in_db.id == "new_record"
@@ -58,12 +58,12 @@ def test_method(pytest_default_db):
     assert records_count == 1
 
     # Test updating existing record.
-    existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value").build()
+    existing_record = StubDataclassDerived(id="existing_record", derived_str_field="old_value").build()
     DbContext.save_one(existing_record)
     update_record_request_obj = SaveRequest(records=[update_record_payload])
 
     update_record_result = SaveResponseUtil.save_records(update_record_request_obj)
-    existing_record_key = StubDataclassRecordKey(id="existing_record").build()
+    existing_key = StubDataclassKey(id="existing_record").build()
 
     # Check if result is a list[KeyRequestItem] object.
     assert isinstance(update_record_result, list)
@@ -72,8 +72,8 @@ def test_method(pytest_default_db):
     # Check that response contains the key of the new record.
     assert update_record_result[0].key == "existing_record"
 
-    updated_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, existing_record_key)
-    records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
+    updated_record_in_db = DbContext.load_one(StubDataclassDerived, existing_key)
+    records_count = len(list(DbContext.load_all(StubDataclassDerived)))
     assert updated_record_in_db is not None
     assert updated_record_in_db.id == "existing_record"
     assert updated_record_in_db.derived_str_field == "new_value"
@@ -100,9 +100,9 @@ def test_api(pytest_default_db):
         assert save_new_record_json[0].get("Key") is not None
         assert save_new_record_json[0].get("Key") == "new_record"
 
-        new_record_key = StubDataclassRecordKey(id="new_record").build()
-        new_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, new_record_key)
-        records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
+        new_key = StubDataclassKey(id="new_record").build()
+        new_record_in_db = DbContext.load_one(StubDataclassDerived, new_key)
+        records_count = len(list(DbContext.load_all(StubDataclassDerived)))
 
         assert new_record_in_db is not None
         assert new_record_in_db.id == "new_record"
@@ -111,7 +111,7 @@ def test_api(pytest_default_db):
         assert records_count == 1
 
         # Test updating existing record
-        existing_record = StubDataclassDerivedRecord(id="existing_record", derived_str_field="old_value").build()
+        existing_record = StubDataclassDerived(id="existing_record", derived_str_field="old_value").build()
         DbContext.save_one(existing_record)
 
         update_record_response = test_client.post("/storage/save", json=[update_record_payload])
@@ -125,8 +125,8 @@ def test_api(pytest_default_db):
         assert update_record_json[0].get("Key") is not None
         assert update_record_json[0].get("Key") == "existing_record"
 
-        updated_record_in_db = DbContext.load_one(StubDataclassDerivedRecord, existing_record.get_key())
-        records_count = len(list(DbContext.load_all(StubDataclassDerivedRecord)))
+        updated_record_in_db = DbContext.load_one(StubDataclassDerived, existing_record.get_key())
+        records_count = len(list(DbContext.load_all(StubDataclassDerived)))
         assert updated_record_in_db is not None
         assert updated_record_in_db.id == "existing_record"
         assert updated_record_in_db.derived_str_field == "new_value"

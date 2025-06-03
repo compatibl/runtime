@@ -27,29 +27,29 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
+from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 
 _CSV_SERIALIZER = DataSerializers.FOR_CSV
 """Serializer for CSV serialization."""
 
 
 stub_entries: List[List[RecordProtocol]] = [  # noqa
-    [StubDataclassRecord(id=f"abc1_n{i}") for i in range(5)],
+    [StubDataclass(id=f"abc1_n{i}") for i in range(5)],
     [StubDataclassNestedFields(id=f"abc2_n{i}") for i in range(5)],
     [StubDataclassComposite(primitive=f"abc{i}") for i in range(5)],
-    [StubDataclassDerivedRecord(id=f"abc3_n{i}") for i in range(5)],
-    [StubDataclassDerivedFromDerivedRecord(id=f"abc4_n{i}") for i in range(5)],
-    [StubDataclassOtherDerivedRecord(id=f"abc5_n{i}") for i in range(5)],
+    [StubDataclassDerived(id=f"abc3_n{i}") for i in range(5)],
+    [StubDataclassDoubleDerived(id=f"abc4_n{i}") for i in range(5)],
+    [StubDataclassOtherDerived(id=f"abc5_n{i}") for i in range(5)],
     [StubDataclassOptionalFields(id=f"abc7_n{i}") for i in range(5)],
     [StubDataclassListFields(id=f"abc6_n{i}") for i in range(5)],
     [StubDataclassDictFields(id=f"abc8_n{i}") for i in range(5)],

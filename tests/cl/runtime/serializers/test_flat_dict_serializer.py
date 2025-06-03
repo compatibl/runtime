@@ -20,27 +20,27 @@ from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
+from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 
 
 def test_data_serialization():
     sample_types = [
-        StubDataclassRecord,
+        StubDataclass,
         StubDataclassNestedFields,
         StubDataclassComposite,
-        StubDataclassDerivedRecord,
-        StubDataclassDerivedFromDerivedRecord,
-        StubDataclassOtherDerivedRecord,
+        StubDataclassDerived,
+        StubDataclassDoubleDerived,
+        StubDataclassOtherDerived,
         StubDataclassListFields,
         StubDataclassOptionalFields,
         StubDataclassDictFields,

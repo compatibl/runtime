@@ -14,17 +14,17 @@
 
 import pytest
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
+from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassSingleton
 
 
@@ -33,12 +33,12 @@ def test_build():
 
     samples = [
         StubDataclassOptionalFields(id="abc7"),
-        StubDataclassRecord(id="abc1"),
+        StubDataclass(id="abc1"),
         StubDataclassNestedFields(id="abc2"),
         StubDataclassComposite(),
-        StubDataclassDerivedRecord(id="abc3"),
-        StubDataclassDerivedFromDerivedRecord(id="abc4"),
-        StubDataclassOtherDerivedRecord(id="abc5"),
+        StubDataclassDerived(id="abc3"),
+        StubDataclassDoubleDerived(id="abc4"),
+        StubDataclassOtherDerived(id="abc5"),
         StubDataclassListFields(id="abc6"),
         StubDataclassOptionalFields(id="abc7"),
         StubDataclassDictFields(id="abc8"),

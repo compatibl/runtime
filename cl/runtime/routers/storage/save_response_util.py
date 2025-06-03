@@ -38,8 +38,8 @@ class SaveResponseUtil:
         deserialized_records = tuple(_UI_SERIALIZER.deserialize(record_dict) for record_dict in request.records)
 
         # Check if all received records are of the same key type.
-        first_record_key_type = deserialized_records[0].get_key_type()
-        if not all(record.get_key_type() == first_record_key_type for record in deserialized_records):
+        first_key_type = deserialized_records[0].get_key_type()
+        if not all(record.get_key_type() == first_key_type for record in deserialized_records):
             raise RuntimeError("Bulk save records of different key types currently is not supported.")
 
         # Save records to DB.

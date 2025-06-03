@@ -22,26 +22,26 @@ from cl.runtime.serializers.json_serializer import orjson_default
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_inclusion import TypeInclusion
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
+from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassSingleton
 
 _SAMPLE_TYPES = [
-    StubDataclassRecord,
+    StubDataclass,
     StubDataclassNestedFields,
     StubDataclassComposite,
-    StubDataclassDerivedRecord,
-    StubDataclassDerivedFromDerivedRecord,
-    StubDataclassOtherDerivedRecord,
+    StubDataclassDerived,
+    StubDataclassDoubleDerived,
+    StubDataclassOtherDerived,
     StubDataclassListFields,
     StubDataclassOptionalFields,
     StubDataclassDictFields,

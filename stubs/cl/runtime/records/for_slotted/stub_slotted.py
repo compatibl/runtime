@@ -14,17 +14,17 @@
 
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
-from stubs.cl.runtime.records.for_slotted.stub_slotted_record_key import StubSlottedRecordKey
+from stubs.cl.runtime.records.for_slotted.stub_slotted_key import StubSlottedKey
 
 
-class StubSlottedRecord(StubSlottedRecordKey, RecordMixin[StubSlottedRecordKey]):
+class StubSlotted(StubSlottedKey, RecordMixin[StubSlottedKey]):
     """Stub record base class not using any dataclass framework."""
 
-    __slots__ = SlotsUtil.merge_slots(StubSlottedRecordKey)
+    __slots__ = SlotsUtil.merge_slots(StubSlottedKey)
 
     def __init__(self, record_id: str = "abc") -> None:
         """Initialize instance attributes."""
         super().__init__(record_id)
 
-    def get_key(self) -> StubSlottedRecordKey:
-        return StubSlottedRecordKey(record_id=self.record_id).build()
+    def get_key(self) -> StubSlottedKey:
+        return StubSlottedKey(record_id=self.record_id).build()

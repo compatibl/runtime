@@ -28,14 +28,14 @@ def test_template_mixin(pytest_default_db):
     body = (
         "base_field.str_field: {base_field.str_field}\n"
         "base_field.int_field: {base_field.int_field}\n"
-        "polymorphic_derived_field.derived_from_derived_str_field: {polymorphic_derived_field.derived_from_derived_str_field}\n"
+        "polymorphic_derived_field.double_derived_str_field: {polymorphic_derived_field.double_derived_str_field}\n"
     )
 
     # Since bytes and large bytes might not render nicely, we format them carefully
     expected_result = (
         "base_field.str_field: abc\n"
         "base_field.int_field: 123\n"
-        "polymorphic_derived_field.derived_from_derived_str_field: derived_from_derived\n"
+        "polymorphic_derived_field.double_derived_str_field: double_derived\n"
     )
 
     # Render and validate

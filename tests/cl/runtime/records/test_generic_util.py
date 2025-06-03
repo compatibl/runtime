@@ -17,36 +17,34 @@ from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import TKey
 from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime import StubDataclassRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_concrete_record import StubDataclassConcreteRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_generic_record import (
-    StubDataclassDerivedGenericRecord,
-)
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_bound_generic import StubDataclassBoundGeneric
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_generic import StubDataclassDerivedGeneric
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record import StubDataclassGenericRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import TKeyArg
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic import StubDataclassGeneric
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_key import StubDataclassGenericKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_key import TKeyArg
 
 
 def test_is_generic():
     """Test for GenericUtil.is_generic method."""
 
     # Immediate parent of a generic type, no generic params
-    assert GenericUtil.is_generic(StubDataclassRecord)
+    assert GenericUtil.is_generic(StubDataclass)
 
     # Parent of parent of a generic type, no generic params
     assert GenericUtil.is_generic(StubDataclassNestedFields)
 
     # Generic alias with a concrete type argument
-    assert GenericUtil.is_generic(StubDataclassGenericRecordKey[StubDataclassGenericArg1])
+    assert GenericUtil.is_generic(StubDataclassGenericKey[StubDataclassGenericArg1])
 
     # Generic type without a concrete type argument, should return TypeVar.__bound__
-    assert GenericUtil.is_generic(StubDataclassGenericRecordKey)
+    assert GenericUtil.is_generic(StubDataclassGenericKey)
 
     # Non-generic type
-    assert not GenericUtil.is_generic(StubDataclassRecordKey)
+    assert not GenericUtil.is_generic(StubDataclassKey)
 
 
 def test_is_instance():
@@ -57,83 +55,83 @@ def test_is_instance():
 
     # Generic alias with a concrete type argument
     assert GenericUtil.is_instance(
-        StubDataclassGenericRecordKey(), StubDataclassGenericRecordKey[StubDataclassGenericArg1]
+        StubDataclassGenericKey(), StubDataclassGenericKey[StubDataclassGenericArg1]
     )
 
     # Generic type without a concrete type argument, should return TypeVar.__bound__
-    assert GenericUtil.is_instance(StubDataclassGenericRecordKey(), StubDataclassGenericRecordKey)
+    assert GenericUtil.is_instance(StubDataclassGenericKey(), StubDataclassGenericKey)
 
     # Non-generic type
-    assert GenericUtil.is_instance(StubDataclassRecordKey(), StubDataclassRecordKey)
+    assert GenericUtil.is_instance(StubDataclassKey(), StubDataclassKey)
 
 
 def test_get_bound_type():
     """Test for GenericUtil.get_bound_type method."""
 
     # Immediate parent of a generic type, no generic params
-    assert GenericUtil.get_bound_type(StubDataclassRecord, TKey) == StubDataclassRecordKey
+    assert GenericUtil.get_bound_type(StubDataclass, TKey) == StubDataclassKey
 
     # Parent of parent of a generic type, no generic params
-    assert GenericUtil.get_bound_type(StubDataclassNestedFields, TKey) == StubDataclassRecordKey
+    assert GenericUtil.get_bound_type(StubDataclassNestedFields, TKey) == StubDataclassKey
 
     # Generic alias with a concrete type argument
     assert (
-        GenericUtil.get_bound_type(StubDataclassGenericRecordKey[StubDataclassGenericArg1], TKeyArg)
+        GenericUtil.get_bound_type(StubDataclassGenericKey[StubDataclassGenericArg1], TKeyArg)
         == StubDataclassGenericArg1
     )
 
     # Generic type without a concrete type argument, should return TypeVar.__bound__
-    assert GenericUtil.get_bound_type(StubDataclassGenericRecordKey, TKeyArg) == KeyMixin
+    assert GenericUtil.get_bound_type(StubDataclassGenericKey, TKeyArg) == KeyMixin
 
     # Error message when the class is not generic
     with pytest.raises(RuntimeError, match="no generic parameter"):
-        GenericUtil.get_bound_type(StubDataclassRecordKey, TKey)
+        GenericUtil.get_bound_type(StubDataclassKey, TKey)
 
     # Error message when type var with this name is not found
     with pytest.raises(RuntimeError, match="no generic parameter"):
-        GenericUtil.get_bound_type(StubDataclassGenericRecordKey, TKey)
+        GenericUtil.get_bound_type(StubDataclassGenericKey, TKey)
 
 
 def test_get_bound_type_dict():
     """Test for GenericUtil.get_bound_type_dict method."""
 
     # Immediate parent of a generic type, no generic params
-    assert GenericUtil.get_bound_type_dict(StubDataclassRecord) == {"TKey": StubDataclassRecordKey}
+    assert GenericUtil.get_bound_type_dict(StubDataclass) == {"TKey": StubDataclassKey}
 
     # Parent of parent of a generic type, no generic params
-    assert GenericUtil.get_bound_type_dict(StubDataclassNestedFields) == {"TKey": StubDataclassRecordKey}
+    assert GenericUtil.get_bound_type_dict(StubDataclassNestedFields) == {"TKey": StubDataclassKey}
 
     # Full concrete type substitution, two params
-    assert GenericUtil.get_bound_type_dict(StubDataclassConcreteRecord) == {
-        "TKeyArg": StubDataclassRecordKey,
+    assert GenericUtil.get_bound_type_dict(StubDataclassBoundGeneric) == {
+        "TKeyArg": StubDataclassKey,
         "TRecordArg": StubDataclassGenericArg1,
-        "TKey": StubDataclassGenericRecordKey[StubDataclassRecordKey],
+        "TKey": StubDataclassGenericKey[StubDataclassKey],
     }
 
     # Partial concrete type substitution, two params
-    assert GenericUtil.get_bound_type_dict(StubDataclassDerivedGenericRecord) == {
-        "TKeyArg": StubDataclassRecordKey,
+    assert GenericUtil.get_bound_type_dict(StubDataclassDerivedGeneric) == {
+        "TKeyArg": StubDataclassKey,
         "TRecordArg": StubDataclassGenericArg,
-        "TKey": StubDataclassGenericRecordKey[StubDataclassRecordKey],
+        "TKey": StubDataclassGenericKey[StubDataclassKey],
     }
 
     # No concrete type substitution, two params
-    assert GenericUtil.get_bound_type_dict(StubDataclassGenericRecord) == {
+    assert GenericUtil.get_bound_type_dict(StubDataclassGeneric) == {
         "TKeyArg": KeyMixin,
         "TRecordArg": StubDataclassGenericArg,
-        "TKey": StubDataclassGenericRecordKey[KeyMixin],
+        "TKey": StubDataclassGenericKey[KeyMixin],
     }
 
     # Generic alias with a concrete type argument
-    assert GenericUtil.get_bound_type_dict(StubDataclassGenericRecordKey[StubDataclassGenericArg1]) == {
+    assert GenericUtil.get_bound_type_dict(StubDataclassGenericKey[StubDataclassGenericArg1]) == {
         "TKeyArg": StubDataclassGenericArg1
     }
 
     # Generic type without a concrete type argument, should return TKeyArg.__bound__
-    assert GenericUtil.get_bound_type_dict(StubDataclassGenericRecordKey) == {"TKeyArg": TKeyArg.__bound__}
+    assert GenericUtil.get_bound_type_dict(StubDataclassGenericKey) == {"TKeyArg": TKeyArg.__bound__}
 
     # Not a generic class, the result is empty
-    assert GenericUtil.get_bound_type_dict(StubDataclassRecordKey) == {}
+    assert GenericUtil.get_bound_type_dict(StubDataclassKey) == {}
 
 
 if __name__ == "__main__":

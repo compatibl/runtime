@@ -16,7 +16,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
-class StubSlottedRecordKey(KeyMixin):
+class StubSlottedKey(KeyMixin):
     """Stub record base class not using any dataclass framework."""
 
     __slots__ = SlotsUtil.merge_slots(KeyMixin, "record_id")
@@ -31,4 +31,4 @@ class StubSlottedRecordKey(KeyMixin):
 
     @classmethod
     def get_key_type(cls) -> type:
-        return StubSlottedRecordKey
+        return StubSlottedKey

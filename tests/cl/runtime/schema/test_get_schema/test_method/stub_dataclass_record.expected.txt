@@ -1,6 +1,6 @@
 Module:
   ModuleName: cl
-Name: StubDataclassRecord
+Name: StubDataclass
 Label: Stub Dataclass Record
 Comment: Stub record base class.
 TypeKind: Record
@@ -8,7 +8,7 @@ DisplayKind: Basic
 Inherit:
   Module:
     ModuleName: cl
-  Name: StubDataclassRecordKey
+  Name: StubDataclassKey
 Elements:
 - Value:
     Type: String

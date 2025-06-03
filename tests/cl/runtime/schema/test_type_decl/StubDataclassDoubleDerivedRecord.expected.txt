@@ -1,14 +1,14 @@
 module:
   module_name: cl
-name: StubDataclassDerivedFromDerivedRecord
+name: StubDataclassDoubleDerived
 label: Stub Dataclass Derived From Derived Record
-comment: Two levels in inheritance hierarchy away from StubDataclassRecord.
+comment: Two levels in inheritance hierarchy away from StubDataclass.
 type_kind: Record
 display_kind: Basic
 inherit:
   module:
     module_name: cl
-  name: StubDataclassDerivedRecord
+  name: StubDataclassDerived
 elements:
 - value:
     type_: String
@@ -22,7 +22,7 @@ elements:
   optional: false
 - value:
     type_: String
-  name: DerivedFromDerivedStrField
+  name: DoubleDerivedStrField
   comment: Stub field.
   vector: false
   optional: false

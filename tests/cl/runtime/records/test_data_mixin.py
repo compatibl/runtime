@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerivedData
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedData
+from stubs.cl.runtime import StubDataclassDoubleDerivedData
 
 
 def test_build():
@@ -27,8 +27,8 @@ def test_build():
     StubDataclassData(_regression_guard=guard).build()
     guard.write("Testing Derived:")
     StubDataclassDerivedData(_regression_guard=guard).build()
-    guard.write("Testing DerivedFromDerivedWithInit:")
-    StubDataclassDerivedFromDerivedData(_regression_guard=guard).build()
+    guard.write("Testing DoubleDerivedWithInit:")
+    StubDataclassDoubleDerivedData(_regression_guard=guard).build()
     guard.verify()
 
 

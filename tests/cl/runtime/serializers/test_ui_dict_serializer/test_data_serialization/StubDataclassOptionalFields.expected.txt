@@ -17,7 +17,7 @@ RequiredListOfOptionalKey:
 - abc
 - 
 RequiredListOfOptionalRecord:
-- _t: StubDataclassRecord
+- _t: StubDataclass
   Id: abc
 - 
 

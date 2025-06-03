@@ -1,4 +1,4 @@
-type_name: StubDataclassVersionedRecord
+type_name: StubDataclassVersioned
 type_kind: Record
 fields:
 - field_name: id

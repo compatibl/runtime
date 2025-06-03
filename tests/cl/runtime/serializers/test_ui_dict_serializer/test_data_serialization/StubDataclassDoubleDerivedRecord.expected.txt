@@ -1,5 +1,5 @@
-_t: StubDataclassDerivedFromDerivedRecord
+_t: StubDataclassDoubleDerived
 Id: abc
 DerivedStrField: derived
-DerivedFromDerivedStrField: derived_from_derived
+DoubleDerivedStrField: double_derived
 

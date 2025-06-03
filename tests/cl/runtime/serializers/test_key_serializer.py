@@ -20,11 +20,11 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataclassCompositeKey
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
 _SERIALIZATION_SAMPLES = [
-    StubDataclassRecordKey().build(),
+    StubDataclassKey().build(),
     StubDataclassCompositeKey().build(),
     StubDataclassPrimitiveFieldsKey().build(),
 ]
@@ -32,8 +32,8 @@ _SERIALIZATION_SAMPLES = [
 _SERIALIZATION_EXCEPTION_SAMPLES = [
     str,  # Primitive type
     float,  # Primitive type
-    [StubDataclassRecordKey().build()],  # List type
-    {"a": StubDataclassRecordKey().build()},  # Dict type
+    [StubDataclassKey().build()],  # List type
+    {"a": StubDataclassKey().build()},  # Dict type
 ]
 
 

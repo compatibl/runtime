@@ -1,6 +1,6 @@
 module:
   module_name: cl
-name: StubDataclassAliasedRecord
+name: StubDataclassAliased
 label: Stub Dataclass Aliased Record
 comment: Stub record class with typename alias.
 type_kind: Record
@@ -8,7 +8,7 @@ display_kind: Basic
 inherit:
   module:
     module_name: cl
-  name: StubDataclassAliasedRecordKey
+  name: StubDataclassAliasedKey
 elements:
 - value:
     type_: String

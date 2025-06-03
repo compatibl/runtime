@@ -21,18 +21,18 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.load_response import LoadResponse
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 
 
 def test_method(pytest_default_db):
     """Test coroutine for /storage/load route."""
 
     # Save test record.
-    record = StubDataclassRecord(id=__name__).build()
+    record = StubDataclass(id=__name__).build()
     DbContext.save_one(record)
 
     # Run the coroutine wrapper added by the FastAPI decorator and get the result.
-    load_request = LoadRequest(load_keys=[KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclassRecord))])
+    load_request = LoadRequest(load_keys=[KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclass))])
     result = LoadResponse.get_response(load_request)
 
     # Check if the result is a LoadResponse instance.
@@ -52,11 +52,11 @@ def test_api(pytest_default_db):
 
     with QaClient() as test_client:
         # Save test record.
-        record = StubDataclassRecord(id=__name__).build()
+        record = StubDataclass(id=__name__).build()
         DbContext.save_one(record)
 
         # Request body.
-        request_body = [KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclassRecord)).model_dump()]
+        request_body = [KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclass)).model_dump()]
 
         # Get response.
         response = test_client.post("/storage/load", json=request_body)

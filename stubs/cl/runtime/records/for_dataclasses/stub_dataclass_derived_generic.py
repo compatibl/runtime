@@ -14,16 +14,16 @@
 
 from dataclasses import dataclass
 from typing import Generic
-from stubs.cl.runtime import StubDataclassRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record import StubDataclassGenericRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record import TRecordArg
+from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic import StubDataclassGeneric
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic import TRecordArg
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassDerivedGenericRecord(
+class StubDataclassDerivedGeneric(
     Generic[TRecordArg],
-    StubDataclassGenericRecord[
-        StubDataclassRecordKey,
+    StubDataclassGeneric[
+        StubDataclassKey,
         TRecordArg,
     ],
 ):

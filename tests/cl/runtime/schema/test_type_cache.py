@@ -19,8 +19,8 @@ from cl.runtime import RecordMixin
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.schema.type_kind import TypeKind
-from stubs.cl.runtime import StubDataclassDerivedRecord
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_one_leading_underscore_data import (
     _StubDataclassOneLeadingUnderscoreData,
@@ -39,26 +39,26 @@ def test_get_qual_name():
     """Test getting class path from class."""
 
     # Base class
-    base_path = f"{StubDataclassRecord.__module__}.{StubDataclassRecord.__name__}"
-    assert TypeInfoCache.get_qual_name_from_class(StubDataclassRecord) == base_path
+    base_path = f"{StubDataclass.__module__}.{StubDataclass.__name__}"
+    assert TypeInfoCache.get_qual_name_from_class(StubDataclass) == base_path
 
     # Derived class
-    derived_path = f"{StubDataclassDerivedRecord.__module__}.{StubDataclassDerivedRecord.__name__}"
-    assert TypeInfoCache.get_qual_name_from_class(StubDataclassDerivedRecord) == derived_path
+    derived_path = f"{StubDataclassDerived.__module__}.{StubDataclassDerived.__name__}"
+    assert TypeInfoCache.get_qual_name_from_class(StubDataclassDerived) == derived_path
 
 
 def test_from_type_name():
     """Test getting class from type names."""
 
     assert TypeInfoCache.get_class_from_type_name("TypeDecl") is TypeDecl
-    assert TypeInfoCache.get_class_from_type_name("StubDataclassRecord") is StubDataclassRecord
+    assert TypeInfoCache.get_class_from_type_name("StubDataclass") is StubDataclass
 
 
 def test_from_qual_name():
     """Test getting class from qual names."""
 
     # Classes that is already imported
-    for imported_class in [TypeInfoCache, TypeDecl, StubDataclassRecord]:
+    for imported_class in [TypeInfoCache, TypeDecl, StubDataclass]:
         class_info_path = f"{imported_class.__module__}.{imported_class.__name__}"
         assert TypeInfoCache.get_class_from_qual_name(class_info_path) == imported_class
 
@@ -93,7 +93,7 @@ def test_get_classes():
 
     # Included data types
     assert TypeDecl in data_types
-    assert StubDataclassRecord in data_types
+    assert StubDataclass in data_types
 
     # Excluded data types
     assert RecordMixin not in data_types

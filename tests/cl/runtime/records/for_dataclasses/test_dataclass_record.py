@@ -13,22 +13,22 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import StubDataclassDictFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import StubDataclassListFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 def test_smoke():
     """Smoke test."""
 
     # Create test record and populate with sample data
-    record = StubDataclassRecord()
+    record = StubDataclass()
 
     # Test primary key
     key = record.get_key()
-    assert key == StubDataclassRecordKey(id="abc")
+    assert key == StubDataclassKey(id="abc")
 
 
 def test_with_primitive_fields():

@@ -21,9 +21,9 @@ from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_util import RecordUtil
 from stubs.cl.runtime import StubDataclassData
-from stubs.cl.runtime import StubDataclassDerivedRecord
-from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassKey
 
 
 def test_functions():
@@ -33,9 +33,9 @@ def test_functions():
     key_mixin_class = KeyMixin
     non_data_class = RecordUtil
     data_class = StubDataclassData
-    key_class = StubDataclassRecordKey
-    record_class = StubDataclassRecord
-    derived_class = StubDataclassDerivedRecord
+    key_class = StubDataclassKey
+    record_class = StubDataclass
+    derived_class = StubDataclassDerived
 
     # Class groups
     all_classes = (

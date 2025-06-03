@@ -19,24 +19,24 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.delete_response_util import DeleteResponseUtil
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDerived
 
 
 def test_method(pytest_default_db):
     """Test coroutine for /storage/delete route."""
 
     existing_records = [
-        StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build() for i in range(5)
+        StubDataclassDerived(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build() for i in range(5)
     ]
     DbContext.save_many(existing_records)
 
     delete_records_payload = {
-        "delete_keys": [{"key": record.id, "type": "StubDataclassDerivedRecord"} for record in existing_records[:3]]
+        "delete_keys": [{"key": record.id, "type": "StubDataclassDerived"} for record in existing_records[:3]]
     }
     delete_records_request_obj = DeleteRequest(**delete_records_payload)
 
     delete_records_result = DeleteResponseUtil.delete_records(delete_records_request_obj)
-    records_in_db = sorted(DbContext.load_all(StubDataclassDerivedRecord), key=lambda x: x.id)
+    records_in_db = sorted(DbContext.load_all(StubDataclassDerived), key=lambda x: x.id)
 
     # Check if result is a list[KeyRequestItem] object.
     assert isinstance(delete_records_result, list)
@@ -54,13 +54,13 @@ def test_api(pytest_default_db):
     """Test REST API for /storage/delete route."""
     with QaClient() as test_client:
         existing_records = [
-            StubDataclassDerivedRecord(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build()
+            StubDataclassDerived(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build()
             for i in range(5)
         ]
         DbContext.save_many(existing_records)
 
         delete_records_payload = [
-            {"Key": record.id, "Type": "StubDataclassDerivedRecord"} for record in existing_records[:3]
+            {"Key": record.id, "Type": "StubDataclassDerived"} for record in existing_records[:3]
         ]
 
         delete_records_response = test_client.post(
@@ -68,7 +68,7 @@ def test_api(pytest_default_db):
             json=delete_records_payload,
         )
         delete_records_json = delete_records_response.json()
-        records_in_db = sorted(DbContext.load_all(StubDataclassDerivedRecord), key=lambda x: x.id)
+        records_in_db = sorted(DbContext.load_all(StubDataclassDerived), key=lambda x: x.id)
 
         assert delete_records_response.status_code == 200
         assert isinstance(delete_records_json, list)

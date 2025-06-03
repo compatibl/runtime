@@ -15,28 +15,28 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
-from stubs.cl.runtime import StubDataclassRecordKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_concrete_record import StubDataclassConcreteRecord
+from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_bound_generic import StubDataclassBoundGeneric
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_record_key import StubDataclassGenericRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_key import StubDataclassGenericKey
 
 
-def test_concrete_record(pytest_default_db):
-    """Test StubDataclassConcreteRecord."""
+def test_bound_generic(pytest_default_db):
+    """Test StubDataclassBoundGeneric."""
 
     # Create and save a record derived from a generic base
-    record = StubDataclassConcreteRecord(
-        key_field=StubDataclassRecordKey(),
+    record = StubDataclassBoundGeneric(
+        key_field=StubDataclassKey(),
         record_field=StubDataclassGenericArg1(),
     ).build()
     DbContext.save_one(record)
 
     # Test key
-    key = StubDataclassGenericRecordKey(key_field=StubDataclassRecordKey()).build()
+    key = StubDataclassGenericKey(key_field=StubDataclassKey()).build()
     assert key == record.get_key()
 
     # Get record from DB using key
-    loaded_record = DbContext.load_one(StubDataclassConcreteRecord, key)
+    loaded_record = DbContext.load_one(StubDataclassBoundGeneric, key)
     assert loaded_record == record
 
 

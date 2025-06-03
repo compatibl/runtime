@@ -16,15 +16,15 @@ from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data import (
-    StubDataclassDerivedFromDerivedData,
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived_data import (
+    StubDataclassDoubleDerivedData,
 )
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassNestedFields(StubDataclassRecord):
+class StubDataclassNestedFields(StubDataclass):
     """Stub derived class."""
 
     base_field: StubDataclassData = required(default_factory=lambda: StubDataclassData())
@@ -33,8 +33,8 @@ class StubDataclassNestedFields(StubDataclassRecord):
     derived_field: StubDataclassDerivedData = required(default_factory=lambda: StubDataclassDerivedData())
     """Stub field."""
 
-    derived_from_derived_field: StubDataclassDerivedFromDerivedData = required(
-        default_factory=lambda: StubDataclassDerivedFromDerivedData()
+    double_derived_field: StubDataclassDoubleDerivedData = required(
+        default_factory=lambda: StubDataclassDoubleDerivedData()
     )
     """Stub field."""
 
@@ -42,12 +42,12 @@ class StubDataclassNestedFields(StubDataclassRecord):
     """Declared StubDataclassData but provided an instance of StubDataclassDerivedData."""
 
     polymorphic_derived_field: StubDataclassDerivedData = required(
-        default_factory=lambda: StubDataclassDerivedFromDerivedData()
+        default_factory=lambda: StubDataclassDoubleDerivedData()
     )
-    """Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData."""
+    """Declared StubDataclassDerivedData but provided an instance of StubDataclassDoubleDerivedData."""
 
-    key_field: StubDataclassRecordKey = required(default_factory=lambda: StubDataclassRecordKey(id="uvw"))
+    key_field: StubDataclassKey = required(default_factory=lambda: StubDataclassKey(id="uvw"))
     """Stub field."""
 
-    record_as_key_field: StubDataclassRecordKey = required(default_factory=lambda: StubDataclassRecord())
+    record_as_key_field: StubDataclassKey = required(default_factory=lambda: StubDataclass())
     """Stub field with key type initialized to record type instance."""

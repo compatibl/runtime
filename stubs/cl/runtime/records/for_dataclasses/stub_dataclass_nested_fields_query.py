@@ -16,15 +16,15 @@ from dataclasses import dataclass
 from cl.runtime.records.conditions import Condition
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data import (
-    StubDataclassDerivedFromDerivedData,
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived_data import (
+    StubDataclassDoubleDerivedData,
 )
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassRecordQuery
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassQuery
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassNestedFieldsQuery(StubDataclassRecordQuery):
+class StubDataclassNestedFieldsQuery(StubDataclassQuery):
     """Stub derived class."""
 
     base_field: Condition[StubDataclassData] | None = None
@@ -33,17 +33,17 @@ class StubDataclassNestedFieldsQuery(StubDataclassRecordQuery):
     derived_field: Condition[StubDataclassDerivedData] | None = None
     """Stub field."""
 
-    derived_from_derived_field: Condition[StubDataclassDerivedFromDerivedData] | None = None
+    double_derived_field: Condition[StubDataclassDoubleDerivedData] | None = None
     """Stub field."""
 
     polymorphic_field: Condition[StubDataclassData] | None = None
     """Declared StubDataclassData but provided an instance of StubDataclassDerivedData."""
 
     polymorphic_derived_field: Condition[StubDataclassDerivedData] | None = None
-    """Declared StubDataclassDerivedData but provided an instance of StubDataclassDerivedFromDerivedData."""
+    """Declared StubDataclassDerivedData but provided an instance of StubDataclassDoubleDerivedData."""
 
-    key_field: Condition[StubDataclassRecordKey] | None = None
+    key_field: Condition[StubDataclassKey] | None = None
     """Stub field."""
 
-    record_as_key_field: Condition[StubDataclassRecordKey] | None = None
+    record_as_key_field: Condition[StubDataclassKey] | None = None
     """Stub field with key type initialized to record type instance."""

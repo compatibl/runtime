@@ -24,7 +24,7 @@ from cl.runtime.records.conditions import Not
 from cl.runtime.records.conditions import Or
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields_query import StubDataclassNestedFieldsQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
     StubDataclassPrimitiveFieldsQuery,
@@ -65,17 +65,17 @@ def test_key_query(pytest_multi_db):
 
     # Create test records and query and populate with sample data
     records = [
-        StubDataclassNestedFields(key_field=StubDataclassRecordKey(id="abc")),
-        StubDataclassNestedFields(key_field=StubDataclassRecordKey(id="def")),
-        StubDataclassNestedFields(key_field=StubDataclassRecordKey(id="xyz")),
+        StubDataclassNestedFields(key_field=StubDataclassKey(id="abc")),
+        StubDataclassNestedFields(key_field=StubDataclassKey(id="def")),
+        StubDataclassNestedFields(key_field=StubDataclassKey(id="xyz")),
     ]
     records = [x.build() for x in records]
     DbContext.save_many(records)
 
     # Create queries
-    key_abc = StubDataclassRecordKey(id="abc")
-    key_def = StubDataclassRecordKey(id="def")
-    key_xyz = StubDataclassRecordKey(id="xyz")
+    key_abc = StubDataclassKey(id="abc")
+    key_def = StubDataclassKey(id="def")
+    key_xyz = StubDataclassKey(id="xyz")
     exists_query = StubDataclassNestedFieldsQuery(key_field=Exists(True)).build()
     eq_query = StubDataclassNestedFieldsQuery(key_field=Eq(key_def)).build()
     in_query = StubDataclassNestedFieldsQuery(key_field=In([key_def, key_xyz])).build()

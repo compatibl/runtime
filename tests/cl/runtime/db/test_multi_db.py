@@ -21,32 +21,32 @@ from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
+from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record import StubDataclassAliasedRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record import StubDataclassVersionedRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased import StubDataclassAliased
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned import StubDataclassVersioned
 
 _SAMPLES = [
     sample.build()
     for sample in [
-        StubDataclassRecord(id="abc1"),
+        StubDataclass(id="abc1"),
         StubDataclassNestedFields(id="abc2"),
         StubDataclassComposite(),
-        StubDataclassDerivedRecord(id="abc3"),
-        StubDataclassDerivedFromDerivedRecord(id="abc4"),
-        StubDataclassOtherDerivedRecord(id="abc5"),
+        StubDataclassDerived(id="abc3"),
+        StubDataclassDoubleDerived(id="abc4"),
+        StubDataclassOtherDerived(id="abc5"),
         StubDataclassListFields(id="abc6"),
         StubDataclassTupleFields(id="abc6tuple"),
         StubDataclassOptionalFields(id="abc7"),
@@ -55,10 +55,10 @@ _SAMPLES = [
         StubDataclassListDictFields(id="abc10"),
         StubDataclassPrimitiveFields(key_str_field="abc11"),
         StubDataclassSingleton(),
-        StubDataclassAliasedRecord(id="abc12", a=123),
+        StubDataclassAliased(id="abc12", a=123),
         StubHandlers(stub_id="abc13"),
-        StubDataclassRecord(id="abc14"),
-        StubDataclassVersionedRecord(id="abc15"),
+        StubDataclass(id="abc14"),
+        StubDataclassVersioned(id="abc15"),
     ]
 ]
 
@@ -82,20 +82,20 @@ def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iter
 def test_record_or_key(pytest_multi_db):
     """Test passing record instead of a key."""
     # Create test record and populate with sample data
-    record = StubDataclassRecord().build()
+    record = StubDataclass().build()
     key = record.get_key()
 
     # Save a single record
     DbContext.save_many([record])
 
     # Load using record or key
-    loaded_records = tuple(DbContext.load_many(StubDataclassRecord, [record, key, None]))
+    loaded_records = tuple(DbContext.load_many(StubDataclass, [record, key, None]))
     assert loaded_records[0] is record  # Same object is returned without lookup
     assert loaded_records[1] == record  # Not the same object but equal
     assert loaded_records[2] is None
 
-    assert DbContext.load_one(StubDataclassRecord, record) is record  # Same object is returned without lookup
-    assert DbContext.load_one(StubDataclassRecord, key) == record  # Not the same object but equal
+    assert DbContext.load_one(StubDataclass, record) is record  # Same object is returned without lookup
+    assert DbContext.load_one(StubDataclass, key) == record  # Not the same object but equal
 
 
 def test_complex_records(pytest_multi_db):
@@ -137,20 +137,20 @@ def test_basic_operations(pytest_multi_db):
 def test_record_upsert(pytest_multi_db):
     """Check that an existing entry is overridden when a new entry with the same key is saved."""
     # Create sample and save
-    sample = StubDataclassRecord().build()
+    sample = StubDataclass().build()
     DbContext.save_one(sample)
-    loaded_record = DbContext.load_one(StubDataclassRecord, sample.get_key())
+    loaded_record = DbContext.load_one(StubDataclass, sample.get_key())
     assert loaded_record == sample
 
     # create sample with the same key and save
-    override_sample = StubDataclassDerivedRecord().build()
+    override_sample = StubDataclassDerived().build()
     DbContext.save_one(override_sample)
-    loaded_record = DbContext.load_one(StubDataclassDerivedRecord, sample.get_key())
+    loaded_record = DbContext.load_one(StubDataclassDerived, sample.get_key())
     assert loaded_record == override_sample
 
-    override_sample = StubDataclassDerivedFromDerivedRecord().build()
+    override_sample = StubDataclassDoubleDerived().build()
     DbContext.save_one(override_sample)
-    loaded_record = DbContext.load_one(StubDataclassDerivedFromDerivedRecord, sample.get_key())
+    loaded_record = DbContext.load_one(StubDataclassDoubleDerived, sample.get_key())
     assert loaded_record == override_sample
 
 
@@ -159,24 +159,24 @@ def test_load_all(pytest_multi_db):
     base_samples = [
         sample.build()
         for sample in [
-            StubDataclassRecord(id="base1"),
-            StubDataclassRecord(id="base2"),
-            StubDataclassRecord(id="base3"),
+            StubDataclass(id="base1"),
+            StubDataclass(id="base2"),
+            StubDataclass(id="base3"),
         ]
     ]
 
     derived_samples = [
         sample.build()
         for sample in [
-            StubDataclassDerivedRecord(id="derived1"),
-            StubDataclassDerivedFromDerivedRecord(id="derived2"),
+            StubDataclassDerived(id="derived1"),
+            StubDataclassDoubleDerived(id="derived2"),
         ]
     ]
 
     other_derived_samples = [
         sample.build()
         for sample in [
-            StubDataclassOtherDerivedRecord(id="derived3"),
+            StubDataclassOtherDerived(id="derived3"),
         ]
     ]
 
@@ -184,10 +184,10 @@ def test_load_all(pytest_multi_db):
 
     DbContext.save_many(all_samples)
 
-    loaded_records = DbContext.load_all(StubDataclassRecord)
+    loaded_records = DbContext.load_all(StubDataclass)
     assert _assert_equals_iterable_without_ordering(all_samples, loaded_records)
 
-    loaded_records = DbContext.load_all(StubDataclassDerivedRecord)
+    loaded_records = DbContext.load_all(StubDataclassDerived)
     assert _assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
@@ -213,25 +213,25 @@ def test_load_filter(pytest_multi_db):
 
     # Create test record and populate with sample data
     offset = 0
-    matching_records = [StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="a").build() for i in range(2)]
+    matching_records = [StubDataclassDerived(id=str(offset + i), derived_str_field="a").build() for i in range(2)]
     offset = len(matching_records)
     non_matching_records = [
-        StubDataclassDerivedRecord(id=str(offset + i), derived_str_field="b").build() for i in range(2)
+        StubDataclassDerived(id=str(offset + i), derived_str_field="b").build() for i in range(2)
     ]
     DbContext.save_many(matching_records + non_matching_records)
 
-    filter_obj = StubDataclassDerivedRecord(id=None, derived_str_field="a").build()  # TODO: Check why id=None is needed
-    loaded_records = DbContext.load_filter(StubDataclassDerivedRecord, filter_obj)
+    filter_obj = StubDataclassDerived(id=None, derived_str_field="a").build()  # TODO: Check why id=None is needed
+    loaded_records = DbContext.load_filter(StubDataclassDerived, filter_obj)
     assert len(loaded_records) == len(matching_records)  # TODO: Refactor to avoid assuming that list is returned
     assert all(x.derived_str_field == filter_obj.derived_str_field for x in loaded_records)
 
 
 def test_repeated(pytest_multi_db):
     """Test including the same object twice in save many."""
-    record = StubDataclassRecord().build()
+    record = StubDataclass().build()
     DbContext.save_many([record, record])
 
-    loaded_records = list(DbContext.load_many(StubDataclassRecord, [record.get_key()]))
+    loaded_records = list(DbContext.load_many(StubDataclass, [record.get_key()]))
     assert len(loaded_records) == 1
     assert loaded_records[0] == record
 

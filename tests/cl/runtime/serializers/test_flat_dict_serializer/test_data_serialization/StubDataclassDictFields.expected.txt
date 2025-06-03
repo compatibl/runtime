@@ -4,7 +4,7 @@ float_dict: '{"a":0.0000123456789,"b":0.000123456789,"c":0.00123456789,"d":0.012
 date_dict: '{"a":"2003-04-21","b":"2003-05-01"}'
 data_dict: '{"a":{"str_field":"A","int_field":1,"_type":"StubDataclassData"},"b":{"str_field":"B","int_field":2,"_type":"StubDataclassData"}}'
 key_dict: '{"a":"A","b":"B"}'
-record_dict: '{"a":{"id":"A","_type":"StubDataclassRecord"},"b":{"id":"B","_type":"StubDataclassRecord"}}'
-derived_record_dict: '{"a":{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerivedRecord"},"b":{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerivedRecord"}}'
+record_dict: '{"a":{"id":"A","_type":"StubDataclass"},"b":{"id":"B","_type":"StubDataclass"}}'
+derived_record_dict: '{"a":{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},"b":{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}}'
 _type: StubDataclassDictFields
 

@@ -16,33 +16,33 @@ import pytest
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.type_info_cache import TypeInfoCache
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
-from stubs.cl.runtime import StubDataclassRecord
-from stubs.cl.runtime import StubDataclassRecordKey
+from stubs.cl.runtime import StubDataclassOtherDerived
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import StubDataclassTupleFields
 
 
 # TODO (Roman): move to Schema tests
 def test_get_subtypes_in_hierarchy():
-    result = TypeInfoCache.get_child_names(StubDataclassRecordKey)
+    result = TypeInfoCache.get_child_names(StubDataclassKey)
     expected_classes = {
-        StubDataclassRecordKey,
-        StubDataclassRecord,
-        StubDataclassDerivedRecord,
-        StubDataclassDerivedFromDerivedRecord,
+        StubDataclassKey,
+        StubDataclass,
+        StubDataclassDerived,
+        StubDataclassDoubleDerived,
         StubDataclassDictFields,
         StubDataclassDictListFields,
         StubDataclassListDictFields,
         StubDataclassListFields,
         StubDataclassTupleFields,
-        StubDataclassOtherDerivedRecord,
+        StubDataclassOtherDerived,
         StubDataclassNestedFields,
     }
     expected_names = {x.__name__ for x in expected_classes}
@@ -54,25 +54,25 @@ def test_get_subtypes_in_hierarchy():
 # TODO (Roman): move to Schema tests
 def test_get_key_class():
     samples = (
-        StubDataclassRecord,
-        StubDataclassDerivedRecord,
-        StubDataclassDerivedFromDerivedRecord,
+        StubDataclass,
+        StubDataclassDerived,
+        StubDataclassDoubleDerived,
         StubDataclassDictFields,
         StubDataclassDictListFields,
         StubDataclassListDictFields,
         StubDataclassListFields,
-        StubDataclassOtherDerivedRecord,
+        StubDataclassOtherDerived,
     )
     for type_ in samples:
-        assert type_.get_key_type() == StubDataclassRecordKey
+        assert type_.get_key_type() == StubDataclassKey
 
 
 def test_get_columns_mapping():
-    test_type = StubDataclassDerivedFromDerivedRecord
+    test_type = StubDataclassDoubleDerived
     expected_columns = {
         "_type": "_type",
-        "id": "StubDataclassRecordKey.id",
-        "derived_str_field": "StubDataclassDerivedRecord.derived_str_field",
+        "id": "StubDataclassKey.id",
+        "derived_str_field": "StubDataclassDerived.derived_str_field",
         "str_dict": "StubDataclassDictFields.str_dict",
         "float_dict": "StubDataclassDictFields.float_dict",
         "date_dict": "StubDataclassDictFields.date_dict",
@@ -95,7 +95,7 @@ def test_get_columns_mapping():
         "key_list": "StubDataclassListFields.key_list",
         "record_list": "StubDataclassListFields.record_list",
         "derived_record_list": "StubDataclassListFields.derived_record_list",
-        "other_derived": "StubDataclassOtherDerivedRecord.other_derived",
+        "other_derived": "StubDataclassOtherDerived.other_derived",
     }
 
     guard = RegressionGuard()

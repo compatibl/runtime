@@ -15,16 +15,16 @@
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_record_key import StubDataclassAliasedRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased_key import StubDataclassAliasedKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassAliasedRecord(
-    StubDataclassAliasedRecordKey, RecordMixin[StubDataclassAliasedRecordKey]
+class StubDataclassAliased(
+    StubDataclassAliasedKey, RecordMixin[StubDataclassAliasedKey]
 ):  # TODO: Specify alias
     """Stub record class with typename alias."""
 
     a: int = required()
 
-    def get_key(self) -> StubDataclassAliasedRecordKey:
-        return StubDataclassAliasedRecordKey(id=self.id).build()
+    def get_key(self) -> StubDataclassAliasedKey:
+        return StubDataclassAliasedKey(id=self.id).build()

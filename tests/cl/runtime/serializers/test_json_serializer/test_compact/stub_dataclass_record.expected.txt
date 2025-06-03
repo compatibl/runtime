@@ -1,1 +1,1 @@
-{"_type":"StubDataclassRecord","id":"abc"}
+{"_type":"StubDataclass","id":"abc"}

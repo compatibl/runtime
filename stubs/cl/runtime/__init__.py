@@ -4,13 +4,9 @@ from stubs.cl.runtime.records.enum.stub_relabeled_int_enum import StubRelabeledI
 from stubs.cl.runtime.records.stub_dict_util import StubDictUtil
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_data import (
-    StubDataclassDerivedFromDerivedData,
-)
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_from_derived_record import (
-    StubDataclassDerivedFromDerivedRecord,
-)
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived_data import StubDataclassDoubleDerivedData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived import StubDataclassDoubleDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import StubDataclassDictFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_list_fields import StubDataclassDictListFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_dict_fields import StubDataclassListDictFields
@@ -18,10 +14,10 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import 
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields import StubDataclassNestedFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite import StubDataclassComposite
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key import StubDataclassCompositeKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_other_derived_record import StubDataclassOtherDerivedRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_other_derived import StubDataclassOtherDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_singleton import StubDataclassSingleton
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers import StubHandlers
 from stubs.cl.runtime.views.stub_data_viewers import StubDataViewers

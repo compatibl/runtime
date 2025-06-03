@@ -14,15 +14,15 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_record_key import StubDataclassVersionedRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_key import StubDataclassVersionedKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassVersionedRecord(StubDataclassVersionedRecordKey, RecordMixin[StubDataclassVersionedRecordKey]):
+class StubDataclassVersioned(StubDataclassVersionedKey, RecordMixin[StubDataclassVersionedKey]):
     """Stub record base class."""
 
     version: int = 0
     """Stub version field."""
 
-    def get_key(self) -> StubDataclassVersionedRecordKey:
-        return StubDataclassVersionedRecordKey(id=self.id).build()
+    def get_key(self) -> StubDataclassVersionedKey:
+        return StubDataclassVersionedKey(id=self.id).build()

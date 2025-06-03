@@ -85,7 +85,7 @@ Elements:
 - Key:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecordKey
+    Name: StubDataclassKey
   Name: OptionalKey
   Comment: Optional key.
   Vector: false
@@ -93,7 +93,7 @@ Elements:
 - Key:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecordKey
+    Name: StubDataclassKey
   Name: RequiredListOfOptionalKey
   Comment: Required list of optional key.
   Vector: true
@@ -102,7 +102,7 @@ Elements:
 - Key:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecordKey
+    Name: StubDataclassKey
   Name: OptionalListOfOptionalKey
   Comment: Optional list of optional key.
   Vector: true
@@ -111,7 +111,7 @@ Elements:
 - Data:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecord
+    Name: StubDataclass
   Name: OptionalRecord
   Comment: Optional record.
   Vector: false
@@ -119,7 +119,7 @@ Elements:
 - Data:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecord
+    Name: StubDataclass
   Name: RequiredListOfOptionalRecord
   Comment: Required list of optional record.
   Vector: true
@@ -128,7 +128,7 @@ Elements:
 - Data:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecord
+    Name: StubDataclass
   Name: OptionalListOfOptionalRecord
   Comment: Optional list of optional record.
   Vector: true

@@ -1,4 +1,4 @@
 {
-  "_type": "StubDataclassRecord",
+  "_type": "StubDataclass",
   "id": "abc"
 }

@@ -19,7 +19,7 @@ elements:
 - key_:
     module:
       module_name: cl
-    name: StubDataclassRecordKey
+    name: StubDataclassKey
   name: Embedded1
   comment: Embedded key 1.
   vector: false
@@ -27,7 +27,7 @@ elements:
 - key_:
     module:
       module_name: cl
-    name: StubDataclassRecordKey
+    name: StubDataclassKey
   name: Embedded2
   comment: Embedded key 2.
   vector: false

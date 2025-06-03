@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassDerivedFromDerivedRecord(StubDataclassDerivedRecord):
-    """Two levels in inheritance hierarchy away from StubDataclassRecord."""
+class StubDataclassDoubleDerived(StubDataclassDerived):
+    """Two levels in inheritance hierarchy away from StubDataclass."""
 
-    derived_from_derived_str_field: str = "derived_from_derived"
+    double_derived_str_field: str = "double_derived"
     """Stub field."""

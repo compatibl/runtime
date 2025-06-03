@@ -18,7 +18,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassAliasedRecordKey(KeyMixin):  # TODO: Specify alias and add derived aliased class
+class StubDataclassAliasedKey(KeyMixin):  # TODO: Specify alias and add derived aliased class
     """Stub record class with typename alias."""
 
     id: str = required()
@@ -26,4 +26,4 @@ class StubDataclassAliasedRecordKey(KeyMixin):  # TODO: Specify alias and add de
 
     @classmethod
     def get_key_type(cls) -> type:
-        return StubDataclassAliasedRecordKey
+        return StubDataclassAliasedKey

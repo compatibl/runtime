@@ -20,7 +20,7 @@ from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
@@ -29,7 +29,7 @@ def test_key_serialization():
     """Test key serialization."""
 
     sample_types = [
-        StubDataclassRecord,
+        StubDataclass,
         StubDataclassPrimitiveFields,
         StubDataclassListFields,
         StubDataclassNestedFields,

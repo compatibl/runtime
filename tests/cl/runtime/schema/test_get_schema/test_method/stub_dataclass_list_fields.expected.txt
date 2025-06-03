@@ -8,7 +8,7 @@ DisplayKind: Basic
 Inherit:
   Module:
     ModuleName: cl
-  Name: StubDataclassRecord
+  Name: StubDataclass
 Elements:
 - Value:
     Type: String
@@ -44,7 +44,7 @@ Elements:
 - Key:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecordKey
+    Name: StubDataclassKey
   Name: KeyList
   Comment: Stub field.
   Vector: true
@@ -52,7 +52,7 @@ Elements:
 - Data:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecord
+    Name: StubDataclass
   Name: RecordList
   Comment: Stub field.
   Vector: true
@@ -60,8 +60,8 @@ Elements:
 - Data:
     Module:
       ModuleName: cl
-    Name: StubDataclassDerivedRecord
-  Name: DerivedRecordList
+    Name: StubDataclassDerived
+  Name: DerivedList
   Comment: Stub field.
   Vector: true
   Optional: false

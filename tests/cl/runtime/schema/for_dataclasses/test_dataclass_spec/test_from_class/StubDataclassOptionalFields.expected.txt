@@ -61,38 +61,38 @@ fields:
       optional: true
 - field_name: optional_key
   type_hint:
-    schema_type_name: StubDataclassRecordKey
+    schema_type_name: StubDataclassKey
     optional: true
 - field_name: required_list_of_optional_key
   type_hint:
     schema_type_name: list
     optional: false
     remaining:
-      schema_type_name: StubDataclassRecordKey
+      schema_type_name: StubDataclassKey
       optional: true
 - field_name: optional_list_of_optional_key
   type_hint:
     schema_type_name: list
     optional: true
     remaining:
-      schema_type_name: StubDataclassRecordKey
+      schema_type_name: StubDataclassKey
       optional: true
 - field_name: optional_record
   type_hint:
-    schema_type_name: StubDataclassRecord
+    schema_type_name: StubDataclass
     optional: true
 - field_name: required_list_of_optional_record
   type_hint:
     schema_type_name: list
     optional: false
     remaining:
-      schema_type_name: StubDataclassRecord
+      schema_type_name: StubDataclass
       optional: true
 - field_name: optional_list_of_optional_record
   type_hint:
     schema_type_name: list
     optional: true
     remaining:
-      schema_type_name: StubDataclassRecord
+      schema_type_name: StubDataclass
       optional: true
 

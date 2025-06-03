@@ -18,9 +18,9 @@ from typing import List
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_record import StubDataclassDerivedRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecordKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 
 
 def stub_dataclass_str_list_factory() -> List[str]:
@@ -69,32 +69,32 @@ def stub_dataclass_data_list_factory() -> List[StubDataclassData]:
     ]
 
 
-def stub_dataclass_key_list_factory() -> List[StubDataclassRecordKey]:
+def stub_dataclass_key_list_factory() -> List[StubDataclassKey]:
     """Create stub values."""
     return [
-        StubDataclassRecordKey(id="A"),
-        StubDataclassRecordKey(id="B"),
+        StubDataclassKey(id="A"),
+        StubDataclassKey(id="B"),
     ]
 
 
-def stub_dataclass_record_list_factory() -> List[StubDataclassRecord]:
+def stub_dataclass_record_list_factory() -> List[StubDataclass]:
     """Create stub values."""
     return [
-        StubDataclassRecord(id="A"),
-        StubDataclassRecord(id="B"),
+        StubDataclass(id="A"),
+        StubDataclass(id="B"),
     ]
 
 
-def stub_dataclass_derived_record_list_factory() -> List[StubDataclassDerivedRecord]:
+def stub_dataclass_derived_record_list_factory() -> List[StubDataclassDerived]:
     """Create stub values."""
     return [
-        StubDataclassDerivedRecord(id="A"),
-        StubDataclassDerivedRecord(id="B"),
+        StubDataclassDerived(id="A"),
+        StubDataclassDerived(id="B"),
     ]
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassListFields(StubDataclassRecord):
+class StubDataclassListFields(StubDataclass):
     """Stub record whose elements are lists."""
 
     str_list: List[str] = required(default_factory=stub_dataclass_str_list_factory)
@@ -109,13 +109,13 @@ class StubDataclassListFields(StubDataclassRecord):
     data_list: List[StubDataclassData] = required(default_factory=stub_dataclass_data_list_factory)
     """Stub field."""
 
-    key_list: List[StubDataclassRecordKey] = required(default_factory=stub_dataclass_key_list_factory)
+    key_list: List[StubDataclassKey] = required(default_factory=stub_dataclass_key_list_factory)
     """Stub field."""
 
-    record_list: List[StubDataclassRecord] = required(default_factory=stub_dataclass_record_list_factory)
+    record_list: List[StubDataclass] = required(default_factory=stub_dataclass_record_list_factory)
     """Stub field."""
 
-    derived_record_list: List[StubDataclassDerivedRecord] = required(
+    derived_record_list: List[StubDataclassDerived] = required(
         default_factory=stub_dataclass_derived_record_list_factory
     )
     """Stub field."""

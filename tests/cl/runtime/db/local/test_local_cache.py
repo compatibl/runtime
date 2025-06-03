@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.local.local_cache import LocalCache
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_record import StubDataclassRecord
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 def test_smoke():
@@ -24,7 +24,7 @@ def test_smoke():
     with DbContext(db=LocalCache.instance()).build():
 
         # Create test record and populate with sample data
-        record = StubDataclassRecord().build()
+        record = StubDataclass().build()
         key = record.get_key()
 
         # Test saving and loading
@@ -35,7 +35,7 @@ def test_smoke():
 
         loaded_records = list(
             DbContext.load_many(
-                StubDataclassRecord,
+                StubDataclass,
                 [record, key, None],
                 dataset=dataset,
             )

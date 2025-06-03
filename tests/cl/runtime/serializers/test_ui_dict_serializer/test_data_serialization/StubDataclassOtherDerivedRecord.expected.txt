@@ -1,4 +1,4 @@
-_t: StubDataclassOtherDerivedRecord
+_t: StubDataclassOtherDerived
 Id: abc
 OtherDerived: other_derived
 

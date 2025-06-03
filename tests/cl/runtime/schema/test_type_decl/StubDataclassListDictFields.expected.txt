@@ -8,7 +8,7 @@ display_kind: Basic
 inherit:
   module:
     module_name: cl
-  name: StubDataclassRecord
+  name: StubDataclass
 elements:
 - value:
     type_: String
@@ -47,7 +47,7 @@ elements:
   optional: false
 - value:
     type_: Dict
-  name: DerivedRecordListDict
+  name: DerivedListDict
   comment: Stub field.
   optional: false
 keys:

@@ -1,8 +1,8 @@
 Schema:
-  cl.StubDataclassRecord:
+  cl.StubDataclass:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecord
+    Name: StubDataclass
     Label: Stub Dataclass Record
     Comment: Stub record base class.
     TypeKind: Record
@@ -10,7 +10,7 @@ Schema:
     Inherit:
       Module:
         ModuleName: cl
-      Name: StubDataclassRecordKey
+      Name: StubDataclassKey
     Elements:
     - Value:
         Type: String
@@ -20,10 +20,10 @@ Schema:
       Optional: false
     Keys:
     - Id
-  cl.StubDataclassRecordKey:
+  cl.StubDataclassKey:
     Module:
       ModuleName: cl
-    Name: StubDataclassRecordKey
+    Name: StubDataclassKey
     Label: Stub Dataclass Record Key
     Comment: Stub record base class.
     TypeKind: Data
@@ -36,6 +36,6 @@ Schema:
       Vector: false
       Optional: false
 Data:
-- _t: StubDataclassRecord
+- _t: StubDataclass
   Id: test_load
 

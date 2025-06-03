@@ -16,17 +16,17 @@ from dataclasses import dataclass
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerivedFromDerivedRecord
-from stubs.cl.runtime import StubDataclassDerivedRecord
+from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassOtherDerivedRecord
+from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataViewers
 from stubs.cl.runtime import StubHandlers
@@ -51,13 +51,13 @@ class StubRuntimeConfig(Config):
 
         # Create stub instances
         stub_dataclass_composite = [StubDataclassComposite(primitive=f"abc{i}") for i in range(10)]
-        stub_dataclass_records = [StubDataclassRecord(id=f"A{i}") for i in range(10)]
+        stub_dataclass_records = [StubDataclass(id=f"A{i}") for i in range(10)]
         stub_dataclass_nested_fields = [StubDataclassNestedFields(id=f"B{i}") for i in range(10)]
-        stub_dataclass_derived_records = [StubDataclassDerivedRecord(id=f"C{i}") for i in range(10)]
-        stub_dataclass_derived_from_derived_records = [
-            StubDataclassDerivedFromDerivedRecord(id=f"D{i}") for i in range(10)
+        stub_dataclass_derived_records = [StubDataclassDerived(id=f"C{i}") for i in range(10)]
+        stub_dataclass_double_derived_records = [
+            StubDataclassDoubleDerived(id=f"D{i}") for i in range(10)
         ]
-        stub_dataclass_other_derived_records = [StubDataclassOtherDerivedRecord(id=f"E{i}") for i in range(10)]
+        stub_dataclass_other_derived_records = [StubDataclassOtherDerived(id=f"E{i}") for i in range(10)]
         stub_dataclass_list_fields_records = [StubDataclassListFields(id=f"F{i}") for i in range(10)]
         stub_dataclass_optional_fields_records = [StubDataclassOptionalFields(id=f"G{i}") for i in range(10)]
         stub_dataclass_dict_fields_records = [StubDataclassDictFields(id=f"H{i}") for i in range(10)]
@@ -82,7 +82,7 @@ class StubRuntimeConfig(Config):
             *stub_dataclass_records,
             *stub_dataclass_nested_fields,
             *stub_dataclass_derived_records,
-            *stub_dataclass_derived_from_derived_records,
+            *stub_dataclass_double_derived_records,
             *stub_dataclass_other_derived_records,
             *stub_dataclass_optional_fields_records,
             # TODO: Restore after supporting dt.date and dt.time for Mongo: *stub_dataclass_list_fields_records,

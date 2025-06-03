@@ -13,25 +13,25 @@ Record:
     StrField: abc
     IntField: '123'
     DerivedStrField: derived
-  DerivedFromDerivedField:
-    _t: StubDataclassDerivedFromDerivedData
+  DoubleDerivedField:
+    _t: StubDataclassDoubleDerivedData
     StrField: abc
     IntField: '123'
     DerivedStrField: derived
-    DerivedFromDerivedStrField: derived_from_derived
+    DoubleDerivedStrField: double_derived
   PolymorphicField:
     _t: StubDataclassDerivedData
     StrField: abc
     IntField: '123'
     DerivedStrField: derived
   PolymorphicDerivedField:
-    _t: StubDataclassDerivedFromDerivedData
+    _t: StubDataclassDoubleDerivedData
     StrField: abc
     IntField: '123'
     DerivedStrField: derived
-    DerivedFromDerivedStrField: derived_from_derived
+    DoubleDerivedStrField: double_derived
   KeyField: uvw
   RecordAsKeyField:
-    _t: StubDataclassRecord
+    _t: StubDataclass
     Id: abc
 

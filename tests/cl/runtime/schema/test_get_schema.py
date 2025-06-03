@@ -20,7 +20,7 @@ from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields import StubDataclassOptionalFields
 
 
@@ -28,7 +28,7 @@ def test_method():
     """Test coroutine for /schema/typeV2 route."""
 
     sample_types = [
-        StubDataclassRecord,
+        StubDataclass,
         StubDataclassPrimitiveFields,
         StubDataclassListFields,
         StubDataclassNestedFields,

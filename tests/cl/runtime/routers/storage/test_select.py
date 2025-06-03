@@ -19,14 +19,14 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.routers.storage.select_response import SelectResponse
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 
 
 def test_method(pytest_default_db):
     """Test coroutine for /storage/select route."""
 
     # Save test record.
-    record = StubDataclassRecord(id=__name__).build()
+    record = StubDataclass(id=__name__).build()
     DbContext.save_one(record)
 
     request_obj = SelectRequest(type_=type(record).__name__)
@@ -47,9 +47,9 @@ def test_api(pytest_default_db):
     """Test REST API for /storage/select route."""
     with QaClient() as test_client:
         # Save test record
-        record = StubDataclassRecord(id=__name__).build()
+        record = StubDataclass(id=__name__).build()
         DbContext.save_one(record)
-        request_body = {"Type": "StubDataclassRecord"}
+        request_body = {"Type": "StubDataclass"}
 
         # Send POST request
         response = test_client.post(

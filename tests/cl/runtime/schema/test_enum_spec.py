@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
-from stubs.cl.runtime import StubDataclassRecord
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubIntEnum
 
 _FROM_CLASS_VALID_CASES = [
@@ -25,7 +25,7 @@ _FROM_CLASS_VALID_CASES = [
 
 _FROM_CLASS_EXCEPTION_CASES = [
     type,
-    StubDataclassRecord,
+    StubDataclass,
 ]
 
 
