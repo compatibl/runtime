@@ -1,0 +1,19 @@
+- event: LOG
+  data: 1 - Info
+- event: LOG
+  data: 2 - Info
+- event: TASK_STARTED
+- event: LOG
+  data: 3 - Warning
+- event: LOG
+  data: 4 - Error
+- event: LOG
+  data: 5 - Info
+- event: TASK_FINISHED
+- event: LOG
+  data: 'Event to reach limit - #0.'
+- event: LOG
+  data: 'Event to reach limit - #1.'
+- event: LOG
+  data: 'Event to reach limit - #2.'
+
