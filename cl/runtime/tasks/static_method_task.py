@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Callable
 from typing_extensions import Self
 from typing_extensions import override
+from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
@@ -31,6 +32,14 @@ class StaticMethodTask(MethodTask):
 
     type_str: str = required()
     """Class type as dot-delimited string in module.ClassName format."""
+
+    def _create_log_context(self) -> LogContext:
+        """Create LogContext with task specific info."""
+        return LogContext(
+            type=TypeUtil.name(TypeInfoCache.get_class_from_qual_name(self.type_str)),
+            handler=self.method_name,
+            task_run_id=self.task_id,
+        ).build()
 
     @override
     def _execute(self) -> None:

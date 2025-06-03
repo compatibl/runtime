@@ -28,6 +28,9 @@ class LogContext(Context):
     type: str | None = optional()
     """Type name."""
 
+    record_key: str | None = optional()
+    """Key of the record on which the handler is run."""
+
     task_run_id: str | None = optional()
     """Task run id."""
 

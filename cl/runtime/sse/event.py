@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from cl.runtime import RecordMixin
-from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.sse.event_key import EventKey
 from cl.runtime.sse.event_type import EventType
@@ -26,10 +25,6 @@ class Event(EventKey, RecordMixin[EventKey]):
 
     event_type: EventType = required()
     """Event type used in event stream."""
-
-    def __init(self):
-        if self.timestamp is None:
-            self.timestamp = Timestamp.create()
 
     def get_key(self) -> EventKey:
         return EventKey(timestamp=self.timestamp).build()

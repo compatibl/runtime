@@ -15,24 +15,27 @@
 import logging
 from logging import LogRecord
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_broker import EventBroker
 from cl.runtime.sse.event_type import EventType
 from cl.runtime.sse.log_event import LogEvent
 
 
 class EventLogHandler(logging.Handler):
-    """Handler to publish logs event."""
+    """Handler to publish log events."""
 
     @classmethod
     def _create_log_event(cls, record: LogRecord) -> LogEvent:
         """Create LogEvent object from LogRecord."""
 
         return LogEvent(
+            timestamp=getattr(record, "timestamp", None),
             event_type=EventType.LOG,
             level=CaseUtil.upper_to_pascal_case(record.levelname),
             message=record.getMessage(),
             record_type=getattr(record, "type", None),
             handler_name=getattr(record, "handler", None),
+            record_key=getattr(record, "key", None),
             task_run_id=getattr(record, "task_run_id", None),
         ).build()
 
@@ -42,6 +45,12 @@ class EventLogHandler(logging.Handler):
         log_event = self._create_log_event(record)
         event_broker = EventBroker.create()
         event_broker.sync_publish("events", log_event)
+
+        # If log record level is Error or Warning - trigger additional Error or Warning event
+        if record.levelno >= logging.ERROR:
+            event_broker.sync_publish("events", Event(event_type=EventType.ERROR).build())
+        elif record.levelno >= logging.WARNING:
+            event_broker.sync_publish("events", Event(event_type=EventType.WARNING).build())
 
         # Publish event from extras
         if (event := getattr(record, "event", None)) is not None:

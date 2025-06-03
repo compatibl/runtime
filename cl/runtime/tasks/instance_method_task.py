@@ -17,6 +17,7 @@ from typing import Callable
 from typing_extensions import Self
 from typing_extensions import override
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
@@ -40,6 +41,15 @@ class InstanceMethodTask(MethodTask):
 
     key_str: str = required()
     """Key as semicolon-delimited string."""
+
+    def _create_log_context(self) -> LogContext:
+        """Create LogContext with task specific info."""
+        return LogContext(
+            type=TypeUtil.name(TypeInfoCache.get_class_from_qual_name(self.key_type_str)),
+            handler=self.method_name,
+            task_run_id=self.task_id,
+            record_key=self.key_str,
+        ).build()
 
     @override
     def _execute(self) -> None:

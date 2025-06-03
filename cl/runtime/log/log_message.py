@@ -49,6 +49,9 @@ class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
     handler_name: str | None = None
     """Handler name."""
 
+    record_key: str | None = None
+    """Record key."""
+
     task_run_id: str | None = None
     """Task run id."""
 

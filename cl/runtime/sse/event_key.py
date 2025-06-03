@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
@@ -27,3 +28,7 @@ class EventKey(KeyMixin):
     @classmethod
     def get_key_type(cls) -> type:
         return EventKey
+
+    def __init(self):
+        if self.timestamp is None:
+            self.timestamp = Timestamp.create()

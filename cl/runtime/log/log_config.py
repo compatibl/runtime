@@ -16,6 +16,7 @@ import logging
 import os
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.settings.log_settings import LogSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
@@ -84,10 +85,10 @@ def _make_filter_above_level(above_level):
     return filter_
 
 
-def _make_filter_add_contextual_info():
+def _make_filter_add_contextual_info(default_empty=None):
     """Add contextual attributes to log record."""
 
-    _default_empty = "."
+    _default_empty = default_empty
 
     def filter_(record):
         log_context = LogContext.current_or_none()
@@ -105,11 +106,20 @@ def _make_filter_add_contextual_info():
         # Name of running handler
         record.handler = log_context.handler if log_context else _default_empty
 
+        # Record key
+        record.key = log_context.record_key if log_context else _default_empty
+
         # Combined type and handler name as single field in short format
         record.type_and_handler = type_and_handler
 
         # Task run id
         record.task_run_id = log_context.task_run_id if log_context else _default_empty
+
+        # Time-ordered unique identifier
+        record.timestamp = Timestamp.create()
+
+        # Human-readable time
+        record.readable_time = Timestamp.to_datetime(record.timestamp).isoformat()
 
         # PID of process
         record.pid = os.getpid()
@@ -146,8 +156,7 @@ logging_config = {
     "version": 1,
     "formatters": {
         "file_formatter": {
-            "format": "%(asctime)s - %(pid)s - %(name)s - %(type)s - %(handler)s - %(levelname)s - %(message)s",
-            "converter": "time.gmtime",
+            "format": "%(readable_time)s - %(pid)s - %(name)s - %(type)s - %(handler)s - %(key)s - %(task_run_id)s - %(levelname)s - %(message)s"
         },
         "console_formatter": {
             "()": "uvicorn.logging.DefaultFormatter",
@@ -165,6 +174,10 @@ logging_config = {
             "above_level": "ERROR",
         },
         "add_contextual_info_filter": {"()": "cl.runtime.log.log_config._make_filter_add_contextual_info"},
+        "add_contextual_info_filter_with_default": {
+            "()": "cl.runtime.log.log_config._make_filter_add_contextual_info",
+            "default_empty": ".",
+        },
         "third_party_logs_filter": {"()": "cl.runtime.log.log_config._make_filter_third_party_logs"},
     },
     "handlers": {
@@ -174,7 +187,7 @@ logging_config = {
             "filename": get_log_filename(),
             "maxBytes": max_log_file_size_bytes,
             "backupCount": 0,  # Do not create backup files because each file has a timestamp.
-            "filters": ["add_contextual_info_filter"],
+            "filters": ["add_contextual_info_filter_with_default"],
             "formatter": "file_formatter",
         },
         "stderr_handler": {

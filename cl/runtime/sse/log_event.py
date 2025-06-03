@@ -34,5 +34,8 @@ class LogEvent(Event):
     handler_name: str | None = optional()
     """Handler name."""
 
+    record_key: str | None = optional()
+    """Record key."""
+
     task_run_id: str | None = optional()
     """Unique task run identifier."""

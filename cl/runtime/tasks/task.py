@@ -87,52 +87,59 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
     def _execute(self) -> None:
         """Run payload without updating status or handling exceptions (protected, callers should invoke 'run_task')."""
 
+    def _create_log_context(self) -> LogContext:
+        """Create LogContext with task specific info."""
+        return LogContext(task_run_id=self.task_id).build()
+
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
-
         logger = LogContext.get_logger(module_name=__name__)
-        try:
-            logger.info("Start task execution.", extra={"event": TaskEvent(event_type=EventType.TASK_STARTED)})
 
-            # Save with Running status
-            update = self.clone()
-            update.status = TaskStatus.RUNNING
-            DbContext.save_one(update.build())
+        with self._create_log_context():
+            try:
+                logger.info("Start task execution.", extra={"event": TaskEvent(event_type=EventType.TASK_STARTED)})
 
-            # Invoke out-of-process execution of payload
-            self._execute()
+                # Save with Running status
+                update = self.clone()
+                update.status = TaskStatus.RUNNING
+                DbContext.save_one(update.build())
 
-        except Exception as e:  # noqa
+                # Invoke out-of-process execution of payload
+                self._execute()
 
-            logger.error(
-                "Task failed with exception.",
-                exc_info=True,
-                extra={"event": TaskEvent(event_type=EventType.TASK_FINISHED)},
-            )
+            except Exception as e:  # noqa
 
-            # Save with Failed status and execution info
-            update = self.clone()
-            update.status = TaskStatus.FAILED
-            update.progress_pct = 100.0
-            update.elapsed_sec = 0.0  # TODO: Implement
-            update.remaining_sec = 0.0
-            update.error_message = str(e)
-            DbContext.save_one(update.build())
-        else:
+                logger.error(
+                    "Task failed with exception.",
+                    exc_info=True,
+                    extra={"event": TaskEvent(event_type=EventType.TASK_FINISHED)},
+                )
 
-            logger.info("Task completed successfully.", extra={"event": TaskEvent(event_type=EventType.TASK_FINISHED)})
+                # Save with Failed status and execution info
+                update = self.clone()
+                update.status = TaskStatus.FAILED
+                update.progress_pct = 100.0
+                update.elapsed_sec = 0.0  # TODO: Implement
+                update.remaining_sec = 0.0
+                update.error_message = str(e)
+                DbContext.save_one(update.build())
+            else:
 
-            # Record the end time
-            end_time = DatetimeUtil.now()
+                logger.info(
+                    "Task completed successfully.", extra={"event": TaskEvent(event_type=EventType.TASK_FINISHED)}
+                )
 
-            # Save with Completed status and execution info
-            # Save with Failed status and execution info
-            update = self.clone()
-            update.status = TaskStatus.COMPLETED
-            update.progress_pct = 100.0
-            update.elapsed_sec = 0.0  # TODO: Implement
-            update.remaining_sec = 0.0
-            DbContext.save_one(update.build())
+                # Record the end time
+                end_time = DatetimeUtil.now()
+
+                # Save with Completed status and execution info
+                # Save with Failed status and execution info
+                update = self.clone()
+                update.status = TaskStatus.COMPLETED
+                update.progress_pct = 100.0
+                update.elapsed_sec = 0.0  # TODO: Implement
+                update.remaining_sec = 0.0
+                DbContext.save_one(update.build())
 
     @classmethod
     def wait_for_completion(cls, task_key: TaskKey, timeout_sec: int = 10) -> None:  # TODO: Rename or move

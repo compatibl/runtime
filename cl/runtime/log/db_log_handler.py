@@ -20,7 +20,6 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.user_log_message import UserLogMessage
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.primitive.timestamp import Timestamp
 
 
 class DbLogHandler(logging.Handler):
@@ -48,16 +47,17 @@ class DbLogHandler(logging.Handler):
             traceback_str = "".join(traceback.format_tb(traceback_)[-5:])
         else:
             traceback_str = None
-        timestamp = Timestamp.create()
+
         return log_message_class(
-            timestamp=timestamp,
+            timestamp=getattr(record, "timestamp", None),
             level=CaseUtil.upper_to_pascal_case(record.levelname),
             message=record.getMessage(),
             logger_name=record.name,
-            readable_time=Timestamp.to_datetime(timestamp).isoformat(),
+            readable_time=getattr(record, "readable_time", None),
             traceback=traceback_str,
             record_type=getattr(record, "type", None),
             handler_name=getattr(record, "handler", None),
+            record_key=getattr(record, "key", None),
             task_run_id=getattr(record, "task_run_id", None),
         ).build()
 
