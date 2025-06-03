@@ -1,6 +1,6 @@
 _type,_type
 id,StubDataclassKey.id
-derived_str_field,StubDataclassDoubleDerived.derived_str_field
+derived_str_field,StubDataclassDerived.derived_str_field
 double_derived_str_field,StubDataclassDoubleDerived.double_derived_str_field
 str_dict,StubDataclassDictFields.str_dict
 float_dict,StubDataclassDictFields.float_dict

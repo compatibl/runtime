@@ -35,7 +35,7 @@ _media_key = _KEY_SERIALIZER.serialize(_stub_media_viewers.get_key())
 
 panel_requests = [
     {"type_name": "StubDataViewers", "panel_id": "None", "key": _data_key},
-    {"type_name": "StubDataViewers", "panel_id": "Nested Fields Record", "key": _data_key},
+    {"type_name": "StubDataViewers", "panel_id": "Nested Fields", "key": _data_key},
     {"type_name": "StubDataViewers", "panel_id": "Record List", "key": _data_key},
     {"type_name": "StubMediaViewers", "panel_id": "Png", "key": _media_key},
     {"type_name": "StubMediaViewers", "panel_id": "Pdf", "key": _media_key},
