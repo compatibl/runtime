@@ -1,7 +1,7 @@
 module:
   module_name: cl
 name: StubDataclassDoubleDerived
-label: Stub Dataclass Derived From Derived Record
+label: Stub Dataclass Double Derived
 comment: Two levels in inheritance hierarchy away from StubDataclass.
 type_kind: Record
 display_kind: Basic

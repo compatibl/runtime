@@ -76,7 +76,7 @@ def stub_dataclass_record_tuple_factory() -> Tuple[StubDataclass, ...]:
     )
 
 
-def stub_dataclass_derived_record_tuple_factory() -> Tuple[StubDataclassDerived, ...]:
+def stub_dataclass_derived_tuple_factory() -> Tuple[StubDataclassDerived, ...]:
     """Create stub values."""
     return (
         StubDataclassDerived(id="A"),
@@ -106,7 +106,7 @@ class StubDataclassTupleFields(StubDataclass):
     record_tuple: Tuple[StubDataclass, ...] = required(default_factory=stub_dataclass_record_tuple_factory)
     """Stub field."""
 
-    derived_record_tuple: Tuple[StubDataclassDerived, ...] = required(
-        default_factory=stub_dataclass_derived_record_tuple_factory
+    derived_tuple: Tuple[StubDataclassDerived, ...] = required(
+        default_factory=stub_dataclass_derived_tuple_factory
     )
     """Stub field."""

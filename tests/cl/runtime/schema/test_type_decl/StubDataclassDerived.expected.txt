@@ -1,7 +1,7 @@
 module:
   module_name: cl
 name: StubDataclassDerived
-label: Stub Dataclass Derived Record
+label: Stub Dataclass Derived
 comment: Stub derived class.
 type_kind: Record
 display_kind: Basic

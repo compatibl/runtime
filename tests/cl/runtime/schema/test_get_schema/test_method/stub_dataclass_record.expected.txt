@@ -1,7 +1,7 @@
 Module:
   ModuleName: cl
 Name: StubDataclass
-Label: Stub Dataclass Record
+Label: Stub Dataclass
 Comment: Stub record base class.
 TypeKind: Record
 DisplayKind: Basic

@@ -35,7 +35,7 @@ fields:
       remaining:
         schema_type_name: StubDataclass
         optional: false
-- field_name: derived_record_dict_list
+- field_name: derived_dict_list
   type_hint:
     schema_type_name: list
     optional: false

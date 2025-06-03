@@ -5,6 +5,6 @@ date_dict: '{"a":"2003-04-21","b":"2003-05-01"}'
 data_dict: '{"a":{"str_field":"A","int_field":1,"_type":"StubDataclassData"},"b":{"str_field":"B","int_field":2,"_type":"StubDataclassData"}}'
 key_dict: '{"a":"A","b":"B"}'
 record_dict: '{"a":{"id":"A","_type":"StubDataclass"},"b":{"id":"B","_type":"StubDataclass"}}'
-derived_record_dict: '{"a":{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},"b":{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}}'
+derived_dict: '{"a":{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},"b":{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}}'
 _type: StubDataclassDictFields
 

@@ -2,6 +2,6 @@ id: abc
 float_dict_list: '[{"a":1.0},{"b":2.0}]'
 date_dict_list: '[{"a":"2003-04-21","b":"2003-05-01"},{"a":"2003-04-21","b":"2003-05-01"}]'
 record_dict_list: '[{"a":{"id":"A","_type":"StubDataclass"},"b":{"id":"B","_type":"StubDataclass"}},{"a":{"id":"A","_type":"StubDataclass"},"b":{"id":"B","_type":"StubDataclass"}}]'
-derived_record_dict_list: '[{"a":{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},"b":{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}},{"a":{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},"b":{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}}]'
+derived_dict_list: '[{"a":{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},"b":{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}},{"a":{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},"b":{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}}]'
 _type: StubDataclassDictListFields
 

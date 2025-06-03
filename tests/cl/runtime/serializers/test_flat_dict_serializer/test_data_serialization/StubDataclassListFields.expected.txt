@@ -5,6 +5,6 @@ date_list: '["2003-04-21","2003-05-01"]'
 data_list: '[{"str_field":"A","int_field":0,"_type":"StubDataclassData"},{"str_field":"B","int_field":1,"_type":"StubDataclassData"}]'
 key_list: '["A","B"]'
 record_list: '[{"id":"A","_type":"StubDataclass"},{"id":"B","_type":"StubDataclass"}]'
-derived_record_list: '[{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}]'
+derived_list: '[{"id":"A","derived_str_field":"derived","_type":"StubDataclassDerived"},{"id":"B","derived_str_field":"derived","_type":"StubDataclassDerived"}]'
 _type: StubDataclassListFields
 

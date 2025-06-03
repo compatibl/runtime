@@ -76,7 +76,7 @@ def stub_dataclass_record_dict_factory() -> Dict[str, StubDataclass]:
     }
 
 
-def stub_dataclass_derived_record_dict_factory() -> Dict[str, StubDataclassDerived]:
+def stub_dataclass_derived_dict_factory() -> Dict[str, StubDataclassDerived]:
     """Create stub values."""
     return {
         "a": StubDataclassDerived(id="A"),
@@ -106,7 +106,7 @@ class StubDataclassDictFields(StubDataclass):
     record_dict: Dict[str, StubDataclass] = required(default_factory=stub_dataclass_record_dict_factory)
     """Stub field."""
 
-    derived_record_dict: Dict[str, StubDataclassDerived] = required(
-        default_factory=stub_dataclass_derived_record_dict_factory
+    derived_dict: Dict[str, StubDataclassDerived] = required(
+        default_factory=stub_dataclass_derived_dict_factory
     )
     """Stub field."""

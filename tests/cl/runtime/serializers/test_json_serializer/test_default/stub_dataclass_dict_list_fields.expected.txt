@@ -37,7 +37,7 @@
       }
     }
   ],
-  "derived_record_dict_list": [
+  "derived_dict_list": [
     {
       "a": {
         "id": "A",

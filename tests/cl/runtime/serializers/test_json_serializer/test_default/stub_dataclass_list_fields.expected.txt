@@ -47,7 +47,7 @@
       "id": "B"
     }
   ],
-  "derived_record_list": [
+  "derived_list": [
     {
       "id": "A",
       "derived_str_field": "derived"

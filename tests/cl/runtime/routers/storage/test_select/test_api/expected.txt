@@ -3,7 +3,7 @@ Schema:
     Module:
       ModuleName: cl
     Name: StubDataclass
-    Label: Stub Dataclass Record
+    Label: Stub Dataclass
     Comment: Stub record base class.
     TypeKind: Record
     DisplayKind: Basic
@@ -24,7 +24,7 @@ Schema:
     Module:
       ModuleName: cl
     Name: StubDataclassKey
-    Label: Stub Dataclass Record Key
+    Label: Stub Dataclass Key
     Comment: Stub record base class.
     TypeKind: Data
     DisplayKind: Basic

@@ -22,7 +22,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import Stub
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_data_dict_factory
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_date_dict_factory
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import (
-    stub_dataclass_derived_record_dict_factory,
+    stub_dataclass_derived_dict_factory,
 )
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_key_dict_factory
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import stub_dataclass_record_dict_factory
@@ -75,11 +75,11 @@ def stub_dataclass_record_dict_list_factory() -> List[Dict[str, StubDataclass]]:
     ]
 
 
-def stub_dataclass_derived_record_dict_list_factory() -> List[Dict[str, StubDataclassDerived]]:
+def stub_dataclass_derived_dict_list_factory() -> List[Dict[str, StubDataclassDerived]]:
     """Create stub values."""
     return [
-        stub_dataclass_derived_record_dict_factory(),
-        stub_dataclass_derived_record_dict_factory(),
+        stub_dataclass_derived_dict_factory(),
+        stub_dataclass_derived_dict_factory(),
     ]
 
 
@@ -98,7 +98,7 @@ class StubDataclassDictListFields(StubDataclass):
     )
     """Stub field."""
 
-    derived_record_dict_list: List[Dict[str, StubDataclassDerived]] = required(
-        default_factory=stub_dataclass_derived_record_dict_list_factory
+    derived_dict_list: List[Dict[str, StubDataclassDerived]] = required(
+        default_factory=stub_dataclass_derived_dict_list_factory
     )
     """Stub field."""

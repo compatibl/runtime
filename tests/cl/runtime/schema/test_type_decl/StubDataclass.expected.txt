@@ -1,7 +1,7 @@
 module:
   module_name: cl
 name: StubDataclass
-label: Stub Dataclass Record
+label: Stub Dataclass
 comment: Stub record base class.
 type_kind: Record
 display_kind: Basic
@@ -22,7 +22,7 @@ keys:
 module:
   module_name: cl
 name: StubDataclass
-label: Stub Dataclass Record
+label: Stub Dataclass
 comment: Stub record base class.
 type_kind: Record
 display_kind: Basic

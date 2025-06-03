@@ -1,7 +1,7 @@
 module:
   module_name: cl
 name: StubDataclassAliased
-label: Stub Dataclass Aliased Record
+label: Stub Dataclass Aliased
 comment: Stub record class with typename alias.
 type_kind: Record
 display_kind: Basic

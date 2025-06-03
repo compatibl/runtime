@@ -34,7 +34,7 @@ record_dict:
     id: A
   b:
     id: B
-derived_record_dict:
+derived_dict:
   a:
     id: A
     derived_str_field: derived

@@ -17,7 +17,7 @@ record_dict_list:
     id: A
   b:
     id: B
-derived_record_dict_list:
+derived_dict_list:
 - a:
     id: A
     derived_str_field: derived

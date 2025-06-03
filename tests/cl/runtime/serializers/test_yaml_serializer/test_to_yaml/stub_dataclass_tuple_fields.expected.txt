@@ -28,7 +28,7 @@ key_tuple:
 record_tuple:
 - id: A
 - id: B
-derived_record_tuple:
+derived_tuple:
 - id: A
   derived_str_field: derived
 - id: B

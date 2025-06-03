@@ -85,7 +85,7 @@ def stub_dataclass_record_list_factory() -> List[StubDataclass]:
     ]
 
 
-def stub_dataclass_derived_record_list_factory() -> List[StubDataclassDerived]:
+def stub_dataclass_derived_list_factory() -> List[StubDataclassDerived]:
     """Create stub values."""
     return [
         StubDataclassDerived(id="A"),
@@ -115,7 +115,7 @@ class StubDataclassListFields(StubDataclass):
     record_list: List[StubDataclass] = required(default_factory=stub_dataclass_record_list_factory)
     """Stub field."""
 
-    derived_record_list: List[StubDataclassDerived] = required(
-        default_factory=stub_dataclass_derived_record_list_factory
+    derived_list: List[StubDataclassDerived] = required(
+        default_factory=stub_dataclass_derived_list_factory
     )
     """Stub field."""

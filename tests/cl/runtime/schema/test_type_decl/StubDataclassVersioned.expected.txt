@@ -1,7 +1,7 @@
 module:
   module_name: cl
 name: StubDataclassVersioned
-label: Stub Dataclass Versioned Record
+label: Stub Dataclass Versioned
 comment: Stub record base class.
 type_kind: Record
 display_kind: Basic

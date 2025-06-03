@@ -107,7 +107,7 @@
       }
     ]
   },
-  "derived_record_list_dict": {
+  "derived_list_dict": {
     "a": [
       {
         "id": "A",

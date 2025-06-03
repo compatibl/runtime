@@ -47,7 +47,7 @@
       "id": "B"
     }
   },
-  "derived_record_dict": {
+  "derived_dict": {
     "a": {
       "id": "A",
       "derived_str_field": "derived"
