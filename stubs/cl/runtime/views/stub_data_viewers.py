@@ -24,16 +24,16 @@ from stubs.cl.runtime.views.stub_viewers import StubViewers
 nested_fields_key = StubDataclassKey(id="B0").build()
 """Key returned by the viewer."""
 
-nested_fields_record = StubDataclassNestedFields().build()
+nested_fields = StubDataclassNestedFields().build()
 """Record returned by the viewer."""
 
-list_fields_record = StubDataclassListFields().build()
+list_fields = StubDataclassListFields().build()
 """Record returned by the viewer."""
 
 composite_key = StubDataclassCompositeKey(primitive="abc0").build()
 """Record returned by the viewer."""
 
-composite_record = StubDataclassComposite().build()
+composite = StubDataclassComposite().build()
 """Record returned by the viewer."""
 
 
@@ -57,17 +57,17 @@ class StubDataViewers(StubViewers):
         """Viewer returning a key."""
         return composite_key
 
-    def view_nested_fields_record(self) -> StubDataclassNestedFields:
+    def view_nested_fields(self) -> StubDataclassNestedFields:
         """Viewer returning a record."""
-        return nested_fields_record
+        return nested_fields
 
-    def view_list_fields_record(self) -> StubDataclassListFields:
+    def view_list_fields(self) -> StubDataclassListFields:
         """Viewer returning a record."""
-        return list_fields_record
+        return list_fields
 
-    def view_composite_record(self) -> StubDataclassComposite:
+    def view_composite(self) -> StubDataclassComposite:
         """Viewer returning a key."""
-        return composite_record
+        return composite
 
     def view_key_list(self) -> List[StubDataclassKey]:
         """Stub viewer returning a list of keys."""
@@ -85,7 +85,7 @@ class StubDataViewers(StubViewers):
 
     def view_record_list(self) -> List[StubDataclassNestedFields]:
         """Stub viewer returning a list of records."""
-        return 3 * [nested_fields_record]
+        return 3 * [nested_fields]
 
     def _view_string(self) -> str:  # TODO: Not yet supported, currenly must wrap into Script content
         """Viewer returning a string."""
