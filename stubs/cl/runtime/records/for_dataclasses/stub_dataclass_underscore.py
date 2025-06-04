@@ -17,5 +17,5 @@ from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class _StubDataclassOneLeadingUnderscoreData(DataMixin):
+class _StubDataclassUnderscore(DataMixin):
     """Class name has one leading underscore."""

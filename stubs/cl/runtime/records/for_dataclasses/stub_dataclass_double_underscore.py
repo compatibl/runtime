@@ -17,5 +17,5 @@ from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class __StubDataclassTwoLeadingUnderscoresData(DataMixin):
+class __StubDataclassDoubleUnderscore(DataMixin):
     """Class name has two leading underscores."""

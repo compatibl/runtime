@@ -22,5 +22,5 @@ TKeyArg = TypeVar("TKeyArg", bound=KeyMixin)
 
 
 @dataclass(slots=True)
-class StubDataclassConcreteKey(StubDataclassGenericKey[StubDataclassKey]):
+class StubDataclassBoundGenericKey(StubDataclassGenericKey[StubDataclassKey]):
     """Stub concrete key class."""
