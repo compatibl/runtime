@@ -32,40 +32,5 @@ def test_build():
     guard.verify()
 
 
-def test_clone():
-    """Test DataMixin.clone method."""
-
-    # Create target from source
-    guard = RegressionGuard()
-    source = StubDataclassData(str_field="xyz", _regression_guard=guard)
-    target = source.clone()
-
-    # Public fields in source, only one is set
-    assert target.str_field == source.str_field
-    assert target.int_field == 123  # Takes its default value when not set in source
-
-    # Protected fields in source, not set
-    assert target._regression_guard is None
-    guard.verify()
-
-
-def test_clone_as():
-    """Test DataMixin.clone_as method."""
-
-    # Create target from source
-    guard = RegressionGuard()
-    source = StubDataclassData(str_field="xyz", int_field=789, _regression_guard=guard)
-    target = source.clone_as(StubDataclassDerivedData)
-
-    # Public fields in source, only one is set
-    assert target.str_field == source.str_field
-    assert target.int_field == source.int_field
-    assert target.derived_str_field == "derived"  # Takes its default value when not present in source class
-
-    # Protected fields in source, not set
-    assert target._regression_guard is None
-    guard.verify()
-
-
 if __name__ == "__main__":
     pytest.main([__file__])

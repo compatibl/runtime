@@ -16,6 +16,8 @@ import weakref
 from abc import ABC
 from abc import abstractmethod
 from typing_extensions import Self
+
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.clone_util import CloneUtil
 from cl.runtime.records.protocols import TData
 from cl.runtime.records.type_util import TypeUtil
@@ -63,6 +65,13 @@ class FreezableMixin(ABC):
     @abstractmethod
     def build(self) -> Self:
         """Configure the instance and freeze to prevent further modifications."""
+
+    def cast(self, result_type: type[TData]) -> TData:
+        """
+        Cast obj to result_type after checking it is an instance of result_type, error message otherwise.
+        This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
+        """
+        return CastUtil.cast(result_type, self)
 
     def clone(self) -> Self:
         """Return an unfrozen object of the same type constructed from shallow copies of the public fields of self."""
