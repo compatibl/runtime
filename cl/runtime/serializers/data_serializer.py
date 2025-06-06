@@ -60,7 +60,7 @@ class DataSerializer(Serializer):
     """Encode the output of inner serializer if specified."""
 
     type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
-    """Where to include type information in serialized data."""
+    """When to include type information in serialized data."""
 
     type_format: TypeFormat = TypeFormat.NAME_ONLY
     """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
