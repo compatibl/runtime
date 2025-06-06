@@ -13,22 +13,30 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime import StubDataclassKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
-
+from stubs.cl.runtime import StubDataclassKey, StubDataclassComposite, StubDataclassCompositeKey
 
 def test_key():
-    """Test for StubDataclass key."""
+    """Test for StubDataclassComposite key."""
 
-    # Create test record and populate with sample data
-    record = StubDataclass()
+    record = StubDataclassComposite()
 
     # Test get_key
     key = record.get_key()
-    assert StubDataclassKey().build() == key
+    assert StubDataclassCompositeKey().build() == key
 
     # Test serialize_key
-    serialized_key = (StubDataclassKey, key.id)
+    serialized_key = (
+                         StubDataclassCompositeKey,
+                         key.primitive,
+                         (
+                             StubDataclassKey,
+                             key.embedded_1.id,
+                         ),
+                         (
+                             StubDataclassKey,
+                             key.embedded_2.id,
+                         ),
+    )
     assert key.serialize_key() == serialized_key
 
 

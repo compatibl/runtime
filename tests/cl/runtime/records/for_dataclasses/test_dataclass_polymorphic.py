@@ -23,17 +23,25 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key imp
 def test_smoke(pytest_default_db):
     """Smoke test."""
 
+    table_field = "stub_table_field"
+    key_field = "stub_key_field"
+    record_field = "stub_record_field"
+
     # Create and save a record derived from a generic base
     record = StubDataclassPolymorphic(
-        table_field="stub_table_field",
-        key_field="stub_key_field",
-        record_field="stub_record_field",
+        table_field=table_field,
+        key_field=key_field,
+        record_field=record_field,
     ).build()
     DbContext.save_one(record)
 
-    # Test key
-    key = StubDataclassPolymorphicKey(table_field="stub_table_field", key_field="stub_key_field").build()
-    assert key == record.get_key()
+    # Test get_key
+    key = StubDataclassPolymorphicKey(table_field=table_field, key_field=key_field).build()
+    assert record.get_key() == key
+
+    # Test serialize_key
+    serialized_key = (table_field, key_field)
+    assert key.serialize_key() == serialized_key
 
     # Get record from DB using key
     loaded_record = DbContext.load_one(StubDataclassPolymorphic, key)
