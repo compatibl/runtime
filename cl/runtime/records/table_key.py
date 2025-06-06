@@ -13,19 +13,14 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True)
-class TableKey(DataMixin):
-    """
-    Specifies the table where a record is stored.
-
-    Notes:
-        This class is derived from DataMixin directly rather than KeyMixin to avoid a cyclic reference.
-    """
+class TableKey(KeyMixin):
+    """Information about a database table."""
 
     table_id: str = required()
     """Globally unique table identifier across all key types."""
@@ -35,6 +30,3 @@ class TableKey(DataMixin):
         """Return key type even when called from a record."""
         return TableKey
 
-    def get_table(self) -> "TableKey":
-        """Returns key class name as table name, key class may override to make the table dependent on its fields."""
-        return TableKey(table_id=TypeUtil.name(self.get_key_type()))

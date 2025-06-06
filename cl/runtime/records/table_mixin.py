@@ -19,12 +19,11 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class TableMixin(DataMixin, ABC):
-    """Mixin class for the table specification in a key or record."""
+    """Abstract base for the data that determines the table for polymorphic records."""
 
     __slots__ = SlotsUtil.merge_slots(DataMixin)
     """To prevent creation of __dict__ in derived types."""
 
-    @classmethod
     @abstractmethod
-    def get_table(cls) -> str:
+    def get_table(self) -> str:
         """Return table name for this record as a PascalCase string."""

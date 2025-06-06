@@ -15,12 +15,11 @@
 from abc import ABC
 from abc import abstractmethod
 from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.table_mixin import TableMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
-class KeyMixin(TableMixin, ABC):
+class KeyMixin(DataMixin, ABC):
     """Mixin class for a key."""
 
     __slots__ = SlotsUtil.merge_slots(DataMixin)
@@ -30,10 +29,3 @@ class KeyMixin(TableMixin, ABC):
     @abstractmethod
     def get_key_type(cls) -> type:
         """Return key type even when called from a record."""
-
-    @classmethod
-    def get_table(cls) -> str:
-        """Returns key class name as table name, key class may override to make the table dependent on its fields."""
-        # TODO: Get the default from TypeInfo
-        key_type = cls.get_key_type()
-        return TypeUtil.name(key_type)

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Tuple
+
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.table_key import TableKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_table import StubDataclassPolymorphicTable
@@ -32,6 +34,5 @@ class StubDataclassPolymorphicKey(StubDataclassPolymorphicTable):
     def get_key_type(cls) -> type:
         return StubDataclassPolymorphicKey
 
-    def get_table(self) -> TableKey:
-        """Determined by 'table_field'."""
-        return TableKey(table_id=self.table_field)
+    def serialize_key(self) -> Tuple:
+        return self.table_field, self.key_field

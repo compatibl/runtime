@@ -14,7 +14,11 @@
 
 from abc import abstractmethod
 from typing import Generic
+
+from cl.runtime import TypeInfoCache
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import TKey
+from cl.runtime.records.type_util import TypeUtil
 
 
 class RecordMixin(Generic[TKey]):
@@ -27,5 +31,13 @@ class RecordMixin(Generic[TKey]):
     """To prevent creation of __dict__ in derived types."""
 
     @abstractmethod
-    def get_key(self) -> TKey:
+    def get_key(self) -> KeyMixin:
         """Return a new key object whose fields populated from self, do not return self."""
+        if hasattr(self, 'serialize_key'):
+            serialized_key = self.serialize_key()
+            key_type = serialized_key[0]
+            remaining_fields = serialized_key[1:]
+            result = key_type(*remaining_fields)
+            return result
+        else:
+            raise RuntimeError(f"Type {TypeUtil.name(self)} must implement either get_key or serialize_key method.")
