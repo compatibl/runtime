@@ -17,45 +17,45 @@ from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 
 
 def test_check_db_id():
-    """Test 'check_db_id' method."""
+    """Test that _get_db_name method correctly detects invalid names."""
     # Check for length
-    BasicMongoDb.check_db_id("a" * 63)
+    BasicMongoDb(db_id="a" * 63)._get_db_name()
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("a" * 64)
+        BasicMongoDb(db_id="a" * 64)._get_db_name()
 
     # Letters, numbers and underscore are allowed
-    BasicMongoDb.check_db_id("abc")
-    BasicMongoDb.check_db_id("123")
-    BasicMongoDb.check_db_id("abc_xyz")
+    BasicMongoDb(db_id="abc")._get_db_name()
+    BasicMongoDb(db_id="123")._get_db_name()
+    BasicMongoDb(db_id="abc_xyz")._get_db_name()
 
     # Semicolon is allowed even though it is not in the suggested list
-    BasicMongoDb.check_db_id("abc;xyz")
+    BasicMongoDb(db_id="abc;xyz")._get_db_name()
 
     # Check for space
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("abc xyz")
+        BasicMongoDb(db_id="abc xyz")._get_db_name()
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("abc ")
+        BasicMongoDb(db_id="abc ")._get_db_name()
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id(" xyz")
+        BasicMongoDb(db_id=" xyz")._get_db_name()
 
     # Check for period
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("abc.xyz")
+        BasicMongoDb(db_id="abc.xyz")._get_db_name()
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("abc.")
+        BasicMongoDb(db_id="abc.")._get_db_name()
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id(".xyz")
+        BasicMongoDb(db_id=".xyz")._get_db_name()
 
     # Check for other symbols
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("abc:xyz")
+        BasicMongoDb(db_id="abc:xyz")._get_db_name()
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("abc|xyz")
+        BasicMongoDb(db_id="abc|xyz")._get_db_name()
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("abc\\xyz")
+        BasicMongoDb(db_id="abc\\xyz")._get_db_name()
     with pytest.raises(RuntimeError):
-        BasicMongoDb.check_db_id("abc/xyz")
+        BasicMongoDb(db_id="abc/xyz")._get_db_name()
 
 
 if __name__ == "__main__":
