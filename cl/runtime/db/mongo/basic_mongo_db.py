@@ -170,11 +170,9 @@ class BasicMongoDb(Db):
     ) -> None:
         # TODO: Provide a more performant implementation
         for record in records:
-            # Get collection name from key type by removing Key suffix if present
-            key_type = record.get_key_type()
-            collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
+            table = record.get_table()
             db = self._get_mongo_db()
-            collection = db[collection_name]
+            collection = db[table]
 
             # Serialize data, this also executes 'init_all' method
             serialized_record = data_serializer.serialize(record)

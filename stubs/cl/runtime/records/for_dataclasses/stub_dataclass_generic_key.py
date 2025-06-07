@@ -30,12 +30,4 @@ class StubDataclassGenericKey(Generic[TKeyArg], KeyMixin):
     key_field: TKeyArg = required()
     """Required field with generic type."""
 
-    @classmethod
-    def get_key_type(cls) -> type:
-        return StubDataclassGenericKey[TKeyArg]
 
-    @classmethod
-    def get_table(cls) -> str:
-        """A separate table for each TKeyArg."""
-        key_arg_type = GenericUtil.get_bound_type(cls, TKeyArg)
-        return f"StubDataclassGenericKey[{TypeUtil.name(key_arg_type)}]"

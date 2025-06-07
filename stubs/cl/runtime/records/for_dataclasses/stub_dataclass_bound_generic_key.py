@@ -24,3 +24,8 @@ TKeyArg = TypeVar("TKeyArg", bound=KeyMixin)
 @dataclass(slots=True)
 class StubDataclassBoundGenericKey(StubDataclassGenericKey[StubDataclassKey]):
     """Stub concrete key class."""
+
+    @classmethod
+    def get_key_type(cls) -> type:
+        return StubDataclassBoundGenericKey
+

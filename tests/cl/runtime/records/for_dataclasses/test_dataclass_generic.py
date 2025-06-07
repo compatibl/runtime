@@ -17,8 +17,9 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_bound_generic import StubDataclassBoundGeneric
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_bound_generic_key import StubDataclassBoundGenericKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 import StubDataclassGenericArg1
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_key import StubDataclassGenericKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_2 import StubDataclassGenericArg2
 
 
 def test_bound_generic(pytest_default_db):
@@ -27,12 +28,13 @@ def test_bound_generic(pytest_default_db):
     # Create and save a record derived from a generic base
     record = StubDataclassBoundGeneric(
         key_field=StubDataclassKey(),
-        record_field=StubDataclassGenericArg1(),
+        record_field_1=StubDataclassGenericArg1(),
+        record_field_2=StubDataclassGenericArg2(),
     ).build()
     DbContext.save_one(record)
 
     # Test key
-    key = StubDataclassGenericKey(key_field=StubDataclassKey()).build()
+    key = StubDataclassBoundGenericKey(key_field=StubDataclassKey()).build()
     assert key == record.get_key()
 
     # Get record from DB using key

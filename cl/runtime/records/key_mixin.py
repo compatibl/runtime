@@ -33,6 +33,10 @@ class KeyMixin(DataMixin, ABC):
     def get_key_type(cls) -> type:
         """Return key type even when called from a record."""
 
+    def get_table(self) -> str:
+        """Return table name for this record as a PascalCase string, return key type name by default."""
+        return TypeUtil.name(self.get_key_type())
+
     def serialize_key(self) -> Tuple:
         """Implement using get_key_type during transition to the new API."""
         if hasattr(self, 'get_key_type'):

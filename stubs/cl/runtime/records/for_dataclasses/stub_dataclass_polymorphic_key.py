@@ -34,5 +34,9 @@ class StubDataclassPolymorphicKey(StubDataclassPolymorphicTable):
     def get_key_type(cls) -> type:
         return StubDataclassPolymorphicKey
 
+    def get_table(self) -> str:
+        """Override the default to specify a custom table name."""
+        return self.table_field
+
     def serialize_key(self) -> Tuple:
         return self.table_field, self.key_field

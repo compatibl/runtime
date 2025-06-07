@@ -182,7 +182,7 @@ class DbContext(Context):
     def load_many(
         cls,
         record_type: type[TRecord],
-        records_or_keys: Sequence[TRecord | TKey | tuple | None] | None,
+        records_or_keys: Sequence[TRecord | TKey | None] | None,
         *,
         dataset: str | None = None,
     ) -> Sequence[TRecord | None] | None:
@@ -200,15 +200,15 @@ class DbContext(Context):
         if not records_or_keys:
             return records_or_keys
 
-        # Check that the input list consists of only None, records, or keys in object or tuple format
+        # Check that the input list consists of only None, records, or keys
         invalid_inputs = [
-            x for x in records_or_keys if x is not None and not isinstance(x, tuple) and not is_key_or_record(x)
+            x for x in records_or_keys if x is not None and not is_key_or_record(x)
         ]
         if len(invalid_inputs) > 0:
             invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
             raise RuntimeError(
                 f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following items that are not None, key, or record:\n{invalid_inputs_str}"
+                f"the following items that are not record, key or None:\n{invalid_inputs_str}"
             )
 
         # Check that the keys in the input list have type record_type.get_key_type()
@@ -232,7 +232,7 @@ class DbContext(Context):
 
         # Check that all records or keys in object format are frozen
         unfrozen_inputs = [
-            x for x in records_or_keys if x is not None and not isinstance(x, tuple) and not x.is_frozen()
+            x for x in records_or_keys if x is not None and not x.is_frozen()
         ]
         if len(unfrozen_inputs) > 0:
             unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_inputs)
@@ -241,40 +241,40 @@ class DbContext(Context):
                 f"the following items that are not frozen:\n{unfrozen_inputs_str}"
             )
 
-        # Convert keys to tuple unless already a tuple, pass through all other item types
-        tuple_keys_or_records = [
-            None
-            if x is None else
-            KeyUtil.normalize_key(x) if isinstance(x, tuple) else
-            KeyUtil.normalize_key(x.serialize_key()) if is_key(x) else
-            x
-            for x in records_or_keys
-        ]
+        # The list of keys to load, skip None and records
+        keys_to_load = [x for x in records_or_keys if is_key(x)]
 
-        # The list of keys to query, skip None and records
-        loaded_tuple_keys = [x for x in tuple_keys_or_records if isinstance(x, tuple)]
+        # Tables for each key
+        tables = [key.get_table() for key in keys_to_load]
 
-        # Group by table name preserving the order of tables
-        loaded_tuple_keys_grouped_by_table = {
-            table: tuple(k for k in loaded_tuple_keys if k[0] == table)
-            for table in dict.fromkeys(k[0] for k in loaded_tuple_keys)
+        # Get unique tables in order of first occurrence
+        unique_tables = list(dict.fromkeys(tables))
+
+        # Group keys by table using dictionary comprehension
+        keys_to_load_grouped_by_table = {
+            table: tuple(key for t, key in zip(tables, keys_to_load) if t == table)
+            for table in unique_tables
         }
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_table = [
             cls._get_db().load_many_unsorted(table, table_keys, dataset=dataset)
-            for table, table_keys in loaded_tuple_keys_grouped_by_table.items()
+            for table, table_keys in keys_to_load_grouped_by_table.items()
         ]
 
         # Concatenated list
         loaded_records = [item for sublist in loaded_records_grouped_by_table for item in sublist]
-        loaded_record_keys = [KeyUtil.normalize_key(x.serialize_key()) for x in loaded_records]
+        normalized_loaded_keys = [KeyUtil.normalize_key(x.serialize_key()) for x in loaded_records]
 
         # Create a dictionary with pairs consisting of serialized key (after normalization) and the record for this key
-        loaded_records_dict = {k:v for k, v in zip(loaded_record_keys, loaded_records)}
+        loaded_records_dict = {k:v for k, v in zip(normalized_loaded_keys, loaded_records)}
 
         # Populate the result with records loaded using input keys, pass through None and input records
-        result = tuple(loaded_records_dict.get(x, None) if isinstance(x, tuple) else x for x in tuple_keys_or_records)
+        result = tuple(
+            loaded_records_dict.get(KeyUtil.normalize_key(x.serialize_key()), None)
+            if is_key(x) else
+            x
+            for x in records_or_keys)
         return result
 
     @classmethod
