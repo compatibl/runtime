@@ -32,6 +32,7 @@ from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -245,7 +246,7 @@ class DbContext(Context):
         keys_to_load = [x for x in records_or_keys if is_key(x)]
 
         # Tables for each key
-        tables = [key.get_table() for key in keys_to_load]
+        tables = [TableUtil.get_table(key) for key in keys_to_load]
 
         # Get unique tables in order of first occurrence
         unique_tables = list(dict.fromkeys(tables))

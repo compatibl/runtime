@@ -136,7 +136,7 @@ def test_check_snake_case():
     check_raises_error(
         CaseUtil.check_snake_case,
         "invalid_snake_case2",
-        "String invalid_snake_case2 is not snake_case because it does not follow custom rule "
+        "String invalid_snake_case2 is not snake_case because it does not follow the rule "
         "for separators in front of digits.",
     )
 
@@ -184,7 +184,7 @@ def test_check_title_case():
     check_raises_error(
         CaseUtil.check_title_case,
         "Invalid Title Case2",
-        "String Invalid Title Case2 is not Title Case because it does not follow custom rule "
+        "String Invalid Title Case2 is not Title Case because it does not follow the rule "
         "for separators in front of digits.",
     )
 
@@ -208,7 +208,8 @@ def test_check_upper_case():
     check_raises_error(
         CaseUtil.check_upper_case,
         "UPPER_CASE2",
-        "String UPPER_CASE2 is not UPPER_CASE because it does not follow custom rule for separators in front of digits.",
+        "String UPPER_CASE2 is not UPPER_CASE because it does not follow the rule "
+        "for separators in front of digits.",
     )
 
 

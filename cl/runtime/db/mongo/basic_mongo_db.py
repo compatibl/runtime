@@ -33,6 +33,7 @@ from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -170,7 +171,7 @@ class BasicMongoDb(Db):
     ) -> None:
         # TODO: Provide a more performant implementation
         for record in records:
-            table = record.get_table()
+            table = TableUtil.get_table(record)
             db = self._get_mongo_db()
             collection = db[table]
 

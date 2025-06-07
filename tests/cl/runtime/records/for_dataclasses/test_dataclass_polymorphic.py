@@ -23,7 +23,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key imp
 def test_smoke(pytest_default_db):
     """Smoke test."""
 
-    table_field = "stub_table_field"
+    table_field = "StubPolymorphicTable"
     key_field = "stub_key_field"
     record_field = "stub_record_field"
 
