@@ -53,7 +53,7 @@ def test_data_serialization():
     ]
 
     for sample_type in sample_types:
-        sample = sample_type()
+        sample = sample_type().build()
         type_hint = TypeHint.for_class(sample_type)
         serialized = DataSerializers.FOR_SQLITE.serialize(sample)
         deserialized = DataSerializers.FOR_SQLITE.deserialize(serialized, type_hint)

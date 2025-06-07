@@ -44,18 +44,18 @@ _CSV_SERIALIZER = DataSerializers.FOR_CSV
 
 
 stub_entries: List[List[RecordProtocol]] = [  # noqa
-    [StubDataclass(id=f"abc1_n{i}") for i in range(5)],
-    [StubDataclassNestedFields(id=f"abc2_n{i}") for i in range(5)],
-    [StubDataclassComposite(primitive=f"abc{i}") for i in range(5)],
-    [StubDataclassDerived(id=f"abc3_n{i}") for i in range(5)],
-    [StubDataclassDoubleDerived(id=f"abc4_n{i}") for i in range(5)],
-    [StubDataclassOtherDerived(id=f"abc5_n{i}") for i in range(5)],
-    [StubDataclassOptionalFields(id=f"abc7_n{i}") for i in range(5)],
-    [StubDataclassListFields(id=f"abc6_n{i}") for i in range(5)],
-    [StubDataclassDictFields(id=f"abc8_n{i}") for i in range(5)],
-    [StubDataclassDictListFields(id=f"abc9_n{i}") for i in range(5)],
-    [StubDataclassListDictFields(id=f"abc10_n{i}") for i in range(5)],
-    [StubDataclassPrimitiveFields(key_str_field=f"abc11_n{i}") for i in range(5)],
+    [StubDataclass(id=f"abc1_n{i}").build() for i in range(5)],
+    [StubDataclassNestedFields(id=f"abc2_n{i}").build() for i in range(5)],
+    [StubDataclassComposite(primitive=f"abc{i}").build() for i in range(5)],
+    [StubDataclassDerived(id=f"abc3_n{i}").build() for i in range(5)],
+    [StubDataclassDoubleDerived(id=f"abc4_n{i}").build() for i in range(5)],
+    [StubDataclassOtherDerived(id=f"abc5_n{i}").build() for i in range(5)],
+    [StubDataclassOptionalFields(id=f"abc7_n{i}").build() for i in range(5)],
+    [StubDataclassListFields(id=f"abc6_n{i}").build() for i in range(5)],
+    [StubDataclassDictFields(id=f"abc8_n{i}").build() for i in range(5)],
+    [StubDataclassDictListFields(id=f"abc9_n{i}").build() for i in range(5)],
+    [StubDataclassListDictFields(id=f"abc10_n{i}").build() for i in range(5)],
+    [StubDataclassPrimitiveFields(key_str_field=f"abc11_n{i}").build() for i in range(5)],
 ]
 """Stub entries for testing."""
 

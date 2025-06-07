@@ -50,7 +50,7 @@ def test_data_serialization():
     ]
 
     for sample_type in sample_types:
-        sample = sample_type()
+        sample = sample_type().build()
         serialized = DataSerializers.FOR_UI.serialize(sample)
         deserialized = DataSerializers.FOR_UI.deserialize(serialized)
         assert deserialized == FreezeUtil.freeze(sample)

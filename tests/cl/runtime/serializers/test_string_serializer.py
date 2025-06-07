@@ -38,7 +38,7 @@ def test_key_serialization():
     ]
 
     for sample_type in sample_types:
-        obj_1 = sample_type()
+        obj_1 = sample_type().build()
         obj_1_key = obj_1.get_key()
         serialized = _KEY_SERIALIZER.serialize(obj_1_key)
 
