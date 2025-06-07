@@ -16,11 +16,13 @@ from typing import Generic, TypeVar
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
 
-def test_smoke(pytest_default_db):
+
+def test_smoke(pytest_multi_db):
     """Smoke test."""
 
     table_field = "StubPolymorphicTable"

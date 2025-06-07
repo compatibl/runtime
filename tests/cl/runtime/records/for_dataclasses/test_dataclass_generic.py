@@ -14,7 +14,8 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_bound_generic import StubDataclassBoundGeneric
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_bound_generic_key import StubDataclassBoundGenericKey
@@ -22,7 +23,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_1 impor
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_2 import StubDataclassGenericArg2
 
 
-def test_bound_generic(pytest_default_db):
+def test_smoke(pytest_multi_db):
     """Test StubDataclassBoundGeneric."""
 
     # Create and save a record derived from a generic base

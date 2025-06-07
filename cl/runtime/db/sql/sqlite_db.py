@@ -22,16 +22,20 @@ from typing import Iterable
 from typing import Sequence
 from typing import Tuple
 
-from cl.runtime import RecordMixin
+from more_itertools import consume
+
+from cl.runtime import RecordMixin, KeyUtil
 from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.file.file_util import FileUtil
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -95,16 +99,19 @@ class SqliteDb(Db):
     def load_many_unsorted(
         self,
         table: str,
-        keys: Sequence[tuple],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str | None = None,
     ) -> Sequence[RecordMixin]:
-        schema_manager = self._get_schema_manager()
 
         # Return an empty list if the table does not exist for the derived type
+        schema_manager = self._get_schema_manager()
         existing_tables = schema_manager.existing_tables()
         if table not in existing_tables:
             return []
+
+        # Ensure all keys within the table have the same type and get that type, error otherwise
+        key_type = KeyUtil.get_key_type(table=table, records_or_keys=keys)
 
         key_fields = schema_manager.get_primary_keys(key_type)
         columns_mapping = schema_manager.get_columns_mapping(key_type)
@@ -116,7 +123,7 @@ class SqliteDb(Db):
 
         # TODO: Check the logic for multiple keys when the tuple is flattened
         serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
-        flattened_tuple = tuple(item for group in keys for item in group)
+        flattened_tuple = tuple(item for group in serialized_keys for item in group)
 
         cursor = self._get_connection().cursor()
         try:
@@ -207,20 +214,23 @@ class SqliteDb(Db):
     ) -> None:
         schema_manager = self._get_schema_manager()
 
-        grouped_records = defaultdict(list)
+        # Group keys by table
+        records_grouped_by_table = defaultdict(list)
+        consume(records_grouped_by_table[record.get_table()].append(record) for record in records)
 
-        # TODO (Roman): improve grouping
-        for record in records:
-            grouped_records[record.get_key_type()].append(record)
+        # Iterate over tables
+        for table, table_records in records_grouped_by_table.items():
 
-        for key_type, records_group in grouped_records.items():
-            # serialize records
-            serialized_records = [_SERIALIZER.serialize(rec) for rec in records_group]
+            # Ensure all keys within the table have the same type and get that type, error otherwise
+            key_type = KeyUtil.get_key_type(table=table, records_or_keys=table_records)
 
-            # get maximum set of fields from records
+            # Serialize records
+            serialized_records = [_SERIALIZER.serialize(rec) for rec in table_records]
+
+            # Get maximum set of fields from records
             all_fields = list({k for rec in serialized_records for k in rec.keys()})
 
-            # fill sql_values with ordered values from serialized records
+            # Fill sql_values with ordered values from serialized records
             # if field isn't in some records - fill with None
             sql_values = tuple(
                 serialized_record[k] if k in serialized_record else None
@@ -228,24 +238,18 @@ class SqliteDb(Db):
                 for k in all_fields
             )
 
-            if key_type.__name__ == "LlmKey":
-                pass
-
             columns_mapping = schema_manager.get_columns_mapping(key_type)
             quoted_columns = [f'"{columns_mapping[field]}"' for field in all_fields]
             columns_str = ", ".join(quoted_columns)
 
-            value_placeholders = ", ".join([f"({', '.join(['?']*len(all_fields))})" for _ in range(len(records_group))])
-
-            table_name = schema_manager.table_name_for_type(key_type)
-
             primary_keys = [columns_mapping[primary_key] for primary_key in schema_manager.get_primary_keys(key_type)]
 
             schema_manager.create_table(
-                table_name, columns_mapping.values(), if_not_exists=True, primary_keys=primary_keys
+                table, columns_mapping.values(), if_not_exists=True, primary_keys=primary_keys
             )
 
-            sql_statement = f'REPLACE INTO "{table_name}" ({columns_str}) VALUES {value_placeholders};'
+            value_placeholders = ", ".join([f"({', '.join(['?']*len(all_fields))})" for _ in range(len(table_records))])
+            sql_statement = f'REPLACE INTO "{table}" ({columns_str}) VALUES {value_placeholders};'
 
             if not primary_keys:
                 # TODO (Roman): this is a workaround for handling singleton records.
@@ -253,7 +257,7 @@ class SqliteDb(Db):
                 #  So this code just deletes the existing records before saving.
                 #  As a possible solution, we can introduce some mandatory primary key that isn't based on the
                 #  key fields.
-                self.delete_many((rec.get_key() for rec in records_group))
+                self.delete_many((rec.get_key() for rec in table_records))
 
             connection = self._get_connection()
             cursor = connection.cursor()
@@ -399,4 +403,3 @@ class SqliteDb(Db):
                 return False
 
         return True
-

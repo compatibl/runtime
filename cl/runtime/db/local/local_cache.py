@@ -19,6 +19,7 @@ from typing import Sequence
 from typing_extensions import Self
 from cl.runtime import Db, RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -44,7 +45,7 @@ class LocalCache(Db):
     def load_many_unsorted(
         self,
         table: str,
-        keys: Sequence[tuple],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str | None = None,
     ) -> Sequence[RecordMixin]:
@@ -52,7 +53,7 @@ class LocalCache(Db):
             result = []
             for key in keys:
                 # Look up the record, defaults to None
-                serialized_key = _KEY_SERIALIZER.serialize(key)
+                serialized_key = _KEY_SERIALIZER.serialize(key)  # Use hash instead?
                 record = table_cache.get(serialized_key, None)
                 result.append(record)
             return result

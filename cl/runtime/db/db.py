@@ -21,6 +21,7 @@ from typing import Sequence
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -42,7 +43,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def load_many_unsorted(
         self,
         table: str,
-        keys: Sequence[tuple],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str | None = None,
     ) -> Sequence[RecordMixin]:

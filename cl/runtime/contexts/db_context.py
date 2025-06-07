@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Iterable
 from typing import Sequence
+
+from more_itertools import consume
+
 from cl.runtime import Db
 from cl.runtime import KeyUtil
 from cl.runtime.contexts.context import Context
@@ -248,14 +252,9 @@ class DbContext(Context):
         # Tables for each key
         tables = [TableUtil.get_table(key) for key in keys_to_load]
 
-        # Get unique tables in order of first occurrence
-        unique_tables = list(dict.fromkeys(tables))
-
-        # Group keys by table using dictionary comprehension
-        keys_to_load_grouped_by_table = {
-            table: tuple(key for t, key in zip(tables, keys_to_load) if t == table)
-            for table in unique_tables
-        }
+        # Group keys by table
+        keys_to_load_grouped_by_table = defaultdict(list)
+        consume(keys_to_load_grouped_by_table[key.get_table()].append(key) for key in keys_to_load)
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_table = [

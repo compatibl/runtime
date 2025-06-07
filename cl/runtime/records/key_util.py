@@ -104,6 +104,20 @@ class KeyUtil:
         # TODO: Remove, use key_serializer instead
         return str(value)  # TODO: Add checks
 
+    @classmethod
+    def get_key_type(cls, *, table: str, records_or_keys: Sequence[KeyMixin]) -> type[KeyMixin]:
+        """Ensure all keys within the table have the same type and return that type, error otherwise."""
+        if not records_or_keys:
+            raise RuntimeError(f"Param 'records_or_keys' for table {table} in KeyUtil.get_key_type is None or empty.")
+
+        # Create a set of unique keys
+        key_types = {key.get_key_type() for key in records_or_keys}
+        if len(key_types) == 1:
+            return key_types.pop()
+        else:
+            key_types_str = "\n".join(sorted(TypeUtil.name(key_type) for key_type in key_types))
+            raise RuntimeError(f"More than one key type is specified for table {table}:\n{key_types_str}\n")
+
     # TODO: Extract from key class instead
     @classmethod
     def get_key_fields(cls, record_type: type) -> List[str] | None:
