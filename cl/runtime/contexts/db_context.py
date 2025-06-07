@@ -256,14 +256,14 @@ class DbContext(Context):
 
         # Group by table name preserving the order of tables
         loaded_tuple_keys_grouped_by_table = {
-            table: tuple(k[1:] for k in loaded_tuple_keys if k[0] == table)
+            table: tuple(k for k in loaded_tuple_keys if k[0] == table)
             for table in dict.fromkeys(k[0] for k in loaded_tuple_keys)
         }
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_table = [
-            cls._get_db().load_many_unsorted(table, primary_keys, dataset=dataset)
-            for table, primary_keys in loaded_tuple_keys_grouped_by_table.items()
+            cls._get_db().load_many_unsorted(table, table_keys, dataset=dataset)
+            for table, table_keys in loaded_tuple_keys_grouped_by_table.items()
         ]
 
         # Concatenated list

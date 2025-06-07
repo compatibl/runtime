@@ -72,16 +72,16 @@ class BasicMongoDb(Db):
     def load_many_unsorted(
         self,
         table: str,
-        primary_keys: Sequence[tuple],
+        keys: Sequence[tuple],
         *,
         dataset: str | None = None,
     ) -> Sequence[RecordMixin]:
         # Get Mongo collection using table name
         collection = self._get_mongo_collection(table)
         result = []
-        for primary_key in primary_keys:
+        for key in keys:
             # TODO: Implement using a more performant approach
-            serialized_primary_key = _KEY_SERIALIZER.serialize(primary_key)
+            serialized_primary_key = _KEY_SERIALIZER.serialize(key)
             serialized_record = collection.find_one({"_key": serialized_primary_key})
 
             # Do not include None if the record is not found, skip instead

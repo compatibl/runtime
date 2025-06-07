@@ -95,24 +95,22 @@ class SqliteDb(Db):
     def load_many_unsorted(
         self,
         table: str,
-        primary_keys: Sequence[tuple],
+        keys: Sequence[tuple],
         *,
         dataset: str | None = None,
     ) -> Sequence[RecordMixin]:
         schema_manager = self._get_schema_manager()
-        key_type = record_type.get_key_type()
-        table_name = schema_manager.table_name_for_type(key_type)
 
         # Return an empty list if the table does not exist for the derived type
         existing_tables = schema_manager.existing_tables()
-        if table_name not in existing_tables:
+        if table not in existing_tables:
             return []
 
         key_fields = schema_manager.get_primary_keys(key_type)
         columns_mapping = schema_manager.get_columns_mapping(key_type)
 
         # if keys_group don't support "in" or "len" operator convert it to tuple
-        sql_statement = f'SELECT * FROM "{table_name}"'
+        sql_statement = f'SELECT * FROM "{table}"'
         sql_statement = self._add_where_keys_in_clause(sql_statement, key_fields, columns_mapping, len(keys))
         sql_statement += ";"
 

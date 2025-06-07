@@ -42,7 +42,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def load_many_unsorted(
         self,
         table: str,
-        primary_keys: Sequence[tuple],
+        keys: Sequence[tuple],
         *,
         dataset: str | None = None,
     ) -> Sequence[RecordMixin]:
@@ -51,8 +51,8 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         The result is unsorted and skips the records that are not found.
 
         Args:
-            table: Logical database table name, may be different from the physical name
-            primary_keys: A sequence of primary key tuples without table name or key type
+            table: Logical database table name, may be different from the physical name or the key type name
+            keys: A sequence of keys in (key_type_or_type_name, *primary_keys) format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
 

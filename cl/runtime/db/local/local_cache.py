@@ -44,14 +44,11 @@ class LocalCache(Db):
     def load_many_unsorted(
         self,
         table: str,
-        primary_keys: Sequence[tuple],
+        keys: Sequence[tuple],
         *,
         dataset: str | None = None,
     ) -> Sequence[RecordMixin]:
-        # Try to retrieve table dictionary
-        key_type = record_type.get_key_type()
-        key_type_name = TypeUtil.name(key_type)
-        if (table_cache := self.__cache.get(key_type_name, None)) is not None:
+        if (table_cache := self.__cache.get(table, None)) is not None:
             result = []
             for key in keys:
                 # Look up the record, defaults to None

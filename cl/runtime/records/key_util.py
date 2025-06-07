@@ -18,7 +18,7 @@ import textwrap
 from typing import List, Sequence, Tuple, Type
 
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import KeyProtocol, TPrimitive, is_primitive
+from cl.runtime.records.protocols import KeyProtocol, TPrimitive, is_primitive, is_enum
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -43,7 +43,7 @@ class KeyUtil:
         """Normalize key tuples recursively, leave primitive types unchanged."""
         if isinstance(primary_key, tuple):
             return cls.normalize_key(primary_key)
-        elif is_primitive(primary_key):
+        elif is_primitive(primary_key) or is_enum(primary_key):
             return primary_key
         else:
             raise RuntimeError(f"A primary key {primary_key} is neither an embedded key nor a primitive type.")
