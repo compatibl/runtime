@@ -17,7 +17,7 @@ from typing import Dict
 from typing import Iterable
 from typing import Sequence
 from typing_extensions import Self
-from cl.runtime import Db
+from cl.runtime import Db, RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -43,11 +43,11 @@ class LocalCache(Db):
 
     def load_many_unsorted(
         self,
-        record_type: type[TRecord],
-        keys: Sequence[tuple],
+        table: str,
+        primary_keys: Sequence[tuple],
         *,
         dataset: str | None = None,
-    ) -> Sequence[TRecord]:
+    ) -> Sequence[RecordMixin]:
         # Try to retrieve table dictionary
         key_type = record_type.get_key_type()
         key_type_name = TypeUtil.name(key_type)
@@ -144,11 +144,6 @@ class LocalCache(Db):
     def close_connection(self) -> None:
         """Close database connection to releasing resource locks."""
         # Do nothing here, as this is an in-memory cache which does not require a connection
-
-    @classmethod
-    def check_db_id(cls, db_id: str) -> None:
-        """Check that db_id follows the database name restrictions, error message otherwise."""
-        pass  # TODO: Implement validation
 
     @classmethod
     def instance(cls) -> Self:

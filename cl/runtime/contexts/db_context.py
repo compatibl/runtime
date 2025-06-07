@@ -243,20 +243,38 @@ class DbContext(Context):
 
         # Convert keys to tuple unless already a tuple, pass through all other item types
         tuple_keys_or_records = [
-            _KEY_SERIALIZER.serialize(x) if x is not None and is_key(x) else x for x in records_or_keys
+            None
+            if x is None else
+            KeyUtil.normalize_key(x) if isinstance(x, tuple) else
+            KeyUtil.normalize_key(x.serialize_key()) if is_key(x) else
+            x
+            for x in records_or_keys
         ]
 
-        # Keys only, skip None and records
-        queried_tuple_keys = [x for x in tuple_keys_or_records if isinstance(x, tuple)]
+        # The list of keys to query, skip None and records
+        loaded_tuple_keys = [x for x in tuple_keys_or_records if isinstance(x, tuple)]
 
-        # Get records from DB, the result is unsorted
-        queried_records = cls._get_db().load_many_unsorted(record_type, queried_tuple_keys, dataset=dataset)
+        # Group by table name preserving the order of tables
+        loaded_tuple_keys_grouped_by_table = {
+            table: tuple(k[1:] for k in loaded_tuple_keys if k[0] == table)
+            for table in dict.fromkeys(k[0] for k in loaded_tuple_keys)
+        }
 
-        # Create a dictionary with pairs consisting of key in tuple format and the record for this key
-        queried_records_dict = {_KEY_SERIALIZER.serialize(x.get_key()): x for x in queried_records}
+        # Get records from DB, the result is unsorted and grouped by table
+        loaded_records_grouped_by_table = [
+            cls._get_db().load_many_unsorted(table, primary_keys, dataset=dataset)
+            for table, primary_keys in loaded_tuple_keys_grouped_by_table.items()
+        ]
 
-        # Populate the result with records queried using input keys, pass through None and input records
-        result = [queried_records_dict.get(x, None) if isinstance(x, tuple) else x for x in tuple_keys_or_records]
+        # Concatenated list
+        loaded_records = [item for sublist in loaded_records_grouped_by_table for item in sublist]
+        loaded_record_keys = [KeyUtil.normalize_key(x.serialize_key()) for x in loaded_records]
+
+        # Create a dictionary with pairs consisting of serialized key (after normalization) and the record for this key
+        loaded_records_dict = {k:v for k, v in zip(loaded_record_keys, loaded_records)}
+
+        # Populate the result with records loaded using input keys, pass through None and input records
+        result = tuple(loaded_records_dict.get(x, None) if isinstance(x, tuple) else x for x in tuple_keys_or_records)
         return result
 
     @classmethod

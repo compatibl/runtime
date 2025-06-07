@@ -133,7 +133,7 @@ class SseQueryUtil:
 
         # Get collection name from key type
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-        db_obj = db._get_db()
+        db_obj = db._get_mongo_db()
         collection = db_obj[collection_name]
 
         subtype_names = TypeInfoCache.get_child_names(record_type)

@@ -21,6 +21,8 @@ from typing import Dict
 from typing import Iterable
 from typing import Sequence
 from typing import Tuple
+
+from cl.runtime import RecordMixin
 from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
@@ -92,11 +94,11 @@ class SqliteDb(Db):
 
     def load_many_unsorted(
         self,
-        record_type: type[TRecord],
-        keys: Sequence[tuple],
+        table: str,
+        primary_keys: Sequence[tuple],
         *,
         dataset: str | None = None,
-    ) -> Sequence[TRecord]:
+    ) -> Sequence[RecordMixin]:
         schema_manager = self._get_schema_manager()
         key_type = record_type.get_key_type()
         table_name = schema_manager.table_name_for_type(key_type)
@@ -400,7 +402,3 @@ class SqliteDb(Db):
 
         return True
 
-    @classmethod
-    def check_db_id(cls, db_id: str) -> None:
-        """Check that db_id follows the database name restrictions, error message otherwise."""
-        pass  # TODO: Implement validation

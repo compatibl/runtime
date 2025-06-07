@@ -15,24 +15,93 @@
 import ast
 import inspect
 import textwrap
-from typing import List
-from cl.runtime.records.protocols import KeyProtocol
+from typing import List, Sequence, Tuple, Type
+
+from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.protocols import KeyProtocol, TPrimitive, is_primitive
+from cl.runtime.records.type_util import TypeUtil
 
 
 class KeyUtil:
     """Utilities for working with keys."""
+    
+    @classmethod
+    def normalize_table(cls, type_or_table: type[KeyMixin] | str) -> str:
+        """Get table name from key type using the standard naming convention, leave string table name unchanged."""
+        if isinstance(type_or_table, type) and issubclass(type_or_table, KeyMixin):
+            table = TypeUtil.name(type_or_table)  # TODO: Remove Key suffix
+        elif isinstance(type_or_table, str):
+            table = type_or_table
+        else:
+            raise RuntimeError(f"Head of a key tuple {type_or_table} is neither a string table name nor a key type.")
+        
+        # TODO: Perform validation
+        return table
 
     @classmethod
-    def format(cls, value: KeyProtocol) -> str:  # TODO: Remove, use key_serializer instead
+    def normalize_primary_key(cls, primary_key: Tuple | TPrimitive) -> Tuple | TPrimitive:
+        """Normalize key tuples recursively, leave primitive types unchanged."""
+        if isinstance(primary_key, tuple):
+            return cls.normalize_key(primary_key)
+        elif is_primitive(primary_key):
+            return primary_key
+        else:
+            raise RuntimeError(f"A primary key {primary_key} is neither an embedded key nor a primitive type.")
+        
+    @classmethod
+    def normalize_key(cls, key: KeyMixin | Tuple | None) -> Tuple | None:
+        """
+        Replace types by table names using the default table naming convention, leave the rest unchanged.
+        
+        Notes:
+            If a key object:
+                - Invoke serialize_key to convert to tuple before further processing
+            If a tuple, key[0] can be:
+                - a type which is converted using `get_table`
+                - string table name (left unchanged)
+            If a tuple, remaining fields are primary keys which can be:
+                - another key tuple (normalized recursively)
+                - a primitive type (left unchanged)
+        """
+        if key is None:
+            return None
+        elif isinstance(key, KeyMixin):
+            # Invoke serialize_key to convert to tuple before further processing
+            key = key.serialize_key()
+        elif isinstance(key, tuple):
+            if not key:
+                raise RuntimeError(
+                    "A key or an element of composite key is an empty tuple.\n"
+                    "Tuple keys must begin from a table name or type.")
+
+        head, *primary_keys = key
+        # Convert from type to string if necessary
+        table = cls.normalize_table(head)
+        # Normalize each primary key in the remaining fields, with recursion if necessary
+        normalized_primary_keys = tuple(cls.normalize_primary_key(primary_key) for primary_key in primary_keys)
+
+        # Return as a tuple of table name followed by normalized primary keys
+        return table, *normalized_primary_keys
+
+    @classmethod
+    def normalize_keys(cls, keys: Sequence[KeyMixin | Tuple]) -> Sequence[Tuple]:
+        """Apply normalize_key to each item of the sequence."""
+        return tuple(cls.normalize_key(key) for key in keys)
+
+    @classmethod
+    def format(cls, value: KeyProtocol) -> str:
         """Convert to semicolon-delimited string without type (error message if value is None)."""
+        # TODO: Remove, use key_serializer instead
+        # TODO: Improve and check usage
         if value is not None:
             return cls.serialize(value)
         else:
             raise RuntimeError("Argument to KeyUtil.format method is None or an empty string.")
 
     @classmethod
-    def serialize(cls, value: KeyProtocol | None) -> str | None:  # TODO: Remove, use key_serializer instead
+    def serialize(cls, value: KeyProtocol | None) -> str | None:
         """Convert to semicolon-delimited string without type (return None if argument is None)."""
+        # TODO: Remove, use key_serializer instead
         return str(value)  # TODO: Add checks
 
     # TODO: Extract from key class instead

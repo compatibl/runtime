@@ -41,18 +41,18 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def load_many_unsorted(
         self,
-        record_type: type[TRecord],
-        keys: Sequence[tuple],
+        table: str,
+        primary_keys: Sequence[tuple],
         *,
         dataset: str | None = None,
-    ) -> Sequence[TRecord]:
+    ) -> Sequence[RecordMixin]:
         """
-        Load records for the specified sequence of keys in tuple format.
+        Load records from the specified table for a sequence of primary key tuples.
         The result is unsorted and skips the records that are not found.
 
         Args:
-            record_type: Record type to load, error if the result is not this type or its subclass
-            keys: A sequence of keys in tuple format without key type
+            table: Logical database table name, may be different from the physical name
+            primary_keys: A sequence of primary key tuples without table name or key type
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
 
@@ -166,11 +166,6 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def close_connection(self) -> None:
         """Close database connection to releasing resource locks."""
-
-    @classmethod
-    @abstractmethod
-    def check_db_id(cls, db_id: str) -> None:
-        """Check that db_id follows MongoDB database name restrictions, error message otherwise."""
 
     @classmethod
     def _get_test_db_name(cls) -> str:  # TODO: Use fixture instead

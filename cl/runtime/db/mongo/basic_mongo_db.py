@@ -17,9 +17,14 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Iterable
 from typing import Sequence
+
+from memoization import cached
 from mongomock import MongoClient as MongoClientMock
 from pymongo import MongoClient
 from pymongo.database import Database
+from pymongo.synchronous.collection import Collection
+
+from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
 from cl.runtime.records.protocols import KeyProtocol, is_record, is_key
@@ -66,23 +71,18 @@ class BasicMongoDb(Db):
 
     def load_many_unsorted(
         self,
-        record_type: type[TRecord],
-        keys: Sequence[tuple],
+        table: str,
+        primary_keys: Sequence[tuple],
         *,
         dataset: str | None = None,
-    ) -> Sequence[TRecord]:
-
-        # Get collection name from key type
-        key_type = record_type.get_key_type()
-        collection_name = TypeUtil.name(key_type)
-        db = self._get_db()
-        collection = db[collection_name]
-
+    ) -> Sequence[RecordMixin]:
+        # Get Mongo collection using table name
+        collection = self._get_mongo_collection(table)
         result = []
-        for key in keys:
+        for primary_key in primary_keys:
             # TODO: Implement using a more performant approach
-            serialized_key = _KEY_SERIALIZER.serialize(key)
-            serialized_record = collection.find_one({"_key": serialized_key})
+            serialized_primary_key = _KEY_SERIALIZER.serialize(primary_key)
+            serialized_record = collection.find_one({"_key": serialized_primary_key})
 
             # Do not include None if the record is not found, skip instead
             if serialized_record is not None:
@@ -108,7 +108,7 @@ class BasicMongoDb(Db):
 
         # Get collection name from key type
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-        db = self._get_db()
+        db = self._get_mongo_db()
         collection = db[collection_name]
 
         subtype_names = TypeInfoCache.get_child_names(record_type)
@@ -147,7 +147,7 @@ class BasicMongoDb(Db):
 
         # Get collection name from key type
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-        db = self._get_db()
+        db = self._get_mongo_db()
         collection = db[collection_name]
 
         # Convert filter object to a dictionary
@@ -173,7 +173,7 @@ class BasicMongoDb(Db):
             # Get collection name from key type by removing Key suffix if present
             key_type = record.get_key_type()
             collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-            db = self._get_db()
+            db = self._get_mongo_db()
             collection = db[collection_name]
 
             # Serialize data, this also executes 'init_all' method
@@ -197,7 +197,7 @@ class BasicMongoDb(Db):
     ) -> None:
         # Get collection name from key type by removing Key suffix if present
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-        db = self._get_db()
+        db = self._get_mongo_db()
         collection = db[collection_name]
 
         serialized_key = _KEY_SERIALIZER.serialize(key)
@@ -222,7 +222,7 @@ class BasicMongoDb(Db):
 
         # Drop the entire database without possibility of recovery, this
         # relies on the temp_db_prefix check above to prevent unintended use
-        client = self._get_client()
+        client = self._get_mongo_client()
         client.drop_database(db_name)
 
     def close_connection(self) -> None:
@@ -232,7 +232,27 @@ class BasicMongoDb(Db):
             # Remove client from dictionary so connection can be reopened on next access
             del _client_dict[self.client_uri]
 
-    def _get_client(self) -> MongoClient:
+    def _get_mongo_collection(self, table: str) -> Collection:
+        """Get PyMongo collection for the specified table."""
+        mongo_db = self._get_mongo_db()
+        # TODO: Perform table name validation and correction here
+        collection_name = table
+        result = mongo_db[collection_name]
+        return result
+
+    def _get_mongo_db(self) -> Database:
+        """Get PyMongo database object."""
+        db_name = self._get_db_name()
+        db_key = f"{self.client_uri}{db_name}"
+        if (result := _db_dict.get(db_key, None)) is None:
+            # Create if it does not exist
+            client = self._get_mongo_client()
+            # TODO: Implement dispose logic
+            result = client[db_name]
+            _db_dict[db_key] = result
+        return result
+
+    def _get_mongo_client(self) -> MongoClient:
         """Get PyMongo client object."""
         if (client := _client_dict.get(self.client_uri, None)) is None:
             # Determine regular or mock client type based on the presence of 'Mock' substring in class name
@@ -250,45 +270,29 @@ class BasicMongoDb(Db):
             _client_dict[self.client_uri] = client
         return client
 
-    def _get_db(self) -> Database:
-        """Get PyMongo database object."""
-        db_name = self._get_db_name()
-        db_key = f"{self.client_uri}{db_name}"
-        if (result := _db_dict.get(db_key, None)) is None:
-            # Create if it does not exist
-            client = self._get_client()
-            # TODO: Implement dispose logic
-            result = client[db_name]
-            _db_dict[db_key] = result
-        return result
-
+    @cached
     def _get_db_name(self) -> str:
-        """Database is from db_id, check validity before returning."""
-        result = self.db_id
-        self.check_db_id(result)
-        return result
-
-    @classmethod
-    def check_db_id(cls, db_id: str) -> None:
-        """Check that db_id follows MongoDB database name restrictions, error message otherwise."""
+        """Database is from db_id, perform validation before returning."""
 
         # Check for invalid characters in MongoDB name
-        if invalid_db_name_regex.search(db_id):
+        if invalid_db_name_regex.search(self.db_id):
             raise RuntimeError(
-                f"MongoDB db_id='{db_id}' is not valid because it contains "
+                f"MongoDB db_id='{self.db_id}' is not valid because it contains "
                 f"special characters from this list: '{invalid_db_name_symbols_msg}'"
             )
 
         # Check for maximum byte length of less than 64 (use Unicode bytes, not string chars to count)
         max_bytes = 63
-        actual_bytes = len(db_id.encode("utf-8"))
+        actual_bytes = len(self.db_id.encode("utf-8"))
         if actual_bytes > max_bytes:
             raise RuntimeError(
-                f"MongoDB does not support db_id='{db_id}' because "
+                f"MongoDB does not support db_id='{self.db_id}' because "
                 f"it has {actual_bytes} bytes, exceeding the maximum of {max_bytes}."
             )
 
-    # TODO (Roman): move to base Db class?
+        return self.db_id
+
+    # TODO (Roman): move to base Db class or remove?
     def is_empty(self) -> bool:
         """Return True if db has no collections."""
-        return len(self._get_db().list_collection_names()) == 0
+        return len(self._get_mongo_db().list_collection_names()) == 0
