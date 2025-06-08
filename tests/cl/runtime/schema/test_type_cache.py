@@ -22,8 +22,11 @@ from cl.runtime.schema.type_kind import TypeKind
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubIntEnum
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_underscore import (  # noqa
+    __StubDataclassDoubleUnderscore,
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_underscore import _StubDataclassUnderscore  # noqa
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_underscore import __StubDataclassDoubleUnderscore  # noqa
+
 
 def test_rebuild_cache():
     """Test TypeInfoCache.reload_cache method, this also generates and saves a new TypeInfo.csv file."""

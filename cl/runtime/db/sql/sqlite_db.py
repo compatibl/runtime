@@ -21,10 +21,9 @@ from typing import Dict
 from typing import Iterable
 from typing import Sequence
 from typing import Tuple
-
 from more_itertools import consume
-
-from cl.runtime import RecordMixin, KeyUtil
+from cl.runtime import KeyUtil
+from cl.runtime import RecordMixin
 from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
@@ -35,7 +34,6 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -244,9 +242,7 @@ class SqliteDb(Db):
 
             primary_keys = [columns_mapping[primary_key] for primary_key in schema_manager.get_primary_keys(key_type)]
 
-            schema_manager.create_table(
-                table, columns_mapping.values(), if_not_exists=True, primary_keys=primary_keys
-            )
+            schema_manager.create_table(table, columns_mapping.values(), if_not_exists=True, primary_keys=primary_keys)
 
             value_placeholders = ", ".join([f"({', '.join(['?']*len(all_fields))})" for _ in range(len(table_records))])
             sql_statement = f'REPLACE INTO "{table}" ({columns_str}) VALUES {value_placeholders};'

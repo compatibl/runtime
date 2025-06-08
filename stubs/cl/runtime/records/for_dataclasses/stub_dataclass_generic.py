@@ -16,15 +16,16 @@ from dataclasses import dataclass
 from typing import Generic
 from typing import TypeVar
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_bound_generic_key import StubDataclassBoundGenericKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg import StubDataclassGenericArg
 
 TRecordArg1 = TypeVar("TRecordArg1", bound=StubDataclassGenericArg)
 TRecordArg2 = TypeVar("TRecordArg2", bound=StubDataclassGenericArg)
 
+
 @dataclass(slots=True, kw_only=True)
-class StubDataclassGeneric(Generic[TRecordArg1, TRecordArg2],
+class StubDataclassGeneric(
+    Generic[TRecordArg1, TRecordArg2],
     StubDataclassBoundGenericKey,
     RecordMixin[StubDataclassBoundGenericKey],
 ):

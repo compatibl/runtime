@@ -86,17 +86,21 @@ class KeySerializer(Serializer):
         elif isinstance(data, tuple):
             # Check that the first element is a type or type name string
             if not data:
-                raise RuntimeError("A tuple key cannot be empty. Its first item must be\n"
-                                   "a key type or a type name string.")
+                raise RuntimeError(
+                    "A tuple key cannot be empty. Its first item must be\n" "a key type or a type name string."
+                )
             elif not isinstance(data[0], (type, str)):
-                raise RuntimeError("If an inner key field inside a composite key is a tuple.\n"
-                                   "Its first item must be a key type or type name string.")
+                raise RuntimeError(
+                    "If an inner key field inside a composite key is a tuple.\n"
+                    "Its first item must be a key type or type name string."
+                )
             # Perform checks and flatten into a linear sequence
             sequence = self._to_tuple(data)
         else:
             raise RuntimeError(
                 f"{TypeUtil.name(self)} cannot serialize {type(data)}.\n"
-                f"The input must be a key object, key tuple or None.")
+                f"The input must be a key object, key tuple or None."
+            )
 
         # Check that all tokens are primitive types
         invalid_tokens = [x for x in sequence if not is_primitive(x) and not is_enum(x)]
@@ -192,21 +196,25 @@ class KeySerializer(Serializer):
                         # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
                         self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_hint)
                     ]
-                    if (v := getattr(data, k)).__class__.__name__ in PRIMITIVE_CLASS_NAMES else
-                    [
-                        # Use enum serializer, specify enum class
-                        self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
-                    ]
-                    if isinstance(v, Enum) else
-                    self._to_tuple(v)
+                    if (v := getattr(data, k)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                    else (
+                        [
+                            # Use enum serializer, specify enum class
+                            self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
+                        ]
+                        if isinstance(v, Enum)
+                        else self._to_tuple(v)
+                    )
                 )
                 for k, field_spec in field_dict.items()
             )
         elif isinstance(data, tuple):
             # Check that the first element is a type or type name string
             if not data:
-                raise RuntimeError("An inner key field inside a composite key cannot be empty.\n"
-                                   "Its first item must be a key type or type name string.")
+                raise RuntimeError(
+                    "An inner key field inside a composite key cannot be empty.\n"
+                    "Its first item must be a key type or type name string."
+                )
 
             # Parse the tuple and get type_spec
             key_type, *primitive_keys = data
@@ -215,8 +223,10 @@ class KeySerializer(Serializer):
             elif isinstance(key_type, str):
                 type_spec = TypeSchema.for_type_name(key_type)
             else:
-                raise RuntimeError("If an inner key field inside a composite key is a tuple.\n"
-                                   "Its first item must be a key type or type name string.")
+                raise RuntimeError(
+                    "If an inner key field inside a composite key is a tuple.\n"
+                    "Its first item must be a key type or type name string."
+                )
             if not isinstance(type_spec, DataSpec):
                 raise RuntimeError(
                     f"Key serializer cannot serialize '{TypeUtil.name(data)}'\nbecause it is not a slotted class."
@@ -228,7 +238,8 @@ class KeySerializer(Serializer):
                 key_type_name = TypeUtil.name(key_type) if isinstance(key_type, type) else key_type
                 raise RuntimeError(
                     f"The number of primitive keys {primitive_keys_count} does not match the number of\n"
-                    f"key fields {field_count} for key type {key_type_name}.")
+                    f"key fields {field_count} for key type {key_type_name}."
+                )
 
             # Serialize slot values in the order of declaration packing primitive types into size-one lists
             packed_result = tuple(
@@ -237,19 +248,22 @@ class KeySerializer(Serializer):
                         # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
                         self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_hint)
                     ]
-                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES else
-                    [
-                        # Use enum serializer, specify enum class
-                        self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
-                    ]
-                    if isinstance(v, Enum) else
-                    self._to_tuple(v)
+                    if v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                    else (
+                        [
+                            # Use enum serializer, specify enum class
+                            self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
+                        ]
+                        if isinstance(v, Enum)
+                        else self._to_tuple(v)
+                    )
                 )
                 for v, field_spec in zip(primitive_keys, field_specs)
             )
         else:
             raise RuntimeError(
-                f"An inner key field {TypeUtil.name(data)} is not a primitive type, enum, tuple or key object.")
+                f"An inner key field {TypeUtil.name(data)} is not a primitive type, enum, tuple or key object."
+            )
 
         # Flatten by unpacking the inner tuples
         result = tuple(token for item in packed_result for token in item)

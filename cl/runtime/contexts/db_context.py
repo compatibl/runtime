@@ -16,9 +16,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Iterable
 from typing import Sequence
-
 from more_itertools import consume
-
 from cl.runtime import Db
 from cl.runtime import KeyUtil
 from cl.runtime.contexts.context import Context
@@ -206,9 +204,7 @@ class DbContext(Context):
             return records_or_keys
 
         # Check that the input list consists of only None, records, or keys
-        invalid_inputs = [
-            x for x in records_or_keys if x is not None and not is_key_or_record(x)
-        ]
+        invalid_inputs = [x for x in records_or_keys if x is not None and not is_key_or_record(x)]
         if len(invalid_inputs) > 0:
             invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
             raise RuntimeError(
@@ -236,9 +232,7 @@ class DbContext(Context):
             )
 
         # Check that all records or keys in object format are frozen
-        unfrozen_inputs = [
-            x for x in records_or_keys if x is not None and not x.is_frozen()
-        ]
+        unfrozen_inputs = [x for x in records_or_keys if x is not None and not x.is_frozen()]
         if len(unfrozen_inputs) > 0:
             unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_inputs)
             raise RuntimeError(
@@ -267,14 +261,13 @@ class DbContext(Context):
         normalized_loaded_keys = [KeyUtil.normalize_key(x.serialize_key()) for x in loaded_records]
 
         # Create a dictionary with pairs consisting of serialized key (after normalization) and the record for this key
-        loaded_records_dict = {k:v for k, v in zip(normalized_loaded_keys, loaded_records)}
+        loaded_records_dict = {k: v for k, v in zip(normalized_loaded_keys, loaded_records)}
 
         # Populate the result with records loaded using input keys, pass through None and input records
         result = tuple(
-            loaded_records_dict.get(KeyUtil.normalize_key(x.serialize_key()), None)
-            if is_key(x) else
-            x
-            for x in records_or_keys)
+            loaded_records_dict.get(KeyUtil.normalize_key(x.serialize_key()), None) if is_key(x) else x
+            for x in records_or_keys
+        )
         return result
 
     @classmethod

@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import Tuple
-
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -31,4 +30,3 @@ class StubDataclassKey(KeyMixin):
 
     def serialize_key(self) -> Tuple:
         return StubDataclassKey, self.id
-

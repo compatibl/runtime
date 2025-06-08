@@ -15,16 +15,20 @@
 import ast
 import inspect
 import textwrap
-from typing import List, Sequence, Tuple, Type
-
+from typing import List
+from typing import Sequence
+from typing import Tuple
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import KeyProtocol, TPrimitive, is_primitive, is_enum
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.type_util import TypeUtil
 
 
 class KeyUtil:
     """Utilities for working with keys."""
-    
+
     @classmethod
     def normalize_table(cls, type_or_table: type[KeyMixin] | str) -> str:
         """Get table name from key type using the standard naming convention, leave string table name unchanged."""
@@ -34,7 +38,7 @@ class KeyUtil:
             table = type_or_table
         else:
             raise RuntimeError(f"Head of a key tuple {type_or_table} is neither a string table name nor a key type.")
-        
+
         # TODO: Perform validation
         return table
 
@@ -47,12 +51,12 @@ class KeyUtil:
             return primary_key
         else:
             raise RuntimeError(f"A primary key {primary_key} is neither an embedded key nor a primitive type.")
-        
+
     @classmethod
     def normalize_key(cls, key: KeyMixin | Tuple | None) -> Tuple | None:
         """
         Replace types by table names using the default table naming convention, leave the rest unchanged.
-        
+
         Notes:
             If a key object:
                 - Invoke serialize_key to convert to tuple before further processing
@@ -72,7 +76,8 @@ class KeyUtil:
             if not key:
                 raise RuntimeError(
                     "A key or an element of composite key is an empty tuple.\n"
-                    "Tuple keys must begin from a table name or type.")
+                    "Tuple keys must begin from a table name or type."
+                )
 
         head, *primary_keys = key
         # Convert from type to string if necessary

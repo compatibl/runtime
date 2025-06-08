@@ -14,9 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Tuple
-
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.table_key import TableKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_table import StubDataclassPolymorphicTable
 
 

@@ -17,21 +17,21 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Iterable
 from typing import Sequence
-
 from memoization import cached
 from mongomock import MongoClient as MongoClientMock
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.synchronous.collection import Collection
-
 from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import KeyProtocol, is_record, is_key
+from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.table_util import TableUtil

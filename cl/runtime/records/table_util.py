@@ -12,20 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import ast
-import inspect
-import textwrap
-from typing import List, Sequence, Tuple, Type
 
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import KeyProtocol, TPrimitive, is_primitive, is_enum
 from cl.runtime.records.type_util import TypeUtil
 
 
 class TableUtil:
     """Utilities for working with tables."""
-    
+
     @classmethod
     def get_table(cls, key: KeyMixin) -> str:
         """Get table name from type, validate format and remove Key suffix if present."""
@@ -35,8 +30,10 @@ class TableUtil:
 
         # Validate PascalCase format
         if not CaseUtil.is_pascal_case(table):
-            raise RuntimeError(f"Table name {table} for key type {TypeUtil.name(key)} is not in PascalCase format\n"
-                               f"or does not follow the custom rule for separators in front of digits.")
+            raise RuntimeError(
+                f"Table name {table} for key type {TypeUtil.name(key)} is not in PascalCase format\n"
+                f"or does not follow the custom rule for separators in front of digits."
+            )
 
         # Remove Key suffix if present
         # TODO: Restore which will also test that this method is used consistently everywhere

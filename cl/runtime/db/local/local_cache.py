@@ -17,7 +17,8 @@ from typing import Dict
 from typing import Iterable
 from typing import Sequence
 from typing_extensions import Self
-from cl.runtime import Db, RecordMixin
+from cl.runtime import Db
+from cl.runtime import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol

@@ -14,7 +14,8 @@
 
 from dataclasses import dataclass
 from typing import Generic
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic import StubDataclassGeneric, TRecordArg1
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic import StubDataclassGeneric
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic import TRecordArg1
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_generic_arg_2 import StubDataclassGenericArg2
 
 

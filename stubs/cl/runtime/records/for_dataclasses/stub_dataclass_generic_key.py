@@ -16,9 +16,7 @@ from dataclasses import dataclass
 from typing import Generic
 from typing import TypeVar
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.type_util import TypeUtil
 
 TKeyArg = TypeVar("TKeyArg", bound=KeyMixin)
 
@@ -29,5 +27,3 @@ class StubDataclassGenericKey(Generic[TKeyArg], KeyMixin):
 
     key_field: TKeyArg = required()
     """Required field with generic type."""
-
-

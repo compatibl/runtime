@@ -14,8 +14,10 @@
 
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubDataclassData, StubDataclassDoubleDerivedData
+from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerivedData
+from stubs.cl.runtime import StubDataclassDoubleDerivedData
+
 
 def test_cast():
     """Test FreezableMixin.cast method."""
@@ -29,6 +31,7 @@ def test_cast():
     # Cast fails
     with pytest.raises(RuntimeError, match="Cannot cast an object of type"):
         source.cast(StubDataclassDoubleDerivedData)
+
 
 def test_clone():
     """Test FreezableMixin.clone method."""

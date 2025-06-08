@@ -13,7 +13,10 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime import StubDataclassKey, StubDataclassComposite, StubDataclassCompositeKey
+from stubs.cl.runtime import StubDataclassComposite
+from stubs.cl.runtime import StubDataclassCompositeKey
+from stubs.cl.runtime import StubDataclassKey
+
 
 def test_key():
     """Test for StubDataclassComposite key."""
@@ -26,16 +29,16 @@ def test_key():
 
     # Test serialize_key
     serialized_key = (
-                         StubDataclassCompositeKey,
-                         key.primitive,
-                         (
-                             StubDataclassKey,
-                             key.embedded_1.id,
-                         ),
-                         (
-                             StubDataclassKey,
-                             key.embedded_2.id,
-                         ),
+        StubDataclassCompositeKey,
+        key.primitive,
+        (
+            StubDataclassKey,
+            key.embedded_1.id,
+        ),
+        (
+            StubDataclassKey,
+            key.embedded_2.id,
+        ),
     )
     assert key.serialize_key() == serialized_key
 

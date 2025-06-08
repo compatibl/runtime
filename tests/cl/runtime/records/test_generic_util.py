@@ -126,9 +126,7 @@ def test_get_bound_type_dict():
     }
 
     # Generic alias with a concrete type argument
-    assert GenericUtil.get_bound_type_dict(StubDataclassGenericKey[StubDataclassKey]) == {
-        "TKeyArg": StubDataclassKey
-    }
+    assert GenericUtil.get_bound_type_dict(StubDataclassGenericKey[StubDataclassKey]) == {"TKeyArg": StubDataclassKey}
 
     # Generic type without a concrete type argument, should return TKeyArg.__bound__
     assert GenericUtil.get_bound_type_dict(StubDataclassGenericKey) == {"TKeyArg": TKeyArg.__bound__}

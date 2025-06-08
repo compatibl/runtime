@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import cast, Any
-
+from typing import Any
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.type_util import TypeUtil
 

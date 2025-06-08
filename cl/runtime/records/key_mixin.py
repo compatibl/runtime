@@ -15,7 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import Tuple
-
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
@@ -39,16 +38,15 @@ class KeyMixin(DataMixin, ABC):
 
     def serialize_key(self) -> Tuple:
         """Implement using get_key_type during transition to the new API."""
-        if hasattr(self, 'get_key_type'):
+        if hasattr(self, "get_key_type"):
             key_type = self.get_key_type()
             key_slots = SlotsUtil.get_slots(key_type)
             key_fields = tuple(
-                v.serialize_key() if is_key(v := getattr(self, key_slot, None))
-                else v
-                for key_slot in key_slots
+                v.serialize_key() if is_key(v := getattr(self, key_slot, None)) else v for key_slot in key_slots
             )
             result = (key_type,) + key_fields
             return result
         else:
             raise RuntimeError(
-                f"Type {TypeUtil.name(self)} must implement either get_key_type or serialize_key method.")
+                f"Type {TypeUtil.name(self)} must implement either get_key_type or serialize_key method."
+            )

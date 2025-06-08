@@ -28,4 +28,3 @@ class StubDataclassBoundGenericKey(StubDataclassGenericKey[StubDataclassKey]):
     @classmethod
     def get_key_type(cls) -> type:
         return StubDataclassBoundGenericKey
-

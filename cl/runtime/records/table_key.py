@@ -13,9 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
@@ -29,4 +28,3 @@ class TableKey(KeyMixin):
     def get_key_type(cls) -> type:
         """Return key type even when called from a record."""
         return TableKey
-
