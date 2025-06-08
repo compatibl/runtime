@@ -92,7 +92,7 @@ class DbContext(Context):
 
         #  Load 'db' field of this context using 'Context.current()'
         if self.db is not None and is_key(self.db):
-            self.db = DbContext.load_one(DbKey, self.db)  # TODO: Revise to use DB settings
+            self.db = DbContext.load_one(self.db)  # TODO: Revise to use DB settings
 
     @classmethod
     def _get_db(cls) -> Db:
@@ -129,54 +129,64 @@ class DbContext(Context):
     @classmethod
     def load_one(
         cls,
-        record_type: type[TRecord],
-        record_or_key: KeyProtocol | TPrimitive,
+        record_or_key: TKey,
         *,
         dataset: str | None = None,
+        cast_to: type[TRecord] | None = None,
     ) -> TRecord:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
         Error message if 'record_or_key' is None or the record is not found in DB.
 
         Args:
-            record_type: Record type to load, error if the result is not this type or its subclass
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Perform runtime checked cast to this class if specified
         """
+
+        # TODO: This is a temporary safeguard, remove after verification
+        if isinstance(record_or_key, type):
+            raise RuntimeError("Code update error for load_one signature.")
+
         if record_or_key is not None:
-            result = cls.load_one_or_none(record_type, record_or_key, dataset=dataset)
+            result = cls.load_one_or_none(record_or_key, dataset=dataset, cast_to=cast_to)
             if result is None:
+                cast_to_str = f"\nwhen loading type {TypeUtil.name(cast_to)}" if cast_to else ""
                 raise RuntimeError(
-                    f"Record not found for key {KeyUtil.format(record_or_key)} when loading type "
-                    f"{TypeUtil.name(record_type)}.\n"
+                    f"Record not found for key {KeyUtil.format(record_or_key)}{cast_to_str}.\n"
                     f"Use 'load_one_or_none' method to return None instead of raising an error."
                 )
             return result
         else:
+            cast_to_str = f"\nwhen loading type {TypeUtil.name(cast_to)}" if cast_to else ""
             raise RuntimeError(
-                f"Parameter 'record_or_key' is None for load_one method when loading type "
-                f"{TypeUtil.name(record_type)}.\n"
+                f"Parameter 'record_or_key' is None for load_one method{cast_to_str}.\n"
                 f"Use 'load_one_or_none' method to return None instead of raising an error."
             )
 
     @classmethod
     def load_one_or_none(
         cls,
-        record_type: type[TRecord],
-        record_or_key: KeyProtocol | TPrimitive | None,
+        record_or_key: TKey | None,
         *,
         dataset: str | None = None,
+        cast_to: type[TRecord] | None = None,
     ) -> TRecord | None:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
         Return None if 'record_or_key' is None or the record is not found in DB.
 
         Args:
-            record_type: Record type to load, error if the result is not this type or its subclass
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Perform runtime checked cast to this class if specified
         """
-        result = cls.load_many([record_or_key], dataset=dataset, cast_to=record_type)
+
+        # TODO: This is a temporary safeguard, remove after verification
+        if isinstance(record_or_key, type):
+            raise RuntimeError("Code update error for load_one_or_none signature.")
+
+        result = cls.load_many([record_or_key], dataset=dataset, cast_to=cast_to)
         if len(result) == 1:
             return result[0]
         else:
@@ -221,16 +231,17 @@ class DbContext(Context):
             if len(invalid_keys) > 0:
                 invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
                 raise RuntimeError(
-                    f"Parameter 'records_or_keys' of load_many method includes\n"
-                    f"the following keys whose type is not {TypeUtil.name(key_type)}:\n{invalid_keys_str}"
+                    f"Parameter 'records_or_keys' of a load method in DbContext includes the following keys\n"
+                    f"whose type is not the same as the key type {TypeUtil.name(key_type)}\n"
+                    f"of the cast_to parameter {TypeUtil.name(cast_to)}:\n{invalid_keys_str}"
                 )
             # Check that the records in the input list are derived from cast_to
             invalid_records = [x for x in records_or_keys if is_record(x) and not isinstance(x, cast_to)]
             if len(invalid_records) > 0:
                 invalid_records_str = "\n".join(str(x) for x in invalid_records)
                 raise RuntimeError(
-                    f"Parameter 'records_or_keys' of load_many method includes\n"
-                    f"the following records that are not derived from {TypeUtil.name(cast_to)}:\n{invalid_records_str}"
+                    f"Parameter 'records_or_keys' of a load method in DbContext includes the following records\n"
+                    f"that are not derived from the cast_to parameter {TypeUtil.name(cast_to)}:\n{invalid_records_str}"
                 )
 
         # Check that all records or keys in object format are frozen
@@ -244,9 +255,6 @@ class DbContext(Context):
 
         # The list of keys to load, skip None and records
         keys_to_load = [x for x in records_or_keys if is_key(x)]
-
-        # Tables for each key
-        tables = [TableUtil.get_table(key) for key in keys_to_load]
 
         # Group keys by table
         keys_to_load_grouped_by_table = defaultdict(list)
