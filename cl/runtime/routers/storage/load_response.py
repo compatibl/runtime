@@ -69,7 +69,7 @@ class LoadResponse(RecordsWithSchemaResponse):
                 loaded_records.append(record)
         else:
             # Load record using current context, filter None values.
-            loaded_records = tuple(x for x in DbContext.load_many(key_type, deserialized_keys) if x is not None)
+            loaded_records = tuple(x for x in DbContext.load_many(deserialized_keys) if x is not None)
 
         # TODO (Roman): Improve check for not found.
         if not request.ignore_not_found and len(loaded_records) != len(request.load_keys):

@@ -35,7 +35,6 @@ def test_smoke():
 
         loaded_records = list(
             DbContext.load_many(
-                StubDataclass,
                 [record, key, None],
                 dataset=dataset,
             )

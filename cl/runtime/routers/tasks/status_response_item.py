@@ -58,7 +58,7 @@ class StatusResponseItem(BaseModel):
         """Get status for tasks in request."""
 
         task_keys = [TaskKey(task_id=x).build() for x in request.task_run_ids]  # TODO: Update if task_run_id is UUID
-        tasks = cast(Iterable[Task], DbContext.load_many(Task, task_keys))
+        tasks = DbContext.load_many(task_keys, cast_to=Task)
 
         response_items = []
         for task in tasks:

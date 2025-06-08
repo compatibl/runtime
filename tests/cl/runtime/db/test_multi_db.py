@@ -90,7 +90,7 @@ def test_record_or_key(pytest_multi_db):
 
     # Load using record or key
     another_record = StubDataclass(id="another").build()
-    loaded_records = tuple(DbContext.load_many(StubDataclass, [another_record, key, None]))
+    loaded_records = tuple(DbContext.load_many([another_record, key, None]))
     assert loaded_records[0] is another_record  # Same object is returned without lookup
     assert loaded_records[1] == record  # Not the same object but equal
     assert loaded_records[2] is None
@@ -230,7 +230,7 @@ def test_repeated(pytest_multi_db):
     record = StubDataclass().build()
     DbContext.save_many([record, record])
 
-    loaded_records = list(DbContext.load_many(StubDataclass, [record.get_key()]))
+    loaded_records = list(DbContext.load_many([record.get_key()]))
     assert len(loaded_records) == 1
     assert loaded_records[0] == record
 

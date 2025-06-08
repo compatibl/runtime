@@ -87,7 +87,7 @@ def test_method(pytest_default_db, pytest_celery_queue):
             Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build())
             for response_item in response_items
         ]
-        actual_records = list(DbContext.load_many(StubDataclass, expected_keys))
+        actual_records = list(DbContext.load_many(expected_keys))
         assert actual_records == expected_records
 
 
@@ -125,7 +125,7 @@ def test_api(pytest_celery_queue):
             request_object = SubmitRequest(**request)
             response_items = SubmitResponseItem.run_tasks(request_object)
             [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
-            actual_records = list(DbContext.load_many(StubDataclass, expected_keys))
+            actual_records = list(DbContext.load_many(expected_keys))
             assert actual_records == expected_records
 
 

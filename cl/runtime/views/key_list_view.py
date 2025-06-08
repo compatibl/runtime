@@ -30,5 +30,5 @@ class KeyListView(View):
     def materialize(self) -> RecordListView:
         """Load records and return RecordListView object. KeyListView is used only for storage in the DB."""
 
-        records = DbContext.load_many(self.keys[0].get_key_type(), self.keys) if self.keys else []
+        records = DbContext.load_many(self.keys) if self.keys else []
         return RecordListView(view_for=self.view_for, view_name=self.view_name, records=records)

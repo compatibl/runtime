@@ -25,8 +25,9 @@ class CastUtil:
         """
         Cast obj to result_type after checking it is an instance of result_type, error message otherwise.
         This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
+        Pass through None.
         """
-        if isinstance(obj, result_type):
+        if obj is None or isinstance(obj, result_type):
             return obj
         else:
             raise RuntimeError(f"Cannot cast an object of type {TypeUtil.name(obj)} to {TypeUtil.name(result_type)}.")

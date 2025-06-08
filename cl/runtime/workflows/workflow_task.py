@@ -30,7 +30,7 @@ class WorkflowTask(Task):
 
     def _execute(self) -> None:
         # Check that phases do not specify prerequisites
-        phases = DbContext.load_many(WorkflowPhase, self.phases)  # TODO: Error message if not found
+        phases = DbContext.load_many(self.phases, cast_to=WorkflowPhase)  # TODO: Error message if not found
         if any(phase.prerequisites is not None for phase in phases):
             # TODO: Support checking for prerequisites
             raise RuntimeError("Checking for prerequisites is not yet supported.")

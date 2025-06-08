@@ -23,6 +23,7 @@ from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.db.db_key import DbKey
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -175,7 +176,7 @@ class DbContext(Context):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        result = cls.load_many(record_type, [record_or_key], dataset=dataset)
+        result = cls.load_many([record_or_key], dataset=dataset, cast_to=record_type)
         if len(result) == 1:
             return result[0]
         else:
@@ -184,19 +185,19 @@ class DbContext(Context):
     @classmethod
     def load_many(
         cls,
-        record_type: type[TRecord],
         records_or_keys: Sequence[TRecord | TKey | None] | None,
         *,
         dataset: str | None = None,
+        cast_to: type[TRecord] = None,
     ) -> Sequence[TRecord | None] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
         the result must have the same order as 'records_or_keys'.
 
         Args:
-            record_type: Record type to load, error if the result is not this type or its subclass
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Perform runtime checked cast to this class if specified
         """
 
         # Pass through None or an empty sequence
@@ -212,24 +213,25 @@ class DbContext(Context):
                 f"the following items that are not record, key or None:\n{invalid_inputs_str}"
             )
 
-        # Check that the keys in the input list have type record_type.get_key_type()
-        key_type = record_type.get_key_type()
-        invalid_keys = [x for x in records_or_keys if is_key(x) and not GenericUtil.is_instance(x, key_type)]
-        if len(invalid_keys) > 0:
-            invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
-            raise RuntimeError(
-                f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following keys whose type is not {TypeUtil.name(key_type)}:\n{invalid_keys_str}"
-            )
-
-        # Check that the records in the input list are derived from record_type
-        invalid_records = [x for x in records_or_keys if is_record(x) and not isinstance(x, record_type)]
-        if len(invalid_records) > 0:
-            invalid_records_str = "\n".join(str(x) for x in invalid_records)
-            raise RuntimeError(
-                f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following records that are not derived from {TypeUtil.name(record_type)}:\n{invalid_records_str}"
-            )
+        # Perform these checks if cast_to is specified
+        if cast_to is not None:
+            # Check that the keys in the input list have the same type as cast_to.get_key_type()
+            key_type = cast_to.get_key_type()
+            invalid_keys = [x for x in records_or_keys if is_key(x) and not GenericUtil.is_instance(x, key_type)]
+            if len(invalid_keys) > 0:
+                invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
+                raise RuntimeError(
+                    f"Parameter 'records_or_keys' of load_many method includes\n"
+                    f"the following keys whose type is not {TypeUtil.name(key_type)}:\n{invalid_keys_str}"
+                )
+            # Check that the records in the input list are derived from cast_to
+            invalid_records = [x for x in records_or_keys if is_record(x) and not isinstance(x, cast_to)]
+            if len(invalid_records) > 0:
+                invalid_records_str = "\n".join(str(x) for x in invalid_records)
+                raise RuntimeError(
+                    f"Parameter 'records_or_keys' of load_many method includes\n"
+                    f"the following records that are not derived from {TypeUtil.name(cast_to)}:\n{invalid_records_str}"
+                )
 
         # Check that all records or keys in object format are frozen
         unfrozen_inputs = [x for x in records_or_keys if x is not None and not x.is_frozen()]
@@ -268,6 +270,10 @@ class DbContext(Context):
             loaded_records_dict.get(KeyUtil.normalize_key(x.serialize_key()), None) if is_key(x) else x
             for x in records_or_keys
         )
+
+        # Cast to cast_to if specified
+        if cast_to is not None:
+            result = tuple(CastUtil.cast(cast_to, x) for x in result)
         return result
 
     @classmethod

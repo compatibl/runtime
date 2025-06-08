@@ -45,7 +45,7 @@ class ResultResponseItem(BaseModel):
         """Get results for tasks in request."""
 
         task_keys = [TaskKey(task_id=x).build() for x in request.task_run_ids]
-        tasks = cast(Iterable[Task], DbContext.load_many(Task, task_keys))
+        tasks = DbContext.load_many(task_keys, cast_to=Task)
 
         response_items = []
         for task in tasks:
