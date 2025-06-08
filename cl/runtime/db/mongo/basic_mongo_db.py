@@ -126,16 +126,16 @@ class BasicMongoDb(Db):
 
     def load_where(
         self,
-        where: TRecord,
+        conditions: TRecord,
         *,
         dataset: str | None = None,
     ) -> Sequence[TRecord]:
         # Get table from the argument
-        table = TableUtil.get_table(where)
+        table = TableUtil.get_table(conditions)
         # Get Mongo collection using table name
         collection = self._get_mongo_collection(table)
 
-        subtype_names = TypeInfoCache.get_child_names(type(where))
+        subtype_names = TypeInfoCache.get_child_names(type(conditions))
         serialized_records = collection.find({"_type": {"$in": subtype_names}})
         result = []
         for serialized_record in serialized_records:

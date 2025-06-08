@@ -77,7 +77,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def load_where(
         self,
-        where: TRecord,
+        conditions: TRecord,
         *,
         dataset: str | None = None,
     ) -> Sequence[TRecord]:
@@ -91,7 +91,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
             - Leaving required fields of the argument empty will not cause an error
 
         Args:
-            where: Returned records will match the argument type or subtype and its specified (not None) fields
+            conditions: Returned records will match the argument type or subtype and its specified (not None) fields
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
 

@@ -58,8 +58,8 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
 
     def view_trials(self) -> Sequence[TrialKey]:
         """View trials of the experiment."""
-        trial_filter = TrialKey(experiment=self.get_key())
-        trial_keys = DbContext.load_where(trial_filter)
+        conditions = TrialKey(experiment=self.get_key())
+        trial_keys = DbContext.load_where(conditions)
         # TODO: Use query instead of additional filtering
         result = [x for x in trial_keys if x.experiment.experiment_id == self.experiment_id]
         return result
@@ -113,9 +113,9 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
         """Get the remaining of existing trials."""
         # TODO: !! Implement DbContext.count method
         # Load trials for this experiment
-        # TODO: Support key filter fields trial_filter = Trial(experiment=self.get_key())
-        trial_filter = TrialKey(experiment=self.get_key())
-        trial_keys = DbContext.load_where(trial_filter)
+        # TODO: Support key filter fields conditions = Trial(experiment=self.get_key())
+        conditions = TrialKey(experiment=self.get_key())
+        trial_keys = DbContext.load_where(conditions)
         # TODO: Use query instead of additional filtering and use count_where instead
         num_existing_trials = len(tuple(x for x in trial_keys if x.experiment.experiment_id == self.experiment_id))
         return num_existing_trials

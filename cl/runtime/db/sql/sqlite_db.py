@@ -189,7 +189,7 @@ class SqliteDb(Db):
 
     def load_where(
         self,
-        where: TRecord,
+        conditions: TRecord,
         *,
         dataset: str | None = None,
     ) -> Sequence[TRecord]:

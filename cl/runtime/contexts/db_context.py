@@ -314,7 +314,7 @@ class DbContext(Context):
     @classmethod
     def load_where(
         cls,
-        where: TRecord,
+        conditions: TRecord,
         *,
         dataset: str | None = None,
     ) -> Sequence[TRecord]:
@@ -328,11 +328,11 @@ class DbContext(Context):
             - Leaving required fields of the argument empty will not cause an error
 
         Args:
-            where: Returned records will match the argument type or subtype and its specified (not None) fields
+            conditions: Returned records will match the argument type or subtype and its specified (not None) fields
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
         result = cls._get_db().load_where(
-            where,
+            conditions,
             dataset=cls.get_dataset(dataset),
         )
         return result
