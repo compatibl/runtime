@@ -28,5 +28,6 @@ class KeyView(View):
 
     def materialize(self) -> RecordView:
         """Load record and return RecordView object. KeyView is used only for storage in the DB."""
-        record = DbContext.load_one_or_none(self.key.get_key_type(), self.key) if self.key else None
+        # TODO: Fix cast
+        record = DbContext.load_one_or_none(self.key) if self.key else None
         return RecordView(view_for=self.view_for, view_name=self.view_name, record=record)

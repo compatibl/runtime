@@ -46,6 +46,6 @@ class TemplateMixin(Generic[TKey, TParams], RecordMixin[TKey], ABC):
 
     def render(self, data: TParams) -> str:
         """Render the template by substituting parameters from the specified data object."""
-        engine = DbContext.load_one(TemplateEngine, self.engine)
+        engine = DbContext.load_one(self.engine, cast_to=TemplateEngine)
         result = engine.render(self.body, data)
         return result

@@ -52,7 +52,7 @@ class PanelsResponseItem(BaseModel):
             key = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(request_type.get_key_type()))
 
             # If the record is not found, display panel tabs for the base type
-            record = DbContext.load_one_or_none(request_type, key)
+            record = DbContext.load_one_or_none(key)
             actual_type = request_type if record is None else type(record)
         else:
             actual_type = request_type

@@ -46,7 +46,7 @@ def test_performance(pytest_multi_db):
 
     start_time = time.time()
     for key in sample_keys:
-        DbContext.load_one(type(key), key)
+        DbContext.load_one(key)
     end_time = time.time()
     print(f"Load many one by one: {end_time - start_time}s.")
 

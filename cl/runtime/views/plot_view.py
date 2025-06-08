@@ -32,7 +32,7 @@ class PlotView(View):
         """Return Self with loaded plot if self.plot is a key."""
 
         if is_key(self.plot):
-            plot = DbContext.load_one(self.plot.get_key_type(), self.plot)
+            plot = DbContext.load_one(self.plot)
             self.plot = plot
 
         return self

@@ -45,7 +45,7 @@ def test_smoke(pytest_multi_db):
     assert key.serialize_key() == serialized_key
 
     # Get record from DB using key
-    loaded_record = DbContext.load_one(StubDataclassPolymorphic, key)
+    loaded_record = DbContext.load_one(key, cast_to=StubDataclassPolymorphic)
     assert loaded_record == record
 
 

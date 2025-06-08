@@ -60,7 +60,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         if key_type == UiTypeStateKey:
             loaded_records = []
             for deserialized_key in deserialized_keys:
-                record = DbContext.load_one_or_none(key_type, deserialized_key)
+                record = DbContext.load_one_or_none(deserialized_key)
 
                 # If record not found set default.
                 if record is None:

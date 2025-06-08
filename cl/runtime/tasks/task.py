@@ -147,7 +147,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
 
         start_datetime = DatetimeUtil.now()
         while DatetimeUtil.now() < start_datetime + dt.timedelta(seconds=timeout_sec):
-            task = DbContext.load_one(Task, task_key)
+            task = DbContext.load_one(task_key, cast_to=Task)
             if task.status == TaskStatus.COMPLETED:
                 # Test success, task has been completed
                 return

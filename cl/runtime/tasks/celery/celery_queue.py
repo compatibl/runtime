@@ -74,7 +74,7 @@ def execute_task(
 
         # Load and run the task
         task_key = TaskKey(task_id=task_id).build()
-        task = DbContext.load_one(Task, task_key)
+        task = DbContext.load_one(task_key, cast_to=Task)
         task.run_task()
 
 

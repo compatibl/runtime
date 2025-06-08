@@ -60,7 +60,7 @@ class InstanceMethodTask(MethodTask):
         key = _KEY_SERIALIZER.deserialize(self.key_str, type_hint)
 
         # Load record from storage
-        record = DbContext.load_one(key_type, key)  # TODO: Require record type?
+        record = DbContext.load_one(key)  # TODO: Require record type?
 
         # Convert the name to snake_case and get method callable
         method_name = self.normalized_method_name()

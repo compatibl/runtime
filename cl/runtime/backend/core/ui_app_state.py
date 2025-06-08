@@ -82,7 +82,7 @@ class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
             user=UserKey(username="root")
         ).build()  # TODO: Review the use of root default
 
-        default_app_state = DbContext.load_one_or_none(UiAppState, default_app_state_key)
+        default_app_state = DbContext.load_one(default_app_state_key, cast_to=UiAppState)
         if default_app_state is not None and default_app_state.application_theme is not None:
             return default_app_state.application_theme
 

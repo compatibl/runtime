@@ -50,12 +50,12 @@ def test_csv_file_reader(pytest_default_db):
             id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
         ).build()
         key = StubDataclassKey(id=f"derived_id_{i}").build()
-        record = DbContext.load_one(StubDataclass, key)
+        record = DbContext.load_one(key)
         assert record == expected_record
 
     for i in range(1, 4):
         expected_record = StubDataclassNestedFields().build()
-        record = DbContext.load_one(StubDataclassNestedFields, expected_record.get_key())
+        record = DbContext.load_one(expected_record.get_key())
         assert record == expected_record
 
     for i in range(1, 4):
@@ -64,7 +64,7 @@ def test_csv_file_reader(pytest_default_db):
             embedded_1=StubDataclassKey(id=f"embedded_key_id_{i}a"),
             embedded_2=StubDataclassKey(id=f"embedded_key_id_{i}b"),
         ).build()
-        record = DbContext.load_one(StubDataclassComposite, expected_record.get_key())
+        record = DbContext.load_one(expected_record.get_key())
         assert record == expected_record
 
 

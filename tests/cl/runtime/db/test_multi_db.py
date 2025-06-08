@@ -95,8 +95,8 @@ def test_record_or_key(pytest_multi_db):
     assert loaded_records[1] == record  # Not the same object but equal
     assert loaded_records[2] is None
 
-    assert DbContext.load_one(StubDataclass, another_record) is another_record  # Same object is returned without lookup
-    assert DbContext.load_one(StubDataclass, key) == record  # Not the same object but equal
+    assert DbContext.load_one(another_record) is another_record  # Same object is returned without lookup
+    assert DbContext.load_one(key) == record  # Not the same object but equal
 
 
 def test_complex_records(pytest_multi_db):
@@ -104,7 +104,7 @@ def test_complex_records(pytest_multi_db):
     DbContext.save_many(_SAMPLES)
 
     sample_keys = [sample.get_key() for sample in _SAMPLES]
-    loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
+    loaded_records = [DbContext.load_one(key) for key in sample_keys]
 
     assert loaded_records == DataUtil.remove_none(_SAMPLES)
 
@@ -114,24 +114,24 @@ def test_basic_operations(pytest_multi_db):
     sample_keys = [x.get_key() for x in _SAMPLES]
 
     # Load from empty tables
-    loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
+    loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
     assert loaded_records == [None] * len(_SAMPLES)
 
     # Populate tables
     DbContext.save_many(_SAMPLES)
 
     # Load one by one for all keys because each type is different
-    loaded_records = [DbContext.load_one(type(key), key) for key in sample_keys]
+    loaded_records = [DbContext.load_one(key) for key in sample_keys]
     assert loaded_records == DataUtil.remove_none(_SAMPLES)
 
     # Delete first and last record
     DbContext.delete_many([sample_keys[0], sample_keys[-1]])
-    loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
+    loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
     assert loaded_records == DataUtil.remove_none([None, *_SAMPLES[1:-1], None])
 
     # Delete all records
     DbContext.delete_many(sample_keys)
-    loaded_records = [DbContext.load_one_or_none(type(key), key) for key in sample_keys]
+    loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
     assert loaded_records == [None] * len(_SAMPLES)
 
 
@@ -140,18 +140,18 @@ def test_record_upsert(pytest_multi_db):
     # Create sample and save
     sample = StubDataclass().build()
     DbContext.save_one(sample)
-    loaded_record = DbContext.load_one(StubDataclass, sample.get_key())
+    loaded_record = DbContext.load_one(sample.get_key())
     assert loaded_record == sample
 
     # create sample with the same key and save
     override_sample = StubDataclassDerived().build()
     DbContext.save_one(override_sample)
-    loaded_record = DbContext.load_one(StubDataclassDerived, sample.get_key())
+    loaded_record = DbContext.load_one(sample.get_key())
     assert loaded_record == override_sample
 
     override_sample = StubDataclassDoubleDerived().build()
     DbContext.save_one(override_sample)
-    loaded_record = DbContext.load_one(StubDataclassDoubleDerived, sample.get_key())
+    loaded_record = DbContext.load_one(sample.get_key())
     assert loaded_record == override_sample
 
 
@@ -196,7 +196,7 @@ def test_singleton(pytest_multi_db):
     """Test singleton type saving."""
     singleton_sample = StubDataclassSingleton().build()
     DbContext.save_one(singleton_sample)
-    loaded_sample = DbContext.load_one(StubDataclassSingleton, singleton_sample.get_key())
+    loaded_sample = DbContext.load_one(singleton_sample.get_key(), cast_to=StubDataclassSingleton, )
     assert loaded_sample == singleton_sample
 
     other_singleton_sample = StubDataclassSingleton(str_field="other").build()

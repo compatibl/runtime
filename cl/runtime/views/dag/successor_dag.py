@@ -40,7 +40,7 @@ class SuccessorDag(SuccessorDagKey, RecordMixin[SuccessorDagKey]):
         if self.root_node is None:
             return None
 
-        root_node = DbContext.load_one(SuccessorDagNodeKey, self.root_node)
+        root_node = DbContext.load_one(self.root_node, cast_to=SuccessorDagNodeKey)
 
         if root_node is None:
             return None

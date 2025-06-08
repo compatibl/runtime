@@ -39,7 +39,7 @@ def test_smoke(pytest_multi_db):
     assert key == record.get_key()
 
     # Get record from DB using key
-    loaded_record = DbContext.load_one(StubDataclassBoundGeneric, key)
+    loaded_record = DbContext.load_one(key, cast_to=StubDataclassBoundGeneric)
     assert loaded_record == record
 
 

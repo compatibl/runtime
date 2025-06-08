@@ -131,7 +131,7 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
 
             for field_name, field_value in node_fields.items():
                 if isinstance(field_value, SuccessorDagNodeKey):
-                    loaded_node = DbContext.load_one(SuccessorDagNodeKey, field_value)
+                    loaded_node = DbContext.load_one(field_value, cast_to=SuccessorDagNodeKey)
                     if loaded_node is None:
                         SuccessorDagNode.__append_empty_node(
                             source_node=source_node,
@@ -166,7 +166,7 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
                             if edges_names and len(edges_names) == len(field_value):
                                 edge_label = edges_names[index - 1]
 
-                        loaded_node = DbContext.load_one(SuccessorDagNodeKey, node_key)
+                        loaded_node = DbContext.load_one(node_key, cast_to=SuccessorDagNodeKey)
                         if loaded_node is None:
                             SuccessorDagNode.__append_empty_node(
                                 source_node=source_node,
