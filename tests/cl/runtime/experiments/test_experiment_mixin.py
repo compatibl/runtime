@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_mock_db  # noqa
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
@@ -23,6 +25,7 @@ def test_run_many(pytest_basic_mongo_mock_db):
 
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
+        experiment_type=ExperimentTypeKey(experiment_type_id="TestExperiment"),
         experiment_id="test_run_many.max_trials_not_set",
     )
 
@@ -38,6 +41,7 @@ def test_run_many(pytest_basic_mongo_mock_db):
 
     # Create and run the experiment with max_trials set to 5
     max_trials_set = StubBinaryExperiment(
+        experiment_type=ExperimentTypeKey(experiment_type_id="TestExperiment"),
         experiment_id="test_run_many.max_trials_set",
         max_trials=5,
     )
@@ -71,6 +75,7 @@ def test_run_all(pytest_basic_mongo_mock_db):
 
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
+        experiment_type=ExperimentTypeKey(experiment_type_id="TestExperiment"),
         experiment_id="test_run_all.max_trials_not_set",
     )
 
@@ -80,6 +85,7 @@ def test_run_all(pytest_basic_mongo_mock_db):
 
     # Create and run the experiment with max_trials set to 5
     max_trials_set = StubBinaryExperiment(
+        experiment_type=ExperimentTypeKey(experiment_type_id="TestExperiment"),
         experiment_id="test_run_all.max_trials_set",
         max_trials=5,
     )

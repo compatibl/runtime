@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_mock_db  # noqa
 from stubs.cl.runtime.experiments.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
@@ -23,6 +25,7 @@ def test_smoke(pytest_basic_mongo_mock_db):
 
     # Create and run the experiment
     experiment = StubSupervisedClassifierExperiment(
+        experiment_type=ExperimentTypeKey(experiment_type_id="TestSupervisedClassifierExperiment"),
         experiment_id="test_supervised_classifier_experiment.test_smoke",
         max_trials=5,
     )

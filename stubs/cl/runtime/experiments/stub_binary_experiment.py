@@ -13,26 +13,16 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.binary_experiment_mixin import BinaryExperimentMixin
-from stubs.cl.runtime.experiments.stub_binary_experiment_key import StubBinaryExperimentKey
-from stubs.cl.runtime.experiments.stub_binary_trial import StubBinaryTrial
+from cl.runtime.experiments.binary_experiment import BinaryExperiment
+from cl.runtime.experiments.binary_trial import BinaryTrial
 
 
 @dataclass(slots=True, kw_only=True)
-class StubBinaryExperiment(StubBinaryExperimentKey, BinaryExperimentMixin[StubBinaryExperimentKey, StubBinaryTrial]):
-    """Stub implementation of BinaryExperimentMixin."""
-
-    max_trials: int | None = None
-    """Maximum number of trials to run (optional)."""
-
-    max_parallel: int | None = None
-    """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
-
-    def get_key(self) -> StubBinaryExperimentKey:
-        return StubBinaryExperimentKey(experiment_id=self.experiment_id).build()
+class StubBinaryExperiment(BinaryExperiment):
+    """Stub implementation of BinaryExperiment."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self) -> StubBinaryTrial:
-        return StubBinaryTrial(experiment=self.get_key(), result=True).build()
+    def create_trial(self) -> BinaryTrial:
+        return BinaryTrial(experiment=self.get_key(), actual=True).build()

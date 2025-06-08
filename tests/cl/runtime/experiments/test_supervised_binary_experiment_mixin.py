@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.experiments.experiment_type import ExperimentType
+from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_mock_db  # noqa
 from stubs.cl.runtime.experiments.stub_supervised_binary_experiment import StubSupervisedBinaryExperiment
@@ -23,6 +26,7 @@ def test_smoke(pytest_basic_mongo_mock_db):
 
     # Create and run the experiment
     experiment = StubSupervisedBinaryExperiment(
+        experiment_type=ExperimentTypeKey(experiment_type_id="TestSupervisedBinaryExperiment"),
         experiment_id="test_supervised_binary_experiment.test_smoke",
         max_trials=5,
     )

@@ -13,19 +13,17 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
-from cl.runtime.experiments.classifier_trial import ClassifierTrial
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True, kw_only=True)
-class StubClassifierExperiment(ClassifierExperiment):
-    """Stub implementation of ClassifierExperiment."""
+@dataclass(slots=True)
+class ExperimentTypeKey(KeyMixin):
+    """Experiment and trial records are assigned to separate tables for each experiment type."""
 
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+    experiment_type_id: str = required()
+    """Unique experiment type identifier."""
 
-    def create_trial(self) -> ClassifierTrial:
-        return ClassifierTrial(
-            experiment=self.get_key(),
-            actual="A",
-        ).build()
+    @classmethod
+    def get_key_type(cls) -> type:
+        return ExperimentTypeKey

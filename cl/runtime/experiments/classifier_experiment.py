@@ -12,20 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
-from cl.runtime.experiments.classifier_trial import ClassifierTrial
+from cl.runtime.experiments.experiment import Experiment
 
 
 @dataclass(slots=True, kw_only=True)
-class StubClassifierExperiment(ClassifierExperiment):
-    """Stub implementation of ClassifierExperiment."""
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-
-    def create_trial(self) -> ClassifierTrial:
-        return ClassifierTrial(
-            experiment=self.get_key(),
-            actual="A",
-        ).build()
+class ClassifierExperiment(Experiment, ABC):
+    """Unsupervised classifier experiment with string result type representing the class label."""

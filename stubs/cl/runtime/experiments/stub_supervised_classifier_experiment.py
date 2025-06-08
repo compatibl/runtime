@@ -13,33 +13,20 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.supervised_classifier_experiment_mixin import SupervisedClassifierExperimentMixin
-from stubs.cl.runtime.experiments.stub_supervised_classifier_experiment_key import StubSupervisedClassifierExperimentKey
-from stubs.cl.runtime.experiments.stub_supervised_classifier_trial import StubSupervisedClassifierTrial
+from cl.runtime.experiments.supervised_classifier_experiment import SupervisedClassifierExperiment
+from cl.runtime.experiments.supervised_classifier_trial import SupervisedClassifierTrial
 
 
 @dataclass(slots=True, kw_only=True)
-class StubSupervisedClassifierExperiment(
-    StubSupervisedClassifierExperimentKey,
-    SupervisedClassifierExperimentMixin[StubSupervisedClassifierExperimentKey, StubSupervisedClassifierTrial],
-):
-    """Stub implementation of SupervisedClassifierExperimentMixin."""
-
-    max_trials: int | None = None
-    """Maximum number of trials to run (optional)."""
-
-    max_parallel: int | None = None
-    """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
-
-    def get_key(self) -> StubSupervisedClassifierExperimentKey:
-        return StubSupervisedClassifierExperimentKey(experiment_id=self.experiment_id).build()
+class StubSupervisedClassifierExperiment(SupervisedClassifierExperiment):
+    """Stub implementation of SupervisedClassifierExperiment."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self) -> StubSupervisedClassifierTrial:
-        return StubSupervisedClassifierTrial(
+    def create_trial(self) -> SupervisedClassifierTrial:
+        return SupervisedClassifierTrial(
             experiment=self.get_key(),
-            result="A",
+            actual="A",
             expected="B",
         ).build()

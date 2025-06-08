@@ -12,20 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
-from cl.runtime.experiments.classifier_trial import ClassifierTrial
+from cl.runtime.experiments.experiment_key import ExperimentKey
+from cl.runtime.experiments.trial_key import TrialKey
+from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class StubClassifierExperiment(ClassifierExperiment):
-    """Stub implementation of ClassifierExperiment."""
+class Trial(TrialKey, RecordMixin[TrialKey], ABC):
+    """Abstract base class for a single trial of a statistical experiment."""
+
+    def get_key(self) -> TrialKey:
+        return TrialKey(experiment=self.experiment, timestamp=self.timestamp).build()
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-
-    def create_trial(self) -> ClassifierTrial:
-        return ClassifierTrial(
-            experiment=self.get_key(),
-            actual="A",
-        ).build()
+        # Create a unique timestamp
+        if self.timestamp is None:
+            self.timestamp = Timestamp.create()

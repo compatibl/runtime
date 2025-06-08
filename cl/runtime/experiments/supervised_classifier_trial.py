@@ -13,19 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
 from cl.runtime.experiments.classifier_trial import ClassifierTrial
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class StubClassifierExperiment(ClassifierExperiment):
-    """Stub implementation of ClassifierExperiment."""
+class SupervisedClassifierTrial(ClassifierTrial):
+    """Supervised classifier experiment trial has string actual and expected results representing the class label."""
 
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-
-    def create_trial(self) -> ClassifierTrial:
-        return ClassifierTrial(
-            experiment=self.get_key(),
-            actual="A",
-        ).build()
+    expected: str = required()
+    """Expected result of the classifier trial (class label)."""
