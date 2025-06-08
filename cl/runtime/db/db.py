@@ -73,6 +73,27 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         """
 
     @abstractmethod
+    def load_where(
+        self,
+        where: TRecord,
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
+        """
+        Load records that match the argument type or subtype and its specified fields.
+
+        Notes:
+            - Only the records that match the argument type or subtype will be returned
+            - Specified (not None) fields of the argument are matched using the equality operand
+            - Unspecified (None) fields of the argument are ignored
+            - Leaving required fields of the argument empty will not cause an error
+
+        Args:
+            where: Returned records will match the argument type or subtype and its specified (not None) fields
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+        """
+
+    @abstractmethod
     def query(
         self,
         record_type: type[TRecord],

@@ -19,6 +19,7 @@ from typing import Sequence
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial import Trial
+from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
@@ -55,13 +56,13 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
         without checking if max_trials has already been reached.
         """
 
-    def view_trials(self) -> Sequence[Trial]:
+    def view_trials(self) -> Sequence[TrialKey]:
         """View trials of the experiment."""
-        # Get trial type at runtime
-        # TODO: Use query
-        all_trials = DbContext.load_all(Trial)
-        trials = [trial for trial in all_trials if trial.experiment.experiment_id == self.experiment_id]
-        return trials
+        trial_filter = TrialKey(experiment=self.get_key())
+        trial_keys = DbContext.load_where(trial_filter)
+        # TODO: Use query instead of additional filtering
+        result = [x for x in trial_keys if x.experiment.experiment_id == self.experiment_id]
+        return result
 
     def save_trial(self) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
@@ -113,7 +114,9 @@ class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
         # TODO: !! Implement DbContext.count method
         # Load trials for this experiment
         # TODO: Support key filter fields trial_filter = Trial(experiment=self.get_key())
-        trial_keys = tuple(DbContext.load_all(Trial))  # TODO: !!! Replace by count
+        trial_filter = TrialKey(experiment=self.get_key())
+        trial_keys = DbContext.load_where(trial_filter)
+        # TODO: Use query instead of additional filtering and use count_where instead
         num_existing_trials = len(tuple(x for x in trial_keys if x.experiment.experiment_id == self.experiment_id))
         return num_existing_trials
 

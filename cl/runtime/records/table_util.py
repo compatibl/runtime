@@ -15,6 +15,7 @@
 
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.protocols import TRecord, TKey
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -22,16 +23,26 @@ class TableUtil:
     """Utilities for working with tables."""
 
     @classmethod
-    def get_table(cls, key: KeyMixin) -> str:
+    def get_table(cls, record_or_key: TRecord | TKey) -> str:
         """Get table name from type, validate format and remove Key suffix if present."""
+        
+        # Check that the argument is not empty
+        if record_or_key is None:
+            raise RuntimeError("The argument of TableUtil.get_table is None or empty.")
 
-        # Get table name from key
-        table = key.get_table()
+        # Get table name from record or key
+        table = record_or_key.get_table()
+        
+        # Ensure table is not empty
+        if not table:
+            raise RuntimeError(
+                f"The result of get_table for {TypeUtil.name(record_or_key)} is None or empty.\n"
+                f"Ensure all fields of the argument that determine the table are set.")
 
         # Validate PascalCase format
         if not CaseUtil.is_pascal_case(table):
             raise RuntimeError(
-                f"Table name {table} for key type {TypeUtil.name(key)} is not in PascalCase format\n"
+                f"Table name {table} for key type {TypeUtil.name(record_or_key)} is not in PascalCase format\n"
                 f"or does not follow the custom rule for separators in front of digits."
             )
 

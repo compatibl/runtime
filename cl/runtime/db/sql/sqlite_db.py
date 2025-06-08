@@ -34,6 +34,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.table_util import TableUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -186,6 +187,14 @@ class SqliteDb(Db):
             data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
             yield _SERIALIZER.deserialize(data)
 
+    def load_where(
+        self,
+        where: TRecord,
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
+        raise NotImplementedError()
+
     def query(
         self,
         record_type: type[TRecord],
@@ -214,7 +223,7 @@ class SqliteDb(Db):
 
         # Group keys by table
         records_grouped_by_table = defaultdict(list)
-        consume(records_grouped_by_table[record.get_table()].append(record) for record in records)
+        consume(records_grouped_by_table[TableUtil.get_table(record)].append(record) for record in records)
 
         # Iterate over tables
         for table, table_records in records_grouped_by_table.items():

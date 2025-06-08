@@ -32,3 +32,7 @@ class ExperimentKey(KeyMixin):
     @classmethod
     def get_key_type(cls) -> type:
         return ExperimentKey
+
+    def get_table(self) -> str:
+        """Override the default to specify a custom table name based on experiment type."""
+        return self.experiment_type.experiment_type_id

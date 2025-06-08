@@ -70,6 +70,14 @@ class LocalCache(Db):
     ) -> Iterable[TRecord | None] | None:
         raise NotImplementedError()
 
+    def load_where(
+        self,
+        where: TRecord,
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
+        raise NotImplementedError()
+
     def query(
         self,
         record_type: type[TRecord],

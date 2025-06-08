@@ -123,6 +123,27 @@ class BasicMongoDb(Db):
             result.append(record)
         return RecordUtil.sort_records_by_key(result)
 
+    def load_where(
+        self,
+        where: TRecord,
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
+        # Get table from the argument
+        table = TableUtil.get_table(where)
+        # Get Mongo collection using table name
+        collection = self._get_mongo_collection(table)
+
+        subtype_names = TypeInfoCache.get_child_names(type(where))
+        serialized_records = collection.find({"_type": {"$in": subtype_names}})
+        result = []
+        for serialized_record in serialized_records:
+            del serialized_record["_id"]
+            del serialized_record["_key"]
+            record = data_serializer.deserialize(serialized_record)  # TODO: Convert to comprehension for performance
+            result.append(record)
+        return RecordUtil.sort_records_by_key(result)  # TODO: Decide on the default sorting method
+
     def query(
         self,
         record_type: type[TRecord],

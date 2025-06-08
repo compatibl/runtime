@@ -258,7 +258,7 @@ class DbContext(Context):
 
         # Group keys by table
         keys_to_load_grouped_by_table = defaultdict(list)
-        consume(keys_to_load_grouped_by_table[key.get_table()].append(key) for key in keys_to_load)
+        consume(keys_to_load_grouped_by_table[TableUtil.get_table(key)].append(key) for key in keys_to_load)
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_table = [
@@ -302,6 +302,32 @@ class DbContext(Context):
             record_type,
             dataset=cls.get_dataset(dataset),
         )
+
+    @classmethod
+    def load_where(
+        cls,
+        where: TRecord,
+        *,
+        dataset: str | None = None,
+    ) -> Sequence[TRecord]:
+        """
+        Load records that match the argument type or subtype and its specified fields.
+
+        Notes:
+            - Only the records that match the argument type or subtype will be returned
+            - Specified (not None) fields of the argument are matched using the equality operand
+            - Unspecified (None) fields of the argument are ignored
+            - Leaving required fields of the argument empty will not cause an error
+
+        Args:
+            where: Returned records will match the argument type or subtype and its specified (not None) fields
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+        """
+        result = cls._get_db().load_where(
+            where,
+            dataset=cls.get_dataset(dataset),
+        )
+        return result
 
     @classmethod
     def query(
