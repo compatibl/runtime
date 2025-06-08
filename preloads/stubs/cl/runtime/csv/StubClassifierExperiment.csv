@@ -1,0 +1,3 @@
+experiment_type,experiment_id,max_trials,max_parallel
+StubClassifierExperimentType1,StubClassifierExperiment11,,
+StubClassifierExperimentType2,StubClassifierExperiment21,"""5""","""2"""

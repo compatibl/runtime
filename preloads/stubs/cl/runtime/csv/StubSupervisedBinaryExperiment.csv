@@ -1,0 +1,3 @@
+experiment_type,experiment_id,max_trials,max_parallel
+StubSupervisedBinaryExperimentType1,StubSupervisedBinaryExperiment11,,
+StubSupervisedBinaryExperimentType2,StubSupervisedBinaryExperiment21,"""5""","""2"""
