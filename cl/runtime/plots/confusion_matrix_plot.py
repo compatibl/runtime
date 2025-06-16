@@ -60,7 +60,7 @@ class ConfusionMatrixPlot(MatplotlibPlot):
             cmap = LinearSegmentedColormap.from_list("rg", ["g", "y", "r"], N=256)
 
             im = MatplotlibUtil.heatmap(data.values, data.index.tolist(), data.columns.tolist(), ax=axes, cmap=cmap)
-            MatplotlibUtil.annotate_heatmap(im, labels=annotation_text, textcolors="black", size=self.label_font_size)
+            MatplotlibUtil.annotate_heatmap(im, labels=annotation_text, text_colors="black", size=self.label_font_size)
 
             # Set figure and axes labels
             axes.set_xlabel(self.x_label)

@@ -109,7 +109,7 @@ class MatplotlibUtil:
             for j in range(data.shape[1]):
                 kw.update(
                     color=(
-                        text_colors[int(im.norm(data[i, j]) < threshold)]
+                        text_colors[int(im.norm(data[i, j]) < threshold if threshold is not None else True)]
                         if isinstance(text_colors, tuple)
                         else text_colors
                     ),

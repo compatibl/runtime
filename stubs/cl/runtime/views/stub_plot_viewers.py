@@ -17,13 +17,26 @@ from pathlib import Path
 import pandas as pd
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.plots.confusion_matrix_plot import ConfusionMatrixPlot
+from cl.runtime.plots.line_plot import LinePlot
 from cl.runtime.views.plot_view import PlotView
+from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
+from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
+from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 from stubs.cl.runtime.views.stub_viewers import StubViewers
 
 
 @dataclass(slots=True, kw_only=True)
 class StubPlotViewers(StubViewers):
     """Class with plot viewers."""
+
+    def view_line_plot(self):
+        return StubLinePlots.get_two_line_plot("stub_line_plot").get_view()
+
+    def view_heatmap_plot(self):
+        return StubHeatMapPlots.get_basic_plot("stub_heatmap_plot").get_view()
+
+    def view_group_bar_plot(self):
+        return StubGroupBarPlots.get_4_groups_2_bars_plot("stub_group_bar_plot").get_view()
 
     @classmethod
     def _create_confusion_matrix_plot(cls):
@@ -36,7 +49,7 @@ class StubPlotViewers(StubViewers):
         matrix_plot.received_categories = raw_data["Predicted"].values.tolist()
         return matrix_plot.build()
 
-    def view_confusion_matrix_plot_png(self):
+    def view_confusion_matrix_plot(self):
         """Png viewer for MatplotlibPlot with theme."""
 
         # Create ConfusionMatrixPlot instance
@@ -45,23 +58,26 @@ class StubPlotViewers(StubViewers):
         # Return PngView
         return matrix_plot.get_view()
 
-    def view_confusion_matrix_plot_with_record(self):
-        """Plot viewer for MatplotlibPlot as record with theme."""
+    # TODO (Roman): Review.
+    # def view_confusion_matrix_plot_with_record(self):
+    #     """Plot viewer for MatplotlibPlot as record with theme."""
+    #
+    #     # Create ConfusionMatrixPlot instance
+    #     matrix_plot = self._create_confusion_matrix_plot()
+    #
+    #     # Return PlotView
+    #     return PlotView(plot=matrix_plot)
 
-        # Create ConfusionMatrixPlot instance
-        matrix_plot = self._create_confusion_matrix_plot()
-
-        # Return PlotView
-        return PlotView(plot=matrix_plot)
-
-    def view_confusion_matrix_plot_with_key(self):
-        """Plot viewer for MatplotlibPlot as key with theme."""
-
-        # Create ConfusionMatrixPlot instance
-        matrix_plot = self._create_confusion_matrix_plot()
-        matrix_plot.plot_id = "confusion_matrix_plot"
-
-        DbContext.save_one(matrix_plot)
-
-        # Return PlotView
-        return PlotView(plot=matrix_plot.get_key())
+    # TODO (Roman): Review.
+    # def view_confusion_matrix_plot_with_key(self):
+    #     """Plot viewer for MatplotlibPlot as key with theme."""
+    #
+    #     # Create ConfusionMatrixPlot instance
+    #     matrix_plot = self._create_confusion_matrix_plot().clone()
+    #     matrix_plot.plot_id = "confusion_matrix_plot"
+    #     matrix_plot.build()
+    #
+    #     DbContext.save_one(matrix_plot)
+    #
+    #     # Return PlotView
+    #     return PlotView(plot=matrix_plot.get_key())
