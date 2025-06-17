@@ -22,19 +22,18 @@ from cl.runtime import KeyUtil
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
-from cl.runtime.db.db_key import DbKey
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
-from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.table import Table
 from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
@@ -289,6 +288,7 @@ class DbContext(Context):
         cls,
         record_type: type[TRecord],
         *,
+        tables: list[str] | None = None,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         """
@@ -296,12 +296,17 @@ class DbContext(Context):
 
         Args:
             record_type: Type of the records to load
+            tables: List of tables to load
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        return cls._get_db().load_all(  # noqa
-            record_type,
-            dataset=cls.get_dataset(dataset),
-        )
+        # Load data across all tables if 'tables' parameter is None
+        tables = [x.table_id for x in TableUtil.get_tables(TypeUtil.name(record_type.get_key_type()))] if tables is None else tables
+
+        return [
+            record
+            for table in tables
+            for record in cls._get_db().load_all(table, record_type, dataset=cls.get_dataset(dataset))
+        ]
 
     @classmethod
     def load_where(

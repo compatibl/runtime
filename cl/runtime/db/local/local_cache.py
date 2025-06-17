@@ -64,6 +64,7 @@ class LocalCache(Db):
 
     def load_all(
         self,
+        table: str,
         record_type: type[TRecord],
         *,
         dataset: str | None = None,

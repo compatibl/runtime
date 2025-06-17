@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import itertools
 import re
 from dataclasses import dataclass
 from typing import Dict
@@ -96,6 +97,7 @@ class BasicMongoDb(Db):
 
     def load_all(
         self,
+        table: str,
         record_type: type[TKey],
         *,
         dataset: str | None = None,
@@ -109,9 +111,8 @@ class BasicMongoDb(Db):
             raise RuntimeError(f"Type {TypeUtil.name(record_type)} passed to load_all method is not a record or key.")
 
         # Get collection name from key type
-        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
         db = self._get_mongo_db()
-        collection = db[collection_name]
+        collection = db[table]
 
         subtype_names = TypeInfoCache.get_child_names(record_type)
         serialized_records = collection.find({"_type": {"$in": subtype_names}})
@@ -192,8 +193,15 @@ class BasicMongoDb(Db):
         dataset: str | None = None,
     ) -> None:
         # TODO: Provide a more performant implementation
-        for record in records:
+
+        # Add Table objects to save at the end
+        # TODO (Roman): Improve performance
+        tables = TableUtil.get_tables_in_records(records)
+        records_to_save = itertools.chain(records, tables)
+
+        for record in records_to_save:
             table = TableUtil.get_table(record)
+
             db = self._get_mongo_db()
             collection = db[table]
 

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import itertools
 import os
 import sqlite3
 from collections import defaultdict
@@ -147,26 +147,25 @@ class SqliteDb(Db):
 
     def load_all(
         self,
+        table: str,
         record_type: type[TRecord],
         *,
         dataset: str | None = None,
     ) -> Iterable[TRecord | None] | None:
         schema_manager = self._get_schema_manager()
 
-        table_name: str = schema_manager.table_name_for_type(record_type)
-
         # if table doesn't exist return empty list
-        if table_name not in schema_manager.existing_tables():
+        if table not in schema_manager.existing_tables():
             return list()
 
         # using primary keys (which are fields from key type) to sort the selection
-        pk_cols = [f'"{table_name}.{col}"' for col in schema_manager.get_primary_keys(record_type)]
+        pk_cols = [f'"{table}.{col}"' for col in schema_manager.get_primary_keys(record_type)]
         sort_columns = ", ".join(pk_cols)
 
         # get subtypes for record_type and use them in match condition
         subtype_names = TypeInfoCache.get_child_names(record_type)
         value_placeholders = ", ".join(["?"] * len(subtype_names))
-        sql_statement = f'SELECT * FROM "{table_name}" WHERE _type in ({value_placeholders})'
+        sql_statement = f'SELECT * FROM "{table}" WHERE _type in ({value_placeholders})'
 
         if sort_columns:
             sql_statement += f" ORDER BY {sort_columns};"
@@ -219,11 +218,17 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
     ) -> None:
+
+        # Add Table objects to records to save
+        # TODO (Roman): Improve performance
+        tables = TableUtil.get_tables_in_records(records)
+        records_to_save = itertools.chain(records, tables)
+
         schema_manager = self._get_schema_manager()
 
         # Group keys by table
         records_grouped_by_table = defaultdict(list)
-        consume(records_grouped_by_table[TableUtil.get_table(record)].append(record) for record in records)
+        consume(records_grouped_by_table[TableUtil.get_table(record)].append(record) for record in records_to_save)
 
         # Iterate over tables
         for table, table_records in records_grouped_by_table.items():
