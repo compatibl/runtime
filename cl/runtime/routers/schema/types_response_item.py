@@ -32,8 +32,8 @@ class TypesResponseItem(BaseModel):
     label: str | None
     """Type label displayed in the UI is humanized class name (may be customized in settings)."""
 
-    table: bool | None = optional()
-    """Flag to indicate it is table."""
+    kind: str | None = optional()
+    """Flag to indicate type kind."""
 
     class Config:
         alias_generator = CaseUtil.snake_to_pascal_case
@@ -50,14 +50,13 @@ class TypesResponseItem(BaseModel):
             TypesResponseItem(
                 name=TypeUtil.name(record_type),
                 label=titleize(TypeUtil.name(record_type)),
-                table=False,
             )
             for record_type in record_types
         ]
 
         # Add tables to result
         tables_result = [
-            TypesResponseItem(name=TableUtil.add_table_prefix(table.table_id), label=table.table_id, table=True)
+            TypesResponseItem(name=TableUtil.add_table_prefix(table.table_id), label=titleize(table.table_id), kind="Table")
             for table in TableUtil.get_tables()
         ]
 
