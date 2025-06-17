@@ -20,6 +20,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
+from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.routers.storage.select_request import SelectRequest
@@ -51,7 +52,13 @@ class SelectResponse(RecordsWithSchemaResponse):
         select_type = TypeInfoCache.get_class_from_type_name(request.type_)
 
         # Load records for type.
-        records = DbContext.load_all(select_type)  # noqa
+
+        # If requested type is a table - select with this table.
+        tables = None
+        if TableUtil.is_table(request.type_):
+            tables = [TableUtil.remove_table_prefix(request.type_)]
+
+        records = DbContext.load_all(select_type, tables=tables)  # noqa
 
         # Serialize records for table.
         serialized_records = [cls._serialize_record_for_table(record) for record in records]

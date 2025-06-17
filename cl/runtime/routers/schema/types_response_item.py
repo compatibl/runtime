@@ -16,6 +16,8 @@ from __future__ import annotations
 from inflection import titleize
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.for_dataclasses.extensions import optional
+from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.schema.type_kind import TypeKind
@@ -30,6 +32,9 @@ class TypesResponseItem(BaseModel):
     label: str | None
     """Type label displayed in the UI is humanized class name (may be customized in settings)."""
 
+    table: bool | None = optional()
+    """Flag to indicate it is table."""
+
     class Config:
         alias_generator = CaseUtil.snake_to_pascal_case
         populate_by_name = True
@@ -41,11 +46,19 @@ class TypesResponseItem(BaseModel):
         # Get cached classes (does not rebuild cache)
         record_types = TypeInfoCache.get_classes(type_kinds=(TypeKind.RECORD,))
 
-        result = [
+        types_result = [
             TypesResponseItem(
                 name=TypeUtil.name(record_type),
                 label=titleize(TypeUtil.name(record_type)),
+                table=False,
             )
             for record_type in record_types
         ]
-        return result
+
+        # Add tables to result
+        tables_result = [
+            TypesResponseItem(name=TableUtil.add_table_prefix(table.table_id), label=table.table_id, table=True)
+            for table in TableUtil.get_tables()
+        ]
+
+        return tables_result + types_result

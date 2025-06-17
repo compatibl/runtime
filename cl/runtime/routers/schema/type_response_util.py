@@ -13,7 +13,11 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+from cl.runtime.records.table_util import TableUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
+from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 
@@ -29,6 +33,16 @@ class TypeResponseUtil:
         record_type = TypeInfoCache.get_class_from_type_name(request.type_name)
         handler_args_elements = dict()
         result = TypeDecl.as_dict_with_dependencies(record_type)
+
+        # Find an element in the results for a record type to use as the basis for a synthetic table item
+        record_type_key_in_result = f"{ModuleDeclKey().build().module_name}.{TypeUtil.name(record_type)}"
+        record_type_result = result.get(record_type_key_in_result)
+
+        # Add synthetic table item to schema
+        table_type_key_in_result = f"{ModuleDeclKey().build().module_name}.{request.type_name}"
+        table_type_result = {k: v for k, v in record_type_result.items()}
+        table_type_result["Name"] = request.type_name
+        result[table_type_key_in_result] = table_type_result
 
         # TODO: Experimental patch to exclude generated fields from top grid and editor but not the record picker
         # This patch is activated in three cases:
