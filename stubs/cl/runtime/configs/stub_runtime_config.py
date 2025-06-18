@@ -77,10 +77,18 @@ class StubRuntimeConfig(Config):
         ]
 
         stub_polymorphic_records = [
-            StubDataclassPolymorphic(table_field="PolymorphicTable1", key_field="stub_key1", record_field="stub_record1"),
-            StubDataclassPolymorphic(table_field="PolymorphicTable1", key_field="stub_key2", record_field="stub_record2"),
-            StubDataclassPolymorphic(table_field="PolymorphicTable2", key_field="stub_key3", record_field="stub_record3"),
-            StubDataclassPolymorphic(table_field="PolymorphicTable2", key_field="stub_key4", record_field="stub_record4"),
+            StubDataclassPolymorphic(
+                table_field="PolymorphicTable1", key_field="stub_key1", record_field="stub_record1"
+            ),
+            StubDataclassPolymorphic(
+                table_field="PolymorphicTable1", key_field="stub_key2", record_field="stub_record2"
+            ),
+            StubDataclassPolymorphic(
+                table_field="PolymorphicTable2", key_field="stub_key3", record_field="stub_record3"
+            ),
+            StubDataclassPolymorphic(
+                table_field="PolymorphicTable2", key_field="stub_key4", record_field="stub_record4"
+            ),
         ]
 
         all_records = [

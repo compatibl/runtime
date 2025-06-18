@@ -33,7 +33,6 @@ from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.table import Table
 from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
@@ -300,7 +299,11 @@ class DbContext(Context):
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
         # Load data across all tables if 'tables' parameter is None
-        tables = [x.table_id for x in TableUtil.get_tables(TypeUtil.name(record_type.get_key_type()))] if tables is None else tables
+        tables = (
+            [x.table_id for x in TableUtil.get_tables(TypeUtil.name(record_type.get_key_type()))]
+            if tables is None
+            else tables
+        )
 
         return [
             record

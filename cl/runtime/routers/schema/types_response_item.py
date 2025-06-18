@@ -56,7 +56,9 @@ class TypesResponseItem(BaseModel):
 
         # Add tables to result
         tables_result = [
-            TypesResponseItem(name=TableUtil.add_table_prefix(table.table_id), label=titleize(table.table_id), kind="Table")
+            TypesResponseItem(
+                name=TableUtil.add_table_prefix(table.table_id), label=titleize(table.table_id), kind="Table"
+            )
             for table in TableUtil.get_tables()
         ]
 

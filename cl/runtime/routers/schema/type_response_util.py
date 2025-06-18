@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-
-from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey

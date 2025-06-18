@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Iterable, Final
-
+from typing import Final
+from typing import Iterable
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
@@ -139,7 +139,6 @@ class TableUtil:
         """Remove table prefix from table name."""
 
         if table.startswith(_TABLE_PREFIX):
-            return table[len(_TABLE_PREFIX):]
+            return table[len(_TABLE_PREFIX) :]
         else:
             return table
-
