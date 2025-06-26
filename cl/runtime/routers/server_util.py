@@ -16,8 +16,10 @@ from fastapi import FastAPI
 from cl.runtime.routers.app import app_router
 from cl.runtime.routers.auth import auth_router
 from cl.runtime.routers.entity import entity_router
+from cl.runtime.routers.handler import handler_router
 from cl.runtime.routers.health import health_router
 from cl.runtime.routers.schema import schema_router
+from cl.runtime.routers.settings import settings_router
 from cl.runtime.routers.sse import sse_router
 from cl.runtime.routers.storage import storage_router
 from cl.runtime.routers.tasks import tasks_router
@@ -30,9 +32,11 @@ class ServerUtil:
     def include_routers(cls, server_app: FastAPI):
         server_app.include_router(app_router.router, prefix="", tags=["App"])
         server_app.include_router(health_router.router, prefix="", tags=["Health Check"])
+        server_app.include_router(settings_router.router, prefix="", tags=["Application Settings"])
         server_app.include_router(sse_router.router, prefix="/sse", tags=["SSE"])
         server_app.include_router(auth_router.router, prefix="/auth", tags=["Authorization"])
         server_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"])
         server_app.include_router(storage_router.router, prefix="/storage", tags=["Storage"])
         server_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"])
         server_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"])
+        server_app.include_router(handler_router.router, prefix="/handler", tags=["Handler"])

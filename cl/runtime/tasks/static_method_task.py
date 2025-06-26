@@ -42,7 +42,7 @@ class StaticMethodTask(MethodTask):
         ).build()
 
     @override
-    def _execute(self) -> None:
+    def _execute(self):
         """Invoke the specified @staticmethod or @classmethod."""
 
         # Get record type from fully qualified name in module.ClassName format
@@ -53,7 +53,7 @@ class StaticMethodTask(MethodTask):
         method = getattr(record_type, method_name)
 
         params = self.deserialized_method_params()
-        method(**params)
+        return method(**params)
 
     @classmethod
     def create(

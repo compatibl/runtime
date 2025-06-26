@@ -52,7 +52,7 @@ class InstanceMethodTask(MethodTask):
         ).build()
 
     @override
-    def _execute(self) -> None:
+    def _execute(self):
         """Invoke the specified instance method."""
 
         key_type = TypeInfoCache.get_class_from_qual_name(self.key_type_str)
@@ -67,7 +67,7 @@ class InstanceMethodTask(MethodTask):
         method = getattr(record, method_name)
 
         params = self.deserialized_method_params()
-        method(**params)
+        return method(**params)
 
     @classmethod
     def create(

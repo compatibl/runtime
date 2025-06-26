@@ -84,7 +84,7 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
             self.progress_pct = 0.0
 
     @abstractmethod
-    def _execute(self) -> None:
+    def _execute(self):
         """Run payload without updating status or handling exceptions (protected, callers should invoke 'run_task')."""
 
     def _create_log_context(self) -> LogContext:
@@ -140,6 +140,9 @@ class Task(TaskKey, RecordMixin[TaskKey], ABC):
                 update.elapsed_sec = 0.0  # TODO: Implement
                 update.remaining_sec = 0.0
                 DbContext.save_one(update.build())
+
+    def run_task_in_process(self):
+        return self._execute()
 
     @classmethod
     def wait_for_completion(cls, task_key: TaskKey, timeout_sec: int = 10) -> None:  # TODO: Rename or move
