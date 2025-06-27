@@ -19,7 +19,7 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
 
-expected_result = {"Name": "TypeDecl", "Label": "Type Decl"}
+expected_result = {"Kind": None, "Name": "TypeDecl", "Label": "Type Decl"}
 
 
 def test_method(pytest_default_db):
