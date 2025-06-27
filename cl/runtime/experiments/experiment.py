@@ -15,9 +15,10 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Sequence, List
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_key import ExperimentKey
+from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.trial import Trial
 from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.record_mixin import RecordMixin
@@ -28,8 +29,11 @@ from cl.runtime.records.type_util import TypeUtil
 class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
     """Abstract base class for a statistical experiment."""
 
+    scenarios: List[ExperimentScenarioKey] | None = None
+    """Experiment scenarios (optional)."""
+
     max_trials: int | None = None
-    """Maximum number of trials to run (optional)."""
+    """Maximum number of trials to run per scenario (optional)."""
 
     max_parallel: int | None = None
     """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""

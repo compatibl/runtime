@@ -14,25 +14,13 @@
 
 from abc import ABC
 from dataclasses import dataclass
-
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
-from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class Trial(TrialKey, RecordMixin[TrialKey], ABC):
-    """Abstract base class for a single trial of a statistical experiment."""
+class ExperimentScenario(ExperimentScenarioKey, RecordMixin[ExperimentScenarioKey], ABC):
+    """One of multiple scenarios for an experiment."""
 
-    scenario: ExperimentScenarioKey | None = None
-    """Experiment scenario for which the trial is performed."""
-
-    def get_key(self) -> TrialKey:
-        return TrialKey(experiment=self.experiment, timestamp=self.timestamp).build()
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        # Create a unique timestamp
-        if self.timestamp is None:
-            self.timestamp = Timestamp.create()
+    def get_key(self) -> ExperimentScenarioKey:
+        return ExperimentScenarioKey(experiment_scenario_id=self.experiment_scenario_id).build()
