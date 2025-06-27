@@ -14,9 +14,16 @@
 
 from abc import ABC
 from dataclasses import dataclass
+from typing import List
+
 from cl.runtime.experiments.experiment import Experiment
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
 class ClassifierExperiment(Experiment, ABC):
     """Unsupervised classifier experiment with string result type representing the class label."""
+
+    class_labels: List[str] = required()
+    """List of permitted class labels."""
+
