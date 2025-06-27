@@ -1,3 +1,3 @@
-experiment_type,experiment_id,experiment_scenarios,max_trials,max_parallel
+experiment_type,experiment_id,scenarios,max_trials,max_parallel
 StubBinaryExperimentType1,StubBinaryExperiment11,"[""StubBinaryExperimentType1;StubBinaryExperimentScenario11A"",""StubBinaryExperimentType1;StubBinaryExperimentScenario11B""]",,
 StubBinaryExperimentType2,StubBinaryExperiment21,,"""5""","""2"""

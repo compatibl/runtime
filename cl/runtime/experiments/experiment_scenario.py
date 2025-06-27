@@ -23,4 +23,6 @@ class ExperimentScenario(ExperimentScenarioKey, RecordMixin[ExperimentScenarioKe
     """One of multiple scenarios for an experiment."""
 
     def get_key(self) -> ExperimentScenarioKey:
-        return ExperimentScenarioKey(experiment_scenario_id=self.experiment_scenario_id).build()
+        return ExperimentScenarioKey(
+            experiment_type=self.experiment_type, experiment_scenario_id=self.experiment_scenario_id
+        ).build()
