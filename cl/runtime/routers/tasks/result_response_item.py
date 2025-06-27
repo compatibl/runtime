@@ -14,8 +14,6 @@
 
 from __future__ import annotations
 from typing import Any
-from typing import Iterable
-from typing import cast
 from pydantic import BaseModel
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil

@@ -196,7 +196,10 @@ def test_singleton(pytest_multi_db):
     """Test singleton type saving."""
     singleton_sample = StubDataclassSingleton().build()
     DbContext.save_one(singleton_sample)
-    loaded_sample = DbContext.load_one(singleton_sample.get_key(), cast_to=StubDataclassSingleton, )
+    loaded_sample = DbContext.load_one(
+        singleton_sample.get_key(),
+        cast_to=StubDataclassSingleton,
+    )
     assert loaded_sample == singleton_sample
 
     other_singleton_sample = StubDataclassSingleton(str_field="other").build()

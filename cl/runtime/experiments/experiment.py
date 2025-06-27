@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Sequence
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial import Trial
 from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 

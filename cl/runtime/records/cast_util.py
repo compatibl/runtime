@@ -31,4 +31,5 @@ class CastUtil:
             return obj
         else:
             raise RuntimeError(
-                f"Cannot cast an object of type {TypeUtil.name(obj)} to type {TypeUtil.name(result_type)}.")
+                f"Cannot cast an object of type {TypeUtil.name(obj)} to type {TypeUtil.name(result_type)}."
+            )
