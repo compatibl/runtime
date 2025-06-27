@@ -12,18 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
 import re
 from abc import ABC
+from collections import namedtuple
 from dataclasses import dataclass
+from types import FunctionType
+from types import MethodType
 from typing import Dict
 from inflection import underscore
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.callable_task import CallableTask
 
 _UI_SERIALIZER = DataSerializers.FOR_UI
+
+# Named tuple for method param details
+ParamDetails = namedtuple("ParamDetails", ["annot", "default"])
 
 
 @dataclass(slots=True, kw_only=True)
@@ -47,7 +55,20 @@ class MethodTask(CallableTask, ABC):
 
         return result
 
-    def deserialized_method_params(self) -> dict:
+    @classmethod
+    def _get_method_param_details(cls, method_callable: FunctionType | MethodType) -> dict[str, ParamDetails]:
+        """For a given method/function, extract a dictionary of parameter names to param details."""
+
+        signature = inspect.signature(method_callable)
+        param_details = {
+            name: ParamDetails(param.annotation, param.default)
+            for name, param in signature.parameters.items()
+            if param.annotation != inspect.Parameter.empty
+        }
+
+        return param_details
+
+    def deserialized_method_params(self, method_callable: FunctionType | MethodType) -> dict:
         """For every method's param - deserialize its value and assign back to it's param name."""
 
         # Convert names back to snake_case
@@ -56,14 +77,24 @@ class MethodTask(CallableTask, ABC):
             for param_name, param_value in self.method_params.items()
         }
 
-        # Deserialize each param value
-        for param_name, param_values in params.items():
-            if not isinstance(param_values, dict):
-                continue
+        # Get param details from method callable
+        param_details = self._get_method_param_details(method_callable)
 
-            type_instance = _UI_SERIALIZER.deserialize(param_values)
+        # Deserialize each param value
+        for param_name, param_value in params.items():
+
+            # Create TypeHint for parameter
+            type_hint = (
+                TypeHint.for_type_alias(
+                    type_alias=_param_details.annot, containing_type=self.__class__, field_name=param_name
+                )
+                if (_param_details := param_details.get(param_name)) is not None
+                else None
+            )
+
+            param_value = _UI_SERIALIZER.deserialize(param_value, type_hint=type_hint)
 
             # Assign deserialized value instead of dict
-            params[param_name] = type_instance
+            params[param_name] = param_value
 
         return params

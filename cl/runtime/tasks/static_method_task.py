@@ -52,7 +52,7 @@ class StaticMethodTask(MethodTask):
         method_name = self.normalized_method_name()
         method = getattr(record_type, method_name)
 
-        params = self.deserialized_method_params()
+        params = self.deserialized_method_params(method)
         return method(**params)
 
     @classmethod

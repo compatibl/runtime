@@ -35,6 +35,9 @@ class TaskUtil:
         # Workaround for static handlers
         requested_keys = request.keys if request.keys else [None]
 
+        # TODO (Roman): Workaround to make handlers with parameters work.
+        #  Currently, we do not support non-string arguments for handlers in the MethodTask class model.
+        request_arguments = {k: str(v) for k, v in request.arguments.items()} if request.arguments else None
         tasks = []
         for serialized_key in requested_keys:
 
@@ -54,7 +57,7 @@ class TaskUtil:
                     key_type_str=key_type_str,
                     key_str=serialized_key,
                     method_name=request.method,
-                    method_params=request.arguments,
+                    method_params=request_arguments,
                 ).build()
                 tasks.append(handler_task)
             else:
@@ -67,7 +70,7 @@ class TaskUtil:
                     queue=handler_queue.get_key(),
                     type_str=record_type_str,
                     method_name=request.method,
-                    method_params=request.arguments,
+                    method_params=request_arguments,
                 ).build()
                 tasks.append(handler_task)
 
