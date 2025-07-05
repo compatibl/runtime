@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
@@ -36,4 +35,3 @@ class ExperimentScenarioKey(KeyMixin):
     def get_table(self) -> str:
         """Override the default to specify a custom table name based on experiment type."""
         return self.experiment_type.experiment_type_id + "Scenario"
-

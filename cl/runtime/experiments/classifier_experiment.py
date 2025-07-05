@@ -15,7 +15,6 @@
 from abc import ABC
 from dataclasses import dataclass
 from typing import List
-
 from cl.runtime.experiments.experiment import Experiment
 from cl.runtime.records.for_dataclasses.extensions import required
 
@@ -26,4 +25,3 @@ class ClassifierExperiment(Experiment, ABC):
 
     class_labels: List[str] = required()
     """List of permitted class labels."""
-
