@@ -76,11 +76,14 @@ server_app.add_middleware(ContextMiddleware)
 ServerUtil.include_routers(server_app)
 
 
-if __name__ == "__main__":
+def run_backend() -> None:
+    """Run REST backend."""
+
     # Set up logging config
     logging.config.dictConfig(logging_config)
 
     with ProcessContext().build(), DbContext(db=Db.create()).build():
+
         # TODO: This only works for the Mongo celery backend
         celery_delete_existing_tasks()
 
@@ -101,7 +104,12 @@ if __name__ == "__main__":
         webbrowser.open_new_tab(f"http://{api_settings.hostname}:{api_settings.port}")
 
         # Run Uvicorn using hostname and port specified by Dynaconf
-        api_settings = ApiSettings.instance()
         uvicorn.run(
             server_app, host=api_settings.hostname, port=api_settings.port, log_config=uvicorn_empty_logging_config
         )
+
+
+if __name__ == "__main__":
+
+    # Run backend
+    run_backend()
