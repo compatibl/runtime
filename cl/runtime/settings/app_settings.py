@@ -13,7 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Tuple
+
 from typing_extensions import final
+
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.app_env import AppEnv
 from cl.runtime.settings.settings import Settings
 
@@ -22,6 +28,9 @@ from cl.runtime.settings.settings import Settings
 @final
 class AppSettings(Settings):
     """Settings for the naming and location of the app data."""
+
+    packages: Tuple[str, ...] = required()
+    """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
     env: AppEnv | None = None
     """Determines the default settings for multiuser access and data retention."""
@@ -37,6 +46,32 @@ class AppSettings(Settings):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        # Convert to tuple
+        if self.packages is None:
+            raise RuntimeError(f"No packages are specified in {TypeUtil.name(self)}, specify at least one.")
+        elif is_sequence(self.packages):
+            # Convert sequence to tuple
+            self.packages = tuple(self.packages)
+        elif isinstance(self.packages, str):
+            # Deserialize from string in comma-delimited format
+            self.packages = tuple(token.strip() for token in self.packages.split(","))
+        else:
+            raise RuntimeError(f"Field '{TypeUtil.name(self)}.packages' must be a string or an iterable of strings.")
+
+        # Check that each element is a string and is not empty
+        package_errors = [
+            (
+                f"- Element at index {index} of field '{TypeUtil.name(self)}.packages is not a string:\n"
+                f"  Value: {element} Type: {TypeUtil.name(element)})\n"
+                if not isinstance(element, str)
+                else f"- Element at index {index} of field '{TypeUtil.name(self)} is an empty string.\n"
+            )
+            for index, element in enumerate(self.packages)
+            if not isinstance(element, str) or element == ""
+        ]
+        if package_errors:
+            raise ValueError("\n".join(package_errors))
 
         if self.env is not None:
             # Convert from string to AppEnv enum if necessary
