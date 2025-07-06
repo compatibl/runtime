@@ -32,7 +32,7 @@ class Log(LogKey, RecordMixin[LogKey], ABC):
     # TODO: Do not store here, instead get from settings once during the initial Context construction
     __default: ClassVar[Self | None] = None
 
-    level: str = LogSettings.instance().level
+    level: str = LogSettings.instance().log_level
     """Log level using logging module conventions (lower, upper or mixed case can be used)."""
 
     def get_key(self) -> LogKey:

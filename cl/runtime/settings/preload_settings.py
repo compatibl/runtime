@@ -30,7 +30,7 @@ from cl.runtime.settings.settings import Settings
 class PreloadSettings(Settings):
     """Settings for preloading records from files."""
 
-    dirs: List[str] | None = None
+    preload_dirs: List[str] | None = None
     """
     Absolute or relative (to Dynaconf project root) directory paths under which preloaded data is located.
     
@@ -45,7 +45,7 @@ class PreloadSettings(Settings):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
-        self.dirs = ProjectSettings.instance().normalize_paths("dirs", self.dirs)
+        self.preload_dirs = ProjectSettings.instance().normalize_paths("dirs", self.preload_dirs)
 
     def save_and_configure(self, *, final_record_types: List[type] | None = None) -> None:
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
@@ -70,11 +70,11 @@ class PreloadSettings(Settings):
 
     def _get_files(self, ext: str) -> List[str]:
         # Return empty list if no dirs are specified in settings
-        if self.dirs is None or len(self.dirs) == 0:
+        if self.preload_dirs is None or len(self.preload_dirs) == 0:
             return []
 
         # Normalize dirs to remove redundant slash at the end
-        dirs = [os.path.normpath(x) for x in self.dirs]
+        dirs = [os.path.normpath(x) for x in self.preload_dirs]
 
         # Add dot prefix from ext if not included
         ext = f".{ext}" if not ext.startswith(".") else ext

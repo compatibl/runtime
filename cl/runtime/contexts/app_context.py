@@ -49,15 +49,15 @@ class AppContext(Context):
 
         # Default values are based on settings (which may still be None) if not specified in the context
         app_settings = AppSettings.instance()
-        self.env = self.env if self.env is not None else app_settings.env
-        self.name = self.name if self.name is not None else app_settings.name
-        self.user = self.user if self.user is not None else app_settings.user
-        self.user_scoped = self.user_scoped if self.user_scoped is not None else app_settings.user_scoped
+        self.env = self.env if self.env is not None else app_settings.app_env
+        self.name = self.name if self.name is not None else app_settings.app_name
+        self.user = self.user if self.user is not None else app_settings.app_user
+        self.user_scoped = self.user_scoped if self.user_scoped is not None else app_settings.app_user_scoped
 
     @classmethod
     def get_env(cls) -> AppEnv:
         """Determines the default settings for multiuser access and data retention."""
-        env = context.env if (context := cls.current_or_none()) is not None else AppSettings.instance().env
+        env = context.env if (context := cls.current_or_none()) is not None else AppSettings.instance().app_env
         if env is not None:
             return env
         else:
@@ -67,7 +67,7 @@ class AppContext(Context):
     @classmethod
     def get_name(cls) -> str:
         """Identifies the application or test."""
-        name = context.name if (context := cls.current_or_none()) is not None else AppSettings.instance().name
+        name = context.name if (context := cls.current_or_none()) is not None else AppSettings.instance().app_name
         if name is not None:
             return name
         else:
@@ -77,7 +77,7 @@ class AppContext(Context):
     @classmethod
     def get_user(cls) -> str:
         """Identifies the application or test user."""
-        user = context.user if (context := cls.current_or_none()) is not None else AppSettings.instance().user
+        user = context.user if (context := cls.current_or_none()) is not None else AppSettings.instance().app_user
         if user is not None:
             return user
         else:
@@ -90,7 +90,7 @@ class AppContext(Context):
         user_scoped = (
             context.user_scoped
             if (context := cls.current_or_none()) is not None
-            else AppSettings.instance().user_scoped
+            else AppSettings.instance().app_user_scoped
         )
         if user_scoped is not None:
             return user_scoped

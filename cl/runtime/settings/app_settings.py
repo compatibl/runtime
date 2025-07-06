@@ -29,33 +29,33 @@ from cl.runtime.settings.settings import Settings
 class AppSettings(Settings):
     """Settings for the naming and location of the app data."""
 
-    packages: Tuple[str, ...] = required()
+    app_packages: Tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
-    env: AppEnv | None = None
+    app_env: AppEnv | None = None
     """Determines the default settings for multiuser access and data retention."""
 
-    name: str | None = None
+    app_name: str | None = None
     """Identifies the application or test."""
 
-    user: str | None = None
+    app_user: str | None = None
     """Identifies the application or test user."""
 
-    user_scoped: bool | None = None
+    app_user_scoped: bool | None = None
     """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert to tuple
-        if self.packages is None:
+        if self.app_packages is None:
             raise RuntimeError(f"No packages are specified in {TypeUtil.name(self)}, specify at least one.")
-        elif is_sequence(self.packages):
+        elif is_sequence(self.app_packages):
             # Convert sequence to tuple
-            self.packages = tuple(self.packages)
-        elif isinstance(self.packages, str):
+            self.app_packages = tuple(self.app_packages)
+        elif isinstance(self.app_packages, str):
             # Deserialize from string in comma-delimited format
-            self.packages = tuple(token.strip() for token in self.packages.split(","))
+            self.app_packages = tuple(token.strip() for token in self.app_packages.split(","))
         else:
             raise RuntimeError(f"Field '{TypeUtil.name(self)}.packages' must be a string or an iterable of strings.")
 
@@ -67,26 +67,26 @@ class AppSettings(Settings):
                 if not isinstance(element, str)
                 else f"- Element at index {index} of field '{TypeUtil.name(self)} is an empty string.\n"
             )
-            for index, element in enumerate(self.packages)
+            for index, element in enumerate(self.app_packages)
             if not isinstance(element, str) or element == ""
         ]
         if package_errors:
             raise ValueError("\n".join(package_errors))
 
-        if self.env is not None:
+        if self.app_env is not None:
             # Convert from string to AppEnv enum if necessary
-            if isinstance(self.env, str):
-                if self.env.islower():
+            if isinstance(self.app_env, str):
+                if self.app_env.islower():
                     # Create enum after converting to uppercase if the string is in lowercase
-                    if (item := self.env.upper()) in AppEnv:
-                        self.env = AppEnv[item]  # noqa
+                    if (item := self.app_env.upper()) in AppEnv:
+                        self.app_env = AppEnv[item]  # noqa
                     else:
                         valid_items = "\n".join(item.name.lower() for item in AppEnv)
                         raise RuntimeError(
-                            f"Enum AppEnv does not include the item {str(self.env)}.\n"
+                            f"Enum AppEnv does not include the item {str(self.app_env)}.\n"
                             f"Valid items are:\n{valid_items}\n"
                         )
                 else:
-                    raise RuntimeError(f"Invalid environment name {self.env}, it should be lowercase.")
-            elif not isinstance(self.env, AppEnv):
+                    raise RuntimeError(f"Invalid environment name {self.app_env}, it should be lowercase.")
+            elif not isinstance(self.app_env, AppEnv):
                 raise RuntimeError(f"The value of env should be a string or an instance of AppEnv.")

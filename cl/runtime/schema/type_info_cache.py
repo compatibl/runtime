@@ -199,7 +199,7 @@ class TypeInfoCache:
         """Get the list of packages specified in settings."""
         if cls._packages is None:
             # Get the list of packages from settings
-            cls._packages = tuple(AppSettings.instance().packages)
+            cls._packages = tuple(AppSettings.instance().app_packages)
         return cls._packages
 
     @classmethod

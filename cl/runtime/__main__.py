@@ -60,13 +60,13 @@ async def http_exception_handler(request, exc):
 api_settings = ApiSettings.instance()
 server_app.add_middleware(
     CORSMiddleware,
-    allow_origins=api_settings.allow_origins,
-    allow_origin_regex=api_settings.allow_origin_regex,
-    allow_credentials=api_settings.allow_credentials,
-    allow_methods=api_settings.allow_methods,
-    allow_headers=api_settings.allow_headers,
-    expose_headers=api_settings.expose_headers,
-    max_age=api_settings.max_age,
+    allow_origins=api_settings.api_allow_origins,
+    allow_origin_regex=api_settings.api_allow_origin_regex,
+    allow_credentials=api_settings.api_allow_credentials,
+    allow_methods=api_settings.api_allow_methods,
+    allow_headers=api_settings.api_allow_headers,
+    expose_headers=api_settings.api_expose_headers,
+    max_age=api_settings.api_max_age,
 )
 
 # Middleware for clearing contextvars and restoring their previous state after async task execution
@@ -101,11 +101,11 @@ def run_backend() -> None:
 
         # Open new browser tab in the default browser using http protocol.
         # It will switch to https if cert is present.
-        webbrowser.open_new_tab(f"http://{api_settings.hostname}:{api_settings.port}")
+        webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}")
 
         # Run Uvicorn using hostname and port specified by Dynaconf
         uvicorn.run(
-            server_app, host=api_settings.hostname, port=api_settings.port, log_config=uvicorn_empty_logging_config
+            server_app, host=api_settings.api_hostname, port=api_settings.api_port, log_config=uvicorn_empty_logging_config
         )
 
 

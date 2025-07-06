@@ -64,4 +64,4 @@ class ProcessContext(Context):
                 # Return test_module.test_module or test_module.test_class.test_method inside a test
                 return QaUtil.get_test_name()
             else:
-                return DbSettings.instance().id  # TODO: Pass f-string parameters
+                return DbSettings.instance().db_id  # TODO: Pass f-string parameters

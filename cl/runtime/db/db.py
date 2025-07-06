@@ -209,12 +209,12 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
         # Get DB type from context settings if not specified
         if db_type is None:
-            db_type = TypeInfoCache.get_class_from_type_name(db_settings.type)
+            db_type = TypeInfoCache.get_class_from_type_name(db_settings.db_type)
 
         # Get DB identifier if not specified
         if db_id is None:
             if not ProcessContext.is_testing():
-                db_id = db_settings.id
+                db_id = db_settings.db_id
             else:
                 raise RuntimeError("Use pytest fixtures to create temporary DBs inside tests.")
 
@@ -225,8 +225,8 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def error_if_not_temp_db(self) -> None:
         """Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')."""
         db_settings = DbSettings.instance()
-        if not self.db_id.startswith(db_settings.temp_prefix):
+        if not self.db_id.startswith(db_settings.db_temp_prefix):
             raise RuntimeError(
-                f"To drop a DB from code, its name must start from the following prefix: '{db_settings.temp_prefix}'\n"
+                f"To drop a DB from code, its name must start from the following prefix: '{db_settings.db_temp_prefix}'\n"
                 f"Database name: {self.db_id}"
             )

@@ -30,11 +30,11 @@ def get_log_filename() -> str:
     # TODO: Refactor to use a unique directory name instead
     # Generate log file name.
     log_settings = LogSettings.instance()
-    log_filename_format = log_settings.filename_format
+    log_filename_format = log_settings.log_filename_format
     match log_filename_format:
         case "prefix":
             # Filename is the prefix with .log extension.
-            result = f"{log_settings.filename_prefix}.log"
+            result = f"{log_settings.log_filename_prefix}.log"
         case "prefix-timestamp":
             # UTC timestamp to millisecond precision for the log file name.
             log_timestamp = DatetimeUtil.now()
@@ -42,7 +42,7 @@ def get_log_filename() -> str:
             log_timestamp_str = (
                 log_timestamp.strftime("%Y-%m-%d-%H-%M-%S") + f"-{int(round(log_timestamp.microsecond / 1000)):03d}"
             )
-            result = f"{log_settings.filename_prefix}-{log_timestamp_str}.log"
+            result = f"{log_settings.log_filename_prefix}-{log_timestamp_str}.log"
         case _:
             valid_choices = ["prefix", "prefix-timestamp"]
             raise RuntimeError(
@@ -101,7 +101,7 @@ def _make_filter_add_contextual_info(default_empty=None):
                 type_and_handler += f" - {log_context.handler}"
 
         # Type on which the handler is running
-        record.type = log_context.type if log_context else _default_empty
+        record.db_type = log_context.type if log_context else _default_empty
 
         # Name of running handler
         record.handler = log_context.handler if log_context else _default_empty

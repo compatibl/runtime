@@ -30,20 +30,20 @@ class LogSettings(Settings):
     log_type: str = "FileLog"
     """Log type name in ClassName format."""
 
-    level: str = "INFO"
+    log_level: str = "INFO"
     """Log level in UPPERCASE format."""
 
-    filename_format: str = "prefix-timestamp"
+    log_filename_format: str = "prefix-timestamp"
     """
     Log filename format, the choices are:
     - prefix: Prefix only
     - prefix-timestamp: Prefix followed by UTC timestamp to millisecond precision in dash-delimited format
     """
 
-    filename_prefix: str = "default"
+    log_filename_prefix: str = "default"
     """Log filename prefix."""
 
-    filename_timestamp: dt.datetime = DatetimeUtil.now()
+    log_filename_timestamp: dt.datetime = DatetimeUtil.now()
     """Timestamp to use for log file, set to the time of program launch if not specified in settings."""
 
     def __init(self) -> None:
@@ -55,10 +55,10 @@ class LogSettings(Settings):
             )
 
         # Convert logging level to uppercase and validate its values
-        self.level = self.level.upper()
+        self.log_level = self.log_level.upper()
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-        if self.level not in valid_levels:
+        if self.log_level not in valid_levels:
             raise RuntimeError(
-                f"Invalid log level: {self.level}, permitted values are: {', '.join(valid_levels)}. "
+                f"Invalid log level: {self.log_level}, permitted values are: {', '.join(valid_levels)}. "
                 f"Lower, upper or mixed case can be used."
             )

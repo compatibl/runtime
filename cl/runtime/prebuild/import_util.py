@@ -25,7 +25,7 @@ class ImportUtil:
     def check_imports(cls) -> None:
         """Check that all imports succeed, output a detailed error message otherwise."""
         # Get the list of packages
-        app_packages = AppSettings.instance().packages
+        app_packages = AppSettings.instance().app_packages
         all_packages = []
         for package in app_packages:
             if package.startswith("stubs.") or package.startswith("tests."):

@@ -24,28 +24,28 @@ from cl.runtime.settings.settings import Settings
 class DbSettings(Settings):
     """Database settings."""
 
-    id: str = required()  # TODO: Allow f-string parameters
+    db_id: str = required()  # TODO: Allow f-string parameters
     """Database identifier as string or Python f-string."""
 
-    type: str = required()
+    db_type: str = required()
     """Database class name."""
 
-    uri: str | None = None
+    db_uri: str | None = None
     """Database URI (optional, defaults to a local database file or localhost)."""
 
-    temp_prefix: str = "temp_"
+    db_temp_prefix: str = "temp_"
     """
-    IMPORTANT: DELETING ALL RECORDS AND DROPPING THE DATABASE FROM CODE OR AN API CALL IS PERMITTED
+    IMPORTANT: DROPPING THE DATABASE FROM CODE OR AN API CALL IS PERMITTED
     ONLY WHEN THE DATABASE NAME STARTS FROM THIS PREFIX (defaults to 'temp_')
     """
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-        if self.id is None:
+        if self.db_id is None:
             raise RuntimeError(f"Field 'db_name' in settings.yaml is missing.")
-        elif not isinstance(self.id, str):
+        elif not isinstance(self.db_id, str):
             raise RuntimeError(f"Field 'db_name' in settings.yaml must be None or a string.")
 
-        if not isinstance(self.type, str):
+        if not isinstance(self.db_type, str):
             raise RuntimeError(f"{TypeUtil.name(self)} field 'db_type' must be a string in module.ClassName format.")

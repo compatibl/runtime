@@ -28,11 +28,11 @@ def _get_log_file_path() -> str:
 
     # Generate log file name
     log_settings = LogSettings.instance()
-    log_filename_format = log_settings.filename_format
+    log_filename_format = log_settings.log_filename_format
     match log_filename_format:
         case "prefix":
             # Filename is the prefix with .log extension
-            filename = f"{log_settings.filename_prefix}.log"
+            filename = f"{log_settings.log_filename_prefix}.log"
         case "prefix-timestamp":
             # UTC timestamp to millisecond precision for the log file name
             log_timestamp = DatetimeUtil.now()
@@ -40,7 +40,7 @@ def _get_log_file_path() -> str:
             log_timestamp_str = (
                 log_timestamp.strftime("%Y-%m-%d-%H-%M-%S") + f"-{int(round(log_timestamp.microsecond / 1000)):03d}"
             )
-            filename = f"{log_settings.filename_prefix}-{log_timestamp_str}.log"
+            filename = f"{log_settings.log_filename_prefix}-{log_timestamp_str}.log"
         case _:
             valid_choices = ["prefix", "prefix-timestamp"]
             raise RuntimeError(

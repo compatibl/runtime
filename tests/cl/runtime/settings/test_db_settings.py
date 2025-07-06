@@ -20,7 +20,7 @@ def test_smoke():
     """Test DbSettings class."""
 
     db_settings = DbSettings.instance()
-    assert db_settings.type is not None
+    assert db_settings.db_type is not None
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ def _collect_package_versions() -> dict[str, str]:
         dict: Mapping of package names to their version strings.
     """
     result = {}
-    packages = AppSettings.instance().packages
+    packages = AppSettings.instance().app_packages
 
     for package in packages:
         version = "0.1.0"  # Default version

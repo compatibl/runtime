@@ -46,7 +46,7 @@ class CsvFileUtil:
         """
 
         # The list of packages from context settings
-        packages = AppSettings.instance().packages
+        packages = AppSettings.instance().app_packages
 
         missing_files = []
         all_root_paths = set()

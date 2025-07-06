@@ -68,7 +68,7 @@ class CopyrightUtil:
         """
 
         # The list of packages from context settings
-        packages = AppSettings.instance().packages
+        packages = AppSettings.instance().app_packages
 
         files_with_copyright_header_error = []
         files_with_trailing_line_error = []
