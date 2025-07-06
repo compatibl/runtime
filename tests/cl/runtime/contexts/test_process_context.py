@@ -14,9 +14,9 @@
 
 import pytest
 from cl.runtime.contexts.process_context import ProcessContext
-from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.app_settings import AppSettings
 
-context_settings = ContextSettings.instance()
+app_settings = AppSettings.instance()
 
 
 def test_process_context():

@@ -22,8 +22,5 @@ from cl.runtime.settings.settings import Settings
 
 @dataclass(slots=True, kw_only=True)
 @final
-class ContextSettings(Settings):
+class AppSettings(Settings):
     """Default context parameters."""
-
-
-

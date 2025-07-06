@@ -17,7 +17,7 @@ from cl.runtime.settings.db_settings import DbSettings
 
 
 def test_smoke():
-    """Test ContextSettings class."""
+    """Test DbSettings class."""
 
     db_settings = DbSettings.instance()
     assert db_settings.type is not None

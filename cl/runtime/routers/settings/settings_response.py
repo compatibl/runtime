@@ -20,18 +20,18 @@ from typing_extensions import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.routers.settings.env_info import EnvInfo
-from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.app_settings import AppSettings
 
 
 def _collect_package_versions() -> dict[str, str]:
     """
-    Collects versions of all packages listed in ContextSettings.
+    Collects versions of all packages listed in AppSettings.
 
     Returns:
         dict: Mapping of package names to their version strings.
     """
     result = {}
-    packages = ContextSettings.instance().packages
+    packages = AppSettings.instance().packages
 
     for package in packages:
         version = "0.1.0"  # Default version

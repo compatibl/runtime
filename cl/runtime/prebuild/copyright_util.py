@@ -16,7 +16,7 @@ import os
 from fnmatch import fnmatch
 from typing import List
 from cl.runtime.primitive.string_util import StringUtil
-from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.app_settings import AppSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
 APACHE_LICENSE_MD5 = "f9154a63c383844813d6abf79e4230d1"
@@ -68,7 +68,7 @@ class CopyrightUtil:
         """
 
         # The list of packages from context settings
-        packages = ContextSettings.instance().packages
+        packages = AppSettings.instance().packages
 
         files_with_copyright_header_error = []
         files_with_trailing_line_error = []

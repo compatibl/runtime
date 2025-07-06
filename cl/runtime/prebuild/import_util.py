@@ -15,7 +15,7 @@
 import importlib
 import pkgutil
 from typing import List
-from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.app_settings import AppSettings
 
 
 class ImportUtil:
@@ -25,9 +25,9 @@ class ImportUtil:
     def check_imports(cls) -> None:
         """Check that all imports succeed, output a detailed error message otherwise."""
         # Get the list of packages
-        context_packages = ContextSettings.instance().packages
+        app_packages = AppSettings.instance().packages
         all_packages = []
-        for package in context_packages:
+        for package in app_packages:
             if package.startswith("stubs.") or package.startswith("tests."):
                 all_packages.append(package)
             else:
