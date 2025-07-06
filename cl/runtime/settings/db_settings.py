@@ -25,8 +25,8 @@ from typing_extensions import final
 class DbSettings(Settings):
     """Database settings."""
 
-    name: str = required()  # TODO: Allow f-string parameters
-    """Database name as string or Python f-string."""
+    id: str = required()  # TODO: Allow f-string parameters
+    """Database identifier as string or Python f-string."""
 
     type: str = required()
     """Database class name."""
@@ -36,16 +36,16 @@ class DbSettings(Settings):
 
     temp_prefix: str = "temp_"
     """
-    IMPORTANT: DELETING ALL RECORDS AND DROPPING THE DATABASE FROM CODE IS PERMITTED
-    only when database name starts with this prefix (optional, defaults to 'temp_').
+    IMPORTANT: DELETING ALL RECORDS AND DROPPING THE DATABASE FROM CODE OR AN API CALL IS PERMITTED
+    ONLY WHEN THE DATABASE NAME STARTS FROM THIS PREFIX (defaults to 'temp_')
     """
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-        if self.name is None:
+        if self.id is None:
             raise RuntimeError(f"Field 'db_name' in settings.yaml is missing.")
-        elif not isinstance(self.name, str):
+        elif not isinstance(self.id, str):
             raise RuntimeError(f"Field 'db_name' in settings.yaml must be None or a string.")
 
         if not isinstance(self.type, str):

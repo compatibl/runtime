@@ -11,7 +11,7 @@ default:
     - stubs.cl.runtime
 
   # Documented in DbSettings class
-  db_name: dev_runtime_main
+  db_id: dev_runtime_main
   db_type: SqliteDb
 
   # Documented in ApiSettings class

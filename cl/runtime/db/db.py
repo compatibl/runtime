@@ -214,12 +214,10 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
 
         # Get DB identifier if not specified
         if db_id is None:
-            if ProcessContext.is_testing():
-                raise NotImplementedError()
-                test_name = QaUtil.get_test_name()
-                db_id = test_name.replace(".", ";")
+            if not ProcessContext.is_testing():
+                db_id = db_settings.id
             else:
-                db_id = db_settings.name
+                raise RuntimeError("Use pytest fixtures to create temporary DBs inside tests.")
 
         # Create and return a new DB instance
         result = db_type(db_id=db_id)
