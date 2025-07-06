@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context import Context
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.settings import Settings
 
@@ -66,4 +65,3 @@ class ProcessContext(Context):
                 return QaUtil.get_test_name()
             else:
                 return DbSettings.instance().id  # TODO: Pass f-string parameters
-

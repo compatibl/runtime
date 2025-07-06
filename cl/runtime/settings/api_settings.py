@@ -14,9 +14,9 @@
 
 from dataclasses import dataclass
 from typing import List
+from typing_extensions import final
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
-from typing_extensions import final
 
 
 @dataclass(slots=True, kw_only=True)
@@ -122,4 +122,3 @@ class ApiSettings(Settings):
 
         if self.max_age is not None and not isinstance(self.max_age, int):
             raise RuntimeError(f"{TypeUtil.name(self)} field 'max_age' must be an int or None.")
-

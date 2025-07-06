@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing_extensions import final
 from cl.runtime.settings.app_env import AppEnv
 from cl.runtime.settings.settings import Settings
-from typing_extensions import final
 
 
 @dataclass(slots=True, kw_only=True)
@@ -55,4 +55,3 @@ class AppSettings(Settings):
                     raise RuntimeError(f"Invalid environment name {self.env}, it should be lowercase.")
             elif not isinstance(self.env, AppEnv):
                 raise RuntimeError(f"The value of env should be a string or an instance of AppEnv.")
-

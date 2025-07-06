@@ -29,7 +29,6 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.type_info_cache import TypeInfoCache
-from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.db_settings import DbSettings
 
 

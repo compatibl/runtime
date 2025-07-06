@@ -14,10 +14,10 @@
 
 from dataclasses import dataclass
 from typing import Tuple
+from typing_extensions import final
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
-from typing_extensions import final
 
 
 @dataclass(slots=True, kw_only=True)
@@ -66,4 +66,3 @@ class ContextSettings(Settings):
             raise RuntimeError(
                 f"{TypeUtil.name(self)} field 'log_class' must be a string " f"in module.ClassName format."
             )
-

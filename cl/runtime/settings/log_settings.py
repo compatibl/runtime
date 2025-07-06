@@ -14,9 +14,10 @@
 
 import datetime as dt
 from dataclasses import dataclass
+from typing_extensions import final
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.settings.settings import Settings
-from typing_extensions import final
+
 
 @dataclass(slots=True, kw_only=True)
 @final
@@ -50,4 +51,3 @@ class LogSettings(Settings):
                 f"Invalid log level: {self.level}, permitted values are: {', '.join(valid_levels)}. "
                 f"Lower, upper or mixed case can be used."
             )
-

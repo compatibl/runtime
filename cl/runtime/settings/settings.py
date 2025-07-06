@@ -15,7 +15,6 @@
 from __future__ import annotations
 import os
 from abc import ABC
-from abc import abstractmethod
 from dataclasses import MISSING
 from dataclasses import dataclass
 from typing import ClassVar
@@ -114,13 +113,15 @@ class Settings(DataMixin, ABC):
         # Check that the method is not invoked on the Settings base class
         if cls == Settings:
             raise RuntimeError(
-                "Class method instance() can be invoked on final Settings classes but not the Settings base class.")
+                "Class method instance() can be invoked on final Settings classes but not the Settings base class."
+            )
 
         # All settings classes must be final
-        if not hasattr(cls, '__final__'):
+        if not hasattr(cls, "__final__"):
             raise RuntimeError(
                 f"Settings class {TypeUtil.name(cls)} is not marked as final, or for Python version < 3.11 the @final"
-                f"decorator was imported from typing rather than typing_extensions.")
+                f"decorator was imported from typing rather than typing_extensions."
+            )
 
         # Check if cached value exists, load if not found
         if (result := cls.__settings_dict.get(cls, None)) is None:
@@ -146,7 +147,7 @@ class Settings(DataMixin, ABC):
             # Filter user settings by 'prefix_' and create a new dictionary where prefix is removed from keys
             # This will include fields that are not specified in the settings class
             p = prefix + "_"
-            settings_dict = {k[len(p):]: v for k, v in _user_settings.items() if k.startswith(p)}
+            settings_dict = {k[len(p) :]: v for k, v in _user_settings.items() if k.startswith(p)}
 
             # List of required fields in cls (fields for which neither default nor default_factory is specified)
             required_fields = [

@@ -14,14 +14,15 @@
 
 import os
 from dataclasses import dataclass
-from typing import List, final
+from typing import List
+from typing import final
+from typing_extensions import final
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
-from typing_extensions import final
 
 
 @dataclass(slots=True, kw_only=True)

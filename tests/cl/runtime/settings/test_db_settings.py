@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.db_settings import DbSettings
 
 
