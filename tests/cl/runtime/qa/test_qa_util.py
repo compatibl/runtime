@@ -21,8 +21,8 @@ def _test_env_dir_and_name(*, expected_name: str):
     """Test for QaUtil.env_dir and QaUtil.env_name."""
     dir_name = os.path.dirname(__file__)
     expected_dir = os.path.join(dir_name, expected_name.replace(".", os.sep))
-    assert QaUtil.get_env_name() == expected_name
-    assert os.path.normpath(QaUtil.get_env_dir()) == os.path.normpath(expected_dir)
+    assert QaUtil.get_test_name() == expected_name
+    assert os.path.normpath(QaUtil.get_test_dir()) == os.path.normpath(expected_dir)
 
 
 def test_qa_util():

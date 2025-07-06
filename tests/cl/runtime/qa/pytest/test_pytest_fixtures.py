@@ -24,7 +24,7 @@ def _test_working_dir(*, actual: str, expected: str):
     expected_dir = os.path.join(dir_name, expected.replace(".", os.sep))
     assert actual == expected_dir
     assert os.getcwd() == expected_dir
-    assert QaUtil.get_env_dir() == expected_dir
+    assert QaUtil.get_test_dir() == expected_dir
 
 
 class TestPytestFixtures:

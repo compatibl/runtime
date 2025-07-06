@@ -246,8 +246,9 @@ class BasicMongoDb(Db):
     def delete_all_and_drop_db(self) -> None:
         # Check that db_id and db_name both match temp_db_prefix
         db_name = self._get_db_name()
-        self.error_if_not_temp_db(self.db_id)
-        self.error_if_not_temp_db(db_name)
+
+        # Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')
+        self.error_if_not_temp_db()
 
         # Drop the entire database without possibility of recovery, this
         # relies on the temp_db_prefix check above to prevent unintended use
@@ -301,7 +302,7 @@ class BasicMongoDb(Db):
 
     @cached
     def _get_db_name(self) -> str:
-        """Database is from db_id, perform validation before returning."""
+        """For MongoDB, database name is db_id, perform validation before returning."""
 
         # Check for invalid characters in MongoDB name
         if invalid_db_name_regex.search(self.db_id):

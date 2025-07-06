@@ -23,7 +23,8 @@ def test_process_context():
     """Smoke test."""
 
     assert ProcessContext.is_testing() == True
-    assert ProcessContext.get_env_name() == "test_process_context"
+    with ProcessContext().build() as context:
+        assert context.get_env_name() == "test_process_context"
 
 
 if __name__ == "__main__":

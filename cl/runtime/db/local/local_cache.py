@@ -143,8 +143,8 @@ class LocalCache(Db):
             This method will not run unless both db_id and database start with 'temp_db_prefix'
             specified using Dynaconf and stored in 'DbSettings' class
         """
-        # Check that db_id matches temp_db_prefix
-        self.error_if_not_temp_db(self.db_id)
+        # Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')
+        self.error_if_not_temp_db()
 
         # Create a new cache
         __cache = {}

@@ -44,23 +44,23 @@ class PytestUtil:
         return data
 
     @classmethod
-    def get_env_dir(cls, request: FixtureRequest) -> str:
+    def get_test_dir(cls, request: FixtureRequest) -> str:
         """
         Return module_dir/test_module/test_function or module_dir/test_module/test_class/test_method
         using the data from FixtureRequest, collapsing levels with identical name into one.
         """
-        return cls._get_test_env_dir_or_name(request, is_name=False)
+        return cls._get_test_dir_or_name(request, is_name=False)
 
     @classmethod
-    def get_env_name(cls, request: FixtureRequest) -> str:
+    def get_test_name(cls, request: FixtureRequest) -> str:
         """
         Return module_dir/test_module.test_function or module_dir/test_module.test_class.test_method
         using the data from FixtureRequest, collapsing levels with identical name into one.
         """
-        return cls._get_test_env_dir_or_name(request, is_name=True)
+        return cls._get_test_dir_or_name(request, is_name=True)
 
     @classmethod
-    def _get_test_env_dir_or_name(cls, request: FixtureRequest, *, is_name: bool) -> str:
+    def _get_test_dir_or_name(cls, request: FixtureRequest, *, is_name: bool) -> str:
         """
         Return test_module<delim>test_function or test_module<delim>test_class<delim>test_function
         using the data from FixtureRequest, collapsing levels with identical name into one,

@@ -131,8 +131,8 @@ class Settings(DataMixin, ABC):
 
         # Check if cached value exists, load if not found
         if (result := cls.__settings_dict.get(cls, None)) is None:
-            # A settings class may specify an optional prefix used to filter dynaconf fields
-            base_type_name = cls.get_base_type().__name__
+            # Settings base class determines the prefix used to filter dynaconf fields
+            base_type_name = TypeUtil.name(cls.get_base_type())
             if base_type_name.endswith("Settings"):
                 prefix = CaseUtil.pascal_to_snake_case(base_type_name.removesuffix("Settings"))
             else:
@@ -155,17 +155,17 @@ class Settings(DataMixin, ABC):
             if prefix.endswith("_"):
                 raise RuntimeError(f"{prefix_description} must not end with an underscore.")
 
+            # Filter user settings by 'prefix_' and create a new dictionary where prefix is removed from keys
+            # This will include fields that are not specified in the settings class
+            p = prefix + "_"
+            settings_dict = {k[len(p):]: v for k, v in _user_settings.items() if k.startswith(p)}
+
             # List of required fields in cls (fields for which neither default nor default_factory is specified)
             required_fields = [
                 name
                 for name, field_info in cls.__dataclass_fields__.items()  # noqa
                 if field_info.default is MISSING and field_info.default_factory is MISSING
             ]
-
-            # Filter user settings by 'prefix_' and create a new dictionary where prefix is removed from keys
-            # This will include fields that are not specified in the settings class
-            p = prefix + "_"
-            settings_dict = {k[len(p) :]: v for k, v in _user_settings.items() if k.startswith(p)}
 
             # Check for missing required fields
             missing_fields = [k for k in required_fields if k not in settings_dict]

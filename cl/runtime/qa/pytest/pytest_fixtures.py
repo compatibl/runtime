@@ -34,7 +34,7 @@ from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 def pytest_work_dir(request: FixtureRequest) -> Iterator[str]:
     """Pytest module fixture to make test module directory the local directory during test execution."""
 
-    work_dir = PytestUtil.get_env_dir(request)
+    work_dir = PytestUtil.get_test_dir(request)
 
     # Change test working directory, create if does not exist
     if not os.path.exists(work_dir):
@@ -51,9 +51,12 @@ def pytest_work_dir(request: FixtureRequest) -> Iterator[str]:
 def _pytest_db(request: FixtureRequest, *, db_type: type | None = None) -> Iterator[Db]:
     """Setup and teardown a temporary databases in DB of the specified type."""
 
-    # Get test DB identifier
-    env_name = PytestUtil.get_env_name(request)
-    db_id = "temp;" + env_name.replace(".", ";")
+    # Set test DB name to test name in dot-delimited snake_case format, prefixed by 'temp_'
+    test_name = PytestUtil.get_test_name(request)
+
+    # Replace dots by underscores and add temp_ prefix
+    normalized_test_name = test_name.replace(".", "_")
+    db_id = f"temp_{normalized_test_name}"
 
     # Create a new DB instance of the specified type (use the type from settings if None)
     db = Db.create(db_type=db_type, db_id=db_id)

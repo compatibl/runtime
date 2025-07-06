@@ -43,10 +43,9 @@ class QaUtil:
         return False
 
     @classmethod
-    def get_env_dir(
+    def get_test_dir(
         cls,
         *,
-        default_dir: str | None = None,
         test_function_pattern: str | None = None,
     ) -> str:
         """
@@ -57,28 +56,21 @@ class QaUtil:
             Implemented by searching the stack frame for 'test_' or a custom test function name pattern.
 
         Args:
-            default_dir: When not running inside a test, return this directory if specified, error if not specified
             test_function_pattern: Glob pattern for function or method in stack frame, defaults to 'test_*'
         """
-        result = cls._get_test_env_dir_or_name(
+        result = cls._get_test_dir_or_name(
             is_name=False,
             test_function_pattern=test_function_pattern,
         )
 
-        # If the end of the frame is reached and no function or method starting from test_ is found,
-        # the function was not called from inside a test and default_dir will be returned if specified
+        # Error if not inside a test
         if result is None:
-            if default_dir is not None and default_dir != "":
-                result = default_dir
-            else:
-                raise RuntimeError(
-                    f"Not invoked inside a function or method that starts from '{test_function_pattern}' "
-                    f"and 'default_dir' is None or empty."
-                )
+            raise RuntimeError("Attempting to get test dir outside a test.")
+
         return result
 
     @classmethod
-    def get_env_name(
+    def get_test_name(
         cls,
         *,
         test_function_pattern: str | None = None,
@@ -95,18 +87,19 @@ class QaUtil:
         """
 
         # Get test environment if inside test
-        result = cls._get_test_env_dir_or_name(
+        result = cls._get_test_dir_or_name(
             is_name=True,
             test_function_pattern=test_function_pattern,
         )
 
-        # Otherwise assign default name
+        # Error if not inside a test
         if result is None:
-            result = "main"
+            raise RuntimeError("Attempting to get test name outside a test.")
+
         return result
 
     @classmethod
-    def _get_test_env_dir_or_name(
+    def _get_test_dir_or_name(
         cls,
         *,
         is_name: bool,

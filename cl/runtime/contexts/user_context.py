@@ -18,6 +18,7 @@ from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
@@ -43,7 +44,7 @@ class UserContext(Context):
             return user_context.user
         elif ProcessContext.is_testing():
             # Use process namespace as the user
-            return UserKey(username=ProcessContext.get_env_name())
+            return UserKey(username=QaUtil.get_test_name())
         else:
             # User reported by OS
             os_user_id = getuser()

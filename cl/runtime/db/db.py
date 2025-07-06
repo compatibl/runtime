@@ -30,6 +30,7 @@ from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.db_settings import DbSettings
 
 
 @dataclass(slots=True, kw_only=True)
@@ -180,11 +181,11 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def delete_all_and_drop_db(self) -> None:
         """
-        IMPORTANT: !!! DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY
+        IMPORTANT: DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY
 
         Notes:
-            This method will not run unless both db_id and database start with 'temp_db_prefix'
-            specified using Dynaconf and stored in 'DbSettings' class
+            This method will not run unless db_id starts with the db_temp_prefix specified in settings.yaml.
+            The default prefix is 'temp_'
         """
 
     @abstractmethod
@@ -195,7 +196,7 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def _get_test_db_name(cls) -> str:  # TODO: Use fixture instead
         """Get SQLite database with name based on test namespace."""
         if ProcessContext.is_testing():
-            result = f"temp;{ProcessContext.get_env_name().replace('.', ';')}"
+            result = f"temp;{QaUtil.get_test_name().replace('.', ';')}"
             return result
         else:
             raise RuntimeError("Attempting to get test DB name outside a test.")
@@ -204,28 +205,31 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     def create(cls, *, db_type: type | None = None, db_id: str | None = None):
         """Create DB of the specified type, or use DB type from context settings if not specified."""
 
+        # Get DB settings instance for the lookup of defaults
+        db_settings = DbSettings.instance()
+
         # Get DB type from context settings if not specified
         if db_type is None:
-            context_settings = ContextSettings.instance()
-            db_type = TypeInfoCache.get_class_from_qual_name(context_settings.db_class)
+            db_type = TypeInfoCache.get_class_from_type_name(db_settings.type)
 
         # Get DB identifier if not specified
         if db_id is None:
-            env_name = QaUtil.get_env_name()
-            db_id = env_name.replace(".", ";")
+            if ProcessContext.is_testing():
+                raise NotImplementedError()
+                test_name = QaUtil.get_test_name()
+                db_id = test_name.replace(".", ";")
+            else:
+                db_id = db_settings.name
 
         # Create and return a new DB instance
         result = db_type(db_id=db_id)
         return result
 
-    @classmethod
-    def error_if_not_temp_db(cls, db_id_or_database_name: str) -> None:
-        """Confirm that database id or database name matches temp_db_prefix, error otherwise."""
-        context_settings = ContextSettings.instance()
-        temp_db_prefix = context_settings.db_temp_prefix
-        if not db_id_or_database_name.startswith(temp_db_prefix):
+    def error_if_not_temp_db(self) -> None:
+        """Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')."""
+        db_settings = DbSettings.instance()
+        if not self.db_id.startswith(db_settings.temp_prefix):
             raise RuntimeError(
-                f"Destructive action on database not permitted because db_id or database name "
-                f"'{db_id_or_database_name}' does not match temp_db_prefix '{temp_db_prefix}' "
-                f"specified in Dynaconf database settings ('DbSettings' class)."
+                f"To drop a DB from code, its name must start from the following prefix: '{db_settings.temp_prefix}'\n"
+                f"Database name: {self.db_id}"
             )

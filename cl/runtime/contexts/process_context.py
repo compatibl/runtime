@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context import Context
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.settings import Settings
 
 
@@ -52,8 +54,7 @@ class ProcessContext(Context):
             # Otherwise set based on the current process
             return Settings.is_inside_test
 
-    @classmethod
-    def get_env_name(cls) -> str:
+    def get_env_name(self) -> str:
         """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
         if (current_context := ProcessContext.current_or_none()) is not None:
             # Get from the current ProcessContext if exists
@@ -62,7 +63,7 @@ class ProcessContext(Context):
             # Otherwise set based on the current process
             if Settings.is_inside_test:
                 # Return test_module.test_module or test_module.test_class.test_method inside a test
-                return QaUtil.get_env_name()  # TODO: Move code from QaUtil
+                return QaUtil.get_test_name()
             else:
-                # Return None outside a test
-                return "main"  # TODO: Use context_id
+                return DbSettings.instance().name  # TODO: Pass f-string parameters
+

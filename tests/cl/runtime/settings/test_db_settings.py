@@ -14,12 +14,14 @@
 
 import pytest
 from cl.runtime.settings.context_settings import ContextSettings
+from cl.runtime.settings.db_settings import DbSettings
 
 
 def test_smoke():
     """Test ContextSettings class."""
 
-    context_settings = ContextSettings.instance()
+    db_settings = DbSettings.instance()
+    assert db_settings.type is not None
 
 
 if __name__ == "__main__":
