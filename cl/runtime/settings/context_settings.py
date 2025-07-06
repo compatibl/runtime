@@ -17,9 +17,11 @@ from typing import Tuple
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
+from typing_extensions import final
 
 
 @dataclass(slots=True, kw_only=True)
+@final
 class ContextSettings(Settings):
     """Default context parameters."""
 
@@ -65,6 +67,3 @@ class ContextSettings(Settings):
                 f"{TypeUtil.name(self)} field 'log_class' must be a string " f"in module.ClassName format."
             )
 
-    @classmethod
-    def get_base_type(cls) -> type:
-        return ContextSettings

@@ -14,16 +14,18 @@
 
 import os
 from dataclasses import dataclass
-from typing import List
+from typing import List, final
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
+from typing_extensions import final
 
 
 @dataclass(slots=True, kw_only=True)
+@final
 class PreloadSettings(Settings):
     """Settings for preloading records from files."""
 
@@ -43,10 +45,6 @@ class PreloadSettings(Settings):
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.dirs = ProjectSettings.instance().normalize_paths("dirs", self.dirs)
-
-    @classmethod
-    def get_base_type(cls) -> type:
-        return PreloadSettings
 
     def save_and_configure(self, *, final_record_types: List[type] | None = None) -> None:
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""

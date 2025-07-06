@@ -15,9 +15,11 @@
 from dataclasses import dataclass
 from cl.runtime.settings.app_env import AppEnv
 from cl.runtime.settings.settings import Settings
+from typing_extensions import final
 
 
 @dataclass(slots=True, kw_only=True)
+@final
 class AppSettings(Settings):
     """Settings for the naming and location of the app data."""
 
@@ -54,6 +56,3 @@ class AppSettings(Settings):
             elif not isinstance(self.env, AppEnv):
                 raise RuntimeError(f"The value of env should be a string or an instance of AppEnv.")
 
-    @classmethod
-    def get_base_type(cls) -> type:
-        return AppSettings

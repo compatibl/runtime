@@ -17,9 +17,11 @@ from typing import Tuple
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
+from typing_extensions import final
 
 
 @dataclass(slots=True, kw_only=True)
+@final
 class DbSettings(Settings):
     """Database settings."""
 
@@ -51,6 +53,3 @@ class DbSettings(Settings):
                 f"{TypeUtil.name(self)} field 'db_type' must be a string in module.ClassName format."
             )
 
-    @classmethod
-    def get_base_type(cls) -> type:
-        return DbSettings

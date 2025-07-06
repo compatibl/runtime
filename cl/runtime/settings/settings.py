@@ -89,7 +89,6 @@ class Settings(DataMixin, ABC):
     Abstract base of settings classes.
 
     Notes:
-      - Settings lookup is performed by the base type returned by the 'get_base_type' method
       - Environment variable prefix is the global prefix (CL_ by default) followed
         by UPPER_CASE settings class name with suffix '_SETTINGS' removed,
         for example 'CL_APP_USER' for the field 'user' in AppSettings.
@@ -109,38 +108,27 @@ class Settings(DataMixin, ABC):
     """Dictionary of initialized settings objects indexed by the the settings class type."""
 
     @classmethod
-    @abstractmethod
-    def get_base_type(cls) -> type:
-        """
-        Return the immediate descendant of Settings class, do not use type(self).
-
-        Notes:
-          - Settings lookup is performed by the base type returned by this method
-          - Environment variable prefix is the global prefix (CL_ by default) followed
-            by UPPER_CASE settings class name with suffix '_SETTINGS' removed,
-            for example 'CL_APP_USER' for the field 'user' in AppSettings.
-          - Dynaconf (settings.yaml) prefix is snake_case settings class name with suffix '_settings'
-            removed, for example 'app_user' for the field 'user' in AppSettings.
-          - Use CL_APP_SETTINGS_TYPE environment variable or app_settings_type Dynaconf (settings.yaml) key
-            to specify a settings type derived from AppSettings.
-        """
-
-    @classmethod
     def instance(cls) -> Self:
         """Return singleton instance."""
 
+        # Check that the method is not invoked on the Settings base class
+        if cls == Settings:
+            raise RuntimeError(
+                "Class method instance() can be invoked on final Settings classes but not the Settings base class.")
+
+        # All settings classes must be final
+        if not hasattr(cls, '__final__'):
+            raise RuntimeError(
+                f"Settings class {TypeUtil.name(cls)} is not marked as final, or for Python version < 3.11 the @final"
+                f"decorator was imported from typing rather than typing_extensions.")
+
         # Check if cached value exists, load if not found
         if (result := cls.__settings_dict.get(cls, None)) is None:
-            # Settings base class determines the prefix used to filter dynaconf fields
-            base_type_name = TypeUtil.name(cls.get_base_type())
-            if base_type_name.endswith("Settings"):
-                prefix = CaseUtil.pascal_to_snake_case(base_type_name.removesuffix("Settings"))
-            else:
-                raise RuntimeError(
-                    f"The method 'get_base_type' of {cls.__name__} returned class {base_type_name}.\n"
-                    f"By convention, classnames of immediate descendants of Settings class\n"
-                    f"returned by 'get_base_type' method must end with 'Settings'."
-                )
+
+            # Settings class name determines the prefix used to filter dynaconf fields
+            settings_type_name = TypeUtil.name(cls)
+            if settings_type_name.endswith("Settings"):
+                prefix = CaseUtil.pascal_to_snake_case(settings_type_name.removesuffix("Settings"))
 
             # Validate prefix
             prefix_description = f"Dynaconf settings prefix '{prefix}' returned by '{TypeUtil.name(cls)}.get_prefix()'"

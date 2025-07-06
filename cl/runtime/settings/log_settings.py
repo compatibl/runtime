@@ -16,9 +16,10 @@ import datetime as dt
 from dataclasses import dataclass
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.settings.settings import Settings
-
+from typing_extensions import final
 
 @dataclass(slots=True, kw_only=True)
+@final
 class LogSettings(Settings):
     """REST API settings."""
 
@@ -50,6 +51,3 @@ class LogSettings(Settings):
                 f"Lower, upper or mixed case can be used."
             )
 
-    @classmethod
-    def get_base_type(cls) -> type:
-        return LogSettings

@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import List
-from typing import final
+from typing_extensions import final
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.views.view import View
 
