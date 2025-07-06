@@ -28,6 +28,7 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR
 from cl.runtime.settings.project_settings import ProjectSettings
 
@@ -88,13 +89,10 @@ class Settings(DataMixin, ABC):
     Abstract base of settings classes.
 
     Notes:
-      - Environment variable prefix is the global prefix (CL_ by default) followed
-        by UPPER_CASE settings class name with suffix '_SETTINGS' removed,
-        for example 'CL_APP_USER' for the field 'user' in AppSettings.
-      - Dynaconf (settings.yaml) prefix is snake_case settings class name with suffix '_settings'
-        removed, for example 'app_user' for the field 'user' in AppSettings.
-      - Use CL_APP_SETTINGS_TYPE environment variable or app_settings_type Dynaconf (settings.yaml) key
-        to specify a settings type derived from AppSettings.
+      - Environment variable prefix is the global prefix (CL_ by default) followed by UPPER_CASE settings field name,
+        for example 'CL_APP_USER' for the field 'app_user' in AppSettings
+      - Dynaconf (settings.yaml) field is snake_case settings field name,
+        for example 'app_user' for the field 'user' in AppSettings
     """
 
     process_timestamp: ClassVar[str] = _process_timestamp
@@ -107,40 +105,53 @@ class Settings(DataMixin, ABC):
     """Dictionary of initialized settings objects indexed by the the settings class type."""
 
     @classmethod
+    def get_prefix(cls) -> str:
+        """
+        Dynaconf fields will be filtered by 'prefix_' before being passed to the settings class constructor.
+        Defaults to the class name converted to snake_case with _settings suffix removed.
+
+        Notes:
+            - If this method provides an override of the default prefix, the returned prefix must be lowercase
+            - and must not start or end with underscore (but may include underscore separators)
+        """
+        result = CaseUtil.pascal_to_snake_case(TypeUtil.name(cls)).removesuffix("_settings")
+        result = result if result.endswith("_") else f"{result}_"
+        return result
+
+    @classmethod
     def instance(cls) -> Self:
         """Return singleton instance."""
 
         # Check if cached value exists, load if not found
         if (result := cls.__settings_dict.get(cls, None)) is None:
 
-            # Check that the method is not invoked on the Settings base class
-            if cls == Settings:
-                raise RuntimeError(
-                    "Class method instance() can be invoked on final Settings classes but not the Settings base class."
-                )
-
-            # All settings classes must be final
-            if not hasattr(cls, "__final__"):
-                raise RuntimeError(
-                    f"Settings class {TypeUtil.name(cls)} is not marked as final, or for Python version < 3.11\n"
-                    f"the @final decorator was imported from typing rather than typing_extensions."
-                )
-
-            # Settings class name determines the prefix used to filter dynaconf fields
-            settings_type_name = TypeUtil.name(cls)
-            prefix = CaseUtil.pascal_to_snake_case(settings_type_name).removesuffix("_settings")
-
-            # Validate prefix
+            # Get and validate the field prefix to filter Dynaconf fields for this settings class
+            prefix = cls.get_prefix()
             prefix_description = f"Dynaconf settings prefix '{prefix}' for {TypeUtil.name(cls)}"
+            if prefix is None:
+                raise RuntimeError(f"{prefix_description} is None.")
+            if prefix == "":
+                raise RuntimeError(f"{prefix_description} is an empty string.")
+            if not prefix.islower():
+                raise RuntimeError(f"{prefix_description} must be lowercase.")
             if prefix.startswith("_"):
-                raise RuntimeError(f"{prefix_description}\nmust not start with an underscore.")
-            if prefix.endswith("_"):
-                raise RuntimeError(f"{prefix_description}\nmust not end with an underscore.")
+                raise RuntimeError(f"{prefix_description} must not start with an underscore.")
+            if not prefix.endswith("_"):
+                raise RuntimeError(f"{prefix_description} must end with an underscore.")
 
             # Create a new dictionary of fields that start with 'prefix_'
             # This may include fields that are not specified in the settings class
-            p = prefix + "_"
-            settings_dict = {k: v for k, v in _user_settings.items() if k.startswith(p)}
+            settings_dict = {k: v for k, v in _user_settings.items() if k.startswith(prefix)}
+
+            slots = SlotsUtil.get_slots(cls)
+            slots_without_prefix = [slot for slot in slots if not slot.startswith(prefix)]
+            if slots_without_prefix:
+                slots_without_prefix_str = "\n".join(slots_without_prefix)
+                message = (
+                    f"The following fields in {TypeUtil.name(cls)} do not start with the prefix '{prefix}'\n"
+                    f"returned by the '{TypeUtil.name(cls)}.get_prefix' method:\n{slots_without_prefix_str}"
+                )
+                raise RuntimeError(message)
 
             # List of required fields in cls (fields for which neither default nor default_factory is specified)
             required_fields = [
@@ -152,30 +163,27 @@ class Settings(DataMixin, ABC):
             # Check for missing required fields
             missing_fields = [k for k in required_fields if k not in settings_dict]
             if missing_fields:
-                # Combine the global Dynaconf envvar prefix with settings prefix in uppercase
+                # Combine the global Dynaconf envvar prefix with settings prefix
                 envvar_prefix = f"{_dynaconf_envvar_prefix}_{prefix.upper()}"
-                dynaconf_msg = f"(in lowercase with prefix '{prefix}_')"
-                envvar_msg = f"(in uppercase with prefix '{envvar_prefix}_')"
+                # Environment variables source
+                sources_list = [f"Environment variables in uppercase with prefix '{envvar_prefix}'"]
 
-                # Environment variables
-                sources_list = [f"Environment variables {envvar_msg}"]
-
-                # Dotenv file or message that it is not found
+                # Dotenv file source or message that it is not found
                 if (env_file := find_dotenv()) != "":
                     env_file_name = env_file
                 else:
                     env_file_name = "No .env file in default search path"
-                sources_list.append(f"Dotenv file {envvar_msg}: {env_file_name}")
+                sources_list.append(f"Dotenv file: {env_file_name}")
 
-                # Dynaconf file(s) or message that they are not found
+                # Dynaconf file source(s) or message that they are not found
                 if _dynaconf_loaded_files:
                     dynaconf_file_list = _dynaconf_loaded_files
                 else:
                     _dynaconf_file_patterns_str = ", ".join(_dynaconf_file_patterns)
                     dynaconf_file_list = [f"No {_dynaconf_file_patterns_str} file(s) in default search path."]
-                sources_list.extend(f"Dynaconf file {dynaconf_msg}: {x}" for x in dynaconf_file_list)
+                sources_list.extend(f"Dynaconf file: {x}" for x in dynaconf_file_list)
 
-                # Convert to string
+                # Convert sources to string
                 settings_sources_str = "\n".join(f"    - {x}" for x in sources_list)
 
                 # List of missing required fields
@@ -193,7 +201,7 @@ class Settings(DataMixin, ABC):
 
             # TODO: Add a check for nested complex types in settings, if these are present deserialization will fail
             # TODO: Can custom deserializer that removes trailing and leading _ can be used without cyclic reference?
-            result = cls(**settings_dict).build()
+            result = cls(**settings_dict).build()  # noqa
 
             # Cache the result
             cls.__settings_dict[cls] = result
