@@ -110,44 +110,37 @@ class Settings(DataMixin, ABC):
     def instance(cls) -> Self:
         """Return singleton instance."""
 
-        # Check that the method is not invoked on the Settings base class
-        if cls == Settings:
-            raise RuntimeError(
-                "Class method instance() can be invoked on final Settings classes but not the Settings base class."
-            )
-
-        # All settings classes must be final
-        if not hasattr(cls, "__final__"):
-            raise RuntimeError(
-                f"Settings class {TypeUtil.name(cls)} is not marked as final, or for Python version < 3.11 the @final"
-                f"decorator was imported from typing rather than typing_extensions."
-            )
-
         # Check if cached value exists, load if not found
         if (result := cls.__settings_dict.get(cls, None)) is None:
 
+            # Check that the method is not invoked on the Settings base class
+            if cls == Settings:
+                raise RuntimeError(
+                    "Class method instance() can be invoked on final Settings classes but not the Settings base class."
+                )
+
+            # All settings classes must be final
+            if not hasattr(cls, "__final__"):
+                raise RuntimeError(
+                    f"Settings class {TypeUtil.name(cls)} is not marked as final, or for Python version < 3.11\n"
+                    f"the @final decorator was imported from typing rather than typing_extensions."
+                )
+
             # Settings class name determines the prefix used to filter dynaconf fields
             settings_type_name = TypeUtil.name(cls)
-            if settings_type_name.endswith("Settings"):
-                prefix = CaseUtil.pascal_to_snake_case(settings_type_name.removesuffix("Settings"))
+            prefix = CaseUtil.pascal_to_snake_case(settings_type_name).removesuffix("_settings")
 
             # Validate prefix
-            prefix_description = f"Dynaconf settings prefix '{prefix}' returned by '{TypeUtil.name(cls)}.get_prefix()'"
-            if prefix is None:
-                raise RuntimeError(f"{prefix_description} is None.")
-            if prefix == "":
-                raise RuntimeError(f"{prefix_description} is an empty string.")
-            if not prefix.islower():
-                raise RuntimeError(f"{prefix_description} must be lowercase.")
+            prefix_description = f"Dynaconf settings prefix '{prefix}' for {TypeUtil.name(cls)}"
             if prefix.startswith("_"):
-                raise RuntimeError(f"{prefix_description} must not start with an underscore.")
+                raise RuntimeError(f"{prefix_description}\nmust not start with an underscore.")
             if prefix.endswith("_"):
-                raise RuntimeError(f"{prefix_description} must not end with an underscore.")
+                raise RuntimeError(f"{prefix_description}\nmust not end with an underscore.")
 
-            # Filter user settings by 'prefix_' and create a new dictionary where prefix is removed from keys
-            # This will include fields that are not specified in the settings class
+            # Create a new dictionary of fields that start with 'prefix_'
+            # This may include fields that are not specified in the settings class
             p = prefix + "_"
-            settings_dict = {k[len(p) :]: v for k, v in _user_settings.items() if k.startswith(p)}
+            settings_dict = {k: v for k, v in _user_settings.items() if k.startswith(p)}
 
             # List of required fields in cls (fields for which neither default nor default_factory is specified)
             required_fields = [
