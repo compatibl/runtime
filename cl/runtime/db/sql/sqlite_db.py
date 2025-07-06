@@ -39,6 +39,7 @@ from cl.runtime.records.table_util import TableUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.settings.db_settings import DbSettings
 
 _KEY_SERIALIZER = KeySerializers.FOR_SQLITE
 _SERIALIZER = DataSerializers.FOR_SQLITE
@@ -384,7 +385,7 @@ class SqliteDb(Db):
         FileUtil.check_valid_filename(filename)
 
         # Get dir for database
-        db_dir = AppContext.get_deployment_dir()
+        db_dir = DbSettings.get_db_dir()
         result = os.path.join(db_dir, f"{filename}.sqlite")
         return result
 

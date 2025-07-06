@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from dataclasses import dataclass
 from typing_extensions import final
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
 
 
@@ -39,6 +41,9 @@ class DbSettings(Settings):
     ONLY WHEN THE DATABASE NAME STARTS FROM THIS PREFIX (defaults to 'temp_')
     """
 
+    db_dir: str | None = None
+    """Directory for database files (optional, defaults to '{project_root}/databases')."""
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
@@ -48,4 +53,12 @@ class DbSettings(Settings):
             raise RuntimeError(f"Field 'db_name' in settings.yaml must be None or a string.")
 
         if not isinstance(self.db_type, str):
-            raise RuntimeError(f"{TypeUtil.name(self)} field 'db_type' must be a string in module.ClassName format.")
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'db_type' must be Db class name in PascalCase format.")
+
+    @classmethod
+    def get_db_dir(cls) -> str:
+        """Get database directory (optional, defaults to '{project_root}/databases')."""
+        if (result := DbSettings.instance().db_dir) is None:
+            project_root = ProjectSettings.get_project_root()
+            result = os.path.join(project_root, "databases")
+        return result

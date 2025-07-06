@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import datetime as dt
+import os
 from dataclasses import dataclass
 from typing_extensions import final
 
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
 
 
@@ -46,6 +48,9 @@ class LogSettings(Settings):
     log_filename_timestamp: dt.datetime = DatetimeUtil.now()
     """Timestamp to use for log file, set to the time of program launch if not specified in settings."""
 
+    log_dir: str | None = None
+    """Directory for log files (optional, defaults to '{project_root}/logs')."""
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
@@ -62,3 +67,12 @@ class LogSettings(Settings):
                 f"Invalid log level: {self.log_level}, permitted values are: {', '.join(valid_levels)}. "
                 f"Lower, upper or mixed case can be used."
             )
+
+    @classmethod
+    def get_log_dir(cls) -> str:
+        """Get database directory (optional, defaults to '{project_root}/logs')."""
+        if (result := LogSettings.instance().log_dir) is None:
+            project_root = ProjectSettings.get_project_root()
+            result = os.path.join(project_root, "logs")
+        return result
+

@@ -37,7 +37,7 @@ class AppContext(Context):
     user: str = required()
     """Identifies the application or test user."""
 
-    user_scoped: bool = required()
+    user_scoped: bool = required()  # TODO: Refactor and make the names more clear
     """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
 
     @classmethod
@@ -124,25 +124,3 @@ class AppContext(Context):
             return True
         else:
             raise ErrorUtil.enum_value_error(env, AppEnv)
-
-    @classmethod
-    def get_deployment_name(cls) -> str:
-        """Combines the app env, the app name and (for user-scoped deployments) user into a unique deployment name."""
-        env_str = CaseUtil.upper_to_snake_case(cls.get_env().name)
-        if cls.is_user_scoped():
-            return f"{env_str};{cls.get_name()};{cls.get_user()}"
-        else:
-            return f"{env_str};{cls.get_name()}"
-
-    @classmethod
-    def get_deployment_dir(cls) -> str:
-        """Root directory for the files associated with the current deployment inclusive of deployment name."""
-
-        # Unique subdirectory for each deployment
-        project_root = ProjectSettings.get_project_root()
-        result = os.path.join(project_root, "deployments", cls.get_deployment_name())
-
-        # Create deployment directory if it does not exist
-        if not os.path.exists(result):
-            os.makedirs(result)
-        return result

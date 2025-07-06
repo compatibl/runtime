@@ -49,7 +49,7 @@ def _get_log_file_path() -> str:
 
     # Create log directory if does not exist
     # Create log directory and filename relative to project root
-    result = os.path.join(AppContext.get_deployment_dir(), filename)
+    result = os.path.join(LogSettings.get_log_dir(), filename)
     return result
 
 
