@@ -16,7 +16,6 @@ import datetime as dt
 import os
 from dataclasses import dataclass
 from typing_extensions import final
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.records.type_util import TypeUtil
@@ -55,9 +54,7 @@ class LogSettings(Settings):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         if not isinstance(self.log_type, str) or not CaseUtil.is_pascal_case(self.log_type):
-            raise RuntimeError(
-                f"{TypeUtil.name(self)} field 'log_type' must be a string in ClassName format."
-            )
+            raise RuntimeError(f"{TypeUtil.name(self)} field 'log_type' must be a string in ClassName format.")
 
         # Convert logging level to uppercase and validate its values
         self.log_level = self.log_level.upper()
@@ -75,4 +72,3 @@ class LogSettings(Settings):
             project_root = ProjectSettings.get_project_root()
             result = os.path.join(project_root, "logs")
         return result
-

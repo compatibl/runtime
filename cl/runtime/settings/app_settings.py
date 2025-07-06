@@ -14,9 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Tuple
-
 from typing_extensions import final
-
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil

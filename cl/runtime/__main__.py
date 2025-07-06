@@ -105,7 +105,10 @@ def run_backend() -> None:
 
         # Run Uvicorn using hostname and port specified by Dynaconf
         uvicorn.run(
-            server_app, host=api_settings.api_hostname, port=api_settings.api_port, log_config=uvicorn_empty_logging_config
+            server_app,
+            host=api_settings.api_hostname,
+            port=api_settings.api_port,
+            log_config=uvicorn_empty_logging_config,
         )
 
 

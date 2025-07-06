@@ -116,7 +116,7 @@ class ApiSettings(Settings):
             raise RuntimeError(f"{TypeUtil.name(self)} field 'allow_headers' must be a list or None.")
 
         if self.api_expose_headers is not None and (
-                isinstance(self.api_expose_headers, str) or not hasattr(self.api_expose_headers, "__iter__")
+            isinstance(self.api_expose_headers, str) or not hasattr(self.api_expose_headers, "__iter__")
         ):
             raise RuntimeError(f"{TypeUtil.name(self)} field 'expose_headers' must be a list or None.")
 

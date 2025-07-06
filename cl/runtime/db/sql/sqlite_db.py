@@ -25,7 +25,6 @@ from typing import Tuple
 from more_itertools import consume
 from cl.runtime import KeyUtil
 from cl.runtime import RecordMixin
-from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db import Db
 from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
 from cl.runtime.file.file_util import FileUtil

@@ -21,7 +21,6 @@ from typing import Final
 from typing import List
 from celery import Celery
 from celery.signals import setup_logging
-from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.contexts.context_manager import ContextManager
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.contexts.process_context import ProcessContext
