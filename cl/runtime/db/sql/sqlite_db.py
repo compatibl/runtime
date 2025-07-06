@@ -333,8 +333,7 @@ class SqliteDb(Db):
             cursor.execute(sql_statement, query_values)
             connection.commit()
 
-    def delete_all_and_drop_db(self) -> None:
-
+    def drop_temp_db(self) -> None:
         # Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')
         self.error_if_not_temp_db()
 
@@ -345,7 +344,6 @@ class SqliteDb(Db):
         # we already checked, but given the critical importance of this check will check db_filename
         # as well in case this approach changes later.
         db_file_path = self._get_db_file()
-        db_filename = os.path.basename(db_file_path)
 
         # Delete database file if exists, all checks gave been performed
         if os.path.exists(db_file_path):

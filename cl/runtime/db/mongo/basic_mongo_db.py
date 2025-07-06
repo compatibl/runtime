@@ -243,7 +243,7 @@ class BasicMongoDb(Db):
         for key in keys:
             self.delete_one(type(key), key, dataset=dataset)
 
-    def delete_all_and_drop_db(self) -> None:
+    def drop_temp_db(self) -> None:
         # Check that db_id and db_name both match temp_db_prefix
         db_name = self._get_db_name()
 

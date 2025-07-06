@@ -21,11 +21,11 @@ def init_db():
     """Drop old DB, create and populate new DB."""
     with DbContext(db=Db.create()).build():
         if (db := DbContext._get_db()) is not None:  # noqa
-            print("Removing existing DB data...")
-            db.delete_all_and_drop_db()
+            print("Dropping the existing DB (will check that it has temp DB prefix)")
+            db.drop_temp_db()
 
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
-        print("Saving new records to DB...")
+        print("Adding preloads to the new DB")
         PreloadSettings.instance().save_and_configure()
         print("Done.\n")
 

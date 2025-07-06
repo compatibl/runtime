@@ -179,13 +179,13 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         """
 
     @abstractmethod
-    def delete_all_and_drop_db(self) -> None:
+    def drop_temp_db(self) -> None:
         """
         IMPORTANT: DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY
 
         Notes:
             This method will not run unless db_id starts with the db_temp_prefix specified in settings.yaml.
-            The default prefix is 'temp_'
+            The default prefix is 'temp_'.
         """
 
     @abstractmethod

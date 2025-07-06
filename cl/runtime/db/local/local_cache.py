@@ -135,14 +135,7 @@ class LocalCache(Db):
         # Validate the dataset and if necessary convert to delimited string
         raise NotImplementedError()
 
-    def delete_all_and_drop_db(self) -> None:
-        """
-        IMPORTANT: !!! DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY
-
-        Notes:
-            This method will not run unless both db_id and database start with 'temp_db_prefix'
-            specified using Dynaconf and stored in 'DbSettings' class
-        """
+    def drop_temp_db(self) -> None:
         # Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')
         self.error_if_not_temp_db()
 

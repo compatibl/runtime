@@ -62,14 +62,14 @@ def _pytest_db(request: FixtureRequest, *, db_type: type | None = None) -> Itera
     db = Db.create(db_type=db_type, db_id=db_id)
 
     # Delete all existing records in test DB before the test in case it was not performed by the preceding run
-    db.delete_all_and_drop_db()
+    db.drop_temp_db()
 
     # Run with the created DB, return db from the fixture
     with DbContext(db=db).build():
         yield db
 
     # Delete all existing records in test DB after the test
-    db.delete_all_and_drop_db()
+    db.drop_temp_db()
 
 
 def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
