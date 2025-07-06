@@ -28,9 +28,6 @@ class ContextSettings(Settings):
     packages: Tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
-    log_class: str = "cl.runtime.log.file.file_log.FileLog"  # TODO: Deprecated, switch to class-specific fields
-    """Default log class in module.ClassName format."""
-
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
@@ -62,7 +59,3 @@ class ContextSettings(Settings):
         ]:
             raise ValueError("".join(package_errors))
 
-        if not isinstance(self.log_class, str):
-            raise RuntimeError(
-                f"{TypeUtil.name(self)} field 'log_class' must be a string " f"in module.ClassName format."
-            )

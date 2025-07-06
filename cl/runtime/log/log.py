@@ -22,7 +22,6 @@ from typing_extensions import Self
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.type_info_cache import TypeInfoCache
-from cl.runtime.settings.context_settings import ContextSettings
 from cl.runtime.settings.log_settings import LogSettings
 
 
@@ -45,8 +44,7 @@ class Log(LogKey, RecordMixin[LogKey], ABC):
 
         if Log.__default is None:
             # Create the class specified in settings and invoke its constructor
-            context_settings = ContextSettings.instance()
-            log_type = TypeInfoCache.get_class_from_qual_name(context_settings.log_class)
+            log_type = TypeInfoCache.get_class_from_type_name(LogSettings.instance().log_type)
             Log.__default = log_type()
 
         return Log.__default

@@ -15,7 +15,10 @@
 import datetime as dt
 from dataclasses import dataclass
 from typing_extensions import final
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.settings import Settings
 
 
@@ -23,6 +26,12 @@ from cl.runtime.settings.settings import Settings
 @final
 class LogSettings(Settings):
     """REST API settings."""
+
+    log_type: str = "FileLog"
+    """Log type name in ClassName format."""
+
+    level: str = "INFO"
+    """Log level in UPPERCASE format."""
 
     filename_format: str = "prefix-timestamp"
     """
@@ -37,11 +46,13 @@ class LogSettings(Settings):
     filename_timestamp: dt.datetime = DatetimeUtil.now()
     """Timestamp to use for log file, set to the time of program launch if not specified in settings."""
 
-    level: str = "info"
-    """Log level using logging module conventions (lower, upper or mixed case can be used)."""
-
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        if not isinstance(self.log_type, str) or not CaseUtil.is_pascal_case(self.log_type):
+            raise RuntimeError(
+                f"{TypeUtil.name(self)} field 'log_type' must be a string in ClassName format."
+            )
 
         # Convert logging level to uppercase and validate its values
         self.level = self.level.upper()
