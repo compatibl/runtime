@@ -22,7 +22,7 @@ class QaUtil:
     """Helper methods for environment selection."""
 
     @classmethod
-    def is_inside_test(cls, *, test_module_pattern: str | None = None) -> bool:
+    def inspect_stack_for_test_module_pattern(cls, *, test_module_pattern: str | None = None) -> bool:
         """
         Return True if invoked from a test, detection is based on test module pattern.
 

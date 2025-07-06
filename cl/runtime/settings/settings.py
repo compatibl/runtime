@@ -38,13 +38,13 @@ load_dotenv()
 _process_timestamp = Timestamp.create()
 """Unique UUIDv7-based timestamp set during the Python process launch."""
 
-# True if we are inside a test, the result is cached in Settings for performance
-_is_inside_test = QaUtil.is_inside_test()
+# True if we are inside a test process, use ProcessSettings.is_testing() to also detect inside child processes
+is_test_process = QaUtil.inspect_stack_for_test_module_pattern()
 
 # Select Dynaconf test environment when invoked from the pytest or UnitTest test runner.
 # Other runners not detected automatically, in which case the Dynaconf environment must be
 # configured in settings explicitly.
-if _is_inside_test:
+if is_test_process:
     os.environ["CL_SETTINGS_ENV"] = "test"
 
 _all_settings = Dynaconf(
@@ -102,7 +102,7 @@ class Settings(DataMixin, ABC):
     process_timestamp: ClassVar[str] = _process_timestamp
     """Unique UUIDv7-based timestamp set during the Python process launch."""
 
-    is_inside_test: ClassVar[bool] = _is_inside_test
+    is_inside_test: ClassVar[bool] = is_test_process
     """True if we are inside a test."""
 
     __settings_dict: ClassVar[Dict[type, Settings]] = {}
