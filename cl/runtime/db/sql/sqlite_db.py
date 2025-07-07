@@ -253,7 +253,7 @@ class SqliteDb(Db):
                 #  So this code just deletes the existing records before saving.
                 #  As a possible solution, we can introduce some mandatory primary key that isn't based on the
                 #  key fields.
-                self.delete_many((rec.get_key() for rec in table_records))
+                self.delete_many(table, (rec.get_key() for rec in table_records))
 
             connection = self._get_connection()
             cursor = connection.cursor()
@@ -267,19 +267,10 @@ class SqliteDb(Db):
 
             connection.commit()
 
-    def delete_one(
-        self,
-        key_type: type[TKey],
-        key: TKey | KeyProtocol | tuple | str | None,
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        # TODO (Yauheni): Add implementation independent from delete_many()
-        self.delete_many([key], dataset=dataset)
-
     def delete_many(
         self,
-        keys: Iterable[KeyProtocol] | None,
+        table: str,
+        keys: Sequence[KeyMixin],
         *,
         dataset: str | None = None,
     ) -> None:
@@ -291,10 +282,9 @@ class SqliteDb(Db):
             grouped_keys[key.get_key_type()].append(key)
 
         for key_type, keys_group in grouped_keys.items():
-            table_name = schema_manager.table_name_for_type(key_type)
 
             existing_tables = schema_manager.existing_tables()
-            if table_name not in existing_tables:
+            if table not in existing_tables:
                 continue
 
             key_fields = schema_manager.get_primary_keys(key_type)
@@ -305,7 +295,7 @@ class SqliteDb(Db):
                 keys_group = tuple(keys_group)
 
             # construct sql_statement with placeholders for values
-            sql_statement = f'DELETE FROM "{table_name}"'
+            sql_statement = f'DELETE FROM "{table}"'
             sql_statement = self._add_where_keys_in_clause(sql_statement, key_fields, columns_mapping, len(keys_group))
             sql_statement += ";"
 
@@ -370,6 +360,8 @@ class SqliteDb(Db):
 
         # Get dir for database
         db_dir = DbSettings.get_db_dir()
+        os.makedirs(db_dir, exist_ok=True)
+
         result = os.path.join(db_dir, f"{filename}.sqlite")
         return result
 

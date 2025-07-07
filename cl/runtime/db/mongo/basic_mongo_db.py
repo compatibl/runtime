@@ -207,31 +207,19 @@ class BasicMongoDb(Db):
             serialized_record["_key"] = serialized_key
             collection.replace_one({"_key": serialized_key}, serialized_record, upsert=True)
 
-    def delete_one(
-        self,
-        key_type: type[TKey],
-        key: TKey | KeyProtocol | tuple | str | None,
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        # Get collection name from key type by removing Key suffix if present
-        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-        db = self._get_mongo_db()
-        collection = db[collection_name]
-
-        serialized_key = _KEY_SERIALIZER.serialize(key)
-
-        delete_filter = {"_key": serialized_key}
-        collection.delete_one(delete_filter)
-
     def delete_many(
         self,
-        keys: Iterable[KeyProtocol] | None,
+        table: str,
+        keys: Sequence[KeyMixin],
         *,
         dataset: str | None = None,
     ) -> None:
+        # Get Mongo collection using table name
+        collection = self._get_mongo_collection(table)
         for key in keys:
-            self.delete_one(type(key), key, dataset=dataset)
+            # TODO: Implement using a more performant approach
+            serialized_primary_key = _KEY_SERIALIZER.serialize(key)
+            collection.delete_one({"_key": serialized_primary_key})
 
     def drop_temp_db(self) -> None:
         # Check that db_id and db_name both match temp_db_prefix

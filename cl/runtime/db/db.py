@@ -111,26 +111,10 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
-    def delete_one(
-        self,
-        key_type: type[TKey],
-        key: TKey | KeyProtocol | tuple | str | None,
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        """
-        Delete one record for the specified key type using its key in one of several possible formats.
-
-        Args:
-            key_type: Key type to delete, used to determine the database table
-            key: Key in object, tuple or string format
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-        """
-
-    @abstractmethod
     def delete_many(
         self,
-        keys: Iterable[KeyProtocol] | None,
+        table: str,
+        keys: Sequence[KeyMixin],
         *,
         dataset: str | None = None,
     ) -> None:
@@ -138,6 +122,7 @@ class Db(DbKey, RecordMixin, ABC):
         Delete records using an iterable of keys.
 
         Args:
+            table: Logical database table name, may be different from the physical name or the key type name
             keys: Iterable of keys.
             dataset: Target dataset as a delimited string, list of levels, or None
         """

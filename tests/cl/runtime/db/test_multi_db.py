@@ -18,6 +18,7 @@ from typing import Iterable
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
+from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
@@ -60,22 +61,6 @@ _SAMPLES = [
         StubDataclassVersioned(id="abc15"),
     ]
 ]
-
-
-def _assert_equals_iterable_without_ordering(iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
-    """Checks that two iterables contain the same elements, regardless of order."""
-
-    iterable_as_list = list(iterable) if not isinstance(iterable, list) else iterable
-    other_iterable_as_list = list(other_iterable) if not isinstance(other_iterable, list) else other_iterable
-
-    if len(iterable_as_list) != len(other_iterable_as_list):
-        raise ValueError(f"Iterables have different length: {len(iterable_as_list)} and {len(other_iterable_as_list)}")
-
-    for item in iterable_as_list:
-        if item not in other_iterable_as_list:
-            raise ValueError(f"Item {item} contains only in first iterable.")
-
-    return True
 
 
 def test_record_or_key(pytest_multi_db):
@@ -185,10 +170,10 @@ def test_load_all(pytest_multi_db):
     DbContext.save_many(all_samples)
 
     loaded_records = DbContext.load_all(StubDataclass)
-    assert _assert_equals_iterable_without_ordering(all_samples, loaded_records)
+    assert PytestUtil.assert_equals_iterable_without_ordering(all_samples, loaded_records)
 
     loaded_records = DbContext.load_all(StubDataclassDerived)
-    assert _assert_equals_iterable_without_ordering(derived_samples, loaded_records)
+    assert PytestUtil.assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
 def test_singleton(pytest_multi_db):

@@ -383,7 +383,6 @@ class DbContext(Context):
     @classmethod
     def delete_one(
         cls,
-        key_type: type[TKey],
         key: TKey | KeyProtocol | tuple | str | None,
         *,
         dataset: str | None = None,
@@ -392,20 +391,15 @@ class DbContext(Context):
         Delete one record for the specified key type using its key in one of several possible formats.
 
         Args:
-            key_type: Key type to delete, used to determine the database table
             key: Key in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
         """
-        cls._get_db().delete_one(  # noqa
-            key_type,
-            key,
-            dataset=cls.get_dataset(dataset),
-        )
+        return cls.delete_many([key], dataset=dataset)
 
     @classmethod
     def delete_many(
         cls,
-        keys: Iterable[KeyProtocol] | None,
+        keys: Sequence[TKey | None] | None,
         *,
         dataset: str | None = None,
     ) -> None:
@@ -413,12 +407,30 @@ class DbContext(Context):
         Delete records using an iterable of keys.
 
         Args:
-            keys: Iterable of keys.
+            keys: Sequence of keys to delete.
             dataset: Target dataset as a delimited string, list of levels, or None
         """
-        cls._get_db().delete_many(  # noqa
-            keys,
-            dataset=cls.get_dataset(dataset),
+
+        if not keys:
+            return
+
+        # Check that the input list consists of only None or keys
+        invalid_inputs = [x for x in keys if x is not None and not is_key(x)]
+        if len(invalid_inputs) > 0:
+            invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
+            raise RuntimeError(
+                f"Parameter 'keys' of delete_many method includes\n"
+                f"the following items that are not key or None:\n{invalid_inputs_str}"
+            )
+
+        # Group keys by table
+        keys_to_delete_grouped_by_table = defaultdict(list)
+        consume(keys_to_delete_grouped_by_table[TableUtil.get_table(key)].append(key) for key in keys)
+
+        # Perform delete for each table
+        consume(
+            cls._get_db().delete_many(table, table_keys, dataset=dataset)
+            for table, table_keys in keys_to_delete_grouped_by_table.items()
         )
 
     @classmethod

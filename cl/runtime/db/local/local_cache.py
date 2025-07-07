@@ -102,18 +102,10 @@ class LocalCache(Db):
             # Add record to cache, overwriting an existing record if present
             table_cache[serialized_key] = record
 
-    def delete_one(
-        self,
-        key_type: type[TKey],
-        key: TKey | KeyProtocol | tuple | str | None,
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        raise NotImplementedError()
-
     def delete_many(
         self,
-        keys: Iterable[KeyProtocol] | None,
+        table: str,
+        keys: Sequence[KeyMixin],
         *,
         dataset: str | None = None,
     ) -> None:

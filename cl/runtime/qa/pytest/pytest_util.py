@@ -14,7 +14,7 @@
 
 import pytest
 import os
-from typing import Any
+from typing import Any, Iterable
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES
@@ -104,3 +104,20 @@ class PytestUtil:
         if not is_name:
             result = os.path.join(module_dir, result)
         return result
+
+    @classmethod
+    def assert_equals_iterable_without_ordering(cls, iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:
+        """Checks that two iterables contain the same elements, regardless of order."""
+
+        iterable_as_list = list(iterable) if not isinstance(iterable, list) else iterable
+        other_iterable_as_list = list(other_iterable) if not isinstance(other_iterable, list) else other_iterable
+
+        if len(iterable_as_list) != len(other_iterable_as_list):
+            raise ValueError(
+                f"Iterables have different length: {len(iterable_as_list)} and {len(other_iterable_as_list)}")
+
+        for item in iterable_as_list:
+            if item not in other_iterable_as_list:
+                raise ValueError(f"Item {item} contains only in first iterable.")
+
+        return True
