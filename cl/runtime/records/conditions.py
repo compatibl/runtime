@@ -21,18 +21,29 @@ from cl.runtime.records.protocols import TObj
 
 
 class Condition(Generic[TObj], BootstrapMixin, ABC):
-    """Common base class to query conditions."""
+    """Common base class of all query conditions."""
 
+class Eq(Generic[TObj], Condition[TObj]):
+    """Matches when the argument is equal to the value, equivalent to specifying the value itself."""
+
+    __slots__ = ("value",)
+
+    value: TObj
+    """Value to compare to."""
+
+    def __init__(self, value: TObj):
+        """Create from the value."""
+        object.__setattr__(self, "value", value)
 
 class And(Generic[TObj], Condition[TObj]):
     """Matches when all of the conditions match."""
 
     __slots__ = ("conditions",)
 
-    conditions: Tuple[Condition[TObj], ...]
-    """The sequence of conditions to match"""
+    conditions: Tuple[Condition[TObj] | TObj, ...]
+    """The sequence of conditions or values in AND."""
 
-    def __init__(self, *args: Condition[TObj]):
+    def __init__(self, *args: Condition[TObj] | TObj):
         """Create from the sequence of conditions to match."""
         object.__setattr__(self, "conditions", tuple(args))
 
@@ -42,10 +53,10 @@ class Or(Generic[TObj], Condition[TObj]):
 
     __slots__ = ("conditions",)
 
-    conditions: Tuple[Condition[TObj], ...]
-    """The sequence of conditions to match"""
+    conditions: Tuple[Condition[TObj] | TObj, ...]
+    """The sequence of conditions or values in OR."""
 
-    def __init__(self, *args: Condition[TObj]):
+    def __init__(self, *args: Condition[TObj] | TObj):
         """Create from the sequence of conditions to match."""
         object.__setattr__(self, "conditions", tuple(args))
 
@@ -55,10 +66,10 @@ class Not(Generic[TObj], Condition[TObj]):
 
     __slots__ = ("condition",)
 
-    condition: Condition[TObj]
-    """Matches when the argument does not match and vice versa."""
+    condition: Condition[TObj] | TObj
+    """Applies OR operator to the argument."""
 
-    def __init__(self, condition: Condition):
+    def __init__(self, condition: Condition | TObj):
         """Matches when the argument does not match and vice versa."""
         object.__setattr__(self, "condition", condition)
 
@@ -69,23 +80,10 @@ class Exists(Generic[TObj], Condition[TObj]):
     __slots__ = ("value",)
 
     value: bool
-    """Matches not None if true, matches None if false."""
+    """Matches non-empty value if true, matches empty value if false."""
 
     def __init__(self, value: bool):
-        """Matches not None if true, matches None if false."""
-        object.__setattr__(self, "value", value)
-
-
-class Eq(Generic[TObj], Condition[TObj]):
-    """Matches when the argument is equal to the value."""
-
-    __slots__ = ("value",)
-
-    value: TObj
-    """Value to compare to."""
-
-    def __init__(self, value: TObj):
-        """Create from the value to compare to."""
+        """Matches non-empty value if true, matches empty value if false."""
         object.__setattr__(self, "value", value)
 
 
@@ -95,7 +93,20 @@ class In(Generic[TObj], Condition[TObj]):
     __slots__ = ("values",)
 
     values: Tuple[TObj, ...]
-    """Sequence of values to compare to."""
+    """Values to compare to."""
+
+    def __init__(self, values: Sequence[TObj]):
+        """Create from the sequence of values to compare to."""
+        if not isinstance(values, tuple):
+            object.__setattr__(self, "values", tuple(values))
+
+class NotIn(Generic[TObj], Condition[TObj]):
+    """Matches when the argument is not equal to any of the values."""
+
+    __slots__ = ("values",)
+
+    values: Tuple[TObj, ...]
+    """Values to compare to."""
 
     def __init__(self, values: Sequence[TObj]):
         """Create from the sequence of values to compare to."""

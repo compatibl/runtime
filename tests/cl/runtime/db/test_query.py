@@ -45,10 +45,10 @@ def test_str_query(pytest_multi_db):
     DbContext.save_many(records)
 
     exists_query = StubDataclassPrimitiveFieldsQuery(key_str_field=Exists(True)).build()
-    eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field=Eq("def")).build()
+    eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
-    or_query = StubDataclassPrimitiveFieldsQuery(key_str_field=Or(Eq("def"), Eq("xyz"))).build()
-    and_query = StubDataclassPrimitiveFieldsQuery(key_str_field=And(Not(Eq("def")), Not(Eq("xyz")))).build()
+    or_query = StubDataclassPrimitiveFieldsQuery(key_str_field=Or("def", "xyz")).build()
+    and_query = StubDataclassPrimitiveFieldsQuery(key_str_field=And(Not("def"), Or("def", "xyz"))).build()
 
     # Load using record or key
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
@@ -77,10 +77,10 @@ def test_key_query(pytest_multi_db):
     key_def = StubDataclassKey(id="def")
     key_xyz = StubDataclassKey(id="xyz")
     exists_query = StubDataclassNestedFieldsQuery(key_field=Exists(True)).build()
-    eq_query = StubDataclassNestedFieldsQuery(key_field=Eq(key_def)).build()
+    eq_query = StubDataclassNestedFieldsQuery(key_field=key_def).build()
     in_query = StubDataclassNestedFieldsQuery(key_field=In([key_def, key_xyz])).build()
-    or_query = StubDataclassNestedFieldsQuery(key_field=Or(Eq(key_def), Eq(key_xyz))).build()
-    and_query = StubDataclassNestedFieldsQuery(key_field=And(Not(Eq(key_def)), Not(Eq(key_xyz)))).build()
+    or_query = StubDataclassNestedFieldsQuery(key_field=Or(key_def, key_xyz)).build()
+    and_query = StubDataclassNestedFieldsQuery(key_field=And(Not(key_def), Not(key_xyz))).build()
 
     # Load using record or key
     to_keys = lambda rec: [x.get_key() for x in rec]

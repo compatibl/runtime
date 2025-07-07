@@ -22,5 +22,5 @@ from stubs.cl.runtime import StubDataclassKey
 class StubDataclassQuery(QueryMixin[StubDataclassKey]):
     """Query class for StubDataclass."""
 
-    id: Condition[str] | None = None
+    id: Condition[str] | str | None = None
     """Unique identifier."""
