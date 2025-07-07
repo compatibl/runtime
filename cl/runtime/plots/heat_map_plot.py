@@ -17,6 +17,7 @@ from typing import List
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
+from cl.runtime.plots.matrix_util import MatrixUtil
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -47,8 +48,8 @@ class HeatMapPlot(MatplotlibPlot):
     y_label: str = required()
     """y-axis label."""
 
-    def _create_figure(self) -> plt.Figure:
-        # Load style object or create with default settings if not specified
+    def draw_to_axis(self, axes: plt.Axes) -> None:
+        """Render relatively to axes of some plot."""
         theme = self._get_pyplot_theme()
 
         received_df, expected_df = (
@@ -60,18 +61,30 @@ class HeatMapPlot(MatplotlibPlot):
 
         data = (received_df - expected_df).abs()
 
+        cmap = LinearSegmentedColormap.from_list("rg", ["g", "y", "r"], N=256)
+
         with plt.style.context(theme):
-            fig, axes = plt.subplots()
-
-            cmap = LinearSegmentedColormap.from_list("rg", ["g", "y", "r"], N=256)
-
-            im = MatplotlibUtil.heatmap(data.values, data.index.tolist(), data.columns.tolist(), ax=axes, cmap=cmap)
-
-            # Set figure and axes labels
+            im = MatplotlibUtil.heatmap(
+                data.values,
+                data.index.tolist(),
+                data.columns.tolist(),
+                ax=axes,
+                cmap=cmap
+            )
+            MatplotlibUtil.annotate_heatmap(
+                im,
+                labels=MatrixUtil.create_confusion_matrix_labels(data, in_percent=True),
+                text_colors="black",
+                size=6
+            )
+            plt.colorbar(im, ax=axes)
+            axes.set_title(self.title)
             axes.set_xlabel(self.x_label)
             axes.set_ylabel(self.y_label)
-            axes.set_title(self.title)
 
-            fig.tight_layout()
-
+    def _create_figure(self) -> plt.Figure:
+        """Render only this plot."""
+        fig, axes = plt.subplots()
+        self.draw_to_axis(axes)
+        fig.tight_layout()
         return fig

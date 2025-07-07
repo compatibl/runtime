@@ -22,9 +22,12 @@ from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.trial import Trial
 from cl.runtime.experiments.trial_key import TrialKey
+from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.experiments.trial_key_query import TrialKeyQuery
+from cl.runtime.plots.plot import Plot
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.views.png_view import PngView
 
 
 @dataclass(slots=True, kw_only=True)
@@ -55,7 +58,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             )
 
     @abstractmethod
-    def create_trial(self) -> Trial:
+    def create_trial(self, scenario: ExperimentScenarioKey) -> Trial:
         """
         Create and return a new trial record with actual and (if applicable) expected fields
         without checking if max_trials has already been reached.
@@ -68,9 +71,16 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         trial_keys = [x.get_key() for x in trials]  # TODO: Use project_to instead of get_key
         return trial_keys
 
-    def save_trial(self) -> None:
+    @abstractmethod
+    def get_plot(self, plot_id: str) -> Plot:
+        raise NotImplementedError
+
+    def view_plot(self) -> PngView:
+        return self.get_plot(self.experiment_id).get_view()
+
+    def save_trial(self, scenario: ExperimentScenarioKey) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
-        trial = self.create_trial()
+        trial = self.create_trial(scenario)
         DbContext.save_one(trial)
 
     def run_one(self) -> None:
@@ -78,7 +88,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         # This will raise an error if the maximum number of trials has been reached
         self._query_remaining_trials_and_check_limit()
         # Create and save one trial
-        self.save_trial()
+        for scenario in self.scenarios:
+            self.save_trial(scenario)
 
     def run_many(self, *, num_trials: int) -> None:
         """Run up to the specified number of trials, stop when max_trials is reached or exceeded."""
@@ -90,7 +101,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         if self.max_parallel is None or self.max_parallel <= 1:
             # Run sequentially
             for _ in range(num_remaining):
-                self.save_trial()
+                for scenario in self.scenarios:
+                    self.save_trial(scenario)
         else:
             # TODO: Implement parallel execution of trials
             raise RuntimeError(f"Cannot run trials in parallel for experiment {self.experiment_id}.")
@@ -100,7 +112,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
         # This will raise an error if the maximum number of trials has been reached
         if (num_remaining := self._query_remaining_trials_and_check_limit()) is None:
-            raise RuntimeError(
+            raise UserError(
                 f"Cannot invoke run_all for experiment {self.experiment_id}\n"
                 f"because max_trials is not set, use run_one or run_many instead."
             )
@@ -108,7 +120,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         if self.max_parallel is None or self.max_parallel <= 1:
             # Run sequentially
             for _ in range(num_remaining):
-                self.save_trial()
+                for scenario in self.scenarios:
+                    self.save_trial(scenario)
         else:
             # TODO: Implement parallel execution of trials
             raise RuntimeError(f"Cannot run trials in parallel for experiment {self.experiment_id}.")
@@ -165,3 +178,14 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                 f"for {TypeUtil.name(self)} with experiment_id={self.experiment_id}."
             )
         return result
+
+    def get_scenario_trials(self, all_trials: List[Trial], scenario: ExperimentScenarioKey):
+        """Get trials of the particular scenario from all trials."""
+        trials = [
+            trial for trial in all_trials if
+            trial.experiment.experiment_id == self.experiment_id and
+            trial.scenario.experiment_scenario_id == scenario.experiment_scenario_id
+        ]
+        if not trials:
+            raise RuntimeError(f"No trials for experiment {self.experiment_id}.")
+        return trials

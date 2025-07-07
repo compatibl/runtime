@@ -1,3 +1,3 @@
-experiment_type,experiment_id,max_trials,max_parallel
-StubSupervisedBinaryExperimentType1,StubSupervisedBinaryExperiment11,,
-StubSupervisedBinaryExperimentType2,StubSupervisedBinaryExperiment21,"""5""","""2"""
+experiment_type,experiment_id,scenarios,max_trials,max_parallel
+StubSupervisedBinaryExperimentType1,StubSupervisedBinaryExperiment11,"[""StubSupervisedBinaryExperimentType1;StubSupervisedBinaryExperimentScenario11A"",""StubSupervisedBinaryExperimentType1;StubSupervisedBinaryExperimentScenario11B""]",,
+StubSupervisedBinaryExperimentType2,StubSupervisedBinaryExperiment21,"[""StubSupervisedBinaryExperimentType2;StubSupervisedBinaryExperimentScenario11A"",""StubSupervisedBinaryExperimentType2;StubSupervisedBinaryExperimentScenario11B""]","""5""","""2"""

@@ -13,9 +13,13 @@
 # limitations under the License.
 
 from abc import ABC
+from collections import Counter
 from dataclasses import dataclass
 from typing import List
+from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.experiments.classifier_trial import ClassifierTrial
 from cl.runtime.experiments.experiment import Experiment
+from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
@@ -25,3 +29,42 @@ class ClassifierExperiment(Experiment, ABC):
 
     class_labels: List[str] = required()
     """List of permitted class labels."""
+
+    def get_plot(self, plot_id: str) -> StackBarPlot:
+        """Builds and returns plot for Classifier Experiment."""
+
+        if not self.scenarios:
+            raise RuntimeError("Experiment must have scenarios to build a plot.")
+
+        group_labels = []
+        bar_labels = []
+        values = []
+
+        scenario_counts = []
+        # TODO: Apply db filter.
+        all_trials = list(DbContext.current().load_all(record_type=ClassifierTrial))
+        for scenario in self.scenarios:
+            trials = self.get_scenario_trials(all_trials, scenario)
+            total = len(trials)
+            class_counts = Counter(trial.actual for trial in trials)
+            scenario_counts.append((scenario.experiment_scenario_id, class_counts, total))
+
+        for scenario_id, counts, total in scenario_counts:
+            for class_label in self.class_labels:
+                group_labels.append(scenario_id)
+                bar_labels.append(class_label)
+                values.append(counts.get(class_label, 0) / total)
+
+        result = StackBarPlot(
+            plot_id=plot_id,
+            title="Proportions by Scenario and Class",
+            value_axis_label="Proportion",
+            xtick_rotation=45,
+            xtick_ha="right",
+            value_ticks=[0.0, 0.5, 1.0]
+        )
+        result.group_labels = group_labels
+        result.bar_labels = bar_labels
+
+        result.values = values
+        return result.build()

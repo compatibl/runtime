@@ -14,9 +14,48 @@
 
 from abc import ABC
 from dataclasses import dataclass
+from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.experiments.binary_trial import BinaryTrial
 from cl.runtime.experiments.experiment import Experiment
+from cl.runtime.plots.stack_bar_plot import StackBarPlot
 
 
 @dataclass(slots=True, kw_only=True)
 class BinaryExperiment(Experiment, ABC):
     """Unsupervised binary experiment with boolean result type."""
+
+    def get_plot(self, plot_id: str) -> StackBarPlot:
+        """Builds and returns plot for Binary Experiment."""
+
+        if not self.scenarios:
+            raise RuntimeError("Experiment must have scenarios to build a plot.")
+
+        group_labels = []
+        bar_labels = []
+        values = []
+        # TODO: Apply db filter.
+        all_trials = list(DbContext.current().load_all(record_type=BinaryTrial))
+        for scenario in self.scenarios:
+
+            trials = self.get_scenario_trials(all_trials, scenario)
+            total = len(trials)
+
+            true_trials = sum(trial.actual for trial in trials)
+            false_trials = total - true_trials
+
+            group_labels.extend([scenario.experiment_scenario_id] * 2)
+            bar_labels.extend(["True", "False"])
+            values.extend([true_trials / total, false_trials / total])
+
+        result = StackBarPlot(
+            plot_id=plot_id,
+            title="True/False Ratio by Scenario",
+            value_axis_label="Ratio",
+            xtick_rotation=45,
+            xtick_ha="right",
+            value_ticks=[0.0, 0.5, 1.0]
+        )
+        result.bar_labels = bar_labels
+        result.group_labels = group_labels
+        result.values = values
+        return result.build()

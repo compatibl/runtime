@@ -30,7 +30,7 @@ def test_dark_theme(pytest_work_dir):
     plot.title = "Confusion Matrix"
     plot.expected_categories = raw_data["True Category"].values.tolist()
     plot.received_categories = raw_data["Predicted"].values.tolist()
-    plot.save_png()
+    plot.save()
 
 
 if __name__ == "__main__":

@@ -42,7 +42,7 @@ class MatrixUtil:
         # str of each non-zero element of data for annotations
 
         if in_percent:
-            data_percent = data.values / data.values.sum(axis=1) * 100
+            data_percent = data.values / data.values.sum(axis=1, keepdims=True) * 100
             annotation_text = [[f"{y:.2f}%" if y != 0 else "" for y in x] for x in data_percent]
         else:
             annotation_text = [[str(y) if y != 0 else "" for y in x] for x in data.values]

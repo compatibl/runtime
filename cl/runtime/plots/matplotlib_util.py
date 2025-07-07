@@ -120,8 +120,8 @@ class MatplotlibUtil:
         return texts
 
     @classmethod
-    def no_metadata(cls) -> Dict[str, str]:
-        """Return empty metadata for Matplotlib to prevent version changes from creating test diffs."""
+    def no_png_metadata(cls) -> Dict[str, str]:
+        """Return empty metadata for Matplotlib png format to prevent version changes from creating test diffs."""
         return {
             "Title": "",
             "Author": "",
@@ -133,4 +133,13 @@ class MatplotlibUtil:
             "Warning": "",
             "Source": "",
             "Comment": "",
+        }
+
+    @classmethod
+    def no_svg_metadata(cls) -> Dict[str, str]:
+        """Return empty metadata for Matplotlib svg format to prevent version changes from creating test diffs."""
+        return {
+            "Title": "",
+            "Description": "",
+            "Creator": ""
         }

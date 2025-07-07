@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import random
 from dataclasses import dataclass
+
+from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.supervised_classifier_experiment import SupervisedClassifierExperiment
 from cl.runtime.experiments.supervised_classifier_trial import SupervisedClassifierTrial
 
@@ -24,9 +26,12 @@ class StubSupervisedClassifierExperiment(SupervisedClassifierExperiment):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self) -> SupervisedClassifierTrial:
+    def create_trial(self, scenario: ExperimentScenarioKey) -> SupervisedClassifierTrial:
+        actual = random.choice(self.class_labels)
+        expected = random.choice(self.class_labels)
         return SupervisedClassifierTrial(
             experiment=self.get_key(),
-            actual="A",
-            expected="B",
+            actual=actual,
+            expected=expected,
+            scenario=scenario
         ).build()

@@ -39,7 +39,7 @@ class MatplotlibPlot(Plot, ABC):
     def _create_figure(self) -> plt.Figure:
         """Return Matplotlib figure object for the plot."""
 
-    def get_view(self) -> View:
+    def get_view(self) -> PngView:
         """Return a view object for the plot, implement using 'create_figure' method."""
 
         # Create figure
@@ -51,16 +51,17 @@ class MatplotlibPlot(Plot, ABC):
 
         # Save to bytes
         png_buffer = io.BytesIO()
-        fig.savefig(png_buffer, format="png", transparent=transparent, metadata=MatplotlibUtil.no_metadata())
+        fig.savefig(png_buffer, format="png", transparent=transparent, metadata=MatplotlibUtil.no_png_metadata())
 
         # Get the PNG image bytes and wrap in PngView
         png_bytes = png_buffer.getvalue()
         result = PngView(png_bytes=png_bytes)
         return result
 
-    def save_png(self) -> None:
-        """Save in png format to 'base_dir/plot_id.png', implement using 'create_figure' method."""
-
+    def save(self, format_: str = "png") -> None:
+        """Save in given format to 'base_dir/plot_id.format_', implement using 'create_figure' method."""
+        if format_ not in ("png", "svg"):
+            raise RuntimeError(f"Unsupported figure save format: {format_}.")
         # Create figure
         fig = self._create_figure()
 
@@ -71,14 +72,15 @@ class MatplotlibPlot(Plot, ABC):
 
         # Check that plot_id is set
         if self.plot_id is None or self.plot_id == "":
-            raise RuntimeError("Cannot save figure as png because 'plot_id' field is not set.")
+            raise RuntimeError("Cannot save figure because 'plot_id' field is not set.")
 
         # Transparent in dark theme
         transparent = self.is_dark_theme()
 
         # Save
-        file_path = os.path.join(base_dir, f"{self.plot_id}.png")
-        fig.savefig(file_path, transparent=transparent, metadata=MatplotlibUtil.no_metadata())
+        file_path = os.path.join(base_dir, f"{self.plot_id}.{format_}")
+        metadata = MatplotlibUtil.no_svg_metadata() if format_ == "svg" else MatplotlibUtil.no_png_metadata()
+        fig.savefig(file_path, transparent=transparent, metadata=metadata)
 
     @classmethod
     def is_dark_theme(cls) -> bool:

@@ -13,14 +13,23 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from cl.runtime.plots.bar_plot import BarPlot
 
+# Color map for confusion matrix labels stack bar plot.
+color_map = {
+    "TP": "#66bb66",
+    "TN": "#228B22",
+    "FP": "#ff6666",
+    "FN": "#b22222",
+}
+
 
 @dataclass(slots=True, kw_only=True)
-class GroupBarPlot(BarPlot):
-    """Base class for the 2D group bar plot."""
+class StackBarPlot(BarPlot):
+    """Base class for the 2D stack bar plot."""
 
     def _create_figure(self) -> plt.Figure:
 
@@ -30,23 +39,23 @@ class GroupBarPlot(BarPlot):
             .astype(float)
         )
 
-        fig, axes, x_ticks = self._prepare_common_plot_elements(data=data)
+        fig, axes, x_ticks = self._prepare_common_plot_elements(data)
 
-        num_bars = data.shape[1]
-        if num_bars % 2 != 0:
-            bar_shifts_positive = list(range(1, num_bars // 2 + 1))
-        else:
-            bar_shifts_positive = [x + 0.5 for x in range(num_bars // 2)]
+        bottom = np.zeros(len(x_ticks))
+        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
-        bar_shifts = [-x for x in reversed(bar_shifts_positive)]
-        if num_bars % 2 != 0:
-            bar_shifts += [0]
+        for i, col in enumerate(data.columns):
+            color = color_map.get(col, None)
+            if color is None:
+                if col.startswith("True"):
+                    color = "green"
+                elif col.startswith("False"):
+                    color = "red"
+                else:
+                    color = default_colors[i % len(default_colors)]
 
-        bar_shifts += bar_shifts_positive
-
-        space = 1 / (num_bars + 1)
-
-        for i, (bar_label, bar_shift) in enumerate(zip(data.columns, bar_shifts)):
-            axes.bar(x_ticks + space * bar_shift, data[bar_label].values, space, label=bar_label)
+            values = data[col].values
+            axes.bar(x_ticks, values, bottom=bottom, label=col, color=color)
+            bottom += values
         axes.legend()
         return fig

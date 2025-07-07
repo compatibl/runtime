@@ -35,5 +35,5 @@ class Plot(PlotKey, RecordMixin, ABC):
         """Return a view object for the plot."""  # TODO: Refactor and fix return type hint
 
     @abstractmethod
-    def save_png(self) -> None:
-        """Save in png format to 'base_dir/plot_id.png'."""
+    def save(self, format_: str = "png") -> None:
+        """Save in given format to 'base_dir/plot_id.format_'."""

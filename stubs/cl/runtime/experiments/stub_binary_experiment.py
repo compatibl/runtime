@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+import random
+
 from cl.runtime.experiments.binary_experiment import BinaryExperiment
 from cl.runtime.experiments.binary_trial import BinaryTrial
+from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 
 
 @dataclass(slots=True, kw_only=True)
@@ -24,5 +27,6 @@ class StubBinaryExperiment(BinaryExperiment):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self) -> BinaryTrial:
-        return BinaryTrial(experiment=self.get_key(), actual=True).build()
+    def create_trial(self, scenario: ExperimentScenarioKey) -> BinaryTrial:
+        actual = random.choice([True, False])
+        return BinaryTrial(experiment=self.get_key(), scenario=scenario, actual=actual).build()

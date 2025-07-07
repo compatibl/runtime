@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import random
 from dataclasses import dataclass
 from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
 from cl.runtime.experiments.classifier_trial import ClassifierTrial
+from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 
 
 @dataclass(slots=True, kw_only=True)
@@ -24,8 +25,10 @@ class StubClassifierExperiment(ClassifierExperiment):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self) -> ClassifierTrial:
+    def create_trial(self, scenario: ExperimentScenarioKey) -> ClassifierTrial:
+        actual = random.choice(self.class_labels)
         return ClassifierTrial(
             experiment=self.get_key(),
-            actual="A",
+            actual=actual,
+            scenario=scenario
         ).build()

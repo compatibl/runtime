@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 from dataclasses import dataclass
+
+from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.supervised_binary_experiment import SupervisedBinaryExperiment
 from cl.runtime.experiments.supervised_binary_trial import SupervisedBinaryTrial
 
@@ -24,9 +27,12 @@ class StubSupervisedBinaryExperiment(SupervisedBinaryExperiment):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self) -> SupervisedBinaryTrial:
+    def create_trial(self, scenario: ExperimentScenarioKey) -> SupervisedBinaryTrial:
+        actual = random.choice([True, False])
+        expected = random.choice([True, False])
         return SupervisedBinaryTrial(
             experiment=self.get_key(),
-            actual=True,
-            expected=True,
+            actual=actual,
+            expected=expected,
+            scenario=scenario
         ).build()
