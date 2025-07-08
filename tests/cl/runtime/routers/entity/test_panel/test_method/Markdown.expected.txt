@@ -20,7 +20,7 @@ Record:
   - 
   - '### Code Example'
   - 
-  - 'Here’s a code snippet:'
+  - 'Here is a code snippet:'
   - 
   - '```python'
   - 'def say_hello():'

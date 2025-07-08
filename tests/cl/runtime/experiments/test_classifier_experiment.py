@@ -40,6 +40,7 @@ def test_smoke(pytest_basic_mongo_mock_db):
         experiment_type=ExperimentTypeKey(experiment_type_id="TestClassifierExperiment"),
         experiment_id="test_classifier_experiment.test_smoke",
         max_trials=5,
+        class_labels=["A", "B", "C"],
         scenarios=[
             ExperimentScenario(
                 experiment_type=ExperimentTypeKey(experiment_type_id="Test"),

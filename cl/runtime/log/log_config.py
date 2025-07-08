@@ -101,7 +101,7 @@ def _make_filter_add_contextual_info(default_empty=None):
                 type_and_handler += f" - {log_context.handler}"
 
         # Type on which the handler is running
-        record.db_type = log_context.type if log_context else _default_empty
+        record.type = log_context.type if log_context else _default_empty
 
         # Name of running handler
         record.handler = log_context.handler if log_context else _default_empty

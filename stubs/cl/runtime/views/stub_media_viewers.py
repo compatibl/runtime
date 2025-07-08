@@ -56,7 +56,7 @@ class StubMediaViewers(StubViewers):
 
         # Save to buffer
         png_buffer = io.BytesIO()
-        sample_image.save(png_buffer, format="PNG")
+        sample_image.save(png_buffer, format="PNG", optimize=True, compress_level=9)
 
         # Get the PNG image bytes and wrap in PngView
         png_bytes = png_buffer.getvalue()
@@ -143,7 +143,7 @@ class StubMediaViewers(StubViewers):
                 "",
                 "### Code Example",
                 "",
-                "Here’s a code snippet:",
+                "Here is a code snippet:",
                 "",
                 "```python",
                 "def say_hello():",

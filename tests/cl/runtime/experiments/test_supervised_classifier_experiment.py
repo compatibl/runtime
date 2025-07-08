@@ -39,6 +39,7 @@ def test_smoke(pytest_basic_mongo_mock_db):
     experiment = StubSupervisedClassifierExperiment(
         experiment_type=ExperimentTypeKey(experiment_type_id="TestSupervisedClassifierExperiment"),
         experiment_id="test_supervised_classifier_experiment.test_smoke",
+        class_labels=["A", "B", "C"],
         max_trials=5,
         scenarios=[
             ExperimentScenario(
