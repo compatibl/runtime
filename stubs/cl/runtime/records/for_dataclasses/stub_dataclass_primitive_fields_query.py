@@ -15,7 +15,7 @@
 import datetime as dt
 from dataclasses import dataclass
 from uuid import UUID
-from cl.runtime.records.conditions import Condition, ConditionField
+from cl.runtime.records.conditions import Condition
 from cl.runtime.records.query_mixin import QueryMixin
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
