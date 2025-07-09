@@ -436,6 +436,17 @@ class DbContext(Context):
         )
 
     @classmethod
+    def drop_temp_db(cls) -> None:
+        """
+        IMPORTANT: DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY
+
+        Notes:
+            This method will not run unless db_id starts with the db_temp_prefix specified in settings.yaml.
+            The default prefix is 'temp_'.
+        """
+        cls._get_db().drop_temp_db()
+
+    @classmethod
     def _pre_save_check(cls, record: RecordProtocol) -> None:
         if record is None:
             # Confirm argument is not None

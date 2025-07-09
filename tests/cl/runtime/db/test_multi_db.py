@@ -222,7 +222,7 @@ def test_load_where(pytest_basic_mongo_db):  # TODO: Switch to pytest_multi_db a
     DbContext.save_many(matching_records + non_matching_records)
 
     query = StubDataclassDerivedQuery(derived_str_field="a").build()  # TODO: Check why id=None is needed
-    loaded_records = DbContext._get_db().load_where(query)
+    loaded_records = DbContext.load_where(query)
     assert len(loaded_records) == len(matching_records)  # TODO: Refactor to avoid assuming that list is returned
     assert all(x.derived_str_field == query.derived_str_field for x in loaded_records)
 

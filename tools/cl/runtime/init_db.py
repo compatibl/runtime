@@ -14,15 +14,15 @@
 
 from cl.runtime import Db
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.preload_settings import PreloadSettings
 
 
 def init_db():
     """Drop old DB, create and populate new DB."""
     with DbContext(db=Db.create()).build():
-        if (db := DbContext._get_db()) is not None:  # noqa
-            print("Dropping the existing DB (will check that it has temp DB prefix)")
-            db.drop_temp_db()
+        print(f"Dropping the existing DB (will succeed only if DB name has prefix '{DbSettings.instance().db_temp_prefix}')")
+        DbContext.drop_temp_db()
 
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
         print("Adding preloads to the new DB")
