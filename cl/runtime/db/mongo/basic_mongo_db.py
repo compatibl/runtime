@@ -26,6 +26,7 @@ from pymongo.synchronous.collection import Collection
 from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
+from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -126,17 +127,42 @@ class BasicMongoDb(Db):
 
     def load_where(
         self,
-        conditions: TRecord,
+        query: QueryMixin,
         *,
         dataset: str | None = None,
-    ) -> Sequence[TRecord]:
-        # Get table from the argument
-        table = TableUtil.get_table(conditions)
-        # Get Mongo collection using table name
+        cast_to: type | None = None,
+        # TODO: Add sort
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> Sequence[RecordMixin]:
+        # Check that query has been frozen
+        query.check_frozen()
+
+        # Get record type from the query and key type from the record
+        record_type = query.get_record_type()
+        if cast_to is None:
+            # Limit returned results to record_type if cast_to is not specified
+            cast_to = record_type
+        else:
+            # Ensure cast_to is a subclass of query_record_type
+            if not issubclass(cast_to, record_type):
+                raise RuntimeError(
+                    f"In {TypeUtil.name(self)}.load_where, cast_to={TypeUtil.name(cast_to)} which is not a subclass\n"
+                    f"of the type {TypeUtil.name(record_type)} returned by {TypeUtil.name(query)}.get_record_type().")
+
+        # Get collection using table name from the query
+        table = query.get_table()
         collection = self._get_mongo_collection(table)
 
-        subtype_names = TypeInfoCache.get_child_names(type(conditions))
-        serialized_records = collection.find({"_type": {"$in": subtype_names}})
+        # Serialize the query
+        query_dict = DataSerializers.FOR_MONGO.serialize(query)
+        # TODO: Remove table fields
+
+        # Add condition on type
+        subtype_names = TypeInfoCache.get_child_names(cast_to)
+        query_dict["_type"] = {"$in": subtype_names}
+
+        serialized_records = collection.find(query_dict)
         result = []
         for serialized_record in serialized_records:
             del serialized_record["_id"]

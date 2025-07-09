@@ -73,10 +73,13 @@ class LocalCache(Db):
 
     def load_where(
         self,
-        conditions: TRecord,
+        query: QueryMixin,
         *,
         dataset: str | None = None,
-    ) -> Sequence[TRecord]:
+        cast_to: type | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> Sequence[RecordMixin]:
         raise NotImplementedError()
 
     def save_many(

@@ -77,22 +77,22 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
     @abstractmethod
     def load_where(
         self,
-        conditions: TRecord,
+        query: QueryMixin,
         *,
         dataset: str | None = None,
-    ) -> Sequence[TRecord]:
+        cast_to: type | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> Sequence[RecordMixin]:
         """
-        Load records that match the argument type or subtype and its specified fields.
-
-        Notes:
-            - Only the records that match the argument type or subtype will be returned
-            - Specified (not None) fields of the argument are matched using the equality operand
-            - Unspecified (None) fields of the argument are ignored
-            - Leaving required fields of the argument empty will not cause an error
+        Load records that match the specified query.
 
         Args:
-            conditions: Returned records will match the argument type or subtype and its specified (not None) fields
+            query: Contains query conditions to match
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
         """
 
     @abstractmethod

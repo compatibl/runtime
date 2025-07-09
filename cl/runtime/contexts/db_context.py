@@ -139,7 +139,7 @@ class DbContext(Context):
         Args:
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            cast_to: Perform runtime checked cast to this class if specified
+            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
 
         # TODO: This is a temporary safeguard, remove after verification
@@ -177,7 +177,7 @@ class DbContext(Context):
         Args:
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            cast_to: Perform runtime checked cast to this class if specified
+            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
 
         # TODO: This is a temporary safeguard, remove after verification
@@ -196,7 +196,7 @@ class DbContext(Context):
         records_or_keys: Sequence[TRecord | TKey | None] | None,
         *,
         dataset: str | None = None,
-        cast_to: type[TRecord] = None,
+        cast_to: type[TRecord] | None = None,
     ) -> Sequence[TRecord | None] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
@@ -205,7 +205,7 @@ class DbContext(Context):
         Args:
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            cast_to: Perform runtime checked cast to this class if specified
+            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
 
         # Pass through None or an empty sequence
@@ -314,27 +314,33 @@ class DbContext(Context):
     @classmethod
     def load_where(
         cls,
-        conditions: TRecord,
+        query: QueryMixin,
         *,
         dataset: str | None = None,
-    ) -> Sequence[TRecord]:
+        cast_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> Sequence[TRecord] | None:
         """
-        Load records that match the argument type or subtype and its specified fields.
-
-        Notes:
-            - Only the records that match the argument type or subtype will be returned
-            - Specified (not None) fields of the argument are matched using the equality operand
-            - Unspecified (None) fields of the argument are ignored
-            - Leaving required fields of the argument empty will not cause an error
+        Load records that match the specified query.
 
         Args:
-            conditions: Returned records will match the argument type or subtype and its specified (not None) fields
+            query: Contains query conditions to match
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
         """
         result = cls._get_db().load_where(
-            conditions,
+            query,
             dataset=cls.get_dataset(dataset),
+            limit=limit,
+            skip=skip,
         )
+
+        # Cast to cast_to if specified
+        if cast_to is not None:
+            result = tuple(CastUtil.cast(cast_to, x) for x in result)
         return result
 
     @classmethod

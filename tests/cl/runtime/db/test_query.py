@@ -44,7 +44,7 @@ def test_str_query(pytest_multi_db):
     records = [x.build() for x in records]
     DbContext.save_many(records)
 
-    exists_query = StubDataclassPrimitiveFieldsQuery(key_str_field=Exists(True)).build()
+    exists_query = StubDataclassPrimitiveFieldsQuery(key_str_field="abc").build()
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
     or_query = StubDataclassPrimitiveFieldsQuery(key_str_field=Or("def", "xyz")).build()

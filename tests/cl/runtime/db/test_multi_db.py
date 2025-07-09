@@ -17,8 +17,9 @@ from typing import Any
 from typing import Iterable
 from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
 from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
@@ -36,6 +37,7 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased import StubDataclassAliased
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned import StubDataclassVersioned
 
 _SAMPLES = [
@@ -207,6 +209,22 @@ def test_singleton(pytest_multi_db):
     all_records = list(DbContext.load_all(other_singleton_sample.__class__))
     assert len(all_records) == 1
     assert all_records[0] == other_singleton_sample
+
+
+def test_load_where(pytest_basic_mongo_db):  # TODO: Switch to pytest_multi_db after load_where is completed for all DBs
+    """Test 'load_where' method."""
+
+    # Create test record and populate with sample data
+    counter = 0
+    matching_records = [StubDataclassDerived(id=str(counter + i), derived_str_field="a").build() for i in range(2)]
+    counter = len(matching_records)
+    non_matching_records = [StubDataclassDerived(id=str(counter + i), derived_str_field="b").build() for i in range(2)]
+    DbContext.save_many(matching_records + non_matching_records)
+
+    query = StubDataclassDerivedQuery(derived_str_field="a").build()  # TODO: Check why id=None is needed
+    loaded_records = DbContext._get_db().load_where(query)
+    assert len(loaded_records) == len(matching_records)  # TODO: Refactor to avoid assuming that list is returned
+    assert all(x.derived_str_field == query.derived_str_field for x in loaded_records)
 
 
 def test_repeated(pytest_multi_db):
