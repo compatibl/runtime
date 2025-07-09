@@ -13,22 +13,21 @@
 # limitations under the License.
 
 from abc import abstractmethod
-from typing import Generic
-from cl.runtime.records.protocols import TKey
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.type_util import TypeUtil
 
 
-class RecordMixin(Generic[TKey]):
+class RecordMixin:
     """
     Optional generic mixin for a record parameterized by its key.
-    Derive MyRecord from MyRecord(MyKey, RecordMixin[MyKey]).
+    Derive MyRecord from MyRecord(MyKey, RecordMixin).
     """
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
 
     @abstractmethod
-    def get_key(self) -> TKey:
+    def get_key(self) -> KeyMixin:
         """Return a new key object whose fields populated from self, do not return self."""
         if hasattr(self, "serialize_key"):
             serialized_key = self.serialize_key()
