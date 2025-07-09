@@ -13,22 +13,23 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.conditions import Condition
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.type_util import TypeUtil
-from stubs.cl.runtime import StubDataclassKey, StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_table import StubDataclassPolymorphicTable
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassQuery(QueryMixin[StubDataclassKey]):
-    """Query for StubDataclass."""
+class StubDataclassPolymorphicQuery(StubDataclassPolymorphicTable, QueryMixin[StubDataclassPolymorphicKey]):
+    """Query for the stub record with a polymorphic key."""
 
-    id: str | None = None
-    """Unique identifier."""
+    key_field: str | None = None
+    """Unique within this table where this record is stored."""
 
-    def get_table(self) -> str:
-        return TypeUtil.name(StubDataclassKey)
+    record_field: str | None = None
+    """Stub field of the record."""
 
     @classmethod
     def get_record_type(cls) -> type:
-        return StubDataclass
+        return StubDataclassPolymorphic
+

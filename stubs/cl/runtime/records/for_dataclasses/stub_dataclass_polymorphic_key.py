@@ -22,9 +22,6 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_table i
 class StubDataclassPolymorphicKey(StubDataclassPolymorphicTable):
     """Specifies the table where this record is stored and the key within that table."""
 
-    table_field: str = required()
-    """Determines the table where this record is stored."""
-
     key_field: str = required()
     """Unique within this table where this record is stored."""
 

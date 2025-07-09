@@ -16,13 +16,15 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_query import StubDataclassPolymorphicQuery
 
 
-def test_smoke(pytest_multi_db):
-    """Smoke test."""
+def test_load(pytest_basic_mongo_db):  # TODO: Switch to pytest_multi_db after load_where is completed for all DBs
+    """Test load methods."""
 
     table_field = "StubPolymorphicTable"
     key_field = "stub_key_field"
@@ -47,6 +49,14 @@ def test_smoke(pytest_multi_db):
     # Get record from DB using key
     loaded_record = DbContext.load_one(key, cast_to=StubDataclassPolymorphic)
     assert loaded_record == record
+
+    # Test load_where method
+    query = StubDataclassPolymorphicQuery(
+        table_field=table_field,
+        record_field=record_field,
+    ).build()
+    loaded_where = DbContext.load_where(query, cast_to=StubDataclassPolymorphic)
+    pass
 
 
 if __name__ == "__main__":

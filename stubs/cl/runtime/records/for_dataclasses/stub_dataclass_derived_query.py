@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod, ABC
-from typing import Generic
-from cl.runtime.records.protocols import TKey
-from cl.runtime.records.table_mixin import TableMixin
+from dataclasses import dataclass
+from cl.runtime.records.conditions import Condition
+from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassQuery
 
 
-class QueryMixin(Generic[TKey], TableMixin, ABC):
-    """Optional generic mixin for a query parameterized by the record type as in MyQuery(QueryMixin[MyRecord])."""
+@dataclass(slots=True, kw_only=True)
+class StubDataclassDerivedQuery(StubDataclassQuery):
+    """Query for StubDataclassDerived."""
 
-    __slots__ = ()
-    """To prevent creation of __dict__ in derived types."""
+    derived_str_field: str | None = None
+    """Stub field."""
 
     @classmethod
-    @abstractmethod
     def get_record_type(cls) -> type:
-        """Get record type matched by this query (each query class must override the implementation in its base)."""
+        return StubDataclassDerived

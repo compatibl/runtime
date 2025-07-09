@@ -105,6 +105,14 @@ class KeyProtocol(Protocol):
         """Return key type even when called from a record."""
         ...
 
+class TableProtocol(Protocol):
+    """Protocol implemented by tables, keys, and records."""
+
+    @classmethod
+    def get_key_type(cls) -> type["KeyProtocol"]:
+        """Return key type even when called from a record."""
+        ...
+
 
 class RecordProtocol(Protocol):
     """Protocol implemented by records."""
@@ -144,10 +152,13 @@ TEnum = TypeVar("TEnum", bound=Enum)
 TData = TypeVar("TData", bound=DataProtocol)
 """Generic type parameter for a class that has slots and implements the builder pattern."""
 
-TKey = TypeVar("TKey", bound=DataProtocol | KeyProtocol)
+TTable = TypeVar("TTable", bound=DataProtocol | TableProtocol)
+"""Generic type parameter for a record."""
+
+TKey = TypeVar("TKey", bound=DataProtocol | TableProtocol | KeyProtocol)
 """Generic type parameter for a key."""
 
-TRecord = TypeVar("TRecord", bound=DataProtocol | KeyProtocol | RecordProtocol)
+TRecord = TypeVar("TRecord", bound=DataProtocol | TableProtocol | KeyProtocol | RecordProtocol)
 """Generic type parameter for a record."""
 
 
@@ -228,7 +239,8 @@ def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
 
 
 def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
-    """Return True if the argument has 'get_key' method and is not a mixin.
+    """
+    Return True if the argument has 'get_key' method and is not a mixin.
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
