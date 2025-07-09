@@ -93,22 +93,9 @@ class DbContext(Context):
             self.db = DbContext.load_one(self.db)  # TODO: Revise to use DB settings
 
     @classmethod
-    def _get_db(cls) -> Db:
-        """
-        Return DB for the current DbContext inside the 'with DbContext(...)' clause.
-        Return the default DB from settings outside the outermost 'with DbContext(...)' clause.
-        """
-        if (db_context := DbContext.current_or_none()) is not None:
-            # Use the value from the current context if not None
-            return db_context.db
-        else:
-            if ProcessContext.is_testing():
-                raise RuntimeError(
-                    "To use DB in a test, specify pytest_default_db or similar pytest fixture or "
-                    "use 'with DbContext(...)' clause if not using pytest."
-                )
-            else:
-                raise RuntimeError("Attempting to access DB outside the outermost 'with DbContext(...)' clause.")
+    def get_db_id(cls) -> str:
+        """Get db_id of the database from the current context or error message if not inside 'with DbContext(...)' clause."""
+        return cls._get_db().db_id
 
     @classmethod
     def get_dataset(cls, dataset: str | None = None) -> str | None:
@@ -445,6 +432,25 @@ class DbContext(Context):
             The default prefix is 'temp_'.
         """
         cls._get_db().drop_temp_db()
+
+
+    @classmethod
+    def _get_db(cls) -> Db:
+        """
+        Return DB for the current DbContext inside the 'with DbContext(...)' clause.
+        Return the default DB from settings outside the outermost 'with DbContext(...)' clause.
+        """
+        if (db_context := DbContext.current_or_none()) is not None:
+            # Use the value from the current context if not None
+            return db_context.db
+        else:
+            if ProcessContext.is_testing():
+                raise RuntimeError(
+                    "To use DB in a test, specify pytest_default_db or similar pytest fixture or "
+                    "use 'with DbContext(...)' clause if not using pytest."
+                )
+            else:
+                raise RuntimeError("Attempting to access DB outside the outermost 'with DbContext(...)' clause.")
 
     @classmethod
     def _pre_save_check(cls, record: RecordProtocol) -> None:

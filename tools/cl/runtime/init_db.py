@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 from cl.runtime import Db
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.settings.db_settings import DbSettings
@@ -21,8 +22,15 @@ from cl.runtime.settings.preload_settings import PreloadSettings
 def init_db():
     """Drop old DB, create and populate new DB."""
     with DbContext(db=Db.create()).build():
-        print(f"Dropping the existing DB (will succeed only if DB name has prefix '{DbSettings.instance().db_temp_prefix}')")
-        DbContext.drop_temp_db()
+        # Ask for confirmation before dropping the DB
+        confirmation = input(
+            f"Are you sure you want to delete all data in the default DB '{DbContext.get_db_id()}'?\n"
+            f"This step is not reversible. Type 'yes' to confirm: "
+            )
+        if confirmation.strip().lower() == 'yes':
+            DbContext.drop_temp_db()
+        else:
+            raise RuntimeError("Default DB drop operation aborted by the user.")
 
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
         print("Adding preloads to the new DB")
