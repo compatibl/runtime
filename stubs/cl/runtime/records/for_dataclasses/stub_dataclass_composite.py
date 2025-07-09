@@ -18,7 +18,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key impor
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassComposite(StubDataclassCompositeKey, RecordMixin[StubDataclassCompositeKey]):
+class StubDataclassComposite(StubDataclassCompositeKey, RecordMixin):
     """Stub for a composite key that contains other key fields."""
 
     def get_key(self) -> StubDataclassCompositeKey:

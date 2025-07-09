@@ -33,7 +33,7 @@ from cl.runtime.settings.db_settings import DbSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class Db(DbKey, RecordMixin[DbKey], ABC):
+class Db(DbKey, RecordMixin, ABC):
     """Polymorphic data storage with dataset isolation."""
 
     def get_key(self) -> DbKey:

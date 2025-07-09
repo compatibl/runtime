@@ -19,7 +19,7 @@ from stubs.cl.runtime.views.stub_viewers_key import StubViewersKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubViewers(StubViewersKey, RecordMixin[StubViewersKey], ABC):
+class StubViewers(StubViewersKey, RecordMixin, ABC):
     """Common base to stub classes for testing viewers."""
 
     def get_key(self) -> StubViewersKey:

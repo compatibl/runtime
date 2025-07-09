@@ -25,7 +25,7 @@ from cl.runtime.templates.template_engine_key import TemplateEngineKey
 TParams = TypeVar("TParams")
 
 
-class TemplateMixin(Generic[TKey, TParams], RecordMixin[TKey], ABC):
+class TemplateMixin(Generic[TKey, TParams], RecordMixin, ABC):
     """
     Optional generic mixin for a template parameterized by its key and the parameters data type.
     Derive MyTemplate from MyTemplate(MyKey, TemplateMixin[MyKey, TParams]).

@@ -18,7 +18,7 @@ from cl.runtime.schema.module_decl_key import ModuleDeclKey
 
 
 @dataclass(slots=True, kw_only=True)
-class ModuleDecl(ModuleDeclKey, RecordMixin[ModuleDeclKey]):
+class ModuleDecl(ModuleDeclKey, RecordMixin):
     """Specifies module path in dot-delimited format."""
 
     def get_key(self) -> ModuleDeclKey:

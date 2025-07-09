@@ -21,7 +21,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class Trial(TrialKey, RecordMixin[TrialKey], ABC):
+class Trial(TrialKey, RecordMixin, ABC):
     """Abstract base class for a single trial of a statistical experiment."""
 
     scenario: ExperimentScenarioKey | None = None

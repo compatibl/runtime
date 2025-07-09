@@ -18,7 +18,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key imp
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPolymorphic(StubDataclassPolymorphicKey, RecordMixin[StubDataclassPolymorphicKey]):
+class StubDataclassPolymorphic(StubDataclassPolymorphicKey, RecordMixin):
     """Stub record with a polymorphic key."""
 
     record_field: str | None = None

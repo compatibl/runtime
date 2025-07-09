@@ -19,7 +19,7 @@ from cl.runtime.settings.labels.package_label_key import PackageLabelKey
 
 
 @dataclass(slots=True, kw_only=True)
-class PackageLabel(PackageLabelKey, RecordMixin[PackageLabelKey]):
+class PackageLabel(PackageLabelKey, RecordMixin):
     """
     Custom package label overrides the standard 'package_alias' -> 'Package Alias' transformation.
 

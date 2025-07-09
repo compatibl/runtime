@@ -18,7 +18,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubData
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclass(StubDataclassKey, RecordMixin[StubDataclassKey]):
+class StubDataclass(StubDataclassKey, RecordMixin):
     """Stub record base class."""
 
     def get_key(self) -> StubDataclassKey:

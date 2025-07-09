@@ -28,7 +28,7 @@ from cl.runtime.storage.text_file_mode import TextFileMode
 
 
 @dataclass(slots=True, kw_only=True)
-class Storage(StorageKey, LifecycleMixin, RecordMixin[StorageKey], ABC):
+class Storage(StorageKey, LifecycleMixin, RecordMixin, ABC):
     """Provides access to a filesystem or cloud blob storage service using a file-based API."""
 
     storage_mode: StorageMode = StorageMode.READ_WRITE

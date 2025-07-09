@@ -21,7 +21,7 @@ from cl.runtime.workflows.workflow_phase_key import WorkflowPhaseKey
 
 @final
 @dataclass(slots=True, kw_only=True)
-class WorkflowPhase(WorkflowPhaseKey, RecordMixin[WorkflowPhaseKey]):
+class WorkflowPhase(WorkflowPhaseKey, RecordMixin):
     """
     Determines the order of task execution within the workflow.
 

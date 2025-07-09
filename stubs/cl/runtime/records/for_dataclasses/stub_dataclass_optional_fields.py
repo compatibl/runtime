@@ -23,7 +23,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields_key
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin[StubDataclassOptionalFieldsKey]):
+class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin):
     """Stub derived class."""
 
     optional_str: str | None = "xyz"

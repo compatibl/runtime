@@ -19,7 +19,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class ExperimentType(ExperimentTypeKey, RecordMixin[ExperimentTypeKey], ABC):
+class ExperimentType(ExperimentTypeKey, RecordMixin, ABC):
     """Experiment and trial records are assigned to separate tables for each experiment type."""
 
     def get_key(self) -> ExperimentTypeKey:

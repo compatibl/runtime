@@ -19,7 +19,7 @@ from cl.runtime.records.table_key import TableKey
 
 
 @dataclass(slots=True, kw_only=True)
-class Table(TableKey, RecordMixin[TableKey]):
+class Table(TableKey, RecordMixin):
     """Specifies the table where a record is stored."""
 
     key_type: str = required()

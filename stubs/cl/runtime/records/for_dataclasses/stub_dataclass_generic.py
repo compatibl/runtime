@@ -27,7 +27,7 @@ TRecordArg2 = TypeVar("TRecordArg2", bound=StubDataclassGenericArg)
 class StubDataclassGeneric(
     Generic[TRecordArg1, TRecordArg2],
     StubDataclassBoundGenericKey,
-    RecordMixin[StubDataclassBoundGenericKey],
+    RecordMixin,
 ):
     """Stub dataclass-based generic record."""
 

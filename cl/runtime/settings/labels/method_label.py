@@ -19,7 +19,7 @@ from cl.runtime.settings.labels.method_label_key import MethodLabelKey
 
 
 @dataclass(slots=True, kw_only=True)
-class MethodLabel(MethodLabelKey, RecordMixin[MethodLabelKey]):
+class MethodLabel(MethodLabelKey, RecordMixin):
     """
     Custom method label overrides the standard 'method_name' -> 'Method Name' transformation.
 

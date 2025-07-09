@@ -19,7 +19,7 @@ from cl.runtime.settings.labels.field_label_key import FieldLabelKey
 
 
 @dataclass(slots=True, kw_only=True)
-class FieldLabel(FieldLabelKey, RecordMixin[FieldLabelKey]):
+class FieldLabel(FieldLabelKey, RecordMixin):
     """
     Custom field label overrides the standard 'field_name' -> 'Field Name' transformation.
 

@@ -19,7 +19,7 @@ from cl.runtime.settings.labels.class_label_key import ClassLabelKey
 
 
 @dataclass(slots=True, kw_only=True)
-class ClassLabel(ClassLabelKey, RecordMixin[ClassLabelKey]):
+class ClassLabel(ClassLabelKey, RecordMixin):
     """
     Custom class label overrides the standard 'ClassName' -> 'Class Label' transformation.
 

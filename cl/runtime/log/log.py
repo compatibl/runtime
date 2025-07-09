@@ -26,7 +26,7 @@ from cl.runtime.settings.log_settings import LogSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class Log(LogKey, RecordMixin[LogKey], ABC):
+class Log(LogKey, RecordMixin, ABC):
     """A target for log messages."""
 
     # TODO: Do not store here, instead get from settings once during the initial Context construction

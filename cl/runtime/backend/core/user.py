@@ -19,7 +19,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class User(UserKey, RecordMixin[UserKey]):
+class User(UserKey, RecordMixin):
     """User which is allowed to log in."""
 
     first_name: str = required()

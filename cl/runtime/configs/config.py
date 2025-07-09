@@ -20,7 +20,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class Config(ConfigKey, RecordMixin[ConfigKey], ABC):
+class Config(ConfigKey, RecordMixin, ABC):
     """Performs configuration using parameters specified in this record."""
 
     def get_key(self) -> ConfigKey:

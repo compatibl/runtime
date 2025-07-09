@@ -29,7 +29,7 @@ from cl.runtime.views.dag.successor_dag_node_key import SuccessorDagNodeKey
 
 
 @dataclass(slots=True, kw_only=True)
-class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin[SuccessorDagNodeKey]):
+class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin):
     """Single node of SuccessorDag, defines its successors."""
 
     dag: SuccessorDagKey = required()

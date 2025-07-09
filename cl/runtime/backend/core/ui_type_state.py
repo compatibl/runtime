@@ -21,7 +21,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 @final
 @dataclass(slots=True, kw_only=True)
-class UiTypeState(UiTypeStateKey, RecordMixin[UiTypeStateKey]):
+class UiTypeState(UiTypeStateKey, RecordMixin):
     """Defines ui settings for a type."""
 
     read_only: bool | None = None

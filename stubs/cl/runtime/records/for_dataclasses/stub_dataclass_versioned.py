@@ -18,7 +18,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned_key impor
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassVersioned(StubDataclassVersionedKey, RecordMixin[StubDataclassVersionedKey]):
+class StubDataclassVersioned(StubDataclassVersionedKey, RecordMixin):
     """Stub record base class."""
 
     version: int = 0

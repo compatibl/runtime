@@ -20,7 +20,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class Plot(PlotKey, RecordMixin[PlotKey], ABC):
+class Plot(PlotKey, RecordMixin, ABC):
     """Base class for plot objects."""
 
     def get_key(self) -> PlotKey:

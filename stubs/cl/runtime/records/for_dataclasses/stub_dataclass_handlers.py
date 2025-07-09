@@ -49,7 +49,7 @@ def _log_method_info():  # TODO: Move into testing directory
 
 
 @dataclass(slots=True, kw_only=True)
-class StubHandlers(StubHandlersKey, RecordMixin[StubHandlersKey]):
+class StubHandlers(StubHandlersKey, RecordMixin):
     """Stub record base class."""
 
     def get_key(self) -> StubHandlersKey:

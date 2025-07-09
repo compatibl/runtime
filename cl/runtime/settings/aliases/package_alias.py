@@ -24,7 +24,7 @@ _package_alias_dict: Dict[str, str] = {}
 
 
 @dataclass(slots=True, kw_only=True)
-class PackageAlias(PackageAliasKey, RecordMixin[PackageAliasKey]):
+class PackageAlias(PackageAliasKey, RecordMixin):
     """
     Custom package alias defined using module glob pattern.
 

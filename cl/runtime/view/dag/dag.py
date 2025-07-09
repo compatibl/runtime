@@ -25,7 +25,7 @@ from cl.runtime.view.dag.nodes.dag_node import DagNode
 
 
 @dataclass(slots=True, kw_only=True)
-class Dag(DagKey, RecordMixin[DagKey]):
+class Dag(DagKey, RecordMixin):
     """Structure and visual representation of a directed acyclic graph (DAG)."""
 
     nodes: List[DagNode] = required()

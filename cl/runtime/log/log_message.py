@@ -19,7 +19,7 @@ from cl.runtime.primitive.timestamp import Timestamp
 
 
 @dataclass(slots=True, kw_only=True)
-class LogMessage(LogMessageKey, RecordMixin[LogMessageKey]):
+class LogMessage(LogMessageKey, RecordMixin):
     """
     Refers to a record that captures specific information
     about events or actions occurring within an application.

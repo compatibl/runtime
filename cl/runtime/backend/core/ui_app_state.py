@@ -24,7 +24,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class UiAppState(UiAppStateKey, RecordMixin[UiAppStateKey]):
+class UiAppState(UiAppStateKey, RecordMixin):
     """UiAppState."""
 
     opened_tabs: List[TabInfo] | None = optional()

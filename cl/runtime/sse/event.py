@@ -20,7 +20,7 @@ from cl.runtime.sse.event_type import EventType
 
 
 @dataclass(slots=True, kw_only=True)
-class Event(EventKey, RecordMixin[EventKey]):
+class Event(EventKey, RecordMixin):
     """Base server event."""
 
     event_type: EventType = required()

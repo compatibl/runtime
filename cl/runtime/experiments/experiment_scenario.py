@@ -19,7 +19,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class ExperimentScenario(ExperimentScenarioKey, RecordMixin[ExperimentScenarioKey], ABC):
+class ExperimentScenario(ExperimentScenarioKey, RecordMixin, ABC):
     """One of multiple scenarios for an experiment."""
 
     def get_key(self) -> ExperimentScenarioKey:

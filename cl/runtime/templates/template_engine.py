@@ -21,7 +21,7 @@ from cl.runtime.templates.template_engine_key import TemplateEngineKey
 
 
 @dataclass(slots=True, kw_only=True)
-class TemplateEngine(TemplateEngineKey, RecordMixin[TemplateEngineKey], ABC):
+class TemplateEngine(TemplateEngineKey, RecordMixin, ABC):
     """Engine to perform template rendering."""
 
     def get_key(self) -> TemplateEngineKey:

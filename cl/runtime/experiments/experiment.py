@@ -27,7 +27,7 @@ from cl.runtime.records.type_util import TypeUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class Experiment(ExperimentKey, RecordMixin[ExperimentKey], ABC):
+class Experiment(ExperimentKey, RecordMixin, ABC):
     """Abstract base class for a statistical experiment."""
 
     scenarios: List[ExperimentScenarioKey] | None = None

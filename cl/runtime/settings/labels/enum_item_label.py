@@ -19,7 +19,7 @@ from cl.runtime.settings.labels.enum_item_label_key import EnumItemLabelKey
 
 
 @dataclass(slots=True, kw_only=True)
-class EnumItemLabel(EnumItemLabelKey, RecordMixin[EnumItemLabelKey]):
+class EnumItemLabel(EnumItemLabelKey, RecordMixin):
     """
     Custom enum item label overrides the standard 'ITEM_NAME' -> 'Item Name' transformation.
 

@@ -84,7 +84,7 @@ def get_name_of_type_decl_dict(dict_: Dict[str, Dict]) -> str | None:
 
 
 @dataclass(slots=True, kw_only=True)
-class TypeDecl(TypeDeclKey, RecordMixin[TypeDeclKey]):
+class TypeDecl(TypeDeclKey, RecordMixin):
     """Provides information about a class, its fields, and its methods."""
 
     label: str | None = None

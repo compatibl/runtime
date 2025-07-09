@@ -31,7 +31,7 @@ from cl.runtime.tasks.task_status import TaskStatus
 
 
 @dataclass(slots=True, kw_only=True)
-class Task(TaskKey, RecordMixin[TaskKey], ABC):
+class Task(TaskKey, RecordMixin, ABC):
     """
     The task 'run_task' method is invoked by the queue to which the task is submitted.
 
