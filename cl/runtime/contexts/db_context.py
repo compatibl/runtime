@@ -338,51 +338,6 @@ class DbContext(Context):
         return result
 
     @classmethod
-    def query(
-        cls,
-        record_type: type[TRecord],
-        query: QueryMixin[TRecord],  # TODO: Use QueryProtocol?
-        *,
-        dataset: str | None = None,
-    ) -> Sequence[TRecord]:
-        """
-        Load all records of the specified type and its subtypes that match the query
-        (excludes other types in the same DB table).
-
-        Args:
-            record_type: Type of the records to load
-            query: Query used to select the records
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-        """
-        return cls._get_db().query(  # noqa
-            record_type,
-            query,
-            dataset=cls.get_dataset(dataset),
-        )
-
-    @classmethod
-    def load_filter(
-        cls,
-        record_type: type[TRecord],
-        filter_obj: TRecord,
-        *,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord]:
-        """
-        Load records where values of those fields that are set in the filter match the filter.
-
-        Args:
-            record_type: Record type to load, error if the result is not this type or its subclass
-            filter_obj: Instance of 'record_type' whose fields are used for the query
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-        """
-        return cls._get_db().load_filter(  # noqa
-            record_type,
-            filter_obj,
-            dataset=cls.get_dataset(dataset),
-        )
-
-    @classmethod
     def save_one(
         cls,
         record: RecordProtocol,

@@ -195,24 +195,6 @@ class SqliteDb(Db):
     ) -> Sequence[TRecord]:
         raise NotImplementedError()
 
-    def query(
-        self,
-        record_type: type[TRecord],
-        query: QueryMixin[TRecord],  # TODO: Use QueryProtocol?
-        *,
-        dataset: str | None = None,
-    ) -> Sequence[TRecord]:
-        raise NotImplementedError()
-
-    def load_filter(
-        self,
-        record_type: type[TRecord],
-        filter_obj: TRecord,
-        *,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord]:
-        raise NotImplementedError()
-
     def save_many(
         self,
         records: Iterable[RecordProtocol],

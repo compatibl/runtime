@@ -96,41 +96,6 @@ class Db(DbKey, RecordMixin[DbKey], ABC):
         """
 
     @abstractmethod
-    def query(
-        self,
-        record_type: type[TRecord],
-        query: QueryMixin[TRecord],  # TODO: Use QueryProtocol?
-        *,
-        dataset: str | None = None,
-    ) -> Sequence[TRecord]:
-        """
-        Load all records of the specified type and its subtypes that match the query
-        (excludes other types in the same DB table).
-
-        Args:
-            record_type: Type of the records to load
-            query: Query used to select the records
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-        """
-
-    @abstractmethod
-    def load_filter(
-        self,
-        record_type: type[TRecord],
-        filter_obj: TRecord,
-        *,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord]:
-        """
-        Load records where values of those fields that are set in the filter match the filter.
-
-        Args:
-            record_type: Record type to load, error if the result is not this type or its subclass
-            filter_obj: Instance of 'record_type' whose fields are used for the query
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-        """
-
-    @abstractmethod
     def save_many(
         self,
         records: Iterable[RecordProtocol],

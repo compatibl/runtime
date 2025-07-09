@@ -59,37 +59,5 @@ def test_str_query(pytest_multi_db):
     assert to_key_str_field(DbContext.query(StubDataclassPrimitiveFields, and_query)) == ["abc"]
 
 
-@pytest.mark.skip("Query support implementation in progress.")
-def test_key_query(pytest_multi_db):
-    """Test query with nested fields."""
-
-    # Create test records and query and populate with sample data
-    records = [
-        StubDataclassNestedFields(key_field=StubDataclassKey(id="abc")),
-        StubDataclassNestedFields(key_field=StubDataclassKey(id="def")),
-        StubDataclassNestedFields(key_field=StubDataclassKey(id="xyz")),
-    ]
-    records = [x.build() for x in records]
-    DbContext.save_many(records)
-
-    # Create queries
-    key_abc = StubDataclassKey(id="abc")
-    key_def = StubDataclassKey(id="def")
-    key_xyz = StubDataclassKey(id="xyz")
-    exists_query = StubDataclassNestedFieldsQuery(key_field=Exists(True)).build()
-    eq_query = StubDataclassNestedFieldsQuery(key_field=key_def).build()
-    in_query = StubDataclassNestedFieldsQuery(key_field=In([key_def, key_xyz])).build()
-    or_query = StubDataclassNestedFieldsQuery(key_field=Or(key_def, key_xyz)).build()
-    and_query = StubDataclassNestedFieldsQuery(key_field=And(Not(key_def), Not(key_xyz))).build()
-
-    # Load using record or key
-    to_keys = lambda rec: [x.get_key() for x in rec]
-    assert to_keys(DbContext.query(StubDataclassNestedFields, exists_query)) == [key_abc, key_def, key_xyz]
-    assert to_keys(DbContext.query(StubDataclassNestedFields, eq_query)) == [key_def]
-    assert to_keys(DbContext.query(StubDataclassNestedFields, in_query)) == [key_def, key_xyz]
-    assert to_keys(DbContext.query(StubDataclassNestedFields, or_query)) == [key_def, key_xyz]
-    assert to_keys(DbContext.query(StubDataclassNestedFields, and_query)) == [key_abc]
-
-
 if __name__ == "__main__":
     pytest.main([__file__])

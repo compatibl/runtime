@@ -145,47 +145,6 @@ class BasicMongoDb(Db):
             result.append(record)
         return RecordUtil.sort_records_by_key(result)  # TODO: Decide on the default sorting method
 
-    def query(
-        self,
-        record_type: type[TRecord],
-        query: QueryMixin[TRecord],  # TODO: Use QueryProtocol?
-        *,
-        dataset: str | None = None,
-    ) -> Sequence[TRecord]:
-        raise NotImplementedError()
-
-    def load_filter(
-        self,
-        record_type: type[TRecord],
-        filter_obj: TRecord,
-        *,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord]:
-        # Get key type
-        if is_record(record_type):
-            key_type = record_type.get_key_type()
-        elif is_key(record_type):
-            key_type = record_type
-        else:
-            raise RuntimeError(f"Type {TypeUtil.name(record_type)} passed to load_filter is not a record or key.")
-
-        # Get collection name from key type
-        collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias
-        db = self._get_mongo_db()
-        collection = db[collection_name]
-
-        # Convert filter object to a dictionary
-        filter_dict = filter_serializer.serialize_filter(filter_obj)
-
-        serialized_records = collection.find(filter_dict)  # TODO: Filter by derived type
-        result = []
-        for serialized_record in serialized_records:
-            del serialized_record["_id"]
-            del serialized_record["_key"]
-            record = data_serializer.deserialize(serialized_record)  # TODO: Convert to comprehension for performance
-            result.append(record)
-        return result
-
     def save_many(
         self,
         records: Iterable[RecordProtocol],

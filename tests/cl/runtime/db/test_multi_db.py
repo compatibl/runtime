@@ -209,25 +209,6 @@ def test_singleton(pytest_multi_db):
     assert all_records[0] == other_singleton_sample
 
 
-def test_load_filter(pytest_multi_db):
-    """Test 'load_filter' method."""
-
-    if isinstance(pytest_multi_db, SqliteDb):
-        pytest.skip("Sqlite does not support load_filter method.")
-
-    # Create test record and populate with sample data
-    offset = 0
-    matching_records = [StubDataclassDerived(id=str(offset + i), derived_str_field="a").build() for i in range(2)]
-    offset = len(matching_records)
-    non_matching_records = [StubDataclassDerived(id=str(offset + i), derived_str_field="b").build() for i in range(2)]
-    DbContext.save_many(matching_records + non_matching_records)
-
-    filter_obj = StubDataclassDerived(id=None, derived_str_field="a").build()  # TODO: Check why id=None is needed
-    loaded_records = DbContext.load_filter(StubDataclassDerived, filter_obj)
-    assert len(loaded_records) == len(matching_records)  # TODO: Refactor to avoid assuming that list is returned
-    assert all(x.derived_str_field == filter_obj.derived_str_field for x in loaded_records)
-
-
 def test_repeated(pytest_multi_db):
     """Test including the same object twice in save many."""
     record = StubDataclass().build()
