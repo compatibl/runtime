@@ -26,7 +26,6 @@ from pymongo.synchronous.collection import Collection
 from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
-from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -148,7 +147,8 @@ class BasicMongoDb(Db):
             if not issubclass(cast_to, record_type):
                 raise RuntimeError(
                     f"In {TypeUtil.name(self)}.load_where, cast_to={TypeUtil.name(cast_to)} which is not a subclass\n"
-                    f"of the type {TypeUtil.name(record_type)} returned by {TypeUtil.name(query)}.get_record_type().")
+                    f"of the type {TypeUtil.name(record_type)} returned by {TypeUtil.name(query)}.get_record_type()."
+                )
 
         # Get collection using table name from the query
         table = query.get_table()

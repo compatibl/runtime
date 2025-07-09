@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod, ABC
-from typing import Generic
-from cl.runtime.records.protocols import TKey
+from abc import ABC
+from abc import abstractmethod
 from cl.runtime.records.table_mixin import TableMixin
 
 

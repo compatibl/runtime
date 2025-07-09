@@ -56,7 +56,6 @@ def test_load(pytest_basic_mongo_db):  # TODO: Switch to pytest_multi_db after l
         record_field=record_field,
     ).build()
     loaded_where = DbContext.load_where(query, cast_to=StubDataclassPolymorphic)
-    pass
 
 
 if __name__ == "__main__":

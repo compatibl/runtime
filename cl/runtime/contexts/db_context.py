@@ -433,7 +433,6 @@ class DbContext(Context):
         """
         cls._get_db().drop_temp_db()
 
-
     @classmethod
     def _get_db(cls) -> Db:
         """

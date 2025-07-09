@@ -23,6 +23,7 @@ from cl.runtime.records.protocols import TObj
 class Condition(Generic[TObj], BootstrapMixin, ABC):
     """Common base class of all query conditions."""
 
+
 class Eq(Generic[TObj], Condition[TObj]):
     """Matches when the argument is equal to the value, equivalent to specifying the value itself."""
 
@@ -34,6 +35,7 @@ class Eq(Generic[TObj], Condition[TObj]):
     def __init__(self, value: TObj):
         """Create from the value."""
         object.__setattr__(self, "value", value)
+
 
 class And(Generic[TObj], Condition[TObj]):
     """Matches when all of the conditions match."""
@@ -99,6 +101,7 @@ class In(Generic[TObj], Condition[TObj]):
         """Create from the sequence of values to compare to."""
         if not isinstance(values, tuple):
             object.__setattr__(self, "values", tuple(values))
+
 
 class NotIn(Generic[TObj], Condition[TObj]):
     """Matches when the argument is not equal to any of the values."""

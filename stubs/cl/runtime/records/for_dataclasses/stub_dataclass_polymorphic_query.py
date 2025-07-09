@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from cl.runtime.records.query_mixin import QueryMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_table import StubDataclassPolymorphicTable
 
 
@@ -32,4 +31,3 @@ class StubDataclassPolymorphicQuery(StubDataclassPolymorphicTable, QueryMixin):
     @classmethod
     def get_record_type(cls) -> type:
         return StubDataclassPolymorphic
-

@@ -105,6 +105,7 @@ class KeyProtocol(Protocol):
         """Return key type even when called from a record."""
         ...
 
+
 class TableProtocol(Protocol):
     """Protocol implemented by tables, keys, and records."""
 
