@@ -101,7 +101,7 @@ class KeyProtocol(Protocol):
     """Protocol implemented by both keys and records."""
 
     @classmethod
-    def get_key_type(cls) -> type["KeyProtocol"]:
+    def get_key_type(cls) -> type:
         """Return key type even when called from a record."""
         ...
 
@@ -110,7 +110,7 @@ class TableProtocol(Protocol):
     """Protocol implemented by tables, keys, and records."""
 
     @classmethod
-    def get_key_type(cls) -> type["KeyProtocol"]:
+    def get_key_type(cls) -> type:
         """Return key type even when called from a record."""
         ...
 

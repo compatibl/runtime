@@ -23,7 +23,6 @@ from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -212,7 +211,7 @@ class DbContext(Context):
         if cast_to is not None:
             # Check that the keys in the input list have the same type as cast_to.get_key_type()
             key_type = cast_to.get_key_type()
-            invalid_keys = [x for x in records_or_keys if is_key(x) and not GenericUtil.is_instance(x, key_type)]
+            invalid_keys = [x for x in records_or_keys if is_key(x) and not isinstance(x, key_type)]
             if len(invalid_keys) > 0:
                 invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
                 raise RuntimeError(

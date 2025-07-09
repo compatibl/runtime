@@ -21,7 +21,6 @@ from uuid import UUID
 from frozendict import frozendict
 from typing_extensions import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.generic_util import GenericUtil
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -228,10 +227,6 @@ class TypeHint(BootstrapMixin):
                 type_alias_args = typing.get_args(type_alias)
 
             else:
-                # Resolve if type_alias is a TypeVar
-                if isinstance(type_alias, typing.TypeVar):
-                    type_alias = GenericUtil.get_bound_type(containing_type, type_alias)
-
                 # If not optional and not a container, the remaining part of the type hint
                 # must be a genuine inner type remains without wrappers from typing.
                 # Check using isinstance(type_alias, type) which will return False for a type alias.
