@@ -22,7 +22,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_ke
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPrimitiveFieldsQuery(QueryMixin[StubDataclassPrimitiveFieldsKey]):
+class StubDataclassPrimitiveFieldsQuery(QueryMixin):
     """Stub record whose elements are primitive types."""
 
     key_str_field: Condition[str] | str | None = None

@@ -20,7 +20,7 @@ from stubs.cl.runtime import StubDataclassKey, StubDataclass
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassQuery(QueryMixin[StubDataclassKey]):
+class StubDataclassQuery(QueryMixin):
     """Query for StubDataclass."""
 
     id: str | None = None

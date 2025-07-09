@@ -18,8 +18,8 @@ from cl.runtime.records.protocols import TKey
 from cl.runtime.records.table_mixin import TableMixin
 
 
-class QueryMixin(Generic[TKey], TableMixin, ABC):
-    """Optional generic mixin for a query parameterized by the record type as in MyQuery(QueryMixin[MyRecord])."""
+class QueryMixin(TableMixin, ABC):
+    """Optional mixin for a query."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
@@ -27,4 +27,4 @@ class QueryMixin(Generic[TKey], TableMixin, ABC):
     @classmethod
     @abstractmethod
     def get_record_type(cls) -> type:
-        """Get record type matched by this query (each query class must override the implementation in its base)."""
+        """Get record type matched by this query (a derived query type must override to match a derived record type)."""

@@ -20,7 +20,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_table i
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPolymorphicQuery(StubDataclassPolymorphicTable, QueryMixin[StubDataclassPolymorphicKey]):
+class StubDataclassPolymorphicQuery(StubDataclassPolymorphicTable, QueryMixin):
     """Query for the stub record with a polymorphic key."""
 
     key_field: str | None = None
