@@ -24,80 +24,80 @@ from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 class StubDataclassPrimitiveFieldsQuery(QueryMixin):
     """Stub record whose elements are primitive types."""
 
-    key_str_field: Condition[str] | str | None = None
+    key_str_field: str | Condition[str] | None = None
     """Stub field."""
 
-    key_float_field: Condition[float] | float | None = None
+    key_float_field: float | Condition[float] | None = None
     """Stub field."""
 
-    key_bool_field: Condition[bool] | bool | None = None
+    key_bool_field: bool | Condition[bool] | None = None
     """Stub field."""
 
-    key_int_field: Condition[int] | int | None = None
+    key_int_field: int | Condition[int] | None = None
     """Stub field."""
 
-    key_long_field: Condition[int] | int | None = None
+    key_long_field: int | Condition[int] | None = None
     """The default is maximum safe signed int for JSON: 2^53 - 1."""
 
-    key_date_field: Condition[dt.date] | dt.date | None = None
+    key_date_field: dt.date | Condition[dt.date] | None = None
     """Stub field."""
 
-    key_time_field: Condition[dt.time] | dt.time | None = None
+    key_time_field: dt.time | Condition[dt.time] | None = None
     """Stub field."""
 
-    key_date_time_field: Condition[dt.datetime] | dt.datetime | None = None
+    key_date_time_field: dt.datetime | Condition[dt.datetime] | None = None
     """Stub field."""
 
-    key_uuid_field: Condition[UUID] | UUID | None = None
+    key_uuid_field: UUID | Condition[UUID] | None = None
     """Stub field."""
 
-    key_bytes_field: Condition[bytes] | bytes | None = None
+    key_bytes_field: bytes | Condition[bytes] | None = None
     """Stub field."""
 
-    key_int_enum_field: Condition[StubIntEnum] | StubIntEnum | None = None
+    key_int_enum_field: StubIntEnum | Condition[StubIntEnum] | None = None
     """Stub field."""
 
-    obj_str_field: Condition[str] | str | None = None
+    obj_str_field: str | Condition[str] | None = None
     """Stub field."""
 
-    obj_str_with_eol_field: Condition[str] | str | None = None
+    obj_str_with_eol_field: str | Condition[str] | None = None
     """Stub field."""
 
-    obj_str_with_trailing_eol_field: Condition[str] | str | None = None
+    obj_str_with_trailing_eol_field: str | Condition[str] | None = None
     """Stub field."""
 
-    obj_str_timestamp_field: Condition[str] | str | None = None
+    obj_str_timestamp_field: str | Condition[str] | None = None
     """Stub field."""
 
-    obj_float_field: Condition[float] | float | None = None
+    obj_float_field: float | Condition[float] | None = None
     """Stub field."""
 
-    obj_bool_field: Condition[bool] | bool | None = None
+    obj_bool_field: bool | Condition[bool] | None = None
     """Stub field."""
 
-    obj_int_field: Condition[int] | int | None = None
+    obj_int_field: int | Condition[int] | None = None
     """Stub field."""
 
-    obj_long_field: Condition[int] | int | None = None
+    obj_long_field: int | Condition[int] | None = None
     """The default is maximum safe signed int for JSON: 2^53 - 1."""
 
-    obj_date_field: Condition[dt.date] | dt.date | None = None
+    obj_date_field: dt.date | Condition[dt.date] | None = None
     """Stub field."""
 
-    obj_time_field: Condition[dt.time] | dt.time | None = None
+    obj_time_field: dt.time | Condition[dt.time] | None = None
     """Stub field."""
 
-    obj_date_time_field: Condition[dt.datetime] | dt.datetime | None = None
+    obj_date_time_field: dt.datetime | Condition[dt.datetime] | None = None
     """Stub field."""
 
-    obj_uuid_field: Condition[UUID] | UUID | None = None
+    obj_uuid_field: UUID | Condition[UUID] | None = None
     """Stub field."""
 
-    obj_bytes_field: Condition[bytes] | bytes | None = None
+    obj_bytes_field: bytes | Condition[bytes] | None = None
     """Stub field."""
 
-    obj_bytes_large_field: Condition[bytes] | bytes | None = None
+    obj_bytes_large_field: bytes | Condition[bytes] | None = None
     """Stub field."""
 
-    obj_int_enum_field: Condition[StubIntEnum] | StubIntEnum | None = None
+    obj_int_enum_field: StubIntEnum | Condition[StubIntEnum] | None = None
     """Stub field."""

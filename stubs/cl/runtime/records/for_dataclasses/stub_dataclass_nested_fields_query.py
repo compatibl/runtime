@@ -25,23 +25,23 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDa
 class StubDataclassNestedFieldsQuery(StubDataclassQuery):
     """Stub derived class."""
 
-    base_field: Condition[StubDataclassData] | StubDataclassData | None = None
+    base_field: StubDataclassData | Condition[StubDataclassData] | None = None
     """Stub field."""
 
-    derived_field: Condition[StubDataclassDerivedData] | StubDataclassDerivedData | None = None
+    derived_field: StubDataclassDerivedData | Condition[StubDataclassDerivedData] | None = None
     """Stub field."""
 
-    double_derived_field: Condition[StubDataclassDoubleDerivedData] | StubDataclassDoubleDerivedData | None = None
+    double_derived_field: StubDataclassDoubleDerivedData | Condition[StubDataclassDoubleDerivedData] | None = None
     """Stub field."""
 
-    polymorphic_field: Condition[StubDataclassData] | StubDataclassData | None = None
+    polymorphic_field: StubDataclassData | Condition[StubDataclassData] | None = None
     """Declared StubDataclassData but provided an instance of StubDataclassDerivedData."""
 
-    polymorphic_derived_field: Condition[StubDataclassDerivedData] | StubDataclassDerivedData | None = None
+    polymorphic_derived_field: StubDataclassDerivedData | Condition[StubDataclassDerivedData] | None = None
     """Declared StubDataclassDerivedData but provided an instance of StubDataclassDoubleDerivedData."""
 
-    key_field: Condition[StubDataclassKey] | StubDataclassKey | None = None
+    key_field: StubDataclassKey | Condition[StubDataclassKey] | None = None
     """Stub field."""
 
-    record_as_key_field: Condition[StubDataclassKey] | StubDataclassKey | None = None
+    record_as_key_field: StubDataclassKey | Condition[StubDataclassKey] | None = None
     """Stub field with key type initialized to record type instance."""
