@@ -21,7 +21,7 @@ from stubs.cl.runtime.templates.stub_template_key import StubTemplateKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubTemplate(StubTemplateKey, TemplateMixin[StubTemplateKey, StubDataclassNestedFields]):
+class StubTemplate(StubTemplateKey, TemplateMixin):
     """Interest rate swap trade template."""
 
     engine: TemplateEngineKey = required()
