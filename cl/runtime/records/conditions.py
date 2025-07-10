@@ -56,6 +56,74 @@ class Range(Generic[TObj], Condition[TObj]):
         self.op_lte = lte
 
 
+class Gt(Generic[TObj], Condition[TObj]):
+    """Matches when the argument is greater than the value."""
+
+    __slots__ = ("op_gt",)
+
+    op_gt: TObj
+    """Value to compare to."""
+
+    def __init__(self, value: TObj):
+        """Create from the value to use with the greater-than operator."""
+        if is_primitive(value):
+            self.op_gt = value
+        else:
+            raise RuntimeError(
+                f"Argument of Gt operator has type {TypeUtil.name(value)} which is not a primitive.")
+
+
+class Gte(Generic[TObj], Condition[TObj]):
+    """Matches when the argument is greater than or equal to the value."""
+
+    __slots__ = ("op_gte",)
+
+    op_gte: TObj
+    """Value to compare to."""
+
+    def __init__(self, value: TObj):
+        """Create from the value to use with the greater-than-or-equal operator."""
+        if is_primitive(value):
+            self.op_gte = value
+        else:
+            raise RuntimeError(
+                f"Argument of Gte operator has type {TypeUtil.name(value)} which is not a primitive.")
+
+
+class Lt(Generic[TObj], Condition[TObj]):
+    """Matches when the argument is less than the value."""
+
+    __slots__ = ("op_lt",)
+
+    op_lt: TObj
+    """Value to compare to."""
+
+    def __init__(self, value: TObj):
+        """Create from the value to use with the less-than operator."""
+        if is_primitive(value):
+            self.op_lt = value
+        else:
+            raise RuntimeError(
+                f"Argument of Lt operator has type {TypeUtil.name(value)} which is not a primitive.")
+
+
+class Lte(Generic[TObj], Condition[TObj]):
+    """Matches when the argument is less than or equal to the value."""
+
+    __slots__ = ("op_lte",)
+
+    op_lte: TObj
+    """Value to compare to."""
+
+    def __init__(self, value: TObj):
+        """Create from the value to use with the less-than-or-equal operator."""
+        if is_primitive(value):
+            self.op_lte = value
+        else:
+            raise RuntimeError(
+                f"Argument of Lte operator has type {TypeUtil.name(value)} which is not a primitive.")
+
+
 class And(Generic[TObj], Condition[TObj]):
     """Matches when all of the conditions match."""
 
