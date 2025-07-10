@@ -15,13 +15,11 @@ elements:
   name: Id
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: Int
   name: Version
   comment: Stub version field.
   vector: false
-  optional: false
 keys:
 - Id
 

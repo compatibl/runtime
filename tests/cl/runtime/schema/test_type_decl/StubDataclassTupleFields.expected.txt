@@ -14,25 +14,21 @@ elements:
     type_: String
   name: Id
   vector: false
-  optional: false
 - value:
     type_: String
   name: StrTuple
   comment: Stub field.
   vector: true
-  optional: false
 - value:
     type_: Double
   name: FloatTuple
   comment: Stub field.
   vector: true
-  optional: false
 - value:
     type_: Date
   name: DateTuple
   comment: Stub field.
   vector: true
-  optional: false
 - data:
     module:
       module_name: cl
@@ -40,7 +36,6 @@ elements:
   name: DataTuple
   comment: Stub field.
   vector: true
-  optional: false
 - key_:
     module:
       module_name: cl
@@ -48,7 +43,6 @@ elements:
   name: KeyTuple
   comment: Stub field.
   vector: true
-  optional: false
 - data:
     module:
       module_name: cl
@@ -56,7 +50,6 @@ elements:
   name: RecordTuple
   comment: Stub field.
   vector: true
-  optional: false
 - data:
     module:
       module_name: cl
@@ -64,7 +57,6 @@ elements:
   name: DerivedTuple
   comment: Stub field.
   vector: true
-  optional: false
 keys:
 - Id
 

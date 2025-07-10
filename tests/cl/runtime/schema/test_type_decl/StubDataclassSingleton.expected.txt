@@ -15,5 +15,4 @@ elements:
   name: StrField
   comment: Stub field.
   vector: false
-  optional: false
 

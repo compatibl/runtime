@@ -17,7 +17,6 @@ Schema:
       Name: Id
       Comment: Unique identifier.
       Vector: false
-      Optional: false
     Keys:
     - Id
   cl.StubDataclassKey:
@@ -34,7 +33,6 @@ Schema:
       Name: Id
       Comment: Unique identifier.
       Vector: false
-      Optional: false
 Data:
 - _t: StubDataclass
   Id: test_load

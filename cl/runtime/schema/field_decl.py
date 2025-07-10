@@ -61,7 +61,7 @@ class FieldDecl(DataMixin):
     container: ContainerDecl | None = None
     """Container declaration if the value is inside a container."""
 
-    optional_field: bool = False
+    optional_field: bool | None = None
     """Indicates if the entire field can be None."""
 
     additive: bool | None = None
@@ -123,9 +123,6 @@ class FieldDecl(DataMixin):
             field_type = field_args[0]
             field_origin = typing.get_origin(field_type)
             field_args = typing.get_args(field_type)
-        else:
-            # Set optional flag in result
-            result.optional_field = False
 
         # Check for one of the supported container types
         outer_container = None

@@ -15,12 +15,10 @@ elements:
   name: Id
   comment: Unique identifier.
   vector: false
-  optional: false
 - value:
     type_: Int
   name: A
   vector: false
-  optional: false
 keys:
 - Id
 

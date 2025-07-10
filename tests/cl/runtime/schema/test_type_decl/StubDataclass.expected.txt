@@ -15,7 +15,6 @@ elements:
   name: Id
   comment: Unique identifier.
   vector: false
-  optional: false
 keys:
 - Id
 
@@ -36,7 +35,6 @@ elements:
   name: Id
   comment: Unique identifier.
   vector: false
-  optional: false
 keys:
 - Id
 

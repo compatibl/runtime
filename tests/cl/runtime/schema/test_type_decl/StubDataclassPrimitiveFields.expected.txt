@@ -15,61 +15,51 @@ elements:
   name: KeyStrField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: Double
   name: KeyFloatField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: Bool
   name: KeyBoolField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: Int
   name: KeyIntField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: Int
   name: KeyLongField
   comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
   vector: false
-  optional: false
 - value:
     type_: Date
   name: KeyDateField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: Time
   name: KeyTimeField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: DateTime
   name: KeyDateTimeField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: UUID
   name: KeyUuidField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: Binary
   name: KeyBytesField
   comment: Stub field.
   vector: false
-  optional: false
 - enum:
     module:
       module_name: cl
@@ -77,7 +67,6 @@ elements:
   name: KeyIntEnumField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: String
   name: ObjStrField
@@ -119,13 +108,11 @@ elements:
   name: ObjIntField
   comment: Stub field.
   vector: false
-  optional: false
 - value:
     type_: Int
   name: ObjLongField
   comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
   vector: false
-  optional: false
 - value:
     type_: Date
   name: ObjDateField

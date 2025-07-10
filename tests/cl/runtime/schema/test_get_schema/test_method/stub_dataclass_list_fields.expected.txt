@@ -14,25 +14,21 @@ Elements:
     Type: String
   Name: Id
   Vector: false
-  Optional: false
 - Value:
     Type: String
   Name: StrList
   Comment: Stub field.
   Vector: true
-  Optional: false
 - Value:
     Type: Double
   Name: FloatList
   Comment: Stub field.
   Vector: true
-  Optional: false
 - Value:
     Type: Date
   Name: DateList
   Comment: Stub field.
   Vector: true
-  Optional: false
 - Data:
     Module:
       ModuleName: cl
@@ -40,7 +36,6 @@ Elements:
   Name: DataList
   Comment: Stub field.
   Vector: true
-  Optional: false
 - Key:
     Module:
       ModuleName: cl
@@ -48,7 +43,6 @@ Elements:
   Name: KeyList
   Comment: Stub field.
   Vector: true
-  Optional: false
 - Data:
     Module:
       ModuleName: cl
@@ -56,7 +50,6 @@ Elements:
   Name: RecordList
   Comment: Stub field.
   Vector: true
-  Optional: false
 - Data:
     Module:
       ModuleName: cl
@@ -64,7 +57,6 @@ Elements:
   Name: DerivedList
   Comment: Stub field.
   Vector: true
-  Optional: false
 Keys:
 - Id
 

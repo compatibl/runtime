@@ -14,22 +14,18 @@ elements:
     type_: String
   name: Id
   vector: false
-  optional: false
 - value:
     type_: Dict
   name: FloatListDict
   comment: Stub field.
-  optional: false
 - value:
     type_: Dict
   name: FloatOrNoneListDict
   comment: Stub field.
-  optional: false
 - value:
     type_: Dict
   name: FloatListOrNoneDict
   comment: Stub field.
-  optional: false
 - value:
     type_: Dict
   name: FloatListDictOrNone
@@ -39,17 +35,14 @@ elements:
     type_: Dict
   name: DateListDict
   comment: Stub field.
-  optional: false
 - value:
     type_: Dict
   name: RecordListDict
   comment: Stub field.
-  optional: false
 - value:
     type_: Dict
   name: DerivedListDict
   comment: Stub field.
-  optional: false
 keys:
 - Id
 

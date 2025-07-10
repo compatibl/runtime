@@ -15,7 +15,6 @@ elements:
   name: Primitive
   comment: String key element.
   vector: false
-  optional: false
 - key_:
     module:
       module_name: cl
@@ -23,7 +22,6 @@ elements:
   name: Embedded1
   comment: Embedded key 1.
   vector: false
-  optional: false
 - key_:
     module:
       module_name: cl
@@ -31,7 +29,6 @@ elements:
   name: Embedded2
   comment: Embedded key 2.
   vector: false
-  optional: false
 keys:
 - Primitive
 - Embedded1

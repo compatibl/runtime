@@ -110,7 +110,6 @@ declare:
           name: FileBytes
           comment: Embedded binary content to be displayed as the current view.
           vector: false
-          optional: false
         - enum:
             module:
               module_name: cl
@@ -284,7 +283,6 @@ declare:
           name: FileBytes
           comment: Embedded binary content to be displayed as the current view.
           vector: false
-          optional: false
         - enum:
             module:
               module_name: cl
@@ -439,7 +437,6 @@ elements:
   name: StubId
   comment: Stub identifier.
   vector: false
-  optional: false
 keys:
 - StubId
 

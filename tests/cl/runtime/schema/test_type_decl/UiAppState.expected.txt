@@ -17,7 +17,6 @@ elements:
   name: User
   comment: A user the app state is applied for.
   vector: false
-  optional: false
 - data:
     module:
       module_name: cl

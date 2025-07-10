@@ -15,7 +15,6 @@ Elements:
   Name: Id
   Comment: Unique identifier.
   Vector: false
-  Optional: false
 Keys:
 - Id
 

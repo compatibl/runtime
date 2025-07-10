@@ -14,13 +14,11 @@ elements:
     type_: String
   name: Id
   vector: false
-  optional: false
 - value:
     type_: String
   name: OtherDerived
   comment: Stub field for other derived class.
   vector: false
-  optional: false
 keys:
 - Id
 

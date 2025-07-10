@@ -15,7 +15,6 @@ Elements:
   Name: Id
   Comment: Unique identifier.
   Vector: false
-  Optional: false
 - Value:
     Type: String
   Name: OptionalStr
@@ -27,7 +26,6 @@ Elements:
   Name: RequiredListOfOptionalStr
   Comment: Required list of optional strings.
   Vector: true
-  Optional: false
   OptionalVectorElement: true
 - Value:
     Type: String
@@ -47,7 +45,6 @@ Elements:
   Name: RequiredListOfOptionalFloat
   Comment: Required list of optional floats.
   Vector: true
-  Optional: false
   OptionalVectorElement: true
 - Value:
     Type: Double
@@ -71,7 +68,6 @@ Elements:
   Name: RequiredListOfOptionalData
   Comment: Required list of optional data.
   Vector: true
-  Optional: false
   OptionalVectorElement: true
 - Data:
     Module:
@@ -97,7 +93,6 @@ Elements:
   Name: RequiredListOfOptionalKey
   Comment: Required list of optional key.
   Vector: true
-  Optional: false
   OptionalVectorElement: true
 - Key:
     Module:
@@ -123,7 +118,6 @@ Elements:
   Name: RequiredListOfOptionalRecord
   Comment: Required list of optional record.
   Vector: true
-  Optional: false
   OptionalVectorElement: true
 - Data:
     Module:

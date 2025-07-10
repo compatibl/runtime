@@ -18,7 +18,6 @@ cl.UiAppState:
     Name: User
     Comment: A user the app state is applied for.
     Vector: false
-    Optional: false
   - Data:
       Module:
         ModuleName: cl
@@ -97,19 +96,16 @@ cl.BaseTypeInfo:
     Name: Name
     Comment: Name of type.
     Vector: false
-    Optional: false
   - Value:
       Type: String
     Name: Module
     Comment: Module of type.
     Vector: false
-    Optional: false
   - Value:
       Type: String
     Name: Label
     Comment: Label of type.
     Vector: false
-    Optional: false
 cl.TabInfo:
   Module:
     ModuleName: cl
@@ -126,7 +122,6 @@ cl.TabInfo:
     Name: Type
     Comment: Type.
     Vector: false
-    Optional: false
 cl.UiAppStateKey:
   Module:
     ModuleName: cl
@@ -143,7 +138,6 @@ cl.UiAppStateKey:
     Name: User
     Comment: A user the app state is applied for.
     Vector: false
-    Optional: false
 cl.UserKey:
   Module:
     ModuleName: cl
@@ -158,5 +152,4 @@ cl.UserKey:
     Name: Username
     Comment: Unique user identifier.
     Vector: false
-    Optional: false
 

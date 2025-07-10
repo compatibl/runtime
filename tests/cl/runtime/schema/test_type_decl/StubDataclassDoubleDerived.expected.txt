@@ -14,18 +14,15 @@ elements:
     type_: String
   name: Id
   vector: false
-  optional: false
 - value:
     type_: String
   name: DerivedStrField
   vector: false
-  optional: false
 - value:
     type_: String
   name: DoubleDerivedStrField
   comment: Stub field.
   vector: false
-  optional: false
 keys:
 - Id
 

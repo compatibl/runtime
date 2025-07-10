@@ -14,7 +14,6 @@ Elements:
     Type: String
   Name: Id
   Vector: false
-  Optional: false
 - Data:
     Module:
       ModuleName: cl
@@ -22,7 +21,6 @@ Elements:
   Name: BaseField
   Comment: Stub field.
   Vector: false
-  Optional: false
 - Data:
     Module:
       ModuleName: cl
@@ -30,7 +28,6 @@ Elements:
   Name: DerivedField
   Comment: Stub field.
   Vector: false
-  Optional: false
 - Data:
     Module:
       ModuleName: cl
@@ -38,7 +35,6 @@ Elements:
   Name: DoubleDerivedField
   Comment: Stub field.
   Vector: false
-  Optional: false
 - Data:
     Module:
       ModuleName: cl
@@ -46,7 +42,6 @@ Elements:
   Name: PolymorphicField
   Comment: Declared StubDataclassData but provided an instance of StubDataclassDerivedData.
   Vector: false
-  Optional: false
 - Data:
     Module:
       ModuleName: cl
@@ -54,7 +49,6 @@ Elements:
   Name: PolymorphicDerivedField
   Comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDoubleDerivedData.
   Vector: false
-  Optional: false
 - Key:
     Module:
       ModuleName: cl
@@ -62,7 +56,6 @@ Elements:
   Name: KeyField
   Comment: Stub field.
   Vector: false
-  Optional: false
 - Key:
     Module:
       ModuleName: cl
@@ -70,7 +63,6 @@ Elements:
   Name: RecordAsKeyField
   Comment: Stub field with key type initialized to record type instance.
   Vector: false
-  Optional: false
 Keys:
 - Id
 
