@@ -36,21 +36,21 @@ from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassSingleton
 
-_SAMPLE_TYPES = [
-    StubDataclass,
-    StubDataclassNestedFields,
-    StubDataclassComposite,
-    StubDataclassDerived,
-    StubDataclassDoubleDerived,
-    StubDataclassOtherDerived,
-    StubDataclassListFields,
-    StubDataclassOptionalFields,
-    StubDataclassDictFields,
-    StubDataclassDictListFields,
-    StubDataclassListDictFields,
-    StubDataclassPrimitiveFields,
-    StubDataclassSingleton,
-    # TODO: StubDataclassTupleFields,
+_SAMPLES = [
+    StubDataclass().build(),
+    StubDataclassNestedFields().build(),
+    StubDataclassComposite().build(),
+    StubDataclassDerived().build(),
+    StubDataclassDoubleDerived().build(),
+    StubDataclassOtherDerived().build(),
+    StubDataclassListFields().build(),
+    StubDataclassOptionalFields().build(),
+    StubDataclassDictFields().build(),
+    StubDataclassDictListFields().build(),
+    StubDataclassListDictFields().build(),
+    StubDataclassPrimitiveFields().build(),
+    StubDataclassSingleton().build(),
+    # TODO: StubDataclassTupleFields().build(),
 ]
 
 
@@ -63,15 +63,14 @@ def test_bidirectional():
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
 
-    for sample_type in _SAMPLE_TYPES:
+    for sample in _SAMPLES:
 
         # Serialize to dict
-        obj = sample_type().build()
-        serialized = serializer.serialize(obj)
+        serialized = serializer.serialize(sample)
 
         # Deserialize and compare
         deserialized = serializer.deserialize(serialized)
-        assert deserialized == DataUtil.remove_none(obj)
+        assert deserialized == DataUtil.remove_none(sample)
 
         # Convert serialized data to JSON using orjson to avoid relying on the functionality being tested
         result_str = orjson.dumps(
@@ -81,7 +80,7 @@ def test_bidirectional():
         ).decode()
 
         # Write to regression guard
-        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(type(sample).__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(result_str)
 
@@ -98,11 +97,10 @@ def test_unidirectional():
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
 
-    for sample_type in _SAMPLE_TYPES:
+    for sample in _SAMPLES:
 
         # Serialize to dict
-        obj = sample_type().build()
-        serialized = serializer.serialize(obj)
+        serialized = serializer.serialize(sample)
 
         # Convert to JSON using orjson
         result_str = orjson.dumps(
@@ -112,7 +110,7 @@ def test_unidirectional():
         ).decode()
 
         # Write to regression guard
-        snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(type(sample).__name__)
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(result_str)
 
