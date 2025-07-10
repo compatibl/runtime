@@ -24,6 +24,6 @@ class QueryMixin(TableMixin, ABC):
     """To prevent creation of __dict__ in derived types."""
 
     @classmethod
-    @abstractmethod
+    # @abstractmethod  # TODO: Restore
     def get_record_type(cls) -> type:
         """Get record type matched by this query (a derived query type must override to match a derived record type)."""
