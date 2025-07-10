@@ -16,6 +16,7 @@ from enum import Enum
 from typing import Any
 from frozendict import frozendict
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.records.conditions import Condition
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -132,6 +133,7 @@ class BuildUtil:
                     (v := getattr(data, k)) is not None
                     and type(v).__name__ not in PRIMITIVE_CLASS_NAMES
                     and not isinstance(v, Enum)
+                    and not isinstance(v, Condition)
                     and not k.startswith("_")
                 )
             )
