@@ -27,18 +27,18 @@ class Condition(Generic[TObj], BootstrapMixin, ABC):
 class Range(Generic[TObj], Condition[TObj]):
     """Range with one or two bounds."""
 
-    __slots__ = ("gt_op", "gte_op", "lt_op", "lte_op",)
+    __slots__ = ("op_gt", "op_gte", "op_lt", "op_lte",)
 
-    gt_op: TObj
+    op_gt: TObj
     """Value for greater-than operator."""
 
-    gte_op: TObj
+    op_gte: TObj
     """Value for greater-than-or-equal operator."""
 
-    lt_op: TObj
+    op_lt: TObj
     """Value for less-than operator."""
 
-    lte_op: TObj
+    op_lte: TObj
     """Value for less-than-or-equal operator."""
 
     def __init__(
@@ -50,63 +50,63 @@ class Range(Generic[TObj], Condition[TObj]):
             lte: TObj | None = None,
     ):
         """Create from the individual conditions"""
-        self.gt_op = gt
-        self.gte_op = gte
-        self.lt_op = lt
-        self.lte_op = lte
+        self.op_gt = gt
+        self.op_gte = gte
+        self.op_lt = lt
+        self.op_lte = lte
 
 
 class And(Generic[TObj], Condition[TObj]):
     """Matches when all of the conditions match."""
 
-    __slots__ = ("and_op",)
+    __slots__ = ("op_and",)
 
-    and_op: Tuple[Condition[TObj] | TObj, ...]
+    op_and: Tuple[Condition[TObj] | TObj, ...]
     """The sequence of conditions or values in And operator."""
 
     def __init__(self, *args: Condition[TObj] | TObj):
         """Create from the sequence of conditions to match."""
-        self.and_op = tuple(args)
+        self.op_and = tuple(args)
 
 
 class Or(Generic[TObj], Condition[TObj]):
     """Matches when at least one of the conditions matches."""
 
-    __slots__ = ("or_op",)
+    __slots__ = ("op_or",)
 
-    or_op: Tuple[Condition[TObj] | TObj, ...]
+    op_or: Tuple[Condition[TObj] | TObj, ...]
     """The sequence of conditions or values in Or operator."""
 
     def __init__(self, *args: Condition[TObj] | TObj):
         """Create from the sequence of conditions to match."""
-        self.or_op = tuple(args)
+        self.op_or = tuple(args)
 
 
 class Not(Generic[TObj], Condition[TObj]):
     """Matches when the argument does not match and vice versa."""
 
-    __slots__ = ("not_op",)
+    __slots__ = ("op_not",)
 
-    not_op: Condition[TObj] | TObj
+    op_not: Condition[TObj] | TObj
     """Applies Not operator to the value."""
 
     def __init__(self, value: Condition | TObj):
         """Matches when the argument does not match and vice versa."""
-        self.not_op = value
+        self.op_not = value
 
 
 class Exists(Generic[TObj], Condition[TObj]):
     """Matches not None if true, matches None if false."""
 
-    __slots__ = ("exists_op",)
+    __slots__ = ("op_exists",)
 
-    exists_op: bool
+    op_exists: bool
     """Matches non-empty value if true, matches empty value if false."""
 
     def __init__(self, value: bool):
         """Matches non-empty value if true, matches empty value if false."""
         if type(value) is bool:
-            self.exists_op = value
+            self.op_exists = value
         else:
             raise RuntimeError(
                 f"Argument of Exists operator has type {TypeUtil.name(value)} which is not a bool.")
@@ -115,17 +115,17 @@ class Exists(Generic[TObj], Condition[TObj]):
 class In(Generic[TObj], Condition[TObj]):
     """Matches when the argument is equal to one of the values."""
 
-    __slots__ = ("in_op",)
+    __slots__ = ("op_in",)
 
-    in_op: Tuple[TObj, ...]
+    op_in: Tuple[TObj, ...]
     """Values to compare to."""
 
     def __init__(self, values: Sequence[TObj]):
         """Create from the sequence of values to use with the In operator."""
         if isinstance(values, tuple):
-            self.in_op = values
+            self.op_in = values
         elif is_sequence(values):
-            self.in_op = tuple(values)
+            self.op_in = tuple(values)
         else:
             raise RuntimeError(
                 f"Argument of In operator has type {TypeUtil.name(values)} which is not a sequence.")
@@ -134,17 +134,17 @@ class In(Generic[TObj], Condition[TObj]):
 class NotIn(Generic[TObj], Condition[TObj]):
     """Matches when the argument is not equal to any of the values."""
 
-    __slots__ = ("nin_op",)
+    __slots__ = ("op_nin",)
 
-    nin_op: Tuple[TObj, ...]
+    op_nin: Tuple[TObj, ...]
     """Values to compare to."""
 
     def __init__(self, values: Sequence[TObj]):
         """Create from the sequence of values to use with the NotIn operator."""
         if isinstance(values, tuple):
-            self.nin_op = values
+            self.op_nin = values
         elif is_sequence(values):
-            self.nin_op = tuple(values)
+            self.op_nin = tuple(values)
         else:
             raise RuntimeError(
                 f"Argument of NotIn operator has type {TypeUtil.name(values)} which is not a sequence.")
