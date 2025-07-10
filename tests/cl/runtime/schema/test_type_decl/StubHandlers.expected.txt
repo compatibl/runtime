@@ -28,11 +28,9 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
-      optional: false
       name: Param2
     static: true
   - name: run_class_method_2b
@@ -42,7 +40,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -56,7 +53,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -70,7 +66,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -107,7 +102,6 @@ declare:
           name: FileType
           comment: Embedded binary content type.
           optional: true
-      optional: false
       name: PdfFile
     static: true
   - name: run_instance_method_1a
@@ -122,7 +116,6 @@ declare:
     params:
     - value:
         type_: Int
-      optional: false
       name: IntParam
     static: false
   - name: run_instance_method_1a_with_primitive_params
@@ -132,39 +125,30 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: StrParam
     - value:
         type_: Double
-      optional: false
       name: FloatParam
     - value:
         type_: Bool
-      optional: false
       name: BoolParam
     - value:
         type_: Int
-      optional: false
       name: IntParam
     - value:
         type_: Date
-      optional: false
       name: DateParam
     - value:
         type_: Time
-      optional: false
       name: TimeParam
     - value:
         type_: DateTime
-      optional: false
       name: DatetimeParam
     - value:
         type_: UUID
-      optional: false
       name: UuidParam
     - value:
         type_: Binary
-      optional: false
       name: BytesParam
     static: false
   - name: run_instance_method_1b
@@ -179,7 +163,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -193,7 +176,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -207,7 +189,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -221,7 +202,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -258,11 +238,9 @@ declare:
           name: FileType
           comment: Embedded binary content type.
           optional: true
-      optional: false
       name: PdfFile
     - value:
         type_: String
-      optional: false
       name: NoteParam
     static: false
   - name: run_static_method_1a
@@ -282,7 +260,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -296,7 +273,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -310,7 +286,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -324,7 +299,6 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Param1
     - value:
         type_: String
@@ -338,11 +312,9 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Arg1
     - value:
         type_: String
-      optional: false
       name: Arg2
     - value:
         type_: String
@@ -351,7 +323,6 @@ declare:
     return_:
       value:
         type_: String
-      optional: false
     static: false
   - name: run_with_error
     label: With Error
@@ -365,16 +336,13 @@ declare:
     params:
     - value:
         type_: String
-      optional: false
       name: Arg1
     - value:
         type_: String
-      optional: false
       name: Arg2
     return_:
       value:
         type_: String
-      optional: false
     static: false
   - name: run_with_user_error
     label: With User Error

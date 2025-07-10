@@ -30,7 +30,7 @@ from cl.runtime.schema.value_decl import ValueDecl
 class HandlerVariableDecl(MemberDecl):
     """Handler parameter or return variable declaration."""
 
-    vector: bool | None = None  # TODO: Similar change to vector in element decl
+    vector: bool | None = None
     """Flag indicating variable size array (vector) container."""
 
     optional: bool | None = None
@@ -73,9 +73,6 @@ class HandlerVariableDecl(MemberDecl):
             value_type_ = type_args[0]
             type_origin = get_origin(value_type_)
             type_args = get_args(value_type_)
-        else:
-            # Indicate that field cannot be None
-            result.optional = False
 
         # Check for one of the supported container types
         if is_sequence(type_origin):
