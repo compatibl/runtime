@@ -24,6 +24,6 @@ class TableMixin(DataMixin, ABC):
     __slots__ = SlotsUtil.merge_slots(DataMixin)
     """To prevent creation of __dict__ in derived types."""
 
-    # @abstractmethod  # TODO: Restore
+    @abstractmethod
     def get_table(self) -> str:
         """Return table name for this record as a PascalCase string."""

@@ -15,6 +15,7 @@
 from abc import ABC
 from abc import abstractmethod
 from cl.runtime.records.table_mixin import TableMixin
+from cl.runtime.records.type_util import TypeUtil
 
 
 class QueryMixin(TableMixin, ABC):
@@ -24,6 +25,10 @@ class QueryMixin(TableMixin, ABC):
     """To prevent creation of __dict__ in derived types."""
 
     @classmethod
-    # @abstractmethod  # TODO: Restore
+    @abstractmethod
     def get_record_type(cls) -> type:
         """Get record type matched by this query (a derived query type must override to match a derived record type)."""
+
+    def get_table(self) -> str:
+        """Return table name for this record as a PascalCase string, return key type name by default."""
+        return TypeUtil.name(self.get_record_type().get_key_type())

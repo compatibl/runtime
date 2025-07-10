@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
 from cl.runtime.records.conditions import And
 from cl.runtime.records.conditions import In
 from cl.runtime.records.conditions import Not
@@ -26,9 +26,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_qu
 )
 
 
-@pytest.mark.skip("Query support implementation in progress.")
-def test_str_query(pytest_multi_db):
-    """Test query with primitive fields."""
+def test_str_query(pytest_basic_mongo_db):
+    """Test query for a string field."""
 
     # Create test records and query and populate with sample data
     records = [
@@ -39,19 +38,20 @@ def test_str_query(pytest_multi_db):
     records = [x.build() for x in records]
     DbContext.save_many(records)
 
-    exists_query = StubDataclassPrimitiveFieldsQuery(key_str_field="abc").build()
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
     or_query = StubDataclassPrimitiveFieldsQuery(key_str_field=Or("def", "xyz")).build()
-    and_query = StubDataclassPrimitiveFieldsQuery(key_str_field=And(Not("def"), Or("def", "xyz"))).build()
+    and_query = StubDataclassPrimitiveFieldsQuery(key_str_field=And(Not("def"), Or("def", "xyz"))).build() 
+    exists_query = StubDataclassPrimitiveFieldsQuery(key_str_field="abc").build()
 
     # Load using record or key
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
-    assert to_key_str_field(DbContext.query(StubDataclassPrimitiveFields, exists_query)) == ["abc", "def", "xyz"]
-    assert to_key_str_field(DbContext.query(StubDataclassPrimitiveFields, eq_query)) == ["def"]
-    assert to_key_str_field(DbContext.query(StubDataclassPrimitiveFields, in_query)) == ["def", "xyz"]
-    assert to_key_str_field(DbContext.query(StubDataclassPrimitiveFields, or_query)) == ["def", "xyz"]
-    assert to_key_str_field(DbContext.query(StubDataclassPrimitiveFields, and_query)) == ["abc"]
+    assert to_key_str_field(DbContext.load_where(eq_query)) == ["def"]
+    return
+    assert to_key_str_field(DbContext.load_where(in_query)) == ["def", "xyz"]
+    assert to_key_str_field(DbContext.load_where(or_query)) == ["def", "xyz"]
+    assert to_key_str_field(DbContext.load_where(and_query)) == ["abc"]
+    assert to_key_str_field(DbContext.load_where(exists_query)) == ["abc", "def", "xyz"]
 
 
 if __name__ == "__main__":

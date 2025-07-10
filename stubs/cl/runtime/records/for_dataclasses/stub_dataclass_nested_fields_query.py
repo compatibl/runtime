@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.conditions import Condition
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields import StubDataclassNestedFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
@@ -45,3 +46,7 @@ class StubDataclassNestedFieldsQuery(StubDataclassQuery):
 
     record_as_key_field: StubDataclassKey | Condition[StubDataclassKey] | None = None
     """Stub field with key type initialized to record type instance."""
+
+    @classmethod
+    def get_record_type(cls) -> type:
+        return StubDataclassNestedFields

@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from uuid import UUID
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.query_mixin import QueryMixin
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 
 
@@ -101,3 +102,7 @@ class StubDataclassPrimitiveFieldsQuery(QueryMixin):
 
     obj_int_enum_field: StubIntEnum | Condition[StubIntEnum] | None = None
     """Stub field."""
+
+    @classmethod
+    def get_record_type(cls) -> type:
+        return StubDataclassPrimitiveFields
