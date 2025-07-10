@@ -86,3 +86,20 @@ class BootstrapSerializers:
         pascalize_keys=True,
     ).build()
     """Default bidirectional data serializer settings for UI."""
+
+    FOR_MONGO_QUERY = BootstrapSerializer(
+        none_format=NoneFormat.PASSTHROUGH,
+        string_format=StringFormat.PASSTHROUGH,
+        float_format=FloatFormat.PASSTHROUGH,
+        bool_format=BoolFormat.PASSTHROUGH,
+        int_format=IntFormat.PASSTHROUGH,
+        long_format=LongFormat.PASSTHROUGH,
+        date_format=DateFormat.PASSTHROUGH,
+        time_format=TimeFormat.PASSTHROUGH,
+        datetime_format=DatetimeFormat.PASSTHROUGH,
+        uuid_format=UuidFormat.PASSTHROUGH,
+        timestamp_format=TimestampFormat.PASSTHROUGH,
+        bytes_format=BytesFormat.PASSTHROUGH,
+        enum_format=EnumFormat.DEFAULT,
+    ).build()
+    """Default bidirectional data serializer settings for MongoDB query."""
