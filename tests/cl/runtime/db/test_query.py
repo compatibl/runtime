@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
-from cl.runtime.records.conditions import And
+from cl.runtime.records.conditions import And, Exists, NotIn
 from cl.runtime.records.conditions import In
 from cl.runtime.records.conditions import Not
 from cl.runtime.records.conditions import Or
@@ -31,7 +31,7 @@ def test_str_query(pytest_basic_mongo_db):
 
     # Create test records and query and populate with sample data
     records = [
-        StubDataclassPrimitiveFields(key_str_field="abc"),
+        StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),
         StubDataclassPrimitiveFields(key_str_field="def"),
         StubDataclassPrimitiveFields(key_str_field="xyz"),
     ]
@@ -40,18 +40,21 @@ def test_str_query(pytest_basic_mongo_db):
 
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
+    not_in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=NotIn(["def", "xyz"])).build()
     or_query = StubDataclassPrimitiveFieldsQuery(key_str_field=Or("def", "xyz")).build()
     and_query = StubDataclassPrimitiveFieldsQuery(key_str_field=And(Not("def"), Or("def", "xyz"))).build() 
-    exists_query = StubDataclassPrimitiveFieldsQuery(key_str_field="abc").build()
+    exists_query = StubDataclassPrimitiveFieldsQuery(obj_str_field=Exists(True)).build()
+    does_not_exist_query = StubDataclassPrimitiveFieldsQuery(obj_str_field=Exists(False)).build()
 
     # Load using record or key
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
     assert to_key_str_field(DbContext.load_where(eq_query)) == ["def"]
-    return
     assert to_key_str_field(DbContext.load_where(in_query)) == ["def", "xyz"]
-    assert to_key_str_field(DbContext.load_where(or_query)) == ["def", "xyz"]
-    assert to_key_str_field(DbContext.load_where(and_query)) == ["abc"]
-    assert to_key_str_field(DbContext.load_where(exists_query)) == ["abc", "def", "xyz"]
+    assert to_key_str_field(DbContext.load_where(not_in_query)) == ["abc"]
+    # assert to_key_str_field(DbContext.load_where(or_query)) == ["def", "xyz"]
+    # assert to_key_str_field(DbContext.load_where(and_query)) == ["abc"]
+    assert to_key_str_field(DbContext.load_where(exists_query)) == ["def", "xyz"]
+    assert to_key_str_field(DbContext.load_where(does_not_exist_query)) == ["abc"]
 
 
 if __name__ == "__main__":

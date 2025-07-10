@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Iterable
 from typing import Sequence
+from typing import Any
 from memoization import cached
 from mongomock import MongoClient as MongoClientMock
 from pymongo import MongoClient
@@ -40,6 +41,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 
 invalid_db_name_symbols = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -155,8 +157,11 @@ class BasicMongoDb(Db):
         collection = self._get_mongo_collection(table)
 
         # Serialize the query
-        query_dict = DataSerializers.FOR_MONGO.serialize(query)
+        query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
         # TODO: Remove table fields
+
+        # Convert op_* fields to MongoDB $* syntax
+        query_dict = self._convert_op_fields_to_mongo_syntax(query_dict)
 
         # Add condition on type
         subtype_names = TypeInfoCache.get_child_names(cast_to)
@@ -246,6 +251,29 @@ class BasicMongoDb(Db):
             client.close()
             # Remove client from dictionary so connection can be reopened on next access
             del _client_dict[self.client_uri]
+
+    def _convert_op_fields_to_mongo_syntax(self, query_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert op_* fields to MongoDB $* syntax recursively."""
+        if not isinstance(query_dict, dict):
+            return query_dict
+        
+        result = {}
+        for key, value in query_dict.items():
+            if key.startswith("op_"):
+                # Convert op_* to $* syntax
+                mongo_key = "$" + key[3:]  # Remove "op_" prefix
+                result[mongo_key] = value
+            elif isinstance(value, dict):
+                # Recursively convert nested dictionaries
+                result[key] = self._convert_op_fields_to_mongo_syntax(value)
+            elif isinstance(value, list):
+                # Recursively convert list items
+                result[key] = [self._convert_op_fields_to_mongo_syntax(item) if isinstance(item, dict) else item for item in value]
+            else:
+                # Keep other values as-is
+                result[key] = value
+        
+        return result
 
     def _get_mongo_collection(self, table: str) -> Collection:
         """Get PyMongo collection for the specified table."""
