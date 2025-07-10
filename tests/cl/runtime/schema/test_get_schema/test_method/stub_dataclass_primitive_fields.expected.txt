@@ -83,37 +83,37 @@ Elements:
   Name: ObjStrField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: String
   Name: ObjStrWithEolField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: String
   Name: ObjStrWithTrailingEolField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: String
   Name: ObjStrTimestampField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: Double
   Name: ObjFloatField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: Bool
   Name: ObjBoolField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: Int
   Name: ObjIntField
@@ -131,37 +131,37 @@ Elements:
   Name: ObjDateField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: Time
   Name: ObjTimeField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: DateTime
   Name: ObjDateTimeField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: UUID
   Name: ObjUuidField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: Binary
   Name: ObjBytesField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Value:
     Type: Binary
   Name: ObjBytesLargeField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 - Enum:
     Module:
       ModuleName: cl
@@ -169,7 +169,7 @@ Elements:
   Name: ObjIntEnumField
   Comment: Stub field.
   Vector: false
-  Optional: false
+  Optional: true
 Keys:
 - KeyStrField
 - KeyFloatField

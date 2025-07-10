@@ -37,21 +37,27 @@ fields:
 - field_name: obj_str_field
   type_hint:
     schema_type_name: str
+    optional: true
 - field_name: obj_str_with_eol_field
   type_hint:
     schema_type_name: str
+    optional: true
 - field_name: obj_str_with_trailing_eol_field
   type_hint:
     schema_type_name: str
+    optional: true
 - field_name: obj_str_timestamp_field
   type_hint:
     schema_type_name: str
+    optional: true
 - field_name: obj_float_field
   type_hint:
     schema_type_name: float
+    optional: true
 - field_name: obj_bool_field
   type_hint:
     schema_type_name: bool
+    optional: true
 - field_name: obj_int_field
   type_hint:
     schema_type_name: int
@@ -61,22 +67,29 @@ fields:
 - field_name: obj_date_field
   type_hint:
     schema_type_name: date
+    optional: true
 - field_name: obj_time_field
   type_hint:
     schema_type_name: time
+    optional: true
 - field_name: obj_date_time_field
   type_hint:
     schema_type_name: datetime
+    optional: true
 - field_name: obj_uuid_field
   type_hint:
     schema_type_name: UUID
+    optional: true
 - field_name: obj_bytes_field
   type_hint:
     schema_type_name: bytes
+    optional: true
 - field_name: obj_bytes_large_field
   type_hint:
     schema_type_name: bytes
+    optional: true
 - field_name: obj_int_enum_field
   type_hint:
     schema_type_name: StubIntEnum
+    optional: true
 
