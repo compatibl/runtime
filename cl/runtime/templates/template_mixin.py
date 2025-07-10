@@ -14,22 +14,16 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing import Generic
-from typing import TypeVar
+from cl.convince.readers.entry_mixin import EntryMixin
 from cl.runtime import RecordMixin
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.protocols import TKey
 from cl.runtime.templates.template_engine import TemplateEngine
 from cl.runtime.templates.template_engine_key import TemplateEngineKey
 
-TParams = TypeVar("TParams")
 
-
-class TemplateMixin(Generic[TKey, TParams], RecordMixin, ABC):
-    """
-    Optional generic mixin for a template parameterized by its key and the parameters data type.
-    Derive MyTemplate from MyTemplate(MyKey, TemplateMixin[MyKey, TParams]).
-    """
+class TemplateMixin(RecordMixin, ABC):
+    """Mixin for a template parameterized by its key and the parameters data type."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
@@ -44,7 +38,7 @@ class TemplateMixin(Generic[TKey, TParams], RecordMixin, ABC):
     def engine(self) -> TemplateEngineKey:
         """Template engine used to render the template."""
 
-    def render(self, data: TParams) -> str:
+    def render(self, data: EntryMixin) -> str:
         """Render the template by substituting parameters from the specified data object."""
         engine = DbContext.load_one(self.engine, cast_to=TemplateEngine)
         result = engine.render(self.body, data)
