@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
@@ -80,6 +81,7 @@ def test_experiment_plot(pytest_basic_mongo_mock_db, pytest_work_dir):
         ],
         max_trials=5,
     )
+    random.seed(0)
     experiment.run_all()
 
     experiment.get_plot("test_supervised_binary_experiment.supervised_binary_experiment_plot").save(format_="svg")

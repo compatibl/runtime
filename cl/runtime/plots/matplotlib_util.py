@@ -141,5 +141,6 @@ class MatplotlibUtil:
         return {
             "Title": "",
             "Description": "",
-            "Creator": ""
+            "Creator": "",
+            "Date": "",
         }

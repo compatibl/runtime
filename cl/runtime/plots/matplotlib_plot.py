@@ -80,6 +80,7 @@ class MatplotlibPlot(Plot, ABC):
         # Save
         file_path = os.path.join(base_dir, f"{self.plot_id}.{format_}")
         metadata = MatplotlibUtil.no_svg_metadata() if format_ == "svg" else MatplotlibUtil.no_png_metadata()
+        matplotlib.rcParams['svg.hashsalt'] = ''  # prevent random hash on svg generation
         fig.savefig(
             file_path,
             transparent=transparent,
