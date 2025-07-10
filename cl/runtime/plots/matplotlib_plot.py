@@ -80,7 +80,15 @@ class MatplotlibPlot(Plot, ABC):
         # Save
         file_path = os.path.join(base_dir, f"{self.plot_id}.{format_}")
         metadata = MatplotlibUtil.no_svg_metadata() if format_ == "svg" else MatplotlibUtil.no_png_metadata()
-        fig.savefig(file_path, transparent=transparent, metadata=metadata)
+        fig.savefig(
+            file_path,
+            transparent=transparent,
+            metadata=metadata,
+            dpi=100,
+            format=format_,
+            bbox_inches="tight",
+            pad_inches=0.1,
+        )
 
     @classmethod
     def is_dark_theme(cls) -> bool:
