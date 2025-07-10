@@ -83,13 +83,13 @@ class FieldSpec(BootstrapMixin):
             raise RuntimeError(f"Specifying 'field_formatter' in schema is not yet supported.")
 
         # Validate optional flag if provided
-        if field_optional is not None and field_optional != type_hint.optional:
-            if field_optional is True:
+        if field_optional is not None and field_optional != bool(type_hint.optional):
+            if field_optional:
                 raise RuntimeError(
                     f"Field {TypeUtil.name(containing_type)}.{field_name} uses '= optional()'\n"
                     f"but type hint is not a union with None: {type_hint.to_str()}"
                 )
-            if field_optional is False:
+            if not field_optional:
                 raise RuntimeError(
                     f"Field {TypeUtil.name(containing_type)}.{field_name} uses '= required()'\n"
                     f"but type hint is a union with None: {type_hint.to_str()}"

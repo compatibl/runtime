@@ -38,8 +38,11 @@ class TypeHint(BootstrapMixin):
     _schema_class: type
     """Class if available, if not provided it will be looked up using the type name."""
 
-    optional: bool
-    """Optional flag, True if the type hint is a union with None, None otherwise."""
+    optional: bool | None = None
+    """True if the type hint is a union with None, None otherwise."""
+
+    condition: bool | None = None
+    """True if the type hint includes T | Condition[T], None otherwise."""
 
     remaining: Self | None = None
     """Remaining chain if present, None otherwise."""
@@ -50,16 +53,19 @@ class TypeHint(BootstrapMixin):
 
     def to_str(self):
         """Serialize as string in type alias format."""
-        if self.remaining is not None:
-            if self.optional:
-                return f"{self.schema_type_name}[{self.remaining.to_str()}] | None"
-            else:
-                return f"{self.schema_type_name}[{self.remaining.to_str()}]"
+        base = (
+            f"{self.schema_type_name}[{self.remaining.to_str()}]"
+            if self.remaining is not None
+            else f"{self.schema_type_name}"
+        )
+        if self.condition and self.optional:
+            return f"{base} | Condition[{base}] | None"
+        elif self.condition:
+            return f"{base} | Condition[{base}]"
+        elif self.optional:
+            return f"{base} | None"
         else:
-            if self.optional:
-                return f"{self.schema_type_name} | None"
-            else:
-                return f"{self.schema_type_name}"
+            return base
 
     def validate_for_primitive(self) -> None:
         """Raise an error if the type hint is not a primitive type."""
@@ -94,7 +100,8 @@ class TypeHint(BootstrapMixin):
         cls,
         class_: type,
         *,
-        optional: bool = False,
+        optional: bool = None,
+        condition: bool = None,
         schema_type_name: str | None = None,
     ) -> Self:
         """Create type hint for a class with optional parameters."""
@@ -115,6 +122,7 @@ class TypeHint(BootstrapMixin):
             schema_type_name=schema_type_name,
             _schema_class=class_,
             optional=optional,
+            condition=condition,
         )
 
     @classmethod
@@ -147,72 +155,106 @@ class TypeHint(BootstrapMixin):
         union_types = [types.UnionType, typing.Union]
         supported_containers = [list, tuple, dict, frozendict]
         while True:
-            # There are two possible forms of origin for optional, typing.Union and types.UnionType
-            if type_alias_optional := type_alias_origin in union_types:
-                # Union with None is the only permitted Union type
-                if len(type_alias_args) != 2 or type_alias_args[1] is not type(None):
+            # Handle unions that introduce optionality and/or Condition
+            type_alias_optional = None
+            type_alias_condition = None
+
+            if type_alias_origin in union_types:
+                args = list(type_alias_args)
+
+                # Detect and strip None (optional)
+                if type(None) in args:
+                    type_alias_optional = True
+                    args.remove(type(None))
+
+                # Detect and strip Condition[T]
+                condition_arg = next(
+                    (
+                        a
+                        for a in args
+                        if typing.get_origin(a) is not None and typing.get_origin(a).__name__ == "Condition"
+                    ),
+                    None,
+                )
+                if condition_arg is not None:
+                    type_alias_condition = True
+                    args.remove(condition_arg)
+                    cond_inner, = typing.get_args(condition_arg)
+                else:
+                    cond_inner = None
+
+                # After removing None and Condition, there must be exactly one base type
+                if len(args) != 1:
                     raise RuntimeError(
                         f"Union type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                        f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
-                        f"because it is not an optional value using the syntax 'Type | None'\n"
+                        f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported.\n"
+                        f"Expected forms: 'T', 'T | None', 'T | Condition[T]', or 'T | Condition[T] | None'.\n"
                     )
 
-                # Get type information without None
-                type_alias = type_alias_args[0]
-                type_alias_origin = typing.get_origin(type_alias)
-                type_alias_args = typing.get_args(type_alias)  # TODO: Add a check
+                base_type = args[0]
 
-            if is_container := type_alias_origin in supported_containers:
-                # Parse container definition and add container types
+                # If Condition is present, its inner type must match the base
+                if type_alias_condition and cond_inner is not base_type:
+                    raise RuntimeError(
+                        f"Condition parameter does not match base type in union "
+                        f"'{cls._serialize_type_alias(type_alias)}'."
+                    )
+
+                # Proceed with unwrapped base type
+                type_alias = base_type
+                type_alias_origin = typing.get_origin(type_alias)
+                type_alias_args = typing.get_args(type_alias)
+
+            # Parse container definitions and primitive/enum types
+            is_container = type_alias_origin in supported_containers
+            if is_container:
                 if type_alias_origin is list:
-                    # Perform additional checks for list
                     if len(type_alias_args) != 1:
                         raise RuntimeError(
                             f"List type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
                             f"because it is not a list of elements using the syntax 'List[type]'\n"
                         )
-                    # Populate container data and extract the inner type alias
+                    # Populate container data and extract inner type alias
                     type_alias = type_alias_args[0]
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name="list",
                             _schema_class=list,
                             optional=type_alias_optional,
+                            condition=type_alias_condition,
                         )
                     )
                 elif type_alias_origin is tuple:
-                    # Perform additional checks for tuple
                     if len(type_alias_args) != 2 or type_alias_args[1] is not Ellipsis:
                         raise RuntimeError(
                             f"Tuple type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
                             f"because it is not a variable-length tuple using the syntax 'Tuple[type, ...]'\n"
                         )
-                    # Populate container data and extract the inner type alias
                     type_alias = type_alias_args[0]
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name="tuple",
                             _schema_class=tuple,
                             optional=type_alias_optional,
+                            condition=type_alias_condition,
                         )
                     )
                 elif type_alias_origin is dict:
-                    # Perform additional checks for dict
                     if len(type_alias_args) != 2 or type_alias_args[0] is not str:
                         raise RuntimeError(
                             f"Dict type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
                             f"because it is not a dictionary with string keys using the syntax 'Dict[str, type]'\n"
                         )
-                    # Populate container data and extract the inner type alias
                     type_alias = type_alias_args[1]
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name="dict",
                             _schema_class=dict,
                             optional=type_alias_optional,
+                            condition=type_alias_condition,
                         )
                     )
                 else:
@@ -222,27 +264,21 @@ class TypeHint(BootstrapMixin):
                         f"{supported_container_names}."
                     )
 
-                # Strip container information from the type alias to get the type of value inside the container
+                # Strip container wrapper
                 type_alias_origin = typing.get_origin(type_alias)
                 type_alias_args = typing.get_args(type_alias)
-
             else:
-                # If not optional and not a container, the remaining part of the type hint
-                # must be a genuine inner type remains without wrappers from typing.
-                # Check using isinstance(type_alias, type) which will return False for a type alias.
+                # Not a container: must be a genuine type (not TypeAlias)
                 if isinstance(type_alias, type):
                     if type_alias_origin is None and not type_alias_args:
-
-                        # Add the ultimate inner type inside nested containers to the last type chain item
                         schema_type_name = TypeUtil.name(type_alias)
-
-                        # Apply field subtype from metadata if specified
                         if field_subtype is None or field_subtype == schema_type_name:
                             type_hint_tokens.append(
                                 TypeHint(
                                     schema_type_name=schema_type_name,
                                     _schema_class=type_alias,
                                     optional=type_alias_optional,
+                                    condition=type_alias_condition,
                                 )
                             )
                         elif field_subtype == "long":
@@ -252,6 +288,7 @@ class TypeHint(BootstrapMixin):
                                         schema_type_name="long",
                                         _schema_class=int,
                                         optional=type_alias_optional,
+                                        condition=type_alias_condition,
                                     )
                                 )
                             else:
@@ -263,6 +300,7 @@ class TypeHint(BootstrapMixin):
                                         schema_type_name="timestamp",
                                         _schema_class=UUID,
                                         optional=type_alias_optional,
+                                        condition=type_alias_condition,
                                     )
                                 )
                             else:
@@ -308,6 +346,7 @@ class TypeHint(BootstrapMixin):
                 schema_type_name=head.schema_type_name,
                 _schema_class=head._schema_class,
                 optional=head.optional,
+                condition=head.condition,
                 remaining=cls._link_type_hint_tokens(tail),
             )
         else:

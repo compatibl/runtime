@@ -1,0 +1,9 @@
+type_name: StubDataclassQuery
+type_kind: Data
+fields:
+- field_name: id
+  type_hint:
+    schema_type_name: str
+    optional: true
+    condition: true
+
