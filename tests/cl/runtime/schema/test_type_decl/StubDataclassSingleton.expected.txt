@@ -14,5 +14,4 @@ elements:
     type_: String
   name: StrField
   comment: Stub field.
-  vector: false
 

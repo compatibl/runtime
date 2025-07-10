@@ -13,7 +13,6 @@ Elements:
 - Value:
     Type: String
   Name: Id
-  Vector: false
 - Value:
     Type: String
   Name: StrList

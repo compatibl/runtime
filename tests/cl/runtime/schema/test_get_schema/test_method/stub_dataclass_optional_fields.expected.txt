@@ -14,12 +14,10 @@ Elements:
     Type: String
   Name: Id
   Comment: Unique identifier.
-  Vector: false
 - Value:
     Type: String
   Name: OptionalStr
   Comment: Optional string.
-  Vector: false
   Optional: true
 - Value:
     Type: String
@@ -38,7 +36,6 @@ Elements:
     Type: Double
   Name: OptionalFloat
   Comment: Optional float.
-  Vector: false
   Optional: true
 - Value:
     Type: Double
@@ -59,7 +56,6 @@ Elements:
     Name: StubDataclassData
   Name: OptionalData
   Comment: Optional data.
-  Vector: false
   Optional: true
 - Data:
     Module:
@@ -84,7 +80,6 @@ Elements:
     Name: StubDataclassKey
   Name: OptionalKey
   Comment: Optional key.
-  Vector: false
   Optional: true
 - Key:
     Module:
@@ -109,7 +104,6 @@ Elements:
     Name: StubDataclass
   Name: OptionalRecord
   Comment: Optional record.
-  Vector: false
   Optional: true
 - Data:
     Module:

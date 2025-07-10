@@ -14,21 +14,18 @@ Elements:
     Type: String
   Name: Primitive
   Comment: String key element.
-  Vector: false
 - Key:
     Module:
       ModuleName: cl
     Name: StubDataclassKey
   Name: Embedded1
   Comment: Embedded key 1.
-  Vector: false
 - Key:
     Module:
       ModuleName: cl
     Name: StubDataclassKey
   Name: Embedded2
   Comment: Embedded key 2.
-  Vector: false
 Keys:
 - Primitive
 - Embedded1

@@ -13,56 +13,48 @@ Elements:
 - Value:
     Type: String
   Name: Id
-  Vector: false
 - Data:
     Module:
       ModuleName: cl
     Name: StubDataclassData
   Name: BaseField
   Comment: Stub field.
-  Vector: false
 - Data:
     Module:
       ModuleName: cl
     Name: StubDataclassDerivedData
   Name: DerivedField
   Comment: Stub field.
-  Vector: false
 - Data:
     Module:
       ModuleName: cl
     Name: StubDataclassDoubleDerivedData
   Name: DoubleDerivedField
   Comment: Stub field.
-  Vector: false
 - Data:
     Module:
       ModuleName: cl
     Name: StubDataclassData
   Name: PolymorphicField
   Comment: Declared StubDataclassData but provided an instance of StubDataclassDerivedData.
-  Vector: false
 - Data:
     Module:
       ModuleName: cl
     Name: StubDataclassDerivedData
   Name: PolymorphicDerivedField
   Comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDoubleDerivedData.
-  Vector: false
 - Key:
     Module:
       ModuleName: cl
     Name: StubDataclassKey
   Name: KeyField
   Comment: Stub field.
-  Vector: false
 - Key:
     Module:
       ModuleName: cl
     Name: StubDataclassKey
   Name: RecordAsKeyField
   Comment: Stub field with key type initialized to record type instance.
-  Vector: false
 Keys:
 - Id
 

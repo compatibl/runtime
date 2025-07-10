@@ -14,7 +14,6 @@ elements:
     type_: String
   name: Id
   comment: Unique identifier.
-  vector: false
 keys:
 - Id
 
@@ -34,7 +33,6 @@ elements:
     type_: String
   name: Id
   comment: Unique identifier.
-  vector: false
 keys:
 - Id
 

@@ -17,7 +17,6 @@ cl.UiAppState:
       Name: UserKey
     Name: User
     Comment: A user the app state is applied for.
-    Vector: false
   - Data:
       Module:
         ModuleName: cl
@@ -30,13 +29,11 @@ cl.UiAppState:
       Type: Int
     Name: ActiveTabIndex
     Comment: Index of active opened tab.
-    Vector: false
     Optional: true
   - Value:
       Type: String
     Name: BackendVersion
     Comment: DEPRECATED. Use versions instead.
-    Vector: false
     Optional: true
   - Value:
       Type: Dict
@@ -47,19 +44,16 @@ cl.UiAppState:
       Type: String
     Name: ApplicationName
     Comment: Application name.
-    Vector: false
     Optional: true
   - Value:
       Type: Bool
     Name: ReadOnly
     Comment: Flag indicating that UI is read-only.
-    Vector: false
     Optional: true
   - Value:
       Type: String
     Name: ApplicationTheme
     Comment: Application theme (dark, light, etc.).
-    Vector: false
     Optional: true
   - Value:
       Type: String
@@ -78,7 +72,6 @@ cl.UiAppState:
     Comment: |-
       Flag indicating whether the UI is in full-screen mode (e.g., only a single active tab is visible with a 
       minimalistic interface).
-    Vector: false
     Optional: true
   Keys:
   - User
@@ -95,17 +88,14 @@ cl.BaseTypeInfo:
       Type: String
     Name: Name
     Comment: Name of type.
-    Vector: false
   - Value:
       Type: String
     Name: Module
     Comment: Module of type.
-    Vector: false
   - Value:
       Type: String
     Name: Label
     Comment: Label of type.
-    Vector: false
 cl.TabInfo:
   Module:
     ModuleName: cl
@@ -121,7 +111,6 @@ cl.TabInfo:
       Name: BaseTypeInfo
     Name: Type
     Comment: Type.
-    Vector: false
 cl.UiAppStateKey:
   Module:
     ModuleName: cl
@@ -137,7 +126,6 @@ cl.UiAppStateKey:
       Name: UserKey
     Name: User
     Comment: A user the app state is applied for.
-    Vector: false
 cl.UserKey:
   Module:
     ModuleName: cl
@@ -151,5 +139,4 @@ cl.UserKey:
       Type: String
     Name: Username
     Comment: Unique user identifier.
-    Vector: false
 

@@ -82,9 +82,6 @@ class HandlerVariableDecl(MemberDecl):
             # Get the type of value inside the container
             result.vector = True
             value_type_ = type_args[0]
-        else:
-            # No container
-            result.vector = False
 
         # Check if value_type is Self
         if value_type_ == Self:

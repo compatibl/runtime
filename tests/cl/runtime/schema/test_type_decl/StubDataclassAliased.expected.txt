@@ -14,11 +14,9 @@ elements:
     type_: String
   name: Id
   comment: Unique identifier.
-  vector: false
 - value:
     type_: Int
   name: A
-  vector: false
 keys:
 - Id
 

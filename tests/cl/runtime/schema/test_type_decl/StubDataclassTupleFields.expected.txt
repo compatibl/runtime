@@ -13,7 +13,6 @@ elements:
 - value:
     type_: String
   name: Id
-  vector: false
 - value:
     type_: String
   name: StrTuple

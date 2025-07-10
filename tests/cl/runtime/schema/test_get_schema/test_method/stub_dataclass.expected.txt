@@ -14,7 +14,6 @@ Elements:
     Type: String
   Name: Id
   Comment: Unique identifier.
-  Vector: false
 Keys:
 - Id
 

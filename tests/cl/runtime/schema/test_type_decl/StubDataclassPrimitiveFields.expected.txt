@@ -14,140 +14,115 @@ elements:
     type_: String
   name: KeyStrField
   comment: Stub field.
-  vector: false
 - value:
     type_: Double
   name: KeyFloatField
   comment: Stub field.
-  vector: false
 - value:
     type_: Bool
   name: KeyBoolField
   comment: Stub field.
-  vector: false
 - value:
     type_: Int
   name: KeyIntField
   comment: Stub field.
-  vector: false
 - value:
     type_: Int
   name: KeyLongField
   comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
-  vector: false
 - value:
     type_: Date
   name: KeyDateField
   comment: Stub field.
-  vector: false
 - value:
     type_: Time
   name: KeyTimeField
   comment: Stub field.
-  vector: false
 - value:
     type_: DateTime
   name: KeyDateTimeField
   comment: Stub field.
-  vector: false
 - value:
     type_: UUID
   name: KeyUuidField
   comment: Stub field.
-  vector: false
 - value:
     type_: Binary
   name: KeyBytesField
   comment: Stub field.
-  vector: false
 - enum:
     module:
       module_name: cl
     name: StubIntEnum
   name: KeyIntEnumField
   comment: Stub field.
-  vector: false
 - value:
     type_: String
   name: ObjStrField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: String
   name: ObjStrWithEolField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: String
   name: ObjStrWithTrailingEolField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: String
   name: ObjStrTimestampField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: Double
   name: ObjFloatField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: Bool
   name: ObjBoolField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: Int
   name: ObjIntField
   comment: Stub field.
-  vector: false
 - value:
     type_: Int
   name: ObjLongField
   comment: 'The default is maximum safe signed int for JSON: 2^53 - 1.'
-  vector: false
 - value:
     type_: Date
   name: ObjDateField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: Time
   name: ObjTimeField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: DateTime
   name: ObjDateTimeField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: UUID
   name: ObjUuidField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: Binary
   name: ObjBytesField
   comment: Stub field.
-  vector: false
   optional: true
 - value:
     type_: Binary
   name: ObjBytesLargeField
   comment: Stub field.
-  vector: false
   optional: true
 - enum:
     module:
@@ -155,7 +130,6 @@ elements:
     name: StubIntEnum
   name: ObjIntEnumField
   comment: Stub field.
-  vector: false
   optional: true
 keys:
 - KeyStrField

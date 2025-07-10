@@ -14,12 +14,10 @@ elements:
     type_: String
   name: Id
   comment: Stub field.
-  vector: false
 - value:
     type_: Int
   name: Version
   comment: Stub version field.
-  vector: false
 keys:
 - Id
 

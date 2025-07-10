@@ -28,12 +28,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param2
     static: true
@@ -44,12 +42,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: true
@@ -60,12 +56,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: true
@@ -76,12 +70,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: true
@@ -103,22 +95,18 @@ declare:
             type_: String
           name: Name
           comment: Content name.
-          vector: false
           optional: true
         - value:
             type_: Binary
           name: FileBytes
           comment: Embedded binary content to be displayed as the current view.
-          vector: false
         - enum:
             module:
               module_name: cl
             name: FileType
           name: FileType
           comment: Embedded binary content type.
-          vector: false
           optional: true
-      vector: false
       optional: false
       name: PdfFile
     static: true
@@ -134,7 +122,6 @@ declare:
     params:
     - value:
         type_: Int
-      vector: false
       optional: false
       name: IntParam
     static: false
@@ -145,47 +132,38 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: StrParam
     - value:
         type_: Double
-      vector: false
       optional: false
       name: FloatParam
     - value:
         type_: Bool
-      vector: false
       optional: false
       name: BoolParam
     - value:
         type_: Int
-      vector: false
       optional: false
       name: IntParam
     - value:
         type_: Date
-      vector: false
       optional: false
       name: DateParam
     - value:
         type_: Time
-      vector: false
       optional: false
       name: TimeParam
     - value:
         type_: DateTime
-      vector: false
       optional: false
       name: DatetimeParam
     - value:
         type_: UUID
-      vector: false
       optional: false
       name: UuidParam
     - value:
         type_: Binary
-      vector: false
       optional: false
       name: BytesParam
     static: false
@@ -201,12 +179,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: false
@@ -217,12 +193,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: false
@@ -233,12 +207,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: false
@@ -249,12 +221,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: false
@@ -276,27 +246,22 @@ declare:
             type_: String
           name: Name
           comment: Content name.
-          vector: false
           optional: true
         - value:
             type_: Binary
           name: FileBytes
           comment: Embedded binary content to be displayed as the current view.
-          vector: false
         - enum:
             module:
               module_name: cl
             name: FileType
           name: FileType
           comment: Embedded binary content type.
-          vector: false
           optional: true
-      vector: false
       optional: false
       name: PdfFile
     - value:
         type_: String
-      vector: false
       optional: false
       name: NoteParam
     static: false
@@ -317,12 +282,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: true
@@ -333,12 +296,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: true
@@ -349,12 +310,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: true
@@ -365,12 +324,10 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Param1
     - value:
         type_: String
-      vector: false
       optional: true
       name: Param2
     static: true
@@ -381,23 +338,19 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Arg1
     - value:
         type_: String
-      vector: false
       optional: false
       name: Arg2
     - value:
         type_: String
-      vector: false
       optional: true
       name: Arg3
     return_:
       value:
         type_: String
-      vector: false
       optional: false
     static: false
   - name: run_with_error
@@ -412,18 +365,15 @@ declare:
     params:
     - value:
         type_: String
-      vector: false
       optional: false
       name: Arg1
     - value:
         type_: String
-      vector: false
       optional: false
       name: Arg2
     return_:
       value:
         type_: String
-      vector: false
       optional: false
     static: false
   - name: run_with_user_error
@@ -436,7 +386,6 @@ elements:
     type_: String
   name: StubId
   comment: Stub identifier.
-  vector: false
 keys:
 - StubId
 

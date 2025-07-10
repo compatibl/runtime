@@ -100,7 +100,5 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
                         f"Unsupported container kind {field_decl.container.container_kind.name} "
                         f"for field {field_decl.name}."
                     )
-        else:
-            result.vector = False
 
         return result

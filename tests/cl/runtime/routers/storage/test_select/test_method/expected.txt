@@ -16,7 +16,6 @@ Schema:
         Type: String
       Name: Id
       Comment: Unique identifier.
-      Vector: false
     Keys:
     - Id
   cl.StubDataclassKey:
@@ -32,7 +31,6 @@ Schema:
         Type: String
       Name: Id
       Comment: Unique identifier.
-      Vector: false
 Data:
 - Id: test_select
   _t: StubDataclass

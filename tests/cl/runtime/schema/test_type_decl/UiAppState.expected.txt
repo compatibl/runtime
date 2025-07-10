@@ -16,7 +16,6 @@ elements:
     name: UserKey
   name: User
   comment: A user the app state is applied for.
-  vector: false
 - data:
     module:
       module_name: cl
@@ -29,13 +28,11 @@ elements:
     type_: Int
   name: ActiveTabIndex
   comment: Index of active opened tab.
-  vector: false
   optional: true
 - value:
     type_: String
   name: BackendVersion
   comment: DEPRECATED. Use versions instead.
-  vector: false
   optional: true
 - value:
     type_: Dict
@@ -46,19 +43,16 @@ elements:
     type_: String
   name: ApplicationName
   comment: Application name.
-  vector: false
   optional: true
 - value:
     type_: Bool
   name: ReadOnly
   comment: Flag indicating that UI is read-only.
-  vector: false
   optional: true
 - value:
     type_: String
   name: ApplicationTheme
   comment: Application theme (dark, light, etc.).
-  vector: false
   optional: true
 - value:
     type_: String
@@ -77,7 +71,6 @@ elements:
   comment: |-
     Flag indicating whether the UI is in full-screen mode (e.g., only a single active tab is visible with a 
     minimalistic interface).
-  vector: false
   optional: true
 keys:
 - User
