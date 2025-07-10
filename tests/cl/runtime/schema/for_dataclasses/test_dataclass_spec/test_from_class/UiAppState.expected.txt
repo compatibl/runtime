@@ -4,14 +4,12 @@ fields:
 - field_name: user
   type_hint:
     schema_type_name: UserKey
-    optional: false
 - field_name: opened_tabs
   type_hint:
     schema_type_name: list
     optional: true
     remaining:
       schema_type_name: TabInfo
-      optional: false
 - field_name: active_tab_index
   type_hint:
     schema_type_name: int
@@ -26,7 +24,6 @@ fields:
     optional: true
     remaining:
       schema_type_name: str
-      optional: false
 - field_name: application_name
   type_hint:
     schema_type_name: str
@@ -45,7 +42,6 @@ fields:
     optional: true
     remaining:
       schema_type_name: str
-      optional: false
 - field_name: full_screen_mode
   type_hint:
     schema_type_name: bool

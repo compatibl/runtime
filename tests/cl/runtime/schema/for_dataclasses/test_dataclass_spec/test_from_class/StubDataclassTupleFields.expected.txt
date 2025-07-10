@@ -4,54 +4,39 @@ fields:
 - field_name: id
   type_hint:
     schema_type_name: str
-    optional: false
 - field_name: str_tuple
   type_hint:
     schema_type_name: tuple
-    optional: false
     remaining:
       schema_type_name: str
-      optional: false
 - field_name: float_tuple
   type_hint:
     schema_type_name: tuple
-    optional: false
     remaining:
       schema_type_name: float
-      optional: false
 - field_name: date_tuple
   type_hint:
     schema_type_name: tuple
-    optional: false
     remaining:
       schema_type_name: date
-      optional: false
 - field_name: data_tuple
   type_hint:
     schema_type_name: tuple
-    optional: false
     remaining:
       schema_type_name: StubDataclassData
-      optional: false
 - field_name: key_tuple
   type_hint:
     schema_type_name: tuple
-    optional: false
     remaining:
       schema_type_name: StubDataclassKey
-      optional: false
 - field_name: record_tuple
   type_hint:
     schema_type_name: tuple
-    optional: false
     remaining:
       schema_type_name: StubDataclass
-      optional: false
 - field_name: derived_tuple
   type_hint:
     schema_type_name: tuple
-    optional: false
     remaining:
       schema_type_name: StubDataclassDerived
-      optional: false
 

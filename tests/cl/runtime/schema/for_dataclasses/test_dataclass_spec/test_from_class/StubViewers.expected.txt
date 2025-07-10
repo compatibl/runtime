@@ -4,5 +4,4 @@ fields:
 - field_name: stub_id
   type_hint:
     schema_type_name: str
-    optional: false
 

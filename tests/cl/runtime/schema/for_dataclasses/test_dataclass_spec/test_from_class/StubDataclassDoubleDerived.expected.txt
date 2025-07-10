@@ -4,13 +4,10 @@ fields:
 - field_name: id
   type_hint:
     schema_type_name: str
-    optional: false
 - field_name: derived_str_field
   type_hint:
     schema_type_name: str
-    optional: false
 - field_name: double_derived_str_field
   type_hint:
     schema_type_name: str
-    optional: false
 

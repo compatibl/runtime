@@ -4,45 +4,32 @@ fields:
 - field_name: id
   type_hint:
     schema_type_name: str
-    optional: false
 - field_name: float_dict_list
   type_hint:
     schema_type_name: list
-    optional: false
     remaining:
       schema_type_name: dict
-      optional: false
       remaining:
         schema_type_name: float
-        optional: false
 - field_name: date_dict_list
   type_hint:
     schema_type_name: list
-    optional: false
     remaining:
       schema_type_name: dict
-      optional: false
       remaining:
         schema_type_name: date
-        optional: false
 - field_name: record_dict_list
   type_hint:
     schema_type_name: list
-    optional: false
     remaining:
       schema_type_name: dict
-      optional: false
       remaining:
         schema_type_name: StubDataclass
-        optional: false
 - field_name: derived_dict_list
   type_hint:
     schema_type_name: list
-    optional: false
     remaining:
       schema_type_name: dict
-      optional: false
       remaining:
         schema_type_name: StubDataclassDerived
-        optional: false
 

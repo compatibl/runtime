@@ -4,5 +4,4 @@ fields:
 - field_name: id
   type_hint:
     schema_type_name: str
-    optional: false
 
