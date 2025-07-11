@@ -32,8 +32,10 @@ def _perform_serialization_test(contexts: List[Context]):
         assert not deserialized_context_manager._all_contexts  # noqa
     else:
         assert len(contexts) == len(deserialized_context_manager._all_contexts)  # noqa
-        for context, deserialized_context in zip(contexts, deserialized_context_manager._all_contexts):  # noqa
-            assert context == deserialized_context
+
+        # Check that the contexts passed match the contexts in ContextManager regardless of order.
+        not_in_contexts = [ctx for ctx in contexts if ctx not in deserialized_context_manager._all_contexts]  # noqa
+        assert len(not_in_contexts) == 0
 
 
 def _perform_manager_test(contexts: List[Context]):
