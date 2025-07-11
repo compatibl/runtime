@@ -129,8 +129,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def query_existing_trials(self) -> int:
         """Get the remaining of existing trials."""
         trial_key_query = TrialKeyQuery(experiment=self.get_key()).build()
-        trials = DbContext.load_where(trial_key_query, cast_to=Trial)  # TODO: Use count_where instead of load_where
-        num_existing_trials = len(trials)
+        num_existing_trials = DbContext.count_where(trial_key_query)
         return num_existing_trials
 
     def query_remaining_trials(self, *, num_trials: int | None = None) -> int | None:
