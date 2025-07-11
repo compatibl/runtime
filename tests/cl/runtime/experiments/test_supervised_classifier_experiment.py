@@ -88,7 +88,7 @@ def test_experiment_plot(pytest_basic_mongo_mock_db, pytest_work_dir):
                 experiment_scenario_id="Test4"
             ),
         ],
-        max_trials=5,
+        max_trials=15,
         class_labels=["A", "B", "C"]
     )
     random.seed(0)

@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pandas as pd
+import matplotlib.ticker as mticker
 from dataclasses import dataclass
 from typing import List
-import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from cl.runtime.plots.matrix_util import MatrixUtil
@@ -64,6 +65,7 @@ class HeatMapPlot(MatplotlibPlot):
         cmap = LinearSegmentedColormap.from_list("rg", ["g", "y", "r"], N=256)
 
         with plt.style.context(theme):
+            data = MatrixUtil.convert_confusion_matrix_to_percent(data)
             im = MatplotlibUtil.heatmap(
                 data.values,
                 data.index.tolist(),
@@ -77,7 +79,8 @@ class HeatMapPlot(MatplotlibPlot):
                 text_colors="black",
                 size=6
             )
-            plt.colorbar(im, ax=axes)
+            cbar = plt.colorbar(im, ax=axes)
+            cbar.ax.yaxis.set_major_formatter(mticker.FormatStrFormatter('%.0f%%'))  # adding percent sign to colorbar
             axes.set_title(self.title)
             axes.set_xlabel(self.x_label)
             axes.set_ylabel(self.y_label)

@@ -33,7 +33,7 @@ class MatrixUtil:
     @staticmethod
     def convert_confusion_matrix_to_percent(data: pd.DataFrame) -> pd.DataFrame:
         # convert to percents row-wise
-        result = data / data.values.sum(axis=1) * 100
+        result = data / data.values.sum(axis=1, keepdims=True) * 100
 
         return result
 
