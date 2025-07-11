@@ -36,13 +36,15 @@ elements:
       module_name: cl
     name: StubDataclassData
   name: PolymorphicField
-  comment: Declared StubDataclassData but provided an instance of StubDataclassDerivedData.
+  comment: Declared StubDataclassData but provided an instance of 
+    StubDataclassDerivedData.
 - data:
     module:
       module_name: cl
     name: StubDataclassDerivedData
   name: PolymorphicDerivedField
-  comment: Declared StubDataclassDerivedData but provided an instance of StubDataclassDoubleDerivedData.
+  comment: Declared StubDataclassDerivedData but provided an instance of 
+    StubDataclassDoubleDerivedData.
 - key_:
     module:
       module_name: cl
