@@ -197,6 +197,15 @@ class SqliteDb(Db):
     ) -> Sequence[RecordMixin]:
         raise NotImplementedError()
 
+    def count_where(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str | None = None,
+        cast_to: type | None = None,
+    ) -> int:
+        raise NotImplementedError()
+
     def save_many(
         self,
         records: Iterable[RecordProtocol],

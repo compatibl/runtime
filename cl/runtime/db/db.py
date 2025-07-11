@@ -126,6 +126,23 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
+    def count_where(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str | None = None,
+        cast_to: type | None = None,
+    ) -> int:
+        """
+        Return the count of records that match the specified query.
+
+        Args:
+            query: Contains query conditions to match
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+        """
+
+    @abstractmethod
     def drop_temp_db(self) -> None:
         """
         IMPORTANT: DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY

@@ -330,6 +330,25 @@ class DbContext(Context):
         return result
 
     @classmethod
+    def count_where(
+        cls,
+        query: QueryMixin,
+        *,
+        dataset: str | None = None,
+        cast_to: type | None = None,
+    ) -> int:
+        """
+        Return the count of records that match the specified query using the current context's DB.
+
+        Args:
+            query: Contains query conditions to match
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+        """
+        db = cls._get_db()
+        return db.count_where(query, dataset=dataset, cast_to=cast_to)
+
+    @classmethod
     def save_one(
         cls,
         record: RecordProtocol,

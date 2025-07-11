@@ -110,6 +110,15 @@ class LocalCache(Db):
         # Validate the dataset and if necessary convert to delimited string
         raise NotImplementedError()
 
+    def count_where(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str | None = None,
+        cast_to: type | None = None,
+    ) -> int:
+        raise NotImplementedError()
+
     def drop_temp_db(self) -> None:
         # Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')
         self.error_if_not_temp_db()

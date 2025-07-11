@@ -58,5 +58,28 @@ def test_load(pytest_basic_mongo_db):  # TODO: Switch to pytest_multi_db after l
     loaded_where = DbContext.load_where(query, cast_to=StubDataclassPolymorphic)
 
 
+def test_count_where(pytest_basic_mongo_db):
+    """Test count_where method."""
+    table_field = "StubPolymorphicTable"
+    key_field = "stub_key_field"
+    record_field = "stub_record_field"
+
+    # Create and save a record derived from a generic base
+    record = StubDataclassPolymorphic(
+        table_field=table_field,
+        key_field=key_field,
+        record_field=record_field,
+    ).build()
+    DbContext.save_one(record)
+
+    # Create the same query as in test_load
+    query = StubDataclassPolymorphicQuery(
+        table_field=table_field,
+        record_field=record_field,
+    ).build()
+    count = DbContext.count_where(query, cast_to=StubDataclassPolymorphic)
+    assert count == 1
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

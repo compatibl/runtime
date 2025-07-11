@@ -16,8 +16,11 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.conditions import In
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import StubDataclassPrimitiveFieldsQuery
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -199,6 +202,40 @@ def test_repeated(pytest_multi_db):
     loaded_records = list(DbContext.load_many([record.get_key()]))
     assert len(loaded_records) == 1
     assert loaded_records[0] == record
+
+def test_load_where(pytest_basic_mongo_db):  # TODO: Use test_multi_db fixture when implemented
+    """Test count_where for a string field."""
+    records = [
+        StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),
+        StubDataclassPrimitiveFields(key_str_field="def"),
+        StubDataclassPrimitiveFields(key_str_field="xyz"),
+    ]
+    records = [x.build() for x in records]
+    DbContext.save_many(records)
+
+    eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
+    in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
+
+    # Load using a query
+    to_key_str_field = lambda rec: [x.key_str_field for x in rec]
+    assert to_key_str_field(DbContext.load_where(eq_query)) == ["def"]
+    assert to_key_str_field(DbContext.load_where(in_query)) == ["def", "xyz"]
+
+def test_count_where(pytest_basic_mongo_db):  # TODO: Use test_multi_db fixture when implemented
+    """Test count_where for a string field."""
+    records = [
+        StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),
+        StubDataclassPrimitiveFields(key_str_field="def"),
+        StubDataclassPrimitiveFields(key_str_field="xyz"),
+    ]
+    records = [x.build() for x in records]
+    DbContext.save_many(records)
+
+    eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
+    in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
+
+    assert DbContext.count_where(eq_query) == 1
+    assert DbContext.count_where(in_query) == 2
 
 
 if __name__ == "__main__":

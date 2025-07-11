@@ -48,7 +48,7 @@ def test_str_query(pytest_basic_mongo_db):
     exists_query = StubDataclassPrimitiveFieldsQuery(obj_str_field=Exists(True)).build()
     does_not_exist_query = StubDataclassPrimitiveFieldsQuery(obj_str_field=Exists(False)).build()
 
-    # Load using record or key
+    # Load using a query
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
     assert to_key_str_field(DbContext.load_where(eq_query)) == ["def"]
     assert to_key_str_field(DbContext.load_where(in_query)) == ["def", "xyz"]

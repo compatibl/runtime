@@ -175,6 +175,49 @@ class BasicMongoDb(Db):
             result.append(record)
         return RecordUtil.sort_records_by_key(result)  # TODO: Decide on the default sorting method
 
+    def count_where(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str | None = None,
+        cast_to: type | None = None,
+    ) -> int:
+        """Return the count of documents matching the query using MongoDB's count_documents."""
+        # Check that query has been frozen
+        query.check_frozen()
+
+        # Get record type from the query and key type from the record
+        record_type = query.get_record_type()
+        if cast_to is None:
+            # Limit returned results to record_type if cast_to is not specified
+            cast_to = record_type
+        else:
+            # Ensure cast_to is a subclass of query_record_type
+            if not issubclass(cast_to, record_type):
+                raise RuntimeError(
+                    f"In {TypeUtil.name(self)}.count_where, cast_to={TypeUtil.name(cast_to)} which is not a subclass\n"
+                    f"of the type {TypeUtil.name(record_type)} returned by {TypeUtil.name(query)}.get_record_type()."
+                )
+
+        # Get collection using table name from the query
+        table = query.get_table()
+        collection = self._get_mongo_collection(table)
+
+        # Serialize the query
+        query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
+        # TODO: Remove table fields
+
+        # Convert op_* fields to MongoDB $* syntax
+        query_dict = self._convert_op_fields_to_mongo_syntax(query_dict)
+
+        # Add condition on type
+        subtype_names = TypeInfoCache.get_child_names(cast_to)
+        query_dict["_type"] = {"$in": subtype_names}
+
+        # Use count_documents to get the count
+        count = collection.count_documents(query_dict)
+        return count
+
     def save_many(
         self,
         records: Iterable[RecordProtocol],
