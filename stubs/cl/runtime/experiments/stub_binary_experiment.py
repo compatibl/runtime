@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
 import random
-
+from dataclasses import dataclass
 from cl.runtime.experiments.binary_experiment import BinaryExperiment
 from cl.runtime.experiments.binary_trial import BinaryTrial
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey

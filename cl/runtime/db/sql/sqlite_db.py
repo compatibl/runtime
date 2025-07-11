@@ -31,7 +31,6 @@ from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.table_util import TableUtil

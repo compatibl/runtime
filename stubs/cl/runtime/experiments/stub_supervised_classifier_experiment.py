@@ -14,7 +14,6 @@
 
 import random
 from dataclasses import dataclass
-
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.supervised_classifier_experiment import SupervisedClassifierExperiment
 from cl.runtime.experiments.supervised_classifier_trial import SupervisedClassifierTrial
@@ -31,8 +30,5 @@ class StubSupervisedClassifierExperiment(SupervisedClassifierExperiment):
         actual = random.choice(self.class_labels)
         expected = random.choice(self.class_labels)
         return SupervisedClassifierTrial(
-            experiment=self.get_key(),
-            actual=actual,
-            expected=expected,
-            scenario=scenario
+            experiment=self.get_key(), actual=actual, expected=expected, scenario=scenario
         ).build()

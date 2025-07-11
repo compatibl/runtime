@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import random
 import pytest
+import random
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_type import ExperimentType
@@ -29,8 +29,7 @@ def test_smoke(pytest_basic_mongo_mock_db):
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
     sc1 = ExperimentScenario(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-        experiment_scenario_id="Test1"
+        experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
     DbContext.current().save_one(exp_type)
@@ -44,10 +43,9 @@ def test_smoke(pytest_basic_mongo_mock_db):
         max_trials=5,
         scenarios=[
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test1"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
             ),
-        ]
+        ],
     )
     experiment.run_all()
 
@@ -56,12 +54,10 @@ def test_experiment_plot(pytest_basic_mongo_mock_db, pytest_work_dir):
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
     sc1 = ExperimentScenario(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-        experiment_scenario_id="Test1"
+        experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
     sc2 = ExperimentScenario(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-        experiment_scenario_id="Test2"
+        experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test2"
     ).build()
 
     DbContext.current().save_one(exp_type)
@@ -72,29 +68,27 @@ def test_experiment_plot(pytest_basic_mongo_mock_db, pytest_work_dir):
         experiment_id="Test",
         scenarios=[
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test1"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
             ),
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test2"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test2"
             ),
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test3"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test3"
             ),
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test4"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test4"
             ),
         ],
         max_trials=15,
-        class_labels=["A", "B", "C"]
+        class_labels=["A", "B", "C"],
     )
     random.seed(0)
     experiment.run_all()
 
-    experiment.get_plot("test_supervised_classifier_experiment.supervised_classifier_experiment_plot").save(format_="svg")
+    experiment.get_plot("test_supervised_classifier_experiment.supervised_classifier_experiment_plot").save(
+        format_="svg"
+    )
 
 
 if __name__ == "__main__":

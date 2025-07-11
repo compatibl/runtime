@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.plots.multi_plot import MultiPlot
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
@@ -29,7 +28,7 @@ def test_multi_heatmap(pytest_work_dir):
             StubHeatMapPlots.get_basic_plot("test"),
             StubHeatMapPlots.get_basic_plot("test"),
             StubHeatMapPlots.get_basic_plot("test"),
-        ]
+        ],
     )
     plot.save()
 

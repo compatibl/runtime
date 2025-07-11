@@ -20,23 +20,23 @@ _DESCRIPTION_MAP = {
     "\t": "Tab",
     "\r": "Carriage Return",
     "\ufeff": "UTF-8 BOM",
-    "\uFFFD": "Unicode replacement character",
-    "\u201C": "Left Double Quotation Mark",
-    "\u201D": "Right Double Quotation Mark",
+    "\ufffd": "Unicode replacement character",
+    "\u201c": "Left Double Quotation Mark",
+    "\u201d": "Right Double Quotation Mark",
 }
 """Map of special unprintable characters to their descriptions."""
 
 _FLAGGED_CHARS = [
     "\x00",  # Null Byte
-    "\uFFFD",  # Unicode replacement character
+    "\ufffd",  # Unicode replacement character
 ]
 """List of characters that will trigger an error during normalization."""
 
 _REMOVED_CHARS = [
     "\r",  # Carriage Return
     "\ufeff",  # UTF-8 BOM
-    "\u201C",  # Left Double Quotation Mark
-    "\u201D",  # Right Double Quotation Mark
+    "\u201c",  # Left Double Quotation Mark
+    "\u201d",  # Right Double Quotation Mark
 ]
 """List of characters that will be removed during normalization."""
 

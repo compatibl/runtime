@@ -51,15 +51,15 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
                     fn += 1
 
             group_labels.extend([scenario.experiment_scenario_id] * 4)
-            bar_labels.extend(
-                ["TP", "TN", "FP", "FN"]
+            bar_labels.extend(["TP", "TN", "FP", "FN"])
+            values.extend(
+                [
+                    tp / total,
+                    tn / total,
+                    fp / total,
+                    fn / total,
+                ]
             )
-            values.extend([
-                tp / total,
-                tn / total,
-                fp / total,
-                fn / total,
-            ])
 
         result = StackBarPlot(
             plot_id=plot_id,
@@ -67,7 +67,7 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
             value_axis_label="Ratio",
             xtick_rotation=45,
             xtick_ha="right",
-            value_ticks=[0.0, 0.5, 1.0]
+            value_ticks=[0.0, 0.5, 1.0],
         )
         result.group_labels = group_labels
         result.bar_labels = bar_labels

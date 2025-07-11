@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import math
-import numpy as np
 from dataclasses import dataclass
 from typing import List
+import numpy as np
 from matplotlib import pyplot as plt
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.plots.plot import Plot
@@ -58,6 +58,3 @@ class MultiPlot(MatplotlibPlot):
             fig.tight_layout()
 
             return fig
-
-
-

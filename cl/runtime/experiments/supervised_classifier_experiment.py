@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 from abc import ABC
 from dataclasses import dataclass
+import numpy as np
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
 from cl.runtime.experiments.supervised_classifier_trial import SupervisedClassifierTrial

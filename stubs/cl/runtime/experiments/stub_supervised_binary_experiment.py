@@ -14,7 +14,6 @@
 
 import random
 from dataclasses import dataclass
-
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.supervised_binary_experiment import SupervisedBinaryExperiment
 from cl.runtime.experiments.supervised_binary_trial import SupervisedBinaryTrial
@@ -31,8 +30,5 @@ class StubSupervisedBinaryExperiment(SupervisedBinaryExperiment):
         actual = random.choice([True, False])
         expected = random.choice([True, False])
         return SupervisedBinaryTrial(
-            experiment=self.get_key(),
-            actual=actual,
-            expected=expected,
-            scenario=scenario
+            experiment=self.get_key(), actual=actual, expected=expected, scenario=scenario
         ).build()

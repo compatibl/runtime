@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_type import ExperimentType
@@ -28,8 +27,7 @@ def test_run_many(pytest_basic_mongo_mock_db):
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
     sc1 = ExperimentScenario(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-        experiment_scenario_id="Test1"
+        experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
     DbContext.current().save_one(exp_type)
@@ -41,10 +39,9 @@ def test_run_many(pytest_basic_mongo_mock_db):
         experiment_id="test_run_many.max_trials_not_set",
         scenarios=[
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test1"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
             ),
-        ]
+        ],
     )
 
     # Run the experiment in stages
@@ -64,10 +61,9 @@ def test_run_many(pytest_basic_mongo_mock_db):
         max_trials=5,
         scenarios=[
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test1"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
             ),
-        ]
+        ],
     )
 
     # Run the experiment in stages
@@ -99,8 +95,7 @@ def test_run_all(pytest_basic_mongo_mock_db):
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
     sc1 = ExperimentScenario(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-        experiment_scenario_id="Test1"
+        experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
     DbContext.current().save_one(exp_type)
@@ -112,10 +107,9 @@ def test_run_all(pytest_basic_mongo_mock_db):
         experiment_id="test_run_all.max_trials_not_set",
         scenarios=[
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test1"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
             ),
-        ]
+        ],
     )
 
     with pytest.raises(RuntimeError):
@@ -129,10 +123,9 @@ def test_run_all(pytest_basic_mongo_mock_db):
         max_trials=5,
         scenarios=[
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
-                experiment_scenario_id="Test1"
+                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
             ),
-        ]
+        ],
     )
 
     # Run the experiment in stages

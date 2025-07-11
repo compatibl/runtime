@@ -61,7 +61,7 @@ class ClassifierExperiment(Experiment, ABC):
             value_axis_label="Proportion",
             xtick_rotation=45,
             xtick_ha="right",
-            value_ticks=[0.0, 0.5, 1.0]
+            value_ticks=[0.0, 0.5, 1.0],
         )
         result.group_labels = group_labels
         result.bar_labels = bar_labels

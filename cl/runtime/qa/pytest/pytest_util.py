@@ -14,7 +14,8 @@
 
 import pytest
 import os
-from typing import Any, Iterable
+from typing import Any
+from typing import Iterable
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES
@@ -114,7 +115,8 @@ class PytestUtil:
 
         if len(iterable_as_list) != len(other_iterable_as_list):
             raise ValueError(
-                f"Iterables have different length: {len(iterable_as_list)} and {len(other_iterable_as_list)}")
+                f"Iterables have different length: {len(iterable_as_list)} and {len(other_iterable_as_list)}"
+            )
 
         for item in iterable_as_list:
             if item not in other_iterable_as_list:

@@ -33,7 +33,9 @@ class KeyUtil:
     @classmethod
     def normalize_table(cls, type_or_table: type[KeyMixin] | str) -> str:
         """Get table name from key type using the standard naming convention, leave string table name unchanged."""
-        if isinstance(type_or_table, type) and (issubclass(type_or_table, ShardMixin) or issubclass(type_or_table, KeyMixin)):  # TODO: Use is_shard instead?
+        if isinstance(type_or_table, type) and (
+            issubclass(type_or_table, ShardMixin) or issubclass(type_or_table, KeyMixin)
+        ):  # TODO: Use is_shard instead?
             table = TypeUtil.name(type_or_table)  # TODO: Remove Key suffix
         elif isinstance(type_or_table, str):
             table = type_or_table

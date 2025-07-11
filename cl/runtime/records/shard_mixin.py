@@ -15,7 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import Tuple
-
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil

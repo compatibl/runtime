@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime import TypeInfoCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.binary_experiment import BinaryExperiment
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.table_util import TableUtil
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
@@ -55,7 +54,7 @@ def _multiple_table_stubs():
 
 def test_save_table(pytest_default_db):
     """Test saving records of the same type to different tables."""
-    
+
     stubs = _multiple_table_stubs()
     DbContext.save_many(stubs)
 
@@ -65,6 +64,7 @@ def test_save_table(pytest_default_db):
     assert PytestUtil.assert_equals_iterable_without_ordering(
         created_table_names, ["ExperimentTable1", "ExperimentTable2", "TableKey"]
     )
+
 
 def test_table_schema_type(pytest_default_db):
     """Test get type from table name."""
@@ -78,6 +78,7 @@ def test_table_schema_type(pytest_default_db):
 
     # Check table type. Temporary it is a first child from key class
     assert table_type == BinaryExperiment
+
 
 def test_load_table(pytest_default_db):
     """Test load records of the same type from different tables."""

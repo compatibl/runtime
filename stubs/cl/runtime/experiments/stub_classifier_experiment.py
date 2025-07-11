@@ -28,8 +28,4 @@ class StubClassifierExperiment(ClassifierExperiment):
 
     def create_trial(self, scenario: ExperimentScenarioKey) -> ClassifierTrial:
         actual = random.choice(self.class_labels)
-        return ClassifierTrial(
-            experiment=self.get_key(),
-            actual=actual,
-            scenario=scenario
-        ).build()
+        return ClassifierTrial(experiment=self.get_key(), actual=actual, scenario=scenario).build()

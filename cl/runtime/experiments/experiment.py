@@ -22,8 +22,8 @@ from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.trial import Trial
 from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.experiments.trial_key_query import TrialKeyQuery
+from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.plots.plot import Plot
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
@@ -182,9 +182,10 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def get_scenario_trials(self, all_trials: List[Trial], scenario: ExperimentScenarioKey):
         """Get trials of the particular scenario from all trials."""
         trials = [
-            trial for trial in all_trials if
-            trial.experiment.experiment_id == self.experiment_id and
-            trial.scenario.experiment_scenario_id == scenario.experiment_scenario_id
+            trial
+            for trial in all_trials
+            if trial.experiment.experiment_id == self.experiment_id
+            and trial.scenario.experiment_scenario_id == scenario.experiment_scenario_id
         ]
         if not trials:
             raise RuntimeError(f"No trials for experiment {self.experiment_id}.")

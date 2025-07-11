@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 from abc import ABC
 from dataclasses import dataclass
 from typing import List
+import numpy as np
 from matplotlib import pyplot as plt
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.records.for_dataclasses.extensions import required
