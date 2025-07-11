@@ -13,20 +13,18 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment_key import ExperimentKey
+from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.experiments.trial_shard import TrialShard
-from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.conditions import Condition
 
 
-@dataclass(slots=True)
-class TrialKey(TrialShard):
-    """Abstract base class for a single trial of a statistical experiment."""
+@dataclass(slots=True, kw_only=True)
+class TrialKeyQuery(TrialShard):
+    """Query TrialKey by the experiment and timestamp fields."""
 
-    timestamp: str = required()
+    timestamp: str | Condition[str] | None = None  # TODO: Use UUID based timestamp for faster range queries
     """Trial timestamp must be unique for each experiment but not globally."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_record_type(cls) -> type:
         return TrialKey
-

@@ -14,19 +14,17 @@
 
 from dataclasses import dataclass
 from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.experiments.trial_shard import TrialShard
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.shard_mixin import ShardMixin
 
 
 @dataclass(slots=True)
-class TrialKey(TrialShard):
+class TrialShard(ShardMixin):
     """Abstract base class for a single trial of a statistical experiment."""
 
-    timestamp: str = required()
-    """Trial timestamp must be unique for each experiment but not globally."""
+    experiment: ExperimentKey = required()
+    """Experiment for which the trial is performed."""
 
-    @classmethod
-    def get_key_type(cls) -> type:
-        return TrialKey
-
+    def get_table(self) -> str:
+        """Override the default to specify a custom table name based on experiment type."""
+        return self.experiment.experiment_type.experiment_type_id + "Trial"

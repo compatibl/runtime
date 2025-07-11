@@ -22,6 +22,7 @@ from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.trial import Trial
 from cl.runtime.experiments.trial_key import TrialKey
+from cl.runtime.experiments.trial_key_query import TrialKeyQuery
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 
@@ -62,10 +63,10 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def view_trials(self) -> Sequence[TrialKey]:
         """View trials of the experiment."""
-        trial_keys = DbContext.load_all(Trial)  # TODO: Use load_where
-        # TODO: Use query instead of additional filtering
-        result = [x for x in trial_keys if x.experiment.experiment_id == self.experiment_id]
-        return result
+        trial_key_query = TrialKeyQuery(experiment=self.get_key()).build()
+        trials = DbContext.load_where(trial_key_query, cast_to=Trial)
+        trial_keys = [x.get_key() for x in trials]  # TODO: Use project_to instead of get_key
+        return trial_keys
 
     def save_trial(self) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
@@ -114,12 +115,9 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def query_existing_trials(self) -> int:
         """Get the remaining of existing trials."""
-        # TODO: !! Implement DbContext.count method
-        # Load trials for this experiment
-        # TODO: Support key filter fields conditions = Trial(experiment=self.get_key())
-        trial_keys = DbContext.load_all(Trial)  # TODO: Use load_where
-        # TODO: Use query instead of additional filtering and use count_where instead
-        num_existing_trials = len(tuple(x for x in trial_keys if x.experiment.experiment_id == self.experiment_id))
+        trial_key_query = TrialKeyQuery(experiment=self.get_key()).build()
+        trials = DbContext.load_where(trial_key_query, cast_to=Trial)  # TODO: Use count_where instead of load_where
+        num_existing_trials = len(trials)
         return num_existing_trials
 
     def query_remaining_trials(self, *, num_trials: int | None = None) -> int | None:
