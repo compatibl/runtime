@@ -26,7 +26,7 @@ class QueryMixin(TableMixin, ABC):
 
     @classmethod
     @abstractmethod
-    def get_record_type(cls) -> type:
+    def get_record_type(cls) -> type:  # TODO: Rename to get_queried_type as this may be a key
         """Get record type matched by this query (a derived query type must override to match a derived record type)."""
 
     def get_table(self) -> str:

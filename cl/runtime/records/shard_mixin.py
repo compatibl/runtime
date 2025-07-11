@@ -15,26 +15,22 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import Tuple
+
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
-class KeyMixin(DataMixin, ABC):
-    """Mixin class for a key."""
+class ShardMixin(DataMixin, ABC):
+    """Abstract base for the data that determines the shard for sharded tables."""
 
     __slots__ = SlotsUtil.merge_slots(DataMixin)
     """To prevent creation of __dict__ in derived types."""
 
-    @classmethod
     @abstractmethod
-    def get_key_type(cls) -> type:
-        """Return key type even when called from a record."""
-
-    def get_table(self) -> str:
-        """Return table name for this record as a PascalCase string, return key type name by default."""
-        return TypeUtil.name(self.get_key_type())
+    def get_table(self) -> str:  # TODO: Rename to get_shard or rely on fields in shard class?
+        """Return table name for this record as a PascalCase string."""
 
     # TODO: Move to KeyUtil class and share between KeyMixin and ShardMixin
     def serialize_key(self) -> Tuple:

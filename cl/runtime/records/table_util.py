@@ -81,6 +81,7 @@ class TableUtil:
     def get_tables(cls, for_key_type: str | None = None) -> Iterable[Table]:
         """Get iterable of Table records for key type name. If 'for_key_type' is None - return all tables."""
 
+        # TODO: Refactor to avoid inline import
         from cl.runtime.contexts.db_context import DbContext
 
         all_tables = DbContext.load_all(Table, tables=[Table().get_table()])

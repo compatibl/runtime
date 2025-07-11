@@ -18,10 +18,7 @@ from cl.runtime.records.type_util import TypeUtil
 
 
 class RecordMixin:
-    """
-    Optional generic mixin for a record parameterized by its key.
-    Derive MyRecord from MyRecord(MyKey, RecordMixin).
-    """
+    """Mixin for a non-sharded record, derive MyRecord from MyRecord(MyKey, RecordMixin)."""
 
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
