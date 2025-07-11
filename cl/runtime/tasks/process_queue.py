@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.tasks.task import Task
+from cl.runtime.tasks.task_query import TaskQuery
 from cl.runtime.tasks.task_queue import TaskQueue
 from cl.runtime.tasks.task_status import TaskStatus
 
@@ -42,15 +43,16 @@ class ProcessQueue(TaskQueue):
         # Set the counter of while loop cycles with no tasks
         no_task_cycles = 0
         while True:
-            # Get pending tasks
-            # TODO: Use DB queries with filter by queue field
-            all_tasks = tuple(DbContext.load_all(Task))
-            awaiting_tasks = [
-                task for task in all_tasks if task.queue.queue_id == queue_id and task.status == TaskStatus.AWAITING
-            ]
-            pending_tasks = [
-                task for task in all_tasks if task.queue.queue_id == queue_id and task.status == TaskStatus.PENDING
-            ]
+            # Get key for the current queue
+            queue_key = self.get_key()
+
+            # Tasks that are awaiting completion of other tasks and will have priority for subsequent execution
+            awaiting_query = TaskQuery(queue=queue_key, status=TaskStatus.AWAITING).build()
+            awaiting_tasks = DbContext.load_where(awaiting_query, cast_to=Task)
+
+            # The task that have been submitted to the queue but are not yet running
+            pending_query = TaskQuery(queue=queue_key, status=TaskStatus.PENDING).build()
+            pending_tasks = DbContext.load_where(pending_query, cast_to=Task)
 
             # Awaiting tasks have priority over pending tasks
             queued_tasks = awaiting_tasks + pending_tasks
