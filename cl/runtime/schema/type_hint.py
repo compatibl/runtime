@@ -179,7 +179,7 @@ class TypeHint(BootstrapMixin):
                 if condition_arg is not None:
                     type_alias_condition = True
                     args.remove(condition_arg)
-                    cond_inner, = typing.get_args(condition_arg)
+                    (cond_inner,) = typing.get_args(condition_arg)
                 else:
                     cond_inner = None
 

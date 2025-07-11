@@ -36,8 +36,9 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased import Stub
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields_query import StubDataclassNestedFieldsQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_query import StubDataclassPolymorphicQuery
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import \
-    StubDataclassPrimitiveFieldsQuery
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
+    StubDataclassPrimitiveFieldsQuery,
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_tuple_fields import StubDataclassTupleFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned import StubDataclassVersioned

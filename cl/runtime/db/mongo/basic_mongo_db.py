@@ -15,10 +15,10 @@
 import itertools
 import re
 from dataclasses import dataclass
+from typing import Any
 from typing import Dict
 from typing import Iterable
 from typing import Sequence
-from typing import Any
 from memoization import cached
 from mongomock import MongoClient as MongoClientMock
 from pymongo import MongoClient
@@ -39,9 +39,9 @@ from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 
 invalid_db_name_symbols = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -256,7 +256,7 @@ class BasicMongoDb(Db):
         """Convert op_* fields to MongoDB $* syntax recursively."""
         if not isinstance(query_dict, dict):
             return query_dict
-        
+
         result = {}
         for key, value in query_dict.items():
             if key.startswith("op_"):
@@ -268,11 +268,13 @@ class BasicMongoDb(Db):
                 result[key] = self._convert_op_fields_to_mongo_syntax(value)
             elif isinstance(value, list):
                 # Recursively convert list items
-                result[key] = [self._convert_op_fields_to_mongo_syntax(item) if isinstance(item, dict) else item for item in value]
+                result[key] = [
+                    self._convert_op_fields_to_mongo_syntax(item) if isinstance(item, dict) else item for item in value
+                ]
             else:
                 # Keep other values as-is
                 result[key] = value
-        
+
         return result
 
     def _get_mongo_collection(self, table: str) -> Collection:

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.records.conditions import Condition
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassQuery

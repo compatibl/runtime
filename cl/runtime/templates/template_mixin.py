@@ -17,7 +17,6 @@ from abc import abstractmethod
 from cl.convince.readers.entry_mixin import EntryMixin
 from cl.runtime import RecordMixin
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.records.protocols import TKey
 from cl.runtime.templates.template_engine import TemplateEngine
 from cl.runtime.templates.template_engine_key import TemplateEngineKey
 

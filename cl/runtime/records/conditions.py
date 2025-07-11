@@ -17,17 +17,25 @@ from typing import Generic
 from typing import Sequence
 from typing import Tuple
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import TObj, is_sequence, is_primitive
+from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil
 
 
 class Condition(Generic[TObj], BootstrapMixin, ABC):
     """Common base class of all query conditions."""
 
+
 class Range(Generic[TObj], Condition[TObj]):
     """Range with one or two bounds."""
 
-    __slots__ = ("op_gt", "op_gte", "op_lt", "op_lte",)
+    __slots__ = (
+        "op_gt",
+        "op_gte",
+        "op_lt",
+        "op_lte",
+    )
 
     op_gt: TObj
     """Value for greater-than operator."""
@@ -42,12 +50,12 @@ class Range(Generic[TObj], Condition[TObj]):
     """Value for less-than-or-equal operator."""
 
     def __init__(
-            self,
-            *,
-            gt: TObj | None = None,
-            gte: TObj | None = None,
-            lt: TObj | None = None,
-            lte: TObj | None = None,
+        self,
+        *,
+        gt: TObj | None = None,
+        gte: TObj | None = None,
+        lt: TObj | None = None,
+        lte: TObj | None = None,
     ):
         """Create from the individual conditions"""
         self.op_gt = gt
@@ -69,8 +77,7 @@ class Gt(Generic[TObj], Condition[TObj]):
         if is_primitive(value):
             self.op_gt = value
         else:
-            raise RuntimeError(
-                f"Argument of Gt operator has type {TypeUtil.name(value)} which is not a primitive.")
+            raise RuntimeError(f"Argument of Gt operator has type {TypeUtil.name(value)} which is not a primitive.")
 
 
 class Gte(Generic[TObj], Condition[TObj]):
@@ -86,8 +93,7 @@ class Gte(Generic[TObj], Condition[TObj]):
         if is_primitive(value):
             self.op_gte = value
         else:
-            raise RuntimeError(
-                f"Argument of Gte operator has type {TypeUtil.name(value)} which is not a primitive.")
+            raise RuntimeError(f"Argument of Gte operator has type {TypeUtil.name(value)} which is not a primitive.")
 
 
 class Lt(Generic[TObj], Condition[TObj]):
@@ -103,8 +109,7 @@ class Lt(Generic[TObj], Condition[TObj]):
         if is_primitive(value):
             self.op_lt = value
         else:
-            raise RuntimeError(
-                f"Argument of Lt operator has type {TypeUtil.name(value)} which is not a primitive.")
+            raise RuntimeError(f"Argument of Lt operator has type {TypeUtil.name(value)} which is not a primitive.")
 
 
 class Lte(Generic[TObj], Condition[TObj]):
@@ -120,8 +125,7 @@ class Lte(Generic[TObj], Condition[TObj]):
         if is_primitive(value):
             self.op_lte = value
         else:
-            raise RuntimeError(
-                f"Argument of Lte operator has type {TypeUtil.name(value)} which is not a primitive.")
+            raise RuntimeError(f"Argument of Lte operator has type {TypeUtil.name(value)} which is not a primitive.")
 
 
 class And(Generic[TObj], Condition[TObj]):
@@ -176,8 +180,7 @@ class Exists(Generic[TObj], Condition[TObj]):
         if type(value) is bool:
             self.op_exists = value
         else:
-            raise RuntimeError(
-                f"Argument of Exists operator has type {TypeUtil.name(value)} which is not a bool.")
+            raise RuntimeError(f"Argument of Exists operator has type {TypeUtil.name(value)} which is not a bool.")
 
 
 class In(Generic[TObj], Condition[TObj]):
@@ -195,8 +198,7 @@ class In(Generic[TObj], Condition[TObj]):
         elif is_sequence(values):
             self.op_in = tuple(values)
         else:
-            raise RuntimeError(
-                f"Argument of In operator has type {TypeUtil.name(values)} which is not a sequence.")
+            raise RuntimeError(f"Argument of In operator has type {TypeUtil.name(values)} which is not a sequence.")
 
 
 class NotIn(Generic[TObj], Condition[TObj]):
@@ -214,5 +216,4 @@ class NotIn(Generic[TObj], Condition[TObj]):
         elif is_sequence(values):
             self.op_nin = tuple(values)
         else:
-            raise RuntimeError(
-                f"Argument of NotIn operator has type {TypeUtil.name(values)} which is not a sequence.")
+            raise RuntimeError(f"Argument of NotIn operator has type {TypeUtil.name(values)} which is not a sequence.")

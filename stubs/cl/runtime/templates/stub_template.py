@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.templates.template_engine_key import TemplateEngineKey
 from cl.runtime.templates.template_mixin import TemplateMixin
-from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime.templates.stub_template_key import StubTemplateKey
 
 

@@ -16,23 +16,23 @@ import pytest
 import orjson
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.conditions import In, Exists, NotIn, Range
+from cl.runtime.records.conditions import Exists
+from cl.runtime.records.conditions import In
+from cl.runtime.records.conditions import NotIn
+from cl.runtime.records.conditions import Range
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
-from cl.runtime.serializers.data_serializer import DataSerializer
-from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from cl.runtime.serializers.type_inclusion import TypeInclusion
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields_query import StubDataclassNestedFieldsQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_query import StubDataclassPolymorphicQuery
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import \
-    StubDataclassPrimitiveFieldsQuery
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
+    StubDataclassPrimitiveFieldsQuery,
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassQuery
 
 _SAMPLES = [
     StubDataclassQuery(
-        id = "abc",
+        id="abc",
     ).build(),
     StubDataclassDerivedQuery(
         derived_str_field=Exists(True),
@@ -43,9 +43,7 @@ _SAMPLES = [
     StubDataclassDerivedQuery(
         derived_str_field=NotIn(["def"]),
     ).build(),
-    StubDataclassPrimitiveFieldsQuery(
-        key_int_field=Range(gt=1, lt=10)
-    ).build(),
+    StubDataclassPrimitiveFieldsQuery(key_int_field=Range(gt=1, lt=10)).build(),
     StubDataclassNestedFieldsQuery().build(),
     StubDataclassPolymorphicQuery().build(),
 ]
