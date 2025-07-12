@@ -135,7 +135,7 @@ class Db(DbKey, RecordMixin, ABC):
         query: QueryMixin,
         *,
         dataset: str | None = None,
-        cast_to: type | None = None,
+        filter_to: type | None = None,
     ) -> int:
         """
         Return the count of records that match the specified query.
@@ -143,7 +143,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            filter_to: Count only the subtypes of this type (defaults to the query target type)
         """
 
     @abstractmethod

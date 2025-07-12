@@ -77,7 +77,7 @@ def test_count_where(pytest_basic_mongo_db):
         table_field=table_field,
         record_field=record_field,
     ).build()
-    count = DbContext.count_where(query, cast_to=StubDataclassPolymorphic)
+    count = DbContext.count_where(query, filter_to=StubDataclassPolymorphic)
     assert count == 1
 
 

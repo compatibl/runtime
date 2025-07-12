@@ -117,7 +117,7 @@ class LocalCache(Db):
         query: QueryMixin,
         *,
         dataset: str | None = None,
-        cast_to: type | None = None,
+        filter_to: type | None = None,
     ) -> int:
         raise NotImplementedError()
 

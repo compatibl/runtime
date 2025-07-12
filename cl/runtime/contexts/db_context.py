@@ -342,7 +342,7 @@ class DbContext(Context):
         query: QueryMixin,
         *,
         dataset: str | None = None,
-        cast_to: type | None = None,
+        filter_to: type | None = None,
     ) -> int:
         """
         Return the count of records that match the specified query using the current context's DB.
@@ -350,10 +350,10 @@ class DbContext(Context):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            filter_to: Count only the subtypes of this type (defaults to the query target type)
         """
         db = cls._get_db()
-        return db.count_where(query, dataset=dataset, cast_to=cast_to)
+        return db.count_where(query, dataset=dataset, filter_to=filter_to)
 
     @classmethod
     def save_one(
