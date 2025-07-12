@@ -14,11 +14,10 @@
 
 from abc import ABC
 from abc import abstractmethod
-from cl.runtime.records.partition_mixin import PartitionMixin
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.data_mixin import DataMixin
 
 
-class QueryMixin(PartitionMixin, ABC):
+class QueryMixin(DataMixin, ABC):
     """Optional mixin for a query."""
 
     __slots__ = ()
@@ -29,6 +28,7 @@ class QueryMixin(PartitionMixin, ABC):
     def get_target_type(cls) -> type:
         """The query will return only the subtypes of this type (each derived query must override)."""
 
-    def get_table(self) -> str:
-        """Return table name for this record as a PascalCase string, return key type name by default."""
-        return TypeUtil.name(self.get_target_type().get_key_type())
+    def get_partition(self) -> str | None:
+        """Return partition in non-delimited PascalCase string format or None for non-partitioned tables."""
+        return None
+

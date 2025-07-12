@@ -13,14 +13,20 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.experiments.trial_partition import TrialPartition
 from cl.runtime.records.conditions import Condition
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.query_mixin import QueryMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialKeyQuery(TrialPartition):
-    """Query TrialKey by the experiment and timestamp fields."""
+class TrialKeyQuery(QueryMixin):
+    """Query for TrialKey by the experiment and timestamp fields."""
+
+    experiment: ExperimentKey = required()
+    """Experiment for which the trial is performed."""
 
     timestamp: str | Condition[str] | None = None  # TODO: Use UUID based timestamp for faster range queries
     """Trial timestamp must be unique for each experiment but not globally."""
@@ -28,3 +34,6 @@ class TrialKeyQuery(TrialPartition):
     @classmethod
     def get_target_type(cls) -> type:
         return TrialKey
+
+    def get_partition(self) -> str | None:
+        return self.experiment.experiment_type.experiment_type_id + "Trial"

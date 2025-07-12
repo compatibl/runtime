@@ -15,12 +15,15 @@
 from dataclasses import dataclass
 from typing import Tuple
 from cl.runtime.records.for_dataclasses.extensions import required
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_table import StubDataclassPolymorphicTable
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassPolymorphicKey(StubDataclassPolymorphicTable):
+class StubDataclassPolymorphicKey(KeyMixin):
     """Specifies the table where this record is stored and the key within that table."""
+
+    table_field: str = required()
+    """Specifies the table where this record is stored."""
 
     key_field: str = required()
     """Unique within this table where this record is stored."""
@@ -29,8 +32,7 @@ class StubDataclassPolymorphicKey(StubDataclassPolymorphicTable):
     def get_key_type(cls) -> type:
         return StubDataclassPolymorphicKey
 
-    def get_table(self) -> str:
-        """Override the default to specify a custom table name."""
+    def get_partition(self) -> str | None:
         return self.table_field
 
     def serialize_key(self) -> Tuple:

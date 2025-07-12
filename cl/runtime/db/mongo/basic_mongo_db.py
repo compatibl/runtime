@@ -141,7 +141,7 @@ class BasicMongoDb(Db):
         query.check_frozen()
 
         # Get collection using table name from the query
-        table = query.get_table()
+        table = query.get_partition()
         collection = self._get_mongo_collection(table)
 
         # Serialize the query
@@ -197,7 +197,7 @@ class BasicMongoDb(Db):
         query.check_frozen()
 
         # Get collection using table name from the query
-        table = query.get_table()
+        table = query.get_partition()
         collection = self._get_mongo_collection(table)
 
         # Serialize the query

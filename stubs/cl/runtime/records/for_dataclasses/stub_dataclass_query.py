@@ -27,9 +27,6 @@ class StubDataclassQuery(QueryMixin):
     id: str | Condition[str] | None = None
     """Unique identifier."""
 
-    def get_table(self) -> str:
-        return TypeUtil.name(StubDataclassKey)
-
     @classmethod
     def get_target_type(cls) -> type:
         return StubDataclass

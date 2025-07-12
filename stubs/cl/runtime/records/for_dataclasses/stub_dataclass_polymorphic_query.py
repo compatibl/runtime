@@ -13,14 +13,18 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.query_mixin import QueryMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_table import StubDataclassPolymorphicTable
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPolymorphicQuery(StubDataclassPolymorphicTable, QueryMixin):
+class StubDataclassPolymorphicQuery(QueryMixin):
     """Query for the stub record with a polymorphic key."""
+
+    table_field: str = required()
+    """Specifies the table where this record is stored."""
 
     key_field: str | None = None
     """Unique within this table where this record is stored."""
@@ -31,3 +35,7 @@ class StubDataclassPolymorphicQuery(StubDataclassPolymorphicTable, QueryMixin):
     @classmethod
     def get_target_type(cls) -> type:
         return StubDataclassPolymorphic
+
+    def get_partition(self) -> str | None:
+        return self.table_field
+

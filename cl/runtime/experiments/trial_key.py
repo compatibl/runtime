@@ -13,13 +13,17 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.trial_partition import TrialPartition
+from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class TrialKey(TrialPartition):
+class TrialKey(KeyMixin):
     """Abstract base class for a single trial of a statistical experiment."""
+
+    experiment: ExperimentKey = required()
+    """Experiment for which the trial is performed."""
 
     timestamp: str = required()
     """Trial timestamp must be unique for each experiment but not globally."""
@@ -27,3 +31,6 @@ class TrialKey(TrialPartition):
     @classmethod
     def get_key_type(cls) -> type:
         return TrialKey
+
+    def get_partition(self) -> str | None:
+        return self.experiment.experiment_type.experiment_type_id + "Trial"

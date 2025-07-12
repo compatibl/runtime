@@ -23,7 +23,7 @@ from cl.runtime.tasks.task_status import TaskStatus
 
 @dataclass(slots=True, kw_only=True)
 class TaskQuery(QueryMixin):
-    """Query Task by the queue and status fields."""
+    """Query for Task by the queue and status fields."""
 
     queue: TaskQueueKey = required()
     """The queue that will run the task once it is saved."""
