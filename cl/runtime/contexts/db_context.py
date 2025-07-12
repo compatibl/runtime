@@ -316,7 +316,7 @@ class DbContext(Context):
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Cast the result to this type (error if not a subtype)
-            filter_to: Narrow the query to return only the subtypes of this type (defaults to the query target type)
+            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
             slice_to: Slice fields from the stored record using projection to return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)

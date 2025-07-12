@@ -26,9 +26,9 @@ class QueryMixin(TableMixin, ABC):
 
     @classmethod
     @abstractmethod
-    def get_record_type(cls) -> type:  # TODO: Rename to get_queried_type as this may be a key
-        """Get record type matched by this query (a derived query type must override to match a derived record type)."""
+    def get_target_type(cls) -> type:
+        """The query will return only the subtypes of this type (each derived query must override)."""
 
     def get_table(self) -> str:
         """Return table name for this record as a PascalCase string, return key type name by default."""
-        return TypeUtil.name(self.get_record_type().get_key_type())
+        return TypeUtil.name(self.get_target_type().get_key_type())

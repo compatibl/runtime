@@ -31,5 +31,5 @@ class StubDataclassQuery(QueryMixin):
         return TypeUtil.name(StubDataclassKey)
 
     @classmethod
-    def get_record_type(cls) -> type:
+    def get_target_type(cls) -> type:
         return StubDataclass

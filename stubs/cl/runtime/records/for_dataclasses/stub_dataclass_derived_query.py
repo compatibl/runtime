@@ -26,5 +26,5 @@ class StubDataclassDerivedQuery(StubDataclassQuery):
     """Stub field."""
 
     @classmethod
-    def get_record_type(cls) -> type:
+    def get_target_type(cls) -> type:
         return StubDataclassDerived

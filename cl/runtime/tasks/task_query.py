@@ -32,5 +32,5 @@ class TaskQuery(QueryMixin):
     """Begins from Pending, continues to Running or Paused, and ends with Completed, Failed, or Cancelled."""
 
     @classmethod
-    def get_record_type(cls) -> type:
+    def get_target_type(cls) -> type:
         return Task

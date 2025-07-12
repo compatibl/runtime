@@ -26,5 +26,5 @@ class TrialKeyQuery(TrialShard):
     """Trial timestamp must be unique for each experiment but not globally."""
 
     @classmethod
-    def get_record_type(cls) -> type:
+    def get_target_type(cls) -> type:
         return TrialKey

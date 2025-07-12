@@ -41,7 +41,7 @@ from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from runtime.cl.runtime.records.cast_util import CastUtil
+from cl.runtime.records.cast_util import CastUtil
 
 invalid_db_name_symbols = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -154,8 +154,8 @@ class BasicMongoDb(Db):
         # Validate filter_to or use the query target type if not specified
         if filter_to is None:
             # Default to the query target type
-            filter_to = query.get_record_type()
-        elif not issubclass(filter_to, (query_target_type := query.get_record_type())):
+            filter_to = query.get_target_type()
+        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
             # Ensure filter_to is a subclass of the query target type
             raise RuntimeError(
                 f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
@@ -210,8 +210,8 @@ class BasicMongoDb(Db):
         # Validate filter_to or use the query target type if not specified
         if filter_to is None:
             # Default to the query target type
-            filter_to = query.get_record_type()
-        elif not issubclass(filter_to, (query_target_type := query.get_record_type())):
+            filter_to = query.get_target_type()
+        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
             # Ensure filter_to is a subclass of the query target type
             raise RuntimeError(
                 f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
