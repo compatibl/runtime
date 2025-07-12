@@ -21,17 +21,17 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
-class ShardMixin(DataMixin, ABC):
-    """Abstract base for the data that determines the shard for sharded tables."""
+class PartitionMixin(DataMixin, ABC):
+    """Abstract base for the data that determines the partition for partitioned tables."""
 
     __slots__ = SlotsUtil.merge_slots(DataMixin)
     """To prevent creation of __dict__ in derived types."""
 
     @abstractmethod
-    def get_table(self) -> str:  # TODO: Rename to get_shard or rely on fields in shard class?
+    def get_table(self) -> str:  # TODO: Rename to get_partition or rely on fields in partition class?
         """Return table name for this record as a PascalCase string."""
 
-    # TODO: Move to KeyUtil class and share between KeyMixin and ShardMixin
+    # TODO: Move to KeyUtil class and share between KeyMixin and PartitionMixin
     def serialize_key(self) -> Tuple:
         """Implement using get_key_type during transition to the new API."""
         if hasattr(self, "get_key_type"):

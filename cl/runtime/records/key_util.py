@@ -23,7 +23,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.shard_mixin import ShardMixin
+from cl.runtime.records.partition_mixin import PartitionMixin
 from cl.runtime.records.type_util import TypeUtil
 
 
@@ -34,8 +34,8 @@ class KeyUtil:
     def normalize_table(cls, type_or_table: type[KeyMixin] | str) -> str:
         """Get table name from key type using the standard naming convention, leave string table name unchanged."""
         if isinstance(type_or_table, type) and (
-            issubclass(type_or_table, ShardMixin) or issubclass(type_or_table, KeyMixin)
-        ):  # TODO: Use is_shard instead?
+            issubclass(type_or_table, PartitionMixin) or issubclass(type_or_table, KeyMixin)
+        ):  # TODO: Use is_partition instead?
             table = TypeUtil.name(type_or_table)  # TODO: Remove Key suffix
         elif isinstance(type_or_table, str):
             table = type_or_table

@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.trial_shard import TrialShard
+from cl.runtime.experiments.trial_partition import TrialPartition
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True)
-class TrialKey(TrialShard):
+class TrialKey(TrialPartition):
     """Abstract base class for a single trial of a statistical experiment."""
 
     timestamp: str = required()

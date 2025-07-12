@@ -15,11 +15,11 @@
 from dataclasses import dataclass
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.shard_mixin import ShardMixin
+from cl.runtime.records.partition_mixin import PartitionMixin
 
 
 @dataclass(slots=True)
-class TrialShard(ShardMixin):
+class TrialPartition(PartitionMixin):
     """Abstract base class for a single trial of a statistical experiment."""
 
     experiment: ExperimentKey = required()

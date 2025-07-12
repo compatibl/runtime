@@ -36,7 +36,7 @@ class KeyMixin(DataMixin, ABC):
         """Return table name for this record as a PascalCase string, return key type name by default."""
         return TypeUtil.name(self.get_key_type())
 
-    # TODO: Move to KeyUtil class and share between KeyMixin and ShardMixin
+    # TODO: Move to KeyUtil class and share between KeyMixin and PartitionMixin
     def serialize_key(self) -> Tuple:
         """Implement using get_key_type during transition to the new API."""
         if hasattr(self, "get_key_type"):

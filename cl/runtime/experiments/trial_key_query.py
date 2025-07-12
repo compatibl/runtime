@@ -14,12 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.experiments.trial_key import TrialKey
-from cl.runtime.experiments.trial_shard import TrialShard
+from cl.runtime.experiments.trial_partition import TrialPartition
 from cl.runtime.records.conditions import Condition
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialKeyQuery(TrialShard):
+class TrialKeyQuery(TrialPartition):
     """Query TrialKey by the experiment and timestamp fields."""
 
     timestamp: str | Condition[str] | None = None  # TODO: Use UUID based timestamp for faster range queries
