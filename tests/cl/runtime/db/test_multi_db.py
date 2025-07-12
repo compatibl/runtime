@@ -15,12 +15,11 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
-from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.conditions import In
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import StubDataclassPrimitiveFieldsQuery
+from cl.runtime.records.data_util import DataUtil
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -37,6 +36,9 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased import StubDataclassAliased
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
+    StubDataclassPrimitiveFieldsQuery,
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned import StubDataclassVersioned
 
 _SAMPLES = [
@@ -203,6 +205,7 @@ def test_repeated(pytest_multi_db):
     assert len(loaded_records) == 1
     assert loaded_records[0] == record
 
+
 def test_load_where(pytest_basic_mongo_db):  # TODO: Use test_multi_db fixture when implemented
     """Test count_where for a string field."""
     records = [
@@ -220,6 +223,7 @@ def test_load_where(pytest_basic_mongo_db):  # TODO: Use test_multi_db fixture w
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
     assert to_key_str_field(DbContext.load_where(eq_query)) == ["def"]
     assert to_key_str_field(DbContext.load_where(in_query)) == ["def", "xyz"]
+
 
 def test_count_where(pytest_basic_mongo_db):  # TODO: Use test_multi_db fixture when implemented
     """Test count_where for a string field."""
