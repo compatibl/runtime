@@ -191,10 +191,12 @@ class SqliteDb(Db):
         query: QueryMixin,
         *,
         dataset: str | None = None,
-        cast_to: type | None = None,
+        cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        slice_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> Sequence[RecordMixin]:
+    ) -> Sequence[TRecord]:
         raise NotImplementedError()
 
     def count_where(

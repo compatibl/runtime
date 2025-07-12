@@ -304,6 +304,8 @@ class DbContext(Context):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        slice_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> Sequence[TRecord] | None:
@@ -313,13 +315,18 @@ class DbContext(Context):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            cast_to: Cast the result to this type (error if not a subtype)
+            filter_to: Narrow the query to return only the subtypes of this type (defaults to the query target type)
+            slice_to: Slice fields from the stored record using projection to return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
         result = cls._get_db().load_where(
             query,
             dataset=cls.get_dataset(dataset),
+            cast_to=cast_to,
+            filter_to=filter_to,
+            slice_to=slice_to,
             limit=limit,
             skip=skip,
         )

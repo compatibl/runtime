@@ -41,6 +41,7 @@ from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from runtime.cl.runtime.records.cast_util import CastUtil
 
 invalid_db_name_symbols = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -130,26 +131,14 @@ class BasicMongoDb(Db):
         query: QueryMixin,
         *,
         dataset: str | None = None,
-        cast_to: type | None = None,
-        # TODO: Add sort
+        cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        slice_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> Sequence[RecordMixin]:
+    ) -> Sequence[TRecord]:
         # Check that query has been frozen
         query.check_frozen()
-
-        # Get record type from the query and key type from the record
-        record_type = query.get_record_type()
-        if cast_to is None:
-            # Limit returned results to record_type if cast_to is not specified
-            cast_to = record_type
-        else:
-            # Ensure cast_to is a subclass of query_record_type
-            if not issubclass(cast_to, record_type):
-                raise RuntimeError(
-                    f"In {TypeUtil.name(self)}.load_where, cast_to={TypeUtil.name(cast_to)} which is not a subclass\n"
-                    f"of the type {TypeUtil.name(record_type)} returned by {TypeUtil.name(query)}.get_record_type()."
-                )
 
         # Get collection using table name from the query
         table = query.get_table()
@@ -162,16 +151,37 @@ class BasicMongoDb(Db):
         # Convert op_* fields to MongoDB $* syntax
         query_dict = self._convert_op_fields_to_mongo_syntax(query_dict)
 
-        # Add condition on type
-        subtype_names = TypeInfoCache.get_child_names(cast_to)
+        # Validate filter_to or use the query target type if not specified
+        if filter_to is None:
+            # Default to the query target type
+            filter_to = query.get_record_type()
+        elif not issubclass(filter_to, (query_target_type := query.get_record_type())):
+            # Ensure filter_to is a subclass of the query target type
+            raise RuntimeError(
+                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+            )
+
+        # Add filter condition on type
+        subtype_names = TypeInfoCache.get_child_names(filter_to)
         query_dict["_type"] = {"$in": subtype_names}
+
+        # Set cast_to to filter_to if not specified
+        if cast_to is None:
+            cast_to = filter_to
 
         serialized_records = collection.find(query_dict)
         result = []
+        # TODO: Convert to comprehension for performance
         for serialized_record in serialized_records:
             del serialized_record["_id"]
             del serialized_record["_key"]
-            record = data_serializer.deserialize(serialized_record)  # TODO: Convert to comprehension for performance
+
+            # Create a record from the serialized data
+            record = data_serializer.deserialize(serialized_record)
+
+            # Apply cast (error if not a subtype)
+            record = CastUtil.cast(cast_to, record)
             result.append(record)
         return RecordUtil.sort_records_by_key(result)  # TODO: Decide on the default sorting method
 
