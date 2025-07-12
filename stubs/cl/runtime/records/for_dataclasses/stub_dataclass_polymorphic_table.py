@@ -14,11 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.table_mixin import TableMixin
+from cl.runtime.records.partition_mixin import PartitionMixin
 
 
 @dataclass(slots=True)
-class StubDataclassPolymorphicTable(TableMixin):
+class StubDataclassPolymorphicTable(PartitionMixin):
     """Specifies the table where this record is stored."""
 
     table_field: str = required()

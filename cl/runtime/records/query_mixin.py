@@ -14,11 +14,11 @@
 
 from abc import ABC
 from abc import abstractmethod
-from cl.runtime.records.table_mixin import TableMixin
+from cl.runtime.records.partition_mixin import PartitionMixin
 from cl.runtime.records.type_util import TypeUtil
 
 
-class QueryMixin(TableMixin, ABC):
+class QueryMixin(PartitionMixin, ABC):
     """Optional mixin for a query."""
 
     __slots__ = ()
