@@ -52,36 +52,18 @@ def _multiple_table_stubs():
     return [*stub_experiments_table_1, *stub_experiments_table_2]
 
 
-def test_save_table(pytest_default_db):
-    """Test saving records of the same type to different tables."""
+def test_load_tables(pytest_default_db):  # TODO: Extend to multiple DBs
+    """Test loading the list of dynamic table names."""
 
     stubs = _multiple_table_stubs()
     DbContext.save_many(stubs)
 
-    created_table_names = [x.table_id for x in TableUtil.get_tables()]
+    # Check the loaded tables
+    loaded_table_names = DbContext.load_tables()
+    assert loaded_table_names == ("ExperimentTable1", "ExperimentTable2")
 
-    # Check expected tables
-    assert PytestUtil.assert_equals_iterable_without_ordering(
-        created_table_names, ["ExperimentTable1", "ExperimentTable2", "TableKey"]
-    )
-
-
-def test_table_schema_type(pytest_default_db):
-    """Test get type from table name."""
-
-    stubs = _multiple_table_stubs()
-    DbContext.save_many(stubs)
-
-    # Add table prefix and get class for synthetic type name
-    table_synthetic_type_name = TableUtil.add_table_prefix("ExperimentTable1")
-    table_type = TypeInfoCache.get_class_from_type_name(table_synthetic_type_name)
-
-    # Check table type. Temporary it is a first child from key class
-    assert table_type == BinaryExperiment
-
-
-def test_load_table(pytest_default_db):
-    """Test load records of the same type from different tables."""
+def test_load_all(pytest_default_db):  # TODO: Extend to multiple DBs
+    """Test load_all for dynamic table names."""
 
     stubs = _multiple_table_stubs()
     DbContext.save_many(stubs)

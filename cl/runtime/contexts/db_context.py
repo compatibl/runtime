@@ -111,6 +111,11 @@ class DbContext(Context):
             return DatasetUtil.root()
 
     @classmethod
+    def load_tables(cls) -> Sequence[str]:
+        """Return table names as non-delimited PascalCase strings in alphabetical order."""
+        return cls._get_db().load_tables()
+
+    @classmethod
     def load_one(
         cls,
         record_or_key: TKey,

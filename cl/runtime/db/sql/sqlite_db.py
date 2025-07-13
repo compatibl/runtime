@@ -59,6 +59,9 @@ def dict_factory(cursor, row):
 class SqliteDb(Db):
     """Sqlite database without dataset and mile wide table for inheritance."""
 
+    def load_tables(self) -> Sequence[str]:
+        raise NotImplementedError()
+
     def batch_size(self) -> int:
         pass
 

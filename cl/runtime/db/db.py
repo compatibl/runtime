@@ -26,6 +26,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.records.table import Table
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.settings.db_settings import DbSettings
 
@@ -36,6 +37,10 @@ class Db(DbKey, RecordMixin, ABC):
 
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id).build()
+
+    @abstractmethod
+    def load_tables(self) -> Sequence[str]:
+        """Return table names as non-delimited PascalCase strings in alphabetical order."""
 
     @abstractmethod
     def load_many_unsorted(

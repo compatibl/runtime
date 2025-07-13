@@ -74,6 +74,10 @@ class BasicMongoDb(Db):
     client_uri: str = "mongodb://localhost:27017/"
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
 
+    def load_tables(self) -> Sequence[str]:
+        collection_names = self._get_mongo_db().list_collection_names()
+        return tuple(sorted(collection_names))
+
     def load_many_unsorted(
         self,
         table: str,
