@@ -141,7 +141,7 @@ class BasicMongoDb(Db):
         query.check_frozen()
 
         # Get collection using table name from the query
-        table = query.get_partition()
+        table = query.get_table()
         collection = self._get_mongo_collection(table)
 
         # Serialize the query
@@ -197,7 +197,7 @@ class BasicMongoDb(Db):
         query.check_frozen()
 
         # Get collection using table name from the query
-        table = query.get_partition()
+        table = query.get_table()
         collection = self._get_mongo_collection(table)
 
         # Serialize the query
@@ -233,14 +233,8 @@ class BasicMongoDb(Db):
         dataset: str | None = None,
     ) -> None:
         # TODO: Provide a more performant implementation
-
-        # Add Table objects to save at the end
-        # TODO (Roman): Improve performance
-        tables = TableUtil.get_tables_in_records(records)
-        records_to_save = itertools.chain(records, tables)
-
-        for record in records_to_save:
-            table = TableUtil.get_table(record)
+        for record in records:
+            table = record.get_table()
 
             db = self._get_mongo_db()
             collection = db[table]

@@ -214,17 +214,11 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
     ) -> None:
-
-        # Add Table objects to records to save
-        # TODO (Roman): Improve performance
-        tables = TableUtil.get_tables_in_records(records)
-        records_to_save = itertools.chain(records, tables)
-
         schema_manager = self._get_schema_manager()
 
         # Group keys by table
         records_grouped_by_table = defaultdict(list)
-        consume(records_grouped_by_table[TableUtil.get_table(record)].append(record) for record in records_to_save)
+        consume(records_grouped_by_table[record.get_table()].append(record) for record in records)
 
         # Iterate over tables
         for table, table_records in records_grouped_by_table.items():

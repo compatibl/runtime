@@ -242,7 +242,7 @@ class DbContext(Context):
 
         # Group keys by table
         keys_to_load_grouped_by_table = defaultdict(list)
-        consume(keys_to_load_grouped_by_table[TableUtil.get_table(key)].append(key) for key in keys_to_load)
+        consume(keys_to_load_grouped_by_table[key.get_table()].append(key) for key in keys_to_load)
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_table = [
@@ -451,7 +451,7 @@ class DbContext(Context):
 
         # Group keys by table
         keys_to_delete_grouped_by_table = defaultdict(list)
-        consume(keys_to_delete_grouped_by_table[TableUtil.get_table(key)].append(key) for key in keys)
+        consume(keys_to_delete_grouped_by_table[key.get_table()].append(key) for key in keys)
 
         # Perform delete for each table
         consume(
