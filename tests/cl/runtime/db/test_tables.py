@@ -18,6 +18,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.binary_experiment import BinaryExperiment
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
+from cl.runtime.experiments.experiment_key_query import ExperimentKeyQuery
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.table_util import TableUtil
@@ -68,17 +69,15 @@ def test_load_all(pytest_default_db):  # TODO: Extend to multiple DBs
     stubs = _multiple_table_stubs()
     DbContext.save_many(stubs)
 
-    # Load all tables for key type
-    actual_result = DbContext.load_all(ExperimentKey)
-    assert PytestUtil.assert_equals_iterable_without_ordering(actual_result, stubs)
-
     # Load table 'ExperimentTable1'
-    actual_result = DbContext.load_all(ExperimentKey, tables=["ExperimentTable1"])
-    assert PytestUtil.assert_equals_iterable_without_ordering(actual_result, [stubs[0], stubs[1]])
+    query = ExperimentKeyQuery(experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1")).build()
+    result_1 = DbContext.load_where(query)
+    assert result_1 == (stubs[0], stubs[1])
 
     # Load table 'ExperimentTable2'
-    actual_result = DbContext.load_all(ExperimentKey, tables=["ExperimentTable2"])
-    assert PytestUtil.assert_equals_iterable_without_ordering(actual_result, [stubs[2], stubs[3]])
+    query = ExperimentKeyQuery(experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2")).build()
+    result_2 = DbContext.load_where(query)
+    assert result_2 == (stubs[2], stubs[3])
 
 
 if __name__ == "__main__":
