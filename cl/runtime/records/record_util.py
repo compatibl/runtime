@@ -23,7 +23,7 @@ class RecordUtil:
     """Utilities for working with records."""
 
     @classmethod
-    def sort_records_by_key(cls, records: Iterable[RecordProtocol]) -> List[RecordProtocol]:
+    def sort_records_by_key(cls, records: Iterable[RecordProtocol]) -> tuple[RecordProtocol]:
         """Sort records by string key fields."""
 
         # TODO (Roman): Check string key fields in nested keys
@@ -35,4 +35,4 @@ class RecordUtil:
             sort_key = ";".join(str_key_values)
             sort_records.append((sort_key, record))
 
-        return [record for _, record in sorted(sort_records, key=lambda x: x[0])]
+        return tuple(record for _, record in sorted(sort_records, key=lambda x: x[0]))

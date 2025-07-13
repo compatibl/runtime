@@ -313,7 +313,7 @@ class DbContext(Context):
         slice_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> Sequence[TRecord] | None:
+    ) -> tuple[TRecord]:
         """
         Load records that match the specified query.
 
@@ -335,10 +335,6 @@ class DbContext(Context):
             limit=limit,
             skip=skip,
         )
-
-        # Cast to cast_to if specified
-        if cast_to is not None:
-            result = tuple(CastUtil.cast(cast_to, x) for x in result)
         return result
 
     @classmethod

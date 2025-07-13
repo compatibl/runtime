@@ -199,7 +199,7 @@ class SqliteDb(Db):
         slice_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> Sequence[TRecord]:
+    ) -> tuple[TRecord]:
         raise NotImplementedError()
 
     def count_where(

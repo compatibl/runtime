@@ -88,7 +88,7 @@ class Db(DbKey, RecordMixin, ABC):
         slice_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> Sequence[TRecord]:
+    ) -> tuple[TRecord]:
         """
         Load records that match the specified query.
 
