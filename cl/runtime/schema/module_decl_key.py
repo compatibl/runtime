@@ -29,7 +29,7 @@ class ModuleDeclKey(KeyMixin):
     """Module name in dot-delimited format."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return ModuleDeclKey
 
     def __init(self):

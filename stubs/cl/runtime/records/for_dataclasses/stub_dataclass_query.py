@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.conditions import Condition
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
 from stubs.cl.runtime import StubDataclass
@@ -28,5 +29,5 @@ class StubDataclassQuery(QueryMixin):
     """Unique identifier."""
 
     @classmethod
-    def get_target_type(cls) -> type:
+    def get_target_type(cls) -> type[KeyMixin]:
         return StubDataclass

@@ -25,6 +25,6 @@ class TableKey(KeyMixin):
     """Globally unique table identifier across all key types."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         """Return key type even when called from a record."""
         return TableKey

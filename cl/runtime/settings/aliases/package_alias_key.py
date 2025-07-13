@@ -32,5 +32,5 @@ class PackageAliasKey(KeyMixin):
     """Glob pattern for the dot-delimited module determines if the alias applies to a class."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return PackageAliasKey

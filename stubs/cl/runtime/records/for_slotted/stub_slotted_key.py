@@ -30,5 +30,5 @@ class StubSlottedKey(KeyMixin):
         self.record_id = record_id
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return StubSlottedKey

@@ -29,8 +29,8 @@ class TrialKey(KeyMixin):
     """Trial timestamp must be unique for each experiment but not globally."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return TrialKey
 
-    def get_partition(self) -> str | None:
+    def get_table(self) -> str:
         return self.experiment.experiment_type.experiment_type_id + "Trial"

@@ -18,6 +18,7 @@ from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.query_mixin import QueryMixin
 
 
@@ -32,8 +33,8 @@ class TrialKeyQuery(QueryMixin):
     """Trial timestamp must be unique for each experiment but not globally."""
 
     @classmethod
-    def get_target_type(cls) -> type:
+    def get_target_type(cls) -> type[KeyMixin]:
         return TrialKey
 
-    def get_partition(self) -> str | None:
+    def get_table(self) -> str:
         return self.experiment.experiment_type.experiment_type_id + "Trial"

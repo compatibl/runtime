@@ -29,10 +29,10 @@ class StubDataclassPolymorphicKey(KeyMixin):
     """Unique within this table where this record is stored."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return StubDataclassPolymorphicKey
 
-    def get_partition(self) -> str | None:
+    def get_table(self) -> str:
         return self.table_field
 
     def serialize_key(self) -> Tuple:

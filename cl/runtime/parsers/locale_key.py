@@ -25,5 +25,5 @@ class LocaleKey(KeyMixin):
     """Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return LocaleKey

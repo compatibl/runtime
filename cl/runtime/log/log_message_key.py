@@ -25,5 +25,5 @@ class LogMessageKey(KeyMixin):
     """Time-ordered UUID."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return LogMessageKey

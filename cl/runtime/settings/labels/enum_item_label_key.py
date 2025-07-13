@@ -31,5 +31,5 @@ class EnumItemLabelKey(KeyMixin):
     """Item name without reference to an enum (the setting will apply to this field name in every enum)."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return EnumItemLabelKey

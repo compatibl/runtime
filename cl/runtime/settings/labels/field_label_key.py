@@ -31,5 +31,5 @@ class FieldLabelKey(KeyMixin):
     """Field name without reference to a class (the setting will apply to this field name in every class)."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return FieldLabelKey

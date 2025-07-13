@@ -16,6 +16,7 @@ import datetime as dt
 from dataclasses import dataclass
 from uuid import UUID
 from cl.runtime.records.conditions import Condition
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.query_mixin import QueryMixin
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
@@ -104,5 +105,5 @@ class StubDataclassPrimitiveFieldsQuery(QueryMixin):
     """Stub field."""
 
     @classmethod
-    def get_target_type(cls) -> type:
+    def get_target_type(cls) -> type[KeyMixin]:
         return StubDataclassPrimitiveFields

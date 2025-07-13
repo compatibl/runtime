@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.conditions import Condition
+from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
@@ -48,5 +49,5 @@ class StubDataclassNestedFieldsQuery(StubDataclassQuery):
     """Stub field with key type initialized to record type instance."""
 
     @classmethod
-    def get_target_type(cls) -> type:
+    def get_target_type(cls) -> type[KeyMixin]:
         return StubDataclassNestedFields

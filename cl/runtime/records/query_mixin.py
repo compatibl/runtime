@@ -15,6 +15,8 @@
 from abc import ABC
 from abc import abstractmethod
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.type_util import TypeUtil
 
 
 class QueryMixin(DataMixin, ABC):
@@ -25,10 +27,10 @@ class QueryMixin(DataMixin, ABC):
 
     @classmethod
     @abstractmethod
-    def get_target_type(cls) -> type:
+    def get_target_type(cls) -> type[KeyMixin]:
         """The query will return only the subtypes of this type (each derived query must override)."""
 
-    def get_partition(self) -> str | None:
-        """Return partition in non-delimited PascalCase string format or None for non-partitioned tables."""
-        return None
+    def get_table(self) -> str:
+        """DB table in non-delimited PascalCase format (defaults to key type name with Key suffix removed)."""
+        return TypeUtil.name(self.get_target_type().get_key_type())
 

@@ -31,5 +31,5 @@ class MethodLabelKey(KeyMixin):
     """Method name without reference to a class (the setting will apply to this method name in every class)."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return MethodLabelKey

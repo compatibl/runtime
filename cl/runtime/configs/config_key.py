@@ -25,5 +25,5 @@ class ConfigKey(KeyMixin):
     """Unique configuration identifier."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return ConfigKey

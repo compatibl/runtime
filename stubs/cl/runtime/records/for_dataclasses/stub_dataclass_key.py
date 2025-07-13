@@ -25,7 +25,7 @@ class StubDataclassKey(KeyMixin):
     """Unique identifier."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return StubDataclassKey
 
     def serialize_key(self) -> Tuple:

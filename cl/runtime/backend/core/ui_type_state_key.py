@@ -30,5 +30,5 @@ class UiTypeStateKey(KeyMixin):
     """A user the app state is applied for."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return UiTypeStateKey

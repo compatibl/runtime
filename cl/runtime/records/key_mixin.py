@@ -29,12 +29,12 @@ class KeyMixin(DataMixin, ABC):
 
     @classmethod
     @abstractmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         """Return key type even when called from a record."""
 
-    def get_partition(self) -> str | None:
-        """Return partition in non-delimited PascalCase string format or None for non-partitioned tables."""
-        return None
+    def get_table(self) -> str:
+        """DB table in non-delimited PascalCase format (defaults to key type name with Key suffix removed)."""
+        return TypeUtil.name(self.get_key_type())
 
     # TODO: Move to KeyUtil class
     def serialize_key(self) -> Tuple:

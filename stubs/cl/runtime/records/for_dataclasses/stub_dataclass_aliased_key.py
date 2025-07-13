@@ -25,5 +25,5 @@ class StubDataclassAliasedKey(KeyMixin):  # TODO: Specify alias and add derived 
     """Unique identifier."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return StubDataclassAliasedKey

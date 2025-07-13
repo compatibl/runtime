@@ -29,8 +29,8 @@ class ExperimentScenarioKey(KeyMixin):
     """Unique experiment scenario identifier."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return ExperimentScenarioKey
 
-    def get_partition(self) -> str | None:
+    def get_table(self) -> str:
         return self.experiment_type.experiment_type_id + "Scenario"

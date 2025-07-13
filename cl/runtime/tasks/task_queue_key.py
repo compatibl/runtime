@@ -34,5 +34,5 @@ class TaskQueueKey(KeyMixin):
     """Unique task queue identifier."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return TaskQueueKey

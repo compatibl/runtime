@@ -25,5 +25,5 @@ class TemplateEngineKey(KeyMixin):
     """Unique template engine identifier."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return TemplateEngineKey

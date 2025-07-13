@@ -62,5 +62,5 @@ class StubDataclassPrimitiveFieldsKey(KeyMixin):
     """Stub field."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return StubDataclassPrimitiveFieldsKey

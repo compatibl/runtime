@@ -29,8 +29,8 @@ class ExperimentKey(KeyMixin):
     """Experiment identifier must be unique for each experiment type but not globally."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return ExperimentKey
 
-    def get_partition(self) -> str | None:
+    def get_table(self) -> str:
         return self.experiment_type.experiment_type_id

@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
@@ -32,5 +33,5 @@ class TaskQuery(QueryMixin):
     """Begins from Pending, continues to Running or Paused, and ends with Completed, Failed, or Cancelled."""
 
     @classmethod
-    def get_target_type(cls) -> type:
+    def get_target_type(cls) -> type[KeyMixin]:
         return Task

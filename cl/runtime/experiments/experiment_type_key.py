@@ -25,5 +25,5 @@ class ExperimentTypeKey(KeyMixin):
     """Unique experiment type identifier."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return ExperimentTypeKey

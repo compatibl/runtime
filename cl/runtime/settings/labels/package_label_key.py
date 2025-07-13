@@ -31,5 +31,5 @@ class PackageLabelKey(KeyMixin):
     """Package alias for which the package label is defined."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return PackageLabelKey

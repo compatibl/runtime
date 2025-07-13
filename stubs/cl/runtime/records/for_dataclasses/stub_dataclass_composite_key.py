@@ -32,5 +32,5 @@ class StubDataclassCompositeKey(KeyMixin):
     """Embedded key 2."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return StubDataclassCompositeKey

@@ -30,7 +30,7 @@ class TypeDeclKey(KeyMixin):
     """Type name is unique when combined with module."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return TypeDeclKey
 
     @classmethod

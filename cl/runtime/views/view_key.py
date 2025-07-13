@@ -28,5 +28,5 @@ class ViewKey(KeyMixin):
     """Name of the view displayed in the front end."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type[KeyMixin]:
         return ViewKey
