@@ -41,8 +41,9 @@ class ClassifierExperiment(Experiment, ABC):
         values = []
 
         scenario_counts = []
-        # TODO: Apply db filter.
-        all_trials = list(DbContext.current().load_type(record_type=ClassifierTrial))
+        # TODO: Apply db filter
+        raise NotImplementedError()
+        all_trials = list(DbContext.load_type(ClassifierTrial))
         for scenario in self.scenarios:
             trials = self.get_scenario_trials(all_trials, scenario)
             total = len(trials)

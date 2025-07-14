@@ -31,8 +31,9 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
             raise RuntimeError("Experiment must have scenarios to build a plot.")
 
         plots = []
-        # TODO: Apply db filter.
-        all_trials = list(DbContext.current().load_type(record_type=SupervisedClassifierTrial))
+        # TODO: Apply db filter
+        raise NotImplementedError()
+        all_trials = list(DbContext.load_type(SupervisedClassifierTrial))
         num_labels = len(self.class_labels)
 
         for scenario in self.scenarios:

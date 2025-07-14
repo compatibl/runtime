@@ -33,8 +33,9 @@ class BinaryExperiment(Experiment, ABC):
         group_labels = []
         bar_labels = []
         values = []
-        # TODO: Apply db filter.
-        all_trials = list(DbContext.current().load_type(record_type=BinaryTrial))
+        # TODO: Apply db filter
+        raise NotImplementedError()
+        all_trials = list(DbContext.load_type(BinaryTrial))
         for scenario in self.scenarios:
 
             trials = self.get_scenario_trials(all_trials, scenario)
