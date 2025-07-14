@@ -16,6 +16,7 @@ import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.conditions import In
