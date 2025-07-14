@@ -104,6 +104,5 @@ class StubDataclassPrimitiveFieldsQuery(QueryMixin):
     obj_int_enum_field: StubIntEnum | Condition[StubIntEnum] | None = None
     """Stub field."""
 
-    @classmethod
-    def get_target_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         return StubDataclassPrimitiveFields

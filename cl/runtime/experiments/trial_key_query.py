@@ -32,8 +32,7 @@ class TrialKeyQuery(QueryMixin):
     timestamp: str | Condition[str] | None = None  # TODO: Use UUID based timestamp for faster range queries
     """Trial timestamp must be unique for each experiment but not globally."""
 
-    @classmethod
-    def get_target_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         return TrialKey
 
     def get_table(self) -> str:

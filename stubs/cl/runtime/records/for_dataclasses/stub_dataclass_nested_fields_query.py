@@ -48,6 +48,5 @@ class StubDataclassNestedFieldsQuery(StubDataclassQuery):
     record_as_key_field: StubDataclassKey | Condition[StubDataclassKey] | None = None
     """Stub field with key type initialized to record type instance."""
 
-    @classmethod
-    def get_target_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         return StubDataclassNestedFields

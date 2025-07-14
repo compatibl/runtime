@@ -32,6 +32,5 @@ class TaskQuery(QueryMixin):
     status: TaskStatus | Condition[TaskStatus] | None = None
     """Begins from Pending, continues to Running or Paused, and ends with Completed, Failed, or Cancelled."""
 
-    @classmethod
-    def get_target_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         return Task

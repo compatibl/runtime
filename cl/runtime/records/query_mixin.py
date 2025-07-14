@@ -25,9 +25,8 @@ class QueryMixin(DataMixin, ABC):
     __slots__ = ()
     """To prevent creation of __dict__ in derived types."""
 
-    @classmethod
     @abstractmethod
-    def get_target_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         """The query will return only the subtypes of this type (each derived query must override)."""
 
     def get_table(self) -> str:

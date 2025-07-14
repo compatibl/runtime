@@ -33,8 +33,7 @@ class StubDataclassPolymorphicQuery(QueryMixin):
     record_field: str | None = None
     """Stub field of the record."""
 
-    @classmethod
-    def get_target_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         return StubDataclassPolymorphic
 
     def get_table(self) -> str:

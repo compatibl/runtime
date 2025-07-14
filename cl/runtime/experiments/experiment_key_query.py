@@ -32,8 +32,7 @@ class ExperimentKeyQuery(QueryMixin):
     experiment_id: str | Condition[str] | None = None
     """Experiment identifier must be unique for each experiment type but not globally."""
 
-    @classmethod
-    def get_target_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         return ExperimentKey
 
     def get_table(self) -> str:

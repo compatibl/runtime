@@ -26,6 +26,5 @@ class StubDataclassDerivedQuery(StubDataclassQuery):
     derived_str_field: str | Condition[str] | None = None
     """Stub field."""
 
-    @classmethod
-    def get_target_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         return StubDataclassDerived
