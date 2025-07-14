@@ -32,8 +32,8 @@ def test_smoke(pytest_basic_mongo_mock_db):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
-    DbContext.current().save_one(exp_type)
-    DbContext.current().save_one(sc1)
+    DbContext.save_one(exp_type)
+    DbContext.save_one(sc1)
 
     # Create and run the experiment
     experiment = StubSupervisedClassifierExperiment(
@@ -60,8 +60,8 @@ def test_experiment_plot(pytest_basic_mongo_mock_db, pytest_work_dir):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test2"
     ).build()
 
-    DbContext.current().save_one(exp_type)
-    DbContext.current().save_many([sc1, sc2])
+    DbContext.save_one(exp_type)
+    DbContext.save_many([sc1, sc2])
 
     experiment = StubSupervisedClassifierExperiment(
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"),

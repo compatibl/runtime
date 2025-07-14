@@ -62,9 +62,6 @@ class DbLogHandler(logging.Handler):
         ).build()
 
     def emit(self, record):
-        # TODO (Roman): Handle the case where the db context is not defined.
-        db_context = DbContext.current()
-
         # Save LogMessage to current db context.
         log_message = self._create_log_message(record)
-        db_context.save_one(log_message)
+        DbContext.save_one(log_message)

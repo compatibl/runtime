@@ -43,10 +43,8 @@ class SseQueryUtil:
         timestamp_field_name: str = "timestamp",
     ) -> Iterable[TRecord]:
         """Load records of 'record_type' using timestamp and limit. Ordered by descending timestamp."""
-
-        db_context = DbContext.current()
-        db = db_context.db
-
+        # TODO: Refactor to use DbContext
+        raise NotImplementedError()
         if isinstance(db, SqliteDb):
             return cls._load_from_timestamp_sqlite(
                 db, record_type, from_timestamp=from_timestamp, limit=limit, timestamp_field_name=timestamp_field_name

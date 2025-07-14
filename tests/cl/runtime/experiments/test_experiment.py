@@ -30,8 +30,8 @@ def test_run_many(pytest_basic_mongo_mock_db):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
-    DbContext.current().save_one(exp_type)
-    DbContext.current().save_one(sc1)
+    DbContext.save_one(exp_type)
+    DbContext.save_one(sc1)
 
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
@@ -98,8 +98,8 @@ def test_run_all(pytest_basic_mongo_mock_db):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
-    DbContext.current().save_one(exp_type)
-    DbContext.current().save_one(sc1)
+    DbContext.save_one(exp_type)
+    DbContext.save_one(sc1)
 
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
