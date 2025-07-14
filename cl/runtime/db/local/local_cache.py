@@ -63,15 +63,6 @@ class LocalCache(Db):
             # Tables are created on demand, table not found means no records with this key type are stored
             return []
 
-    def load_all(
-        self,
-        table: str,
-        record_type: type[TRecord],
-        *,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
-        raise NotImplementedError()
-
     def load_where(
         self,
         query: QueryMixin,

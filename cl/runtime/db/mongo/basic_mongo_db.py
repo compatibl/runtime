@@ -101,35 +101,6 @@ class BasicMongoDb(Db):
                 result.append(record)
         return result
 
-    def load_all(
-        self,
-        table: str,
-        record_type: type[TKey],
-        *,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
-        # Get key type
-        if is_record(record_type):
-            key_type = record_type.get_key_type()
-        elif is_key(record_type):
-            key_type = record_type
-        else:
-            raise RuntimeError(f"Type {TypeUtil.name(record_type)} passed to load_all method is not a record or key.")
-
-        # Get collection name from key type
-        db = self._get_mongo_db()
-        collection = db[table]
-
-        subtype_names = TypeInfoCache.get_child_names(record_type)
-        serialized_records = collection.find({"_type": {"$in": subtype_names}})
-        result = []
-        for serialized_record in serialized_records:
-            del serialized_record["_id"]
-            del serialized_record["_key"]
-            record = data_serializer.deserialize(serialized_record)  # TODO: Convert to comprehension for performance
-            result.append(record)
-        return RecordUtil.sort_records_by_key(result)
-
     def load_where(
         self,
         query: QueryMixin,

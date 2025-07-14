@@ -61,23 +61,6 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
-    def load_all(
-        self,
-        table: str,
-        record_type: type[TRecord],
-        *,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
-        """
-        Load all records of the specified type and its subtypes (excludes other types in the same DB table).
-
-        Args:
-            table: Logical database table name, may be different from the physical name or the key type name
-            record_type: Record type to load, error if the result is not this type or its subclass
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-        """
-
-    @abstractmethod
     def load_where(
         self,
         query: QueryMixin,

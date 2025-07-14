@@ -33,6 +33,7 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.table_util import TableUtil
+from cl.runtime.records.type_query import TypeQuery
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -274,35 +275,6 @@ class DbContext(Context):
         return result
 
     @classmethod
-    def load_all(
-        cls,
-        record_type: type[TRecord],
-        *,
-        tables: list[str] | None = None,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
-        """
-        Load all records of the specified type and its subtypes (excludes other types in the same DB table).
-
-        Args:
-            record_type: Type of the records to load
-            tables: List of tables to load
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-        """
-        # Load data across all tables if 'tables' parameter is None
-        tables = (
-            [x.table_id for x in TableUtil.get_tables(TypeUtil.name(record_type.get_key_type()))]
-            if tables is None
-            else tables
-        )
-
-        return [
-            record
-            for table in tables
-            for record in cls._get_db().load_all(table, record_type, dataset=cls.get_dataset(dataset))
-        ]
-
-    @classmethod
     def load_where(
         cls,
         query: QueryMixin,
@@ -331,6 +303,42 @@ class DbContext(Context):
             dataset=cls.get_dataset(dataset),
             cast_to=cast_to,
             filter_to=filter_to,
+            slice_to=slice_to,
+            limit=limit,
+            skip=skip,
+        )
+        return result
+
+    @classmethod
+    def load_all(
+        cls,
+        target_type: type[TKey],
+        *,
+        dataset: str | None = None,
+        cast_to: type[TKey] | None = None,
+        slice_to: type[TKey] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TKey]:
+        """
+        Load all records of target_type and its subtypes.
+
+        Notes:
+            Error if target_type defines custom tables by overriding get_table, use load_where in this case.
+
+        Args:
+            target_type: The query will return only the subtypes of this type (defaults to the query target type)
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Cast the result to this type (error if not a subtype)
+            slice_to: Slice fields from the stored record using projection to return instances of this type
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
+        """
+        query = TypeQuery(target_type).build()
+        result = cls._get_db().load_where(
+            query,
+            dataset=cls.get_dataset(dataset),
+            cast_to=cast_to,
             slice_to=slice_to,
             limit=limit,
             skip=skip,
