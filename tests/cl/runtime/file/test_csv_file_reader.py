@@ -43,7 +43,7 @@ def test_csv_file_reader(pytest_default_db):
     file_reader.csv_to_db()
 
     # Verify
-    # TODO: Check count using load_all or count method of Db when created
+    # TODO: Check count using load_type or count method of Db when created
     for i in range(1, 3):
         expected_record = StubDataclassDerived(
             id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"

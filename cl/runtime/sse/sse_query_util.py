@@ -129,7 +129,7 @@ class SseQueryUtil:
         elif is_key(record_type):
             key_type = record_type
         else:
-            raise RuntimeError(f"Type {TypeUtil.name(record_type)} passed to load_all method is not a record or key.")
+            raise RuntimeError(f"Type {TypeUtil.name(record_type)} passed to load_type method is not a record or key.")
 
         # Get collection name from key type
         collection_name = TypeUtil.name(key_type)  # TODO: Decision on short alias

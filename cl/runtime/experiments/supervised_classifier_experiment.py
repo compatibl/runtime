@@ -32,7 +32,7 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
 
         plots = []
         # TODO: Apply db filter.
-        all_trials = list(DbContext.current().load_all(record_type=SupervisedClassifierTrial))
+        all_trials = list(DbContext.current().load_type(record_type=SupervisedClassifierTrial))
         num_labels = len(self.class_labels)
 
         for scenario in self.scenarios:

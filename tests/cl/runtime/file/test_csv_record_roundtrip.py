@@ -94,7 +94,7 @@ def test_roundtrip(pytest_default_db):
             entry_type = type(expected_entries[0])
 
             read_records_from_csv(file_path, entry_type)
-            actual_records = tuple(DbContext.load_all(entry_type))
+            actual_records = tuple(DbContext.load_type(entry_type))
             assert actual_records == FreezeUtil.freeze(DataUtil.remove_none(expected_entries))
         finally:
             if file_path is not None:

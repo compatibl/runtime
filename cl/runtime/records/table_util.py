@@ -34,7 +34,7 @@ class TableUtil:
         # TODO: Refactor to avoid inline import
         from cl.runtime.contexts.db_context import DbContext
 
-        all_tables = DbContext.load_all(Table, tables=[Table().get_table()])
+        all_tables = DbContext.load_type(Table, tables=[Table().get_table()])
 
         if for_key_type is not None:
             return [x for x in all_tables if x.key_type == for_key_type]

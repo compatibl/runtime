@@ -62,7 +62,7 @@ class SelectResponse(RecordsWithSchemaResponse):
             load_type = request_type.get_key_type()
             tables = [TableUtil.remove_table_prefix(request.type_)]
 
-        records = DbContext.load_all(load_type, tables=tables)  # noqa
+        records = DbContext.load_type(load_type, tables=tables)  # noqa
 
         # Serialize records for table.
         serialized_records = [cls._serialize_record_for_table(record) for record in records]

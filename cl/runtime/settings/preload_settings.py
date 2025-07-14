@@ -65,7 +65,7 @@ class PreloadSettings(Settings):
         # TODO: Process YAML and JSON preloads
 
         # Execute run_config on all preloaded Config records
-        config_records = DbContext.load_all(Config)
+        config_records = DbContext.load_type(Config)
         tuple(config_record.run_configure() for config_record in config_records)
 
     def _get_files(self, ext: str) -> List[str]:

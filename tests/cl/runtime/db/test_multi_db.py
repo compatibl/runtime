@@ -143,8 +143,8 @@ def test_record_upsert(pytest_multi_db):
     assert loaded_record == override_sample
 
 
-def test_load_all(pytest_multi_db):
-    """Test 'load_all' method."""
+def test_load_type(pytest_multi_db):
+    """Test 'load_type' method."""
     base_samples = [
         sample.build()
         for sample in [
@@ -173,10 +173,10 @@ def test_load_all(pytest_multi_db):
 
     DbContext.save_many(all_samples)
 
-    loaded_records = DbContext.load_all(StubDataclass)
+    loaded_records = DbContext.load_type(StubDataclass)
     assert PytestUtil.assert_equals_iterable_without_ordering(all_samples, loaded_records)
 
-    loaded_records = DbContext.load_all(StubDataclassDerived)
+    loaded_records = DbContext.load_type(StubDataclassDerived)
     assert PytestUtil.assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
@@ -192,7 +192,7 @@ def test_singleton(pytest_multi_db):
 
     other_singleton_sample = StubDataclassSingleton(str_field="other").build()
     DbContext.save_one(other_singleton_sample)
-    all_records = list(DbContext.load_all(other_singleton_sample.__class__))
+    all_records = list(DbContext.load_type(other_singleton_sample.__class__))
     assert len(all_records) == 1
     assert all_records[0] == other_singleton_sample
 

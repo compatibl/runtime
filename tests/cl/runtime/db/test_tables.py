@@ -63,8 +63,8 @@ def test_load_tables(pytest_default_db):  # TODO: Extend to multiple DBs
     loaded_table_names = DbContext.load_tables()
     assert loaded_table_names == ("ExperimentTable1", "ExperimentTable2")
 
-def test_load_all(pytest_default_db):  # TODO: Extend to multiple DBs
-    """Test load_all for dynamic table names."""
+def test_load_type(pytest_default_db):  # TODO: Extend to multiple DBs
+    """Test load_type for dynamic table names."""
 
     stubs = _multiple_table_stubs()
     DbContext.save_many(stubs)

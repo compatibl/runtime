@@ -148,7 +148,7 @@ class SqliteDb(Db):
             result.append(deserialized_data)
         return result
 
-    def load_all(
+    def load_type(
         self,
         table: str,
         record_type: type[TRecord],

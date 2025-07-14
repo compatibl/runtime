@@ -310,7 +310,7 @@ class DbContext(Context):
         return result
 
     @classmethod
-    def load_all(
+    def load_type(
         cls,
         target_type: type[TKey],
         *,

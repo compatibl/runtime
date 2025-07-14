@@ -33,7 +33,7 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
         bar_labels = []
         values = []
         # TODO: Apply db filter.
-        all_trials = list(DbContext.current().load_all(record_type=SupervisedBinaryTrial))
+        all_trials = list(DbContext.current().load_type(record_type=SupervisedBinaryTrial))
         for scenario in self.scenarios:
             trials = self.get_scenario_trials(all_trials, scenario)
             total = len(trials)

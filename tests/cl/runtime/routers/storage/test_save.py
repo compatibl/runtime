@@ -48,7 +48,7 @@ def test_method(pytest_default_db):
 
     new_key = StubDataclassKey(id="new_record").build()
     new_record_in_db = DbContext.load_one(new_key, cast_to=StubDataclassDerived)
-    records_count = len(list(DbContext.load_all(StubDataclassDerived)))
+    records_count = len(list(DbContext.load_type(StubDataclassDerived)))
 
     assert new_record_in_db is not None
     assert new_record_in_db.id == "new_record"
@@ -73,7 +73,7 @@ def test_method(pytest_default_db):
     assert update_record_result[0].key == "existing_record"
 
     updated_record_in_db = DbContext.load_one(existing_key, cast_to=StubDataclassDerived)
-    records_count = len(list(DbContext.load_all(StubDataclassDerived)))
+    records_count = len(list(DbContext.load_type(StubDataclassDerived)))
     assert updated_record_in_db is not None
     assert updated_record_in_db.id == "existing_record"
     assert updated_record_in_db.derived_str_field == "new_value"
@@ -102,7 +102,7 @@ def test_api(pytest_default_db):
 
         new_key = StubDataclassKey(id="new_record").build()
         new_record_in_db = DbContext.load_one(new_key, cast_to=StubDataclassDerived)
-        records_count = len(list(DbContext.load_all(StubDataclassDerived)))
+        records_count = len(list(DbContext.load_type(StubDataclassDerived)))
 
         assert new_record_in_db is not None
         assert new_record_in_db.id == "new_record"
@@ -126,7 +126,7 @@ def test_api(pytest_default_db):
         assert update_record_json[0].get("Key") == "existing_record"
 
         updated_record_in_db = DbContext.load_one(existing_record.get_key(), cast_to=StubDataclassDerived)
-        records_count = len(list(DbContext.load_all(StubDataclassDerived)))
+        records_count = len(list(DbContext.load_type(StubDataclassDerived)))
         assert updated_record_in_db is not None
         assert updated_record_in_db.id == "existing_record"
         assert updated_record_in_db.derived_str_field == "new_value"
