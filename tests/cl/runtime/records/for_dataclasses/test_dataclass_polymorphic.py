@@ -15,15 +15,13 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_query import StubDataclassPolymorphicQuery
 
 
-def test_load(pytest_basic_mongo_db):  # TODO: Switch to pytest_multi_db after load_where is completed for all DBs
+def test_load(pytest_multi_db):
     """Test load methods."""
 
     table_field = "StubPolymorphicTable"
@@ -58,7 +56,7 @@ def test_load(pytest_basic_mongo_db):  # TODO: Switch to pytest_multi_db after l
     loaded_where = DbContext.load_where(query, cast_to=StubDataclassPolymorphic)
 
 
-def test_count_where(pytest_basic_mongo_db):
+def test_count_where(pytest_multi_db):
     """Test count_where method."""
     table_field = "StubPolymorphicTable"
     key_field = "stub_key_field"

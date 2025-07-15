@@ -14,9 +14,6 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_db  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.conditions import In
@@ -207,7 +204,7 @@ def test_repeated(pytest_multi_db):
     assert loaded_records[0] == record
 
 
-def test_load_where(pytest_basic_mongo_db):  # TODO: Use test_multi_db fixture when implemented
+def test_load_where(pytest_multi_db):
     """Test count_where for a string field."""
     records = [
         StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),
@@ -226,7 +223,7 @@ def test_load_where(pytest_basic_mongo_db):  # TODO: Use test_multi_db fixture w
     assert to_key_str_field(DbContext.load_where(in_query)) == ["def", "xyz"]
 
 
-def test_count_where(pytest_basic_mongo_db):  # TODO: Use test_multi_db fixture when implemented
+def test_count_where(pytest_multi_db):
     """Test count_where for a string field."""
     records = [
         StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),

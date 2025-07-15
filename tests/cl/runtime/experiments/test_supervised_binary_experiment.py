@@ -18,13 +18,12 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_type import ExperimentType
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
-from cl.runtime.qa.pytest.pytest_fixtures import patch_uuid_conversion  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_basic_mongo_mock_db  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from stubs.cl.runtime.experiments.stub_supervised_binary_experiment import StubSupervisedBinaryExperiment
 
 
-def test_smoke(pytest_basic_mongo_mock_db):
+def test_smoke(pytest_multi_db):
     """Test for SupervisedBinaryExperiment class."""
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
@@ -49,7 +48,7 @@ def test_smoke(pytest_basic_mongo_mock_db):
     experiment.run_all()
 
 
-def test_experiment_plot(pytest_basic_mongo_mock_db, pytest_work_dir):
+def test_experiment_plot(pytest_multi_db, pytest_work_dir):
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
     sc1 = ExperimentScenario(
