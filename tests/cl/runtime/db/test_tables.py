@@ -21,7 +21,7 @@ from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.experiments.experiment_key_query import ExperimentKeyQuery
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
-from cl.runtime.records.table_util import TableUtil
+from cl.runtime.records.table_binding import TableBinding
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 
 
@@ -52,18 +52,26 @@ def _multiple_table_stubs():
 
     return [*stub_experiments_table_1, *stub_experiments_table_2]
 
-
-def test_load_tables(pytest_default_db):  # TODO: Extend to multiple DBs
-    """Test loading the list of dynamic table names."""
+def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
+    """Test the methods related to bindings."""
 
     stubs = _multiple_table_stubs()
     DbContext.save_many(stubs)
 
-    # Check the loaded tables
-    loaded_table_names = DbContext.load_tables()
-    assert loaded_table_names == ("ExperimentTable1", "ExperimentTable2")
+    bindings = DbContext.get_bindings()
+    assert bindings == (
+        TableBinding(table="ExperimentTable1", key_type="ExperimentKey"),
+        TableBinding(table="ExperimentTable2", key_type="ExperimentKey"),
+        TableBinding(table="TableBindingKey", key_type="TableBindingKey"),
+    )
 
-def test_load_type(pytest_default_db):  # TODO: Extend to multiple DBs
+    bound_tables = DbContext.get_bound_tables(key_type=ExperimentKey)
+    assert bound_tables == ("ExperimentTable1", "ExperimentTable2")
+
+    bound_type = DbContext.get_bound_type(table="ExperimentTable1")
+    assert bound_type == ExperimentKey
+
+def test_load_where(pytest_default_db):  # TODO: Extend to multiple DBs
     """Test load_type for dynamic table names."""
 
     stubs = _multiple_table_stubs()

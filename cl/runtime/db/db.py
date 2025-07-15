@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -21,12 +20,16 @@ from typing import Sequence
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.records.cast_util import CastUtil
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.table import Table
+from cl.runtime.records.table_binding import TableBinding
+from cl.runtime.records.table_binding_key import TableBindingKey
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.settings.db_settings import DbSettings
 
@@ -35,12 +38,11 @@ from cl.runtime.settings.db_settings import DbSettings
 class Db(DbKey, RecordMixin, ABC):
     """Polymorphic data storage with dataset isolation."""
 
+    _table_binding_cache: dict[str, TableBinding] = required(default_factory=lambda: {})
+    """Cache of table bindings for the DB."""
+
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id).build()
-
-    @abstractmethod
-    def load_tables(self) -> Sequence[str]:
-        """Return table names as non-delimited PascalCase strings in alphabetical order."""
 
     @abstractmethod
     def load_many_unsorted(
@@ -178,6 +180,40 @@ class Db(DbKey, RecordMixin, ABC):
         # Create and return a new DB instance
         result = db_type(db_id=db_id)
         return result
+
+    def _add_binding(
+        self,
+        *,
+        table: str,
+        key_type: type[KeyMixin],
+        ) -> None:
+        """
+        Add a new table, or if the table already exists, verify that the key type is the same.
+
+        Args:
+            table: Table name in non-delimited PascalCase format
+            key_type: Key type of the table (must implement KeyProtocol)
+        """
+        if (table_binding := self._table_binding_cache.get(table)) is None:
+            # Attempt to load from DB
+            table_binding_key = TableBindingKey(table=table).build()
+            load_result = self.load_many_unsorted(table, [table_binding_key])
+            if load_result:
+                # Update cache
+                table_binding = CastUtil.cast(TableBinding, load_result[0])
+                self._table_binding_cache[table] = table_binding
+
+        if table_binding is None:
+            # Add to DB and cache
+            table_binding = TableBinding(table=table, key_type=TypeUtil.name(key_type))
+            self._table_binding_cache[table] = table_binding
+            self.save_many([table_binding])
+        else:
+            # Verify that the key type is the same
+            if table_binding.key_type != (key_type_str := TypeUtil.name(key_type)):
+                raise RuntimeError(
+                    f"Binding for table {table} cannot be created for key type {key_type_str}\n"
+                    f"because it already exists with a different key type: {table_binding.key_type}")
 
     def error_if_not_temp_db(self) -> None:
         """Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')."""

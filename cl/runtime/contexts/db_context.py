@@ -23,6 +23,7 @@ from cl.runtime.contexts.context import Context
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.records.cast_util import CastUtil
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -32,9 +33,12 @@ from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.table_util import TableUtil
+from cl.runtime.records.table_binding import TableBinding
+from cl.runtime.records.table_binding_key import TableBindingKey
+from cl.runtime.records.table_binding_query import TableBindingQuery
 from cl.runtime.records.type_query import TypeQuery
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -112,9 +116,45 @@ class DbContext(Context):
             return DatasetUtil.root()
 
     @classmethod
-    def load_tables(cls) -> Sequence[str]:
-        """Return table names as non-delimited PascalCase strings in alphabetical order."""
-        return cls._get_db().load_tables()
+    def get_bindings(cls) -> tuple[TableBinding, ...]:
+        """
+        Return table bindings to key type in alphabetical order of table name, then key type name.
+        
+        Notes:
+            More than one table can exist for the same key type.
+        """
+        query = TableBindingQuery().build()
+        bindings = cls.load_where(query, cast_to=TableBinding)
+        return bindings
+
+    @classmethod
+    def get_bound_tables(cls, *, key_type: type[KeyMixin]) -> tuple[str, ...]:
+        """
+        Return tables for the specified key type in alphabetical order.
+        
+        Returns:
+            Table names in non-delimited PascalCase format.
+        
+        Args:
+            key_type: Key type name for which the tables are returned.
+        """
+        query = TableBindingQuery(key_type=TypeUtil.name(key_type)).build()
+        bindings = cls.load_where(query, cast_to=TableBinding)
+        result = tuple(binding.table for binding in bindings)
+        return result
+
+    @classmethod
+    def get_bound_type(cls, *, table: str) -> type[KeyMixin]:
+        """
+        Return key type for the specified table name.
+
+        Args:
+            table: Table name in non-delimited PascalCase format.
+        """
+        key = TableBindingKey(table=table).build()
+        binding = cls.load_one(key)
+        result = TypeInfoCache.get_class_from_type_name(binding.key_type)
+        return result
 
     @classmethod
     def load_one(

@@ -35,7 +35,6 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_util import RecordUtil
-from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
@@ -73,10 +72,6 @@ class BasicMongoDb(Db):
 
     client_uri: str = "mongodb://localhost:27017/"
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
-
-    def load_tables(self) -> Sequence[str]:
-        collection_names = self._get_mongo_db().list_collection_names()
-        return tuple(sorted(collection_names))
 
     def load_many_unsorted(
         self,
@@ -210,6 +205,9 @@ class BasicMongoDb(Db):
         # TODO: Provide a more performant implementation
         for record in records:
             table = record.get_table()
+
+            # Add table binding
+            self._add_binding(table=table, key_type=record.get_key_type())
 
             db = self._get_mongo_db()
             collection = db[table]
