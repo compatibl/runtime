@@ -17,7 +17,6 @@ from inflection import titleize
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional
-from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.schema.type_kind import TypeKind

@@ -20,7 +20,6 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.routers.storage.select_request import SelectRequest

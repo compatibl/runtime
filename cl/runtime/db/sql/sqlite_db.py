@@ -33,7 +33,6 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.table_util import TableUtil
 from cl.runtime.schema.type_info_cache import TypeInfoCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers

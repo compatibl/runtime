@@ -30,7 +30,6 @@ from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.table_util import TableUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
