@@ -48,7 +48,7 @@ def test_smoke(pytest_multi_db):
     experiment.run_all()
 
 
-def test_experiment_plot(pytest_multi_db, pytest_work_dir):
+def test_plot(pytest_multi_db, pytest_work_dir):
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
     sc1 = ExperimentScenario(
