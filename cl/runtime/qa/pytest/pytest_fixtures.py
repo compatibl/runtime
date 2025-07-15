@@ -72,23 +72,10 @@ def _pytest_db(request: FixtureRequest, *, db_type: type | None = None) -> Itera
     db.drop_temp_db()
 
 
+# TODO: Implement in code to enable BasicMongoMockDb to convert UUIDs to Binary objects
 def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
     """Convert a UUID to BSON Binary object."""
     return Binary(uuid_.bytes, UUID_SUBTYPE)
-
-
-@pytest.fixture(scope="function")
-def patch_uuid_conversion(request):
-    """
-    Fixture to patch the Binary.from_uuid method if request.param is None or BasicMongoMockDb.
-    Required for tests with mongomock.
-    """
-    if (request_param := getattr(request, "param", None)) is None or request_param == BasicMongoMockDb:
-        # The mongomock client does not convert UUID objects by default, but the real pymongo client does.
-        with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
-            yield
-    else:
-        yield
 
 
 @pytest.fixture(scope="function")
@@ -116,19 +103,20 @@ def pytest_basic_mongo_db(request: FixtureRequest) -> Iterator[Db]:
 
 
 @pytest.fixture(scope="function")
-def pytest_basic_mongo_mock_db(request: FixtureRequest, patch_uuid_conversion) -> Iterator[Db]:
+def pytest_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using BasicMongoMockDb."""
     yield from _pytest_db(request, db_type=BasicMongoMockDb)
 
 
-@pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb])
-def pytest_multi_db(request, patch_uuid_conversion) -> Iterator[Db]:
+
+# @pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb]) # TODO: Enable when Sqlite and BasicMongoMockDb support is restored 
+@pytest.fixture(scope="function", params=[BasicMongoDb]) 
+def pytest_multi_db(request) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.
     """
-    # TODO: Enable when Sqlite support is restored yield from _pytest_db(request, db_type=request.param)
-    yield from _pytest_db(request, db_type=BasicMongoDb)
+    yield from _pytest_db(request, db_type=request.param)
 
 
 @pytest.fixture(scope="session")  # TODO: Use a named celery queue for each test
