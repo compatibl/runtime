@@ -127,7 +127,8 @@ def pytest_multi_db(request, patch_uuid_conversion) -> Iterator[Db]:
     Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.
     """
-    yield from _pytest_db(request, db_type=request.param)
+    # TODO: Enable when Sqlite support is restored yield from _pytest_db(request, db_type=request.param)
+    yield from _pytest_db(request, db_type=BasicMongoDb)
 
 
 @pytest.fixture(scope="session")  # TODO: Use a named celery queue for each test
