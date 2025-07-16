@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from __future__ import annotations
+
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
@@ -25,10 +27,18 @@ class TypeResponseUtil:
 
     @classmethod
     def get_type(cls, request: TypeRequest) -> dict[str, dict]:
-        """Implements /storage/get_datasets route."""
+        """Supports /schema/type route."""
 
-        # TODO: Check why empty module is passed, is module the short name prefix?
-        record_type = TypeInfoCache.get_class_from_type_name(request.type_name)
+        try:
+            # TODO: Check why empty module is passed, is module the short name prefix?
+            record_type = TypeInfoCache.get_class_from_type_name(request.type_name)
+        except:
+            # Get type bound to the table
+            key_type = DbContext.get_bound_type(table=request.type_name)
+
+            # TODO: Get the record for this type instead
+            record_type = key_type
+
         handler_args_elements = dict()
         result = TypeDecl.as_dict_with_dependencies(record_type)
 
