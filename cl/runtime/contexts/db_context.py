@@ -315,41 +315,6 @@ class DbContext(Context):
         return result
 
     @classmethod
-    def load_where(
-        cls,
-        query: QueryMixin,
-        *,
-        dataset: str | None = None,
-        cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
-        slice_to: type[TRecord] | None = None,
-        limit: int | None = None,
-        skip: int | None = None,
-    ) -> tuple[TRecord]:
-        """
-        Load records that match the specified query.
-
-        Args:
-            query: Contains query conditions to match
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            cast_to: Cast the result to this type (error if not a subtype)
-            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
-            slice_to: Slice fields from the stored record using projection to return instances of this type
-            limit: Maximum number of records to return (for pagination)
-            skip: Number of records to skip (for pagination)
-        """
-        result = cls._get_db().load_where(
-            query,
-            dataset=cls.get_dataset(dataset),
-            cast_to=cast_to,
-            filter_to=filter_to,
-            slice_to=slice_to,
-            limit=limit,
-            skip=skip,
-        )
-        return result
-
-    @classmethod
     def load_type(
         cls,
         target_type: type[TKey],
@@ -412,6 +377,41 @@ class DbContext(Context):
         """
         result = cls._get_db().load_table(
             table,
+            dataset=cls.get_dataset(dataset),
+            cast_to=cast_to,
+            filter_to=filter_to,
+            slice_to=slice_to,
+            limit=limit,
+            skip=skip,
+        )
+        return result
+
+    @classmethod
+    def load_where(
+        cls,
+        query: QueryMixin,
+        *,
+        dataset: str | None = None,
+        cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        slice_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TRecord]:
+        """
+        Load records that match the specified query.
+
+        Args:
+            query: Contains query conditions to match
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Cast the result to this type (error if not a subtype)
+            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
+            slice_to: Slice fields from the stored record using projection to return instances of this type
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
+        """
+        result = cls._get_db().load_where(
+            query,
             dataset=cls.get_dataset(dataset),
             cast_to=cast_to,
             filter_to=filter_to,
