@@ -84,7 +84,7 @@ class TypeHint(BootstrapMixin):
     def validate_for_sequence(self) -> None:
         """Raise an error if the type hint is not a sequence."""
         if not self.schema_type_name in SEQUENCE_TYPE_NAMES:
-            raise RuntimeError(f"The data is a sequence but type hint {self.to_str()} does not.")
+            raise RuntimeError(f"The data is a sequence but type hint {self.to_str()} is not.")
         elif not self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is a sequence type but does not specify item type.")
 
