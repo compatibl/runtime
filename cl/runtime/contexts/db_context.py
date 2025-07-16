@@ -317,15 +317,14 @@ class DbContext(Context):
     @classmethod
     def load_type(
         cls,
-        target_type: type[TKey],
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        filter_to: type[TRecord],
         slice_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TKey]:
+    ) -> tuple[TRecord]:
         """
         Load all records of target_type and its subtypes.
 
@@ -340,16 +339,54 @@ class DbContext(Context):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        query = TypeQuery(target_type).build()
-        result = cls._get_db().load_where(
-            query,
-            dataset=cls.get_dataset(dataset),
-            cast_to=cast_to,
-            slice_to=slice_to,
-            limit=limit,
-            skip=skip,
-        )
-        return result
+
+        # Check and convert to numerical values
+        if limit is not None and limit < 0:
+            raise RuntimeError("Parameter 'limit' must be >= 0 or None.")
+        elif limit is None:
+            limit = 0
+        if skip is not None and skip < 0:
+            raise ValueError("Parameter skip must be >= 0 or None.")
+        elif skip is None:
+            skip = 0
+
+        tables = cls.get_bound_tables(key_type=filter_to.get_key_type())
+        result = []
+        for table in tables:
+
+            # TODO: Make this code more effective by counting skipped records and only then loading as needed
+            table_result = cls.load_table(
+                table,
+                dataset=dataset,
+                cast_to=cast_to,
+                filter_to=filter_to,
+                slice_to=slice_to,
+                limit=limit+skip if limit != 0 else None,
+                skip=None,
+            )
+
+            # Update skip
+            table_result_len = len(table_result)
+            if skip >= table_result_len:
+                # Skip all records from this table
+                skip -= table_result_len
+                continue
+            else:
+                # Skip some of the records
+                table_result = table_result[skip:]
+                skip = 0
+
+            # Update limit
+            if limit >= table_result_len:
+                # Include all of the records that remain after skipping
+                result.extend(table_result)
+                limit -= table_result_len
+            else:
+                # Include some of the records that remain after skipping and stop
+                result.extend(table_result[:limit])
+                break
+
+        return tuple(result)
 
     @classmethod
     def load_table(
