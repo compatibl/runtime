@@ -126,6 +126,7 @@ class ErrorUtil:
                     f"Valid items are:\n{valid_items}\n"
                 )
 
+    @classmethod
     def mutually_exclusive_fields_error(
         cls,
         fields: List[str],
