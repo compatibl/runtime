@@ -45,6 +45,31 @@ class Db(DbKey, RecordMixin, ABC):
         return DbKey(db_id=self.db_id).build()
 
     @abstractmethod
+    def load_table(
+        self,
+        table: str,
+        *,
+        dataset: str | None = None,
+        cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        slice_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TRecord]:
+        """
+        Load all records from the specified table.
+
+        Args:
+            table: The table from which the records are loaded
+            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            cast_to: Cast the result to this type (error if not a subtype)
+            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
+            slice_to: Slice fields from the stored record using projection to return instances of this type
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
+        """
+
+    @abstractmethod
     def load_many_unsorted(
         self,
         table: str,

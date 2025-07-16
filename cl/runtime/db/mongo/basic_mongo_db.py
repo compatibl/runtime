@@ -15,7 +15,7 @@
 import itertools
 import re
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 from typing import Dict
 from typing import Iterable
 from typing import Sequence
@@ -72,6 +72,41 @@ class BasicMongoDb(Db):
 
     client_uri: str = "mongodb://localhost:27017/"
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
+
+    def load_table(
+        self,
+        table: str,
+        *,
+        dataset: str | None = None,
+        cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        slice_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TRecord]:
+        # Get collection
+        collection = self._get_mongo_collection(table)
+
+        # Filter by type
+        query_dict = {}
+        if filter_to is not None:
+            # Add filter condition on type
+            subtype_names = TypeInfoCache.get_child_names(filter_to)
+            query_dict["_type"] = {"$in": subtype_names}
+
+        # TODO: Filter by keys
+        # serialized_primary_key = _KEY_SERIALIZER.serialize(key)
+        # serialized_record = collection.find_one({"_key": serialized_primary_key})
+
+        serialized_records = collection.find(query_dict)
+        result = tuple(
+            data_serializer.deserialize({
+                k: v for k, v in serialized_record.items()
+                if k not in {"_id", "_key"}
+            })
+            for serialized_record in serialized_records
+        )
+        return cast(tuple[TRecord], result)
 
     def load_many_unsorted(
         self,

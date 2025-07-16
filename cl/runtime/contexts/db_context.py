@@ -405,14 +405,13 @@ class DbContext(Context):
             table: The table from which the records are loaded
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Cast the result to this type (error if not a subtype)
+            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
             slice_to: Slice fields from the stored record using projection to return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        key_type = cls.get_bound_type(table=table)
-        query = TypeQuery(key_type).build()
-        result = cls._get_db().load_where(
-            query,
+        result = cls._get_db().load_table(
+            table,
             dataset=cls.get_dataset(dataset),
             cast_to=cast_to,
             filter_to=filter_to,

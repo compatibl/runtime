@@ -97,6 +97,19 @@ class SqliteDb(Db):
         flattened_tuple = tuple(item for group in key_tuples for item in group)
         return flattened_tuple  # TODO(Roman): Review why it should be flattened
 
+    def load_table(
+        self,
+        table: str,
+        *,
+        dataset: str | None = None,
+        cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        slice_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TRecord]:
+        raise NotImplementedError()
+
     def load_many_unsorted(
         self,
         table: str,

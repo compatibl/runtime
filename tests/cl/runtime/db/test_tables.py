@@ -71,6 +71,20 @@ def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
     bound_type = DbContext.get_bound_type(table="ExperimentTable1")
     assert bound_type == ExperimentKey
 
+def test_load_table(pytest_default_db):  # TODO: Extend to multiple DBs
+    """Test load_table for dynamic table names."""
+
+    stubs = _multiple_table_stubs()
+    DbContext.save_many(stubs)
+
+    # Load table 'ExperimentTable1'
+    result_1 = DbContext.load_table("ExperimentTable1")
+    assert result_1 == (stubs[0], stubs[1])
+
+    # Load table 'ExperimentTable2'
+    result_2 = DbContext.load_table("ExperimentTable2")
+    assert result_2 == (stubs[2], stubs[3])
+
 def test_load_where(pytest_default_db):  # TODO: Extend to multiple DBs
     """Test load_type for dynamic table names."""
 
