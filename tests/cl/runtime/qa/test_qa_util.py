@@ -17,7 +17,7 @@ import os
 from cl.runtime.qa.qa_util import QaUtil
 
 
-def _test_env_dir_and_name(*, expected_name: str):
+def _test_dir_and_name(*, expected_name: str):
     """Test for QaUtil.env_dir and QaUtil.env_name."""
     dir_name = os.path.dirname(__file__)
     expected_dir = os.path.join(dir_name, expected_name.replace(".", os.sep))
@@ -27,12 +27,12 @@ def _test_env_dir_and_name(*, expected_name: str):
 
 def test_qa_util():
     """Method name matches module name, shortened path"""
-    _test_env_dir_and_name(expected_name="test_qa_util")
+    _test_dir_and_name(expected_name="test_qa_util")
 
 
 def test_in_function():
     """Function name does not match module name, two-token path."""
-    _test_env_dir_and_name(expected_name="test_qa_util.test_in_function")
+    _test_dir_and_name(expected_name="test_qa_util.test_in_function")
 
 
 class TestClass:
@@ -40,11 +40,11 @@ class TestClass:
 
     def test_qa_util(self):
         """Method name matches module name, still three-token path as they are not next to each other."""
-        _test_env_dir_and_name(expected_name="test_qa_util.test_class.test_qa_util")
+        _test_dir_and_name(expected_name="test_qa_util.test_class.test_qa_util")
 
     def test_in_method(self):
         """Method name does not match class name or module name, three-token path"""
-        _test_env_dir_and_name(expected_name="test_qa_util.test_class.test_in_method")
+        _test_dir_and_name(expected_name="test_qa_util.test_class.test_in_method")
 
 
 class TestQaUtil:
@@ -53,11 +53,11 @@ class TestQaUtil:
     def test_qa_util(self):
         """All three match, one-token path."""
         """Method name matches module name, still three-token path as they are not next to each other."""
-        _test_env_dir_and_name(expected_name="test_qa_util")
+        _test_dir_and_name(expected_name="test_qa_util")
 
     def test_in_method(self):
         """Method name does not match class name or module name which match, two-token path"""
-        _test_env_dir_and_name(expected_name="test_qa_util.test_in_method")
+        _test_dir_and_name(expected_name="test_qa_util.test_in_method")
 
 
 if __name__ == "__main__":

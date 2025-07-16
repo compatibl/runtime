@@ -76,7 +76,7 @@ class QaUtil:
         test_function_pattern: str | None = None,
     ) -> str:
         """
-        Return module_dir/test_module.test_function or module_dir/test_module.test_class.test_method,
+        Return test_module.test_function or test_module.test_class.test_method,
         collapsing levels with identical name into one.
 
         Notes:
