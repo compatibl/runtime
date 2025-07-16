@@ -40,6 +40,10 @@ default:
 # Test environment
 test:
 
+  # Documented in QaSettings class
+  qa_db_types:
+    - SqliteDb
+    - BasicMongoMockDb
+
   # Documented in LogSettings class
   log_filename_prefix: tests
-
