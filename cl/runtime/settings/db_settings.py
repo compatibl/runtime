@@ -35,10 +35,22 @@ class DbSettings(Settings):
     db_uri: str | None = None
     """Database URI (optional, defaults to a local database file or localhost)."""
 
+    db_test_prefix: str = "test_"
+    """
+    Prefix for unit test databases that are created and deleted automatically.
+
+    Notes:
+        DROPPING THE DATABASE AUTOMATICALLY AS PART OF A UNIT TEST WILL FAIL
+        UNLESS DB_ID STARTS FROM THIS PREFIX
+    """
+
     db_temp_prefix: str = "temp_"
     """
-    IMPORTANT: DROPPING THE DATABASE FROM CODE OR AN API CALL IS PERMITTED
-    ONLY WHEN THE DATABASE NAME STARTS FROM THIS PREFIX (defaults to 'temp_')
+    Prefix for temporary databases that are created automatically but require explicit user approval to delete.
+
+    Notes:
+        DROPPING THE DATABASE FROM CODE OR REST API REQUIRES EXPLICIT USER APPROVAL,
+        AND WILL FAIL EVEN WITH APPROVAL UNLESS DB_ID STARTS FROM THIS PREFIX
     """
 
     db_dir: str | None = None

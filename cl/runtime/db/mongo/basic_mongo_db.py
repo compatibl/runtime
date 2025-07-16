@@ -238,16 +238,24 @@ class BasicMongoDb(Db):
             serialized_primary_key = _KEY_SERIALIZER.serialize(key)
             collection.delete_one({"_key": serialized_primary_key})
 
-    def drop_temp_db(self) -> None:
-        # Check that db_id and db_name both match temp_db_prefix
-        db_name = self._get_db_name()
+    def drop_test_db(self) -> None:
+        # Check preconditions
+        self.check_drop_test_db_preconditions()
 
-        # Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')
-        self.error_if_not_temp_db()
-
-        # Drop the entire database without possibility of recovery, this
-        # relies on the temp_db_prefix check above to prevent unintended use
+        # Drop the entire database without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use
         client = self._get_mongo_client()
+        db_name = self._get_db_name()
+        client.drop_database(db_name)
+
+    def drop_temp_db(self, *, user_approval: bool) -> None:
+        # Check preconditions
+        self.check_drop_temp_db_preconditions(user_approval=user_approval)
+
+        # Drop the entire database without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use
+        client = self._get_mongo_client()
+        db_name = self._get_db_name()
         client.drop_database(db_name)
 
     def close_connection(self) -> None:

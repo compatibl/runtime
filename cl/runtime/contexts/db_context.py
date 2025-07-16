@@ -508,16 +508,28 @@ class DbContext(Context):
             for table, table_keys in keys_to_delete_grouped_by_table.items()
         )
 
-    @classmethod
-    def drop_temp_db(cls) -> None:
-        """
-        IMPORTANT: DESTRUCTIVE - THIS WILL PERMANENTLY DELETE ALL RECORDS WITHOUT THE POSSIBILITY OF RECOVERY
 
-        Notes:
-            This method will not run unless db_id starts with the db_temp_prefix specified in settings.yaml.
-            The default prefix is 'temp_'.
+    @classmethod
+    def drop_test_db(cls) -> None:
         """
-        cls._get_db().drop_temp_db()
+        Drop a database as part of a unit test.
+        
+        EVERY IMPLEMENTATION OF THIS METHOD MUST FAIL UNLESS THE FOLLOWING CONDITIONS ARE MET:
+        - The method is invoked from a unit test based on ProcessContext.is_testing()
+        - db_id starts with db_test_prefix specified in settings.yaml (the default prefix is 'test_')
+        """
+        cls._get_db().drop_test_db()
+
+    @classmethod
+    def drop_temp_db(cls, *, user_approval: bool) -> None:
+        """
+        Drop a temporary database with explicit user approval.
+
+        EVERY IMPLEMENTATION OF THIS METHOD MUST FAIL UNLESS THE FOLLOWING CONDITIONS ARE MET:
+        - user_approval is true
+        - db_id starts with db_temp_prefix specified in settings.yaml (the default prefix is 'temp_')
+        """
+        cls._get_db().drop_temp_db(user_approval=user_approval)
 
     @classmethod
     def _get_db(cls) -> Db:

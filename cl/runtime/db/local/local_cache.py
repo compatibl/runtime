@@ -115,11 +115,20 @@ class LocalCache(Db):
     ) -> int:
         raise NotImplementedError()
 
-    def drop_temp_db(self) -> None:
-        # Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')
-        self.error_if_not_temp_db()
+    def drop_test_db(self) -> None:
+        # Check preconditions
+        self.check_drop_test_db_preconditions()
 
-        # Create a new cache
+        # Create a new cache, the objects in the old cache will no longer be accessible.
+        # This relies on the preconditions check above to prevent unintended use
+        __cache = {}
+
+    def drop_temp_db(self, *, user_approval: bool) -> None:
+        # Check preconditions
+        self.check_drop_temp_db_preconditions(user_approval=user_approval)
+
+        # Create a new cache, the objects in the old cache will no longer be accessible.
+        # This relies on the preconditions check above to prevent unintended use
         __cache = {}
 
     def close_connection(self) -> None:

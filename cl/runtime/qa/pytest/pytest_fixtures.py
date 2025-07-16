@@ -54,22 +54,21 @@ def _pytest_db(request: FixtureRequest, *, db_type: type | None = None) -> Itera
     # Set test DB name to test name in dot-delimited snake_case format, prefixed by 'temp_'
     test_name = PytestUtil.get_test_name(request)
 
-    # Replace dots by underscores and add temp_ prefix
-    normalized_test_name = test_name.replace(".", "_")
-    db_id = f"temp_{normalized_test_name}"
+    # Replace dots by semicolons
+    db_id = test_name.replace(".", ";")
 
     # Create a new DB instance of the specified type (use the type from settings if None)
     db = Db.create(db_type=db_type, db_id=db_id)
 
-    # Delete all existing records in test DB before the test in case it was not performed by the preceding run
-    db.drop_temp_db()
+    # Delete all existing records in unit test DB before the test in case it was not performed by the preceding run
+    db.drop_test_db()
 
     # Run with the created DB, return db from the fixture
     with DbContext(db=db).build():
         yield db
 
-    # Delete all existing records in test DB after the test
-    db.drop_temp_db()
+    # Delete all existing records in unit test DB after the test
+    db.drop_test_db()
 
 
 # TODO: Implement in code to enable BasicMongoMockDb to convert UUIDs to Binary objects

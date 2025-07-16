@@ -23,25 +23,20 @@ def init_db():
     """Drop old DB, create and populate new DB."""
     with DbContext(db=Db.create()).build():
 
-        # Check if the current DB ID starts with the temporary prefix
-        # to prevent accidental data loss when dropping the DB
-        if not (db_id := DbContext.get_db_id()).startswith(temp_prefix := DbSettings.instance().db_temp_prefix):
-            print(f"Database ID '{db_id}' does not start with the temporary prefix '{temp_prefix}'.\n"
-                  f"Aborting to prevent accidental data loss.")
-            return
-        
         # Ask for confirmation before dropping the DB
         confirmation = input(
             f"Are you sure you want to delete all data in the following DB?\n\n"
             f"Database to be deleted: {DbContext.get_db_id()}\n\n"
-            f"This step is not reversible. Type 'yes' to confirm: "
+            f"This step is not reversible, all data in DB will be lost. Type 'yes' to confirm: "
             )
-        if confirmation.strip().lower() != 'yes':
+
+        # Check for lowercase 'yes'
+        if confirmation == 'yes':
+            print(f"\nDropping the existing DB...")
+            DbContext.drop_temp_db(user_approval=True)
+        else:
             print("\nDB drop operation aborted by the user.\n")
             return
-
-        print(f"\nDropping the existing DB...")
-        DbContext.drop_temp_db()
 
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
         print("Adding preloads to the new DB...")

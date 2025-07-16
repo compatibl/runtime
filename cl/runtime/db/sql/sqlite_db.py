@@ -314,19 +314,29 @@ class SqliteDb(Db):
             cursor.execute(sql_statement, query_values)
             connection.commit()
 
-    def drop_temp_db(self) -> None:
-        # Error if db_id does not start from the db_temp_prefix specified in settings.yaml (defaults to 'temp_')
-        self.error_if_not_temp_db()
+    def drop_test_db(self) -> None:
+        # Check preconditions
+        self.check_drop_test_db_preconditions()
 
         # Close connection
         self.close_connection()
 
-        # Check that filename also matches temp_db_prefix. It should normally match db_id
-        # we already checked, but given the critical importance of this check will check db_filename
-        # as well in case this approach changes later.
+        # Drop the entire database file without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use.
         db_file_path = self._get_db_file()
+        if os.path.exists(db_file_path):
+            os.remove(db_file_path)
 
-        # Delete database file if exists, all checks gave been performed
+    def drop_temp_db(self, *, user_approval: bool) -> None:
+        # Check preconditions
+        self.check_drop_temp_db_preconditions(user_approval=user_approval)
+
+        # Close connection
+        self.close_connection()
+
+        # Drop the entire database file without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use.
+        db_file_path = self._get_db_file()
         if os.path.exists(db_file_path):
             os.remove(db_file_path)
 
