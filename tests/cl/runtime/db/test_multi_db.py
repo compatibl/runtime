@@ -14,10 +14,14 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.db.db import Db
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.conditions import In
 from cl.runtime.records.data_util import DataUtil
+from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.settings.qa_settings import QaSettings
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -94,30 +98,43 @@ def test_complex_records(pytest_multi_db):
     assert loaded_records == DataUtil.remove_none(_SAMPLES)
 
 
-def test_basic_operations(pytest_multi_db):
+@pytest.mark.parametrize("db_type_name", QaSettings.instance().qa_db_types)
+def test_basic_operations(db_type_name: str):
     """Test save/load/delete methods for various types."""
-    sample_keys = [x.get_key() for x in _SAMPLES]
 
-    # Load from empty tables
-    loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
-    assert loaded_records == [None] * len(_SAMPLES)
+    # Set test DB name to test name in dot-delimited snake_case format, prefixed by 'temp_'
+    test_name = QaUtil.get_test_name()
 
-    # Populate tables
-    DbContext.save_many(_SAMPLES)
+    # Replace dots by semicolons
+    db_id = test_name.replace(".", ";")
 
-    # Load one by one for all keys because each type is different
-    loaded_records = [DbContext.load_one(key) for key in sample_keys]
-    assert loaded_records == DataUtil.remove_none(_SAMPLES)
+    # Create a new DB instance of the specified type (use the type from settings if None)
+    db_type = TypeInfoCache.get_class_from_type_name(db_type_name)
+    db = Db.create(db_type=db_type, db_id=db_id)
 
-    # Delete first and last record
-    DbContext.delete_many([sample_keys[0], sample_keys[-1]])
-    loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
-    assert loaded_records == DataUtil.remove_none([None, *_SAMPLES[1:-1], None])
+    with DbContext(db=db).build() as db_context:
+        sample_keys = [x.get_key() for x in _SAMPLES]
 
-    # Delete all records
-    DbContext.delete_many(sample_keys)
-    loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
-    assert loaded_records == [None] * len(_SAMPLES)
+        # Load from empty tables
+        loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
+        assert loaded_records == [None] * len(_SAMPLES)
+
+        # Populate tables
+        DbContext.save_many(_SAMPLES)
+
+        # Load one by one for all keys because each type is different
+        loaded_records = [DbContext.load_one(key) for key in sample_keys]
+        assert loaded_records == DataUtil.remove_none(_SAMPLES)
+
+        # Delete first and last record
+        DbContext.delete_many([sample_keys[0], sample_keys[-1]])
+        loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
+        assert loaded_records == DataUtil.remove_none([None, *_SAMPLES[1:-1], None])
+
+        # Delete all records
+        DbContext.delete_many(sample_keys)
+        loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
+        assert loaded_records == [None] * len(_SAMPLES)
 
 
 def test_record_upsert(pytest_multi_db):
