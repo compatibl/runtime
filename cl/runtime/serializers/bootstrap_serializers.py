@@ -33,6 +33,23 @@ from cl.runtime.serializers.yaml_encoders import YamlEncoders
 class BootstrapSerializers:
     """Serialization without including or relying on type information, deserialization is not possible."""
 
+    DEFAULT = BootstrapSerializer(
+        none_format=NoneFormat.PASSTHROUGH,
+        string_format=StringFormat.PASSTHROUGH,
+        float_format=FloatFormat.DEFAULT,
+        bool_format=BoolFormat.DEFAULT,
+        int_format=IntFormat.DEFAULT,
+        long_format=LongFormat.DEFAULT,
+        date_format=DateFormat.DEFAULT,
+        time_format=TimeFormat.DEFAULT,
+        datetime_format=DatetimeFormat.DEFAULT,
+        uuid_format=UuidFormat.DEFAULT,
+        timestamp_format=TimestampFormat.DEFAULT,
+        bytes_format=BytesFormat.DEFAULT,
+        enum_format=EnumFormat.DEFAULT,
+    ).build()
+    """Convert all primitive types to string."""
+
     YAML = BootstrapSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,
