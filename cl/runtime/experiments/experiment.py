@@ -15,7 +15,7 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import List
+from typing import List, TypeVar
 from typing import Sequence
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_key import ExperimentKey
@@ -28,6 +28,8 @@ from cl.runtime.plots.plot import Plot
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.views.png_view import PngView
+
+TTrial = TypeVar("TTrial", bound=Trial)
 
 
 @dataclass(slots=True, kw_only=True)
@@ -73,7 +75,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     @abstractmethod
     def get_plot(self, plot_id: str) -> Plot:
-        raise NotImplementedError
+        """Get plot for the experiment."""
 
     def view_plot(self) -> PngView:
         return self.get_plot(self.experiment_id).get_view()
@@ -178,14 +180,13 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             )
         return result
 
-    def get_scenario_trials(self, all_trials: List[Trial], scenario: ExperimentScenarioKey):
+    def get_scenario_trials(self, all_trials: Sequence[TTrial], scenario: ExperimentScenarioKey) -> tuple[TTrial, ...]:
         """Get trials of the particular scenario from all trials."""
-        trials = [
+        trials = tuple(
             trial
             for trial in all_trials
-            if trial.experiment.experiment_id == self.experiment_id
-            and trial.scenario.experiment_scenario_id == scenario.experiment_scenario_id
-        ]
+            if trial.scenario == scenario
+        )
         if not trials:
-            raise RuntimeError(f"No trials for experiment {self.experiment_id}.")
+            raise RuntimeError(f"No trials for experiment {self.experiment_id} and scenario {scenario.experiment_scenario_id}.")
         return trials

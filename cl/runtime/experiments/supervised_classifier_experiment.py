@@ -18,6 +18,7 @@ import numpy as np
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
 from cl.runtime.experiments.supervised_classifier_trial import SupervisedClassifierTrial
+from cl.runtime.experiments.trial_key_query import TrialKeyQuery
 from cl.runtime.plots.heat_map_plot import HeatMapPlot
 from cl.runtime.plots.multi_plot import MultiPlot
 
@@ -31,9 +32,8 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
             raise RuntimeError("Experiment must have scenarios to build a plot.")
 
         plots = []
-        # TODO: Apply db filter
-        raise NotImplementedError()
-        all_trials = list(DbContext.load_type(SupervisedClassifierTrial))
+        trial_query = TrialKeyQuery(experiment=self.get_key()).build()
+        all_trials = DbContext.load_where(trial_query, cast_to=SupervisedClassifierTrial)
         num_labels = len(self.class_labels)
 
         for scenario in self.scenarios:
@@ -68,6 +68,5 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
 
             plots.append(heatmap)
 
-        plot = MultiPlot(plot_id=plot_id, plots=plots)
-
-        return plot
+        result = MultiPlot(plot_id=plot_id, plots=plots).build()
+        return result

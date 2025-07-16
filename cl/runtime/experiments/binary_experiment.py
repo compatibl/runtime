@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.binary_trial import BinaryTrial
 from cl.runtime.experiments.experiment import Experiment
+from cl.runtime.experiments.trial_key_query import TrialKeyQuery
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 
 
@@ -33,9 +34,9 @@ class BinaryExperiment(Experiment, ABC):
         group_labels = []
         bar_labels = []
         values = []
-        # TODO: Apply db filter
-        raise NotImplementedError()
-        all_trials = list(DbContext.load_type(BinaryTrial))
+        trial_query = TrialKeyQuery(experiment=self.get_key()).build()
+        all_trials = DbContext.load_where(trial_query, cast_to=BinaryTrial)
+    
         for scenario in self.scenarios:
 
             trials = self.get_scenario_trials(all_trials, scenario)
