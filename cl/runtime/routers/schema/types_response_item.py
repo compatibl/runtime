@@ -15,6 +15,7 @@
 from __future__ import annotations
 from inflection import titleize
 from pydantic import BaseModel
+from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.type_util import TypeUtil
@@ -45,10 +46,11 @@ class TypesResponseItem(BaseModel):
         # Get cached classes (does not rebuild cache)
         record_types = TypeInfoCache.get_classes(type_kinds=(TypeKind.RECORD,))
 
+        # Add types to result
         types_result = [
             TypesResponseItem(
                 name=TypeUtil.name(record_type),
-                label=titleize(TypeUtil.name(record_type)),
+                label=titleize(TypeUtil.name(record_type)),  # TODO: Make label different from name or remove
             )
             for record_type in record_types
         ]
@@ -56,9 +58,9 @@ class TypesResponseItem(BaseModel):
         # Add tables to result
         tables_result = [
             TypesResponseItem(
-                name=TableUtil.add_table_prefix(table.table_id), label=titleize(table.table_id), kind="Table"
+                name=binding.table, label=binding.table, kind="Table"  # TODO: Make label different from name or remove
             )
-            for table in TableUtil.get_tables()
+            for binding in DbContext.get_bindings()
         ]
 
         return tables_result + types_result

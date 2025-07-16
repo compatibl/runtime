@@ -48,20 +48,16 @@ class SelectResponse(RecordsWithSchemaResponse):
         if request.limit is not None:
             raise RuntimeError("Select with 'limit' currently is not supported.")
 
-        request_type = TypeInfoCache.get_class_from_type_name(request.type_)
+        # TODO(Roman): !!! Implement separate methods for table and type
+        try:
+            # Try to get a type
+            request_type = TypeInfoCache.get_class_from_type_name(request.type_)
 
-        # Load records for type.
-
-        # If requested type is a table - select with this table.
-        tables = None
-        load_type = request_type
-        if TableUtil.is_table(request.type_):
-            # TODO (Roman): Temporarily select for the key type,
-            #  because the type for the table cannot be determined unambiguously.
-            load_type = request_type.get_key_type()
-            tables = [TableUtil.remove_table_prefix(request.type_)]
-
-        records = DbContext.load_type(load_type, tables=tables)  # noqa
+            # Load records for the table
+            records = DbContext.load_type(request_type)
+        except:
+            # If not a type, the input is a table
+            records = DbContext.load_table(request.type_)
 
         # Serialize records for table.
         serialized_records = [cls._serialize_record_for_table(record) for record in records]
