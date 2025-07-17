@@ -140,7 +140,7 @@ class DbContext(Context):
         """
         query = TableBindingQuery(key_type=TypeUtil.name(key_type)).build()
         bindings = cls.load_where(query, cast_to=TableBinding)
-        result = tuple(binding.table for binding in bindings)
+        result = tuple(sorted(binding.table for binding in bindings))
         return result
 
     @classmethod
@@ -340,65 +340,104 @@ class DbContext(Context):
             skip: Number of records to skip (for pagination)
         """
 
-        # Validate params
-        if limit is not None and limit < 0:
-            raise RuntimeError(f"Parameter limit={limit} is negative.")
-        if skip is not None and skip < 0:
-            raise RuntimeError(f"Parameter skip={skip} is negative.")
-
-        # Handle this case separately because pymongo interprets limit=0 as no limit,
-        # while we interpret it as returning no records
-        if limit == 0:
-            return tuple()
-
-        remaining_limit = limit  # May be None
-        remaining_skip = skip or 0  # Normalize None -> 0
-
+        # Get the list of tables where this type is stored
         tables = cls.get_bound_tables(key_type=filter_to.get_key_type())
-        result = []
 
-        for table in tables:
-            # Stop if we reached the limit
-            if remaining_limit == 0:
-                break
+        tables_len = len(tables)
+        if tables_len == 0:
 
-            # Pull enough rows from this table to satisfy pending skip + limit.
-            # When unlimited, leave table_limit=None to avoid truncation.
-            table_limit = (
-                remaining_limit + remaining_skip if remaining_limit is not None else None
-            )
+            # There are no tables where this type is stored, return an empty tuple
+            return tuple()
+        elif tables_len == 1:
 
-            table_result = cls.load_table(
-                table,
+            # Handle static tables (one table per type) separately by delegating to load_table
+            return cls.load_table(
+                tables[0],
                 dataset=dataset,
                 cast_to=cast_to,
                 filter_to=filter_to,
                 slice_to=slice_to,
-                limit=table_limit,
-                skip=None,  # Global skip is handled below
+                limit=limit,
+                skip=skip,
             )
+        else:
+            # Handle the case of multiple tables
 
-            # Apply global skip
-            if remaining_skip:
-                if remaining_skip >= len(table_result):
-                    remaining_skip -= len(table_result)
-                    continue
-                table_result = table_result[remaining_skip:]
+            # Validate limit and handle the limit=0 case separately
+            if limit is not None:
+                if limit > 0:
+                    # Limit is set
+                    remaining_limit = limit
+                elif limit == 0:
+                    # Handle limit=0 separately because pymongo interprets limit=0 as no limit,
+                    # while we return an empty tuple
+                    return tuple()
+                else:
+                    raise RuntimeError(f"Parameter limit={limit} is negative.")
+            else:
+                # No limit
+                remaining_limit = None
+
+            # Validate skip and replace None by 0 (both mean do not skip)
+            if skip is not None:
+                if skip >= 0:
+                    # Positive or zero values are both valid
+                    remaining_skip = skip
+                else:
+                    raise RuntimeError(f"Parameter skip={skip} is negative.")
+            else:
+                # Normalize to 0 for do not skip
                 remaining_skip = 0
 
-            # Apply global limit
-            if remaining_limit is not None:
-                if remaining_limit >= len(table_result):
-                    result.extend(table_result)
-                    remaining_limit -= len(table_result)
-                else:
-                    result.extend(table_result[:remaining_limit])
-                    break
-            else:
-                # No limit is set
-                result.extend(table_result)
+            result = []
+            for table in tables:
 
-        return tuple(result)
+                if remaining_limit is not None:
+                    # Handle the case with limit
+                    if remaining_limit > 0:
+                        # Pull enough rows from this table to satisfy remaining skip + limit
+                        table_limit = remaining_skip + remaining_limit
+                    elif remaining_limit == 0:
+                        # Limit reached, break the loop over tables
+                        break
+                    else:
+                        # The update logic should guarantee non-negative value, handle a possible error
+                        raise RuntimeError(f"Parameter remaining_limit={remaining_limit} must be positive.")
+                else:
+                    # Otherwise pull from this table with no limit
+                    table_limit = None
+
+                table_result = cls.load_table(
+                    table,
+                    dataset=dataset,
+                    cast_to=cast_to,
+                    filter_to=filter_to,
+                    slice_to=slice_to,
+                    limit=table_limit,
+                    skip=None,  # Global skip is handled below
+                )
+
+                # Apply global skip
+                if remaining_skip:
+                    if remaining_skip >= len(table_result):
+                        remaining_skip -= len(table_result)
+                        continue
+                    table_result = table_result[remaining_skip:]
+                    remaining_skip = 0
+
+                # Apply global limit
+                if remaining_limit is not None:
+                    if remaining_limit >= len(table_result):
+                        result.extend(table_result)
+                        remaining_limit -= len(table_result)
+                    else:
+                        result.extend(table_result[:remaining_limit])
+                        break
+                else:
+                    # No limit is set
+                    result.extend(table_result)
+
+            return tuple(result)
 
     @classmethod
     def load_table(
