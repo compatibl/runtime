@@ -15,10 +15,19 @@
 from cl.runtime.prebuild.init_file_util import InitFileUtil
 from cl.runtime.schema.type_cache import TypeCache
 
-if __name__ == '__main__':
+def init_type_cache() -> None:
+    """Create __init__.py files to avoid missing directories and rebuild type cache."""
 
     # Create __init__.py files first to avoid missing classes in directories without __init__.py
+    print("Adding __init__.py files if any are missing...")
     InitFileUtil.check_init_files(apply_fix=True, verbose=False)
 
     # Rebuild type cache and save TypeInfo.csv file to the bootstrap resources directory
+    print("Initializing the type cache...")
     TypeCache.rebuild()
+
+
+if __name__ == '__main__':
+
+    # Initialize type cache
+    init_type_cache()

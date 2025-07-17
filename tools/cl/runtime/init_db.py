@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 from cl.runtime import Db
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.preload_settings import PreloadSettings
+from tools.cl.runtime.init_type_cache import init_type_cache
 
 
-def init_db():
+def init_db() -> None:
     """Drop old DB, create and populate new DB."""
     with DbContext(db=Db.create()).build():
 
@@ -38,8 +37,10 @@ def init_db():
             print("\nDB drop operation aborted by the user.\n")
             return
 
+        # Initialize type cache before loading data into DB
+        init_type_cache()
+
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
-        print("Adding preloads to the new DB...")
         PreloadSettings.instance().save_and_configure()
         print("Done\n")
 
