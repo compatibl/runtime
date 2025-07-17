@@ -28,6 +28,7 @@ class TypeResponseUtil:
     def get_type(cls, request: TypeRequest) -> dict[str, dict]:
         """Supports /schema/type route."""
 
+        # TODO(Roman): !!! Implement separate methods for table and type
         try:
             # TODO: Check why empty module is passed, is module the short name prefix?
             record_type = TypeCache.get_class_from_type_name(request.type_name)

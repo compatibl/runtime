@@ -51,19 +51,20 @@ class SelectResponse(RecordsWithSchemaResponse):
         # TODO(Roman): !!! Implement separate methods for table and type
         try:
             # Try to get a type
-            request_type = TypeCache.get_class_from_type_name(request.type_)
-
+            record_type = TypeCache.get_class_from_type_name(request.type_)
             # Load records for the table
-            records = DbContext.load_type(request_type)
+            records = DbContext.load_type(record_type)
         except:
-            # If not a type, the input is a table
+            # If not a type, load records for a table
             records = DbContext.load_table(request.type_)
+            # Get bound type
+            record_type = DbContext.get_bound_type(table=request.type_)
 
         # Serialize records for table.
         serialized_records = [cls._serialize_record_for_table(record) for record in records]
 
         # Get schema dict for type.
-        schema_dict = cls._get_schema_dict(request_type)
+        schema_dict = cls._get_schema_dict(record_type)
 
         return SelectResponse(schema_=schema_dict, data=serialized_records)  # noqa
 
