@@ -63,6 +63,9 @@ def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
         TableBinding(table="TableBindingKey", key_type="TableBindingKey"),
     )
 
+    tables = DbContext.get_tables()
+    assert tables == ("ExperimentTable1", "ExperimentTable2", "TableBindingKey")
+
     bound_tables = DbContext.get_bound_tables(key_type=ExperimentKey)
     assert bound_tables == ("ExperimentTable1", "ExperimentTable2")
 

@@ -117,14 +117,27 @@ class DbContext(Context):
     @classmethod
     def get_bindings(cls) -> tuple[TableBinding, ...]:
         """
-        Return table bindings to key type in alphabetical order of table name, then key type name.
+        Return table bindings to key type in alphabetical order of table name, then key type.
 
         Notes:
             More than one table can exist for the same key type.
         """
-        query = TableBindingQuery().build()
-        bindings = cls.load_where(query, cast_to=TableBinding)
-        return bindings
+        # Load all records of TableBinding type
+        bindings = cls.load_type(TableBinding)
+        # Sort bindings by table name and then by key type
+        sorted_bindings = sorted(bindings, key=lambda x: (x.table, x.key_type))
+        return tuple(sorted_bindings)
+
+    @classmethod
+    def get_tables(cls) -> tuple[str, ...]:
+        """
+        Return table names in alphabetical order of non-delimited PascalCase table identifier.
+
+        Notes:
+            More than one table can exist for the same key type.
+        """
+        bindings = cls.get_bindings()
+        return tuple(binding.table for binding in bindings)
 
     @classmethod
     def get_bound_tables(cls, *, key_type: type[KeyMixin]) -> tuple[str, ...]:
