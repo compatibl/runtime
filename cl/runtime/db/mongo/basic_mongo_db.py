@@ -98,7 +98,12 @@ class BasicMongoDb(Db):
         # serialized_primary_key = _KEY_SERIALIZER.serialize(key)
         # serialized_record = collection.find_one({"_key": serialized_primary_key})
 
+        # Get iterable from the query, execution is deferred
         serialized_records = collection.find(query_dict)
+
+        # Apply skip and limit to the iterable
+        serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
+
         result = tuple(
             data_serializer.deserialize({
                 k: v for k, v in serialized_record.items()
@@ -171,11 +176,16 @@ class BasicMongoDb(Db):
         subtype_names = TypeInfoCache.get_child_names(filter_to)
         query_dict["_type"] = {"$in": subtype_names}
 
+        # Get iterable from the query, execution is deferred
+        serialized_records = collection.find(query_dict)
+
+        # Apply skip and limit to the iterable
+        serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
+
         # Set cast_to to filter_to if not specified
         if cast_to is None:
             cast_to = filter_to
 
-        serialized_records = collection.find(query_dict)
         result = []
         # TODO: Convert to comprehension for performance
         for serialized_record in serialized_records:
@@ -384,6 +394,39 @@ class BasicMongoDb(Db):
             )
 
         return self.db_id
+
+    @classmethod
+    def _apply_limit_and_skip(
+            cls,
+            serialized_records: Iterable,
+            *,
+            limit: int | None = None,
+            skip: int | None = None,
+    ) -> Iterable:
+        """Apply limit and skip to the records iterable."""
+        # Apply skip
+        if skip is not None:
+            if skip > 0:
+                # Apply skip to iterable
+                serialized_records = serialized_records.skip(skip)
+            elif skip == 0:
+                # We interpret skip=0 as not skipping, do nothing
+                pass
+            else:
+                raise RuntimeError(f"Parameter skip={skip} is negative.")
+
+        # Apply limit
+        if limit is not None:
+            if limit > 0:
+                # Apply limit to iterable
+                serialized_records = serialized_records.limit(limit)
+            elif limit == 0:
+                # Handle this case separately because pymongo interprets limit=0 as no limit,
+                # while we interpret it as returning no records
+                return tuple()
+            else:
+                raise RuntimeError(f"Parameter limit={limit} is negative.")
+        return serialized_records
 
     # TODO (Roman): move to base Db class or remove?
     def is_empty(self) -> bool:
