@@ -13,13 +13,12 @@
 # limitations under the License.
 
 from __future__ import annotations
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
-from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_decl import TypeDecl
 
 
 class TypeResponseUtil:

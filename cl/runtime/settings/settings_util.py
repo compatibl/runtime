@@ -13,11 +13,10 @@
 # limitations under the License.
 
 
-from typing import Any, cast
-
-from jinja2.utils import F
-from cl.runtime.records.protocols import is_primitive, is_sequence
-from cl.runtime.serializers.bootstrap_serializer import BootstrapSerializer
+from typing import Any
+from typing import cast
+from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 
 
@@ -34,7 +33,7 @@ class SettingsUtil:
     ) -> tuple[str, ...]:
         if value:
             return cast(tuple[str, ...], cls.to_str_tuple_or_none(value, field_name=field_name, type_name=type_name))
-        else:     
+        else:
             raise RuntimeError(f"Required {cls._what(field_name, type_name)} is empty.")
 
     @classmethod
@@ -63,8 +62,9 @@ class SettingsUtil:
                 # Single string value
                 return (value,)
         else:
-            raise RuntimeError(f"Cannot convert {cls._what(field_name, type_name)} with value {value} to a sequence of strings.")
-
+            raise RuntimeError(
+                f"Cannot convert {cls._what(field_name, type_name)} with value {value} to a sequence of strings."
+            )
 
     @classmethod
     def _what(cls, field_name: str | None, type_name: str | None) -> str:

@@ -15,8 +15,9 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import List, TypeVar
+from typing import List
 from typing import Sequence
+from typing import TypeVar
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
@@ -182,11 +183,9 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def get_scenario_trials(self, all_trials: Sequence[TTrial], scenario: ExperimentScenarioKey) -> tuple[TTrial, ...]:
         """Get trials of the particular scenario from all trials."""
-        trials = tuple(
-            trial
-            for trial in all_trials
-            if trial.scenario == scenario
-        )
+        trials = tuple(trial for trial in all_trials if trial.scenario == scenario)
         if not trials:
-            raise RuntimeError(f"No trials for experiment {self.experiment_id} and scenario {scenario.experiment_scenario_id}.")
+            raise RuntimeError(
+                f"No trials for experiment {self.experiment_id} and scenario {scenario.experiment_scenario_id}."
+            )
         return trials

@@ -15,7 +15,6 @@
 from typing import Iterable
 from cl.runtime import SqliteDb
 from cl.runtime import TypeCache
-from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key

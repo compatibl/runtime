@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.records.conditions import Condition

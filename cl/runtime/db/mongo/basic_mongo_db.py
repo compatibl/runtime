@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import itertools
 import re
 from dataclasses import dataclass
-from typing import Any, cast
+from typing import Any
 from typing import Dict
 from typing import Iterable
 from typing import Sequence
+from typing import cast
 from memoization import cached
 from mongomock import MongoClient as MongoClientMock
 from pymongo import MongoClient
@@ -27,12 +27,10 @@ from pymongo.synchronous.collection import Collection
 from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
@@ -40,7 +38,6 @@ from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.records.cast_util import CastUtil
 
 invalid_db_name_symbols = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -105,10 +102,7 @@ class BasicMongoDb(Db):
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
 
         result = tuple(
-            data_serializer.deserialize({
-                k: v for k, v in serialized_record.items()
-                if k not in {"_id", "_key"}
-            })
+            data_serializer.deserialize({k: v for k, v in serialized_record.items() if k not in {"_id", "_key"}})
             for serialized_record in serialized_records
         )
         return cast(tuple[TRecord], result)
@@ -397,11 +391,11 @@ class BasicMongoDb(Db):
 
     @classmethod
     def _apply_limit_and_skip(
-            cls,
-            serialized_records: Iterable,
-            *,
-            limit: int | None = None,
-            skip: int | None = None,
+        cls,
+        serialized_records: Iterable,
+        *,
+        limit: int | None = None,
+        skip: int | None = None,
     ) -> Iterable:
         """Apply limit and skip to the records iterable."""
         # Apply skip

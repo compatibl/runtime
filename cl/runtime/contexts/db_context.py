@@ -118,7 +118,7 @@ class DbContext(Context):
     def get_bindings(cls) -> tuple[TableBinding, ...]:
         """
         Return table bindings to key type in alphabetical order of table name, then key type name.
-        
+
         Notes:
             More than one table can exist for the same key type.
         """
@@ -130,10 +130,10 @@ class DbContext(Context):
     def get_bound_tables(cls, *, key_type: type[KeyMixin]) -> tuple[str, ...]:
         """
         Return tables for the specified key type in alphabetical order.
-        
+
         Returns:
             Table names in non-delimited PascalCase format.
-        
+
         Args:
             key_type: Key type name for which the tables are returned.
         """
@@ -628,12 +628,11 @@ class DbContext(Context):
             for table, table_keys in keys_to_delete_grouped_by_table.items()
         )
 
-
     @classmethod
     def drop_test_db(cls) -> None:
         """
         Drop a database as part of a unit test.
-        
+
         EVERY IMPLEMENTATION OF THIS METHOD MUST FAIL UNLESS THE FOLLOWING CONDITIONS ARE MET:
         - The method is invoked from a unit test based on ProcessContext.is_testing()
         - db_id starts with db_test_prefix specified in settings.yaml (the default prefix is 'test_')

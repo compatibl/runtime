@@ -15,8 +15,8 @@
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
-from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED

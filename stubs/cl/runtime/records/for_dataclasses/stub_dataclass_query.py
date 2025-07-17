@@ -16,9 +16,7 @@ from dataclasses import dataclass
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.type_util import TypeUtil
 from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubDataclassKey
 
 
 @dataclass(slots=True, kw_only=True)

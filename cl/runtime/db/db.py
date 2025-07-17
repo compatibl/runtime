@@ -165,7 +165,7 @@ class Db(DbKey, RecordMixin, ABC):
     def drop_test_db(self) -> None:
         """
         Drop a database as part of a unit test.
-        
+
         EVERY IMPLEMENTATION OF THIS METHOD MUST FAIL UNLESS THE FOLLOWING CONDITIONS ARE MET:
         - The method is invoked from a unit test based on ProcessContext.is_testing()
         - db_id starts with db_test_prefix specified in settings.yaml (the default prefix is 'test_')
@@ -221,7 +221,7 @@ class Db(DbKey, RecordMixin, ABC):
         *,
         table: str,
         key_type: type[KeyMixin],
-        ) -> None:
+    ) -> None:
         """
         Add a new table, or if the table already exists, verify that the key type is the same.
 
@@ -248,7 +248,8 @@ class Db(DbKey, RecordMixin, ABC):
             if table_binding.key_type != (key_type_str := TypeUtil.name(key_type)):
                 raise RuntimeError(
                     f"Binding for table {table} cannot be created for key type {key_type_str}\n"
-                    f"because it already exists with a different key type: {table_binding.key_type}")
+                    f"because it already exists with a different key type: {table_binding.key_type}"
+                )
 
     def check_drop_test_db_preconditions(self) -> None:
         """Error if db_id does not start from db_test_prefix specified in settings.yaml (defaults to 'test_')."""
@@ -259,7 +260,8 @@ class Db(DbKey, RecordMixin, ABC):
         if not self.db_id.startswith(db_settings.db_test_prefix):
             raise RuntimeError(
                 f"Cannot drop a unit test DB from code because its db_id={self.db_id}\n"
-                f"does not start from unit test DB prefix '{db_settings.db_test_prefix}'.")
+                f"does not start from unit test DB prefix '{db_settings.db_test_prefix}'."
+            )
 
     def check_drop_temp_db_preconditions(self, *, user_approval: bool) -> None:
         """
@@ -267,11 +269,11 @@ class Db(DbKey, RecordMixin, ABC):
         specified in settings.yaml (defaults to 'temp_').
         """
         if not user_approval:
-            raise RuntimeError(
-                f"Cannot drop a temporary DB from code without explicit user approval.")
+            raise RuntimeError(f"Cannot drop a temporary DB from code without explicit user approval.")
 
         db_settings = DbSettings.instance()
         if not self.db_id.startswith(db_settings.db_temp_prefix):
             raise RuntimeError(
                 f"Cannot drop a DB from code even with user approval because its db_id={self.db_id}\n"
-                f"does not start from temporary DB prefix '{db_settings.db_temp_prefix}'.")
+                f"does not start from temporary DB prefix '{db_settings.db_temp_prefix}'."
+            )

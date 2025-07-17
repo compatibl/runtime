@@ -13,14 +13,11 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime import TypeCache
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.experiments.binary_experiment import BinaryExperiment
 from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.experiments.experiment_key_query import ExperimentKeyQuery
+from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
-from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.table_binding import TableBinding
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 
@@ -52,6 +49,7 @@ def _multiple_table_records():
 
     return [*stub_experiments_table_1, *stub_experiments_table_2]
 
+
 def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
     """Test the methods related to bindings."""
 
@@ -71,6 +69,7 @@ def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
     bound_type = DbContext.get_bound_type(table="ExperimentTable1")
     assert bound_type == ExperimentKey
 
+
 def test_load_table(pytest_default_db):  # TODO: Extend to multiple DBs
     """Test load_table for dynamic table names."""
 
@@ -89,15 +88,16 @@ def test_load_table(pytest_default_db):  # TODO: Extend to multiple DBs
     for limit in range(0, len(result_1)):
         for skip in range(0, len(result_1)):
             actual_result = DbContext.load_table("ExperimentTable1", limit=limit, skip=skip)
-            expected_result = tuple(result_1[skip:skip + limit])
+            expected_result = tuple(result_1[skip : skip + limit])
             assert actual_result == expected_result
 
     # Test limit and skip for 'ExperimentTable2'
     for limit in range(0, len(result_2)):
         for skip in range(0, len(result_2)):
             actual_result = DbContext.load_table("ExperimentTable2", limit=limit, skip=skip)
-            expected_result = tuple(result_2[skip:skip + limit])
+            expected_result = tuple(result_2[skip : skip + limit])
             assert actual_result == expected_result
+
 
 def test_load_where(pytest_default_db):  # TODO: Extend to multiple DBs
     """Test load_type for dynamic table names."""
@@ -119,14 +119,14 @@ def test_load_where(pytest_default_db):  # TODO: Extend to multiple DBs
     for limit in range(0, len(result_1)):
         for skip in range(0, len(result_1)):
             actual_result = DbContext.load_where(query_1, limit=limit, skip=skip)
-            expected_result = tuple(result_1[skip:skip + limit])
+            expected_result = tuple(result_1[skip : skip + limit])
             assert actual_result == expected_result
 
     # Test limit and skip for 'ExperimentTable2'
     for limit in range(0, len(result_2)):
         for skip in range(0, len(result_2)):
             actual_result = DbContext.load_where(query_2, limit=limit, skip=skip)
-            expected_result = tuple(result_2[skip:skip + limit])
+            expected_result = tuple(result_2[skip : skip + limit])
             assert actual_result == expected_result
 
 

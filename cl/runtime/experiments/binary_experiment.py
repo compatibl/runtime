@@ -36,7 +36,7 @@ class BinaryExperiment(Experiment, ABC):
         values = []
         trial_query = TrialKeyQuery(experiment=self.get_key()).build()
         all_trials = DbContext.load_where(trial_query, cast_to=BinaryTrial)
-    
+
         for scenario in self.scenarios:
 
             trials = self.get_scenario_trials(all_trials, scenario)

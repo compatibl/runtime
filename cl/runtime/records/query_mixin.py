@@ -32,4 +32,3 @@ class QueryMixin(DataMixin, ABC):
     def get_table(self) -> str:
         """DB table in non-delimited PascalCase format (defaults to key type name with Key suffix removed)."""
         return TypeUtil.name(self.get_target_type().get_key_type())
-

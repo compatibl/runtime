@@ -18,9 +18,9 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.panels_request import PanelsRequest
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED

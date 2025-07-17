@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.query_mixin import QueryMixin
@@ -38,4 +37,3 @@ class StubDataclassPolymorphicQuery(QueryMixin):
 
     def get_table(self) -> str:
         return self.table_field
-

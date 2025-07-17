@@ -16,8 +16,8 @@ import pytest
 from enum import Enum
 from enum import IntEnum
 from cl.runtime import RecordMixin
-from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassDerived

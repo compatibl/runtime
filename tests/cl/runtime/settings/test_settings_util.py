@@ -13,8 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.protocols import is_sequence
-from cl.runtime.settings.qa_settings import QaSettings
 from cl.runtime.settings.settings_util import SettingsUtil
 
 
@@ -30,6 +28,7 @@ def test_to_str_tuple_or_none():
     assert SettingsUtil.to_str_tuple_or_none("a, b, c") == ("a", "b", "c")
     assert SettingsUtil.to_str_tuple_or_none("[a, b, c]") == ("a", "b", "c")
 
+
 def test_to_str_tuple():
     """Test SettingsUtil.to_str_tuple method."""
 
@@ -37,7 +36,6 @@ def test_to_str_tuple():
         SettingsUtil.to_str_tuple(None)
     with pytest.raises(RuntimeError):
         SettingsUtil.to_str_tuple([])
-
 
 
 if __name__ == "__main__":

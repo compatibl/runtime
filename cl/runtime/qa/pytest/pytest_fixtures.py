@@ -16,12 +16,10 @@ import pytest
 import os
 import uuid
 from typing import Iterator
-from unittest import mock
 from _pytest.fixtures import FixtureRequest
 from bson import UUID_SUBTYPE
 from bson import Binary
 from cl.runtime import Db
-from cl.runtime import SqliteDb
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
@@ -107,9 +105,8 @@ def pytest_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
     yield from _pytest_db(request, db_type=BasicMongoMockDb)
 
 
-
-# @pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb]) # TODO: Enable when Sqlite and BasicMongoMockDb support is restored 
-@pytest.fixture(scope="function", params=[BasicMongoDb]) 
+# @pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb]) # TODO: Enable when Sqlite and BasicMongoMockDb support is restored
+@pytest.fixture(scope="function", params=[BasicMongoDb])
 def pytest_multi_db(request) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types

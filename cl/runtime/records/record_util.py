@@ -14,7 +14,6 @@
 
 from typing import Any
 from typing import Iterable
-from typing import List
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_record
 

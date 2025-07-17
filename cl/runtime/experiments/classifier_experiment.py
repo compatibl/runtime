@@ -44,7 +44,7 @@ class ClassifierExperiment(Experiment, ABC):
         scenario_counts = []
         trial_query = TrialKeyQuery(experiment=self.get_key()).build()
         all_trials = DbContext.load_where(trial_query, cast_to=ClassifierTrial)
-    
+
         for scenario in self.scenarios:
             trials = self.get_scenario_trials(all_trials, scenario)
             total = len(trials)
