@@ -20,7 +20,7 @@ from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.conditions import In
 from cl.runtime.records.data_util import DataUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.settings.qa_settings import QaSettings
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
@@ -109,7 +109,7 @@ def test_basic_operations(db_type_name: str):
     db_id = test_name.replace(".", ";")
 
     # Create a new DB instance of the specified type (use the type from settings if None)
-    db_type = TypeInfoCache.get_class_from_type_name(db_type_name)
+    db_type = TypeCache.get_class_from_type_name(db_type_name)
     db = Db.create(db_type=db_type, db_id=db_id)
 
     with DbContext(db=db).build() as db_context:

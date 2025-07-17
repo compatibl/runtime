@@ -17,7 +17,7 @@ from enum import Enum
 from enum import IntEnum
 from cl.runtime import RecordMixin
 from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassDerived
@@ -29,8 +29,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_underscore import _
 
 
 def test_rebuild_cache():
-    """Test TypeInfoCache.reload_cache method, this also generates and saves a new TypeInfo.csv file."""
-    TypeInfoCache.rebuild()
+    """Test TypeCache.reload_cache method, this also generates and saves a new TypeInfo.csv file."""
+    TypeCache.rebuild()
 
 
 def test_get_qual_name():
@@ -38,50 +38,50 @@ def test_get_qual_name():
 
     # Base class
     base_path = f"{StubDataclass.__module__}.{StubDataclass.__name__}"
-    assert TypeInfoCache.get_qual_name_from_class(StubDataclass) == base_path
+    assert TypeCache.get_qual_name_from_class(StubDataclass) == base_path
 
     # Derived class
     derived_path = f"{StubDataclassDerived.__module__}.{StubDataclassDerived.__name__}"
-    assert TypeInfoCache.get_qual_name_from_class(StubDataclassDerived) == derived_path
+    assert TypeCache.get_qual_name_from_class(StubDataclassDerived) == derived_path
 
 
 def test_from_type_name():
     """Test getting class from type names."""
 
-    assert TypeInfoCache.get_class_from_type_name("TypeDecl") is TypeDecl
-    assert TypeInfoCache.get_class_from_type_name("StubDataclass") is StubDataclass
+    assert TypeCache.get_class_from_type_name("TypeDecl") is TypeDecl
+    assert TypeCache.get_class_from_type_name("StubDataclass") is StubDataclass
 
 
 def test_from_qual_name():
     """Test getting class from qual names."""
 
     # Classes that is already imported
-    for imported_class in [TypeInfoCache, TypeDecl, StubDataclass]:
+    for imported_class in [TypeCache, TypeDecl, StubDataclass]:
         class_info_path = f"{imported_class.__module__}.{imported_class.__name__}"
-        assert TypeInfoCache.get_class_from_qual_name(class_info_path) == imported_class
+        assert TypeCache.get_class_from_qual_name(class_info_path) == imported_class
 
     # Class that is dynamically imported on demand
     do_no_import_class_path = (
         "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.StubDataclassDoNotImport"
     )
-    do_no_import_class = TypeInfoCache.get_class_from_qual_name(do_no_import_class_path)
+    do_no_import_class = TypeCache.get_class_from_qual_name(do_no_import_class_path)
     assert do_no_import_class_path == f"{do_no_import_class.__module__}.{do_no_import_class.__name__}"
 
     # Module does not exist error
     with pytest.raises(RuntimeError):
         path_with_unknown_module = "unknown_module.StubDataclassDoNotImport"
-        TypeInfoCache.get_class_from_qual_name(path_with_unknown_module)
+        TypeCache.get_class_from_qual_name(path_with_unknown_module)
 
     # Class does not exist error
     with pytest.raises(RuntimeError):
         path_with_unknown_class = "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.UnknownClass"
-        TypeInfoCache.get_class_from_qual_name(path_with_unknown_class)
+        TypeCache.get_class_from_qual_name(path_with_unknown_class)
 
 
 def test_get_classes():
-    """Test TypeInfoCache.get_classes method."""
+    """Test TypeCache.get_classes method."""
 
-    data_types = TypeInfoCache.get_classes(
+    data_types = TypeCache.get_classes(
         type_kinds=(
             TypeKind.DATA,
             TypeKind.KEY,
@@ -98,7 +98,7 @@ def test_get_classes():
     assert _StubDataclassUnderscore not in data_types
     assert __StubDataclassDoubleUnderscore not in data_types
 
-    enum_types = TypeInfoCache.get_classes(type_kinds=(TypeKind.ENUM,))
+    enum_types = TypeCache.get_classes(type_kinds=(TypeKind.ENUM,))
 
     # Included enum types
     assert StubIntEnum in enum_types

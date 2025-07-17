@@ -19,7 +19,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 
 
 class TypeResponseUtil:
@@ -31,7 +31,7 @@ class TypeResponseUtil:
 
         try:
             # TODO: Check why empty module is passed, is module the short name prefix?
-            record_type = TypeInfoCache.get_class_from_type_name(request.type_name)
+            record_type = TypeCache.get_class_from_type_name(request.type_name)
         except:
             # Get type bound to the table
             key_type = DbContext.get_bound_type(table=request.type_name)

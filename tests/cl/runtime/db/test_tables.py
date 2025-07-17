@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime import TypeInfoCache
+from cl.runtime import TypeCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.binary_experiment import BinaryExperiment
 from cl.runtime.experiments.experiment_key import ExperimentKey

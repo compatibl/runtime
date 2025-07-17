@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing_extensions import Any
 from cl.runtime import RecordListView
 from cl.runtime import RecordView
-from cl.runtime import TypeInfoCache
+from cl.runtime import TypeCache
 from cl.runtime import View
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.records.data_mixin import DataMixin
@@ -51,7 +51,7 @@ class UiRecordUtil(DataMixin):
         """Get list of record's viewers with their types."""
 
         # TODO: Return saved view names
-        request_type = TypeInfoCache.get_class_from_type_name(type_name)
+        request_type = TypeCache.get_class_from_type_name(type_name)
 
         # Get actual type from record if request.key is not None
         if key is not None:
@@ -127,7 +127,7 @@ class UiRecordUtil(DataMixin):
         """Run viewer and process result."""
 
         # Get type of the record.
-        type_ = TypeInfoCache.get_class_from_type_name(type_name)
+        type_ = TypeCache.get_class_from_type_name(type_name)
 
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(key, TypeHint.for_class(type_.get_key_type()))

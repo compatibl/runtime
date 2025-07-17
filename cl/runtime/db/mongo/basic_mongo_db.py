@@ -36,7 +36,7 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -91,7 +91,7 @@ class BasicMongoDb(Db):
         query_dict = {}
         if filter_to is not None:
             # Add filter condition on type
-            subtype_names = TypeInfoCache.get_child_names(filter_to)
+            subtype_names = TypeCache.get_child_names(filter_to)
             query_dict["_type"] = {"$in": subtype_names}
 
         # TODO: Filter by keys
@@ -173,7 +173,7 @@ class BasicMongoDb(Db):
             )
 
         # Add filter condition on type
-        subtype_names = TypeInfoCache.get_child_names(filter_to)
+        subtype_names = TypeCache.get_child_names(filter_to)
         query_dict["_type"] = {"$in": subtype_names}
 
         # Get iterable from the query, execution is deferred
@@ -234,7 +234,7 @@ class BasicMongoDb(Db):
             )
 
         # Add filter condition on type
-        subtype_names = TypeInfoCache.get_child_names(filter_to)
+        subtype_names = TypeCache.get_child_names(filter_to)
         query_dict["_type"] = {"$in": subtype_names}
 
         # Use count_documents to get the count

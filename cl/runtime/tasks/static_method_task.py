@@ -21,7 +21,7 @@ from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
@@ -36,7 +36,7 @@ class StaticMethodTask(MethodTask):
     def _create_log_context(self) -> LogContext:
         """Create LogContext with task specific info."""
         return LogContext(
-            type=TypeUtil.name(TypeInfoCache.get_class_from_qual_name(self.type_str)),
+            type=TypeUtil.name(TypeCache.get_class_from_qual_name(self.type_str)),
             handler=self.method_name,
             task_run_id=self.task_id,
         ).build()
@@ -46,7 +46,7 @@ class StaticMethodTask(MethodTask):
         """Invoke the specified @staticmethod or @classmethod."""
 
         # Get record type from fully qualified name in module.ClassName format
-        record_type = TypeInfoCache.get_class_from_qual_name(self.type_str)
+        record_type = TypeCache.get_class_from_qual_name(self.type_str)
 
         # Method callable is already bound to cls, it is not necessary to pass cls as an explicit parameter
         method_name = self.normalized_method_name()

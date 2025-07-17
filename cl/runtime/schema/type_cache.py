@@ -46,7 +46,7 @@ _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildN
 """Headers of TypeInfo preload file."""
 
 
-class TypeInfoCache:
+class TypeCache:
     """Cache of TypeInfo for the specified packages."""
 
     _type_info_dict: Dict[str, TypeInfo] = {}

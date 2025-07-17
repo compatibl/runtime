@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime import TypeInfoCache
+from cl.runtime import TypeCache
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
@@ -47,7 +47,7 @@ class TaskUtil:
                 # Key is not None, this is an instance method
 
                 # Get key type based on table in request
-                key_type = TypeInfoCache.get_class_from_type_name(request.type).get_key_type()  # noqa
+                key_type = TypeCache.get_class_from_type_name(request.type).get_key_type()  # noqa
 
                 key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
                 label = f"{TypeUtil.name(key_type)};{serialized_key};{request.method}"
@@ -62,7 +62,7 @@ class TaskUtil:
                 tasks.append(handler_task)
             else:
                 # Key is None, this is a @classmethod or @staticmethod
-                record_type = TypeInfoCache.get_class_from_type_name(request.type)
+                record_type = TypeCache.get_class_from_type_name(request.type)
                 record_type_str = f"{record_type.__module__}.{TypeUtil.name(record_type)}"
                 label = f"{TypeUtil.name(record_type)};{request.method}"
                 handler_task = StaticMethodTask(

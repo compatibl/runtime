@@ -14,7 +14,7 @@
 
 from typing import Iterable
 from cl.runtime import SqliteDb
-from cl.runtime import TypeInfoCache
+from cl.runtime import TypeCache
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.records.protocols import TRecord
@@ -79,7 +79,7 @@ class SseQueryUtil:
         columns_mapping = schema_manager.get_columns_mapping(record_type.get_key_type())
 
         # Get subtypes for record_type and use them in match condition
-        subtype_names = TypeInfoCache.get_child_names(record_type)
+        subtype_names = TypeCache.get_child_names(record_type)
         query_values = [*subtype_names]
         value_placeholders = ", ".join(["?"] * len(subtype_names))
         sql_statement = f'SELECT * FROM "{table_name}" WHERE _type in ({value_placeholders})'
@@ -134,7 +134,7 @@ class SseQueryUtil:
         db_obj = db._get_mongo_db()
         collection = db_obj[collection_name]
 
-        subtype_names = TypeInfoCache.get_child_names(record_type)
+        subtype_names = TypeCache.get_child_names(record_type)
         query_conditions = {"_type": {"$in": subtype_names}}
 
         if from_timestamp is not None:

@@ -21,7 +21,7 @@ from typing import Iterable
 from typing_extensions import Self
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.settings.log_settings import LogSettings
 
 
@@ -44,7 +44,7 @@ class Log(LogKey, RecordMixin, ABC):
 
         if Log.__default is None:
             # Create the class specified in settings and invoke its constructor
-            log_type = TypeInfoCache.get_class_from_type_name(LogSettings.instance().log_type)
+            log_type = TypeCache.get_class_from_type_name(LogSettings.instance().log_type)
             Log.__default = log_type()
 
         return Log.__default

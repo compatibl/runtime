@@ -24,7 +24,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 
 
 @dataclass(slots=True, kw_only=True)
@@ -111,8 +111,8 @@ class SqliteSchemaManager(DataMixin):
         """Collect all types in hierarchy and check type conflicts for fields with the same name."""
 
         key_type = cast(KeyProtocol, type_).get_key_type()
-        child_type_names = TypeInfoCache.get_child_names(key_type)
-        types_in_hierarchy = [TypeInfoCache.get_class_from_type_name(x) for x in child_type_names]
+        child_type_names = TypeCache.get_child_names(key_type)
+        types_in_hierarchy = [TypeCache.get_class_from_type_name(x) for x in child_type_names]
 
         # Get table name inclusive of Key suffix if presentu
         key_fields_class_name: str = TypeUtil.name(key_type)  # TODO: Also include module

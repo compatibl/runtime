@@ -33,7 +33,7 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.db_settings import DbSettings
@@ -178,7 +178,7 @@ class SqliteDb(Db):
         sort_columns = ", ".join(pk_cols)
 
         # get subtypes for record_type and use them in match condition
-        subtype_names = TypeInfoCache.get_child_names(record_type)
+        subtype_names = TypeCache.get_child_names(record_type)
         value_placeholders = ", ".join(["?"] * len(subtype_names))
         sql_statement = f'SELECT * FROM "{table}" WHERE _type in ({value_placeholders})'
 

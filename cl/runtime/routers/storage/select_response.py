@@ -23,7 +23,7 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.routers.storage.select_request import SelectRequest
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -51,7 +51,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         # TODO(Roman): !!! Implement separate methods for table and type
         try:
             # Try to get a type
-            request_type = TypeInfoCache.get_class_from_type_name(request.type_)
+            request_type = TypeCache.get_class_from_type_name(request.type_)
 
             # Load records for the table
             records = DbContext.load_type(request_type)

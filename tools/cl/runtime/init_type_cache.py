@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from cl.runtime.prebuild.init_file_util import InitFileUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 
 if __name__ == '__main__':
 
@@ -21,4 +21,4 @@ if __name__ == '__main__':
     InitFileUtil.check_init_files(apply_fix=True, verbose=False)
 
     # Rebuild type cache and save TypeInfo.csv file to the bootstrap resources directory
-    TypeInfoCache.rebuild()
+    TypeCache.rebuild()

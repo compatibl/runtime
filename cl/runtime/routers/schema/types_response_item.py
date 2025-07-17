@@ -19,7 +19,7 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
 
 
@@ -44,7 +44,7 @@ class TypesResponseItem(BaseModel):
         """Implements /schema/types route."""
 
         # Get cached classes (does not rebuild cache)
-        record_types = TypeInfoCache.get_classes(type_kinds=(TypeKind.RECORD,))
+        record_types = TypeCache.get_classes(type_kinds=(TypeKind.RECORD,))
 
         # Add types to result
         types_result = [

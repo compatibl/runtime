@@ -20,7 +20,7 @@ from cl.runtime.routers.entity.panels_request import PanelsRequest
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -44,7 +44,7 @@ class PanelsResponseItem(BaseModel):
         """Implements /entity/panels route."""
 
         # TODO: Return saved view names
-        request_type = TypeInfoCache.get_class_from_type_name(request.type_name)
+        request_type = TypeCache.get_class_from_type_name(request.type_name)
 
         # Get actual type from record if request.key is not None
         if request.key is not None:

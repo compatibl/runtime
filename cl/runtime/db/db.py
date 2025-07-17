@@ -30,7 +30,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key import TableBindingKey
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.settings.db_settings import DbSettings
 
 
@@ -203,7 +203,7 @@ class Db(DbKey, RecordMixin, ABC):
 
         # Get DB type from context settings if not specified
         if db_type is None:
-            db_type = TypeInfoCache.get_class_from_type_name(db_settings.db_type)
+            db_type = TypeCache.get_class_from_type_name(db_settings.db_type)
 
         # Get DB identifier if not specified
         if db_id is None:

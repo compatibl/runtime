@@ -38,7 +38,7 @@ from cl.runtime.records.table_binding_key import TableBindingKey
 from cl.runtime.records.table_binding_query import TableBindingQuery
 from cl.runtime.records.type_query import TypeQuery
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -153,7 +153,7 @@ class DbContext(Context):
         """
         key = TableBindingKey(table=table).build()
         binding = cls.load_one(key)
-        result = TypeInfoCache.get_class_from_type_name(binding.key_type)
+        result = TypeCache.get_class_from_type_name(binding.key_type)
         return result
 
     @classmethod

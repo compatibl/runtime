@@ -23,7 +23,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.char_util import CharUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_info_cache import TypeInfoCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 _SERIALIZER = DataSerializers.FOR_CSV
@@ -80,7 +80,7 @@ class CsvFileReader(Reader):
             )
 
         # Get record type
-        record_type = TypeInfoCache.get_class_from_type_name(filename_without_extension)
+        record_type = TypeCache.get_class_from_type_name(filename_without_extension)
 
         # Normalize chars and set None for empty strings
         row_dict = {CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()}
