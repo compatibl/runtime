@@ -340,51 +340,63 @@ class DbContext(Context):
             skip: Number of records to skip (for pagination)
         """
 
-        # Check and convert to numerical values
+        # Validate params
         if limit is not None and limit < 0:
-            raise RuntimeError("Parameter 'limit' must be >= 0 or None.")
-        elif limit is None:
-            limit = 0
+            raise RuntimeError(f"Parameter limit={limit} is negative.")
         if skip is not None and skip < 0:
-            raise ValueError("Parameter skip must be >= 0 or None.")
-        elif skip is None:
-            skip = 0
+            raise RuntimeError(f"Parameter skip={skip} is negative.")
+
+        # Handle this case separately because pymongo interprets limit=0 as no limit,
+        # while we interpret it as returning no records
+        if limit == 0:
+            return tuple()
+
+        remaining_limit = limit  # May be None
+        remaining_skip = skip or 0  # Normalize None -> 0
 
         tables = cls.get_bound_tables(key_type=filter_to.get_key_type())
         result = []
-        for table in tables:
 
-            # TODO: Make this code more effective by counting skipped records and only then loading as needed
+        for table in tables:
+            # Stop if we reached the limit
+            if remaining_limit == 0:
+                break
+
+            # Pull enough rows from this table to satisfy pending skip + limit.
+            # When unlimited, leave table_limit=None to avoid truncation.
+            table_limit = (
+                remaining_limit + remaining_skip if remaining_limit is not None else None
+            )
+
             table_result = cls.load_table(
                 table,
                 dataset=dataset,
                 cast_to=cast_to,
                 filter_to=filter_to,
                 slice_to=slice_to,
-                limit=limit+skip if limit != 0 else None,
-                skip=None,
+                limit=table_limit,
+                skip=None,  # Global skip is handled below
             )
 
-            # Update skip
-            table_result_len = len(table_result)
-            if skip >= table_result_len:
-                # Skip all records from this table
-                skip -= table_result_len
-                continue
-            else:
-                # Skip some of the records
-                table_result = table_result[skip:]
-                skip = 0
+            # Apply global skip
+            if remaining_skip:
+                if remaining_skip >= len(table_result):
+                    remaining_skip -= len(table_result)
+                    continue
+                table_result = table_result[remaining_skip:]
+                remaining_skip = 0
 
-            # Update limit
-            if limit >= table_result_len:
-                # Include all of the records that remain after skipping
-                result.extend(table_result)
-                limit -= table_result_len
+            # Apply global limit
+            if remaining_limit is not None:
+                if remaining_limit >= len(table_result):
+                    result.extend(table_result)
+                    remaining_limit -= len(table_result)
+                else:
+                    result.extend(table_result[:remaining_limit])
+                    break
             else:
-                # Include some of the records that remain after skipping and stop
-                result.extend(table_result[:limit])
-                break
+                # No limit is set
+                result.extend(table_result)
 
         return tuple(result)
 
