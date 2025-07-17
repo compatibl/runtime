@@ -317,24 +317,21 @@ class DbContext(Context):
     @classmethod
     def load_type(
         cls,
+        filter_to: type[TRecord],
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord],
         slice_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord]:
         """
-        Load all records of target_type and its subtypes.
-
-        Notes:
-            Error if target_type defines custom tables by overriding get_table, use load_where in this case.
+        Load all records of target_type and its subtypes from all tables where they are stored
 
         Args:
+            filter_to: The query will return only the subtypes of this type
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Cast the result to this type (error if not a subtype)
-            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
             slice_to: Slice fields from the stored record using projection to return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
