@@ -51,7 +51,7 @@ class LocalCache(Db):
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
         filter_to: type[TRecord] | None = None,
-        slice_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord]:
@@ -83,7 +83,7 @@ class LocalCache(Db):
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
         filter_to: type[TRecord] | None = None,
-        slice_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord]:

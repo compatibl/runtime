@@ -52,7 +52,7 @@ class Db(DbKey, RecordMixin, ABC):
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
         filter_to: type[TRecord] | None = None,
-        slice_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord]:
@@ -64,7 +64,7 @@ class Db(DbKey, RecordMixin, ABC):
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Cast the result to this type (error if not a subtype)
             filter_to: The query will return only the subtypes of this type (defaults to the query target type)
-            slice_to: Slice fields from the stored record using projection to return instances of this type
+            project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
@@ -95,7 +95,7 @@ class Db(DbKey, RecordMixin, ABC):
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
         filter_to: type[TRecord] | None = None,
-        slice_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord]:
@@ -107,7 +107,7 @@ class Db(DbKey, RecordMixin, ABC):
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Cast the result to this type (error if not a subtype)
             filter_to: The query will return only the subtypes of this type (defaults to the query target type)
-            slice_to: Slice fields from the stored record using projection to return instances of this type
+            project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
