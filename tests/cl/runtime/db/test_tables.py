@@ -65,7 +65,7 @@ def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
     stubs = _multiple_table_records()
     DbContext.save_many(stubs)
 
-    bindings = DbContext.get_table_bindings()
+    bindings = DbContext.get_bindings()
     RegressionGuard(channel="bindings").write(bindings)
 
     tables = DbContext.get_tables()

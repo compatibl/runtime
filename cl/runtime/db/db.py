@@ -51,7 +51,7 @@ class Db(DbKey, RecordMixin, ABC):
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id).build()
 
-    def get_table_bindings(self) -> tuple[TableBinding, ...]:
+    def get_bindings(self) -> tuple[TableBinding, ...]:
         """
         Return table to record type bindings in alphabetical order of table name followed by record type name.
 
@@ -68,7 +68,7 @@ class Db(DbKey, RecordMixin, ABC):
         """Return DB table names in alphabetical order of non-delimited PascalCase format."""
 
         # Bindings may include multiple entries with the same table name
-        bindings = self.get_table_bindings()
+        bindings = self.get_bindings()
 
         # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
         return tuple(sorted(set(binding.table for binding in bindings)))
@@ -81,7 +81,7 @@ class Db(DbKey, RecordMixin, ABC):
             More than one table can exist for the same record type.
         """
         # Bindings may include multiple entries with the same record type
-        bindings = self.get_table_bindings()
+        bindings = self.get_bindings()
 
         # Convert to set to remove duplicates and then back to tuple with sorting in alphabetical order
         return tuple(sorted(set(binding.record_type for binding in bindings)))

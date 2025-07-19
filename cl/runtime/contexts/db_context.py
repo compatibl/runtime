@@ -108,14 +108,14 @@ class DbContext(Context):
             return DatasetUtil.root()
 
     @classmethod
-    def get_table_bindings(cls) -> tuple[TableBinding, ...]:
+    def get_bindings(cls) -> tuple[TableBinding, ...]:
         """
         Return table to record type bindings in alphabetical order of table name followed by record type name.
 
         Notes:
             More than one table can exist for the same record type and vice versa.
         """
-        return cls._get_db().get_table_bindings()
+        return cls._get_db().get_bindings()
 
     @classmethod
     def get_tables(cls) -> tuple[str, ...]:

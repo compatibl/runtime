@@ -60,7 +60,7 @@ class TypesResponseItem(BaseModel):
             TypesResponseItem(
                 name=binding.table, label=binding.table, kind="Table"  # TODO: Make label different from name or remove
             )
-            for binding in DbContext.get_table_bindings()
+            for binding in DbContext.get_bindings()
         ]
 
         return tables_result + types_result
