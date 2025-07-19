@@ -18,21 +18,22 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Iterable
 from typing import Sequence
-
 from more_itertools import consume
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.key_util import KeyUtil
-from cl.runtime.records.protocols import KeyProtocol, RecordProtocol, TKey, is_key, is_key_or_record, is_record
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_or_record
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
-from cl.runtime.records.table_binding_key import TableBindingKey
 from cl.runtime.records.table_binding_key_query_by_record_type import TableBindingKeyQueryByRecordType
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
 from cl.runtime.records.type_util import TypeUtil
@@ -65,10 +66,10 @@ class Db(DbKey, RecordMixin, ABC):
 
     def get_tables(self) -> tuple[str, ...]:
         """Return DB table names in alphabetical order of non-delimited PascalCase format."""
-    
+
         # Bindings may include multiple entries with the same table name
         bindings = self.get_table_bindings()
-        
+
         # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
         return tuple(sorted(set(binding.table for binding in bindings)))
 
@@ -81,7 +82,7 @@ class Db(DbKey, RecordMixin, ABC):
         """
         # Bindings may include multiple entries with the same record type
         bindings = self.get_table_bindings()
-        
+
         # Convert to set to remove duplicates and then back to tuple with sorting in alphabetical order
         return tuple(sorted(set(binding.record_type for binding in bindings)))
 
@@ -583,10 +584,7 @@ class Db(DbKey, RecordMixin, ABC):
         if not self._table_binding_cache:
             query = TableBindingKeyQueryByTable().build()
             bindings = self.load_where(query, cast_to=TableBinding)
-            self._table_binding_cache = {
-                (binding.table, binding.record_type): binding
-                for binding in bindings
-            }
+            self._table_binding_cache = {(binding.table, binding.record_type): binding for binding in bindings}
 
         record_type_name = TypeUtil.name(record_type)
         cache_key = (table, record_type_name)
@@ -597,10 +595,7 @@ class Db(DbKey, RecordMixin, ABC):
 
             # Create binding for each parent and self
             parent_names = TypeCache.get_parent_names(record_type)
-            bindings = tuple(
-                TableBinding(table=table, record_type=parent_name)
-                for parent_name in parent_names
-            )
+            bindings = tuple(TableBinding(table=table, record_type=parent_name) for parent_name in parent_names)
 
             # Add to cache
             consume(
