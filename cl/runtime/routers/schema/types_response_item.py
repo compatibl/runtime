@@ -40,7 +40,7 @@ class TypesResponseItem(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def get_types(cls) -> list[TypesResponseItem]:
+    def get_types(cls) -> list[TypesResponseItem]:  # TODO(Roman): !!! Separate routes for types and tables
         """Implements /schema/types route."""
 
         # Get cached classes (does not rebuild cache)
@@ -58,9 +58,9 @@ class TypesResponseItem(BaseModel):
         # Add tables to result
         tables_result = [
             TypesResponseItem(
-                name=binding.table, label=binding.table, kind="Table"  # TODO: Make label different from name or remove
+                name=table, label=table, kind="Table"  # TODO: Make label different from name or remove
             )
-            for binding in DbContext.get_bindings()
+            for table in DbContext.get_tables()
         ]
 
         return tables_result + types_result
