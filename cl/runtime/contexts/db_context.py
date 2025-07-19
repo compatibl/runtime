@@ -155,6 +155,16 @@ class DbContext(Context):
         return cls._get_db().get_bound_record_type_names(table=table)
 
     @classmethod
+    def get_lowest_bound_record_type_name(cls, *, table: str) -> str:
+        """
+        Return non-delimited PascalCase record type name of the lowest common type to the bound record types.
+
+        Args:
+            table: Table name in non-delimited PascalCase format.
+        """
+        return cls._get_db().get_lowest_bound_record_type_name(table=table)
+
+    @classmethod
     def load_one(
         cls,
         record_or_key: TKey,

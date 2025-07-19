@@ -19,6 +19,7 @@ from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.schema.type_kind import TypeKind
 
 
 class TypeResponseUtil:
@@ -29,15 +30,15 @@ class TypeResponseUtil:
         """Supports /schema/type route."""
 
         # TODO(Roman): !!! Implement separate methods for table and type
-        try:
+        if TypeCache.is_type(type_name=request.type_name, type_kinds=TypeKind.RECORD):
             # TODO: Check why empty module is passed, is module the short name prefix?
-            record_type = TypeCache.get_class_from_type_name(request.type_name)
-        except:
-            # Get type bound to the table
-            key_type = DbContext.get_bound_type(table=request.type_name)
+            record_type_name = request.type_name
+        else:
+            # Get lowest common type bound to the table
+            record_type_name = DbContext.get_lowest_bound_record_type_name(table=request.type_name)
 
-            # TODO: Get the record for this type instead
-            record_type = key_type
+        # Get record type from name
+        record_type = TypeCache.get_class_from_type_name(record_type_name)
 
         handler_args_elements = dict()
         result = TypeDecl.as_dict_with_dependencies(record_type)

@@ -74,8 +74,11 @@ def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
     bound_tables = DbContext.get_bound_tables(record_type=Experiment)
     RegressionGuard(channel="bound_tables").write(bound_tables)
 
-    bound_type_names = DbContext.get_bound_record_type_names(table="ExperimentTable1")
-    RegressionGuard(channel="bound_type_names").write(bound_type_names)
+    bound_record_type_names = DbContext.get_bound_record_type_names(table="ExperimentTable1")
+    RegressionGuard(channel="bound_record_type_names").write(bound_record_type_names)
+
+    lowest_bound_record_type_name = DbContext.get_lowest_bound_record_type_name(table="ExperimentTable1")
+    RegressionGuard(channel="lowest_bound_record_type_name").write(lowest_bound_record_type_name)
 
     RegressionGuard().verify_all()
 

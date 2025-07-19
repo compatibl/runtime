@@ -24,6 +24,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -49,16 +50,19 @@ class SelectResponse(RecordsWithSchemaResponse):
             raise RuntimeError("Select with 'limit' currently is not supported.")
 
         # TODO(Roman): !!! Implement separate methods for table and type
-        try:
-            # Try to get a type
-            record_type = TypeCache.get_class_from_type_name(request.type_)
-            # Load records for the table
+        if TypeCache.is_type(type_name=request.type_, type_kinds=TypeKind.RECORD):
+            # Get records for a type
+            record_type_name = request.type_
+            record_type = TypeCache.get_class_from_type_name(record_type_name)
+            # Load records for the type
             records = DbContext.load_type(record_type)
-        except:
-            # If not a type, load records for a table
-            records = DbContext.load_table(request.type_)
-            # Get bound type
-            record_type = DbContext.get_bound_type(table=request.type_)
+        else:
+            # Get records for a table
+            table = request.type_
+            records = DbContext.load_table(table)
+            # Get lowest common type to the records stored in the table
+            record_type_name = DbContext.get_lowest_bound_record_type_name(table=table)
+            record_type = TypeCache.get_class_from_type_name(record_type_name)
 
         # Serialize records for table.
         serialized_records = [cls._serialize_record_for_table(record) for record in records]

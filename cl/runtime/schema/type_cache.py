@@ -25,7 +25,7 @@ from typing import Sequence
 from typing import Tuple
 from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data, is_sequence
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -49,7 +49,7 @@ _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildN
 class TypeCache:
     """Cache of TypeInfo for the specified packages."""
 
-    _type_info_dict: Dict[str, TypeInfo] = {}
+    _type_info_by_type_name_dict: Dict[str, TypeInfo] = {}
     """Dictionary of TypeInfo indexed by type name."""
 
     _type_by_type_name_dict: Dict[str, type] = {}
@@ -63,6 +63,31 @@ class TypeCache:
 
     _packages: Tuple[str, ...] = None
     """List of packages to include in the cache."""
+
+    @classmethod
+    def is_type(cls, *, type_name: str, type_kinds: TypeKind | Sequence[TypeKind] | None) -> bool:
+        """Get fully qualified name in module.ClassName format from the class."""
+
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
+        # Convert to tuple or None
+        type_kinds = cls._normaize_type_kinds(type_kinds)
+
+        # Get cached TypeInfo
+        type_info = cls._type_info_by_type_name_dict.get(type_name)
+
+        if type_info is not None:
+
+            if type_kinds is None:
+                # No restrictions on type, return True
+                return True
+            else:
+                # Return true only if type_kind is in the permitted list
+                return type_info.type_kind in type_kinds
+        else:
+            # Not found, return False
+            return False
 
     @classmethod
     def get_qual_name_from_class(cls, class_: type) -> str:
@@ -131,7 +156,7 @@ class TypeCache:
             return result
 
         # Next, try using cached qual name to avoid enumerating classes in all packages
-        if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
+        if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
             return cls.get_class_from_qual_name(type_info.qual_name)
         else:
             raise cls._type_name_not_found_error(type_name)
@@ -145,7 +170,7 @@ class TypeCache:
 
         # Get from cached TypeInfo
         type_name = TypeUtil.name(class_)
-        if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
+        if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
             return type_info.parent_names
         else:
             raise cls._type_name_not_found_error(type_name)
@@ -159,20 +184,23 @@ class TypeCache:
 
         # Get from cached TypeInfo
         type_name = TypeUtil.name(class_)
-        if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
+        if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
             return type_info.child_names
         else:
             raise cls._type_name_not_found_error(type_name)
 
     @classmethod
-    def get_classes(cls, *, type_kinds: Sequence[TypeKind]) -> Tuple[type, ...]:
+    def get_classes(cls, *, type_kinds: TypeKind | Sequence[TypeKind] | None) -> Tuple[type, ...]:
         """Return already cached classes that match the predicate (does not rebuild cache)."""
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
+        # Convert to tuple or None
+        type_kinds = cls._normaize_type_kinds(type_kinds)
+
         # Get from cached TypeInfo
-        qual_names = [x.qual_name for x in cls._type_info_dict.values() if x.type_kind in type_kinds]
+        qual_names = [x.qual_name for x in cls._type_info_by_type_name_dict.values() if x.type_kind in type_kinds]
         result = tuple(cls.get_class_from_qual_name(qual_name) for qual_name in qual_names)
         return result
 
@@ -330,7 +358,7 @@ class TypeCache:
         )
 
         # Populate the dictionary
-        existing_info = cls._type_info_dict.setdefault(type_info.type_name, type_info)
+        existing_info = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
 
         # Check for duplicate type names
         if existing_info.qual_name != type_info.qual_name:
@@ -346,7 +374,7 @@ class TypeCache:
     @classmethod
     def _ensure_loaded(cls):
         """Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded."""
-        if not cls._type_info_dict:
+        if not cls._type_info_by_type_name_dict:
             # Load the type cache from TypeInfo.csv
             cls._load()
 
@@ -408,7 +436,7 @@ class TypeCache:
                 )
 
                 # Add to the type info dictionary
-                existing = cls._type_info_dict.setdefault(type_info.type_name, type_info)
+                existing = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
 
                 # Check for duplicates
                 if existing.qual_name != type_info.qual_name:
@@ -430,7 +458,7 @@ class TypeCache:
             file.write(",".join(_TYPE_INFO_HEADERS) + "\n")
 
             # Sort the TypeInfo dictionary by type name and iterate
-            sorted_type_info_list = sorted(cls._type_info_dict.values(), key=lambda x: x.type_name)
+            sorted_type_info_list = sorted(cls._type_info_by_type_name_dict.values(), key=lambda x: x.type_name)
             for type_info in sorted_type_info_list:
 
                 # Format fields for writing
@@ -448,7 +476,7 @@ class TypeCache:
     @classmethod
     def _clear(cls) -> None:
         """Clear cache before loading or rebuilding."""
-        cls._type_info_dict = {}
+        cls._type_info_by_type_name_dict = {}
         cls._type_by_type_name_dict = {}
         cls._type_by_qual_name_dict = {}
         cls._module_dict = {}
@@ -460,6 +488,20 @@ class TypeCache:
         resources_root = ProjectSettings.get_resources_root()
         result = os.path.join(resources_root, "bootstrap/TypeInfo.csv")
         return result
+
+    @classmethod
+    def _normaize_type_kinds(cls, type_kinds: TypeKind | Sequence[TypeKind] | None) -> tuple[TypeKind] | None:
+        """Convert input to tuple or None."""
+        if type_kinds is None:
+            return None
+        elif isinstance(type_kinds, TypeKind):
+            return (type_kinds,)
+        elif is_sequence(type_kinds):
+            return tuple(type_kinds)
+        else:
+            raise RuntimeError(
+                    f"Param type_kinds has unsupported type {TypeUtil.name(type_kinds)}.\n"
+                    f"Supported types include TypeKind, Sequence[TypeKind], or None.\n")
 
     @classmethod
     def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:
