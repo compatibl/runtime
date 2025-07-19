@@ -65,7 +65,7 @@ class TypeCache:
     """List of packages to include in the cache."""
 
     @classmethod
-    def is_type(cls, *, type_name: str, type_kinds: TypeKind | Sequence[TypeKind] | None) -> bool:
+    def is_type(cls, type_name: str, *, type_kinds: TypeKind | Sequence[TypeKind] | None = None) -> bool:
         """Get fully qualified name in module.ClassName format from the class."""
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
@@ -162,18 +162,27 @@ class TypeCache:
             raise cls._type_name_not_found_error(type_name)
 
     @classmethod
-    def get_parent_names(cls, class_: type) -> tuple[str, ...]:
-        """Return a tuple of type names for parent classes (inclusive of self) that match the predicate."""
+    def get_parent_names(cls, record_type: type | str) -> tuple[str, ...]:
+        """
+        Return a tuple of type names for parent classes (inclusive of self) that match the predicate.
+
+        Args:
+            record_type: Record type or name in non-delimited PascalCase format.
+        """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
+        # Convert record type to string
+        record_type = TypeUtil.name(record_type) if isinstance(record_type, type) else record_type
+        if not isinstance(record_type, str):
+            raise RuntimeError("Argument of get_parent_names must be a record type or string type name.")
+
         # Get from cached TypeInfo
-        type_name = TypeUtil.name(class_)
-        if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
+        if (type_info := cls._type_info_by_type_name_dict.get(record_type, None)) is not None:
             return type_info.parent_names
         else:
-            raise cls._type_name_not_found_error(type_name)
+            raise cls._type_name_not_found_error(record_type)
 
     @classmethod
     def get_child_names(cls, class_: type) -> Tuple[str, ...] | None:
@@ -203,6 +212,39 @@ class TypeCache:
         qual_names = [x.qual_name for x in cls._type_info_by_type_name_dict.values() if x.type_kind in type_kinds]
         result = tuple(cls.get_class_from_qual_name(qual_name) for qual_name in qual_names)
         return result
+
+    @classmethod
+    def get_common_base_name(cls, *, record_types: Sequence[type | str]) -> str:
+        """
+        Return non-delimited PascalCase record type name of the closest common base to the argument types.
+
+        Args:
+            record_types: Record types or names in non-delimited PascalCase format
+        """
+
+        # Convert to names
+        record_type_names = tuple(TypeUtil.name(x) if isinstance(x, type) else x for x in record_types)
+
+        parent_dict = {x: TypeCache.get_parent_names(x) for x in record_type_names}
+        depth_dict = {x: len(parent_dict[x]) for x in parent_dict}
+        sorted_depth_dict = dict(sorted(depth_dict.items(), key=lambda item: item[1]))
+        result = None
+        for candidate_type in sorted_depth_dict.keys():
+            candidate_parents = parent_dict[candidate_type]
+            is_common = all(
+                candidate_type in parent_dict[other_type]
+                for other_type in parent_dict
+                if other_type not in candidate_parents  # Exclude parents of the candidate and the candidate itself
+            )
+            if is_common:
+                result = candidate_type
+
+        if result is not None:
+            return result
+        else:
+            # Handle the case when common base is not found
+            record_type_names_str = "\n".join(record_type_names)
+            raise RuntimeError(f"No common base is found for the following records:\n{record_type_names_str}")
 
     @classmethod
     def rebuild(cls) -> None:

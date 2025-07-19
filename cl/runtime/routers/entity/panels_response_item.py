@@ -43,19 +43,25 @@ class PanelsResponseItem(BaseModel):
     def get_response(cls, request: PanelsRequest) -> list[PanelsResponseItem]:
         """Implements /entity/panels route."""
 
-        # TODO: Return saved view names
-        request_type = TypeCache.get_class_from_type_name(request.type_name)
+        # TODO: !!! Do not rely on first element to detect type
+        if TypeCache.is_type(request.type_name):
+            record_type_name = request.type_name
+        else:
+            bound_type_names = DbContext.get_bound_record_type_names(table=request.type_name)
+            record_type_name = bound_type_names[0]
+        record_type = TypeCache.get_class_from_type_name(record_type_name)
+        key_type = record_type.get_key_type()
 
         # Get actual type from record if request.key is not None
         if request.key is not None:
             # Deserialize ui key
-            key = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(request_type.get_key_type()))
+            key = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(key_type))
 
             # If the record is not found, display panel tabs for the base type
             record = DbContext.load_one_or_none(key)
-            actual_type = request_type if record is None else type(record)
+            actual_type = TypeCache.get_class_from_type_name(record_type_name) if record is None else type(record)
         else:
-            actual_type = request_type
+            actual_type = TypeCache.get_class_from_type_name(record_type_name)
 
         # Get handlers from TypeDecl
         handlers = declare.handlers if (declare := TypeDecl.for_type(actual_type).declare) is not None else None

@@ -16,6 +16,7 @@ from __future__ import annotations
 from cl.runtime.backend.core.ui_type_state import UiTypeState
 from cl.runtime.backend.core.ui_type_state_key import UiTypeStateKey
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.schema.type_cache import TypeCache
@@ -34,66 +35,43 @@ class LoadResponse(RecordsWithSchemaResponse):
     @classmethod
     def get_response(cls, request: LoadRequest) -> LoadResponse:
 
-        # Handle empty request.
+        # Handle empty request
         if not request.load_keys:
+            # TODO: Review and avoid noqa
             return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa
 
-        # TODO (Roman): Consider allowing different key types in a single load request.
-        #  If different key types are prohibited then the load request model should be simplified.
-        # Check if all requested keys are of the same key type.
-        first_key_item_type = request.load_keys[0].type
-        if not all(key_item.type == first_key_item_type for key_item in request.load_keys):
-            raise RuntimeError("Bulk load records of different key types currently is not supported.")
+        # TODO: !!! Do not rely on first element to detect type
+        if TypeCache.is_type(request.load_keys[0].type):
+            record_type_name = request.load_keys[0].type
+        else:
+            bound_type_names = DbContext.get_bound_record_type_names(table=request.load_keys[0].type)
+            record_type_name = bound_type_names[0]
+        record_type = TypeCache.get_class_from_type_name(record_type_name)
+        key_type = record_type.get_key_type()
 
-        # Expect all keys to be the same key type.
-        key_type = TypeCache.get_class_from_type_name(first_key_item_type).get_key_type()  # noqa
-        key_type_hint = TypeHint.for_class(key_type, optional=True)
-
-        # Deserialize keys in request.
-        deserialized_keys = tuple(
-            _KEY_SERIALIZER.deserialize(key_item.key, key_type_hint).build()
-            for key_item in request.load_keys or tuple()
+        # Deserialize keys in request
+        keys = tuple(
+            _KEY_SERIALIZER.deserialize(x.key, TypeHint.for_class(key_type)).build()
+            for x in request.load_keys or tuple()
         )
 
-        # TODO (Yauheni): Remove temporary workaround of pinning handlers for all requested types.
-        # Pin all handlers by default.
-        if key_type == UiTypeStateKey:
-            loaded_records = []
-            for deserialized_key in deserialized_keys:
-                record = DbContext.load_one_or_none(deserialized_key)
+        # Load and serialize records
+        loaded_records = DbContext.load_many(keys)
+        serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
-                # If record not found set default.
-                if record is None:
-                    record = cls._get_default_ui_type_state(deserialized_key)
-
-                loaded_records.append(record)
-        else:
-            # Load record using current context, filter None values.
-            loaded_records = tuple(x for x in DbContext.load_many(deserialized_keys) if x is not None)
-
-        # TODO (Roman): Improve check for not found.
-        if not request.ignore_not_found and len(loaded_records) != len(request.load_keys):
-            raise RuntimeError(
-                f"Not all records were found. Requested {len(request.load_keys)} keys, found {len(loaded_records)} records."
-            )
-
-        # Return empty response if records not found.
+         # Return empty response if records not found
         if not loaded_records:
             return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa
 
-        # TODO (Roman): Merge schema for all types.
-        # Check if all loaded records are of the same type.
-        # Subtypes are also not allowed due to not implemented schema merging.
-        first_record_type = type(loaded_records[0])
-        if not all(type(record) == first_record_type for record in loaded_records):
-            raise RuntimeError("Bulk load records of different types currently is not supported.")
+        # Find the lowest common base of the specified types
+        loaded_record_type_names = tuple(TypeUtil.name(x) for x in loaded_records)
+        common_base_name = TypeCache.get_common_base_name(record_types=loaded_record_type_names)
+        common_base = TypeCache.get_class_from_type_name(common_base_name)
 
-        # Create schema dict by real type of the first loaded record.
-        schema_dict = cls._get_schema_dict(first_record_type)
+        # Create schema dict for the common base
+        schema_dict = cls._get_schema_dict(common_base)
 
-        # Serialize records.
-        serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
-
+        # Return data and schema
         return LoadResponse(schema_=schema_dict, data=serialized_records)  # noqa
 
     @classmethod

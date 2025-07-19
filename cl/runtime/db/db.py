@@ -126,22 +126,7 @@ class Db(DbKey, RecordMixin, ABC):
             table: Table name in non-delimited PascalCase format.
         """
         bound_type_names = self.get_bound_record_type_names(table=table)
-        bound_types = tuple(TypeCache.get_class_from_type_name(x) for x in bound_type_names)
-        parent_dict = {x[0]: TypeCache.get_parent_names(x[1]) for x in zip(bound_type_names, bound_types)}
-        depth_dict = {x: len(parent_dict[x]) for x in bound_type_names}
-        sorted_depth_dict = dict(sorted(depth_dict.items(), key=lambda item: item[1]))
-        result = None
-        for candidate_type in sorted_depth_dict.keys():
-            candidate_parents = parent_dict[candidate_type]
-            is_common = all(
-                candidate_type in parent_dict[other_type]
-                for other_type in bound_type_names
-                if other_type not in candidate_parents
-            )
-            if is_common:
-                result = candidate_type
-        if result is None:
-            raise RuntimeError(f"No bound records are found for table={table}.")
+        result = TypeCache.get_common_base_name(record_types=bound_type_names)
         return result
 
     def load_one(
