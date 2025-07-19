@@ -22,8 +22,5 @@ from cl.runtime.records.table_binding_key import TableBindingKey
 class TableBinding(TableBindingKey, RecordMixin):
     """Specifies table binding to key type."""
 
-    key_type: str = required()
-    """Key type for the specified record type."""
-
     def get_key(self) -> TableBindingKey:
         return TableBindingKey(table=self.table, record_type=self.record_type).build()

@@ -35,8 +35,6 @@ from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
-from cl.runtime.records.table_binding_key import TableBindingKey
-from cl.runtime.records.table_binding_query import TableBindingQuery
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers

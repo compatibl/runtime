@@ -588,13 +588,12 @@ class Db(DbKey, RecordMixin, ABC):
                 for binding in bindings
             }
 
-        # Check if the binding is already in the cache
         record_type_name = TypeUtil.name(record_type)
         cache_key = (table, record_type_name)
-        if (table_binding := self._table_binding_cache.get(cache_key)) is None:
+        if cache_key not in self._table_binding_cache:
 
-            # If not, write bindings for this type and all parents to DB 
-            # as it is faster to overwrite than to check for each parent
+            # If the binding is not yet in cache, write bindings for this and all parent record types
+            # to DB as it is faster to overwrite than to check for each parent
 
             # Create binding for each parent and self
             parent_names = TypeCache.get_parent_names(record_type)
