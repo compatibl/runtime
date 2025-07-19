@@ -136,6 +136,9 @@ def test_basic_operations(db_type_name: str):
         loaded_records = [DbContext.load_one_or_none(key) for key in sample_keys]
         assert loaded_records == [None] * len(_SAMPLES)
 
+        # Drop test DB
+        db.drop_test_db()  # TODO: Automate this using a specialized QA context
+
 
 def test_record_upsert(pytest_multi_db):
     """Check that an existing entry is overridden when a new entry with the same key is saved."""
