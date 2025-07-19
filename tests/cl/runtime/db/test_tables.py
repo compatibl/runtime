@@ -14,12 +14,15 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.experiments.experiment import Experiment
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_key_query import ExperimentKeyQuery
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
+from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.table_binding import TableBinding
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
+from stubs.cl.runtime.experiments.stub_classifier_experiment import StubClassifierExperiment
 
 
 def _multiple_table_records():
@@ -28,22 +31,30 @@ def _multiple_table_records():
     stub_experiments_table_1 = [
         StubBinaryExperiment(
             experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1"),
-            experiment_id="StubExperiment1",
+            experiment_id="StubExperiment11",
         ).build(),
         StubBinaryExperiment(
             experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1"),
-            experiment_id="StubExperiment2",
+            experiment_id="StubExperiment12",
+        ).build(),
+        StubClassifierExperiment(
+            experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1"),
+            experiment_id="StubExperiment13",
         ).build(),
     ]
 
     stub_experiments_table_2 = [
         StubBinaryExperiment(
             experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2"),
-            experiment_id="StubExperiment3",
+            experiment_id="StubExperiment21",
+        ).build(),
+        StubClassifierExperiment(
+            experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2"),
+            experiment_id="StubExperiment22",
         ).build(),
         StubBinaryExperiment(
             experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2"),
-            experiment_id="StubExperiment4",
+            experiment_id="StubExperiment23",
         ).build(),
     ]
 
@@ -56,22 +67,19 @@ def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
     stubs = _multiple_table_records()
     DbContext.save_many(stubs)
 
-    bindings = DbContext.get_bindings()
-    assert bindings == (
-        TableBinding(table="ExperimentTable1", key_type="ExperimentKey"),
-        TableBinding(table="ExperimentTable2", key_type="ExperimentKey"),
-        TableBinding(table="TableBindingKey", key_type="TableBindingKey"),
-    )
+    bindings = DbContext.get_table_bindings()
+    RegressionGuard(channel="bindings").write(bindings)
 
     tables = DbContext.get_tables()
-    assert tables == ("ExperimentTable1", "ExperimentTable2", "TableBindingKey")
+    RegressionGuard(channel="tables").write(tables)
 
-    bound_tables = DbContext.get_bound_tables(key_type=ExperimentKey)
-    assert bound_tables == ("ExperimentTable1", "ExperimentTable2")
+    bound_tables = DbContext.get_bound_tables(record_type=Experiment)
+    RegressionGuard(channel="bound_tables").write(bound_tables)
 
-    bound_type = DbContext.get_bound_type(table="ExperimentTable1")
-    assert bound_type == ExperimentKey
+    bound_type_names = DbContext.get_bound_record_type_names(table="ExperimentTable1")
+    RegressionGuard(channel="bound_type_names").write(bound_type_names)
 
+    RegressionGuard().verify_all()
 
 def test_load_table(pytest_default_db):  # TODO: Extend to multiple DBs
     """Test load_table for dynamic table names."""
@@ -81,11 +89,11 @@ def test_load_table(pytest_default_db):  # TODO: Extend to multiple DBs
 
     # Load table 'ExperimentTable1'
     result_1 = DbContext.load_table("ExperimentTable1")
-    assert result_1 == (records[0], records[1])
+    assert result_1 == (records[0], records[1], records[2])
 
     # Load table 'ExperimentTable2'
     result_2 = DbContext.load_table("ExperimentTable2")
-    assert result_2 == (records[2], records[3])
+    assert result_2 == (records[3], records[4], records[5])
 
     # Test limit and skip for 'ExperimentTable1'
     for limit in range(0, len(result_1)):
@@ -111,12 +119,12 @@ def test_load_where(pytest_default_db):  # TODO: Extend to multiple DBs
     # Load table 'ExperimentTable1'
     query_1 = ExperimentKeyQuery(experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1")).build()
     result_1 = DbContext.load_where(query_1)
-    assert result_1 == (records[0], records[1])
+    assert result_1 == (records[0], records[1], records[2])
 
     # Load table 'ExperimentTable2'
     query_2 = ExperimentKeyQuery(experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2")).build()
     result_2 = DbContext.load_where(query_2)
-    assert result_2 == (records[2], records[3])
+    assert result_2 == (records[3], records[4], records[5])
 
     # Test limit and skip for 'ExperimentTable1'
     for limit in range(0, len(result_1)):

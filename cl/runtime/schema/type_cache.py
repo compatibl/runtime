@@ -137,7 +137,7 @@ class TypeCache:
             raise cls._type_name_not_found_error(type_name)
 
     @classmethod
-    def get_parent_names(cls, class_: type) -> Tuple[str, ...] | None:
+    def get_parent_names(cls, class_: type) -> tuple[str, ...]:
         """Return a tuple of type names for parent classes (inclusive of self) that match the predicate."""
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded

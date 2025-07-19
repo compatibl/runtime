@@ -13,20 +13,20 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.table_binding import TableBinding
+from cl.runtime.records.table_binding_key import TableBindingKey
 
 
-@dataclass(slots=True)
-class TableBindingKey(KeyMixin):
-    """Specifies table binding to key type."""
+@dataclass(slots=True, kw_only=True)
+class TableBindingKeyQueryByRecordType(QueryMixin):
+    """Query for TableBindingKey by record type field only."""
 
-    table: str = required()
-    """Unique table identifier in non-delimited PascalCase format."""
-
-    record_type: str = required()
+    record_type: str | Condition[str] | None = None
     """Record type name in non-delimited PascalCase format."""
 
-    @classmethod
-    def get_key_type(cls) -> type[KeyMixin]:
+    def get_target_type(self) -> type[KeyMixin]:
         return TableBindingKey

@@ -246,7 +246,7 @@ class BasicMongoDb(Db):
             table = record.get_table()
 
             # Add table binding
-            self._add_binding(table=table, key_type=record.get_key_type())
+            self._add_binding(table=table, record_type=type(record))
 
             db = self._get_mongo_db()
             collection = db[table]

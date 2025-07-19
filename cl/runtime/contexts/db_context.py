@@ -33,6 +33,7 @@ from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_singleton_key
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key import TableBindingKey
 from cl.runtime.records.table_binding_query import TableBindingQuery
@@ -115,58 +116,51 @@ class DbContext(Context):
             return DatasetUtil.root()
 
     @classmethod
-    def get_bindings(cls) -> tuple[TableBinding, ...]:
+    def get_table_bindings(cls) -> tuple[TableBinding, ...]:
         """
-        Return table bindings to key type in alphabetical order of table name, then key type.
+        Return table to record type bindings in alphabetical order of table name followed by record type name.
 
         Notes:
-            More than one table can exist for the same key type.
+            More than one table can exist for the same record type and vice versa.
         """
-        # Load all records of TableBinding type
-        bindings = cls.load_type(TableBinding)
-        # Sort bindings by table name and then by key type
-        sorted_bindings = sorted(bindings, key=lambda x: (x.table, x.key_type))
-        return tuple(sorted_bindings)
+        return cls._get_db().get_table_bindings()
 
     @classmethod
     def get_tables(cls) -> tuple[str, ...]:
+        """Return DB table names in alphabetical order of non-delimited PascalCase format."""
+        return cls._get_db().get_tables()
+
+    def get_record_type_names(cls) -> tuple[str, ...]:
         """
-        Return table names in alphabetical order of non-delimited PascalCase table identifier.
+        Return non-delimited PascalCase record type names in alphabetical order for records stored in this DB.
 
         Notes:
-            More than one table can exist for the same key type.
+            More than one table can exist for the same record type.
         """
-        bindings = cls.get_bindings()
-        return tuple(binding.table for binding in bindings)
+        return cls._get_db().get_record_type_names()
 
     @classmethod
-    def get_bound_tables(cls, *, key_type: type[KeyMixin]) -> tuple[str, ...]:
+    def get_bound_tables(cls, *, record_type: type[RecordProtocol] | str) -> tuple[str, ...]:
         """
-        Return tables for the specified key type in alphabetical order.
+        Return tables for the specified record type or name in alphabetical order.
 
         Returns:
             Table names in non-delimited PascalCase format.
 
         Args:
-            key_type: Key type name for which the tables are returned.
+            record_type: Record type or name for which the tables are returned.
         """
-        query = TableBindingQuery(key_type=TypeUtil.name(key_type)).build()
-        bindings = cls.load_where(query, cast_to=TableBinding)
-        result = tuple(sorted(binding.table for binding in bindings))
-        return result
+        return cls._get_db().get_bound_tables(record_type=record_type)
 
     @classmethod
-    def get_bound_type(cls, *, table: str) -> type[KeyMixin]:
+    def get_bound_record_type_names(cls, *, table: str) -> tuple[str, ...]:
         """
-        Return key type for the specified table name.
+        Return non-delimited PascalCase record type names in alphabetical order stored in the specified table.
 
         Args:
             table: Table name in non-delimited PascalCase format.
         """
-        key = TableBindingKey(table=table).build()
-        binding = cls.load_one(key)
-        result = TypeCache.get_class_from_type_name(binding.key_type)
-        return result
+        return cls._get_db().get_bound_record_type_names(table=table)
 
     @classmethod
     def load_one(
@@ -185,26 +179,11 @@ class DbContext(Context):
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-
-        # TODO: This is a temporary safeguard, remove after verification
-        if isinstance(record_or_key, type):
-            raise RuntimeError("Code update error for load_one signature.")
-
-        if record_or_key is not None:
-            result = cls.load_one_or_none(record_or_key, dataset=dataset, cast_to=cast_to)
-            if result is None:
-                cast_to_str = f"\nwhen loading type {TypeUtil.name(cast_to)}" if cast_to else ""
-                raise RuntimeError(
-                    f"Record not found for key {KeyUtil.format(record_or_key)}{cast_to_str}.\n"
-                    f"Use 'load_one_or_none' method to return None instead of raising an error."
-                )
-            return result
-        else:
-            cast_to_str = f"\nwhen loading type {TypeUtil.name(cast_to)}" if cast_to else ""
-            raise RuntimeError(
-                f"Parameter 'record_or_key' is None for load_one method{cast_to_str}.\n"
-                f"Use 'load_one_or_none' method to return None instead of raising an error."
-            )
+        return cls._get_db().load_one(
+            record_or_key,
+            dataset=dataset,
+            cast_to=cast_to,
+        )
 
     @classmethod
     def load_one_or_none(
@@ -223,16 +202,11 @@ class DbContext(Context):
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-
-        # TODO: This is a temporary safeguard, remove after verification
-        if isinstance(record_or_key, type):
-            raise RuntimeError("Code update error for load_one_or_none signature.")
-
-        result = cls.load_many([record_or_key], dataset=dataset, cast_to=cast_to)
-        if len(result) == 1:
-            return result[0]
-        else:
-            raise RuntimeError("DbContext.load_many returned more records than requested.")
+        return cls._get_db().load_one_or_none(
+            record_or_key,
+            dataset=dataset,
+            cast_to=cast_to,
+        )
 
     @classmethod
     def load_many(
@@ -251,80 +225,11 @@ class DbContext(Context):
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-
-        # Pass through None or an empty sequence
-        if not records_or_keys:
-            return records_or_keys
-
-        # Check that the input list consists of only None, records, or keys
-        invalid_inputs = [x for x in records_or_keys if x is not None and not is_key_or_record(x)]
-        if len(invalid_inputs) > 0:
-            invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
-            raise RuntimeError(
-                f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following items that are not record, key or None:\n{invalid_inputs_str}"
-            )
-
-        # Perform these checks if cast_to is specified
-        if cast_to is not None:
-            # Check that the keys in the input list have the same type as cast_to.get_key_type()
-            key_type = cast_to.get_key_type()
-            invalid_keys = [x for x in records_or_keys if is_key(x) and not isinstance(x, key_type)]
-            if len(invalid_keys) > 0:
-                invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
-                raise RuntimeError(
-                    f"Parameter 'records_or_keys' of a load method in DbContext includes the following keys\n"
-                    f"whose type is not the same as the key type {TypeUtil.name(key_type)}\n"
-                    f"of the cast_to parameter {TypeUtil.name(cast_to)}:\n{invalid_keys_str}"
-                )
-            # Check that the records in the input list are derived from cast_to
-            invalid_records = [x for x in records_or_keys if is_record(x) and not isinstance(x, cast_to)]
-            if len(invalid_records) > 0:
-                invalid_records_str = "\n".join(str(x) for x in invalid_records)
-                raise RuntimeError(
-                    f"Parameter 'records_or_keys' of a load method in DbContext includes the following records\n"
-                    f"that are not derived from the cast_to parameter {TypeUtil.name(cast_to)}:\n{invalid_records_str}"
-                )
-
-        # Check that all records or keys in object format are frozen
-        unfrozen_inputs = [x for x in records_or_keys if x is not None and not x.is_frozen()]
-        if len(unfrozen_inputs) > 0:
-            unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_inputs)
-            raise RuntimeError(
-                f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following items that are not frozen:\n{unfrozen_inputs_str}"
-            )
-
-        # The list of keys to load, skip None and records
-        keys_to_load = [x for x in records_or_keys if is_key(x)]
-
-        # Group keys by table
-        keys_to_load_grouped_by_table = defaultdict(list)
-        consume(keys_to_load_grouped_by_table[key.get_table()].append(key) for key in keys_to_load)
-
-        # Get records from DB, the result is unsorted and grouped by table
-        loaded_records_grouped_by_table = [
-            cls._get_db().load_many_unsorted(table, table_keys, dataset=dataset)
-            for table, table_keys in keys_to_load_grouped_by_table.items()
-        ]
-
-        # Concatenated list
-        loaded_records = [item for sublist in loaded_records_grouped_by_table for item in sublist]
-        normalized_loaded_keys = [KeyUtil.normalize_key(x.serialize_key()) for x in loaded_records]
-
-        # Create a dictionary with pairs consisting of serialized key (after normalization) and the record for this key
-        loaded_records_dict = {k: v for k, v in zip(normalized_loaded_keys, loaded_records)}
-
-        # Populate the result with records loaded using input keys, pass through None and input records
-        result = tuple(
-            loaded_records_dict.get(KeyUtil.normalize_key(x.serialize_key()), None) if is_key(x) else x
-            for x in records_or_keys
+        return cls._get_db().load_many(
+            records_or_keys,
+            dataset=dataset,
+            cast_to=cast_to,
         )
-
-        # Cast to cast_to if specified
-        if cast_to is not None:
-            result = tuple(CastUtil.cast(cast_to, x) for x in result)
-        return result
 
     @classmethod
     def load_type(
@@ -338,115 +243,24 @@ class DbContext(Context):
         skip: int | None = None,
     ) -> tuple[TRecord]:
         """
-        Load all records of target_type and its subtypes from all tables where they are stored
+        Load all records of 'filter_to' type and its subtypes from all tables where they are stored.
 
         Args:
-            filter_to: The query will return only the subtypes of this type
+            filter_to: The query will return only this type and its subtypes
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Cast the result to this type (error if not a subtype)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-
-        # Get the list of tables where this type is stored
-        tables = cls.get_bound_tables(key_type=filter_to.get_key_type())
-
-        tables_len = len(tables)
-        if tables_len == 0:
-
-            # There are no tables where this type is stored, return an empty tuple
-            return tuple()
-        elif tables_len == 1:
-
-            # Handle static tables (one table per type) separately by delegating to load_table
-            return cls.load_table(
-                tables[0],
-                dataset=dataset,
-                cast_to=cast_to,
-                filter_to=filter_to,
-                project_to=project_to,
-                limit=limit,
-                skip=skip,
-            )
-        else:
-            # Handle the case of multiple tables
-
-            # Validate limit and handle the limit=0 case separately
-            if limit is not None:
-                if limit > 0:
-                    # Limit is set
-                    remaining_limit = limit
-                elif limit == 0:
-                    # Handle limit=0 separately because pymongo interprets limit=0 as no limit,
-                    # while we return an empty tuple
-                    return tuple()
-                else:
-                    raise RuntimeError(f"Parameter limit={limit} is negative.")
-            else:
-                # No limit
-                remaining_limit = None
-
-            # Validate skip and replace None by 0 (both mean do not skip)
-            if skip is not None:
-                if skip >= 0:
-                    # Positive or zero values are both valid
-                    remaining_skip = skip
-                else:
-                    raise RuntimeError(f"Parameter skip={skip} is negative.")
-            else:
-                # Normalize to 0 for do not skip
-                remaining_skip = 0
-
-            result = []
-            for table in tables:
-
-                if remaining_limit is not None:
-                    # Handle the case with limit
-                    if remaining_limit > 0:
-                        # Pull enough rows from this table to satisfy remaining skip + limit
-                        table_limit = remaining_skip + remaining_limit
-                    elif remaining_limit == 0:
-                        # Limit reached, break the loop over tables
-                        break
-                    else:
-                        # The update logic should guarantee non-negative value, handle a possible error
-                        raise RuntimeError(f"Parameter remaining_limit={remaining_limit} must be positive.")
-                else:
-                    # Otherwise pull from this table with no limit
-                    table_limit = None
-
-                table_result = cls.load_table(
-                    table,
-                    dataset=dataset,
-                    cast_to=cast_to,
-                    filter_to=filter_to,
-                    project_to=project_to,
-                    limit=table_limit,
-                    skip=None,  # Global skip is handled below
-                )
-
-                # Apply global skip
-                if remaining_skip:
-                    if remaining_skip >= len(table_result):
-                        remaining_skip -= len(table_result)
-                        continue
-                    table_result = table_result[remaining_skip:]
-                    remaining_skip = 0
-
-                # Apply global limit
-                if remaining_limit is not None:
-                    if remaining_limit >= len(table_result):
-                        result.extend(table_result)
-                        remaining_limit -= len(table_result)
-                    else:
-                        result.extend(table_result[:remaining_limit])
-                        break
-                else:
-                    # No limit is set
-                    result.extend(table_result)
-
-            return tuple(result)
+        return cls._get_db().load_type(
+            filter_to,
+            dataset=dataset,
+            cast_to=cast_to,
+            project_to=project_to,
+            limit=limit,
+            skip=skip,
+        )
 
     @classmethod
     def load_table(
