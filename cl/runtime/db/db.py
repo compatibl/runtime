@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import sys
 from abc import ABC
 from abc import abstractmethod
 from collections import defaultdict
@@ -272,13 +272,7 @@ class Db(DbKey, RecordMixin, ABC):
             return records_or_keys
 
         # Check that the input list consists of only None, records, or keys
-        invalid_inputs = [x for x in records_or_keys if x is not None and not is_key_or_record(x)]
-        if len(invalid_inputs) > 0:
-            invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
-            raise RuntimeError(
-                f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following items that are not record, key or None:\n{invalid_inputs_str}"
-            )
+        self._check_invalid_inputs(records_or_keys)
 
         # Perform these checks if cast_to is specified
         if cast_to is not None:
@@ -302,20 +296,13 @@ class Db(DbKey, RecordMixin, ABC):
                 )
 
         # Check that all records or keys in object format are frozen
-        unfrozen_inputs = [x for x in records_or_keys if x is not None and not x.is_frozen()]
-        if len(unfrozen_inputs) > 0:
-            unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_inputs)
-            raise RuntimeError(
-                f"Parameter 'records_or_keys' of load_many method includes\n"
-                f"the following items that are not frozen:\n{unfrozen_inputs_str}"
-            )
+        self._check_frozen_inputs(records_or_keys)
 
         # The list of keys to load, skip None and records
         keys_to_load = [x for x in records_or_keys if is_key(x)]
 
         # Group keys by table
-        keys_to_load_grouped_by_table = defaultdict(list)
-        consume(keys_to_load_grouped_by_table[key.get_table()].append(key) for key in keys_to_load)
+        keys_to_load_grouped_by_table = self._group_inputs_by_table(keys_to_load)
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_table = [
@@ -530,10 +517,9 @@ class Db(DbKey, RecordMixin, ABC):
             skip: Number of records to skip (for pagination)
         """
 
-    @abstractmethod
     def save_many(
         self,
-        records: Iterable[RecordProtocol],
+        records: Sequence[RecordProtocol],
         *,
         dataset: str | None = None,
     ) -> None:
@@ -542,11 +528,66 @@ class Db(DbKey, RecordMixin, ABC):
 
         Args:
             records: Iterable of records.
-            dataset: Dataset as backslash-delimited string
+            dataset: Target dataset as a delimited string, list of levels, or None
         """
 
+        if not records:
+            return
+
+        # Validate inputs. Allowed values are records and None.
+        self._check_invalid_inputs(records, key_allowed=False)
+        self._check_frozen_inputs(records)
+
+        # Group records by table
+        records_grouped_by_table = self._group_inputs_by_table(records)
+
+        # Save records for each table
+        [self.save_many_grouped(table, table_records, dataset=dataset) for table, table_records in records_grouped_by_table.items()]
+
     @abstractmethod
+    def save_many_grouped(
+        self,
+        table: str,
+        records: Sequence[RecordProtocol],
+        *,
+        dataset: str | None = None,
+    ) -> None:
+        """
+        Save records grouped by table to the specified table in storage.
+
+        Args:
+            table: Logical database table name, may be different from the physical name or the key type name
+            records: Iterable of records.
+            dataset: Target dataset as a delimited string, list of levels, or None
+        """
+
     def delete_many(
+        self,
+        keys: Sequence[KeyMixin],
+        *,
+        dataset: str | None = None,
+    ) -> None:
+        """
+        Delete records using an iterable of keys.
+
+        Args:
+            keys: Iterable of keys.
+            dataset: Target dataset as a delimited string, list of levels, or None
+        """
+
+        if not keys:
+            return
+
+        # Validate inputs. Allowed values are keys and None.
+        self._check_invalid_inputs(keys, record_allowed=False)
+        self._check_frozen_inputs(keys)
+
+        keys_grouped_by_table = self._group_inputs_by_table(keys)
+
+        [self.delete_many_grouped(table, table_records, dataset=dataset) for table, table_records in keys_grouped_by_table.items()]
+
+    @abstractmethod
+    def delete_many_grouped(
         self,
         table: str,
         keys: Sequence[KeyMixin],
@@ -554,7 +595,7 @@ class Db(DbKey, RecordMixin, ABC):
         dataset: str | None = None,
     ) -> None:
         """
-        Delete records using an iterable of keys.
+        Delete records using an iterable of keys grouped by table.
 
         Args:
             table: Logical database table name, may be different from the physical name or the key type name
@@ -703,3 +744,67 @@ class Db(DbKey, RecordMixin, ABC):
                 f"Cannot drop a DB from code even with user approval because its db_id={self.db_id}\n"
                 f"does not start from temporary DB prefix '{db_settings.db_temp_prefix}'."
             )
+
+    @classmethod
+    def _check_frozen_inputs(cls, inputs: Sequence[TRecord | TKey | None]) -> None:
+        """Check that all records or keys in object format are frozen."""
+
+        unfrozen_inputs = [x for x in inputs if x is not None and not x.is_frozen()]
+        if len(unfrozen_inputs) > 0:
+            caller_name = sys._getframe(1).f_code.co_name
+            unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_inputs)
+            raise RuntimeError(
+                f"Inputs of {caller_name} method includes\n"
+                f"the following items that are not frozen:\n{unfrozen_inputs_str}"
+            )
+
+    @classmethod
+    def _check_invalid_inputs(cls, inputs: Sequence[TRecord | TKey | None], *, key_allowed: bool = True, record_allowed: bool = True, none_allowed: bool = True) -> None:
+        """
+        Check that the input list consists of only None, records, or keys.
+        Use flags 'key_allowed', 'record_allowed', and 'none_allowed' to control the list of valid values.
+        """
+
+        # Determine which validation function to use
+        if key_allowed and record_allowed:
+            guard_func = is_key_or_record
+        elif key_allowed:
+            guard_func = is_key
+        elif record_allowed:
+            guard_func = is_record
+        else:
+            guard_func = lambda: False
+
+        if none_allowed:
+            validate_func = lambda x: x is None or guard_func(x)
+        else:
+            validate_func = guard_func
+
+        # Check that the input list consists of only None, records, or keys
+        invalid_inputs = [x for x in inputs if not validate_func(x)]
+
+        if len(invalid_inputs) > 0:
+            caller_name = sys._getframe(1).f_code.co_name
+            invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
+
+            allowed_values = []
+            if key_allowed:
+                allowed_values += "Key"
+            if record_allowed:
+                allowed_values += "Record"
+            if none_allowed:
+                allowed_values += "None"
+
+            raise RuntimeError(
+                f"Inputs of {caller_name} method includes\n"
+                f"the following items that are not allowed:\n{invalid_inputs_str}\n"
+                f"Allowed values: {', '.join(allowed_values)}."
+            )
+
+    @classmethod
+    def _group_inputs_by_table(cls, inputs: Sequence[TRecord | TKey | None]) -> dict[str, list]:
+        """Group inputs by table. None are allowed, but will be skipped during grouping."""
+
+        inputs_grouped_by_table = defaultdict(list)
+        consume(inputs_grouped_by_table[x.get_table()].append(x) for x in inputs if x is not None)
+        return inputs_grouped_by_table

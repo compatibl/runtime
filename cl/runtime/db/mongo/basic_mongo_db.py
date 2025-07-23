@@ -235,8 +235,9 @@ class BasicMongoDb(Db):
         count = collection.count_documents(query_dict)
         return count
 
-    def save_many(
+    def save_many_grouped(
         self,
+        table: str,
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
@@ -263,7 +264,7 @@ class BasicMongoDb(Db):
             serialized_record["_key"] = serialized_key
             collection.replace_one({"_key": serialized_key}, serialized_record, upsert=True)
 
-    def delete_many(
+    def delete_many_grouped(
         self,
         table: str,
         keys: Sequence[KeyMixin],

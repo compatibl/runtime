@@ -393,6 +393,8 @@ class DbContext(Context):
             record: Record or None.
             dataset: Target dataset as a delimited string, list of levels, or None
         """
+
+        # TODO (Roman): Consider removing it because we also perform checks in the Db class.
         # Perform pre-save check
         cls._pre_save_check(record)
 
@@ -421,6 +423,7 @@ class DbContext(Context):
         # TODO: Do this incrementally for a large number of records
         records = list(records)
 
+        # TODO (Roman): Consider removing it because we also perform checks in the Db class.
         # Perform pre-save check for each record
         [cls._pre_save_check(record) for record in records]
 
@@ -460,27 +463,9 @@ class DbContext(Context):
             keys: Sequence of keys to delete.
             dataset: Target dataset as a delimited string, list of levels, or None
         """
-
-        if not keys:
-            return
-
-        # Check that the input list consists of only None or keys
-        invalid_inputs = [x for x in keys if x is not None and not is_key(x)]
-        if len(invalid_inputs) > 0:
-            invalid_inputs_str = "\n".join(str(x) for x in invalid_inputs)
-            raise RuntimeError(
-                f"Parameter 'keys' of delete_many method includes\n"
-                f"the following items that are not key or None:\n{invalid_inputs_str}"
-            )
-
-        # Group keys by table
-        keys_to_delete_grouped_by_table = defaultdict(list)
-        consume(keys_to_delete_grouped_by_table[key.get_table()].append(key) for key in keys)
-
-        # Perform delete for each table
-        consume(
-            cls._get_db().delete_many(table, table_keys, dataset=dataset)
-            for table, table_keys in keys_to_delete_grouped_by_table.items()
+        return cls._get_db().delete_many(
+            keys,
+            dataset=dataset,
         )
 
     @classmethod

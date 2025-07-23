@@ -222,8 +222,9 @@ class SqliteDb(Db):
     ) -> int:
         raise NotImplementedError()
 
-    def save_many(
+    def save_many_grouped(
         self,
+        table: str,
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
@@ -285,7 +286,7 @@ class SqliteDb(Db):
 
             connection.commit()
 
-    def delete_many(
+    def delete_many_grouped(
         self,
         table: str,
         keys: Sequence[KeyMixin],

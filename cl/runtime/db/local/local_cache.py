@@ -89,8 +89,9 @@ class LocalCache(Db):
     ) -> tuple[TRecord]:
         raise NotImplementedError()
 
-    def save_many(
+    def save_many_grouped(
         self,
+        table: str,
         records: Iterable[RecordProtocol],
         *,
         dataset: str | None = None,
@@ -109,7 +110,7 @@ class LocalCache(Db):
             # Add record to cache, overwriting an existing record if present
             table_cache[serialized_key] = record
 
-    def delete_many(
+    def delete_many_grouped(
         self,
         table: str,
         keys: Sequence[KeyMixin],

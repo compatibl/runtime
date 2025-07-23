@@ -54,10 +54,10 @@ class SqliteDbV2(Db):
                    limit: int | None = None, skip: int | None = None) -> tuple[TRecord]:
         pass
 
-    def save_many(self, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
+    def save_many_grouped(self, table: str, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
         pass
 
-    def delete_many(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
+    def delete_many_grouped(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
         pass
 
     def count_where(self, query: QueryMixin, *, dataset: str | None = None, filter_to: type | None = None) -> int:
