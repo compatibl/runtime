@@ -44,7 +44,7 @@ class TypesResponseItem(BaseModel):
         """Implements /schema/types route."""
 
         # Get cached classes (does not rebuild cache)
-        record_types = TypeCache.get_classes(type_kinds=(TypeKind.RECORD,))
+        record_types = TypeCache.get_classes(type_kind=TypeKind.RECORD)
 
         # Add types to result
         types_result = [

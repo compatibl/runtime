@@ -16,10 +16,12 @@ import pytest
 from enum import Enum
 from enum import IntEnum
 from cl.runtime import RecordMixin
+from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclass, StubDataclassKey, StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_underscore import (  # noqa
@@ -81,29 +83,35 @@ def test_from_qual_name():
 def test_get_classes():
     """Test TypeCache.get_classes method."""
 
-    data_types = TypeCache.get_classes(
-        type_kinds=(
-            TypeKind.DATA,
-            TypeKind.KEY,
-            TypeKind.RECORD,
-        )
-    )
-
-    # Included data types
-    assert TypeDecl in data_types
-    assert StubDataclass in data_types
-
-    # Excluded data types
+    # Included in data types
+    data_types = TypeCache.get_classes(type_kind=TypeKind.DATA)
+    assert StubDataclassData in data_types
+    # Excluded from data types
+    assert DataMixin not in data_types
     assert RecordMixin not in data_types
     assert _StubDataclassUnderscore not in data_types
     assert __StubDataclassDoubleUnderscore not in data_types
 
-    enum_types = TypeCache.get_classes(type_kinds=(TypeKind.ENUM,))
+    # Included in record types
+    record_types = TypeCache.get_classes(type_kind=TypeKind.RECORD)
+    assert StubDataclass in record_types
+    assert TypeDecl in record_types
+    # Excluded from record types
+    assert RecordMixin not in record_types
+    assert StubDataclassKey not in record_types
+    assert StubDataclassData not in record_types
 
-    # Included enum types
+    # Included in key types
+    key_types = TypeCache.get_classes(type_kind=TypeKind.KEY)
+    assert StubDataclassKey in key_types
+    # Excluded from key types
+    assert KeyMixin not in record_types
+    assert StubDataclassData not in key_types
+
+    # Included in enum types
+    enum_types = TypeCache.get_classes(type_kind=TypeKind.ENUM)
     assert StubIntEnum in enum_types
-
-    # Excluded enum types
+    # Excluded from enum types
     assert Enum not in enum_types
     assert IntEnum not in enum_types
 

@@ -66,26 +66,22 @@ class TypeCache:
     """List of packages to include in the cache."""
 
     @classmethod
-    def is_type(cls, type_name: str, *, type_kinds: TypeKind | Sequence[TypeKind] | None = None) -> bool:
-        """Get fully qualified name in module.ClassName format from the class."""
+    def is_type(cls, type_name: str, *, type_kind: TypeKind | None = None) -> bool:
+        """Get fully qualified name in module.ClassName format from the class, filter by TypeKind if specified."""
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
-
-        # Convert to tuple or None
-        type_kinds = cls._normaize_type_kinds(type_kinds)
 
         # Get cached TypeInfo
         type_info = cls._type_info_by_type_name_dict.get(type_name)
 
         if type_info is not None:
-
-            if type_kinds is None:
+            if type_kind is None:
                 # No restrictions on type, return True
                 return True
             else:
                 # Return true only if type_kind is in the permitted list
-                return type_info.type_kind in type_kinds
+                return type_info.type_kind == type_kind
         else:
             # Not found, return False
             return False
@@ -126,7 +122,7 @@ class TypeCache:
                 except ModuleNotFoundError:
                     raise RuntimeError(
                         f"Module {module_name} is not found in TypeInfo preload, "
-                        f"run fix_type_info to regenerate the preload file."
+                        f"run init_type_info to regenerate."
                     )
 
         # Get class from module, report error if not found
@@ -139,7 +135,7 @@ class TypeCache:
         except AttributeError:
             raise RuntimeError(
                 f"Class {qual_name} is not found in TypeInfo preload,\n"
-                f"run fix_type_info to regenerate the preload file."
+                f"run init_type_info to regenerate."
             )
 
     @classmethod
@@ -200,18 +196,17 @@ class TypeCache:
             raise cls._type_name_not_found_error(type_name)
 
     @classmethod
-    def get_classes(cls, *, type_kinds: TypeKind | Sequence[TypeKind] | None) -> Tuple[type, ...]:
-        """Return already cached classes that match the predicate (does not rebuild cache)."""
+    def get_classes(cls, *, type_kind: TypeKind | None) -> Tuple[type, ...]:
+        """Return already cached classes that match the predicate, filter by TypeKind if specified."""
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
-        # Convert to tuple or None
-        type_kinds = cls._normaize_type_kinds(type_kinds)
-
-        # Get from cached TypeInfo
-        qual_names = [x.qual_name for x in cls._type_info_by_type_name_dict.values() if x.type_kind in type_kinds]
-        result = tuple(cls.get_class_from_qual_name(qual_name) for qual_name in qual_names)
+        # Filter by type_kind if specified
+        type_info_values = cls._type_info_by_type_name_dict.values()
+        if type_kind:
+            type_info_values = [type_info for type_info in type_info_values if type_info.type_kind == type_kind]
+        result = tuple(cls.get_class_from_qual_name(x.qual_name) for x in type_info_values)
         return result
 
     @classmethod
@@ -435,7 +430,7 @@ class TypeCache:
                 rows = file.readlines()
         else:
             # Cache file does not exist, error message
-            raise RuntimeError(f"Cache file is not found at {cache_filename}\n, run fix_type_info to regenerate.")
+            raise RuntimeError(f"Cache file is not found at {cache_filename}\n, run init_type_info to regenerate.")
 
         # Iterate over the rows of TypeInfo preload
         for row_index, row in enumerate(rows):
@@ -533,23 +528,8 @@ class TypeCache:
         return result
 
     @classmethod
-    def _normaize_type_kinds(cls, type_kinds: TypeKind | Sequence[TypeKind] | None) -> tuple[TypeKind] | None:
-        """Convert input to tuple or None."""
-        if type_kinds is None:
-            return None
-        elif isinstance(type_kinds, TypeKind):
-            return (type_kinds,)
-        elif is_sequence(type_kinds):
-            return tuple(type_kinds)
-        else:
-            raise RuntimeError(
-                f"Param type_kinds has unsupported type {TypeUtil.name(type_kinds)}.\n"
-                f"Supported types include TypeKind, Sequence[TypeKind], or None.\n"
-            )
-
-    @classmethod
     def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:
         """Return error message for type name not found."""
         return RuntimeError(
-            f"Type {type_name} is not found in TypeInfo preload,\n" f"run fix_type_info to regenerate the preload file."
+            f"Type {type_name} is not found in TypeInfo preload,\n" f"run init_type_info to regenerate."
         )

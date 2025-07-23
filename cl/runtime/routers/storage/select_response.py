@@ -50,7 +50,7 @@ class SelectResponse(RecordsWithSchemaResponse):
             raise RuntimeError("Select with 'limit' currently is not supported.")
 
         # TODO(Roman): !!! Implement separate methods for table and type
-        if TypeCache.is_type(type_name=request.type_, type_kinds=TypeKind.RECORD):
+        if TypeCache.is_type(type_name=request.type_, type_kind=TypeKind.RECORD):
             # Get records for a type
             record_type_name = request.type_
             record_type = TypeCache.get_class_from_type_name(record_type_name)

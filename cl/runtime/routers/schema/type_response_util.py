@@ -30,7 +30,7 @@ class TypeResponseUtil:
         """Supports /schema/type route."""
 
         # TODO(Roman): !!! Implement separate methods for table and type
-        if TypeCache.is_type(type_name=request.type_name, type_kinds=TypeKind.RECORD):
+        if TypeCache.is_type(type_name=request.type_name, type_kind=TypeKind.RECORD):
             # TODO: Check why empty module is passed, is module the short name prefix?
             record_type_name = request.type_name
         else:
