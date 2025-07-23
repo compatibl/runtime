@@ -106,7 +106,10 @@ class Db(DbKey, RecordMixin, ABC):
 
     def get_bound_record_type_names(self, *, table: str) -> tuple[str, ...]:
         """
-        Return non-delimited PascalCase record type names in alphabetical order stored in the specified table.
+        Return record type names in alphabetical order stored in the specified table.
+
+        Returns:
+            Tuple of non-delimited PascalCase record type names or an empty tuple.
 
         Args:
             table: Table name in non-delimited PascalCase format.
@@ -120,13 +123,23 @@ class Db(DbKey, RecordMixin, ABC):
 
     def get_lowest_bound_record_type_name(self, *, table: str) -> str:
         """
-        Return non-delimited PascalCase record type name of the lowest common type to the bound record types.
+        Return the name of the lowest common type for the record types bound to the table, error if the table is empty.
+
+        Returns:
+            Non-delimited PascalCase record type name.
 
         Args:
             table: Table name in non-delimited PascalCase format.
         """
+
+        # The result may be empty if the table is empty
         bound_type_names = self.get_bound_record_type_names(table=table)
-        result = TypeCache.get_common_base_name(record_types=bound_type_names)
+
+        # The case of empty bound_type_names can only occur if table name is stale because bindings
+        # will include at least one record type when data is added, raise an error
+        if not bound_type_names:
+            raise RuntimeError(f"Table {table} is not found.")
+        result = TypeCache.get_common_base_name(record_types=bound_type_names) if bound_type_names else None
         return result
 
     def load_one(

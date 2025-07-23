@@ -218,8 +218,12 @@ class TypeCache:
             record_types: Record types or names in non-delimited PascalCase format
         """
 
+        # Ensure the argument is not empty
+        if not record_types:
+            raise RuntimeError("The argument of get_common_base_name is empty.")
+
         # Convert to names
-        record_type_names = tuple(TypeUtil.name(x) if isinstance(x, type) else x for x in record_types)
+        record_type_names = tuple(TypeUtil.name(x) if isinstance(x, type) else x for x in record_types if x is not None)
 
         parent_dict = {x: TypeCache.get_parent_names(x) for x in record_type_names}
         depth_dict = {x: len(parent_dict[x]) for x in parent_dict}

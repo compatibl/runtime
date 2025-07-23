@@ -35,6 +35,8 @@ class LoadResponse(RecordsWithSchemaResponse):
     @classmethod
     def get_response(cls, request: LoadRequest) -> LoadResponse:
 
+        # TODO: !!! Consider returning the same size of result as the input
+
         # Handle empty request
         if not request.load_keys:
             # TODO: Review and avoid noqa
@@ -57,22 +59,27 @@ class LoadResponse(RecordsWithSchemaResponse):
 
         # Load and serialize records
         loaded_records = DbContext.load_many(keys)
-        serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
-        # Return empty response if records not found
-        if not loaded_records:
-            return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa
+        # Find the lowest common base of the loaded types except None
+        loaded_record_type_names = tuple(TypeUtil.name(x) for x in loaded_records if x is not None)
 
-        # Find the lowest common base of the specified types
-        loaded_record_type_names = tuple(TypeUtil.name(x) for x in loaded_records)
-        common_base_name = TypeCache.get_common_base_name(record_types=loaded_record_type_names)
-        common_base = TypeCache.get_class_from_type_name(common_base_name)
+        # TODO: Decide if this is the right logic to return empty response if records not found
+        if loaded_record_type_names:
+            # At least one of the records is not None
+            serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
-        # Create schema dict for the common base
-        schema_dict = cls._get_schema_dict(common_base)
+            # Find a common base
+            common_base_name = TypeCache.get_common_base_name(record_types=loaded_record_type_names)
+            common_base = TypeCache.get_class_from_type_name(common_base_name)
 
-        # Return data and schema
-        return LoadResponse(schema_=schema_dict, data=serialized_records)  # noqa
+            # Create schema dict for the common base
+            schema_dict = cls._get_schema_dict(common_base)
+
+            # Return data and schema
+            return LoadResponse(schema_=schema_dict, data=serialized_records)  # noqa  # TODO: Review noqa
+        else:
+            # All of the records are None, return an empty list
+            return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa  # TODO: Review noqa
 
     @classmethod
     def _get_default_ui_type_state(cls, ui_type_state_requested_key: UiTypeStateKey) -> UiTypeState:

@@ -157,7 +157,10 @@ class DbContext(Context):
     @classmethod
     def get_lowest_bound_record_type_name(cls, *, table: str) -> str:
         """
-        Return non-delimited PascalCase record type name of the lowest common type to the bound record types.
+        Return the name of the lowest common type for the record types bound to the table, error if the table is empty.
+
+        Returns:
+            Non-delimited PascalCase record type name.
 
         Args:
             table: Table name in non-delimited PascalCase format.
