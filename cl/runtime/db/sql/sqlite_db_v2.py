@@ -18,10 +18,10 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Sequence, Iterable
 
-from cl.runtime import Db, RecordMixin
+from cl.runtime import Db, RecordMixin, KeyUtil, TypeCache
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol, TRecord, TKey
+from cl.runtime.records.protocols import RecordProtocol, TRecord, TKey, TDataDict
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -43,11 +43,55 @@ class SqliteDbV2(Db):
     def load_table(self, table: str, *, dataset: str | None = None, cast_to: type[TRecord] | None = None,
                    filter_to: type[TRecord] | None = None, project_to: type[TRecord] | None = None,
                    limit: int | None = None, skip: int | None = None) -> tuple[TRecord]:
-        pass
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        # Build SQL query to select all records in table
+        values_for_query = []
+        select_sql = f"SELECT * FROM {self._quote_identifier(table)}"
+
+        if filter_to is not None:
+            # Add filter condition on type
+            subtype_names = TypeCache.get_child_names(filter_to)
+            placeholders = ",".join("?" for _ in subtype_names)
+            select_sql += f' WHERE "_type" IN ({placeholders})'
+            values_for_query += subtype_names
+
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, values_for_query)
+
+        # Deserialize records and return
+        return tuple(  # noqa
+            _DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None})
+            for row in cursor.fetchall()
+        )
 
     def load_many_unsorted(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> Sequence[
         RecordMixin]:
-        pass
+
+        if not keys:
+            return []
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        if not self._is_table_exists(table):
+            return []
+
+        serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
+
+        # Build SQL query to select records by keys
+        placeholders = ",".join("?" for _ in serialized_keys)
+        select_sql = f'SELECT * FROM {self._quote_identifier(table)} WHERE "_key" IN ({placeholders})'
+
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, keys)
+
+        # Deserialize records and return
+        return [_DATA_SERIALIZER.deserialize(dict(row)) for row in cursor.fetchall()]
 
     def load_where(self, query: QueryMixin, *, dataset: str | None = None, cast_to: type[TRecord] | None = None,
                    filter_to: type[TRecord] | None = None, project_to: type[TRecord] | None = None,
@@ -55,7 +99,36 @@ class SqliteDbV2(Db):
         pass
 
     def save_many_grouped(self, table: str, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
-        pass
+
+        if not records:
+            return
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        # Ensure all keys within the table have the same type and get that type, error otherwise
+        key_type = KeyUtil.get_key_type(table=table, records_or_keys=records)
+
+        # Create table if not exists using key_type as source for table schema
+        self._create_table(table, key_type)
+
+        serialized_records = [_DATA_SERIALIZER.serialize(record) for record in records]
+
+        # Dynamically determine all relevant columns to use for query
+        columns_for_query = sorted(set(k for data in serialized_records for k in data.keys()))
+
+        # Build SQL query to insert records
+        quoted_cols = [self._quote_identifier(c) for c in columns_for_query if self._check_safe_identifier(c)]
+        placeholders = ", ".join("?" for _ in quoted_cols)
+        insert_sql = f"INSERT OR REPLACE INTO {self._quote_identifier(table)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
+
+        # Build values for SQL query
+        values_for_query = [tuple(data.get(col) for col in columns_for_query) for data in serialized_records]
+
+        # Execute SQL query
+        conn = self._get_connection()
+        conn.executemany(insert_sql, values_for_query)
+        conn.commit()
 
     def delete_many_grouped(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
         pass
@@ -107,7 +180,7 @@ class SqliteDbV2(Db):
         return conn
 
     def _create_table(self, table: str, key_type: type[TKey]) -> None:
-        """Create a table with a structure corresponding to the key_type hierarchy."""
+        """Create a table if not exists with a structure corresponding to the key_type hierarchy."""
 
         # Validate table name
         self._check_safe_identifier(table)
@@ -126,9 +199,27 @@ class SqliteDbV2(Db):
         conn.execute(sql)
         conn.commit()
 
-    def _get_columns_for_key_type(self, key_type: type[TKey]) -> list[str]:
+    def _is_table_exists(self, table: str) -> bool:
+        """Check if specified table exists in DB."""
+
+        check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
+        conn = self._get_connection()
+        return conn.execute(check_sql, (table,)).fetchone()
+
+    @classmethod
+    def _get_columns_for_key_type(cls, key_type: type[TKey]) -> list[str]:
         """Get columns according to the fields of all descendant classes from the specified key."""
         ...
+
+    @classmethod
+    def _extract_columns_for_data(cls, data: list[TDataDict]) -> list[str]:
+        """Returns a list of columns that are in at least one data item."""
+
+        if not data:
+            return []
+
+        result_columns_set = set(k for data_item in data for k in data_item.keys())
+        return sorted(result_columns_set)
 
     @classmethod
     def _check_safe_identifier(cls, identifier: str) -> bool:
