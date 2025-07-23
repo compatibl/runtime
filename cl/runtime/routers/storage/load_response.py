@@ -59,7 +59,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         loaded_records = DbContext.load_many(keys)
         serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
-         # Return empty response if records not found
+        # Return empty response if records not found
         if not loaded_records:
             return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa
 

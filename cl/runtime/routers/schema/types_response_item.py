@@ -57,9 +57,7 @@ class TypesResponseItem(BaseModel):
 
         # Add tables to result
         tables_result = [
-            TypesResponseItem(
-                name=table, label=table, kind="Table"  # TODO: Make label different from name or remove
-            )
+            TypesResponseItem(name=table, label=table, kind="Table")  # TODO: Make label different from name or remove
             for table in DbContext.get_tables()
         ]
 

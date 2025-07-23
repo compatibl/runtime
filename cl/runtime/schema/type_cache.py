@@ -25,11 +25,12 @@ from typing import Sequence
 from typing import Tuple
 from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data, is_sequence
+from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
@@ -542,8 +543,9 @@ class TypeCache:
             return tuple(type_kinds)
         else:
             raise RuntimeError(
-                    f"Param type_kinds has unsupported type {TypeUtil.name(type_kinds)}.\n"
-                    f"Supported types include TypeKind, Sequence[TypeKind], or None.\n")
+                f"Param type_kinds has unsupported type {TypeUtil.name(type_kinds)}.\n"
+                f"Supported types include TypeKind, Sequence[TypeKind], or None.\n"
+            )
 
     @classmethod
     def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:
