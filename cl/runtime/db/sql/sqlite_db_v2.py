@@ -105,6 +105,7 @@ class SqliteDbV2(Db):
         if not records:
             return
 
+
         # Validate table name
         self._check_safe_identifier(table)
 
@@ -116,6 +117,9 @@ class SqliteDbV2(Db):
 
         serialized_records = []
         for record in records:
+            # Add table binding
+            self._add_binding(table=table, record_type=type(record))
+
             serialized_record = _DATA_SERIALIZER.serialize(record)
             serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
             serialized_records.append(serialized_record)
@@ -137,16 +141,43 @@ class SqliteDbV2(Db):
         conn.commit()
 
     def delete_many_grouped(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
-        pass
+        if not keys:
+            return
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        if not self._is_table_exists(table):
+            return
+
+        serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
+
+        # Build SQL query to delete records by keys
+        placeholders = ",".join("?" for _ in serialized_keys)
+        select_sql = f'DELETE FROM {self._quote_identifier(table)} WHERE "_key" IN ({placeholders})'
+
+        # Execute SQL query
+        conn = self._get_connection()
+        conn.execute(select_sql, serialized_keys)
 
     def count_where(self, query: QueryMixin, *, dataset: str | None = None, filter_to: type | None = None) -> int:
         pass
 
     def drop_test_db(self) -> None:
-        pass
+        # Check preconditions
+        self.check_drop_test_db_preconditions()
+
+        # Drop the entire database without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use
+        self._drop_db()
 
     def drop_temp_db(self, *, user_approval: bool) -> None:
-        pass
+        # Check preconditions
+        self.check_drop_temp_db_preconditions(user_approval=user_approval)
+
+        # Drop the entire database without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use
+        self._drop_db()
 
     def close_connection(self) -> None:
         if (connection := _connection_dict.get(self.db_id, None)) is not None:
@@ -156,11 +187,23 @@ class SqliteDbV2(Db):
             # Remove from dictionary so connection can be reopened on next access
             del _connection_dict[self.db_id]
 
+    def _get_db_file_path(self) -> str:
+        """Get database file path from db_id, applying the appropriate formatting conventions."""
+
+        # Check that db_id is a valid filename
+        FileUtil.check_valid_filename(self.db_id)
+
+        # Get dir for database
+        db_dir = DbSettings.get_db_dir()
+
+        result = os.path.join(db_dir, f"{self.db_id}.sqlite")
+        return result
+
     def _get_connection(self) -> sqlite3.Connection:
         """Get sqlite3 connection object."""
 
         if (conn := _connection_dict.get(self.db_id, None)) is None:
-            db_file_path = self._get_db_file_path(self.db_id)
+            db_file_path = self._get_db_file_path()
 
             # Ensure the parent directory exists
             os.makedirs(os.path.dirname(db_file_path), exist_ok=True)
@@ -211,6 +254,16 @@ class SqliteDbV2(Db):
         check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
         conn = self._get_connection()
         return conn.execute(check_sql, (table,)).fetchone()
+
+    def _drop_db(self):
+        # Close connection
+        self.close_connection()
+
+        # Drop the entire database file without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use.
+        db_file_path = self._get_db_file_path()
+        if os.path.exists(db_file_path):
+            os.remove(db_file_path)
 
     @classmethod
     def _extract_columns_for_key_type(cls, key_type: type[TKey]) -> list[str]:
@@ -264,16 +317,3 @@ class SqliteDbV2(Db):
         # Quote identifier with double quotes, escape embedded quotes if any
         escaped = identifier.replace('"', '""')
         return f'"{escaped}"'
-
-    @classmethod
-    def _get_db_file_path(cls, db_id: str) -> str:
-        """Get database file path from db_id, applying the appropriate formatting conventions."""
-
-        # Check that db_id is a valid filename
-        FileUtil.check_valid_filename(db_id)
-
-        # Get dir for database
-        db_dir = DbSettings.get_db_dir()
-
-        result = os.path.join(db_dir, f"{db_id}.sqlite")
-        return result
