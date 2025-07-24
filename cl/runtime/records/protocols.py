@@ -100,14 +100,19 @@ class DataProtocol(Protocol):
 class KeyProtocol(Protocol):
     """Protocol implemented by both keys and records."""
 
-    @classmethod
-    def get_key_type(cls) -> type:
-        """Return key type even when called from a record."""
+    def is_frozen(self) -> bool:
+        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         ...
 
-
-class TableProtocol(Protocol):
-    """Protocol implemented by tables, keys, and records."""
+    def build(self) -> Self:
+        """
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
+        """
+        ...
 
     @classmethod
     def get_key_type(cls) -> type:
@@ -117,6 +122,25 @@ class TableProtocol(Protocol):
 
 class RecordProtocol(Protocol):
     """Protocol implemented by records."""
+
+    def is_frozen(self) -> bool:
+        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
+        ...
+
+    def build(self) -> Self:
+        """
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
+        """
+        ...
+
+    @classmethod
+    def get_key_type(cls) -> type:
+        """Return key type even when called from a record."""
+        ...
 
     def get_key(self) -> KeyProtocol:
         """Return a new key object whose fields populated from self, do not return self."""
@@ -153,13 +177,10 @@ TEnum = TypeVar("TEnum", bound=Enum)
 TData = TypeVar("TData", bound=DataProtocol)
 """Generic type parameter for a class that has slots and implements the builder pattern."""
 
-TTable = TypeVar("TTable", bound=DataProtocol | TableProtocol)
-"""Generic type parameter for a record."""
-
-TKey = TypeVar("TKey", bound=DataProtocol | TableProtocol | KeyProtocol)
+TKey = TypeVar("TKey", bound=KeyProtocol)
 """Generic type parameter for a key."""
 
-TRecord = TypeVar("TRecord", bound=DataProtocol | TableProtocol | KeyProtocol | RecordProtocol)
+TRecord = TypeVar("TRecord", bound=RecordProtocol)
 """Generic type parameter for a record."""
 
 
