@@ -1,4 +1,4 @@
-type_name: StubDataclassPolymorphicQuery
+type_name: StubDataclassDynamicQuery
 type_kind: Data
 fields:
 - field_name: table_field

@@ -35,7 +35,7 @@ from stubs.cl.runtime import StubPlotViewers
 from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic import StubDataclassDynamic
 
 
 @dataclass(slots=True, kw_only=True)
@@ -77,16 +77,16 @@ class StubRuntimeConfig(Config):
         ]
 
         stub_polymorphic_records = [
-            StubDataclassPolymorphic(
+            StubDataclassDynamic(
                 table_field="PolymorphicTable1", key_field="stub_key1", record_field="stub_record1"
             ),
-            StubDataclassPolymorphic(
+            StubDataclassDynamic(
                 table_field="PolymorphicTable1", key_field="stub_key2", record_field="stub_record2"
             ),
-            StubDataclassPolymorphic(
+            StubDataclassDynamic(
                 table_field="PolymorphicTable2", key_field="stub_key3", record_field="stub_record3"
             ),
-            StubDataclassPolymorphic(
+            StubDataclassDynamic(
                 table_field="PolymorphicTable2", key_field="stub_key4", record_field="stub_record4"
             ),
         ]

@@ -19,8 +19,8 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassPolymorphicKey(KeyMixin):
-    """Specifies the table where this record is stored and the key within that table."""
+class StubDataclassDynamicKey(KeyMixin):
+    """Stub record stored in a table determined from the key fields (dynamic table)."""
 
     table_field: str = required()
     """Specifies the table where this record is stored."""
@@ -30,7 +30,7 @@ class StubDataclassPolymorphicKey(KeyMixin):
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return StubDataclassPolymorphicKey
+        return StubDataclassDynamicKey
 
     def get_table(self) -> str:
         return self.table_field

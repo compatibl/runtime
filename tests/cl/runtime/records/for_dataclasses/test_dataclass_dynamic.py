@@ -16,9 +16,9 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_query import StubDataclassPolymorphicQuery
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic import StubDataclassDynamic
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic_key import StubDataclassDynamicKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic_query import StubDataclassDynamicQuery
 
 
 def test_load(pytest_multi_db):
@@ -29,7 +29,7 @@ def test_load(pytest_multi_db):
     record_field = "stub_record_field"
 
     # Create and save a record derived from a generic base
-    record = StubDataclassPolymorphic(
+    record = StubDataclassDynamic(
         table_field=table_field,
         key_field=key_field,
         record_field=record_field,
@@ -37,7 +37,7 @@ def test_load(pytest_multi_db):
     DbContext.save_one(record)
 
     # Test get_key
-    key = StubDataclassPolymorphicKey(table_field=table_field, key_field=key_field).build()
+    key = StubDataclassDynamicKey(table_field=table_field, key_field=key_field).build()
     assert record.get_key() == key
 
     # Test serialize_key
@@ -45,15 +45,15 @@ def test_load(pytest_multi_db):
     assert key.serialize_key() == serialized_key
 
     # Get record from DB using key
-    loaded_record = DbContext.load_one(key, cast_to=StubDataclassPolymorphic)
+    loaded_record = DbContext.load_one(key, cast_to=StubDataclassDynamic)
     assert loaded_record == record
 
     # Test load_where method
-    query = StubDataclassPolymorphicQuery(
+    query = StubDataclassDynamicQuery(
         table_field=table_field,
         record_field=record_field,
     ).build()
-    loaded_where = DbContext.load_where(query, cast_to=StubDataclassPolymorphic)
+    loaded_where = DbContext.load_where(query, cast_to=StubDataclassDynamic)
 
 
 def test_count_where(pytest_multi_db):
@@ -63,7 +63,7 @@ def test_count_where(pytest_multi_db):
     record_field = "stub_record_field"
 
     # Create and save a record derived from a generic base
-    record = StubDataclassPolymorphic(
+    record = StubDataclassDynamic(
         table_field=table_field,
         key_field=key_field,
         record_field=record_field,
@@ -71,11 +71,11 @@ def test_count_where(pytest_multi_db):
     DbContext.save_one(record)
 
     # Create the same query as in test_load
-    query = StubDataclassPolymorphicQuery(
+    query = StubDataclassDynamicQuery(
         table_field=table_field,
         record_field=record_field,
     ).build()
-    count = DbContext.count_where(query, filter_to=StubDataclassPolymorphic)
+    count = DbContext.count_where(query, filter_to=StubDataclassDynamic)
     assert count == 1
 
 

@@ -16,12 +16,12 @@ from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.query_mixin import QueryMixin
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic import StubDataclassDynamic
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPolymorphicQuery(QueryMixin):
-    """Query for the stub record with a polymorphic key."""
+class StubDataclassDynamicQuery(QueryMixin):
+    """Query for the stub record stored in a table determined from the key fields (dynamic table)."""
 
     table_field: str = required()
     """Specifies the table where this record is stored."""
@@ -33,7 +33,7 @@ class StubDataclassPolymorphicQuery(QueryMixin):
     """Stub field of the record."""
 
     def get_target_type(self) -> type[KeyMixin]:
-        return StubDataclassPolymorphic
+        return StubDataclassDynamic
 
     def get_table(self) -> str:
         return self.table_field

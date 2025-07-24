@@ -14,15 +14,15 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic_key import StubDataclassDynamicKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPolymorphic(StubDataclassPolymorphicKey, RecordMixin):
-    """Stub record with a polymorphic key."""
+class StubDataclassDynamic(StubDataclassDynamicKey, RecordMixin):
+    """Stub record stored in a table determined from the key fields (dynamic table)."""
 
     record_field: str | None = None
     """Stub field of the record."""
 
-    def get_key(self) -> StubDataclassPolymorphicKey:
-        return StubDataclassPolymorphicKey(table_field=self.table_field, key_field=self.key_field).build()
+    def get_key(self) -> StubDataclassDynamicKey:
+        return StubDataclassDynamicKey(table_field=self.table_field, key_field=self.key_field).build()
