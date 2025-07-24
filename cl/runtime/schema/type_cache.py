@@ -179,16 +179,30 @@ class TypeCache:
             raise cls._type_name_not_found_error(record_type)
 
     @classmethod
-    def get_child_names(cls, class_: type) -> Tuple[str, ...] | None:
-        """Return a tuple of type names for child classes (inclusive of self) that match the predicate."""
+    def get_child_names(cls, record_type: type | str) -> tuple[str, ...]:
+        """
+        Return a tuple of type names for child classes (inclusive of self) that match the predicate.
+        Result is sorted by depth in hierarchy.
+
+        Args:
+            record_type: Record type or name in non-delimited PascalCase format.
+        """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
         # Get from cached TypeInfo
-        type_name = TypeUtil.name(class_)
+        type_name = TypeUtil.name(record_type) if isinstance(record_type, type) else record_type
         if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
-            return type_info.child_names
+            child_names = type_info.child_names
+
+            # Sort child classes by depth in hierarchy
+            depth_dict = {x: len(TypeCache.get_parent_names(x)) for x in child_names}
+            sorted_child_names = tuple(
+                child_name for child_name, depth in sorted(depth_dict.items(), key=lambda item: item[1])
+            )
+
+            return sorted_child_names
         else:
             raise cls._type_name_not_found_error(type_name)
 

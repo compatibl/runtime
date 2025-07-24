@@ -16,18 +16,20 @@ import os
 import re
 import sqlite3
 from dataclasses import dataclass
-from typing import Sequence, Iterable
+from typing import Sequence, Iterable, cast
 
 from cl.runtime import Db, RecordMixin, KeyUtil, TypeCache
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol, TRecord, TKey, TDataDict
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.schema.data_spec import DataSpec
+from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.db_settings import DbSettings
 
-_KEY_SERIALIZER = KeySerializers.FOR_SQLITE
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 _DATA_SERIALIZER = DataSerializers.FOR_SQLITE
 
 _connection_dict: dict[str, sqlite3.Connection] = {}
@@ -88,7 +90,7 @@ class SqliteDbV2(Db):
 
         # Execute SQL query
         conn = self._get_connection()
-        cursor = conn.execute(select_sql, keys)
+        cursor = conn.execute(select_sql, serialized_keys)
 
         # Deserialize records and return
         return [_DATA_SERIALIZER.deserialize(dict(row)) for row in cursor.fetchall()]
@@ -112,7 +114,11 @@ class SqliteDbV2(Db):
         # Create table if not exists using key_type as source for table schema
         self._create_table(table, key_type)
 
-        serialized_records = [_DATA_SERIALIZER.serialize(record) for record in records]
+        serialized_records = []
+        for record in records:
+            serialized_record = _DATA_SERIALIZER.serialize(record)
+            serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
+            serialized_records.append(serialized_record)
 
         # Dynamically determine all relevant columns to use for query
         columns_for_query = sorted(set(k for data in serialized_records for k in data.keys()))
@@ -190,7 +196,7 @@ class SqliteDbV2(Db):
 
         # Validate and quote data type columns
         column_defs.extend(
-            (self._quote_identifier(x) for x in self._get_columns_for_key_type(key_type) if self._check_safe_identifier(x))
+            (self._quote_identifier(x) for x in self._extract_columns_for_key_type(key_type) if self._check_safe_identifier(x))
         )
 
         sql = f"CREATE TABLE IF NOT EXISTS {self._quote_identifier(table)} ({', '.join(column_defs)})"
@@ -207,9 +213,28 @@ class SqliteDbV2(Db):
         return conn.execute(check_sql, (table,)).fetchone()
 
     @classmethod
-    def _get_columns_for_key_type(cls, key_type: type[TKey]) -> list[str]:
+    def _extract_columns_for_key_type(cls, key_type: type[TKey]) -> list[str]:
         """Get columns according to the fields of all descendant classes from the specified key."""
-        ...
+
+        # Get child type names for key_type
+        child_names = TypeCache.get_child_names(key_type)
+        result_columns = []
+
+        # Iterate through child types and add unique columns.
+        # Since child types are sorted by depth in the hierarchy, the base fields will be at the beginning.
+        for child in child_names:
+            # Get child type spec
+            child_type_spec = TypeSchema.for_type_name(child)
+            child_type_spec = cast(DataSpec, child_type_spec)
+
+            # Get field dictionary for child type
+            field_dict = child_type_spec.get_field_dict()
+
+            # Add unique columns from child fields
+            add_columns = set(field_dict.keys()) - set(result_columns)
+            result_columns.extend(add_columns)
+
+        return result_columns
 
     @classmethod
     def _extract_columns_for_data(cls, data: list[TDataDict]) -> list[str]:
