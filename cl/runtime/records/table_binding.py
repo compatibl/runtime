@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding_key import TableBindingKey
 
@@ -20,6 +21,9 @@ from cl.runtime.records.table_binding_key import TableBindingKey
 @dataclass(slots=True, kw_only=True)
 class TableBinding(TableBindingKey, RecordMixin):
     """Specifies table binding to key type."""
+
+    key_type: str = required()
+    """Key type for the records in this table."""
 
     def get_key(self) -> TableBindingKey:
         return TableBindingKey(table=self.table, record_type=self.record_type).build()

@@ -45,11 +45,17 @@ class PanelResponseUtil:
     def _get_content(cls, request: PanelRequest):
         """Implements /entity/panel route."""
 
-        # Get type of the record.
-        type_ = TypeCache.get_class_from_type_name(request.type_name)
+        # Get the key type
+        if TypeCache.is_type(request.type_name):
+            # Static type is passed as type_name
+            type_ = TypeCache.get_class_from_type_name(request.type_name)
+            key_type = type_.get_key_type()
+        else:
+            # Table is passed as type_name
+            key_type = DbContext.get_bound_key_type(table=request.type_name)
 
         # Deserialize key from string to object.
-        key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(type_.get_key_type()))
+        key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(key_type))
 
         # Load record from the database.
         record = DbContext.load_one(key_obj, dataset=request.dataset)

@@ -145,6 +145,16 @@ class DbContext(Context):
         return cls._get_db().get_bound_tables(record_type=record_type)
 
     @classmethod
+    def get_bound_key_type(cls, *, table: str) -> type:
+        """
+        Key type for the specified table, table must exist.
+
+        Args:
+            table: Table name in non-delimited PascalCase format.
+        """
+        return cls._get_db().get_bound_key_type(table=table)
+
+    @classmethod
     def get_bound_record_type_names(cls, *, table: str) -> tuple[str, ...]:
         """
         Return non-delimited PascalCase record type names in alphabetical order stored in the specified table.
@@ -153,6 +163,19 @@ class DbContext(Context):
             table: Table name in non-delimited PascalCase format.
         """
         return cls._get_db().get_bound_record_type_names(table=table)
+
+    @classmethod
+    def get_allowed_record_type_names(cls, *, table: str) -> tuple[str, ...]:
+        """
+        Record type names that may be stored in the specified table, table must exist.
+
+        Returns:
+            Tuple of non-delimited PascalCase record type names in alphabetical order.
+
+        Args:
+            table: Table name in non-delimited PascalCase format.
+        """
+        return cls._get_db().get_allowed_record_type_names(table=table)
 
     @classmethod
     def get_lowest_bound_record_type_name(cls, *, table: str) -> str:

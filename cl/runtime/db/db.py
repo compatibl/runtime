@@ -104,12 +104,9 @@ class Db(DbKey, RecordMixin, ABC):
         # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
         return tuple(sorted(set(binding.table for binding in bindings)))
 
-    def get_bound_record_type_names(self, *, table: str) -> tuple[str, ...]:
+    def get_bound_key_type(self, *, table: str) -> type:
         """
-        Return record type names in alphabetical order stored in the specified table.
-
-        Returns:
-            Tuple of non-delimited PascalCase record type names or an empty tuple.
+        Key type for the specified table, table must exist.
 
         Args:
             table: Table name in non-delimited PascalCase format.
@@ -117,9 +114,55 @@ class Db(DbKey, RecordMixin, ABC):
         # Query by record type, each parent type has its own binding record
         query = TableBindingKeyQueryByTable(table=table).build()
         bindings = self.load_where(query, cast_to=TableBinding)
+        if not bindings:
+            raise RuntimeError(f"Table {table} is not found.")
+
+        # Convert to set to remove duplicates
+        key_type_names = tuple(set(binding.key_type for binding in bindings))
+
+        # Error if more than one key type is found
+        if len(key_type_names) > 1:
+            key_type_names_str = "\n".join(sorted(key_type_names))
+            raise RuntimeError(f"Multiple key types found in table {table}:\n{key_type_names_str}")
+
+        key_type = TypeCache.get_class_from_type_name(key_type_names[0])
+        return key_type
+
+    def get_bound_record_type_names(self, *, table: str) -> tuple[str, ...]:
+        """
+        Record type names actually stored in the specified table, table must exist.
+
+        Returns:
+            Tuple of non-delimited PascalCase record type names in alphabetical order or an empty tuple.
+
+        Args:
+            table: Table name in non-delimited PascalCase format.
+        """
+        # Query by record type, each parent type has its own binding record
+        query = TableBindingKeyQueryByTable(table=table).build()
+        bindings = self.load_where(query, cast_to=TableBinding)
+        if not bindings:
+            raise RuntimeError(f"Table {table} is not found.")
 
         # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
         return tuple(sorted(set(binding.record_type for binding in bindings)))
+
+    def get_allowed_record_type_names(self, *, table: str) -> tuple[str, ...]:
+        """
+        Record type names that may be stored in the specified table, table must exist.
+
+        Returns:
+            Tuple of non-delimited PascalCase record type names in alphabetical order.
+
+        Args:
+            table: Table name in non-delimited PascalCase format.
+        """
+        # Bound key type exists if the table exists
+        key_type = self.get_bound_key_type(table=table)
+
+        # Return child names of the bound key type
+        result = TypeCache.get_child_names(key_type)
+        return result
 
     def get_lowest_bound_record_type_name(self, *, table: str) -> str:
         """
@@ -590,18 +633,13 @@ class Db(DbKey, RecordMixin, ABC):
         result = db_type(db_id=db_id)
         return result
 
-    def _add_binding(
-        self,
-        *,
-        table: str,
-        record_type: type[RecordProtocol] | str,
-    ) -> None:
+    def _add_binding(self, *, table: str, record_type: type[RecordProtocol]) -> None:
         """
         Record the table to record type binding in the DB if not found in cache, update cache.
 
         Args:
             table: Table name in non-delimited PascalCase format
-            record_type: Record type or name in non-delimited PascalCase format
+            record_type: Record type bound to the table
         """
 
         # Initialize the table binding cache from the DB table if not yet initialized
@@ -618,8 +656,14 @@ class Db(DbKey, RecordMixin, ABC):
             # to DB as it is faster to overwrite than to check for each parent
 
             # Create binding for each parent and self
-            parent_names = TypeCache.get_parent_names(record_type)
-            bindings = tuple(TableBinding(table=table, record_type=parent_name) for parent_name in parent_names)
+            parent_type_names = TypeCache.get_parent_names(record_type)
+            key_type_name = TypeUtil.name(record_type.get_key_type())
+            bindings = tuple(
+                TableBinding(
+                    table=table,
+                    record_type=parent_type_name,
+                    key_type=key_type_name,
+                ) for parent_type_name in parent_type_names)
 
             # Add to cache
             consume(
