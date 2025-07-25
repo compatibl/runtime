@@ -175,6 +175,8 @@ class PrimitiveSerializer(Serializer):
                     return data
                 elif value_format == LongFormat.DEFAULT:
                     return LongUtil.to_str(data)
+                elif value_format == LongFormat.BSON_INT_64:
+                    return Int64(data)
                 else:
                     raise ErrorUtil.enum_value_error(value_format, LongFormat)
             else:

@@ -132,9 +132,9 @@ class PrimitiveSerializers:
         float_format=FloatFormat.PASSTHROUGH,
         bool_format=BoolFormat.PASSTHROUGH,
         int_format=IntFormat.PASSTHROUGH,
-        long_format=LongFormat.PASSTHROUGH,
-        date_format=DateFormat.ISO_INT,
-        time_format=TimeFormat.ISO_INT,
+        long_format=LongFormat.BSON_INT_64,  # Uses NumberLong format in MongoDB
+        date_format=DateFormat.ISO_INT,  # Uses readable int format in MongoDB
+        time_format=TimeFormat.ISO_INT,  # Uses readable int format in MongoDB
         datetime_format=DatetimeFormat.PASSTHROUGH,
         uuid_format=UuidFormat.PASSTHROUGH,
         timestamp_format=TimestampFormat.PASSTHROUGH,
