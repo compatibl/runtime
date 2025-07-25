@@ -16,13 +16,20 @@ import os
 import re
 import sqlite3
 from dataclasses import dataclass
-from typing import Sequence, Iterable, cast
-
-from cl.runtime import Db, RecordMixin, KeyUtil, TypeCache
+from typing import Iterable
+from typing import Sequence
+from typing import cast
+from cl.runtime import Db
+from cl.runtime import KeyUtil
+from cl.runtime import RecordMixin
+from cl.runtime import TypeCache
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol, TRecord, TKey, TDataDict
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import TDataDict
+from cl.runtime.records.protocols import TKey
+from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
@@ -40,15 +47,23 @@ _connection_dict: dict[str, sqlite3.Connection] = {}
 """Dict of Connection instances with db_id key stored outside the class to avoid serialization."""
 
 # Regex for a safe SQLite identifier (letters, digits, underscores, start with letter or underscore)
-IDENTIFIER_REGEX = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
+IDENTIFIER_REGEX = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
 @dataclass(slots=True, kw_only=True)
 class SqliteDbV2(Db):
 
-    def load_table(self, table: str, *, dataset: str | None = None, cast_to: type[TRecord] | None = None,
-                   filter_to: type[TRecord] | None = None, project_to: type[TRecord] | None = None,
-                   limit: int | None = None, skip: int | None = None) -> tuple[TRecord]:
+    def load_table(
+        self,
+        table: str,
+        *,
+        dataset: str | None = None,
+        cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TRecord]:
 
         # Validate table name
         self._check_safe_identifier(table)
@@ -74,8 +89,9 @@ class SqliteDbV2(Db):
             for row in cursor.fetchall()
         )
 
-    def load_many_unsorted(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> Sequence[
-        RecordMixin]:
+    def load_many_unsorted(
+        self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None
+    ) -> Sequence[RecordMixin]:
 
         if not keys:
             return []
@@ -97,11 +113,22 @@ class SqliteDbV2(Db):
         cursor = conn.execute(select_sql, serialized_keys)
 
         # Deserialize records and return
-        return [_DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None}) for row in cursor.fetchall()]
+        return [
+            _DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None})
+            for row in cursor.fetchall()
+        ]
 
-    def load_where(self, query: QueryMixin, *, dataset: str | None = None, cast_to: type[TRecord] | None = None,
-                   filter_to: type[TRecord] | None = None, project_to: type[TRecord] | None = None,
-                   limit: int | None = None, skip: int | None = None) -> tuple[TRecord]:
+    def load_where(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str | None = None,
+        cast_to: type[TRecord] | None = None,
+        filter_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TRecord]:
 
         if project_to is not None:
             raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
@@ -209,7 +236,9 @@ class SqliteDbV2(Db):
         # Build SQL query to insert records
         quoted_cols = [self._quote_identifier(c) for c in columns_for_query if self._check_safe_identifier(c)]
         placeholders = ", ".join("?" for _ in quoted_cols)
-        insert_sql = f"INSERT OR REPLACE INTO {self._quote_identifier(table)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
+        insert_sql = (
+            f"INSERT OR REPLACE INTO {self._quote_identifier(table)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
+        )
 
         # Build values for SQL query
         values_for_query = [tuple(data.get(col) for col in columns_for_query) for data in serialized_records]
@@ -369,7 +398,11 @@ class SqliteDbV2(Db):
 
         # Validate and quote data type columns
         column_defs.extend(
-            (self._quote_identifier(x) for x in self._extract_columns_for_key_type(key_type) if self._check_safe_identifier(x))
+            (
+                self._quote_identifier(x)
+                for x in self._extract_columns_for_key_type(key_type)
+                if self._check_safe_identifier(x)
+            )
         )
 
         sql = f"CREATE TABLE IF NOT EXISTS {self._quote_identifier(table)} ({', '.join(column_defs)})"
@@ -508,4 +541,3 @@ class SqliteDbV2(Db):
 
         where_clause = " AND ".join(clauses)
         return where_clause, values
-

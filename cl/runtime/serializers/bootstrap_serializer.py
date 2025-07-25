@@ -33,9 +33,10 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_key
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format import BoolFormat

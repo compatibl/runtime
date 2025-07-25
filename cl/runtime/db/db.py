@@ -17,7 +17,6 @@ from abc import ABC
 from abc import abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Iterable
 from typing import Sequence
 from more_itertools import consume
 from cl.runtime.contexts.process_context import ProcessContext
@@ -543,7 +542,10 @@ class Db(DbKey, RecordMixin, ABC):
         records_grouped_by_table = self._group_inputs_by_table(records)
 
         # Save records for each table
-        [self.save_many_grouped(table, table_records, dataset=dataset) for table, table_records in records_grouped_by_table.items()]
+        [
+            self.save_many_grouped(table, table_records, dataset=dataset)
+            for table, table_records in records_grouped_by_table.items()
+        ]
 
     @abstractmethod
     def save_many_grouped(
@@ -585,7 +587,10 @@ class Db(DbKey, RecordMixin, ABC):
 
         keys_grouped_by_table = self._group_inputs_by_table(keys)
 
-        [self.delete_many_grouped(table, table_records, dataset=dataset) for table, table_records in keys_grouped_by_table.items()]
+        [
+            self.delete_many_grouped(table, table_records, dataset=dataset)
+            for table, table_records in keys_grouped_by_table.items()
+        ]
 
     @abstractmethod
     def delete_many_grouped(
@@ -760,7 +765,14 @@ class Db(DbKey, RecordMixin, ABC):
             )
 
     @classmethod
-    def _check_invalid_inputs(cls, inputs: Sequence[TRecord | TKey | None], *, key_allowed: bool = True, record_allowed: bool = True, none_allowed: bool = True) -> None:
+    def _check_invalid_inputs(
+        cls,
+        inputs: Sequence[TRecord | TKey | None],
+        *,
+        key_allowed: bool = True,
+        record_allowed: bool = True,
+        none_allowed: bool = True,
+    ) -> None:
         """
         Check that the input list consists of only None, records, or keys.
         Use flags 'key_allowed', 'record_allowed', and 'none_allowed' to control the list of valid values.
