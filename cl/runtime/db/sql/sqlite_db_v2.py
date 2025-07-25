@@ -492,6 +492,13 @@ class SqliteDbV2(Db):
                 elif op == "op_lte":
                     clauses.append(f"{cls._quote_identifier(key)} <= ?")
                     values.append(v)
+                elif op == "op_exists":
+                    if v is True:
+                        clauses.append(f"{key} IS NOT NULL")
+                    elif v is False:
+                        clauses.append(f"{key} IS NULL")
+                    else:
+                        raise ValueError(f"op_exists must be True or False, got: {v}")
                 else:
                     raise RuntimeError(f"Unsupported operator: {op}")
             else:
