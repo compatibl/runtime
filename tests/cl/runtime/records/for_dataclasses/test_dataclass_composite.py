@@ -27,21 +27,6 @@ def test_key():
     key = record.get_key()
     assert StubDataclassCompositeKey().build() == key
 
-    # Test serialize_key
-    serialized_key = (
-        StubDataclassCompositeKey,
-        key.primitive,
-        (
-            StubDataclassKey,
-            key.embedded_1.id,
-        ),
-        (
-            StubDataclassKey,
-            key.embedded_2.id,
-        ),
-    )
-    assert key.serialize_key() == serialized_key
-
 
 if __name__ == "__main__":
     pytest.main([__file__])

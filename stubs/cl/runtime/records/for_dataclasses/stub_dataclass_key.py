@@ -27,6 +27,3 @@ class StubDataclassKey(KeyMixin):
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
         return StubDataclassKey
-
-    def serialize_key(self) -> Tuple:
-        return StubDataclassKey, self.id

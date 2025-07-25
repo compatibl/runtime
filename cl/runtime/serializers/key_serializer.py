@@ -83,19 +83,6 @@ class KeySerializer(Serializer):
         elif is_key(data):
             # Perform checks and flatten into a linear sequence
             sequence = self._to_tuple(data)
-        elif isinstance(data, tuple):
-            # Check that the first element is a type or type name string
-            if not data:
-                raise RuntimeError(
-                    "A tuple key cannot be empty. Its first item must be\n" "a key type or a type name string."
-                )
-            elif not isinstance(data[0], (type, str)):
-                raise RuntimeError(
-                    "If an inner key field inside a composite key is a tuple.\n"
-                    "Its first item must be a key type or type name string."
-                )
-            # Perform checks and flatten into a linear sequence
-            sequence = self._to_tuple(data)
         else:
             raise RuntimeError(
                 f"{TypeUtil.name(self)} cannot serialize {type(data)}.\n"

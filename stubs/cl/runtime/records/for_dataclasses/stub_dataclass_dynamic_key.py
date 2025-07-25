@@ -35,5 +35,3 @@ class StubDataclassDynamicKey(KeyMixin):
     def get_table(self) -> str:
         return self.table_field
 
-    def serialize_key(self) -> Tuple:
-        return self.table_field, self.key_field

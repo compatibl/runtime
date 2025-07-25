@@ -36,19 +36,3 @@ class KeyMixin(DataMixin, ABC):
     def get_table(self) -> str:
         """DB table in non-delimited PascalCase format (defaults to key type name with Key suffix removed)."""
         return TypeUtil.name(self.get_key_type())
-
-    # TODO: Move to KeyUtil class
-    def serialize_key(self) -> Tuple:
-        """Implement using get_key_type during transition to the new API."""
-        if hasattr(self, "get_key_type"):
-            key_type = self.get_key_type()
-            key_slots = SlotsUtil.get_slots(key_type)
-            key_fields = tuple(
-                v.serialize_key() if is_key(v := getattr(self, key_slot, None)) else v for key_slot in key_slots
-            )
-            result = (key_type,) + key_fields
-            return result
-        else:
-            raise RuntimeError(
-                f"Type {TypeUtil.name(self)} must implement either get_key_type or serialize_key method."
-            )

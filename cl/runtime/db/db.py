@@ -38,6 +38,7 @@ from cl.runtime.records.table_binding_key_query_by_record_type import TableBindi
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.db_settings import DbSettings
 
 
@@ -324,14 +325,14 @@ class Db(DbKey, RecordMixin, ABC):
 
         # Concatenated list
         loaded_records = [item for sublist in loaded_records_grouped_by_table for item in sublist]
-        normalized_loaded_keys = [KeyUtil.normalize_key(x.serialize_key()) for x in loaded_records]
+        serialized_loaded_keys = [KeySerializers.TUPLE.serialize(x.get_key()) for x in loaded_records]
 
         # Create a dictionary with pairs consisting of serialized key (after normalization) and the record for this key
-        loaded_records_dict = {k: v for k, v in zip(normalized_loaded_keys, loaded_records)}
+        loaded_records_dict = {k: v for k, v in zip(serialized_loaded_keys, loaded_records)}
 
         # Populate the result with records loaded using input keys, pass through None and input records
         result = tuple(
-            loaded_records_dict.get(KeyUtil.normalize_key(x.serialize_key()), None) if is_key(x) else x
+            loaded_records_dict.get(KeySerializers.TUPLE.serialize(x), None) if is_key(x) else x
             for x in records_or_keys
         )
 

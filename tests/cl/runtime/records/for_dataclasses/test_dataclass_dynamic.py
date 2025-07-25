@@ -40,10 +40,6 @@ def test_load(pytest_multi_db):
     key = StubDataclassDynamicKey(table_field=table_field, key_field=key_field).build()
     assert record.get_key() == key
 
-    # Test serialize_key
-    serialized_key = (table_field, key_field)
-    assert key.serialize_key() == serialized_key
-
     # Get record from DB using key
     loaded_record = DbContext.load_one(key, cast_to=StubDataclassDynamic)
     assert loaded_record == record
