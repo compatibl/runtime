@@ -17,7 +17,7 @@ from cl.runtime.records.protocols import is_sequence
 from cl.runtime.settings.qa_settings import QaSettings
 
 
-def test_smoke():
+def test_qa_settings():
     """Test DbSettings class."""
 
     qa_settings = QaSettings.instance()
