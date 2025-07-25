@@ -30,3 +30,6 @@ class KeyFormat(IntEnum):
     Flattened tuple of primitive and enum tokens serialized using
     primitive_serializer and enum_serializer respectively.
     """
+
+    DEFAULT = auto()
+    """Key as data dict."""

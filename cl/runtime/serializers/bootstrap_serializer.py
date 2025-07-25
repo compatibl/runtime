@@ -33,7 +33,7 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_key
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.type_util import TypeUtil
@@ -46,6 +46,8 @@ from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.enum_format import EnumFormat
 from cl.runtime.serializers.float_format import FloatFormat
 from cl.runtime.serializers.int_format import IntFormat
+from cl.runtime.serializers.key_format import KeyFormat
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.long_format import LongFormat
 from cl.runtime.serializers.none_format import NoneFormat
 from cl.runtime.serializers.serializer import Serializer
@@ -101,6 +103,9 @@ class BootstrapSerializer(Serializer):
 
     enum_format: EnumFormat = required()
     """Serialization format for enums that are not None."""
+
+    key_format: KeyFormat = required()
+    """Serialization format for keys that are not None."""
 
     encoder: Encoder | None = None
     """Use to encode the output of serialize method if specified."""
@@ -264,7 +269,20 @@ class BootstrapSerializer(Serializer):
                 return CaseUtil.upper_to_pascal_case(data.name)
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormat)
+
         elif is_data(data):
+
+            # Use key serializer for key types
+            if is_key(data):
+                if self.key_format == KeyFormat.DELIMITED:
+                    key_serializer = KeySerializers.DELIMITED
+                    return key_serializer.serialize(data, type_hint)
+                elif self.key_format == KeyFormat.TUPLE:
+                    key_serializer = KeySerializers.TUPLE
+                    return key_serializer.serialize(data, type_hint)
+                elif self.key_format == KeyFormat.DEFAULT:
+                    # Process keys as data (dict format)
+                    pass
 
             # Data type name taking into account aliases
             data_type_name = TypeUtil.name(data)

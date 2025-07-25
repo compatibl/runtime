@@ -21,6 +21,7 @@ from cl.runtime.serializers.enum_format import EnumFormat
 from cl.runtime.serializers.float_format import FloatFormat
 from cl.runtime.serializers.int_format import IntFormat
 from cl.runtime.serializers.json_encoders import JsonEncoders
+from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.long_format import LongFormat
 from cl.runtime.serializers.none_format import NoneFormat
 from cl.runtime.serializers.string_format import StringFormat
@@ -47,6 +48,7 @@ class BootstrapSerializers:
         timestamp_format=TimestampFormat.DEFAULT,
         bytes_format=BytesFormat.DEFAULT,
         enum_format=EnumFormat.DEFAULT,
+        key_format=KeyFormat.DEFAULT,
     ).build()
     """Convert all primitive types to string."""
 
@@ -64,6 +66,7 @@ class BootstrapSerializers:
         timestamp_format=TimestampFormat.PASSTHROUGH,
         bytes_format=BytesFormat.PASSTHROUGH,
         enum_format=EnumFormat.DEFAULT,
+        key_format=KeyFormat.DEFAULT,
         encoder=YamlEncoders.DEFAULT,
     ).build()
     """Default settings with YAML output."""
@@ -82,6 +85,7 @@ class BootstrapSerializers:
         timestamp_format=TimestampFormat.PASSTHROUGH,
         bytes_format=BytesFormat.PASSTHROUGH,
         enum_format=EnumFormat.DEFAULT,
+        key_format=KeyFormat.DEFAULT,
         encoder=JsonEncoders.DEFAULT,
     ).build()
     """Default settings with JSON output."""
@@ -100,6 +104,7 @@ class BootstrapSerializers:
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
         bytes_format=BytesFormat.DEFAULT,
         enum_format=EnumFormat.DEFAULT,
+        key_format=KeyFormat.DEFAULT,
         pascalize_keys=True,
     ).build()
     """Default bidirectional data serializer settings for UI."""
@@ -118,5 +123,24 @@ class BootstrapSerializers:
         timestamp_format=TimestampFormat.PASSTHROUGH,
         bytes_format=BytesFormat.PASSTHROUGH,
         enum_format=EnumFormat.DEFAULT,
+        key_format=KeyFormat.DEFAULT,
     ).build()
     """Default bidirectional data serializer settings for MongoDB query."""
+
+    FOR_SQLITE_QUERY = BootstrapSerializer(
+        none_format=NoneFormat.PASSTHROUGH,
+        string_format=StringFormat.PASSTHROUGH,
+        float_format=FloatFormat.PASSTHROUGH,
+        bool_format=BoolFormat.PASSTHROUGH,
+        int_format=IntFormat.PASSTHROUGH,
+        long_format=LongFormat.PASSTHROUGH,
+        date_format=DateFormat.PASSTHROUGH,
+        time_format=TimeFormat.PASSTHROUGH,
+        datetime_format=DatetimeFormat.PASSTHROUGH,
+        uuid_format=UuidFormat.PASSTHROUGH,
+        timestamp_format=TimestampFormat.PASSTHROUGH,
+        bytes_format=BytesFormat.PASSTHROUGH,
+        enum_format=EnumFormat.DEFAULT,
+        key_format=KeyFormat.DELIMITED,
+    ).build()
+    """Default bidirectional data serializer settings for SQLite query."""
