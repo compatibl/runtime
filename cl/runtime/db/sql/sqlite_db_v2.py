@@ -105,7 +105,6 @@ class SqliteDbV2(Db):
         if not records:
             return
 
-
         # Validate table name
         self._check_safe_identifier(table)
 
