@@ -15,7 +15,6 @@
 import pytest
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.db import Db
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.conditions import In
@@ -68,7 +67,7 @@ _SAMPLES = [
 ]
 
 
-def test_record_or_key(pytest_multi_db):
+def test_record_or_key(multi_db_fixture):
     """Test passing record instead of a key."""
     # Create test record and populate with sample data
     record = StubDataclass().build()
@@ -88,7 +87,7 @@ def test_record_or_key(pytest_multi_db):
     assert DbContext.load_one(key) == record  # Not the same object but equal
 
 
-def test_complex_records(pytest_multi_db):
+def test_complex_records(multi_db_fixture):
     """Test 'save_many' method for various types."""
     DbContext.save_many(_SAMPLES)
 
@@ -98,7 +97,7 @@ def test_complex_records(pytest_multi_db):
     assert loaded_records == DataUtil.remove_none(_SAMPLES)
 
 
-def test_basic_operations(pytest_multi_db):
+def test_basic_operations(multi_db_fixture):
     """Test save/load/delete methods for various types."""
 
     sample_keys = [x.get_key() for x in _SAMPLES]
@@ -125,7 +124,7 @@ def test_basic_operations(pytest_multi_db):
     assert loaded_records == [None] * len(_SAMPLES)
 
 
-def test_record_upsert(pytest_multi_db):
+def test_record_upsert(multi_db_fixture):
     """Check that an existing entry is overridden when a new entry with the same key is saved."""
     # Create sample and save
     sample = StubDataclass().build()
@@ -145,7 +144,7 @@ def test_record_upsert(pytest_multi_db):
     assert loaded_record == override_sample
 
 
-def test_load_type(pytest_multi_db):
+def test_load_type(multi_db_fixture):
     """Test 'load_type' method."""
     base_samples = [
         sample.build()
@@ -182,7 +181,7 @@ def test_load_type(pytest_multi_db):
     assert PytestUtil.assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
-def test_singleton(pytest_multi_db):
+def test_singleton(multi_db_fixture):
     """Test singleton type saving."""
     singleton_sample = StubDataclassSingleton().build()
     DbContext.save_one(singleton_sample)
@@ -199,7 +198,7 @@ def test_singleton(pytest_multi_db):
     assert all_records[0] == other_singleton_sample
 
 
-def test_repeated(pytest_multi_db):
+def test_repeated(multi_db_fixture):
     """Test including the same object twice in save many."""
     record = StubDataclass().build()
     DbContext.save_many([record, record])
@@ -209,7 +208,7 @@ def test_repeated(pytest_multi_db):
     assert loaded_records[0] == record
 
 
-def test_load_where(pytest_multi_db):
+def test_load_where(multi_db_fixture):
     """Test count_where for a string field."""
     records = [
         StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),
@@ -228,7 +227,7 @@ def test_load_where(pytest_multi_db):
     assert to_key_str_field(DbContext.load_where(in_query)) == ["def", "xyz"]
 
 
-def test_count_where(pytest_multi_db):
+def test_count_where(multi_db_fixture):
     """Test count_where for a string field."""
     records = [
         StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),

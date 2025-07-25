@@ -14,7 +14,6 @@
 
 import pytest
 from fastapi import FastAPI
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
@@ -22,7 +21,7 @@ from cl.runtime.routers.schema.types_response_item import TypesResponseItem
 expected_result = {"Kind": None, "Name": "TypeDecl", "Label": "Type Decl"}
 
 
-def test_method(pytest_default_db):
+def test_method(default_db_fixture):
     """Test coroutine for /schema/types route."""
 
     # Run the coroutine wrapper added by the FastAPI decorator and get the result
@@ -38,7 +37,7 @@ def test_method(pytest_default_db):
     assert type_decl_item == TypesResponseItem(**expected_result)
 
 
-def test_api(pytest_default_db):
+def test_api(default_db_fixture):
     """Test REST API for /schema/types route."""
 
     test_app = FastAPI()

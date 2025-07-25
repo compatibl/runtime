@@ -14,7 +14,6 @@
 
 from cl.runtime.plots.line_plot import LinePlot
 from cl.runtime.plots.plot import Plot
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
 class StubLinePlots:

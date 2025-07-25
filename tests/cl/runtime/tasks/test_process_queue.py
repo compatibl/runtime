@@ -14,13 +14,12 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.tasks.process_queue import ProcessQueue
 from stubs.cl.runtime.tasks.stub_task import StubTask
 
 
-def test_process_queue(pytest_default_db):
+def test_process_queue(default_db_fixture):
     """Test ProcessQueue class."""
 
     guard = RegressionGuard()

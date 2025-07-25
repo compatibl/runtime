@@ -17,11 +17,10 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_type import ExperimentType
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 
 
-def test_run_many(pytest_multi_db):
+def test_run_many(multi_db_fixture):
     """Test for the functionality of base Experiment class."""
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
@@ -89,7 +88,7 @@ def test_run_many(pytest_multi_db):
     assert max_trials_set.query_remaining_trials() == 0
 
 
-def test_run_all(pytest_multi_db):
+def test_run_all(multi_db_fixture):
     """Test for the functionality of base Experiment class."""
 
     exp_type = ExperimentType(experiment_type_id="Test").build()

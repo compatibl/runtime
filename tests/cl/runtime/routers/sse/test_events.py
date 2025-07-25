@@ -21,7 +21,6 @@ from fastapi import FastAPI
 from httpx import ASGITransport
 from httpx import AsyncClient
 from cl.runtime.log.log_config import logging_config
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.routers.sse.sse_router import _event_generator as original_event_generator  # noqa
@@ -110,7 +109,7 @@ def _parse_stream_lines(stream_lines: list[str]) -> list[dict]:
 
 
 @pytest.mark.skip(reason="Restore when SSE is supported")
-def test_events(pytest_default_db):
+def test_events(default_db_fixture):
     # Set up logging config
     logging.config.dictConfig(logging_config)
 

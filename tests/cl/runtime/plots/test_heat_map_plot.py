@@ -13,17 +13,16 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 
 
-def test_basic(pytest_work_dir):
+def test_basic(work_dir_fixture):
     """Test a basic heat map plot"""
     StubHeatMapPlots.get_basic_plot("test_heat_map_plot.test_basic").save()
 
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
-def test_dark_theme(pytest_work_dir):
+def test_dark_theme(work_dir_fixture):
     pass
 
 

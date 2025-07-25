@@ -14,11 +14,10 @@
 
 import pytest
 from cl.runtime.plots.multi_plot import MultiPlot
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 
 
-def test_multi_heatmap(pytest_work_dir):
+def test_multi_heatmap(work_dir_fixture):
     """Test a multi heat map plot"""
     plot = MultiPlot(
         plot_id="test_multi_heat_map_plot.test_multi_heatmap",

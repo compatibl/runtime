@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.csv_util import CsvUtil
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
 def test_requires_quotes():
@@ -59,7 +58,7 @@ def test_requires_quotes():
         assert CsvUtil.requires_quotes(case), f"Expected requires_quotes to return True for: {case}"
 
 
-def test_check_or_fix_file(pytest_work_dir):
+def test_check_or_fix_file(work_dir_fixture):
     """Test CsvUtil.check_or_fix_file() method."""
 
     assert CsvUtil.check_or_fix_quotes("valid.csv", apply_fix=False)

@@ -27,26 +27,7 @@ from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 
-
-@pytest.fixture(scope="function")
-def pytest_work_dir(request: FixtureRequest) -> Iterator[str]:
-    """Pytest module fixture to make test module directory the local directory during test execution."""
-
-    work_dir = PytestUtil.get_test_dir(request)
-
-    # Change test working directory, create if does not exist
-    if not os.path.exists(work_dir):
-        os.makedirs(work_dir)
-    os.chdir(work_dir)
-
-    # Back to the test
-    yield work_dir
-
-    # Change directory back before exiting the text
-    os.chdir(request.config.invocation_dir)  # noqa
-
-
-def _pytest_db(request: FixtureRequest, *, db_type: type | None = None) -> Iterator[Db]:
+def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iterator[Db]:
     """Setup and teardown a temporary databases in DB of the specified type."""
 
     # Set test DB name to test name in dot-delimited snake_case format, prefixed by 'temp_'
@@ -69,54 +50,48 @@ def _pytest_db(request: FixtureRequest, *, db_type: type | None = None) -> Itera
     db.drop_test_db()
 
 
-# TODO: Implement in code to enable BasicMongoMockDb to convert UUIDs to Binary objects
-def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
-    """Convert a UUID to BSON Binary object."""
-    return Binary(uuid_.bytes, UUID_SUBTYPE)
-
-
 @pytest.fixture(scope="function")
-def pytest_default_db(request: FixtureRequest) -> Iterator[Db]:
+def default_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using default DB."""
-    yield from _pytest_db(request)
+    yield from _db_fixture(request)
 
 
 @pytest.fixture(scope="function")
-def pytest_sqlite_db(request: FixtureRequest) -> Iterator[Db]:
+def sqlite_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using SqliteDB."""
-    yield from _pytest_db(request, db_type=BasicMongoMockDb)
+    yield from _db_fixture(request, db_type=BasicMongoMockDb)
 
 
 @pytest.fixture(scope="function")
-def pytest_basic_mongo_db(request: FixtureRequest) -> Iterator[Db]:
+def basic_mongo_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases using BasicMongoDb.
 
     Notes:
         This requires a running MongoDB server with DB create and drop permissions.
-        If this is not available, use pytest_basic_mongo_mock_db instead.
+        If this is not available, use basic_mongo_mock_db_fixture instead.
     """
-    yield from _pytest_db(request, db_type=BasicMongoDb)
+    yield from _db_fixture(request, db_type=BasicMongoDb)
 
 
 @pytest.fixture(scope="function")
-def pytest_basic_mongo_mock_db(request: FixtureRequest) -> Iterator[Db]:
+def basic_mongo_mock_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using BasicMongoMockDb."""
-    yield from _pytest_db(request, db_type=BasicMongoMockDb)
+    yield from _db_fixture(request, db_type=BasicMongoMockDb)
 
 
 # @pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb]) # TODO: Enable when Sqlite and BasicMongoMockDb support is restored
 @pytest.fixture(scope="function", params=[BasicMongoDb])
-def pytest_multi_db(request) -> Iterator[Db]:
+def multi_db_fixture(request) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.
     """
-    yield from _pytest_db(request, db_type=request.param)
+    yield from _db_fixture(request, db_type=request.param)
 
 
 @pytest.fixture(scope="session")  # TODO: Use a named celery queue for each test
-def pytest_celery_queue():
+def celery_queue_fixture():
     """Pytest session fixture to start Celery test queue for test execution."""
     print("Starting celery workers, will delete the existing tasks.")
     celery_delete_existing_tasks()
@@ -124,3 +99,27 @@ def pytest_celery_queue():
     yield
     celery_delete_existing_tasks()
     print("Stopping celery workers and cleaning up tasks.")
+
+
+@pytest.fixture(scope="function")
+def work_dir_fixture(request: FixtureRequest) -> Iterator[str]:
+    """Pytest module fixture to make test module directory the local directory during test execution."""
+
+    work_dir = PytestUtil.get_test_dir(request)
+
+    # Change test working directory, create if does not exist
+    if not os.path.exists(work_dir):
+        os.makedirs(work_dir)
+    os.chdir(work_dir)
+
+    # Back to the test
+    yield work_dir
+
+    # Change directory back before exiting the text
+    os.chdir(request.config.invocation_dir)  # noqa
+
+
+# TODO: Implement in code to enable BasicMongoMockDb to convert UUIDs to Binary objects
+def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
+    """Convert a UUID to BSON Binary object."""
+    return Binary(uuid_.bytes, UUID_SUBTYPE)

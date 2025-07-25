@@ -16,7 +16,6 @@ import pytest
 from typing import Dict
 from typing import List
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.result_request import ResultRequest
 from cl.runtime.routers.tasks.result_response_item import ResultResponseItem
@@ -50,7 +49,7 @@ def _save_tasks_and_get_requests() -> List[Dict]:
     return requests
 
 
-def test_method(pytest_default_db):
+def test_method(default_db_fixture):
     """Test coroutine for /tasks/result route."""
 
     for request in _save_tasks_and_get_requests():
@@ -69,7 +68,7 @@ def test_method(pytest_default_db):
             assert result_response_item.result is not None
 
 
-def test_api(pytest_default_db):
+def test_api(default_db_fixture):
     """Test REST API for /tasks/result route."""
 
     with QaClient() as test_client:

@@ -18,12 +18,10 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_type import ExperimentType
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from stubs.cl.runtime.experiments.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
 
 
-def test_smoke(pytest_multi_db):
+def test_smoke(multi_db_fixture):
     """Test for BinaryExperiment class with supervised=True."""
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
@@ -49,7 +47,7 @@ def test_smoke(pytest_multi_db):
     experiment.run_all()
 
 
-def test_plot(pytest_multi_db, pytest_work_dir):
+def test_plot(multi_db_fixture, work_dir_fixture):
 
     exp_type = ExperimentType(experiment_type_id="Test").build()
     sc1 = ExperimentScenario(

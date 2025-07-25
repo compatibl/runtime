@@ -13,26 +13,25 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
 
 
-def test_single_group(pytest_work_dir):
+def test_single_group(work_dir_fixture):
     """Test GroupBarPlot with one group."""
     StubGroupBarPlots.get_single_group_plot("test_group_bar_plot.group_bar_plot").save()
 
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
-def test_dark_theme(pytest_work_dir):
+def test_dark_theme(work_dir_fixture):
     """Test GroupBarPlot plot in dark mode."""
 
 
-def test_4_groups_2_bars(pytest_work_dir):
+def test_4_groups_2_bars(work_dir_fixture):
     """Test GroupBarPlot with 4 groups with 2 bars each."""
     StubGroupBarPlots.get_4_groups_2_bars_plot("test_group_bar_plot.test_4_groups_2_bars").save()
 
 
-def test_4_groups_5_bars(pytest_work_dir):
+def test_4_groups_5_bars(work_dir_fixture):
     """Test GroupBarPlot plot with 4 groups and 5 bars."""
     StubGroupBarPlots.get_4_groups_5_bars("test_group_bar_plot.test_4_groups_5_bars").save()
 

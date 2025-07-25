@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.delete_response_util import DeleteResponseUtil
@@ -22,7 +21,7 @@ from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from stubs.cl.runtime import StubDataclassDerived
 
 
-def test_method(pytest_default_db):
+def test_method(default_db_fixture):
     """Test coroutine for /storage/delete route."""
 
     existing_records = [
@@ -50,7 +49,7 @@ def test_method(pytest_default_db):
         assert non_deleted_record.derived_str_field == record_in_db.derived_str_field
 
 
-def test_api(pytest_default_db):
+def test_api(default_db_fixture):
     """Test REST API for /storage/delete route."""
     with QaClient() as test_client:
         existing_records = [

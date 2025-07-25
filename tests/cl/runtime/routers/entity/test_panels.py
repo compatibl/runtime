@@ -16,7 +16,6 @@ import pytest
 import inspect
 from typing import List
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.entity.panels_request import PanelsRequest
 from cl.runtime.routers.entity.panels_response_item import PanelsResponseItem
@@ -42,7 +41,7 @@ requests = [
 ]
 
 
-def test_method(pytest_default_db):
+def test_method(default_db_fixture):
     """Test coroutine for /entity/panels route."""
 
     for request in requests:
@@ -65,7 +64,7 @@ def test_method(pytest_default_db):
         assert panel_names_set == expected_panel_names_set
 
 
-def test_api(pytest_default_db):
+def test_api(default_db_fixture):
     """Test REST API for /entity/panels route."""
     with QaClient() as test_client:
         for request in requests:

@@ -20,7 +20,6 @@ from typing import Tuple
 import pandas as pd
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.records.protocols import RecordProtocol
@@ -86,7 +85,7 @@ def read_records_from_csv(file_path: Path, entry_type: type[RecordProtocol]):
     loader.csv_to_db()
 
 
-def test_roundtrip(pytest_default_db):
+def test_roundtrip(default_db_fixture):
     for test_entries in (*stub_entries,):
         file_path = None
         try:

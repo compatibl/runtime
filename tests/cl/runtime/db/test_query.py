@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from cl.runtime.records.conditions import And
 from cl.runtime.records.conditions import Exists
 from cl.runtime.records.conditions import In
@@ -27,7 +26,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_qu
 )
 
 
-def test_str_query(pytest_multi_db):
+def test_str_query(multi_db_fixture):
     """Test query for a string field."""
 
     # Create test records and query and populate with sample data

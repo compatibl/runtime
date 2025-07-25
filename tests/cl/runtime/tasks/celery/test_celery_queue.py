@@ -15,7 +15,6 @@
 import pytest
 from cl.runtime.contexts.context_manager import ContextManager
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import execute_task
 from cl.runtime.tasks.static_method_task import StaticMethodTask
@@ -35,7 +34,7 @@ def _create_task(queue: TaskQueueKey) -> TaskKey:
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_method(pytest_celery_queue):
+def test_method(celery_queue_fixture):
     """Test calling 'execute_task' method in-process."""
 
     # Create queue
@@ -55,7 +54,7 @@ def test_method(pytest_celery_queue):
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_api(pytest_celery_queue):
+def test_api(celery_queue_fixture):
     """Test submitting task for execution out of process."""
     # Create queue
     queue_id = f"test_celery_queue.test_api"

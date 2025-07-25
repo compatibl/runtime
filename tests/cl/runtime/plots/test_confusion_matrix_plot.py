@@ -16,15 +16,14 @@ import pytest
 from pathlib import Path
 import pandas as pd
 from cl.runtime.plots.confusion_matrix_plot import ConfusionMatrixPlot
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
-def test_smoke(pytest_work_dir):
+def test_smoke(work_dir_fixture):
     raw_data = pd.read_csv(Path(__file__).resolve().parent / "./test_confusion_matrix_plot.csv")
 
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
-def test_dark_theme(pytest_work_dir):
+def test_dark_theme(work_dir_fixture):
     raw_data = pd.read_csv(Path(__file__).resolve().parent / "./test_confusion_matrix_plot.csv")
     plot = ConfusionMatrixPlot(plot_id="matrix_plot")
     plot.title = "Confusion Matrix"

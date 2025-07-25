@@ -15,12 +15,11 @@
 import pytest
 import time
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 
 
 @pytest.mark.skip("Performance test.")
-def test_performance(pytest_multi_db):
+def test_performance(multi_db_fixture):
     """Test performance of save/load methods."""
     n = 1000
     samples = [StubDataclassPrimitiveFields(key_str_field=f"key{i}") for i in range(n)]

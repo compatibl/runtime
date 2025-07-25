@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.tasks.static_method_task import StaticMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers
 
 
-def test_create(pytest_default_db):
+def test_create(default_db_fixture):
     """Test 'test_create' method."""
     sample_inputs = [
         (StubHandlers, StubHandlers.run_class_method_1a),

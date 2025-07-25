@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.templates.fstring_template_engine import FstringTemplateEngine
 from stubs.cl.runtime import StubDataclassNestedFields
 from stubs.cl.runtime.templates.stub_template import StubTemplate
 
 
-def test_template_mixin(pytest_default_db):
+def test_template_mixin(default_db_fixture):
     """Test rendering TemplateMixin."""
 
     engine = FstringTemplateEngine()

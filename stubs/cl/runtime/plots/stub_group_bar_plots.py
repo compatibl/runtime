@@ -14,7 +14,6 @@
 
 from cl.runtime.plots.group_bar_plot import GroupBarPlot
 from cl.runtime.plots.plot import Plot
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 METRIC_COUNT = 5
 """Number of metrics."""

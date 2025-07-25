@@ -17,7 +17,6 @@ from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.experiments.experiment import Experiment
 from cl.runtime.experiments.experiment_key_query import ExperimentKeyQuery
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 from stubs.cl.runtime.experiments.stub_classifier_experiment import StubClassifierExperiment
@@ -59,7 +58,7 @@ def _multiple_table_records():
     return [*stub_experiments_table_1, *stub_experiments_table_2]
 
 
-def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
+def test_bindings(default_db_fixture):  # TODO: Extend to multiple DBs
     """Test the methods related to bindings."""
 
     stubs = _multiple_table_records()
@@ -83,7 +82,7 @@ def test_bindings(pytest_default_db):  # TODO: Extend to multiple DBs
     RegressionGuard().verify_all()
 
 
-def test_load_table(pytest_default_db):  # TODO: Extend to multiple DBs
+def test_load_table(default_db_fixture):  # TODO: Extend to multiple DBs
     """Test load_table for dynamic table names."""
 
     records = _multiple_table_records()
@@ -112,7 +111,7 @@ def test_load_table(pytest_default_db):  # TODO: Extend to multiple DBs
             assert actual_result == expected_result
 
 
-def test_load_where(pytest_default_db):  # TODO: Extend to multiple DBs
+def test_load_where(default_db_fixture):  # TODO: Extend to multiple DBs
     """Test load_type for dynamic table names."""
 
     records = _multiple_table_records()

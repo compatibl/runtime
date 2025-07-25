@@ -18,10 +18,9 @@ from typing import List
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.patches import Rectangle
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 
-def test_smoke(pytest_work_dir):
+def test_smoke(work_dir_fixture):
 
     @dataclass
     class Node:

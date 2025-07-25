@@ -14,7 +14,6 @@
 
 from cl.runtime.plots.heat_map_plot import HeatMapPlot
 from cl.runtime.plots.plot import Plot
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_work_dir  # noqa
 
 METRIC_COUNT = 5
 """Number of metrics."""

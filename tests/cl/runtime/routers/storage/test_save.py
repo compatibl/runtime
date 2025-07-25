@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.routers.storage.save_request import SaveRequest
@@ -32,7 +31,7 @@ update_record_payload = {
 }
 
 
-def test_method(pytest_default_db):
+def test_method(default_db_fixture):
     """Test coroutine for /storage/save route."""
 
     # Test saving new record.
@@ -81,7 +80,7 @@ def test_method(pytest_default_db):
     assert records_count == 2
 
 
-def test_api(pytest_default_db):
+def test_api(default_db_fixture):
     """Test REST API for /storage/save route."""
     with QaClient() as test_client:
         # Test saving new record

@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
@@ -24,7 +23,7 @@ from cl.runtime.routers.storage.load_response import LoadResponse
 from stubs.cl.runtime import StubDataclass
 
 
-def test_method(pytest_default_db):
+def test_method(default_db_fixture):
     """Test coroutine for /storage/load route."""
 
     # Save test record.
@@ -47,7 +46,7 @@ def test_method(pytest_default_db):
     guard.verify()
 
 
-def test_api(pytest_default_db):
+def test_api(default_db_fixture):
     """Test REST API for /storage/load route."""
 
     with QaClient() as test_client:

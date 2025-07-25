@@ -14,8 +14,6 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_celery_queue  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_default_db  # noqa
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.routers.tasks.submit_response_item import SubmitResponseItem
@@ -56,7 +54,7 @@ def get_save_to_db_requests(key_str: str):
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_method(pytest_default_db, pytest_celery_queue):
+def test_method(default_db_fixture, celery_queue_fixture):
     """Test coroutine for /tasks/run route."""
 
     stub_handlers = StubHandlers().build()
@@ -92,7 +90,7 @@ def test_method(pytest_default_db, pytest_celery_queue):
 
 
 @pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_api(pytest_celery_queue):
+def test_api(celery_queue_fixture):
     """Test REST API for /tasks/submit route."""
 
     stub_handlers = StubHandlers()

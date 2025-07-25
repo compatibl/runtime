@@ -15,13 +15,12 @@
 
 import pytest
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.qa.pytest.pytest_fixtures import pytest_multi_db  # noqa
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic import StubDataclassDynamic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic_key import StubDataclassDynamicKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic_query import StubDataclassDynamicQuery
 
 
-def test_load(pytest_multi_db):
+def test_load(multi_db_fixture):
     """Test load methods."""
 
     table_field = "StubPolymorphicTable"
@@ -52,7 +51,7 @@ def test_load(pytest_multi_db):
     loaded_where = DbContext.load_where(query, cast_to=StubDataclassDynamic)
 
 
-def test_count_where(pytest_multi_db):
+def test_count_where(multi_db_fixture):
     """Test count_where method."""
     table_field = "StubPolymorphicTable"
     key_field = "stub_key_field"
