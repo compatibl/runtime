@@ -39,7 +39,7 @@ _process_timestamp = Timestamp.create()
 """Unique UUIDv7-based timestamp set during the Python process launch."""
 
 # True if we are inside a test process, use ProcessSettings.is_testing() to also detect inside child processes
-is_test_process = QaUtil.inspect_stack_for_test_module_pattern()
+is_test_process = QaUtil.inspect_stack_for_test_module_patterns()
 
 # Select Dynaconf test environment when invoked from the pytest or UnitTest test runner.
 # Other runners not detected automatically, in which case the Dynaconf environment must be

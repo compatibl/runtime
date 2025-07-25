@@ -22,23 +22,23 @@ class QaUtil:
     """Helper methods for environment selection."""
 
     @classmethod
-    def inspect_stack_for_test_module_pattern(cls, *, test_module_pattern: str | None = None) -> bool:
+    def inspect_stack_for_test_module_patterns(cls, *, test_module_patterns: tuple[str, ...] | None = None) -> bool:
         """
         Return True if invoked from a test, detection is based on test module pattern.
 
         Args:
-            test_module_pattern: Glob pattern to identify the test module, defaults to 'test_*.py'
+            test_module_patterns: Glob patterns to identify a running test, defaults to test_* and conftest
         """
 
-        if test_module_pattern is not None:
-            # TODO: test_module_pattern custom patterns
+        if test_module_patterns is not None:
+            # TODO: test_module_patterns custom patterns
             raise RuntimeError("Custom test module patterns are not yet supported.")
-        test_module_pattern = "test_"
+        test_module_patterns = ("test_", "conftest")
 
         stack = inspect.stack()
         for frame_info in stack:
             filename = os.path.basename(frame_info.filename)
-            if filename.startswith(test_module_pattern) and filename.endswith(".py"):
+            if filename.startswith(test_module_patterns) and filename.endswith(".py"):
                 return True
         return False
 
