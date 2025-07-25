@@ -20,11 +20,15 @@ from typing import Sequence, Iterable, cast
 
 from cl.runtime import Db, RecordMixin, KeyUtil, TypeCache
 from cl.runtime.file.file_util import FileUtil
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol, TRecord, TKey, TDataDict
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_schema import TypeSchema
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.db_settings import DbSettings
@@ -93,12 +97,88 @@ class SqliteDbV2(Db):
         cursor = conn.execute(select_sql, serialized_keys)
 
         # Deserialize records and return
-        return [_DATA_SERIALIZER.deserialize(dict(row)) for row in cursor.fetchall()]
+        return [_DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None}) for row in cursor.fetchall()]
 
     def load_where(self, query: QueryMixin, *, dataset: str | None = None, cast_to: type[TRecord] | None = None,
                    filter_to: type[TRecord] | None = None, project_to: type[TRecord] | None = None,
                    limit: int | None = None, skip: int | None = None) -> tuple[TRecord]:
-        pass
+
+        if project_to is not None:
+            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
+
+        if limit is not None:
+            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'limit' option.")
+
+        if skip is not None:
+            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'skip' option.")
+
+        # Check that query has been frozen
+        query.check_frozen()
+
+        # Validate table name
+        table = query.get_table()
+        self._check_safe_identifier(table)
+
+        if not self._is_table_exists(table):
+            return tuple()
+
+        # TODO (Roman): Use a specialized serializer for SQL query.
+        # Serialize the query
+        query_dict = BootstrapSerializers.FOR_SQLITE_QUERY.serialize(query)
+
+        # Validate filter_to or use the query target type if not specified
+        if filter_to is None:
+            # Default to the query target type
+            filter_to = query.get_target_type()
+        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
+            # Ensure filter_to is a subclass of the query target type
+            raise RuntimeError(
+                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+            )
+
+        # Build SQL query to select records in table by conditions
+        where, values = self._convert_query_dict_to_sql_syntax(query_dict)
+
+        if filter_to is not None:
+            # Add filter condition on type
+            subtype_names = TypeCache.get_child_names(filter_to)
+            placeholders = ",".join("?" for _ in subtype_names)
+
+            if where:
+                where += " AND "
+
+            where += f'"_type" IN ({placeholders})'
+            values += subtype_names
+
+        select_sql = f"SELECT * FROM {self._quote_identifier(table)}"
+
+        if where:
+            select_sql += f" WHERE {where}"
+
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, values)
+
+        # Set cast_to to filter_to if not specified
+        if cast_to is None:
+            cast_to = filter_to
+
+        # Deserialize records
+        result = []
+        for row in cursor.fetchall():
+            # Convert sqlite3.Row to dict
+            serialized_record = {k: row[k] for k in row.keys() if row[k] is not None}
+            del serialized_record["_key"]
+
+            # Create a record from the serialized data
+            record = _DATA_SERIALIZER.deserialize(serialized_record)
+
+            # Apply cast (error if not a subtype)
+            record = CastUtil.cast(cast_to, record)
+            result.append(record)
+
+        return RecordUtil.sort_records_by_key(result)  # TODO: Decide on the default sorting method
 
     def save_many_grouped(self, table: str, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
 
@@ -140,6 +220,7 @@ class SqliteDbV2(Db):
         conn.commit()
 
     def delete_many_grouped(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
+
         if not keys:
             return
 
@@ -160,7 +241,57 @@ class SqliteDbV2(Db):
         conn.execute(select_sql, serialized_keys)
 
     def count_where(self, query: QueryMixin, *, dataset: str | None = None, filter_to: type | None = None) -> int:
-        pass
+
+        # Check that query has been frozen
+        query.check_frozen()
+
+        # Validate table name
+        table = query.get_table()
+        self._check_safe_identifier(table)
+
+        if not self._is_table_exists(table):
+            return 0
+
+        # TODO (Roman): Use a specialized serializer for SQL query.
+        # Serialize the query
+        query_dict = BootstrapSerializers.FOR_SQLITE_QUERY.serialize(query)
+
+        # Validate filter_to or use the query target type if not specified
+        if filter_to is None:
+            # Default to the query target type
+            filter_to = query.get_target_type()
+        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
+            # Ensure filter_to is a subclass of the query target type
+            raise RuntimeError(
+                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+            )
+
+        # Build SQL query to count records in table by conditions
+        where, values = self._convert_query_dict_to_sql_syntax(query_dict)
+
+        if filter_to is not None:
+            # Add filter condition on type
+            subtype_names = TypeCache.get_child_names(filter_to)
+            placeholders = ",".join("?" for _ in subtype_names)
+
+            if where:
+                where += " AND "
+
+            where += f'"_type" IN ({placeholders})'
+            values += subtype_names
+
+        select_sql = f"SELECT COUNT(*) FROM {self._quote_identifier(table)}"
+
+        if where:
+            select_sql += f" WHERE {where}"
+
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, values)
+
+        count = cursor.fetchone()[0]
+        return count
 
     def drop_test_db(self) -> None:
         # Check preconditions
@@ -255,6 +386,7 @@ class SqliteDbV2(Db):
         return conn.execute(check_sql, (table,)).fetchone()
 
     def _drop_db(self):
+        """Delete db file."""
         # Close connection
         self.close_connection()
 
@@ -316,3 +448,57 @@ class SqliteDbV2(Db):
         # Quote identifier with double quotes, escape embedded quotes if any
         escaped = identifier.replace('"', '""')
         return f'"{escaped}"'
+
+    @classmethod
+    def _convert_query_dict_to_sql_syntax(cls, query_dict: dict) -> tuple[str, list]:
+        """
+        Create query dict to SQL syntax 'WHERE' clause.
+        Returns a tuple of two values, where the first is an SQL string with placeholders,
+        and the second is the values for the placeholders.
+        """
+
+        clauses = []
+        values = []
+
+        for key, value in query_dict.items():
+            if isinstance(value, dict):
+                # Only support 1 operator per field
+                if len(value) != 1:
+                    raise RuntimeError(f"Multiple operators not supported per field: {value}")
+
+                op, v = next(iter(value.items()))
+
+                if op == "op_in":
+                    if not isinstance(v, (list, tuple)) or not v:
+                        raise RuntimeError(f"'op_in' must have non-empty list/tuple value: {v}")
+                    placeholders = ", ".join("?" for _ in v)
+                    clauses.append(f"{cls._quote_identifier(key)} IN ({placeholders})")
+                    values.extend(v)
+                elif op == "op_nin":
+                    if not isinstance(v, (list, tuple)) or not v:
+                        raise RuntimeError(f"'op_in' must have non-empty list/tuple value: {v}")
+                    placeholders = ", ".join("?" for _ in v)
+                    clauses.append(f"{cls._quote_identifier(key)} NOT IN ({placeholders})")
+                    values.extend(v)
+                elif op == "op_gt":
+                    clauses.append(f"{cls._quote_identifier(key)} > ?")
+                    values.append(v)
+                elif op == "op_gte":
+                    clauses.append(f"{cls._quote_identifier(key)} >= ?")
+                    values.append(v)
+                elif op == "op_lt":
+                    clauses.append(f"{cls._quote_identifier(key)} < ?")
+                    values.append(v)
+                elif op == "op_lte":
+                    clauses.append(f"{cls._quote_identifier(key)} <= ?")
+                    values.append(v)
+                else:
+                    raise RuntimeError(f"Unsupported operator: {op}")
+            else:
+                # Simple equality
+                clauses.append(f"{cls._quote_identifier(key)} = ?")
+                values.append(value)
+
+        where_clause = " AND ".join(clauses)
+        return where_clause, values
+
