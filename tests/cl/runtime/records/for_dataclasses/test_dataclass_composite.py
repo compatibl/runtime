@@ -15,7 +15,6 @@
 import pytest
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassCompositeKey
-from stubs.cl.runtime import StubDataclassKey
 
 
 def test_key():

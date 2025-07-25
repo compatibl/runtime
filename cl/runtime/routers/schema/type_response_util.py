@@ -19,7 +19,6 @@ from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_decl import TypeDecl
-from cl.runtime.schema.type_kind import TypeKind
 
 
 class TypeResponseUtil:

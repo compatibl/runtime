@@ -17,12 +17,8 @@ import inspect
 import textwrap
 from typing import List
 from typing import Sequence
-from typing import Tuple
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import TPrimitive
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.type_util import TypeUtil
 
 

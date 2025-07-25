@@ -14,7 +14,6 @@
 
 from abc import abstractmethod
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.type_util import TypeUtil
 
 
 class RecordMixin:
@@ -26,4 +25,3 @@ class RecordMixin:
     @abstractmethod
     def get_key(self) -> KeyMixin:
         """Return a new key object whose fields populated from self, do not return self."""
-

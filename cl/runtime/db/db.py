@@ -664,7 +664,9 @@ class Db(DbKey, RecordMixin, ABC):
                     table=table,
                     record_type=parent_type_name,
                     key_type=key_type_name,
-                ) for parent_type_name in parent_type_names)
+                )
+                for parent_type_name in parent_type_names
+            )
 
             # Add to cache
             consume(

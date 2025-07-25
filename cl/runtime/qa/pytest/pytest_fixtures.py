@@ -27,6 +27,7 @@ from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 
+
 def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iterator[Db]:
     """Setup and teardown a temporary databases in DB of the specified type."""
 

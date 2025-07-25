@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Tuple
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
@@ -34,4 +33,3 @@ class StubDataclassDynamicKey(KeyMixin):
 
     def get_table(self) -> str:
         return self.table_field
-

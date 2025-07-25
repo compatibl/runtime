@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Tuple
 from cl.runtime.records.key_mixin import KeyMixin
 
 

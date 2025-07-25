@@ -30,7 +30,6 @@ from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
@@ -121,8 +120,7 @@ class TypeCache:
                     module = cls._module_dict.setdefault(module_name, import_module(module_name))
                 except ModuleNotFoundError:
                     raise RuntimeError(
-                        f"Module {module_name} is not found in TypeInfo preload, "
-                        f"run init_type_info to regenerate."
+                        f"Module {module_name} is not found in TypeInfo preload, " f"run init_type_info to regenerate."
                     )
 
         # Get class from module, report error if not found
@@ -134,8 +132,7 @@ class TypeCache:
             return result
         except AttributeError:
             raise RuntimeError(
-                f"Class {qual_name} is not found in TypeInfo preload,\n"
-                f"run init_type_info to regenerate."
+                f"Class {qual_name} is not found in TypeInfo preload,\n" f"run init_type_info to regenerate."
             )
 
     @classmethod

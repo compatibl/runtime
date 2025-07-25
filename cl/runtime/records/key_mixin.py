@@ -14,10 +14,8 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing import Tuple
 from typing_extensions import Self
 from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.slots_util import SlotsUtil
 
