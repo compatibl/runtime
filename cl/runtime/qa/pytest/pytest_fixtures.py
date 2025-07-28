@@ -23,7 +23,7 @@ from cl.runtime import Db
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
-from cl.runtime.db.sql.sqlite_db_v2 import SqliteDbV2
+from cl.runtime.db.sql.sqlite_db import SqliteDb
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
@@ -83,7 +83,7 @@ def basic_mongo_mock_db_fixture(request: FixtureRequest) -> Iterator[Db]:
 
 
 # @pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb]) # TODO: Enable when Sqlite and BasicMongoMockDb support is restored
-@pytest.fixture(scope="function", params=[BasicMongoDb, SqliteDbV2])
+@pytest.fixture(scope="function", params=[BasicMongoDb, SqliteDb])
 def multi_db_fixture(request) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types

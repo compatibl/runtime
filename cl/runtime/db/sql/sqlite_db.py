@@ -13,88 +13,45 @@
 # limitations under the License.
 
 import os
+import re
 import sqlite3
-from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any
-from typing import Dict
 from typing import Iterable
 from typing import Sequence
-from typing import Tuple
-from more_itertools import consume
+from typing import cast
+from cl.runtime import Db
 from cl.runtime import KeyUtil
 from cl.runtime import RecordMixin
-from cl.runtime.db.db import Db
-from cl.runtime.db.sql.sqlite_schema_manager import SqliteSchemaManager
+from cl.runtime import TypeCache
 from cl.runtime.file.file_util import FileUtil
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import TDataDict
+from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.records.record_util import RecordUtil
+from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.data_spec import DataSpec
+from cl.runtime.schema.type_schema import TypeSchema
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.db_settings import DbSettings
 
-_KEY_SERIALIZER = KeySerializers.FOR_SQLITE
-_SERIALIZER = DataSerializers.FOR_SQLITE
+_KEY_SERIALIZER = KeySerializers.DELIMITED
+_DATA_SERIALIZER = DataSerializers.FOR_SQLITE
 
-_connection_dict: Dict[str, sqlite3.Connection] = {}
+_connection_dict: dict[str, sqlite3.Connection] = {}
 """Dict of Connection instances with db_id key stored outside the class to avoid serialization."""
 
-_schema_manager_dict: Dict[str, SqliteSchemaManager] = {}
-"""Dict of SqliteSchemaManager instances with db_id key key stored outside the class to avoid serialization."""
-
-
-def dict_factory(cursor, row):
-    """sqlite3 row factory to return result as dictionary."""
-    fields = [column[0] for column in cursor.description]
-    return {key: value for key, value in zip(fields, row)}
+# Regex for a safe SQLite identifier (letters, digits, underscores, start with letter or underscore)
+IDENTIFIER_REGEX = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
 @dataclass(slots=True, kw_only=True)
 class SqliteDb(Db):
-    """Sqlite database without dataset and mile wide table for inheritance."""
-
-    def load_tables(self) -> Sequence[str]:
-        raise NotImplementedError()
-
-    def batch_size(self) -> int:
-        pass
-
-    @classmethod
-    def _add_where_keys_in_clause(
-        cls,
-        sql_statement: str,
-        key_fields: Tuple[str, ...],
-        columns_mapping: Dict[str, str],
-        keys_len: int,
-    ) -> str:
-        """
-        Add "WHERE (key_field1, ...) IN ((value1_for_field1, ...), (value2_for_field1, ...), ...)" clause to
-        sql_statement.
-        """
-
-        # if key fields isn't empty add WHERE clause
-        if key_fields:
-            value_places = ", ".join([f'({", ".join(["?"] * len(key_fields))})' for _ in range(keys_len)])
-            key_column_str = ", ".join([f'"{columns_mapping[key]}"' for key in key_fields])
-
-            # add WHERE clause to sql_statement
-            sql_statement += f" WHERE ({key_column_str}) IN ({value_places})"
-
-        return sql_statement
-
-    @classmethod
-    def _serialize_keys_to_flat_tuple(cls, keys: Iterable[KeyProtocol]) -> Tuple[Any, ...]:
-        """
-        Sequentially serialize key fields for each key in keys into a flat tuple of values.
-        Expected all keys are of the same type for which key fields are specified.
-        """
-        key_tuples = tuple(_KEY_SERIALIZER.serialize(key) for key in keys)
-        flattened_tuple = tuple(item for group in key_tuples for item in group)
-        return flattened_tuple  # TODO(Roman): Review why it should be flattened
 
     def load_table(
         self,
@@ -107,98 +64,59 @@ class SqliteDb(Db):
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord]:
-        raise NotImplementedError()
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        # Build SQL query to select all records in table
+        values_for_query = []
+        select_sql = f"SELECT * FROM {self._quote_identifier(table)}"
+
+        if filter_to is not None:
+            # Add filter condition on type
+            subtype_names = TypeCache.get_child_names(filter_to)
+            placeholders = ",".join("?" for _ in subtype_names)
+            select_sql += f' WHERE "_type" IN ({placeholders})'
+            values_for_query += subtype_names
+
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, values_for_query)
+
+        # Deserialize records and return
+        return tuple(  # noqa
+            _DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None})
+            for row in cursor.fetchall()
+        )
 
     def load_many_unsorted(
-        self,
-        table: str,
-        keys: Sequence[KeyMixin],
-        *,
-        dataset: str | None = None,
+        self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None
     ) -> Sequence[RecordMixin]:
 
-        # Return an empty list if the table does not exist for the derived type
-        schema_manager = self._get_schema_manager()
-        existing_tables = schema_manager.existing_tables()
-        if table not in existing_tables:
+        if not keys:
             return []
 
-        # Ensure all keys within the table have the same type and get that type, error otherwise
-        key_type = KeyUtil.get_key_type(table=table, records_or_keys=keys)
+        # Validate table name
+        self._check_safe_identifier(table)
 
-        key_fields = schema_manager.get_primary_keys(key_type)
-        columns_mapping = schema_manager.get_columns_mapping(key_type)
+        if not self._is_table_exists(table):
+            return []
 
-        # if keys_group don't support "in" or "len" operator convert it to tuple
-        sql_statement = f'SELECT * FROM "{table}"'
-        sql_statement = self._add_where_keys_in_clause(sql_statement, key_fields, columns_mapping, len(keys))
-        sql_statement += ";"
-
-        # TODO: Check the logic for multiple keys when the tuple is flattened
         serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
-        flattened_tuple = tuple(item for group in serialized_keys for item in group)
 
-        cursor = self._get_connection().cursor()
-        try:
-            cursor.execute(sql_statement, flattened_tuple)
-        except Exception as e:
-            raise RuntimeError(str(keys))
+        # Build SQL query to select records by keys
+        placeholders = ",".join("?" for _ in serialized_keys)
+        select_sql = f'SELECT * FROM {self._quote_identifier(table)} WHERE "_key" IN ({placeholders})'
 
-        reversed_columns_mapping = {v: k for k, v in columns_mapping.items()}
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, serialized_keys)
 
-        # TODO (Roman): investigate performance impact from this ordering approach
-        # bulk load from db returns records in any order so we need to check all records in group before return
-        # collect db result to dictionary to return it according to input keys order
-        result = []
-        for data in cursor.fetchall():
-            # TODO (Roman): select only needed columns on db side.
-            data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
-            deserialized_data = _SERIALIZER.deserialize(data)
-
-            # TODO (Roman): make key hashable and remove conversion of key to str
-            result.append(deserialized_data)
-        return result
-
-    def load_type(
-        self,
-        table: str,
-        record_type: type[TRecord],
-        *,
-        dataset: str | None = None,
-    ) -> Iterable[TRecord | None] | None:
-        schema_manager = self._get_schema_manager()
-
-        # if table doesn't exist return empty list
-        if table not in schema_manager.existing_tables():
-            return list()
-
-        # using primary keys (which are fields from key type) to sort the selection
-        pk_cols = [f'"{table}.{col}"' for col in schema_manager.get_primary_keys(record_type)]
-        sort_columns = ", ".join(pk_cols)
-
-        # get subtypes for record_type and use them in match condition
-        subtype_names = TypeCache.get_child_names(record_type)
-        value_placeholders = ", ".join(["?"] * len(subtype_names))
-        sql_statement = f'SELECT * FROM "{table}" WHERE _type in ({value_placeholders})'
-
-        if sort_columns:
-            sql_statement += f" ORDER BY {sort_columns};"
-        else:
-            sql_statement += ";"
-
-        reversed_columns_mapping = {
-            v: k for k, v in schema_manager.get_columns_mapping(record_type.get_key_type()).items()
-        }
-
-        cursor = self._get_connection().cursor()
-        cursor.execute(sql_statement, subtype_names)
-
-        # TODO: Implement sort in query and restore yield to support large collections
-        result = []
-        for data in cursor.fetchall():
-            # TODO (Roman): Select only needed columns on db side.
-            data = {reversed_columns_mapping[k]: v for k, v in data.items() if v is not None}
-            yield _SERIALIZER.deserialize(data)
+        # Deserialize records and return
+        return [
+            _DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None})
+            for row in cursor.fetchall()
+        ]
 
     def load_where(
         self,
@@ -211,210 +129,415 @@ class SqliteDb(Db):
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord]:
-        raise NotImplementedError()
 
-    def count_where(
-        self,
-        query: QueryMixin,
-        *,
-        dataset: str | None = None,
-        filter_to: type | None = None,
-    ) -> int:
-        raise NotImplementedError()
+        if project_to is not None:
+            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
 
-    def save_many_grouped(
-        self,
-        table: str,
-        records: Iterable[RecordProtocol],
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        schema_manager = self._get_schema_manager()
+        if limit is not None:
+            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'limit' option.")
 
-        # Group keys by table
-        records_grouped_by_table = defaultdict(list)
-        consume(records_grouped_by_table[record.get_table()].append(record) for record in records)
+        if skip is not None:
+            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'skip' option.")
 
-        # Iterate over tables
-        for table, table_records in records_grouped_by_table.items():
+        # Check that query has been frozen
+        query.check_frozen()
 
-            # Ensure all keys within the table have the same type and get that type, error otherwise
-            key_type = KeyUtil.get_key_type(table=table, records_or_keys=table_records)
+        # Validate table name
+        table = query.get_table()
+        self._check_safe_identifier(table)
 
-            # Serialize records
-            serialized_records = [_SERIALIZER.serialize(rec) for rec in table_records]
+        if not self._is_table_exists(table):
+            return tuple()
 
-            # Get maximum set of fields from records
-            all_fields = list({k for rec in serialized_records for k in rec.keys()})
+        # TODO (Roman): Use a specialized serializer for SQL query.
+        # Serialize the query
+        query_dict = BootstrapSerializers.FOR_SQLITE_QUERY.serialize(query)
 
-            # Fill sql_values with ordered values from serialized records
-            # if field isn't in some records - fill with None
-            sql_values = tuple(
-                serialized_record[k] if k in serialized_record else None
-                for serialized_record in serialized_records
-                for k in all_fields
+        # Validate filter_to or use the query target type if not specified
+        if filter_to is None:
+            # Default to the query target type
+            filter_to = query.get_target_type()
+        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
+            # Ensure filter_to is a subclass of the query target type
+            raise RuntimeError(
+                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
             )
 
-            columns_mapping = schema_manager.get_columns_mapping(key_type)
-            quoted_columns = [f'"{columns_mapping[field]}"' for field in all_fields]
-            columns_str = ", ".join(quoted_columns)
+        # Build SQL query to select records in table by conditions
+        where, values = self._convert_query_dict_to_sql_syntax(query_dict)
 
-            primary_keys = [columns_mapping[primary_key] for primary_key in schema_manager.get_primary_keys(key_type)]
+        if filter_to is not None:
+            # Add filter condition on type
+            subtype_names = TypeCache.get_child_names(filter_to)
+            placeholders = ",".join("?" for _ in subtype_names)
 
-            schema_manager.create_table(table, columns_mapping.values(), if_not_exists=True, primary_keys=primary_keys)
+            if where:
+                where += " AND "
 
-            value_placeholders = ", ".join([f"({', '.join(['?']*len(all_fields))})" for _ in range(len(table_records))])
-            sql_statement = f'REPLACE INTO "{table}" ({columns_str}) VALUES {value_placeholders};'
+            where += f'"_type" IN ({placeholders})'
+            values += subtype_names
 
-            if not primary_keys:
-                # TODO (Roman): this is a workaround for handling singleton records.
-                #  Since they don't have primary keys, we can't automatically replace existing records.
-                #  So this code just deletes the existing records before saving.
-                #  As a possible solution, we can introduce some mandatory primary key that isn't based on the
-                #  key fields.
-                self.delete_many(table, (rec.get_key() for rec in table_records))
+        select_sql = f"SELECT * FROM {self._quote_identifier(table)}"
 
-            connection = self._get_connection()
-            cursor = connection.cursor()
-            try:
-                cursor.execute(sql_statement, sql_values)
-            except Exception as e:
-                raise RuntimeError(
-                    f"An exception occurred during SQL command execution for save_many: {e}\n"
-                    f"SQL values: {sql_values}\n"
-                ) from e
+        if where:
+            select_sql += f" WHERE {where}"
 
-            connection.commit()
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, values)
 
-    def delete_many_grouped(
-        self,
-        table: str,
-        keys: Sequence[KeyMixin],
-        *,
-        dataset: str | None = None,
-    ) -> None:
-        schema_manager = self._get_schema_manager()
+        # Set cast_to to filter_to if not specified
+        if cast_to is None:
+            cast_to = filter_to
 
-        # TODO (Roman): improve grouping
-        grouped_keys = defaultdict(list)
-        for key in keys:
-            grouped_keys[key.get_key_type()].append(key)
+        # Deserialize records
+        result = []
+        for row in cursor.fetchall():
+            # Convert sqlite3.Row to dict
+            serialized_record = {k: row[k] for k in row.keys() if row[k] is not None}
+            del serialized_record["_key"]
 
-        for key_type, keys_group in grouped_keys.items():
+            # Create a record from the serialized data
+            record = _DATA_SERIALIZER.deserialize(serialized_record)
 
-            existing_tables = schema_manager.existing_tables()
-            if table not in existing_tables:
-                continue
+            # Apply cast (error if not a subtype)
+            record = CastUtil.cast(cast_to, record)
+            result.append(record)
 
-            key_fields = schema_manager.get_primary_keys(key_type)
-            columns_mapping = schema_manager.get_columns_mapping(key_type)
+        return RecordUtil.sort_records_by_key(result)  # TODO: Decide on the default sorting method
 
-            # if keys_group don't support "in" or "len" operator convert it to tuple
-            if not hasattr(keys_group, "__contains__") or not hasattr(keys_group, "__len__"):
-                keys_group = tuple(keys_group)
+    def save_many_grouped(self, table: str, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
 
-            # construct sql_statement with placeholders for values
-            sql_statement = f'DELETE FROM "{table}"'
-            sql_statement = self._add_where_keys_in_clause(sql_statement, key_fields, columns_mapping, len(keys_group))
-            sql_statement += ";"
+        if not records:
+            return
 
-            # serialize keys to tuple
-            query_values = self._serialize_keys_to_flat_tuple(keys_group)
+        # Validate table name
+        self._check_safe_identifier(table)
 
-            # perform delete query
-            connection = self._get_connection()
-            cursor = connection.cursor()
-            cursor.execute(sql_statement, query_values)
-            connection.commit()
+        # Ensure all keys within the table have the same type and get that type, error otherwise
+        key_type = KeyUtil.get_key_type(table=table, records_or_keys=records)
+
+        # Create table if not exists using key_type as source for table schema
+        self._create_table(table, key_type)
+
+        serialized_records = []
+        for record in records:
+            # Add table binding
+            self._add_binding(table=table, record_type=type(record))
+
+            serialized_record = _DATA_SERIALIZER.serialize(record)
+            serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
+            serialized_records.append(serialized_record)
+
+        # Dynamically determine all relevant columns to use for query
+        columns_for_query = sorted(set(k for data in serialized_records for k in data.keys()))
+
+        # Build SQL query to insert records
+        quoted_cols = [self._quote_identifier(c) for c in columns_for_query if self._check_safe_identifier(c)]
+        placeholders = ", ".join("?" for _ in quoted_cols)
+        insert_sql = (
+            f"INSERT OR REPLACE INTO {self._quote_identifier(table)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
+        )
+
+        # Build values for SQL query
+        values_for_query = [tuple(data.get(col) for col in columns_for_query) for data in serialized_records]
+
+        # Execute SQL query
+        conn = self._get_connection()
+        conn.executemany(insert_sql, values_for_query)
+        conn.commit()
+
+    def delete_many_grouped(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
+
+        if not keys:
+            return
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        if not self._is_table_exists(table):
+            return
+
+        serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
+
+        # Build SQL query to delete records by keys
+        placeholders = ",".join("?" for _ in serialized_keys)
+        select_sql = f'DELETE FROM {self._quote_identifier(table)} WHERE "_key" IN ({placeholders})'
+
+        # Execute SQL query
+        conn = self._get_connection()
+        conn.execute(select_sql, serialized_keys)
+
+    def count_where(self, query: QueryMixin, *, dataset: str | None = None, filter_to: type | None = None) -> int:
+
+        # Check that query has been frozen
+        query.check_frozen()
+
+        # Validate table name
+        table = query.get_table()
+        self._check_safe_identifier(table)
+
+        if not self._is_table_exists(table):
+            return 0
+
+        # TODO (Roman): Use a specialized serializer for SQL query.
+        # Serialize the query
+        query_dict = BootstrapSerializers.FOR_SQLITE_QUERY.serialize(query)
+
+        # Validate filter_to or use the query target type if not specified
+        if filter_to is None:
+            # Default to the query target type
+            filter_to = query.get_target_type()
+        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
+            # Ensure filter_to is a subclass of the query target type
+            raise RuntimeError(
+                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+            )
+
+        # Build SQL query to count records in table by conditions
+        where, values = self._convert_query_dict_to_sql_syntax(query_dict)
+
+        if filter_to is not None:
+            # Add filter condition on type
+            subtype_names = TypeCache.get_child_names(filter_to)
+            placeholders = ",".join("?" for _ in subtype_names)
+
+            if where:
+                where += " AND "
+
+            where += f'"_type" IN ({placeholders})'
+            values += subtype_names
+
+        select_sql = f"SELECT COUNT(*) FROM {self._quote_identifier(table)}"
+
+        if where:
+            select_sql += f" WHERE {where}"
+
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, values)
+
+        count = cursor.fetchone()[0]
+        return count
 
     def drop_test_db(self) -> None:
         # Check preconditions
         self.check_drop_test_db_preconditions()
 
-        # Close connection
-        self.close_connection()
-
-        # Drop the entire database file without possibility of recovery.
-        # This relies on the preconditions check above to prevent unintended use.
-        db_file_path = self._get_db_file()
-        if os.path.exists(db_file_path):
-            os.remove(db_file_path)
+        # Drop the entire database without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use
+        self._drop_db()
 
     def drop_temp_db(self, *, user_approval: bool) -> None:
         # Check preconditions
         self.check_drop_temp_db_preconditions(user_approval=user_approval)
 
-        # Close connection
-        self.close_connection()
-
-        # Drop the entire database file without possibility of recovery.
-        # This relies on the preconditions check above to prevent unintended use.
-        db_file_path = self._get_db_file()
-        if os.path.exists(db_file_path):
-            os.remove(db_file_path)
+        # Drop the entire database without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use
+        self._drop_db()
 
     def close_connection(self) -> None:
         if (connection := _connection_dict.get(self.db_id, None)) is not None:
             # Close connection
             connection.close()
+
             # Remove from dictionary so connection can be reopened on next access
             del _connection_dict[self.db_id]
-            del _schema_manager_dict[self.db_id]
 
-    def _get_connection(self) -> sqlite3.Connection:
-        """Get PyMongo database object."""
-        if (connection := _connection_dict.get(self.db_id, None)) is None:
-            # TODO: Implement dispose logic
-            db_file = self._get_db_file()
-            connection = sqlite3.connect(db_file, check_same_thread=False)
-            connection.row_factory = dict_factory
-            _connection_dict[self.db_id] = connection
-        return connection
-
-    def _get_schema_manager(self) -> SqliteSchemaManager:
-        """Get PyMongo database object."""
-        if (result := _schema_manager_dict.get(self.db_id, None)) is None:
-            # TODO: Implement dispose logic
-            connection = self._get_connection()
-            result = SqliteSchemaManager(sqlite_connection=connection)
-            _schema_manager_dict[self.db_id] = result
-        return result
-
-    def _get_db_file(self) -> str:
+    def _get_db_file_path(self) -> str:
         """Get database file path from db_id, applying the appropriate formatting conventions."""
 
         # Check that db_id is a valid filename
-        filename = self.db_id
-        FileUtil.check_valid_filename(filename)
+        FileUtil.check_valid_filename(self.db_id)
 
         # Get dir for database
         db_dir = DbSettings.get_db_dir()
-        os.makedirs(db_dir, exist_ok=True)
 
-        result = os.path.join(db_dir, f"{filename}.sqlite")
+        result = os.path.join(db_dir, f"{self.db_id}.sqlite")
         return result
 
-    def is_empty(self) -> bool:
-        """Return True if the database has no tables or all tables are empty."""
-        connection = self._get_connection()
-        cursor = connection.cursor()
+    def _get_connection(self) -> sqlite3.Connection:
+        """Get sqlite3 connection object."""
 
-        # Check if there are any tables in the SQLite database
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
+        if (conn := _connection_dict.get(self.db_id, None)) is None:
+            db_file_path = self._get_db_file_path()
 
-        # If no tables are present, the database is empty
-        if not tables:
-            return True
+            # Ensure the parent directory exists
+            os.makedirs(os.path.dirname(db_file_path), exist_ok=True)
 
-        # Check if all tables are empty
-        for table_name in tables:
-            table_name = table_name["name"]
-            cursor.execute(f'SELECT COUNT(*) FROM "{table_name}";')
-            count = cursor.fetchone()["COUNT(*)"]
+            # Open a connection to the SQLite database at the given path.
+            # If the file does not exist, SQLite will create it (but not directory)
+            conn = sqlite3.connect(db_file_path, check_same_thread=False)
 
-            # If any table has data, the database is not empty
-            if count > 0:
-                return False
+            # Enable Write-Ahead Logging (WAL) mode.
+            # This improves concurrent read/write performance and reduces locking issues.
+            conn.execute("PRAGMA journal_mode=WAL")
 
-        return True
+            # Set the synchronous mode to 'NORMAL' to balance performance and durability.
+            # It's faster than FULL, and still safe for most use cases.
+            conn.execute("PRAGMA synchronous=NORMAL")
+
+            # Set the row factory so that rows fetched from queries will be returned
+            # as sqlite3.Row objects, which act like dictionaries (column access by name).
+            conn.row_factory = sqlite3.Row
+
+            _connection_dict[self.db_id] = conn
+
+        return conn
+
+    def _create_table(self, table: str, key_type: type[TKey]) -> None:
+        """Create a table if not exists with a structure corresponding to the key_type hierarchy."""
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        # List of columns that are present in the table by default
+        column_defs = ["_key PRIMARY KEY", "_type"]
+
+        # Validate and quote data type columns
+        column_defs.extend(
+            (
+                self._quote_identifier(x)
+                for x in self._extract_columns_for_key_type(key_type)
+                if self._check_safe_identifier(x)
+            )
+        )
+
+        sql = f"CREATE TABLE IF NOT EXISTS {self._quote_identifier(table)} ({', '.join(column_defs)})"
+
+        conn = self._get_connection()
+        conn.execute(sql)
+        conn.commit()
+
+    def _is_table_exists(self, table: str) -> bool:
+        """Check if specified table exists in DB."""
+
+        check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
+        conn = self._get_connection()
+        return conn.execute(check_sql, (table,)).fetchone()
+
+    def _drop_db(self):
+        """Delete db file."""
+        # Close connection
+        self.close_connection()
+
+        # Drop the entire database file without possibility of recovery.
+        # This relies on the preconditions check above to prevent unintended use.
+        db_file_path = self._get_db_file_path()
+        if os.path.exists(db_file_path):
+            os.remove(db_file_path)
+
+    @classmethod
+    def _extract_columns_for_key_type(cls, key_type: type[TKey]) -> list[str]:
+        """Get columns according to the fields of all descendant classes from the specified key."""
+
+        # Get child type names for key_type
+        child_names = TypeCache.get_child_names(key_type)
+        result_columns = []
+
+        # Iterate through child types and add unique columns.
+        # Since child types are sorted by depth in the hierarchy, the base fields will be at the beginning.
+        for child in child_names:
+            # Get child type spec
+            child_type_spec = TypeSchema.for_type_name(child)
+            child_type_spec = cast(DataSpec, child_type_spec)
+
+            # Get field dictionary for child type
+            field_dict = child_type_spec.get_field_dict()
+
+            # Add unique columns from child fields
+            add_columns = set(field_dict.keys()) - set(result_columns)
+            result_columns.extend(add_columns)
+
+        return result_columns
+
+    @classmethod
+    def _extract_columns_for_data(cls, data: list[TDataDict]) -> list[str]:
+        """Returns a list of columns that are in at least one data item."""
+
+        if not data:
+            return []
+
+        result_columns_set = set(k for data_item in data for k in data_item.keys())
+        return sorted(result_columns_set)
+
+    @classmethod
+    def _check_safe_identifier(cls, identifier: str) -> bool:
+        """Check whether the SQLite identifier does not contain prohibited characters."""
+
+        is_safe = IDENTIFIER_REGEX.fullmatch(identifier) is not None
+
+        if not is_safe:
+            raise RuntimeError(f"Unsafe identifier: {identifier}")
+
+        return is_safe
+
+    @classmethod
+    def _quote_identifier(cls, identifier: str) -> str:
+        """Quote SQLite identifier."""
+
+        # Quote identifier with double quotes, escape embedded quotes if any
+        escaped = identifier.replace('"', '""')
+        return f'"{escaped}"'
+
+    @classmethod
+    def _convert_query_dict_to_sql_syntax(cls, query_dict: dict) -> tuple[str, list]:
+        """
+        Create query dict to SQL syntax 'WHERE' clause.
+        Returns a tuple of two values, where the first is an SQL string with placeholders,
+        and the second is the values for the placeholders.
+        """
+
+        clauses = []
+        values = []
+
+        for key, value in query_dict.items():
+            if isinstance(value, dict):
+                # Only support 1 operator per field
+                if len(value) != 1:
+                    raise RuntimeError(f"Multiple operators not supported per field: {value}")
+
+                op, v = next(iter(value.items()))
+
+                if op == "op_in":
+                    if not isinstance(v, (list, tuple)) or not v:
+                        raise RuntimeError(f"'op_in' must have non-empty list/tuple value: {v}")
+                    placeholders = ", ".join("?" for _ in v)
+                    clauses.append(f"{cls._quote_identifier(key)} IN ({placeholders})")
+                    values.extend(v)
+                elif op == "op_nin":
+                    if not isinstance(v, (list, tuple)) or not v:
+                        raise RuntimeError(f"'op_in' must have non-empty list/tuple value: {v}")
+                    placeholders = ", ".join("?" for _ in v)
+                    clauses.append(f"{cls._quote_identifier(key)} NOT IN ({placeholders})")
+                    values.extend(v)
+                elif op == "op_gt":
+                    clauses.append(f"{cls._quote_identifier(key)} > ?")
+                    values.append(v)
+                elif op == "op_gte":
+                    clauses.append(f"{cls._quote_identifier(key)} >= ?")
+                    values.append(v)
+                elif op == "op_lt":
+                    clauses.append(f"{cls._quote_identifier(key)} < ?")
+                    values.append(v)
+                elif op == "op_lte":
+                    clauses.append(f"{cls._quote_identifier(key)} <= ?")
+                    values.append(v)
+                elif op == "op_exists":
+                    if v is True:
+                        clauses.append(f"{key} IS NOT NULL")
+                    elif v is False:
+                        clauses.append(f"{key} IS NULL")
+                    else:
+                        raise ValueError(f"op_exists must be True or False, got: {v}")
+                else:
+                    raise RuntimeError(f"Unsupported operator: {op}")
+            else:
+                # Simple equality
+                clauses.append(f"{cls._quote_identifier(key)} = ?")
+                values.append(value)
+
+        where_clause = " AND ".join(clauses)
+        return where_clause, values
