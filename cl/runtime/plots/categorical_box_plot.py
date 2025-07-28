@@ -52,7 +52,7 @@ class CategoricalBoxPlot(MatplotlibPlot):
     ylabel: Optional[str] = None
     """Label for the y-axis. If None, `y_col` name is used."""
 
-    ylim: Optional[Tuple[Optional[float], Optional[float]]] = (None, None)
+    ylim: Optional[Tuple[Optional[float], ...]] = (None, None)
     """Tuple defining the y-axis limits (min, max). Use None for automatic limits. Default (None, None)."""
 
     box_width: float = 0.6
