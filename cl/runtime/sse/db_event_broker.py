@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import asyncio
 import logging
 from typing import AsyncGenerator
 from typing import Coroutine
+from collections import deque
 from starlette.requests import Request
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_broker import EventBroker
 from cl.runtime.sse.sse_query_util import SseQueryUtil
@@ -46,9 +47,12 @@ class DbEventBroker(EventBroker):
     _event_type: type = Event
     """Type of event records."""
 
+    _event_buffer_maxlen: int = 100
+    """Max number of sent events in buffer."""
+
     def __init__(self):
-        # Initial timestamp to avoid retrieving events from the past
-        self._last_sent_event_timestamp: str | None = Timestamp.create()
+        # Buffer queue for sent events
+        self._sent_event_buffer: deque[str] = deque(maxlen=self._event_buffer_maxlen)
 
         # Buffer queue for event
         self._event_queue: asyncio.Queue[Event] = asyncio.Queue()
@@ -92,18 +96,34 @@ class DbEventBroker(EventBroker):
         _logger = logging.getLogger(__name__)
 
         while True:
-            # Get events from the DB saved after the last sent timestamp, sorted by descending timestamp
+            # Get unprocessed events from the DB, sorted by ascending timestamp
             # TODO (Roman): Replace with DbContext.query() when supported
-            new_events = list(
-                SseQueryUtil.load_from_timestamp(self._event_type, from_timestamp=self._last_sent_event_timestamp)
-            )
+            new_events = self._get_unprocessed_events()
 
             if new_events:
                 _logger.debug(f"SSE: Found {len(new_events)} events in DB.")
 
-            # Put events to queue in reversed (historical) order
-            for event in reversed(new_events):
+            # Put events to queue
+            for event in new_events:
                 await self._event_queue.put(event)
-                self._last_sent_event_timestamp = event.timestamp
 
             await asyncio.sleep(_PULL_EVENTS_DELAY)
+
+    def _get_unprocessed_events(self) -> list[Event]:
+        """Get unprocessed events and mark them as processed."""
+
+        sent_event_set = set(self._sent_event_buffer)
+
+        # Query DB with limit and exclude already sent events
+        unprocessed_events = list(
+            reversed(
+                [
+                    x for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_table(), limit=100)
+                    if x.timestamp not in sent_event_set
+                ]
+            )
+        )
+
+        self._sent_event_buffer.extend((x.timestamp for x in unprocessed_events))
+
+        return unprocessed_events
