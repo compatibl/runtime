@@ -58,7 +58,7 @@ def _multiple_table_records():
     return [*stub_experiments_table_1, *stub_experiments_table_2]
 
 
-def test_bindings(default_db_fixture):  # TODO: Extend to multiple DBs
+def test_bindings(multi_db_fixture):
     """Test the methods related to bindings."""
 
     stubs = _multiple_table_records()
@@ -82,7 +82,7 @@ def test_bindings(default_db_fixture):  # TODO: Extend to multiple DBs
     RegressionGuard().verify_all()
 
 
-def test_load_table(default_db_fixture):  # TODO: Extend to multiple DBs
+def test_load_table(multi_db_fixture):
     """Test load_table for dynamic table names."""
 
     records = _multiple_table_records()
@@ -111,7 +111,7 @@ def test_load_table(default_db_fixture):  # TODO: Extend to multiple DBs
             assert actual_result == expected_result
 
 
-def test_load_where(default_db_fixture):  # TODO: Extend to multiple DBs
+def test_load_where(multi_db_fixture):
     """Test load_type for dynamic table names."""
 
     records = _multiple_table_records()

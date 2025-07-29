@@ -31,7 +31,6 @@ from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_schema import TypeSchema
@@ -63,31 +62,51 @@ class SqliteDb(Db):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
+
+        if project_to is not None:
+            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
 
         # Validate table name
         self._check_safe_identifier(table)
 
-        # Build SQL query to select all records in table
-        values_for_query = []
-        select_sql = f"SELECT * FROM {self._quote_identifier(table)}"
+        if not self._is_table_exists(table):
+            return tuple()
+
+        select_sql, values = f"SELECT * FROM {self._quote_identifier(table)}", []
 
         if filter_to is not None:
             # Add filter condition on type
             subtype_names = TypeCache.get_child_names(filter_to)
             placeholders = ",".join("?" for _ in subtype_names)
+
             select_sql += f' WHERE "_type" IN ({placeholders})'
-            values_for_query += subtype_names
+            values += subtype_names
+
+        # Add order by '_key' condition
+        select_sql += ' ORDER BY "_key"'
+
+        # Add 'limit' and 'skip' conditions
+        select_sql, add_params = self._add_limit_and_skip(select_sql, limit=limit, skip=skip)
+        values.extend(add_params)
 
         # Execute SQL query
         conn = self._get_connection()
-        cursor = conn.execute(select_sql, values_for_query)
+        cursor = conn.execute(select_sql, values)
 
-        # Deserialize records and return
-        return tuple(  # noqa
-            _DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None})
-            for row in cursor.fetchall()
-        )
+        # Deserialize records
+        result = []
+        for row in cursor.fetchall():
+            # Convert sqlite3.Row to dict
+            serialized_record = {k: row[k] for k in row.keys() if row[k] is not None}
+            del serialized_record["_key"]
+
+            # Create a record from the serialized data
+            record = _DATA_SERIALIZER.deserialize(serialized_record)
+
+            result.append(record)
+
+        return tuple(result)
 
     def load_many_unsorted(
         self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None
@@ -128,16 +147,10 @@ class SqliteDb(Db):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
 
         if project_to is not None:
             raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
-
-        if limit is not None:
-            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'limit' option.")
-
-        if skip is not None:
-            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'skip' option.")
 
         # Check that query has been frozen
         query.check_frozen()
@@ -149,7 +162,6 @@ class SqliteDb(Db):
         if not self._is_table_exists(table):
             return tuple()
 
-        # TODO (Roman): Use a specialized serializer for SQL query.
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_SQLITE_QUERY.serialize(query)
 
@@ -183,6 +195,13 @@ class SqliteDb(Db):
         if where:
             select_sql += f" WHERE {where}"
 
+        # Add order by '_key' condition
+        select_sql += ' ORDER BY "_key"'
+
+        # Add 'limit' and 'skip' conditions
+        select_sql, add_params = self._add_limit_and_skip(select_sql, limit=limit, skip=skip)
+        values.extend(add_params)
+
         # Execute SQL query
         conn = self._get_connection()
         cursor = conn.execute(select_sql, values)
@@ -205,7 +224,7 @@ class SqliteDb(Db):
             record = CastUtil.cast(cast_to, record)
             result.append(record)
 
-        return RecordUtil.sort_records_by_key(result)  # TODO: Decide on the default sorting method
+        return tuple(result)
 
     def save_many_grouped(self, table: str, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
 
@@ -428,6 +447,27 @@ class SqliteDb(Db):
         db_file_path = self._get_db_file_path()
         if os.path.exists(db_file_path):
             os.remove(db_file_path)
+
+    @classmethod
+    def _add_limit_and_skip(
+        cls, select_sql: str, *, limit: int | None = None, skip: int | None = None
+    ) -> tuple[str, list]:
+        """Add 'limit' and 'skip' conditions to sql query."""
+
+        add_params = []
+
+        if limit is not None:
+            select_sql += " LIMIT ?"
+            add_params.append(limit)
+            if skip is not None:
+                select_sql += " OFFSET ?"
+                add_params.append(skip)
+        elif skip is not None:
+            # Use LIMIT -1 to enable OFFSET
+            select_sql += " LIMIT -1 OFFSET ?"
+            add_params.append(skip)
+
+        return select_sql, add_params
 
     @classmethod
     def _extract_columns_for_key_type(cls, key_type: type[TKey]) -> list[str]:

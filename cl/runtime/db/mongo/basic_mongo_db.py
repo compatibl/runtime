@@ -32,7 +32,6 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.record_util import RecordUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
@@ -80,7 +79,7 @@ class BasicMongoDb(Db):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
         # Get collection
         collection = self._get_mongo_collection(table)
 
@@ -95,8 +94,8 @@ class BasicMongoDb(Db):
         # serialized_primary_key = _KEY_SERIALIZER.serialize(key)
         # serialized_record = collection.find_one({"_key": serialized_primary_key})
 
-        # Get iterable from the query, execution is deferred
-        serialized_records = collection.find(query_dict)
+        # Get iterable from the query sorted by '_key', execution is deferred
+        serialized_records = collection.find(query_dict).sort("_key")
 
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
@@ -140,7 +139,7 @@ class BasicMongoDb(Db):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
         # Check that query has been frozen
         query.check_frozen()
 
@@ -170,8 +169,8 @@ class BasicMongoDb(Db):
         subtype_names = TypeCache.get_child_names(filter_to)
         query_dict["_type"] = {"$in": subtype_names}
 
-        # Get iterable from the query, execution is deferred
-        serialized_records = collection.find(query_dict)
+        # Get iterable from the query sorted by '_key', execution is deferred
+        serialized_records = collection.find(query_dict).sort("_key")
 
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
@@ -180,7 +179,7 @@ class BasicMongoDb(Db):
         if cast_to is None:
             cast_to = filter_to
 
-        result = []
+        result: list[TRecord] = []
         # TODO: Convert to comprehension for performance
         for serialized_record in serialized_records:
             del serialized_record["_id"]
@@ -192,7 +191,8 @@ class BasicMongoDb(Db):
             # Apply cast (error if not a subtype)
             record = CastUtil.cast(cast_to, record)
             result.append(record)
-        return RecordUtil.sort_records_by_key(result)  # TODO: Decide on the default sorting method
+
+        return tuple(result)
 
     def count_where(
         self,

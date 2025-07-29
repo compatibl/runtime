@@ -54,7 +54,7 @@ class LocalCache(Db):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
         raise NotImplementedError()
 
     def load_many_unsorted(
@@ -86,7 +86,7 @@ class LocalCache(Db):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
         raise NotImplementedError()
 
     def save_many_grouped(

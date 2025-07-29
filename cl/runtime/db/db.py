@@ -337,7 +337,7 @@ class Db(DbKey, RecordMixin, ABC):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
         """
         Load all records of 'filter_to' type and its subtypes from all tables where they are stored.
 
@@ -460,7 +460,7 @@ class Db(DbKey, RecordMixin, ABC):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
         """
         Load all records from the specified table.
 
@@ -503,7 +503,7 @@ class Db(DbKey, RecordMixin, ABC):
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
-    ) -> tuple[TRecord]:
+    ) -> tuple[TRecord, ...]:
         """
         Load records that match the specified query.
 
