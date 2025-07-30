@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 
-from cl.runtime.records.for_dataclasses.extensions import optional
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.sse.task_event import TaskEvent
 from cl.runtime.tasks.task_status import TaskStatus
 
@@ -23,5 +23,5 @@ from cl.runtime.tasks.task_status import TaskStatus
 class TaskFinishedEvent(TaskEvent):
     """Event type with info about finished Task its status."""
 
-    status: TaskStatus = optional()
+    status: TaskStatus = required()
     """Task status."""
