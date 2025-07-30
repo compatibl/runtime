@@ -28,17 +28,17 @@ class LogEvent(Event):
     message: str = required()
     """A descriptive message providing details about the logging event."""
 
-    readable_time: str | None = optional()
+    readable_time: str | None = None
     """Human-readable time when the log record was created in UTC."""
 
-    record_type: str | None = optional()
+    record_type: str | None = None
     """Type on which the handler is running."""
 
-    handler_name: str | None = optional()
+    handler_name: str | None = None
     """Handler name."""
 
-    record_key: str | None = optional()
+    record_key: str | None = None
     """Record key."""
 
-    task_run_id: str | None = optional()
+    task_run_id: str | None = None
     """Unique task run identifier."""

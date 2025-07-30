@@ -22,16 +22,16 @@ from cl.runtime.records.for_dataclasses.extensions import optional
 class LogContext(Context):
     """Provides get_logger() method returning a configured logger."""
 
-    handler: str | None = optional()
+    handler: str | None = None
     """Name of the called handler."""
 
-    type: str | None = optional()
+    type: str | None = None
     """Type name."""
 
-    record_key: str | None = optional()
+    record_key: str | None = None
     """Key of the record on which the handler is run."""
 
-    task_run_id: str | None = optional()
+    task_run_id: str | None = None
     """Task run id."""
 
     @classmethod

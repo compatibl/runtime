@@ -26,13 +26,13 @@ from cl.runtime.tasks.task_status import TaskStatus
 class TaskQuery(QueryMixin):
     """Query for Task by the queue and status fields."""
 
-    task_id: str | None = optional()
+    task_id: str | None = None
     """Unique task identifier."""
 
-    queue: TaskQueueKey | None = optional()
+    queue: TaskQueueKey | None = None
     """The queue that will run the task once it is saved."""
 
-    status: TaskStatus | Condition[TaskStatus] | None = optional()
+    status: TaskStatus | Condition[TaskStatus] | None = None
     """Begins from Pending, continues to Running or Paused, and ends with Completed, Failed, or Cancelled."""
 
     def get_target_type(self) -> type[KeyMixin]:

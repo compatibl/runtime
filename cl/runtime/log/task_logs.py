@@ -32,11 +32,11 @@ class TaskLogs(DataMixin):
     handler_name: str = required()
     """Handler name."""
 
-    record_key: str | None = optional()
+    record_key: str | None = None
     """Record key on which handler is run."""
 
-    status: TaskStatus | None = optional()
+    status: TaskStatus | None = None
     """Task status."""
 
-    logs: list[LogMessage] | None = optional()
+    logs: list[LogMessage] | None = None
     """Task logs."""

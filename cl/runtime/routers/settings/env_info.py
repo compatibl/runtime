@@ -24,5 +24,5 @@ class EnvInfo(DataMixin):
     name: str = required()
     """Name of the environment."""
 
-    parent: str | None = optional()
+    parent: str | None = None
     """Name of the parent environment."""

@@ -27,28 +27,28 @@ from cl.runtime.records.record_mixin import RecordMixin
 class UiAppState(UiAppStateKey, RecordMixin):
     """UiAppState."""
 
-    opened_tabs: List[TabInfo] | None = optional()
+    opened_tabs: List[TabInfo] | None = None
     """Information about opened tabs."""
 
-    active_tab_index: int | None = optional()
+    active_tab_index: int | None = None
     """Index of active opened tab."""
 
-    backend_version: str | None = optional()
+    backend_version: str | None = None
     """DEPRECATED. Use versions instead."""
 
-    versions: Dict[str, str] | None = optional()
+    versions: Dict[str, str] | None = None
     """Component versions."""
 
-    application_name: str | None = optional()
+    application_name: str | None = None
     """Application name."""
 
-    read_only: bool | None = optional()
+    read_only: bool | None = None
     """Flag indicating that UI is read-only."""
 
-    application_theme: str | None = optional()
+    application_theme: str | None = None
     """Application theme (dark, light, etc.)."""
 
-    user_secret_identifiers: List[str] | None = optional()
+    user_secret_identifiers: List[str] | None = None
     """
     Suggested key names in My Keys section of the head and shoulders dialog.
 
@@ -57,7 +57,7 @@ class UiAppState(UiAppStateKey, RecordMixin):
         - The secret names should be in snake_case, for example ["openai_api_key", "anthropic_api_key"] 
     """
 
-    full_screen_mode: bool | None = optional()
+    full_screen_mode: bool | None = None
     """
     Flag indicating whether the UI is in full-screen mode (e.g., only a single active tab is visible with a 
     minimalistic interface).

@@ -32,7 +32,7 @@ class TypesResponseItem(BaseModel):
     label: str | None
     """Type label displayed in the UI is humanized class name (may be customized in settings)."""
 
-    kind: str | None = optional()
+    kind: str | None = None
     """Flag to indicate type kind."""
 
     class Config:
