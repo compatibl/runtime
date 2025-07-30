@@ -123,11 +123,11 @@ class ContextManager:
         _CONTEXT_STACK_DICT_VAR.reset(token)
 
     @classmethod
-    def serialize_all_current(cls) -> Sequence[Dict]:
+    def serialize_current_contexts(cls) -> Sequence[Dict]:
         """Serialize all current contexts to a list of dicts, each dict represents one serialized context."""
 
         # Get current contexts for all key types
-        contexts = Context.all_current()
+        contexts = Context.current_contexts()
 
         # Serialize
         result = cls._serialize_contexts(contexts)

@@ -24,7 +24,7 @@ def _perform_serialization_test(contexts: List[Context]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Serialize current contexts into data and then deserialize data into a ContextManager instance
-    serialized_data = ContextManager.serialize_all_current()
+    serialized_data = ContextManager.serialize_current_contexts()
     deserialized_context_manager = ContextManager(serialized_data)
 
     # Ensure the deserialized list is identical to the argument

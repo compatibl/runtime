@@ -81,7 +81,7 @@ class Context(DataMixin, ABC):
             return None
 
     @classmethod
-    def all_current(cls) -> List[Self]:
+    def current_contexts(cls) -> List[Self]:
         """
         Return the list of current contexts across all key types, or an empty list if none exist.
         This method is used by the ContextManager to restore the current contexts for out-of-process

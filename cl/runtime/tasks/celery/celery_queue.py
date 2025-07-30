@@ -144,7 +144,7 @@ class CeleryQueue(TaskQueue):
         with ProcessContext().build():
 
             # Get and serialize current context
-            context_manager_data = ContextManager.serialize_all_current()
+            context_manager_data = ContextManager.serialize_current_contexts()
 
             # Pass parameters to the Celery task signature
             execute_task_signature = execute_task.s(
