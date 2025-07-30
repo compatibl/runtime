@@ -33,6 +33,7 @@ class EventLogHandler(logging.Handler):
             event_type=EventType.LOG,
             level=CaseUtil.upper_to_pascal_case(record.levelname),
             message=record.getMessage(),
+            readable_time=getattr(record, "readable_time", None),
             record_type=getattr(record, "type", None),
             handler_name=getattr(record, "handler", None),
             record_key=getattr(record, "key", None),
@@ -41,18 +42,22 @@ class EventLogHandler(logging.Handler):
 
     def emit(self, record):
 
-        # Publish log event
-        log_event = self._create_log_event(record)
-        event_broker = EventBroker.create()
-        event_broker.sync_publish("events", log_event)
+        try:
+            # Publish log event
+            log_event = self._create_log_event(record)
+            event_broker = EventBroker.create()
+            event_broker.sync_publish("events", log_event)
 
-        # If log record level is Error or Warning - trigger additional Error or Warning event
-        if record.levelno >= logging.ERROR:
-            event_broker.sync_publish("events", Event(event_type=EventType.ERROR).build())
-        elif record.levelno >= logging.WARNING:
-            event_broker.sync_publish("events", Event(event_type=EventType.WARNING).build())
+            # If log record level is Error or Warning - trigger additional Error or Warning event
+            if record.levelno >= logging.ERROR:
+                event_broker.sync_publish("events", Event(event_type=EventType.ERROR).build())
+            elif record.levelno >= logging.WARNING:
+                event_broker.sync_publish("events", Event(event_type=EventType.WARNING).build())
 
-        # Publish event from extras
-        if (event := getattr(record, "event", None)) is not None:
-            event = event.build()
-            event_broker.sync_publish("events", event)
+            # Publish event from extras
+            if (event := getattr(record, "event", None)) is not None:
+                event.build()
+                event_broker.sync_publish("events", event)
+
+        except Exception:
+            self.handleError(record)

@@ -62,6 +62,9 @@ class DbLogHandler(logging.Handler):
         ).build()
 
     def emit(self, record):
-        # Save LogMessage to current db context.
-        log_message = self._create_log_message(record)
-        DbContext.save_one(log_message)
+        try:
+            # Save LogMessage to current db context.
+            log_message = self._create_log_message(record)
+            DbContext.save_one(log_message)
+        except Exception:
+            self.handleError(record)

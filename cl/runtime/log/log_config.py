@@ -14,6 +14,9 @@
 
 import logging
 import os
+import socket
+import threading
+
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
@@ -92,6 +95,7 @@ def _make_filter_add_contextual_info(default_empty=None):
 
     def filter_(record):
         log_context = LogContext.current_or_none()
+
         type_and_handler = ""
         if log_context:
             if log_context.type is not None:
@@ -100,40 +104,51 @@ def _make_filter_add_contextual_info(default_empty=None):
             if log_context.handler is not None:
                 type_and_handler += f" - {log_context.handler}"
 
+            if log_context.task_run_id is not None:
+                type_and_handler += f" - run_id={log_context.task_run_id[-5:]}"
+
         # Type on which the handler is running
-        record.type = log_context.type if log_context else _default_empty
+        record.type = log_context.type or _default_empty if log_context else _default_empty
 
         # Name of running handler
-        record.handler = log_context.handler if log_context else _default_empty
+        record.handler = log_context.handler or _default_empty if log_context else _default_empty
 
         # Record key
-        record.key = log_context.record_key if log_context else _default_empty
+        record.key = log_context.record_key or _default_empty if log_context else _default_empty
 
         # Combined type and handler name as single field in short format
         record.type_and_handler = type_and_handler
 
         # Task run id
-        record.task_run_id = log_context.task_run_id if log_context else _default_empty
+        record.task_run_id = log_context.task_run_id or _default_empty if log_context else _default_empty
 
         # Time-ordered unique identifier
-        record.timestamp = Timestamp.create()
+        if getattr(record, "timestamp", None) is None:
+            record.timestamp = Timestamp.create()
 
         # Human-readable time
-        record.readable_time = Timestamp.to_datetime(record.timestamp).isoformat()
+        record.readable_time = DatetimeUtil.to_str(Timestamp.to_datetime(record.timestamp))
 
         # PID of process
         record.pid = os.getpid()
+
+        # Thread id
+        record.tid = threading.get_ident()
+
+        # Machine host name
+        record.host = socket.gethostname()
 
         return True
 
     return filter_
 
 
-def _make_filter_third_party_logs():
-    """Filter out third-party lib logs."""
+def _make_filter_db_logs():
+    """Filter logs to be stored in db."""
 
     def filter_(record):
-        return not record.name.startswith(("uvicorn", "celery"))
+        # Filter out third-party lib info logs
+        return not (record.levelno <= logging.INFO and record.name.startswith(("uvicorn", "celery")))
 
     return filter_
 
@@ -156,7 +171,8 @@ logging_config = {
     "version": 1,
     "formatters": {
         "file_formatter": {
-            "format": "%(readable_time)s - %(pid)s - %(name)s - %(type)s - %(handler)s - %(key)s - %(task_run_id)s - %(levelname)s - %(message)s"
+            "format": "%(readable_time)s - PID=%(pid)s - %(host)s - %(name)s - %(type)s - %(handler)s - %(key)s - "
+            "%(task_run_id)s - %(levelname)s - %(message)s",
         },
         "console_formatter": {
             "()": "uvicorn.logging.DefaultFormatter",
@@ -178,11 +194,11 @@ logging_config = {
             "()": "cl.runtime.log.log_config._make_filter_add_contextual_info",
             "default_empty": ".",
         },
-        "third_party_logs_filter": {"()": "cl.runtime.log.log_config._make_filter_third_party_logs"},
+        "db_logs_filter": {"()": "cl.runtime.log.log_config._make_filter_db_logs"},
     },
     "handlers": {
         "file_handler": {
-            "level": "ERROR",
+            "level": "INFO",
             "class": "concurrent_log_handler.ConcurrentRotatingFileHandler",
             "filename": get_log_filename(),
             "maxBytes": max_log_file_size_bytes,
@@ -204,12 +220,12 @@ logging_config = {
         },
         "db_handler": {
             "level": "INFO",
-            "filters": ["add_contextual_info_filter", "third_party_logs_filter"],
+            "filters": ["add_contextual_info_filter", "db_logs_filter"],
             "class": "cl.runtime.log.db_log_handler.DbLogHandler",
         },
         "event_handler": {
             "level": "INFO",
-            "filters": ["add_contextual_info_filter", "third_party_logs_filter"],
+            "filters": ["add_contextual_info_filter", "db_logs_filter"],
             "class": "cl.runtime.log.event_log_handler.EventLogHandler",
         },
     },
@@ -217,6 +233,6 @@ logging_config = {
         "": {
             "handlers": ["file_handler", "stderr_handler", "stdout_handler", "db_handler", "event_handler"],
             "level": "INFO",
-        }
+        },
     },
 }

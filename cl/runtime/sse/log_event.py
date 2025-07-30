@@ -28,6 +28,9 @@ class LogEvent(Event):
     message: str = required()
     """A descriptive message providing details about the logging event."""
 
+    readable_time: str | None = optional()
+    """Human-readable time when the log record was created in UTC."""
+
     record_type: str | None = optional()
     """Type on which the handler is running."""
 

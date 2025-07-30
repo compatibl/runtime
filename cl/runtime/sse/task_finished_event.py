@@ -13,27 +13,15 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.conditions import Condition
+
 from cl.runtime.records.for_dataclasses.extensions import optional
-from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.tasks.task import Task
-from cl.runtime.tasks.task_queue_key import TaskQueueKey
+from cl.runtime.sse.task_event import TaskEvent
 from cl.runtime.tasks.task_status import TaskStatus
 
 
 @dataclass(slots=True, kw_only=True)
-class TaskQuery(QueryMixin):
-    """Query for Task by the queue and status fields."""
+class TaskFinishedEvent(TaskEvent):
+    """Event type with info about finished Task its status."""
 
-    task_id: str | None = optional()
-    """Unique task identifier."""
-
-    queue: TaskQueueKey | None = optional()
-    """The queue that will run the task once it is saved."""
-
-    status: TaskStatus | Condition[TaskStatus] | None = optional()
-    """Begins from Pending, continues to Running or Paused, and ends with Completed, Failed, or Cancelled."""
-
-    def get_target_type(self) -> type[KeyMixin]:
-        return Task
+    status: TaskStatus = optional()
+    """Task status."""

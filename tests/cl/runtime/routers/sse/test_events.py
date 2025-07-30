@@ -108,7 +108,6 @@ def _parse_stream_lines(stream_lines: list[str]) -> list[dict]:
     return events
 
 
-@pytest.mark.skip(reason="Restore when SSE is supported")
 def test_events(default_db_fixture):
     # Set up logging config
     logging.config.dictConfig(logging_config)

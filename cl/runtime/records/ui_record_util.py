@@ -33,6 +33,7 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.views.empty_view import EmptyView
 from cl.runtime.views.key_list_view import KeyListView
 from cl.runtime.views.key_view import KeyView
+from cl.runtime.views.script import Script
 from cl.runtime.views.script_language import ScriptLanguage
 
 # Create serializers

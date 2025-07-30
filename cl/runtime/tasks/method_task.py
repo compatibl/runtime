@@ -71,6 +71,9 @@ class MethodTask(CallableTask, ABC):
     def deserialized_method_params(self, method_callable: FunctionType | MethodType) -> dict:
         """For every method's param - deserialize its value and assign back to it's param name."""
 
+        if not self.method_params:
+            return dict()
+
         # Convert names back to snake_case
         params = {
             CaseUtil.pascal_to_snake_case(param_name): param_value

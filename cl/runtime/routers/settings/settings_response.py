@@ -63,7 +63,7 @@ class SettingsResponse(BaseModel):
         alias_generator = CaseUtil.snake_to_pascal_case
         populate_by_name = True
 
-    schema_version: str | None = optional(default="1.2.2")
+    schema_version: str | None = optional(default="1.3.0")
     """Version of the backend-frontend API contract (schema). Used to ensure compatibility between backend and frontend."""
 
     application_name: str | None = optional(default_factory=lambda: os.environ.get("CL_APP_TITLE"))
@@ -78,7 +78,7 @@ class SettingsResponse(BaseModel):
     versions: dict[str, str] | None = field(default_factory=_collect_package_versions)
     """Dictionary of component/package names and their versions."""
 
-    event_transport: str | None = optional()
+    event_transport: str | None = optional(default="SSE")
     """
     Server event transport mechanism used for frontend-backend event communication.
     Supported types: 'SSE', 'NO_SSE'.
