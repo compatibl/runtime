@@ -243,6 +243,14 @@ declare:
         type_: String
       name: NoteParam
     static: false
+  - name: run_long_handler
+    label: Long Handler
+    type_: Job
+    static: false
+  - name: run_long_handler_with_error
+    label: Long Handler With Error
+    type_: Job
+    static: false
   - name: run_static_method_1a
     label: Static Method 1A
     comment: Stub handler.

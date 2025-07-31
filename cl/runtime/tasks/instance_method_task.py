@@ -45,7 +45,7 @@ class InstanceMethodTask(MethodTask):
     def _create_log_context(self) -> LogContext:
         """Create LogContext with task specific info."""
         return LogContext(
-            type=TypeUtil.name(TypeCache.get_class_from_qual_name(self.key_type_str)),
+            record_type=TypeUtil.name(TypeCache.get_class_from_qual_name(self.key_type_str)),
             handler=self.method_name,
             task_run_id=self.task_id,
             record_key=self.key_str,

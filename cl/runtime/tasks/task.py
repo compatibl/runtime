@@ -25,6 +25,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.sse.event_type import EventType
 from cl.runtime.sse.task_event import TaskEvent
+from cl.runtime.sse.task_finished_event import TaskFinishedEvent
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from cl.runtime.tasks.task_status import TaskStatus
@@ -112,7 +113,9 @@ class Task(TaskKey, RecordMixin, ABC):
                 logger.error(
                     "Task failed with exception.",
                     exc_info=True,
-                    extra={"event": TaskEvent(event_type=EventType.TASK_FINISHED)},
+                    extra={
+                        "event": TaskFinishedEvent(event_type=EventType.TASK_FINISHED, status=TaskStatus.FAILED),
+                    },
                 )
 
                 # Save with Failed status and execution info
@@ -126,7 +129,10 @@ class Task(TaskKey, RecordMixin, ABC):
             else:
 
                 logger.info(
-                    "Task completed successfully.", extra={"event": TaskEvent(event_type=EventType.TASK_FINISHED)}
+                    "Task completed successfully.",
+                    extra={
+                        "event": TaskFinishedEvent(event_type=EventType.TASK_FINISHED, status=TaskStatus.COMPLETED),
+                    },
                 )
 
                 # Record the end time

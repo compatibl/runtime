@@ -14,7 +14,9 @@
 
 import datetime as dt
 import inspect
+import time
 from dataclasses import dataclass
+from logging import getLogger
 from uuid import UUID
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.file.file_data import FileData
@@ -218,6 +220,20 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         """Stub method."""
         _log_method_info()
         LogContext.get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
+
+    def run_long_handler_with_error(self):
+        _logger = getLogger(__name__)
+        for i in range(10):
+            _logger.info(f"Message {i}")
+            time.sleep(3)
+        raise RuntimeError("Error in handler.")
+
+    def run_long_handler(self):
+        _logger = getLogger(__name__)
+        for i in range(10):
+            _logger.info(f"Message {i}")
+            time.sleep(3)
+        _logger.info("Finished.")
 
     # TODO (Roman): Uncomment for tasks/test_submit.
     # def run_save_to_db(self):

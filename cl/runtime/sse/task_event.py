@@ -31,7 +31,7 @@ class TaskEvent(Event):
     handler_name: str = required()
     """Handler name."""
 
-    record_key: str | None = optional
+    record_key: str | None = None
     """Record key on which handler is run."""
 
     def __init(self):
@@ -44,7 +44,7 @@ class TaskEvent(Event):
             if log_context.task_run_id is None:
                 raise RuntimeError("LogContext.task_run_id is required to create TaskEvent.")
 
-            if log_context.type is None:
+            if log_context.record_type is None:
                 raise RuntimeError("LogContext.type is required to create TaskEvent.")
 
             if log_context.handler is None:
@@ -52,6 +52,6 @@ class TaskEvent(Event):
 
             # Fill in Event fields from Context
             self.task_run_id = log_context.task_run_id
-            self.record_type = log_context.type
+            self.record_type = log_context.record_type
             self.handler_name = log_context.handler
             self.record_key = log_context.record_key

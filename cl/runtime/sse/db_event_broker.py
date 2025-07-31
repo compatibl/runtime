@@ -20,6 +20,7 @@ from typing import Coroutine
 from collections import deque
 from starlette.requests import Request
 from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_broker import EventBroker
 from cl.runtime.sse.sse_query_util import SseQueryUtil
@@ -53,6 +54,9 @@ class DbEventBroker(EventBroker):
     def __init__(self):
         # Buffer queue for sent events
         self._sent_event_buffer: deque[str] = deque(maxlen=self._event_buffer_maxlen)
+
+        # Set start timestamp for filtering old events
+        self._from_timestamp = Timestamp.create()
 
         # Buffer queue for event
         self._event_queue: asyncio.Queue[Event] = asyncio.Queue()
@@ -119,7 +123,7 @@ class DbEventBroker(EventBroker):
             reversed(
                 [
                     x for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_table(), limit=100)
-                    if x.timestamp not in sent_event_set
+                    if x.timestamp > self._from_timestamp and x.timestamp not in sent_event_set
                 ]
             )
         )

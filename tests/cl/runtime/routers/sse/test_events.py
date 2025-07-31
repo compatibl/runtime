@@ -97,7 +97,7 @@ def _parse_stream_lines(stream_lines: list[str]) -> list[dict]:
 
             if key == "data":
                 data_dict = orjson.loads(value)
-                value = data_dict.get("message", "")
+                value = data_dict.get("Message", "")
 
             event[key.strip()] = value.strip()
 

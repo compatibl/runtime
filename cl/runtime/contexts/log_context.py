@@ -25,7 +25,7 @@ class LogContext(Context):
     handler: str | None = None
     """Name of the called handler."""
 
-    type: str | None = None
+    record_type: str | None = None
     """Type name."""
 
     record_key: str | None = None

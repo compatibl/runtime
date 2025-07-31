@@ -98,8 +98,8 @@ def _make_filter_add_contextual_info(default_empty=None):
 
         type_and_handler = ""
         if log_context:
-            if log_context.type is not None:
-                type_and_handler += f" - {log_context.type}"
+            if log_context.record_type is not None:
+                type_and_handler += f" - {log_context.record_type}"
 
             if log_context.handler is not None:
                 type_and_handler += f" - {log_context.handler}"
@@ -108,7 +108,7 @@ def _make_filter_add_contextual_info(default_empty=None):
                 type_and_handler += f" - run_id={log_context.task_run_id[-5:]}"
 
         # Type on which the handler is running
-        record.type = log_context.type or _default_empty if log_context else _default_empty
+        record.type = log_context.record_type or _default_empty if log_context else _default_empty
 
         # Name of running handler
         record.handler = log_context.handler or _default_empty if log_context else _default_empty
