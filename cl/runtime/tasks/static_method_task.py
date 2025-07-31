@@ -37,7 +37,7 @@ class StaticMethodTask(MethodTask):
         """Create LogContext with task specific info."""
         return LogContext(
             record_type=TypeUtil.name(TypeCache.get_class_from_qual_name(self.type_str)),
-            handler=self.method_name,
+            handler=self._title_handler_name(self.method_name),
             task_run_id=self.task_id,
         ).build()
 

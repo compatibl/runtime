@@ -101,3 +101,11 @@ class MethodTask(CallableTask, ABC):
             params[param_name] = param_value
 
         return params
+
+    @classmethod
+    def _title_handler_name(cls, handler_name: str) -> str:
+        """Remove 'run_' prefix and convert to title case."""
+        # TODO (Roman): Fix handler name in schema
+        handler_name = handler_name.removeprefix("run_")
+        handler_title = CaseUtil.snake_to_title_case(handler_name)
+        return handler_title
