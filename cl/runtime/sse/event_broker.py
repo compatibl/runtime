@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import asyncio
 import logging
 from abc import ABC
 from abc import abstractmethod
@@ -20,10 +19,6 @@ from typing import AsyncGenerator
 from fastapi import Request
 from typing_extensions import Self
 from cl.runtime.sse.event import Event
-from cl.runtime.sse.event_type import EventType
-
-_PING_DELAY = 15.0
-"""Delay in seconds to send a ping event."""
 
 
 class EventBroker(ABC):
@@ -58,13 +53,8 @@ class EventBroker(ABC):
                 _logger.debug("SSE: Client disconnected from SSE. Stop sending events.")
                 break
 
-            try:
-                # Wait for the next event from the queue
-                yield await asyncio.wait_for(self._get_event(), _PING_DELAY)
-
-            except asyncio.TimeoutError:
-                # Send ping to keep connection alive
-                yield Event(event_type=EventType.PING).build()
+            # Wait for the next event from the queue
+            yield await self._get_event()
 
     @abstractmethod
     async def _get_event(self) -> Event:
