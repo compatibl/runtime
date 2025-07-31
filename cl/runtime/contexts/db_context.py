@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from logging import getLogger
 from typing import Iterable
 from typing import Sequence
 from cl.runtime import Db
@@ -62,6 +63,8 @@ class DbContext(Context):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
+        logger = getLogger(__name__)
+
         # Initialize from the current context
         if self.db is None:
             self.db = self._get_db()
@@ -85,6 +88,9 @@ class DbContext(Context):
         #  Load 'db' field of this context using 'Context.current()'
         if self.db is not None and is_key(self.db):
             self.db = DbContext.load_one(self.db)  # TODO: Revise to use DB settings
+
+        if self.db is not None:
+            logger.info(f"Connected to Db of type '{TypeUtil.name(self.db)}', db_id = '{self.db.db_id}'.")
 
     @classmethod
     def get_db_id(cls) -> str:
