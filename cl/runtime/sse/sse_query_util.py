@@ -110,7 +110,9 @@ class SseQueryUtil:
         serialized_records = db._apply_limit_and_skip(serialized_records, limit=limit)
 
         result = tuple(
-            DataSerializers.FOR_MONGO.deserialize({k: v for k, v in serialized_record.items() if k not in {"_id", "_key"}})
+            DataSerializers.FOR_MONGO.deserialize(
+                {k: v for k, v in serialized_record.items() if k not in {"_id", "_key"}}
+            )
             for serialized_record in serialized_records
         )
         return result

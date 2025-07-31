@@ -15,9 +15,9 @@
 
 import asyncio
 import logging
+from collections import deque
 from typing import AsyncGenerator
 from typing import Coroutine
-from collections import deque
 from starlette.requests import Request
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.primitive.timestamp import Timestamp
@@ -122,7 +122,8 @@ class DbEventBroker(EventBroker):
         unprocessed_events = list(
             reversed(
                 [
-                    x for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_table(), limit=100)
+                    x
+                    for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_table(), limit=100)
                     if x.timestamp > self._from_timestamp and x.timestamp not in sent_event_set
                 ]
             )

@@ -16,7 +16,6 @@ import orjson
 from fastapi import APIRouter
 from fastapi import Request
 from sse_starlette import EventSourceResponse
-
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.sse.event_broker import EventBroker
 

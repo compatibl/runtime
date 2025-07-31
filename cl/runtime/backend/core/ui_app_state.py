@@ -19,7 +19,6 @@ from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey
 from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.contexts.db_context import DbContext
-from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.record_mixin import RecordMixin
 
 

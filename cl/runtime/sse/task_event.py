@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.contexts.log_context import LogContext
-from cl.runtime.records.for_dataclasses.extensions import required, optional
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.sse.event import Event
 
 

@@ -13,14 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Iterable, Any
-
+from typing import Any
+from typing import Iterable
 from typing_extensions import Final
-
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.task_logs import TaskLogs
-
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.sse.sse_query_util import SseQueryUtil
@@ -32,6 +30,7 @@ _UI_SERIALIZER = DataSerializers.FOR_UI
 
 _LOG_HISTORY_LIMIT: Final[int] = 1000
 
+
 @dataclass(slots=True, kw_only=True)
 class UiLogUtil(DataMixin):
     """UI logs util class."""
@@ -40,7 +39,9 @@ class UiLogUtil(DataMixin):
     def run_get_flat_logs(cls) -> dict[str, Any]:
         """Return a list of the last N log messages, sorted by timestamp in ascending order."""
 
-        log_messages = reversed(list(SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT)))
+        log_messages = reversed(
+            list(SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT))
+        )
         return cls._wrap_to_result(log_messages)
 
     @classmethod
@@ -49,12 +50,12 @@ class UiLogUtil(DataMixin):
 
         log_messages = reversed(
             [
-                x for x in SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT)
+                x
+                for x in SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT)
                 if x.level.lower() == "error"
             ]
         )
         return cls._wrap_to_result(log_messages)
-
 
     @classmethod
     def _get_task_status(cls, task_run_id: str) -> TaskStatus:
@@ -76,7 +77,9 @@ class UiLogUtil(DataMixin):
         """Return last N log messages aggregated by task_run_id and sorted by timestamp in ascending order."""
 
         result = {}
-        for log_message in reversed(list(SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT))):
+        for log_message in reversed(
+            list(SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT))
+        ):
             task_run_id = log_message.task_run_id
 
             if task_run_id is None:
