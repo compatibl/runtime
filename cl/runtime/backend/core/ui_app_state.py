@@ -18,7 +18,7 @@ from typing import List
 from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey
 from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.records.record_mixin import RecordMixin
 
 
@@ -81,7 +81,7 @@ class UiAppState(UiAppStateKey, RecordMixin):
             user=UserKey(username="root")
         ).build()  # TODO: Review the use of root default
 
-        default_app_state = DbContext.load_one(default_app_state_key, cast_to=UiAppState)
+        default_app_state = DataContext.load_one(default_app_state_key, cast_to=UiAppState)
         if default_app_state is not None and default_app_state.application_theme is not None:
             return default_app_state.application_theme
 

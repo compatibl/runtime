@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime import View
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.plots.plot_key import PlotKey
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_key
@@ -32,7 +32,7 @@ class PlotView(View):
         """Return Self with loaded plot if self.plot is a key."""
 
         if is_key(self.plot):
-            plot = DbContext.load_one(self.plot)
+            plot = DataContext.load_one(self.plot)
             self.plot = plot
 
         return self

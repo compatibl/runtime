@@ -15,7 +15,7 @@
 from abc import ABC
 from dataclasses import dataclass
 import numpy as np
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
 from cl.runtime.experiments.supervised_classifier_trial import SupervisedClassifierTrial
 from cl.runtime.experiments.trial_key_query import TrialKeyQuery
@@ -33,7 +33,7 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
 
         plots = []
         trial_query = TrialKeyQuery(experiment=self.get_key()).build()
-        all_trials = DbContext.load_where(trial_query, cast_to=SupervisedClassifierTrial)
+        all_trials = DataContext.load_where(trial_query, cast_to=SupervisedClassifierTrial)
         num_labels = len(self.class_labels)
 
         for scenario in self.scenarios:

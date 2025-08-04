@@ -22,7 +22,7 @@ from typing import List
 from celery import Celery
 from celery.signals import setup_logging
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.log.log_config import celery_empty_logging_config
 from cl.runtime.log.log_config import logging_config
@@ -74,7 +74,7 @@ def execute_task(
 
         # Load and run the task
         task_key = TaskKey(task_id=task_id).build()
-        task = DbContext.load_one(task_key, cast_to=Task)
+        task = DataContext.load_one(task_key, cast_to=Task)
         task.run_task()
 
 

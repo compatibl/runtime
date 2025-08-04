@@ -15,7 +15,7 @@
 from __future__ import annotations
 from enum import Enum
 from typing import Any
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import RecordProtocol
@@ -55,13 +55,13 @@ class SelectResponse(RecordsWithSchemaResponse):
             record_type_name = request.type_
             record_type = TypeCache.get_class_from_type_name(record_type_name)
             # Load records for the type
-            records = DbContext.load_type(record_type)
+            records = DataContext.load_type(record_type)
         else:
             # Get records for a table
             table = request.type_
-            records = DbContext.load_table(table)
+            records = DataContext.load_table(table)
             # Get lowest common type to the records stored in the table
-            record_type_name = DbContext.get_lowest_bound_record_type_name(table=table)
+            record_type_name = DataContext.get_lowest_bound_record_type_name(table=table)
             record_type = TypeCache.get_class_from_type_name(record_type_name)
 
         # Serialize records for table.

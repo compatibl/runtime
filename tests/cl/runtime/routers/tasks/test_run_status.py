@@ -15,7 +15,7 @@
 import pytest
 from typing import Dict
 from typing import List
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.status_request import StatusRequest
 from cl.runtime.routers.tasks.status_response_item import StatusResponseItem
@@ -38,7 +38,7 @@ def _save_tasks_and_get_requests() -> List[Dict]:
         ).build()
         for i in range(2)
     ]
-    DbContext.save_many(tasks)
+    DataContext.save_many(tasks)
 
     requests = [
         {

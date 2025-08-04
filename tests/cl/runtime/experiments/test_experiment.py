@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_type import ExperimentType
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
@@ -28,8 +28,8 @@ def test_run_many(multi_db_fixture):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
-    DbContext.save_one(exp_type)
-    DbContext.save_one(sc1)
+    DataContext.save_one(exp_type)
+    DataContext.save_one(sc1)
 
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
@@ -96,8 +96,8 @@ def test_run_all(multi_db_fixture):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
-    DbContext.save_one(exp_type)
-    DbContext.save_one(sc1)
+    DataContext.save_one(exp_type)
+    DataContext.save_one(sc1)
 
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(

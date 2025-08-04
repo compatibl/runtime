@@ -14,7 +14,7 @@
 
 from typing import Iterable
 from cl.runtime import SqliteDb
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -27,11 +27,11 @@ class SseQueryUtil:
     def query_sorted_desc_and_limited(cls, table: str, *, limit: int | None = None):
         """Query 'table' with sort by 'timestamp' in descending order and limit."""
 
-        # TODO (Roman): Refactor to use DbContext. Needed features:
+        # TODO (Roman): Refactor to use DataContext. Needed features:
         #   - sort by specific field in descending order
         #   - limit sorted result
 
-        db = DbContext._get_db()
+        db = DataContext._get_db()
 
         if isinstance(db, SqliteDb):
             return cls._query_sorted_desc_and_limited_sqlite(

@@ -14,7 +14,7 @@
 
 import pytest
 import os
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.qa.qa_util import QaUtil
 from stubs.cl.runtime import StubDataclassComposite
@@ -48,12 +48,12 @@ def test_csv_file_reader(default_db_fixture):
             id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
         ).build()
         key = StubDataclassKey(id=f"derived_id_{i}").build()
-        record = DbContext.load_one(key)
+        record = DataContext.load_one(key)
         assert record == expected_record
 
     for i in range(1, 4):
         expected_record = StubDataclassNestedFields().build()
-        record = DbContext.load_one(expected_record.get_key())
+        record = DataContext.load_one(expected_record.get_key())
         assert record == expected_record
 
     for i in range(1, 4):
@@ -62,7 +62,7 @@ def test_csv_file_reader(default_db_fixture):
             embedded_1=StubDataclassKey(id=f"embedded_key_id_{i}a"),
             embedded_2=StubDataclassKey(id=f"embedded_key_id_{i}b"),
         ).build()
-        record = DbContext.load_one(expected_record.get_key())
+        record = DataContext.load_one(expected_record.get_key())
         assert record == expected_record
 
 

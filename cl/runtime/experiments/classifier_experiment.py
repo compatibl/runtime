@@ -16,7 +16,7 @@ from abc import ABC
 from collections import Counter
 from dataclasses import dataclass
 from typing import List
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.experiments.classifier_trial import ClassifierTrial
 from cl.runtime.experiments.experiment import Experiment
 from cl.runtime.experiments.trial_key_query import TrialKeyQuery
@@ -43,7 +43,7 @@ class ClassifierExperiment(Experiment, ABC):
 
         scenario_counts = []
         trial_query = TrialKeyQuery(experiment=self.get_key()).build()
-        all_trials = DbContext.load_where(trial_query, cast_to=ClassifierTrial)
+        all_trials = DataContext.load_where(trial_query, cast_to=ClassifierTrial)
 
         for scenario in self.scenarios:
             trials = self.get_scenario_trials(all_trials, scenario)

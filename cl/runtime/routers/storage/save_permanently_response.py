@@ -18,7 +18,7 @@ from typing import DefaultDict
 from typing import Iterable
 import pandas as pd
 from pydantic import BaseModel
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
@@ -38,7 +38,7 @@ def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[type
     type_hint = TypeHint.for_class(request_type, optional=True)
 
     key_objs = [_KEY_SERIALIZER.deserialize(key, type_hint) for key in request.keys]
-    records = DbContext.load_many(key_objs)
+    records = DataContext.load_many(key_objs)
 
     # TODO (Bohdan): Implement with_dependencies logic.
     # if request.with_dependencies:
@@ -48,7 +48,7 @@ def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[type
     #         for dag_node in Dag.create_data_connection_dag_from_record(data=record).nodes
     #         if dag_node.data.node_data_reference
     #     ]
-    #     records = DbContext.load_many(key_objs)
+    #     records = DataContext.load_many(key_objs)
 
     type_to_records_map = defaultdict(list)
     for record in records:

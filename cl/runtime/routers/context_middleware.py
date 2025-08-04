@@ -15,7 +15,7 @@
 from starlette.types import ASGIApp
 from cl.runtime import Db
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.contexts.process_context import ProcessContext
 
 
@@ -34,7 +34,7 @@ class ContextMiddleware:
         token = ContextSnapshot.save_and_clear_state()
         try:
             with ProcessContext().build():
-                with DbContext(db=Db.create()).build():
+                with DataContext(db=Db.create()).build():
                     # TODO: Create a test setting to enable this other than by uncommenting
                     # await asyncio.sleep(duration)
                     await self.app(scope, receive, send)

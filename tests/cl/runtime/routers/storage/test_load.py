@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
@@ -28,7 +28,7 @@ def test_method(default_db_fixture):
 
     # Save test record.
     record = StubDataclass(id=__name__).build()
-    DbContext.save_one(record)
+    DataContext.save_one(record)
 
     # Run the coroutine wrapper added by the FastAPI decorator and get the result.
     load_request = LoadRequest(load_keys=[KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclass))])
@@ -52,7 +52,7 @@ def test_api(default_db_fixture):
     with QaClient() as test_client:
         # Save test record.
         record = StubDataclass(id=__name__).build()
-        DbContext.save_one(record)
+        DataContext.save_one(record)
 
         # Request body.
         request_body = [KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclass)).model_dump()]

@@ -39,7 +39,7 @@ _KEY_SERIALIZER = KeySerializers.TUPLE
 
 
 @dataclass(slots=True, kw_only=True)
-class DbContext(ContextMixin, DataMixin):
+class DataContext(ContextMixin, DataMixin):
     """Includes database and dataset."""
 
     db: Db | None = None
@@ -50,16 +50,16 @@ class DbContext(ContextMixin, DataMixin):
     Dataset can be a single token or multiple tokens in backslash-delimited format.
 
     Notes:
-      - Datasets for the DbContext stack are concatenated in the order entered separately for each DB
+      - Datasets for the DataContext stack are concatenated in the order entered separately for each DB
       - Because 'with' clause cannot be under if/else, in some cases dataset may be None
-        but 'with DbContext(...)' clause would still be present.
+        but 'with DataContext(...)' clause would still be present.
       - If dataset is None, it is is disregarded
-      - If dataset is None for the entire the DbContext stack, this method returns None
+      - If dataset is None for the entire the DataContext stack, this method returns None
     """
 
     @classmethod
     def get_base_type(cls) -> type:
-        return DbContext
+        return DataContext
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
@@ -88,21 +88,21 @@ class DbContext(ContextMixin, DataMixin):
 
         #  Load 'db' field of this context using 'Context.current()'
         if self.db is not None and is_key(self.db):
-            self.db = DbContext.load_one(self.db)  # TODO: Revise to use DB settings
+            self.db = DataContext.load_one(self.db)  # TODO: Revise to use DB settings
 
         if self.db is not None:
             logger.info(f"Connected to Db of type '{TypeUtil.name(self.db)}', db_id = '{self.db.db_id}'.")
 
     @classmethod
     def get_db_id(cls) -> str:
-        """Get db_id of the database from the current context or error message if not inside 'with DbContext(...)' clause."""
+        """Get db_id of the database from the current context or error message if not inside 'with DataContext(...)' clause."""
         return cls._get_db().db_id
 
     @classmethod
     def get_dataset(cls, dataset: str | None = None) -> str | None:
         """
-        Unique dataset in backslash-delimited format obtained by concatenating identifiers from the DbContext stack
-        for the same DB as the current context in the order entered, or None outside 'with DbContext(...)' clause.
+        Unique dataset in backslash-delimited format obtained by concatenating identifiers from the DataContext stack
+        for the same DB as the current context in the order entered, or None outside 'with DataContext(...)' clause.
         The result is combined with dataset. If the overall result is None, root dataset is used.
         """
         if (context := cls.current_or_none()) is not None:
@@ -498,20 +498,20 @@ class DbContext(ContextMixin, DataMixin):
     @classmethod
     def _get_db(cls) -> Db:
         """
-        Return DB for the current DbContext inside the 'with DbContext(...)' clause.
-        Return the default DB from settings outside the outermost 'with DbContext(...)' clause.
+        Return DB for the current DataContext inside the 'with DataContext(...)' clause.
+        Return the default DB from settings outside the outermost 'with DataContext(...)' clause.
         """
-        if (db_context := DbContext.current_or_none()) is not None:
+        if (data_context := DataContext.current_or_none()) is not None:
             # Use the value from the current context if not None
-            return db_context.db
+            return data_context.db
         else:
             if ProcessContext.is_testing():
                 raise RuntimeError(
                     "To use DB in a test, specify default_db_fixture or similar pytest fixture or "
-                    "use 'with DbContext(...)' clause if not using pytest."
+                    "use 'with DataContext(...)' clause if not using pytest."
                 )
             else:
-                raise RuntimeError("Attempting to access DB outside the outermost 'with DbContext(...)' clause.")
+                raise RuntimeError("Attempting to access DB outside the outermost 'with DataContext(...)' clause.")
 
     @classmethod
     def _pre_save_check(cls, record: RecordProtocol) -> None:

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.schema.type_cache import TypeCache
@@ -50,6 +50,6 @@ class DeleteResponseUtil:
         )
 
         # Delete records.
-        DbContext.delete_many(deserialized_keys)
+        DataContext.delete_many(deserialized_keys)
 
         return request.delete_keys

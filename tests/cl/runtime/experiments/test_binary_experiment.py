@@ -14,7 +14,7 @@
 
 import pytest
 import random
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_type import ExperimentType
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
@@ -29,8 +29,8 @@ def test_smoke(multi_db_fixture):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
-    DbContext.save_one(exp_type)
-    DbContext.save_one(sc1)
+    DataContext.save_one(exp_type)
+    DataContext.save_one(sc1)
 
     # Create and run the experiment
     experiment = StubBinaryExperiment(
@@ -57,8 +57,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test2"
     ).build()
 
-    DbContext.save_one(exp_type)
-    DbContext.save_many([sc1, sc2])
+    DataContext.save_one(exp_type)
+    DataContext.save_many([sc1, sc2])
 
     experiment = StubBinaryExperiment(
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"),

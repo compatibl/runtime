@@ -14,7 +14,7 @@
 
 import pytest
 import time
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 
 
@@ -27,25 +27,25 @@ def test_performance(multi_db_fixture):
 
     print(f">>> Test stub type: {StubDataclassPrimitiveFields.__name__}, {n=}.")
     start_time = time.time()
-    DbContext.save_many(samples)
+    DataContext.save_many(samples)
     end_time = time.time()
 
     print(f"Save many bulk: {end_time - start_time}s.")
 
     start_time = time.time()
     for sample in samples:
-        DbContext.save_one(sample)
+        DataContext.save_one(sample)
     end_time = time.time()
     print(f"Save many one by one: {end_time - start_time}s.")
 
     start_time = time.time()
-    list(DbContext.load_many(sample_keys))
+    list(DataContext.load_many(sample_keys))
     end_time = time.time()
     print(f"Load many bulk: {end_time - start_time}s.")
 
     start_time = time.time()
     for key in sample_keys:
-        DbContext.load_one(key)
+        DataContext.load_one(key)
     end_time = time.time()
     print(f"Load many one by one: {end_time - start_time}s.")
 

@@ -15,7 +15,7 @@
 import datetime as dt
 import time
 from dataclasses import dataclass
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_query import TaskQuery
@@ -48,11 +48,11 @@ class ProcessQueue(TaskQueue):
 
             # Tasks that are awaiting completion of other tasks and will have priority for subsequent execution
             awaiting_query = TaskQuery(queue=queue_key, status=TaskStatus.AWAITING).build()
-            awaiting_tasks = DbContext.load_where(awaiting_query, cast_to=Task)
+            awaiting_tasks = DataContext.load_where(awaiting_query, cast_to=Task)
 
             # The task that have been submitted to the queue but are not yet running
             pending_query = TaskQuery(queue=queue_key, status=TaskStatus.PENDING).build()
-            pending_tasks = DbContext.load_where(pending_query, cast_to=Task)
+            pending_tasks = DataContext.load_where(pending_query, cast_to=Task)
 
             # Awaiting tasks have priority over pending tasks
             queued_tasks = awaiting_tasks + pending_tasks

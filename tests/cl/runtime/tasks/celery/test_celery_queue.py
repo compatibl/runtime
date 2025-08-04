@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import execute_task
 from cl.runtime.tasks.static_method_task import StaticMethodTask
@@ -29,7 +29,7 @@ def _create_task(queue: TaskQueueKey) -> TaskKey:
 
     method_callable = StubHandlers.run_static_method_1a
     task = StaticMethodTask.create(queue=queue, record_type=StubHandlers, method_callable=method_callable).build()
-    DbContext.save_one(task)
+    DataContext.save_one(task)
     return task.get_key()
 
 
@@ -40,7 +40,7 @@ def test_method(celery_queue_fixture):
     # Create queue
     queue_id = f"test_celery_queue.test_method"
     queue = CeleryQueue(queue_id=queue_id)
-    DbContext.save_one(queue)
+    DataContext.save_one(queue)
 
     # Create task
     task_key = _create_task(queue.get_key())
@@ -59,7 +59,7 @@ def test_api(celery_queue_fixture):
     # Create queue
     queue_id = f"test_celery_queue.test_api"
     queue = CeleryQueue(queue_id=queue_id)
-    DbContext.save_one(queue)
+    DataContext.save_one(queue)
 
     # Create task
     task_key = _create_task(queue.get_key())

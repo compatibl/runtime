@@ -19,7 +19,7 @@ from collections import deque
 from typing import AsyncGenerator
 from typing import Coroutine
 from starlette.requests import Request
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_broker import EventBroker
@@ -41,7 +41,7 @@ def _handle_async_task_exception(task: asyncio.Task):
 
 class DbEventBroker(EventBroker):
     """
-    Event broker that uses current DbContext as transport for events.
+    Event broker that uses current DataContext as transport for events.
     Constantly checks if there are new events in the DB and sends them to the queue.
     """
 
@@ -89,7 +89,7 @@ class DbEventBroker(EventBroker):
 
     def sync_publish(self, topic: str, event: Event) -> None:
         # Publish event by just saving to DB
-        DbContext.save_one(event)
+        DataContext.save_one(event)
 
     async def close(self) -> None:
         # Cancel pull events task
@@ -101,7 +101,7 @@ class DbEventBroker(EventBroker):
 
         while True:
             # Get unprocessed events from the DB, sorted by ascending timestamp
-            # TODO (Roman): Replace with DbContext.query() when supported
+            # TODO (Roman): Replace with DataContext.query() when supported
             new_events = self._get_unprocessed_events()
 
             if new_events:

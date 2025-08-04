@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.db.local.local_cache import LocalCache
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
@@ -21,7 +21,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclas
 def test_smoke():
     """Smoke test."""
 
-    with DbContext(db=LocalCache.instance()).build():
+    with DataContext(db=LocalCache.instance()).build():
 
         # Create test record and populate with sample data
         record = StubDataclass().build()
@@ -31,10 +31,10 @@ def test_smoke():
         dataset = None  # TODO: Support datasets "\\sample_dataset"
 
         # Save a single record
-        DbContext.save_many([record], dataset=dataset)
+        DataContext.save_many([record], dataset=dataset)
 
         loaded_records = list(
-            DbContext.load_many(
+            DataContext.load_many(
                 [record, key, None],
                 dataset=dataset,
             )

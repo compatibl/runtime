@@ -19,7 +19,7 @@ from cl.runtime import RecordListView
 from cl.runtime import RecordView
 from cl.runtime import TypeCache
 from cl.runtime import View
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_key
@@ -60,7 +60,7 @@ class UiRecordUtil(DataMixin):
             key = _KEY_SERIALIZER.deserialize(key, TypeHint.for_class(request_type.get_key_type()))
 
             # If the record is not found, display panel tabs for the base type
-            record = DbContext.load_one_or_none(key)
+            record = DataContext.load_one_or_none(key)
             actual_type = request_type if record is None else type(record)
         else:
             actual_type = request_type
@@ -134,7 +134,7 @@ class UiRecordUtil(DataMixin):
         key_obj = _KEY_SERIALIZER.deserialize(key, TypeHint.for_class(type_.get_key_type()))
 
         # Load record from the database.
-        record = DbContext.load_one(key_obj)
+        record = DataContext.load_one(key_obj)
         if record is None:
             raise RuntimeError(f"Record with type {type_name} and key {key} is not found.")
 

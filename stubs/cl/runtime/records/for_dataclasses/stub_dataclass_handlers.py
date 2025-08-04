@@ -239,5 +239,5 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     # def run_save_to_db(self):
     #     """Stub method."""
     #     record_to_save = StubDataclass(id="saved_from_handler").build()
-    #     DbContext.save_one(record_to_save)
+    #     DataContext.save_one(record_to_save)
     #     LogContext.get_logger(module_name=__name__).info(f"Record {record_to_save} has been saved to db from handler.")

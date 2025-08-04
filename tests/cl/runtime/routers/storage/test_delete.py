@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.delete_response_util import DeleteResponseUtil
@@ -27,7 +27,7 @@ def test_method(default_db_fixture):
     existing_records = [
         StubDataclassDerived(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build() for i in range(5)
     ]
-    DbContext.save_many(existing_records)
+    DataContext.save_many(existing_records)
 
     delete_records_payload = {
         "delete_keys": [{"key": record.id, "type": "StubDataclassDerived"} for record in existing_records[:3]]
@@ -35,7 +35,7 @@ def test_method(default_db_fixture):
     delete_records_request_obj = DeleteRequest(**delete_records_payload)
 
     delete_records_result = DeleteResponseUtil.delete_records(delete_records_request_obj)
-    records_in_db = sorted(DbContext.load_type(StubDataclassDerived), key=lambda x: x.id)
+    records_in_db = sorted(DataContext.load_type(StubDataclassDerived), key=lambda x: x.id)
 
     # Check if result is a list[KeyRequestItem] object.
     assert isinstance(delete_records_result, list)
@@ -55,7 +55,7 @@ def test_api(default_db_fixture):
         existing_records = [
             StubDataclassDerived(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build() for i in range(5)
         ]
-        DbContext.save_many(existing_records)
+        DataContext.save_many(existing_records)
 
         delete_records_payload = [{"Key": record.id, "Type": "StubDataclassDerived"} for record in existing_records[:3]]
 
@@ -64,7 +64,7 @@ def test_api(default_db_fixture):
             json=delete_records_payload,
         )
         delete_records_json = delete_records_response.json()
-        records_in_db = sorted(DbContext.load_type(StubDataclassDerived), key=lambda x: x.id)
+        records_in_db = sorted(DataContext.load_type(StubDataclassDerived), key=lambda x: x.id)
 
         assert delete_records_response.status_code == 200
         assert isinstance(delete_records_json, list)

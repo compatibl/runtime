@@ -20,7 +20,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 from cl.runtime import Db
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_config import logging_config
@@ -82,7 +82,7 @@ def run_backend() -> None:
     # Set up logging config
     logging.config.dictConfig(logging_config)
 
-    with ProcessContext().build(), DbContext(db=Db.create()).build():
+    with ProcessContext().build(), DataContext(db=Db.create()).build():
 
         # TODO: This only works for the Mongo celery backend
         celery_delete_existing_tasks()

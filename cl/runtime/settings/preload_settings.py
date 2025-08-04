@@ -18,7 +18,7 @@ from typing import List
 from typing import final
 from typing_extensions import final
 from cl.runtime.configs.config import Config
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -65,7 +65,7 @@ class PreloadSettings(Settings):
         # TODO: Process YAML and JSON preloads
 
         # Execute run_config on all preloaded Config records
-        config_records = DbContext.load_type(Config)
+        config_records = DataContext.load_type(Config)
         tuple(config_record.run_configure() for config_record in config_records)
 
     def _get_files(self, ext: str) -> List[str]:
