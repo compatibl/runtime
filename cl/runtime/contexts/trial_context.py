@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Tuple
 from typing_extensions import Self
-from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import TPrimitive
@@ -26,7 +26,7 @@ from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialContext(Context):
+class TrialContext(ContextMixin):
     """Context for a trial in an experiment."""
 
     trial_chain: Tuple[str, ...]

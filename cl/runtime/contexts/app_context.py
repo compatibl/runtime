@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from getpass import getuser
-from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.settings.app_env import AppEnv
@@ -22,7 +22,7 @@ from cl.runtime.settings.app_settings import AppSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class AppContext(Context):
+class AppContext(ContextMixin):
     """Context for the naming and location of the app data."""
 
     env: AppEnv = required()

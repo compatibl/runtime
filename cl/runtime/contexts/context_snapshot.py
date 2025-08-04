@@ -19,7 +19,7 @@ from typing import List
 from typing import Sequence
 from typing_extensions import Self
 from cl.runtime.contexts.context import _CONTEXT_STACK_DICT_VAR
-from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 _CONTEXT_SERIALIZER = DataSerializers.FOR_JSON
@@ -27,16 +27,16 @@ _CONTEXT_SERIALIZER = DataSerializers.FOR_JSON
 
 
 @dataclass(slots=True, kw_only=True)
-class ContextManager:
+class ContextSnapshot:
     """Records current context for each context key type and restores them during out-of-process task execution."""
 
-    _all_contexts: List[Context] | None = None
+    _all_contexts: List[ContextMixin] | None = None
     """All contexts that will be entered into during out-of-process task execution."""
 
-    _entered_contexts: List[Context] | None = None
+    _entered_contexts: List[ContextMixin] | None = None
     """
-    Contexts for which __enter__ method has been called inside ContextManager.__enter__ so far.
-    For each of these contexts, __exit__ will be invoked in case of an error in ContextManager.__enter__ method.
+    Contexts for which __enter__ method has been called inside ContextSnapshot.__enter__ so far.
+    For each of these contexts, __exit__ will be invoked in case of an error in ContextSnapshot.__enter__ method.
     """
 
     _token: Token | None = None
@@ -55,10 +55,10 @@ class ContextManager:
             self._all_contexts = _CONTEXT_SERIALIZER.deserialize(data)
             for context in self._all_contexts:
                 # Ensure context is derived from Context
-                if not isinstance(context, Context):
+                if not isinstance(context, ContextMixin):
                     raise RuntimeError(
-                        f"Context {type(context).__name__} cannot be activated by ContextManager "
-                        f"because it is not derived from {Context.__name__}."
+                        f"Context {type(context).__name__} cannot be activated by ContextSnapshot "
+                        f"because it is not derived from {ContextMixin.__name__}."
                     )
                 # Build the deserialized record
                 context.build()
@@ -70,12 +70,12 @@ class ContextManager:
         if self._token is None:
             self._token = self.save_and_clear_state()
         else:
-            raise RuntimeError("Nested 'with' clauses are not permitted or necessary with ContextManager.")
+            raise RuntimeError("Nested 'with' clauses are not permitted or necessary with ContextSnapshot.")
 
         # Ensure there are no stale entered contexts
         if self._entered_contexts:
             # Check if any exist
-            raise RuntimeError("Stale context entry status detected in ContextManager.")
+            raise RuntimeError("Stale context entry status detected in ContextSnapshot.")
         else:
             # Assign empty list as it could be None
             self._entered_contexts = []
@@ -110,7 +110,7 @@ class ContextManager:
             if self._token is not None:
                 self.restore_state(self._token)
             else:
-                raise RuntimeError("Detected ContextManager.__exit__ without a preceding ContextManager.__enter__.")
+                raise RuntimeError("Detected ContextSnapshot.__exit__ without a preceding ContextSnapshot.__enter__.")
 
     @classmethod
     def save_and_clear_state(cls) -> Token:
@@ -127,14 +127,14 @@ class ContextManager:
         """Serialize all current contexts to a list of dicts, each dict represents one serialized context."""
 
         # Get current contexts for all key types
-        contexts = Context.current_contexts()
+        contexts = ContextMixin.current_contexts()
 
         # Serialize
         result = cls._serialize_contexts(contexts)
         return result
 
     @classmethod
-    def _serialize_contexts(cls, contexts: Sequence[Context]) -> Sequence[Dict]:
+    def _serialize_contexts(cls, contexts: Sequence[ContextMixin]) -> Sequence[Dict]:
         """Serialize argument contexts to a list of dicts, each dict represents one serialized context."""
 
         # Use serializer

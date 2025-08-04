@@ -17,7 +17,7 @@ from logging import getLogger
 from typing import Iterable
 from typing import Sequence
 from cl.runtime import Db
-from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
 from cl.runtime.records.protocols import KeyProtocol
@@ -38,7 +38,7 @@ _KEY_SERIALIZER = KeySerializers.TUPLE
 
 
 @dataclass(slots=True, kw_only=True)
-class DbContext(Context):
+class DbContext(ContextMixin):
     """Includes database and dataset."""
 
     db: Db | None = None

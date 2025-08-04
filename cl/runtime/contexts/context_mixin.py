@@ -31,7 +31,7 @@ Each asynchronous environment has its own stack dictionary
 
 
 @dataclass(slots=True, kw_only=True)
-class Context(DataMixin, ABC):
+class ContextMixin(DataMixin, ABC):
     """
     Abstract base of context classes.
 
@@ -84,7 +84,7 @@ class Context(DataMixin, ABC):
     def current_contexts(cls) -> List[Self]:
         """
         Return the list of current contexts across all key types, or an empty list if none exist.
-        This method is used by the ContextManager to restore the current contexts for out-of-process
+        This method is used by the ContextSnapshot to restore the current contexts for out-of-process
         task execution.
         """
         context_stack_dict = _CONTEXT_STACK_DICT_VAR.get()

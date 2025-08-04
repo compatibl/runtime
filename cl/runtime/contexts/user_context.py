@@ -16,14 +16,14 @@ from dataclasses import dataclass
 from getpass import getuser
 from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.contexts.context import Context
+from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class UserContext(Context):
+class UserContext(ContextMixin):
     """User-specific settings and data."""
 
     user: UserKey = required()

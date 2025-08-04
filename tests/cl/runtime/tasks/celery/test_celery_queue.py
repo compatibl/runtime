@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.context_manager import ContextManager
+from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.contexts.db_context import DbContext
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import execute_task
@@ -46,10 +46,10 @@ def test_method(celery_queue_fixture):
     task_key = _create_task(queue.get_key())
 
     # Call 'execute_task' method in-process
-    context_manager_data = ContextManager.serialize_current_contexts()
+    context_snapshot_data = ContextSnapshot.serialize_current_contexts()
     execute_task(
         task_key.task_id,
-        context_manager_data,
+        context_snapshot_data,
     )
 
 
