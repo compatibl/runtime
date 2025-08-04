@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.local.local_cache import LocalCache
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
@@ -21,7 +22,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclas
 def test_smoke():
     """Smoke test."""
 
-    with DataContext(db=LocalCache.instance()).build():
+    with DataSource(db=LocalCache.instance()).build():
 
         # Create test record and populate with sample data
         record = StubDataclass().build()

@@ -17,6 +17,7 @@ from cl.runtime import Db
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.contexts.process_context import ProcessContext
+from cl.runtime.db.data_source import DataSource
 
 
 class ContextMiddleware:
@@ -34,7 +35,7 @@ class ContextMiddleware:
         token = ContextSnapshot.save_and_clear_state()
         try:
             with ProcessContext().build():
-                with DataContext(db=Db.create()).build():
+                with DataSource(db=Db.create()).build():
                     # TODO: Create a test setting to enable this other than by uncommenting
                     # await asyncio.sleep(duration)
                     await self.app(scope, receive, send)

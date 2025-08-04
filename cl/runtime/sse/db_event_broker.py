@@ -101,7 +101,7 @@ class DbEventBroker(EventBroker):
 
         while True:
             # Get unprocessed events from the DB, sorted by ascending timestamp
-            # TODO (Roman): Replace with DataContext.query() when supported
+            # TODO (Roman): Replace with DataSource.query() when supported
             new_events = self._get_unprocessed_events()
 
             if new_events:

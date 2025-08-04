@@ -21,6 +21,7 @@ from bson import UUID_SUBTYPE
 from bson import Binary
 from cl.runtime import Db
 from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
 from cl.runtime.db.sql.sqlite_db import SqliteDb
@@ -45,7 +46,7 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
     db.drop_test_db()
 
     # Run with the created DB, return db from the fixture
-    with DataContext(db=db).build():
+    with DataSource(db=db).build():
         yield db
 
     # Delete all existing records in unit test DB after the test
