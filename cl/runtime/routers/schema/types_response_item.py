@@ -60,4 +60,16 @@ class TypesResponseItem(BaseModel):
             for table in DataContext.get_tables()
         ]
 
+        # Check name collisions between types and tables
+        cls._check_name_collisions(types_result, tables_result)
+
         return tables_result + types_result
+
+    @classmethod
+    def _check_name_collisions(cls, types: list[TypesResponseItem], tables: list[TypesResponseItem]) -> None:
+        """Check name collisions between types and tables."""
+        collisions = set([x.name for x in types]) & set([x.name for x in tables])
+        if collisions:
+            raise RuntimeError(
+                f"Name collision detected. The following names are used in both 'types' and 'tables': {', '.join(collisions)}"
+            )
