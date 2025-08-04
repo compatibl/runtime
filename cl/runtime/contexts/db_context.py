@@ -20,6 +20,7 @@ from cl.runtime import Db
 from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.dataset_util import DatasetUtil
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TKey
@@ -38,7 +39,7 @@ _KEY_SERIALIZER = KeySerializers.TUPLE
 
 
 @dataclass(slots=True, kw_only=True)
-class DbContext(ContextMixin):
+class DbContext(ContextMixin, DataMixin):
     """Includes database and dataset."""
 
     db: Db | None = None

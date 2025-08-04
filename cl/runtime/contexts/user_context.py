@@ -19,11 +19,12 @@ from cl.runtime.backend.core.user_key import UserKey
 from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class UserContext(ContextMixin):
+class UserContext(ContextMixin, DataMixin):
     """User-specific settings and data."""
 
     user: UserKey = required()

@@ -15,10 +15,11 @@
 from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.contexts.context_mixin import ContextMixin
+from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class StubContext(ContextMixin):
+class StubContext(ContextMixin, DataMixin):
     """Stub context."""
 
     stub_context_id: str = "abc"

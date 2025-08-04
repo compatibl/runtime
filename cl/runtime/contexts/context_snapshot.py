@@ -18,7 +18,7 @@ from typing import Dict
 from typing import List
 from typing import Sequence
 from typing_extensions import Self
-from cl.runtime.contexts.context import _CONTEXT_STACK_DICT_VAR
+from cl.runtime.contexts.context_mixin import _CONTEXT_STACK_DICT_VAR
 from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 

@@ -15,10 +15,11 @@
 import logging
 from dataclasses import dataclass
 from cl.runtime.contexts.context_mixin import ContextMixin
+from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class LogContext(ContextMixin):
+class LogContext(ContextMixin, DataMixin):
     """Provides get_logger() method returning a configured logger."""
 
     handler: str | None = None

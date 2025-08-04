@@ -15,13 +15,14 @@
 from dataclasses import dataclass
 from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
-class ProcessContext(ContextMixin):
+class ProcessContext(ContextMixin, DataMixin):
     """Provides information about the currently running test."""
 
     testing: bool = False
