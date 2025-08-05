@@ -34,10 +34,10 @@ class TypeTablesResponseItem(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def get_type_tables(cls, request: TypeRequest) -> list[TypeTables]:
+    def get_type_tables(cls, request: TypeRequest) -> list[TypeTablesResponseItem]:
         """Implements /schema/type-tables route."""
 
         bound_type_name = request.type_name
         bindings = DbContext.get_bound_tables(record_type=bound_type_name)
 
-        return [TypeTables(name=type_name) for type_name in bindings]
+        return [TypeTablesResponseItem(name=type_name) for type_name in bindings]
