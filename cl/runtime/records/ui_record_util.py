@@ -112,7 +112,7 @@ class UiRecordUtil(DataMixin):
     def _get_panel_kind(cls, handler: HandlerDeclareDecl) -> str | None:
         """Get type of the handler."""
 
-        if handler.type_ == "Viewer" and handler.name == "view_self":
+        if handler.type_ == "Viewer" and handler.name == "self":
             return "Primary"
         else:
             return None
@@ -148,7 +148,7 @@ class UiRecordUtil(DataMixin):
             raise RuntimeError(f"Type {TypeUtil.name(record)} has no view named '{panel_id}'.")
 
         # Call viewer method and get the result.
-        viewer = getattr(record, viewer_name)
+        viewer = getattr(record, f"view_{viewer_name}")
         viewer_result = viewer()
 
         # Get View object for viewer result.

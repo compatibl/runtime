@@ -36,6 +36,9 @@ class TaskUtil:
         # Workaround for static handlers
         requested_keys = request.keys if request.keys else [None]
 
+        # Add 'run_' prefix to method name to get handler name
+        handler_name = f"run_{request.method}"
+
         # TODO (Roman): Workaround to make handlers with parameters work.
         #  Currently, we do not support non-string arguments for handlers in the MethodTask class model.
         request_arguments = {k: str(v) for k, v in request.arguments.items()} if request.arguments else None
@@ -55,13 +58,13 @@ class TaskUtil:
                     key_type = DataContext.get_bound_key_type(table=request.type)
 
                 key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
-                label = f"{TypeUtil.name(key_type)};{serialized_key};{request.method}"
+                label = f"{TypeUtil.name(key_type)};{serialized_key};{handler_name}"
                 handler_task = InstanceMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),
                     key_type_str=key_type_str,
                     key_str=serialized_key,
-                    method_name=request.method,
+                    method_name=handler_name,
                     method_params=request_arguments,
                 ).build()
                 tasks.append(handler_task)
@@ -69,12 +72,12 @@ class TaskUtil:
                 # Key is None, this is a @classmethod or @staticmethod
                 record_type = TypeCache.get_class_from_type_name(request.type)
                 record_type_str = f"{record_type.__module__}.{TypeUtil.name(record_type)}"
-                label = f"{TypeUtil.name(record_type)};{request.method}"
+                label = f"{TypeUtil.name(record_type)};{handler_name}"
                 handler_task = StaticMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),
                     type_str=record_type_str,
-                    method_name=request.method,
+                    method_name=handler_name,
                     method_params=request_arguments,
                 ).build()
                 tasks.append(handler_task)

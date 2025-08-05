@@ -74,7 +74,7 @@ class PanelResponseUtil:
             raise RuntimeError(f"Type {TypeUtil.name(record)} has no view named '{request.panel_id}'.")
 
         # Call viewer method and get the result.
-        viewer = getattr(record, viewer_name)
+        viewer = getattr(record, f"view_{viewer_name}")
         viewer_result = viewer()
 
         # Get View object for viewer result.

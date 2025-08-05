@@ -1,6 +1,6 @@
 _t: RecordView
 ViewFor: media_viewers
-ViewName: view_markdown
+ViewName: markdown
 Record:
   _t: Script
   Name: Stub markdown text.

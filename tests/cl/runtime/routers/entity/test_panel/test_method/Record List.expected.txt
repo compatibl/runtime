@@ -1,6 +1,6 @@
 _t: RecordListView
 ViewFor: data_viewers
-ViewName: view_record_list
+ViewName: record_list
 Records:
 - _t: StubDataclassNestedFields
   Id: abc

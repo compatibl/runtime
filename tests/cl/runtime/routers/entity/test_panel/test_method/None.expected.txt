@@ -1,4 +1,4 @@
 _t: EmptyView
 ViewFor: data_viewers
-ViewName: view_none
+ViewName: none
 

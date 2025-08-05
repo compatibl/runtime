@@ -1,6 +1,6 @@
 _t: RecordView
 ViewFor: media_viewers
-ViewName: view_dag
+ViewName: dag
 Record:
   _t: Dag
   Name: dag_data
