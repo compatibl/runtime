@@ -18,6 +18,7 @@ from fastapi import Query
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.routers.schema.type_successors_response_item import TypeSuccessorsResponseItem
+from cl.runtime.routers.schema.type_tables_response_item import TypeTablesResponseItem
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
 
 router = APIRouter()
@@ -43,3 +44,11 @@ async def get_type_successors(
 ) -> list[TypeSuccessorsResponseItem]:
     """Return type class successors."""
     return TypeSuccessorsResponseItem.get_type_successors(TypeRequest(type_name=type_name))
+
+
+@router.get("/type-tables", response_model=list[TypeTablesResponseItem])
+async def get_type_tables(
+    type_name: Annotated[str, Query(description="Type shortname.")],
+) -> list[TypeTablesResponseItem]:
+    """Return type bound tables."""
+    return TypeTablesResponseItem.get_type_tables(TypeRequest(type_name=type_name))
