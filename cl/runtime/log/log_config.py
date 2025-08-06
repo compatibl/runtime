@@ -18,6 +18,7 @@ import socket
 import threading
 from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.contexts.log_context import LogContext
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.settings.log_settings import LogSettings
@@ -151,7 +152,7 @@ def _make_filter_db_logs():
         third_party_logs = record.levelno <= logging.INFO and record.name.startswith(("uvicorn", "celery"))
 
         # Filter out if the log was created outside the DataContext
-        outside_data_context = DataContext.current_or_none() is None
+        outside_data_context = DataSource.current_or_none() is None
 
         return not any(
             (

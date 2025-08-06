@@ -24,7 +24,7 @@ class TableBindingKeyQueryByRecordType(QueryMixin):
     """Query for TableBindingKey by record type field only."""
 
     record_type: str | Condition[str] | None = None
-    """Record type name in non-delimited PascalCase format."""
+    """Record type name in PascalCase format."""
 
     def get_target_type(self) -> type[KeyMixin]:
         return TableBindingKey

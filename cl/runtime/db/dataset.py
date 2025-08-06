@@ -13,6 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from typing_extensions import Self
+
 from cl.runtime.db.dataset_key import DatasetKey
 from cl.runtime.records.record_mixin import RecordMixin
 
@@ -23,3 +26,7 @@ class Dataset(DatasetKey, RecordMixin):
 
     def get_key(self) -> DatasetKey:
         return DatasetKey(dataset_id=self.dataset_id).build()
+
+    @classmethod
+    def get_root(cls) -> Self:
+        return Dataset(dataset_id="\\").build()

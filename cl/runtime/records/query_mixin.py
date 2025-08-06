@@ -30,5 +30,5 @@ class QueryMixin(DataMixin, ABC):
         """The query will return only the subtypes of this type (each derived query must override)."""
 
     def get_table(self) -> str:
-        """DB table in non-delimited PascalCase format (defaults to key type name with Key suffix removed)."""
+        """DB table in PascalCase format (defaults to key type name with Key suffix removed)."""
         return TypeUtil.name(self.get_target_type().get_key_type())

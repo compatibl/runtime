@@ -24,7 +24,7 @@ class TableBindingKeyQueryByTable(QueryMixin):
     """Query for TableBindingKey by table field only."""
 
     table: str | Condition[str] | None = None
-    """Unique table identifier in non-delimited PascalCase format."""
+    """Unique table identifier in PascalCase format."""
 
     def get_target_type(self) -> type[KeyMixin]:
         return TableBindingKey

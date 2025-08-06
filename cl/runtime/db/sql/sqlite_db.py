@@ -226,68 +226,6 @@ class SqliteDb(Db):
 
         return tuple(result)
 
-    def save_many_grouped(self, table: str, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
-
-        if not records:
-            return
-
-        # Validate table name
-        self._check_safe_identifier(table)
-
-        # Ensure all keys within the table have the same type and get that type, error otherwise
-        key_type = KeyUtil.get_key_type(table=table, records_or_keys=records)
-
-        # Create table if not exists using key_type as source for table schema
-        self._create_table(table, key_type)
-
-        serialized_records = []
-        for record in records:
-            # Add table binding
-            self._add_binding(table=table, record_type=type(record))
-
-            serialized_record = _DATA_SERIALIZER.serialize(record)
-            serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
-            serialized_records.append(serialized_record)
-
-        # Dynamically determine all relevant columns to use for query
-        columns_for_query = sorted(set(k for data in serialized_records for k in data.keys()))
-
-        # Build SQL query to insert records
-        quoted_cols = [self._quote_identifier(c) for c in columns_for_query if self._check_safe_identifier(c)]
-        placeholders = ", ".join("?" for _ in quoted_cols)
-        insert_sql = (
-            f"INSERT OR REPLACE INTO {self._quote_identifier(table)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
-        )
-
-        # Build values for SQL query
-        values_for_query = [tuple(data.get(col) for col in columns_for_query) for data in serialized_records]
-
-        # Execute SQL query
-        conn = self._get_connection()
-        conn.executemany(insert_sql, values_for_query)
-        conn.commit()
-
-    def delete_many_grouped(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
-
-        if not keys:
-            return
-
-        # Validate table name
-        self._check_safe_identifier(table)
-
-        if not self._is_table_exists(table):
-            return
-
-        serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
-
-        # Build SQL query to delete records by keys
-        placeholders = ",".join("?" for _ in serialized_keys)
-        select_sql = f'DELETE FROM {self._quote_identifier(table)} WHERE "_key" IN ({placeholders})'
-
-        # Execute SQL query
-        conn = self._get_connection()
-        conn.execute(select_sql, serialized_keys)
-
     def count_where(self, query: QueryMixin, *, dataset: str | None = None, filter_to: type | None = None) -> int:
 
         # Check that query has been frozen
@@ -340,6 +278,68 @@ class SqliteDb(Db):
 
         count = cursor.fetchone()[0]
         return count
+
+    def save_many_grouped(self, table: str, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
+
+        if not records:
+            return
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        # Ensure all keys within the table have the same type and get that type, error otherwise
+        key_type = KeyUtil.get_key_type(table=table, records_or_keys=records)
+
+        # Create table if not exists using key_type as source for table schema
+        self._create_table(table, key_type)
+
+        serialized_records = []
+        for record in records:
+            # Add table binding
+            self._add_binding(table=table, record_type=type(record), dataset=dataset)
+
+            serialized_record = _DATA_SERIALIZER.serialize(record)
+            serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
+            serialized_records.append(serialized_record)
+
+        # Dynamically determine all relevant columns to use for query
+        columns_for_query = sorted(set(k for data in serialized_records for k in data.keys()))
+
+        # Build SQL query to insert records
+        quoted_cols = [self._quote_identifier(c) for c in columns_for_query if self._check_safe_identifier(c)]
+        placeholders = ", ".join("?" for _ in quoted_cols)
+        insert_sql = (
+            f"INSERT OR REPLACE INTO {self._quote_identifier(table)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
+        )
+
+        # Build values for SQL query
+        values_for_query = [tuple(data.get(col) for col in columns_for_query) for data in serialized_records]
+
+        # Execute SQL query
+        conn = self._get_connection()
+        conn.executemany(insert_sql, values_for_query)
+        conn.commit()
+
+    def delete_many_grouped(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
+
+        if not keys:
+            return
+
+        # Validate table name
+        self._check_safe_identifier(table)
+
+        if not self._is_table_exists(table):
+            return
+
+        serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
+
+        # Build SQL query to delete records by keys
+        placeholders = ",".join("?" for _ in serialized_keys)
+        select_sql = f'DELETE FROM {self._quote_identifier(table)} WHERE "_key" IN ({placeholders})'
+
+        # Execute SQL query
+        conn = self._get_connection()
+        conn.execute(select_sql, serialized_keys)
 
     def drop_test_db(self) -> None:
         # Check preconditions

@@ -32,14 +32,9 @@ def test_smoke():
         dataset = None  # TODO: Support datasets "\\sample_dataset"
 
         # Save a single record
-        DataContext.save_many([record], dataset=dataset)
+        DataContext.save_many([record])
 
-        loaded_records = list(
-            DataContext.load_many(
-                [record, key, None],
-                dataset=dataset,
-            )
-        )
+        loaded_records = DataContext.load_many([record, key, None])
         assert loaded_records[0] is record  # Same object is returned without lookup
         assert loaded_records[1] is record  # In case of local cache only, also the same object
         assert loaded_records[2] is None

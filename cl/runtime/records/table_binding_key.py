@@ -22,10 +22,10 @@ class TableBindingKey(KeyMixin):
     """Specifies table binding to key type."""
 
     table: str = required()
-    """Unique table identifier in non-delimited PascalCase format."""
+    """Unique table identifier in PascalCase format."""
 
     record_type: str = required()
-    """Record type name in non-delimited PascalCase format."""
+    """Record type name in PascalCase format."""
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:

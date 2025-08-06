@@ -104,7 +104,7 @@ class BasicMongoDb(Db):
             data_serializer.deserialize({k: v for k, v in serialized_record.items() if k not in {"_id", "_key"}})
             for serialized_record in serialized_records
         )
-        return cast(tuple[TRecord], result)
+        return cast(tuple[TRecord, ...], result)
 
     def load_many_unsorted(
         self,
@@ -247,7 +247,7 @@ class BasicMongoDb(Db):
             table = record.get_table()
 
             # Add table binding
-            self._add_binding(table=table, record_type=type(record))
+            self._add_binding(table=table, record_type=type(record), dataset=dataset)
 
             db = self._get_mongo_db()
             collection = db[table]

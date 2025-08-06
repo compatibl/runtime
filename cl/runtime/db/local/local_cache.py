@@ -89,6 +89,15 @@ class LocalCache(Db):
     ) -> tuple[TRecord, ...]:
         raise NotImplementedError()
 
+    def count_where(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str | None = None,
+        filter_to: type | None = None,
+    ) -> int:
+        raise NotImplementedError()
+
     def save_many_grouped(
         self,
         table: str,
@@ -118,15 +127,6 @@ class LocalCache(Db):
         dataset: str | None = None,
     ) -> None:
         # Validate the dataset and if necessary convert to delimited string
-        raise NotImplementedError()
-
-    def count_where(
-        self,
-        query: QueryMixin,
-        *,
-        dataset: str | None = None,
-        filter_to: type | None = None,
-    ) -> int:
         raise NotImplementedError()
 
     def drop_test_db(self) -> None:

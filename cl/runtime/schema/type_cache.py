@@ -161,7 +161,7 @@ class TypeCache:
         Return a tuple of type names for parent classes (inclusive of self) that match the predicate.
 
         Args:
-            record_type: Record type or name in non-delimited PascalCase format.
+            record_type: Record type or name in PascalCase format.
         """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
@@ -185,7 +185,7 @@ class TypeCache:
         Result is sorted by depth in hierarchy.
 
         Args:
-            record_type: Record type or name in non-delimited PascalCase format.
+            record_type: Record type or name in PascalCase format.
         """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
@@ -223,10 +223,10 @@ class TypeCache:
     @classmethod
     def get_common_base_name(cls, *, record_types: Sequence[type | str]) -> str:
         """
-        Return non-delimited PascalCase record type name of the closest common base to the argument types.
+        Return PascalCase record type name of the closest common base to the argument types.
 
         Args:
-            record_types: Record types or names in non-delimited PascalCase format
+            record_types: Record types or names in PascalCase format
         """
 
         # Ensure the argument is not empty

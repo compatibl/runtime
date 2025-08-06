@@ -15,6 +15,7 @@
 from typing import Iterable
 from cl.runtime import SqliteDb
 from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -31,7 +32,7 @@ class SseQueryUtil:
         #   - sort by specific field in descending order
         #   - limit sorted result
 
-        db = DataContext._get_db()
+        db = DataSource.current().get_db()  # TODO: !!! Refactor to stop bypassing DataSource logic
 
         if isinstance(db, SqliteDb):
             return cls._query_sorted_desc_and_limited_sqlite(
