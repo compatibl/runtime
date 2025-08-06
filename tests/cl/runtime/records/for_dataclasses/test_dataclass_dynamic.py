@@ -70,7 +70,7 @@ def test_count_where(multi_db_fixture):
         table_field=table_field,
         record_field=record_field,
     ).build()
-    count = DataContext.count_where(query, filter_to=StubDataclassDynamic)
+    count = DataContext.count_where(query, restrict_to=StubDataclassDynamic)
     assert count == 1
 
 

@@ -58,7 +58,7 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -75,9 +75,9 @@ class SqliteDb(Db):
 
         select_sql, values = f"SELECT * FROM {self._quote_identifier(table)}", []
 
-        if filter_to is not None:
+        if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_names(filter_to)
+            subtype_names = TypeCache.get_child_names(restrict_to)
             placeholders = ",".join("?" for _ in subtype_names)
 
             select_sql += f' WHERE "_type" IN ({placeholders})'
@@ -143,7 +143,7 @@ class SqliteDb(Db):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -165,23 +165,23 @@ class SqliteDb(Db):
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_SQLITE_QUERY.serialize(query)
 
-        # Validate filter_to or use the query target type if not specified
-        if filter_to is None:
+        # Validate restrict_to or use the query target type if not specified
+        if restrict_to is None:
             # Default to the query target type
-            filter_to = query.get_target_type()
-        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
-            # Ensure filter_to is a subclass of the query target type
+            restrict_to = query.get_target_type()
+        elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
+            # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
                 f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
             )
 
         # Build SQL query to select records in table by conditions
         where, values = self._convert_query_dict_to_sql_syntax(query_dict)
 
-        if filter_to is not None:
+        if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_names(filter_to)
+            subtype_names = TypeCache.get_child_names(restrict_to)
             placeholders = ",".join("?" for _ in subtype_names)
 
             if where:
@@ -206,9 +206,9 @@ class SqliteDb(Db):
         conn = self._get_connection()
         cursor = conn.execute(select_sql, values)
 
-        # Set cast_to to filter_to if not specified
+        # Set cast_to to restrict_to if not specified
         if cast_to is None:
-            cast_to = filter_to
+            cast_to = restrict_to
 
         # Deserialize records
         result = []
@@ -226,7 +226,7 @@ class SqliteDb(Db):
 
         return tuple(result)
 
-    def count_where(self, query: QueryMixin, *, dataset: str | None = None, filter_to: type | None = None) -> int:
+    def count_where(self, query: QueryMixin, *, dataset: str | None = None, restrict_to: type | None = None) -> int:
 
         # Check that query has been frozen
         query.check_frozen()
@@ -242,23 +242,23 @@ class SqliteDb(Db):
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_SQLITE_QUERY.serialize(query)
 
-        # Validate filter_to or use the query target type if not specified
-        if filter_to is None:
+        # Validate restrict_to or use the query target type if not specified
+        if restrict_to is None:
             # Default to the query target type
-            filter_to = query.get_target_type()
-        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
-            # Ensure filter_to is a subclass of the query target type
+            restrict_to = query.get_target_type()
+        elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
+            # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
                 f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
             )
 
         # Build SQL query to count records in table by conditions
         where, values = self._convert_query_dict_to_sql_syntax(query_dict)
 
-        if filter_to is not None:
+        if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_names(filter_to)
+            subtype_names = TypeCache.get_child_names(restrict_to)
             placeholders = ",".join("?" for _ in subtype_names)
 
             if where:

@@ -50,7 +50,7 @@ class LocalCache(Db):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -82,7 +82,7 @@ class LocalCache(Db):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -94,7 +94,7 @@ class LocalCache(Db):
         query: QueryMixin,
         *,
         dataset: str | None = None,
-        filter_to: type | None = None,
+        restrict_to: type | None = None,
     ) -> int:
         raise NotImplementedError()
 

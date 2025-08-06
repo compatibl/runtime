@@ -75,7 +75,7 @@ class BasicMongoDb(Db):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -85,9 +85,9 @@ class BasicMongoDb(Db):
 
         # Filter by type
         query_dict = {}
-        if filter_to is not None:
+        if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_names(filter_to)
+            subtype_names = TypeCache.get_child_names(restrict_to)
             query_dict["_type"] = {"$in": subtype_names}
 
         # TODO: Filter by keys
@@ -135,7 +135,7 @@ class BasicMongoDb(Db):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -154,19 +154,19 @@ class BasicMongoDb(Db):
         # Convert op_* fields to MongoDB $* syntax
         query_dict = self._convert_op_fields_to_mongo_syntax(query_dict)
 
-        # Validate filter_to or use the query target type if not specified
-        if filter_to is None:
+        # Validate restrict_to or use the query target type if not specified
+        if restrict_to is None:
             # Default to the query target type
-            filter_to = query.get_target_type()
-        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
-            # Ensure filter_to is a subclass of the query target type
+            restrict_to = query.get_target_type()
+        elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
+            # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
                 f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
             )
 
         # Add filter condition on type
-        subtype_names = TypeCache.get_child_names(filter_to)
+        subtype_names = TypeCache.get_child_names(restrict_to)
         query_dict["_type"] = {"$in": subtype_names}
 
         # Get iterable from the query sorted by '_key', execution is deferred
@@ -175,9 +175,9 @@ class BasicMongoDb(Db):
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
 
-        # Set cast_to to filter_to if not specified
+        # Set cast_to to restrict_to if not specified
         if cast_to is None:
-            cast_to = filter_to
+            cast_to = restrict_to
 
         result: list[TRecord] = []
         # TODO: Convert to comprehension for performance
@@ -199,7 +199,7 @@ class BasicMongoDb(Db):
         query: QueryMixin,
         *,
         dataset: str | None = None,
-        filter_to: type | None = None,
+        restrict_to: type | None = None,
     ) -> int:
         """Return the count of documents matching the query using MongoDB's count_documents."""
         # Check that query has been frozen
@@ -216,19 +216,19 @@ class BasicMongoDb(Db):
         # Convert op_* fields to MongoDB $* syntax
         query_dict = self._convert_op_fields_to_mongo_syntax(query_dict)
 
-        # Validate filter_to or use the query target type if not specified
-        if filter_to is None:
+        # Validate restrict_to or use the query target type if not specified
+        if restrict_to is None:
             # Default to the query target type
-            filter_to = query.get_target_type()
-        elif not issubclass(filter_to, (query_target_type := query.get_target_type())):
-            # Ensure filter_to is a subclass of the query target type
+            restrict_to = query.get_target_type()
+        elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
+            # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {TypeUtil.name(self)}.load_where, filter_to={TypeUtil.name(filter_to)} is not a subclass\n"
+                f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
                 f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
             )
 
         # Add filter condition on type
-        subtype_names = TypeCache.get_child_names(filter_to)
+        subtype_names = TypeCache.get_child_names(restrict_to)
         query_dict["_type"] = {"$in": subtype_names}
 
         # Use count_documents to get the count

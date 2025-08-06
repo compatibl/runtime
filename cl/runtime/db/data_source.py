@@ -370,7 +370,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
 
     def load_type(
         self,
-        filter_to: type[TRecord],
+        restrict_to: type[TRecord],
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -378,10 +378,10 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
         """
-        Load all records of 'filter_to' type and its subtypes from all tables where they are stored.
+        Load all records of 'restrict_to' type and its subtypes from all tables where they are stored.
 
         Args:
-            filter_to: The query will return only this type and its subtypes
+            restrict_to: The query will return only this type and its subtypes
             cast_to: Cast the result to this type (error if not a subtype)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
@@ -389,7 +389,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         """
 
         # Get the list of tables where this type is stored
-        tables = self.get_bound_tables(record_type=filter_to)
+        tables = self.get_bound_tables(record_type=restrict_to)
 
         tables_len = len(tables)
         if tables_len == 0:
@@ -402,7 +402,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
             return self.load_table(
                 tables[0],
                 cast_to=cast_to,
-                filter_to=filter_to,
+                restrict_to=restrict_to,
                 project_to=project_to,
                 limit=limit,
                 skip=skip,
@@ -457,7 +457,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
                 table_result = self.load_table(
                     table,
                     cast_to=cast_to,
-                    filter_to=filter_to,
+                    restrict_to=restrict_to,
                     project_to=project_to,
                     limit=table_limit,
                     skip=None,  # Global skip is handled below
@@ -490,7 +490,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         table: str,
         *,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -501,7 +501,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         Args:
             table: The table from which the records are loaded
             cast_to: Cast the result to this type (error if not a subtype)
-            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
@@ -510,7 +510,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
             table,
             dataset=self.dataset.dataset_id,
             cast_to=cast_to,
-            filter_to=filter_to,
+            restrict_to=restrict_to,
             project_to=project_to,
             limit=limit,
             skip=skip,
@@ -521,7 +521,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         query: QueryMixin,
         *,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -532,7 +532,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         Args:
             query: Contains query conditions to match
             cast_to: Cast the result to this type (error if not a subtype)
-            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
@@ -541,7 +541,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
             query,
             dataset=self.dataset.dataset_id,
             cast_to=cast_to,
-            filter_to=filter_to,
+            restrict_to=restrict_to,
             project_to=project_to,
             limit=limit,
             skip=skip,
@@ -551,16 +551,16 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         self,
         query: QueryMixin,
         *,
-        filter_to: type | None = None,
+        restrict_to: type | None = None,
     ) -> int:
         """
         Return the count of records that match the specified query using the current context's DB.
 
         Args:
             query: Contains query conditions to match
-            filter_to: Count only the subtypes of this type (defaults to the query target type)
+            restrict_to: Count only the subtypes of this type (defaults to the query target type)
         """
-        return self.get_db().count_where(query, dataset=self.dataset.dataset_id, filter_to=filter_to)
+        return self.get_db().count_where(query, dataset=self.dataset.dataset_id, restrict_to=restrict_to)
 
     def save_one(
         self,

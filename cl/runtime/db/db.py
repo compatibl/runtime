@@ -49,7 +49,7 @@ class Db(DbKey, RecordMixin, ABC):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -61,7 +61,7 @@ class Db(DbKey, RecordMixin, ABC):
             table: The table from which the records are loaded
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Cast the result to this type (error if not a subtype)
-            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
@@ -92,7 +92,7 @@ class Db(DbKey, RecordMixin, ABC):
         *,
         dataset: str | None = None,
         cast_to: type[TRecord] | None = None,
-        filter_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
@@ -104,7 +104,7 @@ class Db(DbKey, RecordMixin, ABC):
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
             cast_to: Cast the result to this type (error if not a subtype)
-            filter_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
@@ -116,7 +116,7 @@ class Db(DbKey, RecordMixin, ABC):
         query: QueryMixin,
         *,
         dataset: str | None = None,
-        filter_to: type | None = None,
+        restrict_to: type | None = None,
     ) -> int:
         """
         Return the count of records that match the specified query.
@@ -124,7 +124,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset is combined with root dataset of the DB
-            filter_to: Count only the subtypes of this type (defaults to the query target type)
+            restrict_to: Count only the subtypes of this type (defaults to the query target type)
         """
 
     @abstractmethod
