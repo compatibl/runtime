@@ -73,13 +73,17 @@ class BasicMongoDb(Db):
         self,
         table: str,
         *,
-        dataset: str | None = None,
+        dataset: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
         # Get collection
         collection = self._get_mongo_collection(table)
 
@@ -111,8 +115,12 @@ class BasicMongoDb(Db):
         table: str,
         keys: Sequence[KeyMixin],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> Sequence[RecordMixin]:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
         # Get Mongo collection using table name
         collection = self._get_mongo_collection(table)
         result = []
@@ -133,13 +141,17 @@ class BasicMongoDb(Db):
         self,
         query: QueryMixin,
         *,
-        dataset: str | None = None,
+        dataset: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
         # Check that query has been frozen
         query.check_frozen()
 
@@ -198,9 +210,13 @@ class BasicMongoDb(Db):
         self,
         query: QueryMixin,
         *,
-        dataset: str | None = None,
+        dataset: str,
         restrict_to: type | None = None,
     ) -> int:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
         """Return the count of documents matching the query using MongoDB's count_documents."""
         # Check that query has been frozen
         query.check_frozen()
@@ -238,10 +254,14 @@ class BasicMongoDb(Db):
     def save_many_grouped(
         self,
         table: str,
-        records: Iterable[RecordProtocol],
+        records: Sequence[RecordProtocol],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> None:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
         # TODO: Provide a more performant implementation
         for record in records:
             table = record.get_table()
@@ -269,8 +289,12 @@ class BasicMongoDb(Db):
         table: str,
         keys: Sequence[KeyMixin],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> None:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
         # Get Mongo collection using table name
         collection = self._get_mongo_collection(table)
         for key in keys:

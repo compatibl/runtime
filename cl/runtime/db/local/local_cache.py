@@ -48,7 +48,7 @@ class LocalCache(Db):
         self,
         table: str,
         *,
-        dataset: str | None = None,
+        dataset: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -62,8 +62,12 @@ class LocalCache(Db):
         table: str,
         keys: Sequence[KeyMixin],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> Sequence[RecordMixin]:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
         if (table_cache := self.__cache.get(table, None)) is not None:
             result = []
             for key in keys:
@@ -80,7 +84,7 @@ class LocalCache(Db):
         self,
         query: QueryMixin,
         *,
-        dataset: str | None = None,
+        dataset: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -93,7 +97,7 @@ class LocalCache(Db):
         self,
         query: QueryMixin,
         *,
-        dataset: str | None = None,
+        dataset: str,
         restrict_to: type | None = None,
     ) -> int:
         raise NotImplementedError()
@@ -101,10 +105,14 @@ class LocalCache(Db):
     def save_many_grouped(
         self,
         table: str,
-        records: Iterable[RecordProtocol],
+        records: Sequence[RecordProtocol],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> None:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
         # TODO: Provide a more performant implementation
         for record in records:
             # Try to retrieve table dictionary using 'key_type' as key, insert if it does not yet exist
@@ -124,7 +132,7 @@ class LocalCache(Db):
         table: str,
         keys: Sequence[KeyMixin],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> None:
         # Validate the dataset and if necessary convert to delimited string
         raise NotImplementedError()

@@ -47,7 +47,7 @@ class Db(DbKey, RecordMixin, ABC):
         self,
         table: str,
         *,
-        dataset: str | None = None,
+        dataset: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -59,7 +59,7 @@ class Db(DbKey, RecordMixin, ABC):
 
         Args:
             table: The table from which the records are loaded
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -73,7 +73,7 @@ class Db(DbKey, RecordMixin, ABC):
         table: str,
         keys: Sequence[KeyMixin],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> Sequence[RecordMixin]:
         """
         Load records from the specified table for a sequence of primary key tuples.
@@ -82,7 +82,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             table: Logical database table name, may be different from the physical name or the key type name
             keys: A sequence of keys in (key_type_or_type_name, *primary_keys) format
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
         """
 
     @abstractmethod
@@ -90,7 +90,7 @@ class Db(DbKey, RecordMixin, ABC):
         self,
         query: QueryMixin,
         *,
-        dataset: str | None = None,
+        dataset: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -102,7 +102,7 @@ class Db(DbKey, RecordMixin, ABC):
 
         Args:
             query: Contains query conditions to match
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -115,7 +115,7 @@ class Db(DbKey, RecordMixin, ABC):
         self,
         query: QueryMixin,
         *,
-        dataset: str | None = None,
+        dataset: str,
         restrict_to: type | None = None,
     ) -> int:
         """
@@ -123,7 +123,7 @@ class Db(DbKey, RecordMixin, ABC):
 
         Args:
             query: Contains query conditions to match
-            dataset: Backslash-delimited dataset is combined with root dataset of the DB
+            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             restrict_to: Count only the subtypes of this type (defaults to the query target type)
         """
 
@@ -133,15 +133,15 @@ class Db(DbKey, RecordMixin, ABC):
         table: str,
         records: Sequence[RecordProtocol],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> None:
         """
         Save records grouped by table to the specified table in storage.
 
         Args:
             table: Logical database table name, may be different from the physical name or the key type name
-            records: Iterable of records.
-            dataset: Target dataset as a delimited string, list of levels, or None
+            records: Sequence of records
+            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
         """
 
     @abstractmethod
@@ -150,15 +150,15 @@ class Db(DbKey, RecordMixin, ABC):
         table: str,
         keys: Sequence[KeyMixin],
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> None:
         """
         Delete records using an iterable of keys grouped by table.
 
         Args:
             table: Logical database table name, may be different from the physical name or the key type name
-            keys: Iterable of keys.
-            dataset: Target dataset as a delimited string, list of levels, or None
+            keys: Sequence of keys
+            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
         """
 
     @abstractmethod
@@ -246,7 +246,7 @@ class Db(DbKey, RecordMixin, ABC):
     def _get_dataset_table_binding_cache(
         self,
         *,
-        dataset: str | None = None,
+        dataset: str,
     ) -> dict[tuple[str, str], TableBinding]:
         """Get table binding cache for the specified dataset."""
 
@@ -264,7 +264,7 @@ class Db(DbKey, RecordMixin, ABC):
         *,
         table: str,
         record_type: type[RecordProtocol],
-        dataset: str | None = None,
+        dataset: str,
     ) -> None:
         """
         Record the table to record type binding in the DB if not found in cache, update cache.
@@ -308,3 +308,13 @@ class Db(DbKey, RecordMixin, ABC):
                 raise RuntimeError("Bindings must be stored in a single table.")
             binding_table = binding_tables[0]
             self.save_many_grouped(binding_table, bindings, dataset=dataset)
+
+    @classmethod
+    def _check_dataset(cls, dataset: str) -> None:
+        """Error if dataset is None, an empty string, or has invalid format."""
+        if dataset is None:
+            raise RuntimeError(f"Dataset identifier cannot be None.")
+        elif dataset == "":
+            raise RuntimeError(f"Dataset identifier cannot be an empty string.")
+        elif not isinstance(dataset, str):
+            raise RuntimeError(f"Dataset identifier must be a string.")

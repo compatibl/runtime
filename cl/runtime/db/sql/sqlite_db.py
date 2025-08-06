@@ -56,13 +56,16 @@ class SqliteDb(Db):
         self,
         table: str,
         *,
-        dataset: str | None = None,
+        dataset: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
+
+        # Check dataset
+        self._check_dataset(dataset)
 
         if project_to is not None:
             raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
@@ -109,8 +112,15 @@ class SqliteDb(Db):
         return tuple(result)
 
     def load_many_unsorted(
-        self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None
+        self,
+        table: str,
+        keys: Sequence[KeyMixin],
+        *,
+        dataset: str,
     ) -> Sequence[RecordMixin]:
+
+        # Check dataset
+        self._check_dataset(dataset)
 
         if not keys:
             return []
@@ -141,13 +151,16 @@ class SqliteDb(Db):
         self,
         query: QueryMixin,
         *,
-        dataset: str | None = None,
+        dataset: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
+
+        # Check dataset
+        self._check_dataset(dataset)
 
         if project_to is not None:
             raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
@@ -226,7 +239,16 @@ class SqliteDb(Db):
 
         return tuple(result)
 
-    def count_where(self, query: QueryMixin, *, dataset: str | None = None, restrict_to: type | None = None) -> int:
+    def count_where(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str,
+        restrict_to: type | None = None,
+        ) -> int:
+
+        # Check dataset
+        self._check_dataset(dataset)
 
         # Check that query has been frozen
         query.check_frozen()
@@ -279,7 +301,16 @@ class SqliteDb(Db):
         count = cursor.fetchone()[0]
         return count
 
-    def save_many_grouped(self, table: str, records: Iterable[RecordProtocol], *, dataset: str | None = None) -> None:
+    def save_many_grouped(
+        self,
+        table: str,
+        records: Sequence[RecordProtocol],
+        *,
+        dataset: str,
+    ) -> None:
+
+        # Check dataset
+        self._check_dataset(dataset)
 
         if not records:
             return
@@ -320,7 +351,16 @@ class SqliteDb(Db):
         conn.executemany(insert_sql, values_for_query)
         conn.commit()
 
-    def delete_many_grouped(self, table: str, keys: Sequence[KeyMixin], *, dataset: str | None = None) -> None:
+    def delete_many_grouped(
+        self,
+        table: str,
+        keys: Sequence[KeyMixin],
+        *,
+        dataset: str,
+    ) -> None:
+
+        # Check dataset
+        self._check_dataset(dataset)
 
         if not keys:
             return
