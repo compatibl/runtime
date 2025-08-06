@@ -14,7 +14,6 @@
 
 from typing import Iterable
 from cl.runtime import SqliteDb
-from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.records.protocols import TRecord

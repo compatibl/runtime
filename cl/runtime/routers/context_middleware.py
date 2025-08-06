@@ -15,7 +15,6 @@
 from starlette.types import ASGIApp
 from cl.runtime import Db
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
-from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.data_source import DataSource
 

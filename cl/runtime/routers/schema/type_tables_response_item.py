@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-
 from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest

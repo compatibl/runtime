@@ -20,7 +20,6 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 from cl.runtime import Db
-from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.exceptions.user_error import UserError

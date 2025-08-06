@@ -15,12 +15,14 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger
-from typing import List, cast, Sequence
-
+from typing import List
+from typing import Sequence
+from typing import cast
 from more_itertools import consume
 from typing_extensions import Self
-
-from cl.runtime import Db, TypeCache, KeyUtil
+from cl.runtime import Db
+from cl.runtime import KeyUtil
+from cl.runtime import TypeCache
 from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
@@ -29,8 +31,13 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key, RecordProtocol, TRecord, TKey, is_key_or_record, is_record, KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import TKey
+from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_or_record
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
@@ -40,6 +47,7 @@ from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _LOGGER = getLogger(__name__)
+
 
 @dataclass(slots=True, kw_only=True)
 class DataSource(DataSourceKey, RecordMixin, ContextMixin):
@@ -552,10 +560,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
             query: Contains query conditions to match
             filter_to: Count only the subtypes of this type (defaults to the query target type)
         """
-        return self.get_db().count_where(
-            query,
-            dataset=self.dataset.dataset_id,
-            filter_to=filter_to)
+        return self.get_db().count_where(query, dataset=self.dataset.dataset_id, filter_to=filter_to)
 
     def save_one(
         self,
@@ -621,7 +626,8 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         if len(unfrozen_input_keys) > 0:
             unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_input_keys)
             raise RuntimeError(
-                f"Data source method arguments include the following items that are not frozen:\n{unfrozen_inputs_str}")
+                f"Data source method arguments include the following items that are not frozen:\n{unfrozen_inputs_str}"
+            )
 
     @classmethod
     def _check_invalid_inputs(

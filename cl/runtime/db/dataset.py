@@ -13,9 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from typing_extensions import Self
-
 from cl.runtime.db.dataset_key import DatasetKey
 from cl.runtime.records.record_mixin import RecordMixin
 

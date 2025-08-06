@@ -17,11 +17,11 @@ import os
 from dataclasses import field
 from pydantic import BaseModel
 from typing_extensions import Self
+from cl.runtime._version import __api_schema_version__
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.routers.settings.env_info import EnvInfo
 from cl.runtime.settings.app_settings import AppSettings
-from cl.runtime._version import __api_schema_version__
 
 
 def _collect_package_versions() -> dict[str, str]:

@@ -16,7 +16,6 @@ import logging
 import os
 import socket
 import threading
-from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.datetime_util import DatetimeUtil
