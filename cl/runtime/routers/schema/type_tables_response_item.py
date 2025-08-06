@@ -15,7 +15,7 @@
 from __future__ import annotations
 from pydantic import BaseModel
 
-from cl.runtime.contexts.db_context import DbContext
+from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 
@@ -38,6 +38,6 @@ class TypeTablesResponseItem(BaseModel):
         """Implements /schema/type-tables route."""
 
         bound_type_name = request.type_name
-        bindings = DbContext.get_bound_tables(record_type=bound_type_name)
+        bindings = DataContext.get_bound_tables(record_type=bound_type_name)
 
         return [TypeTablesResponseItem(name=type_name) for type_name in bindings]
