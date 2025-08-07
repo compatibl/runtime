@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest import mock
+
 import pytest
 import os
 import uuid
@@ -82,14 +84,14 @@ def basic_mongo_mock_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     yield from _db_fixture(request, db_type=BasicMongoMockDb)
 
 
-# @pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb]) # TODO: Enable when Sqlite and BasicMongoMockDb support is restored
-@pytest.fixture(scope="function", params=[BasicMongoDb, SqliteDb])
+@pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb])
 def multi_db_fixture(request) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.
     """
-    yield from _db_fixture(request, db_type=request.param)
+    with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
+        yield from _db_fixture(request, db_type=request.param)
 
 
 @pytest.fixture(scope="session")  # TODO: Use a named celery queue for each test
@@ -121,7 +123,6 @@ def work_dir_fixture(request: FixtureRequest) -> Iterator[str]:
     os.chdir(request.config.invocation_dir)  # noqa
 
 
-# TODO: Implement in code to enable BasicMongoMockDb to convert UUIDs to Binary objects
 def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
     """Convert a UUID to BSON Binary object."""
     return Binary(uuid_.bytes, UUID_SUBTYPE)
