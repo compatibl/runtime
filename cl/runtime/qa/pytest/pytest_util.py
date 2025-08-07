@@ -18,6 +18,7 @@ from typing import Any
 from typing import Iterable
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.type_util import TypeUtil
@@ -67,44 +68,20 @@ class PytestUtil:
         using the data from FixtureRequest, collapsing levels with identical name into one,
         where <delim> is period when is_name is True and os.sep when is_name is False.
         """
-        module_file = str(request.path)
+
+        # Get test information from the request, call stack inspection like in QaUtil
+        # will not work here because this code is executed before the test function
+        test_file = str(request.path)
         test_name = request.node.name
         class_name = TypeUtil.name(request.cls) if request.cls is not None else None
 
-        if module_file.endswith(".py"):
-            module_file_without_ext = module_file.removesuffix(".py")
-        else:
-            raise RuntimeError(f"Test module file {module_file} does not end with '.py'.")
-
-        # Determine delimiter based on is_name flag
-        delim = "." if is_name else os.sep
-
-        module_dir = os.path.dirname(module_file_without_ext)
-        module_name = os.path.basename(module_file_without_ext)
-        if class_name is None:
-            # Remove repeated identical tokens to shorten the path
-            if module_name != test_name:
-                result = delim.join((module_name, test_name))
-            else:
-                result = module_name
-        else:
-            # Convert class name to snake_case
-            class_name = CaseUtil.pascal_to_snake_case(class_name)
-
-            # Remove repeated identical tokens to shorten the path
-            if module_name != class_name:
-                if class_name != test_name:
-                    result = delim.join((module_name, class_name, test_name))
-                else:
-                    result = delim.join((module_name, class_name))
-            else:
-                if module_name != test_name:
-                    result = delim.join((module_name, test_name))
-                else:
-                    result = module_name
-        if not is_name:
-            result = os.path.join(module_dir, result)
-        return result
+        # Convert to test path or name
+        return QaUtil.get_test_dir_or_name(
+            test_file=test_file,
+            class_name=class_name,
+            test_name=test_name,
+            is_name=is_name,
+        )
 
     @classmethod
     def assert_equals_iterable_without_ordering(cls, iterable: Iterable[Any], other_iterable: Iterable[Any]) -> bool:

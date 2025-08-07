@@ -126,46 +126,76 @@ class QaUtil:
         stack = inspect.stack()
         for frame_info in stack:
             if frame_info.function.startswith(test_function_pattern):
+
+                # Get test information from the call stack
                 frame_globals = frame_info.frame.f_globals
-                module_file = frame_globals["__file__"]
+                test_file = frame_globals["__file__"]
                 test_name = frame_info.function
                 cls_instance = frame_info.frame.f_locals.get("self", None)
                 class_name = TypeUtil.name(cls_instance) if cls_instance else None
 
-                if module_file.endswith(".py"):
-                    module_file_without_ext = module_file.removesuffix(".py")
-                else:
-                    raise RuntimeError(f"Test module file {module_file} does not end with '.py'.")
-
-                # Determine delimiter based on is_name flag
-                delim = "." if is_name else os.sep
-
-                module_dir = os.path.dirname(module_file_without_ext)
-                module_name = os.path.basename(module_file_without_ext)
-                if class_name is None:
-                    # Remove repeated identical tokens to shorten the path
-                    if module_name != test_name:
-                        result = delim.join((module_name, test_name))
-                    else:
-                        result = module_name
-                else:
-                    # Convert class name to snake_case
-                    class_name = CaseUtil.pascal_to_snake_case(class_name)
-
-                    # Remove repeated identical tokens to shorten the path
-                    if module_name != class_name:
-                        if class_name != test_name:
-                            result = delim.join((module_name, class_name, test_name))
-                        else:
-                            result = delim.join((module_name, class_name))
-                    else:
-                        if module_name != test_name:
-                            result = delim.join((module_name, test_name))
-                        else:
-                            result = module_name
-                if not is_name:
-                    result = os.path.join(module_dir, result)
-                return result
+                # Convert to test path or name
+                return cls.get_test_dir_or_name(
+                    test_file=test_file,
+                    class_name=class_name,
+                    test_name=test_name,
+                    is_name=is_name,
+                )
 
         # Not inside test, return None
         return None
+
+    @classmethod
+    def get_test_dir_or_name(
+        cls,
+        *,
+        test_file: str,
+        class_name: str | None = None,
+        test_name: str,
+        is_name: bool,
+    ) -> str | None:
+        """
+        Return the path test_dir/test_dir/test_module/test_function or test_dir/test_module/test_class/test_function
+        and the name test_module.test_function or test_module.test_class.test_function depending on is_name param.
+
+        Args:
+            test_file: Test module file path with .py extension
+            class_name: Test class name if the test is a method inside class, None otherwise
+            test_name: Test function or method name
+            is_name: If True, return dot delimited name, otherwise return directory path
+        """
+
+        if test_file.endswith(".py"):
+            test_file_without_ext = test_file.removesuffix(".py")
+        else:
+            raise RuntimeError(f"Test file path {test_file} does not end with '.py'.")
+
+        # Determine delimiter based on is_name flag
+        delim = "." if is_name else os.sep
+
+        module_dir = os.path.dirname(test_file_without_ext)
+        module_name = os.path.basename(test_file_without_ext)
+        if class_name is None:
+            # Remove repeated identical tokens to shorten the path
+            if module_name != test_name:
+                result = delim.join((module_name, test_name))
+            else:
+                result = module_name
+        else:
+            # Convert class name to snake_case
+            class_name = CaseUtil.pascal_to_snake_case(class_name)
+
+            # Remove repeated identical tokens to shorten the path
+            if module_name != class_name:
+                if class_name != test_name:
+                    result = delim.join((module_name, class_name, test_name))
+                else:
+                    result = delim.join((module_name, class_name))
+            else:
+                if module_name != test_name:
+                    result = delim.join((module_name, test_name))
+                else:
+                    result = module_name
+        if not is_name:
+            result = os.path.join(module_dir, result)
+        return result
