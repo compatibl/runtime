@@ -72,8 +72,11 @@ class PytestUtil:
         # Get test information from the request, call stack inspection like in QaUtil
         # will not work here because this code is executed before the test function
         test_file = str(request.path)
-        test_name = request.node.name
         class_name = TypeUtil.name(request.cls) if request.cls is not None else None
+        test_name_and_params = request.node.name
+
+        # If the test is parameterized 'test_method[Params]', remove the parameters and set test_name to 'test_method'
+        test_name = test_name_and_params.split("[")[0]
 
         # Convert to test path or name
         return QaUtil.get_test_dir_or_name(
