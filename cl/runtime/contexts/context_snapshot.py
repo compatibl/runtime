@@ -19,8 +19,8 @@ from typing import List
 from typing import Sequence
 from typing_extensions import Self
 from cl.runtime.contexts.context_manager import _STACK_DICT_VAR
-from cl.runtime.contexts.context_manager import _activate_and_return_stack
-from cl.runtime.contexts.context_manager import _deactivate_and_check_stack
+from cl.runtime.contexts.context_manager import activate_and_return_stack
+from cl.runtime.contexts.context_manager import deactivate
 from cl.runtime.contexts.context_manager import active_contexts
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -87,17 +87,17 @@ class ContextSnapshot:
             for context in self._active_contexts:
                 try:
                     # Activate context directly bypassing 'with' clause
-                    context_stack = _activate_and_return_stack(context)
+                    context_stack = activate_and_return_stack(context)
                     self._processed_contexts.append(context)
                     self._processed_context_stacks.append(context_stack)
-                except Exception as e:
+                except Exception as exc:
                     # Deactivate directly bypassing 'with' clause in reverse order all processed context
-                    _deactivate_and_check_stack(
+                    deactivate(
                         self._processed_contexts.pop(),
-                        self._processed_context_stacks.pop(),
-                        type(e),
-                        e,
-                        e.__traceback__,
+                        exc_type=type(exc),
+                        exc_val=exc,
+                        exc_tb=exc.__traceback__,
+                        expected_stack=self._processed_context_stacks.pop(),
                     )
                     # Rethrow
                     raise e
@@ -110,12 +110,12 @@ class ContextSnapshot:
             # Remove (pop) from the list and deactivate in reverse order the contexts entered into so far
             while self._processed_contexts:
                 # Deactivate directly bypassing 'with' clause in reverse order all processed context
-                _deactivate_and_check_stack(
+                deactivate(
                     self._processed_contexts.pop(),
-                    self._processed_context_stacks.pop(),
-                    exc_type,
-                    exc_val,
-                    exc_tb,
+                    exc_type=exc_type,
+                    exc_val=exc_val,
+                    exc_tb=exc_tb,
+                    expected_stack=self._processed_context_stacks.pop(),
                 )
         finally:
             # Restore ContextVar to its previous state after async task execution using a token

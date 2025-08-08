@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.contexts.context_manager import activate, active
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.settings.app_settings import AppSettings
 
@@ -23,8 +25,9 @@ def test_process_context():
     """Smoke test."""
 
     assert ProcessContext.is_testing() == True
-    with ProcessContext().build() as context:
+    with activate(ProcessContext().build()) as context:
         assert context.get_env_name() == "test_process_context"
+        assert active(ProcessContext).get_env_name() == "test_process_context"
 
 
 if __name__ == "__main__":

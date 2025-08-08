@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
@@ -22,7 +24,7 @@ from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
-class ProcessContext(ContextMixin, DataMixin):
+class ProcessContext(DataMixin):
     """Provides information about the currently running test."""
 
     testing: bool = False
@@ -47,7 +49,7 @@ class ProcessContext(ContextMixin, DataMixin):
     @classmethod
     def is_testing(cls) -> bool:
         """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
-        if (current_context := ProcessContext.current_or_none()) is not None:
+        if (current_context := active_or_none(ProcessContext)) is not None:
             # Get from the current ProcessContext if exists
             return current_context.testing
         else:
@@ -56,7 +58,7 @@ class ProcessContext(ContextMixin, DataMixin):
 
     def get_env_name(self) -> str:
         """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
-        if (current_context := ProcessContext.current_or_none()) is not None:
+        if (current_context := active_or_none(ProcessContext)) is not None:
             # Get from the current ProcessContext if exists
             return current_context.env_name
         else:

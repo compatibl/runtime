@@ -15,7 +15,7 @@
 from collections import defaultdict
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import DefaultDict, Any
+from typing import DefaultDict, Any, Generator
 from typing import List
 from typing import Optional
 from typing import Type
@@ -43,75 +43,72 @@ def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
     return stack_dict
 
 
-def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
-    """Get or create stack dictionary for the current asynchronous environment."""
-    stack_dict = _STACK_DICT_VAR.get()
-    if stack_dict is None:
-        stack_dict = defaultdict(list)
-        _STACK_DICT_VAR.set(stack_dict)
-    return stack_dict
-
-
 def _get_or_create_stack(context_type: Type[RecordProtocol]) -> List[RecordProtocol]:
     """Get or create stack for the key type of the context in the current asynchronous environment."""
     key_type = context_type.get_base_type()
     return _get_or_create_stack_dict()[key_type]
 
 
-def _activate_and_return_stack(context: TRecord) -> List[RecordProtocol]:
-    """Helper method for activate(...), do not use directly except for context stack replication in ContextSnapshot."""
+def activate_and_return_stack(context: TRecord) -> List[RecordProtocol]:
+    """Helper method for activate(...), returns context stack rather than the argument."""
 
     # Invoke context.__enter__ method before making the context active if it is implemented
     # If this method raises an exception, the context will not be activated
     # and the exception will be propagated outside the 'with' clause
     if hasattr(context, "__enter__"):
-        context.__enter__()
+        returned_context = context.__enter__()
+        if returned_context is not None and returned_context is not context:
+            raise RuntimeError("To use activate(context), context.__enter__() must return self or None.")
 
     # Check that the context is frozen, error otherwise
     context.check_frozen()
 
     # Get context stack for the __enter__ method in the current asynchronous environment
-    enter_stack = _get_or_create_stack(type(context))
+    context_stack = _get_or_create_stack(type(context))
 
     # Activate the argument context by appending it to the context stack
-    enter_stack.append(context)
+    context_stack.append(context)
 
-    return enter_stack
+    # Return for error checking purposes only
+    return context_stack
 
-
-def _deactivate_and_check_stack(
+def deactivate(
         context: TRecord,
-        enter_stack: List[RecordProtocol],
-        exc_type: Any,
-        exc_val: Any,
-        exc_tb: Any,
+        *,
+        exc_type: Any = None,
+        exc_val: Any = None,
+        exc_tb: Any = None,
+        expected_stack: List[RecordProtocol] | None = None,
 ) -> None:
     """
-    Helper method for activate(...), do not use directly except for context stack replication in ContextSnapshot.
+    Make context inactive, do not invoke this method explicitly if activation was performed using
+    'with activate(...)' clause because it will be invoked by the context manager.
+    Invokes __exit___ if it is implemented.
 
     Args:
         context: The context being deactivated.
-        enter_stack: The stack used to activate the context (used to check it is the same instance)
         exc_type: Exception type (None if no exception)
         exc_val: Exception instance (None if no exception)
         exc_tb: The traceback object containing call stack information (None if no exception)
+        expected_stack: The stack used to activate the context for error checking purposes only (not checked if None)
     """
 
     # Get context stack for the __exit__ method in the current asynchronous environment
-    exit_stack = _get_or_create_stack(type(context))
+    context_stack = _get_or_create_stack(type(context))
 
     # Validate stack integrity and restore previous current
-    if not exit_stack:
+    if not context_stack:
         raise RuntimeError(
             f"Context stack for {TypeUtil.name(context)} has been cleared inside 'with activate(...)' clause."
         )
-    elif exit_stack is not enter_stack:
+    elif expected_stack and context_stack is not expected_stack:
+        # Perform this check only if expected_stack is not None
         raise RuntimeError(
             f"Context stack for {TypeUtil.name(context)} has been changed inside 'with activate(...)' clause."
         )
 
     # Deactivate the currently active context by removing it from the context stack
-    deactivated = exit_stack.pop()
+    deactivated = context_stack.pop()
     if deactivated is not context:
         # Error message if it is not the same context as the argument
         raise RuntimeError(
@@ -123,32 +120,47 @@ def _deactivate_and_check_stack(
     if hasattr(context, "__exit__"):
         context.__exit__(exc_type, exc_val, exc_tb)
 
+def make_active(context: TRecord) -> TRecord:
+    """
+    Make context active without automatic deactivation, do not use this method inside 'with' clause.
+    Invokes __enter__ if it is implemented.
+    """
+
+    # Add to the context stack for the context key type in the current asynchronous environment
+    activate_and_return_stack(context)
+    return context
 
 @contextmanager
 def activate(context: TRecord):
     """
-    Set active context using 'with activate(context)' clause, context may or may not implement __enter__ and __exit__
-
-    Notes:
-        - If implemented __enter__, will be called before activation and __exit__ after deactivation
-        - If an exception is raised inside 'with activate(context)' clause, its details will be passed to __exit__
+    Set active context using 'with activate(context)' clause, invokes __enter__ and __exit__ if they are implemented.
+    If an exception is raised inside 'with activate(context)' clause, its details will be passed to __exit__.
     """
 
     # Add to the context stack for the context key type in the current asynchronous environment
-    enter_stack = _activate_and_return_stack(context)
+    context_stack = activate_and_return_stack(context)
 
     try:
-        # Pass control to the code inside 'with activate(context)' clause
+        # Pass control to the code inside 'with activate(context)' clause, deactivate on return
         yield context
     except Exception as exc:
         # If the code inside 'with activate(context)' raises an exception, remove context from the stack
         # and pass exception details to context.__exit__ if it is implemented
-        _deactivate_and_check_stack(context, enter_stack, type(exc), exc, exc.__traceback__)
+        deactivate(
+            context,
+            exc_type=type(exc),
+            exc_val=exc,
+            exc_tb=exc.__traceback__,
+            expected_stack=context_stack
+        )
         # Rethrow
         raise exc
     else:
         # Remove context from the stack
-        _deactivate_and_check_stack(context, enter_stack, None, None, None)
+        deactivate(
+            context,
+            expected_stack=context_stack
+        )
 
 
 def active(context_type: type[TRecord]) -> TRecord:

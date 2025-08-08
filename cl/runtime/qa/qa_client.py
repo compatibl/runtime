@@ -15,6 +15,8 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from typing_extensions import Self
+
+from cl.runtime.contexts.context_manager import activate, deactivate, make_active
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.routers.server_util import ServerUtil
 
@@ -34,17 +36,14 @@ class QaClient(TestClient):
         # Include routers
         ServerUtil.include_routers(rest_app)
 
-        # Create process context and store it in an instance field
-        self.process_context = ProcessContext().build()
-
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource initialization and disposal."""
 
         # Call '__enter__' method of base first
         TestClient.__enter__(self)
 
-        # Enter ProcessContext
-        self.process_context.__enter__()
+        # Create and activate ProcessContext
+        self.process_context = make_active(ProcessContext().build())
 
         # Return self
         return self
@@ -52,8 +51,13 @@ class QaClient(TestClient):
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
 
-        # Exit ProcessContext
-        self.process_context.__exit__(exc_type, exc_val, exc_tb)
+        # Deactivate ProcessContext
+        deactivate(
+            self.process_context,
+            exc_type=exc_type,
+            exc_val=exc_val,
+            exc_tb=exc_tb
+        )
 
         # Call '__exit___' method of base last
         TestClient.__exit__(self, exc_type, exc_val, exc_tb)

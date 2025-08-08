@@ -34,7 +34,7 @@ class ContextMiddleware:
         # Set ContextVar=None before async task execution, get a token for restoring its previous state
         token = ContextSnapshot.save_and_clear_state()
         try:
-            with ProcessContext().build():
+            with activate(ProcessContext().build()):
                 with activate(DataSource(db=Db.create()).build()):
                     # TODO: Create a test setting to enable this other than by uncommenting
                     # await asyncio.sleep(duration)

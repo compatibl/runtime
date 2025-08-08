@@ -21,7 +21,7 @@ from typing import Final
 from typing import List
 from celery import Celery
 from celery.signals import setup_logging
-from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.context_manager import active, activate
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.db.data_source import DataSource
@@ -142,7 +142,7 @@ class CeleryQueue(TaskQueue):
     def submit_task(self, task: TaskKey):
 
         # Wrap into ProcessContext if inside test and into NoOpContext otherwise
-        with ProcessContext().build():
+        with activate(ProcessContext().build()):
 
             # Get and serialize current context
             context_snapshot_data = ContextSnapshot.serialize_current_contexts()
