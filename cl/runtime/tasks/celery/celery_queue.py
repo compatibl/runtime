@@ -141,7 +141,7 @@ class CeleryQueue(TaskQueue):
 
     def submit_task(self, task: TaskKey):
 
-        # Wrap into ProcessContext if inside test and into NoOpContext otherwise
+        # Wrap into ProcessContext
         with activate(ProcessContext().build()):
 
             # Get and serialize current context

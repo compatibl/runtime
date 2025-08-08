@@ -13,12 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class NoOpContext(ContextMixin, DataMixin):
+class NoOpContext(DataMixin):
     """Performs no action, use to conditionally substitute for another context."""
 
     @classmethod

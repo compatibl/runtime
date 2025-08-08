@@ -13,12 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class StorageContext(ContextMixin, DataMixin):
+class StorageContext(DataMixin):
     """Provides access to storage."""
 
     @classmethod
