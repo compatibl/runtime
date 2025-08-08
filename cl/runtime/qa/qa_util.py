@@ -60,7 +60,7 @@ class QaUtil:
         Args:
             test_function_pattern: Glob pattern for function or method in stack frame, defaults to 'test_*'
         """
-        result = cls._get_test_dir_or_name(
+        result = cls.get_test_path_from_call_stack(
             format_as="dir",
             test_function_pattern=test_function_pattern,
         )
@@ -89,7 +89,7 @@ class QaUtil:
         """
 
         # Get test environment if inside test
-        result = cls._get_test_dir_or_name(
+        result = cls.get_test_path_from_call_stack(
             format_as="name",
             test_function_pattern=test_function_pattern,
         )
@@ -101,7 +101,7 @@ class QaUtil:
         return result
 
     @classmethod
-    def _get_test_dir_or_name(
+    def get_test_path_from_call_stack(
         cls,
         *,
         format_as: Literal["name", "dir"],
@@ -139,8 +139,8 @@ class QaUtil:
                 # Convert to test path or name
                 return cls.get_test_path(
                     test_file=test_file,
-                    class_name=class_name,
-                    test_name=test_name,
+                    test_class=class_name,
+                    test_function=test_name,
                     format_as=format_as,
                 )
 
@@ -152,8 +152,8 @@ class QaUtil:
         cls,
         *,
         test_file: str,
-        class_name: str | None = None,
-        test_name: str,
+        test_class: str | None = None,
+        test_function: str,
         format_as: Literal["name", "dir"],
     ) -> str | None:
         """
@@ -162,7 +162,7 @@ class QaUtil:
         collapsing repeated adjacent names into one.
 
         Args:
-            test_module: Test module file path with .py extension
+            test_file: Test file inclusive of directory path and .py extension
             test_class: Test class name if the test is a method inside class, None otherwise
             test_function: Test function or method name
             format_as: If "name", return dot delimited name, if "dir", return directory path
@@ -185,25 +185,25 @@ class QaUtil:
 
         module_dir = os.path.dirname(test_file_without_ext)
         module_name = os.path.basename(test_file_without_ext)
-        if class_name is None:
+        if test_class is None:
             # Remove repeated identical tokens to shorten the path
-            if module_name != test_name:
-                result = delim.join((module_name, test_name))
+            if module_name != test_function:
+                result = delim.join((module_name, test_function))
             else:
                 result = module_name
         else:
             # Convert class name to snake_case
-            class_name = CaseUtil.pascal_to_snake_case(class_name)
+            test_class = CaseUtil.pascal_to_snake_case(test_class)
 
             # Remove repeated identical tokens to shorten the path
-            if module_name != class_name:
-                if class_name != test_name:
-                    result = delim.join((module_name, class_name, test_name))
+            if module_name != test_class:
+                if test_class != test_function:
+                    result = delim.join((module_name, test_class, test_function))
                 else:
-                    result = delim.join((module_name, class_name))
+                    result = delim.join((module_name, test_class))
             else:
-                if module_name != test_name:
-                    result = delim.join((module_name, test_name))
+                if module_name != test_function:
+                    result = delim.join((module_name, test_function))
                 else:
                     result = module_name
 

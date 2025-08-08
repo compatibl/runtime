@@ -65,8 +65,8 @@ class PytestUtil:
         # Convert to test path or name
         return QaUtil.get_test_path(
             test_file=test_file,
-            class_name=class_name,
-            test_name=test_name,
+            test_class=class_name,
+            test_function=test_name,
             format_as=format_as,
         )
 
