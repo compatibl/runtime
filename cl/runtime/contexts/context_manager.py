@@ -75,9 +75,9 @@ def enter_active_and_return_stack(context: TRecord) -> List[RecordProtocol]:
 
 def enter_active(context: TRecord) -> TRecord:
     """
-    Make context active without automatic deactivation, invokes __enter__ if it is implemented.
+    Make context active without automatic deactivation, invokes context.__enter__ if it is implemented.
     Do not use this method for the 'with' clause as it is not a context manager and therefore it
-    requires that exit_active is invoked explicitly.
+    requires that context.exit_active is invoked explicitly.
     """
 
     # Add to the context stack for the context key type in the current asynchronous environment
@@ -95,15 +95,15 @@ def exit_active(
 ) -> None:
     """
     Exit and revert to the previous active context, do not invoke this method explicitly if activation was performed
-    using 'with activate(...)' clause because exit_active will be invoked by the context manager in this case.
-    Invokes __exit___ if it is implemented.
+    using 'with activate(...)' clause because this method will be invoked by the context manager on 'with' clause exit.
+    Invokes context.__exit___ if it is implemented.
 
     Args:
         context: The context being deactivated.
         exc_type: Exception type (None if no exception)
         exc_val: Exception instance (None if no exception)
         exc_tb: The traceback object containing call stack information (None if no exception)
-        expected_stack: The stack used to activate the context for error checking purposes only (not checked if None)
+        expected_stack: The stack that was used to activate the context for error checking only (not checked if None)
     """
 
     # Get context stack for the __exit__ method in the current asynchronous environment
@@ -170,7 +170,7 @@ def activate(context: TRecord):
 def active(context_type: type[TRecord]) -> TRecord:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
-    or raise an error outside such 'with' clause.
+    or raise an error outside a 'with' clause.
     """
     stack = _get_or_create_stack(context_type)
     if stack:
@@ -186,10 +186,19 @@ def active(context_type: type[TRecord]) -> TRecord:
 def active_or_none(context_type: type[TRecord]) -> TRecord | None:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
-    or None outside such 'with' clause.
+    or None outside a 'with' clause.
     """
     stack = _get_or_create_stack(context_type)
     return CastUtil.cast(context_type, stack[-1]) if stack else None
+
+
+def active_or_default(context_type: type[TRecord]) -> TRecord:
+    """
+    Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
+    or create a default instance using 'context_type()' if outside a 'with' clause.
+    """
+    stack = _get_or_create_stack(context_type)
+    return CastUtil.cast(context_type, stack[-1]) if stack else context_type()
 
 
 def active_contexts() -> tuple[RecordProtocol, ...]:

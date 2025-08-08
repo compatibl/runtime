@@ -14,12 +14,11 @@
 
 import logging
 from dataclasses import dataclass
-from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class LogContext(ContextMixin, DataMixin):
+class LogContext(DataMixin):
     """Provides get_logger() method returning a configured logger."""
 
     handler: str | None = None
@@ -38,11 +37,10 @@ class LogContext(ContextMixin, DataMixin):
     def get_base_type(cls) -> type:
         return LogContext
 
-    @classmethod
     def get_logger(
-        cls,
+        self,
         *,
         module_name: str,
     ) -> logging.Logger:
         """Get logger for the specified module name, invoke with __name__ as the argument."""
-        return logging.getLogger(module_name)
+        return logging.getLogger(module_name)  # TODO: Should this be specific to logger?

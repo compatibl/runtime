@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.sse.event import Event
@@ -36,7 +38,7 @@ class TaskEvent(Event):
 
     def __init(self):
         if self.task_run_id is None:
-            log_context = LogContext.current_or_none()
+            log_context = active_or_none(LogContext)
 
             if log_context is None:
                 raise RuntimeError("TaskEvent can only be created inside a LogContext.")

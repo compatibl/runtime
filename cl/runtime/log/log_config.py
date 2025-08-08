@@ -95,7 +95,7 @@ def _make_filter_add_contextual_info(default_empty=None):
     _default_empty = default_empty
 
     def filter_(record):
-        log_context = LogContext.current_or_none()
+        log_context = active_or_none(LogContext)
 
         type_and_handler = ""
         if log_context:

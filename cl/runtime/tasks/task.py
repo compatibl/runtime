@@ -17,7 +17,7 @@ import time
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.context_manager import active, active_or_default, activate
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.datetime_util import DatetimeUtil
@@ -95,9 +95,10 @@ class Task(TaskKey, RecordMixin, ABC):
 
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
-        logger = LogContext.get_logger(module_name=__name__)
+        logger = active_or_default(LogContext).get_logger(module_name=__name__)
 
-        with self._create_log_context():
+        # Activate logging context for the task
+        with activate(self._create_log_context()):
             try:
                 logger.info("Start task execution.", extra={"event": TaskEvent(event_type=EventType.TASK_STARTED)})
 

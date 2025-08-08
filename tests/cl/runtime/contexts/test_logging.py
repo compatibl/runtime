@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.contexts.context_manager import active, active_or_default
 from cl.runtime.contexts.log_context import LogContext
 
 
@@ -20,7 +22,7 @@ def test_smoke():
     """Smoke test."""
 
     # Get logger from LogContext outside the outermost 'with LogContext(...)' clause
-    logger = LogContext.get_logger(module_name=__name__)
+    logger = active_or_default(LogContext).get_logger(module_name=__name__)
 
     # Standard messages
     module_name = __name__

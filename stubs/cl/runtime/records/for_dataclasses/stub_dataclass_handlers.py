@@ -18,6 +18,8 @@ import time
 from dataclasses import dataclass
 from logging import getLogger
 from uuid import UUID
+
+from cl.runtime.contexts.context_manager import active, active_or_default
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
@@ -29,7 +31,7 @@ def _log_method_info():  # TODO: Move into testing directory
     """Print information about the caller method using stack inspection."""
 
     # Get logger from LogContext
-    logger = LogContext.get_logger(module_name=__name__)
+    logger = active_or_default(LogContext).get_logger(module_name=__name__)
 
     # Record method information from stack frame
     current_frame = inspect.currentframe()
@@ -88,7 +90,7 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     def run_instance_method_2a_with_params(self, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
         _log_method_info()
-        LogContext.get_logger(module_name=__name__).info(f"param_1={param_1} param_2={param_2}")
+        active_or_default(LogContext).get_logger(module_name=__name__).info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters()
     def run_instance_method_2b(self, param_1: str, param_2: str | None = None) -> None:
@@ -120,7 +122,7 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     def run_class_method_2a_with_params(cls, param_1: str, param_2: str) -> None:
         """Stub handler."""
         _log_method_info()
-        LogContext.get_logger(module_name=__name__).info(f"param_1={param_1} param_2={param_2}")
+        active_or_default(LogContext).get_logger(module_name=__name__).info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
@@ -182,7 +184,7 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     #     enum_arg: StubIntEnum,
     #     data_arg: Any,
     # ) -> None:
-    #     LogContext.get_logger(module_name=__name__).info(
+    #     active_or_default(LogContext).get_logger(module_name=__name__).info(
     #         f"handler_with_arguments(int_arg={int_arg} datetime_arg={datetime_arg}"
     #         f"enum_arg={enum_arg} data_arg={data_arg})"
     #     )
@@ -213,13 +215,13 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     def run_instance_method_with_binary_param(self, pdf_file: FileData, note_param: str):
         """Stub method."""
         _log_method_info()
-        LogContext.get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
+        active_or_default(LogContext).get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
 
     @staticmethod
     def run_class_method_with_binary_param(pdf_file: FileData):
         """Stub method."""
         _log_method_info()
-        LogContext.get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
+        active_or_default(LogContext).get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
 
     def run_long_handler_with_error(self):
         _logger = getLogger(__name__)
@@ -240,4 +242,4 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     #     """Stub method."""
     #     record_to_save = StubDataclass(id="saved_from_handler").build()
     #     active(DataSource).save_one(record_to_save)
-    #     LogContext.get_logger(module_name=__name__).info(f"Record {record_to_save} has been saved to db from handler.")
+    #     active_or_default(LogContext).get_logger(module_name=__name__).info(f"Record {record_to_save} has been saved to db from handler.")
