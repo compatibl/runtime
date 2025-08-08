@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.storage.select_request import SelectRequest
@@ -26,7 +27,7 @@ def test_method(default_db_fixture):
 
     # Save test record.
     record = StubDataclass(id=__name__).build()
-    DataContext.save_one(record)
+    active(DataSource).save_one(record)
 
     request_obj = SelectRequest(type_=type(record).__name__)
     result = SelectResponse.get_response(request_obj)
@@ -47,7 +48,7 @@ def test_api(default_db_fixture):
     with QaClient() as test_client:
         # Save test record
         record = StubDataclass(id=__name__).build()
-        DataContext.save_one(record)
+        active(DataSource).save_one(record)
         request_body = {"Type": "StubDataclass"}
 
         # Send POST request

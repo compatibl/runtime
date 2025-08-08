@@ -18,7 +18,8 @@ from dataclasses import dataclass
 from typing import List
 from typing import Sequence
 from typing import TypeVar
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.experiments.trial import Trial
@@ -70,7 +71,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def view_trials(self) -> Sequence[TrialKey]:
         """View trials of the experiment."""
         trial_key_query = TrialKeyQuery(experiment=self.get_key()).build()
-        trials = DataContext.load_where(trial_key_query, cast_to=Trial)
+        trials = active(DataSource).load_where(trial_key_query, cast_to=Trial)
         trial_keys = [x.get_key() for x in trials]  # TODO: Use project_to instead of get_key
         return trial_keys
 
@@ -84,7 +85,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def save_trial(self, scenario: ExperimentScenarioKey) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
         trial = self.create_trial(scenario)
-        DataContext.save_one(trial)
+        active(DataSource).save_one(trial)
 
     def run_one(self) -> None:
         """Run one trial, error if max_trials is already reached or exceeded."""
@@ -132,7 +133,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def query_existing_trials(self) -> int:
         """Get the remaining of existing trials."""
         trial_key_query = TrialKeyQuery(experiment=self.get_key()).build()
-        num_existing_trials = DataContext.count_where(trial_key_query)
+        num_existing_trials = active(DataSource).count_where(trial_key_query)
         return num_existing_trials
 
     def query_remaining_trials(self, *, num_trials: int | None = None) -> int | None:

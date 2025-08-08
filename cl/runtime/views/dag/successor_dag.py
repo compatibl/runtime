@@ -14,7 +14,8 @@
 
 from dataclasses import dataclass
 from cl.runtime import RecordMixin
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.views.dag.successor_dag_key import SuccessorDagKey
@@ -40,7 +41,7 @@ class SuccessorDag(SuccessorDagKey, RecordMixin):
         if self.root_node is None:
             return None
 
-        root_node = DataContext.load_one(self.root_node, cast_to=SuccessorDagNodeKey)
+        root_node = active(DataSource).load_one(self.root_node, cast_to=SuccessorDagNodeKey)
 
         if root_node is None:
             return None

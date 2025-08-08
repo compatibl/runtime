@@ -14,7 +14,8 @@
 
 
 import pytest
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic import StubDataclassDynamic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic_key import StubDataclassDynamicKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic_query import StubDataclassDynamicQuery
@@ -33,14 +34,14 @@ def test_load(multi_db_fixture):
         key_field=key_field,
         record_field=record_field,
     ).build()
-    DataContext.save_one(record)
+    active(DataSource).save_one(record)
 
     # Test get_key
     key = StubDataclassDynamicKey(table_field=table_field, key_field=key_field).build()
     assert record.get_key() == key
 
     # Get record from DB using key
-    loaded_record = DataContext.load_one(key, cast_to=StubDataclassDynamic)
+    loaded_record = active(DataSource).load_one(key, cast_to=StubDataclassDynamic)
     assert loaded_record == record
 
     # Test load_where method
@@ -48,7 +49,7 @@ def test_load(multi_db_fixture):
         table_field=table_field,
         record_field=record_field,
     ).build()
-    loaded_where = DataContext.load_where(query, cast_to=StubDataclassDynamic)
+    loaded_where = active(DataSource).load_where(query, cast_to=StubDataclassDynamic)
 
 
 def test_count_where(multi_db_fixture):
@@ -63,14 +64,14 @@ def test_count_where(multi_db_fixture):
         key_field=key_field,
         record_field=record_field,
     ).build()
-    DataContext.save_one(record)
+    active(DataSource).save_one(record)
 
     # Create the same query as in test_load
     query = StubDataclassDynamicQuery(
         table_field=table_field,
         record_field=record_field,
     ).build()
-    count = DataContext.count_where(query, restrict_to=StubDataclassDynamic)
+    count = active(DataSource).count_where(query, restrict_to=StubDataclassDynamic)
     assert count == 1
 
 

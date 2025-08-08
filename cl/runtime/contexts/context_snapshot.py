@@ -18,8 +18,10 @@ from typing import Dict
 from typing import List
 from typing import Sequence
 from typing_extensions import Self
-from cl.runtime.contexts.context_manager import _STACK_DICT_VAR, active_contexts, _activate_and_return_stack, \
-    _deactivate_and_check_stack
+from cl.runtime.contexts.context_manager import _STACK_DICT_VAR
+from cl.runtime.contexts.context_manager import _activate_and_return_stack
+from cl.runtime.contexts.context_manager import _deactivate_and_check_stack
+from cl.runtime.contexts.context_manager import active_contexts
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serializers.data_serializers import DataSerializers
 

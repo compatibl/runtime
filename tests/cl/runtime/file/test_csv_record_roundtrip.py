@@ -18,7 +18,8 @@ from typing import Iterable
 from typing import List
 from typing import Tuple
 import pandas as pd
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.freeze_util import FreezeUtil
@@ -93,7 +94,7 @@ def test_roundtrip(default_db_fixture):
             entry_type = type(expected_entries[0])
 
             read_records_from_csv(file_path, entry_type)
-            actual_records = tuple(DataContext.load_type(entry_type))
+            actual_records = tuple(active(DataSource).load_type(entry_type))
             assert actual_records == FreezeUtil.freeze(DataUtil.remove_none(expected_entries))
         finally:
             if file_path is not None:

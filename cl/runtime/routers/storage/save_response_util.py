@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.routers.storage.save_request import SaveRequest
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -43,7 +44,7 @@ class SaveResponseUtil:
             raise RuntimeError("Bulk save records of different key types currently is not supported.")
 
         # Save records to DB.
-        DataContext.save_many(deserialized_records)
+        active(DataSource).save_many(deserialized_records)
 
         # Create KeyRequestItem objects of saved records for response.
         saved_key_items = [KeyRequestItem.from_record_or_key(record) for record in deserialized_records]

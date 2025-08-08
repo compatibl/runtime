@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import defaultdict
 from contextlib import contextmanager
 from contextvars import ContextVar
-from collections import defaultdict
-from typing import Type, DefaultDict, List, Optional, cast
+from typing import DefaultDict
+from typing import List
+from typing import Optional
+from typing import Type
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.protocols import RecordProtocol, TRecord
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
 
 _STACK_DICT_VAR: ContextVar[Optional[defaultdict[type, list[RecordProtocol]]]] = ContextVar(
@@ -29,13 +33,6 @@ The argument of activate(...) is added to the stack on __enter__ and removed on 
 Each asynchronous environment has its own stack dictionary.
 """
 
-def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
-    """Get or create stack dictionary for the current asynchronous environment."""
-    stack_dict = _STACK_DICT_VAR.get()
-    if stack_dict is None:
-        stack_dict = defaultdict(list)
-        _STACK_DICT_VAR.set(stack_dict)
-    return stack_dict
 
 def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
     """Get or create stack dictionary for the current asynchronous environment."""
@@ -44,11 +41,22 @@ def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
         stack_dict = defaultdict(list)
         _STACK_DICT_VAR.set(stack_dict)
     return stack_dict
+
+
+def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
+    """Get or create stack dictionary for the current asynchronous environment."""
+    stack_dict = _STACK_DICT_VAR.get()
+    if stack_dict is None:
+        stack_dict = defaultdict(list)
+        _STACK_DICT_VAR.set(stack_dict)
+    return stack_dict
+
 
 def _get_or_create_stack(context_type: Type[RecordProtocol]) -> List[RecordProtocol]:
     """Get or create stack for the key type of the context in the current asynchronous environment."""
     key_type = context_type.get_base_type()
     return _get_or_create_stack_dict()[key_type]
+
 
 def _activate_and_return_stack(context: TRecord) -> List[RecordProtocol]:
     """Helper method for activate(...), do not use directly except for context stack replication in ContextSnapshot."""
@@ -64,6 +72,7 @@ def _activate_and_return_stack(context: TRecord) -> List[RecordProtocol]:
 
     return enter_stack
 
+
 def _deactivate_and_check_stack(context: TRecord, enter_stack: List[RecordProtocol]) -> None:
     """Helper method for activate(...), do not use directly except for context stack replication in ContextSnapshot."""
 
@@ -73,17 +82,21 @@ def _deactivate_and_check_stack(context: TRecord, enter_stack: List[RecordProtoc
     # Validate stack integrity and restore previous current
     if not exit_stack:
         raise RuntimeError(
-            f"Context stack for {TypeUtil.name(context)} has been cleared inside 'with activate(...)' clause.")
+            f"Context stack for {TypeUtil.name(context)} has been cleared inside 'with activate(...)' clause."
+        )
     elif exit_stack is not enter_stack:
         raise RuntimeError(
-            f"Context stack for {TypeUtil.name(context)} has been changed inside 'with activate(...)' clause.")
+            f"Context stack for {TypeUtil.name(context)} has been changed inside 'with activate(...)' clause."
+        )
 
     # Deactivate the currently active context by removing it from the context stack
     deactivated = exit_stack.pop()
     if deactivated is not context:
         # Error message if it is not the same context as the argument
         raise RuntimeError(
-            f"Active context of type {TypeUtil.name(context)} has been changed bypassing the context manager.")
+            f"Active context of type {TypeUtil.name(context)} has been changed bypassing the context manager."
+        )
+
 
 @contextmanager
 def activate(context: TRecord):
@@ -102,6 +115,7 @@ def activate(context: TRecord):
         # Remove from the context stack for the context key type in the current asynchronous environment
         _deactivate_and_check_stack(context, enter_stack)
 
+
 def active(context_type: type[TRecord]) -> TRecord:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
@@ -117,6 +131,7 @@ def active(context_type: type[TRecord]) -> TRecord:
             f"Use active_or_none(...) to receive None instead of an exception."
         )
 
+
 def active_or_none(context_type: type[TRecord]) -> TRecord | None:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
@@ -124,6 +139,7 @@ def active_or_none(context_type: type[TRecord]) -> TRecord | None:
     """
     stack = _get_or_create_stack(context_type)
     return CastUtil.cast(context_type, stack[-1]) if stack else None
+
 
 def active_contexts() -> tuple[RecordProtocol, ...]:
     """

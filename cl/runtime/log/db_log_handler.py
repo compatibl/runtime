@@ -15,7 +15,8 @@
 import logging
 import traceback
 from logging import LogRecord
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.user_log_message import UserLogMessage
@@ -65,6 +66,6 @@ class DbLogHandler(logging.Handler):
         try:
             # Save LogMessage to current db context.
             log_message = self._create_log_message(record)
-            DataContext.save_one(log_message)
+            active(DataSource).save_one(log_message)
         except Exception:
             self.handleError(record)

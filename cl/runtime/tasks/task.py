@@ -17,8 +17,9 @@ import time
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.log_context import LogContext
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -103,7 +104,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 # Save with Running status
                 update = self.clone()
                 update.status = TaskStatus.RUNNING
-                DataContext.save_one(update.build())
+                active(DataSource).save_one(update.build())
 
                 # Invoke out-of-process execution of payload
                 self._execute()
@@ -125,7 +126,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 update.elapsed_sec = 0.0  # TODO: Implement
                 update.remaining_sec = 0.0
                 update.error_message = str(e)
-                DataContext.save_one(update.build())
+                active(DataSource).save_one(update.build())
             else:
 
                 logger.info(
@@ -145,7 +146,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 update.progress_pct = 100.0
                 update.elapsed_sec = 0.0  # TODO: Implement
                 update.remaining_sec = 0.0
-                DataContext.save_one(update.build())
+                active(DataSource).save_one(update.build())
 
     def run_task_in_process(self):
         return self._execute()
@@ -156,7 +157,7 @@ class Task(TaskKey, RecordMixin, ABC):
 
         start_datetime = DatetimeUtil.now()
         while DatetimeUtil.now() < start_datetime + dt.timedelta(seconds=timeout_sec):
-            task = DataContext.load_one(task_key, cast_to=Task)
+            task = active(DataSource).load_one(task_key, cast_to=Task)
             if task.status == TaskStatus.COMPLETED:
                 # Test success, task has been completed
                 return

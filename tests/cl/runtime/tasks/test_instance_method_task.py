@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers
@@ -27,7 +28,7 @@ def test_smoke(default_db_fixture):
             StubHandlers(stub_id="abc"),
         ]
     ]
-    DataContext.save_many(records)
+    active(DataSource).save_many(records)
 
     object_and_instance_handler_on_object = [(x, x.run_instance_method_1a) for x in records]
     key_and_instance_handler_on_object = [(x.get_key(), x.run_instance_method_1a) for x in records]

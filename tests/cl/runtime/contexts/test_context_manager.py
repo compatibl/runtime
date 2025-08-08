@@ -17,8 +17,9 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
-
-from cl.runtime.contexts.context_manager import active_or_none, active, activate
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from stubs.cl.runtime.contexts.stub_context import StubContext
 from stubs.cl.runtime.contexts.stub_derived_context import StubDerivedContext

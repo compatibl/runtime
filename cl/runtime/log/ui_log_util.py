@@ -16,7 +16,8 @@ from dataclasses import dataclass
 from typing import Any
 from typing import Iterable
 from typing_extensions import Final
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.task_logs import TaskLogs
 from cl.runtime.records.data_mixin import DataMixin
@@ -62,7 +63,7 @@ class UiLogUtil(DataMixin):
         """Return task status by its run_id."""
 
         target_task_query = TaskQuery(task_id=task_run_id).build()
-        tasks = list(DataContext.load_where(target_task_query))
+        tasks = list(active(DataSource).load_where(target_task_query))
 
         if not tasks:
             raise RuntimeError(f"Not found task for {task_run_id=}")

@@ -14,7 +14,8 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.entity.panels_request import PanelsRequest
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
@@ -47,7 +48,7 @@ class PanelsResponseItem(BaseModel):
         if TypeCache.is_type(request.type_name):
             record_type_name = request.type_name
         else:
-            bound_type_names = DataContext.get_bound_record_type_names(table=request.type_name)
+            bound_type_names = active(DataSource).get_bound_record_type_names(table=request.type_name)
             record_type_name = bound_type_names[0]
         record_type = TypeCache.get_class_from_type_name(record_type_name)
         key_type = record_type.get_key_type()
@@ -58,7 +59,7 @@ class PanelsResponseItem(BaseModel):
             key = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(key_type))
 
             # If the record is not found, display panel tabs for the base type
-            record = DataContext.load_one_or_none(key)
+            record = active(DataSource).load_one_or_none(key)
             actual_type = TypeCache.get_class_from_type_name(record_type_name) if record is None else type(record)
         else:
             actual_type = TypeCache.get_class_from_type_name(record_type_name)

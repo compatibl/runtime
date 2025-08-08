@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.conditions import And
 from cl.runtime.records.conditions import Exists
 from cl.runtime.records.conditions import In
@@ -36,7 +37,7 @@ def test_str_query(multi_db_fixture):
         StubDataclassPrimitiveFields(key_str_field="xyz"),
     ]
     records = [x.build() for x in records]
-    DataContext.save_many(records)
+    active(DataSource).save_many(records)
 
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
@@ -48,13 +49,13 @@ def test_str_query(multi_db_fixture):
 
     # Load using a query
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
-    assert to_key_str_field(DataContext.load_where(eq_query)) == ["def"]
-    assert to_key_str_field(DataContext.load_where(in_query)) == ["def", "xyz"]
-    assert to_key_str_field(DataContext.load_where(not_in_query)) == ["abc"]
-    # assert to_key_str_field(DataContext.load_where(or_query)) == ["def", "xyz"]
-    # assert to_key_str_field(DataContext.load_where(and_query)) == ["abc"]
-    assert to_key_str_field(DataContext.load_where(exists_query)) == ["def", "xyz"]
-    assert to_key_str_field(DataContext.load_where(does_not_exist_query)) == ["abc"]
+    assert to_key_str_field(active(DataSource).load_where(eq_query)) == ["def"]
+    assert to_key_str_field(active(DataSource).load_where(in_query)) == ["def", "xyz"]
+    assert to_key_str_field(active(DataSource).load_where(not_in_query)) == ["abc"]
+    # assert to_key_str_field(active(DataSource).load_where(or_query)) == ["def", "xyz"]
+    # assert to_key_str_field(active(DataSource).load_where(and_query)) == ["abc"]
+    assert to_key_str_field(active(DataSource).load_where(exists_query)) == ["def", "xyz"]
+    assert to_key_str_field(active(DataSource).load_where(does_not_exist_query)) == ["abc"]
 
 
 if __name__ == "__main__":

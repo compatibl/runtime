@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.conditions import In
 from cl.runtime.records.data_util import DataUtil
@@ -70,25 +71,25 @@ def test_record_or_key(multi_db_fixture):
     key = record.get_key()
 
     # Save a single record
-    DataContext.save_many([record])
+    active(DataSource).save_many([record])
 
     # Load using record or key
     another_record = StubDataclass(id="another").build()
-    loaded_records = tuple(DataContext.load_many([another_record, key, None]))
+    loaded_records = tuple(active(DataSource).load_many([another_record, key, None]))
     assert loaded_records[0] is another_record  # Same object is returned without lookup
     assert loaded_records[1] == record  # Not the same object but equal
     assert loaded_records[2] is None
 
-    assert DataContext.load_one(another_record) is another_record  # Same object is returned without lookup
-    assert DataContext.load_one(key) == record  # Not the same object but equal
+    assert active(DataSource).load_one(another_record) is another_record  # Same object is returned without lookup
+    assert active(DataSource).load_one(key) == record  # Not the same object but equal
 
 
 def test_complex_records(multi_db_fixture):
     """Test 'save_many' method for various types."""
-    DataContext.save_many(_SAMPLES)
+    active(DataSource).save_many(_SAMPLES)
 
     sample_keys = [sample.get_key() for sample in _SAMPLES]
-    loaded_records = [DataContext.load_one(key) for key in sample_keys]
+    loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
 
     assert loaded_records == DataUtil.remove_none(_SAMPLES)
 
@@ -99,24 +100,24 @@ def test_basic_operations(multi_db_fixture):
     sample_keys = [x.get_key() for x in _SAMPLES]
 
     # Load from empty tables
-    loaded_records = [DataContext.load_one_or_none(key) for key in sample_keys]
+    loaded_records = [active(DataSource).load_one_or_none(key) for key in sample_keys]
     assert loaded_records == [None] * len(_SAMPLES)
 
     # Populate tables
-    DataContext.save_many(_SAMPLES)
+    active(DataSource).save_many(_SAMPLES)
 
     # Load one by one for all keys because each type is different
-    loaded_records = [DataContext.load_one(key) for key in sample_keys]
+    loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
     assert loaded_records == DataUtil.remove_none(_SAMPLES)
 
     # Delete first and last record
-    DataContext.delete_many([sample_keys[0], sample_keys[-1]])
-    loaded_records = [DataContext.load_one_or_none(key) for key in sample_keys]
+    active(DataSource).delete_many([sample_keys[0], sample_keys[-1]])
+    loaded_records = [active(DataSource).load_one_or_none(key) for key in sample_keys]
     assert loaded_records == DataUtil.remove_none([None, *_SAMPLES[1:-1], None])
 
     # Delete all records
-    DataContext.delete_many(sample_keys)
-    loaded_records = [DataContext.load_one_or_none(key) for key in sample_keys]
+    active(DataSource).delete_many(sample_keys)
+    loaded_records = [active(DataSource).load_one_or_none(key) for key in sample_keys]
     assert loaded_records == [None] * len(_SAMPLES)
 
 
@@ -124,19 +125,19 @@ def test_record_upsert(multi_db_fixture):
     """Check that an existing entry is overridden when a new entry with the same key is saved."""
     # Create sample and save
     sample = StubDataclass().build()
-    DataContext.save_one(sample)
-    loaded_record = DataContext.load_one(sample.get_key())
+    active(DataSource).save_one(sample)
+    loaded_record = active(DataSource).load_one(sample.get_key())
     assert loaded_record == sample
 
     # create sample with the same key and save
     override_sample = StubDataclassDerived().build()
-    DataContext.save_one(override_sample)
-    loaded_record = DataContext.load_one(sample.get_key())
+    active(DataSource).save_one(override_sample)
+    loaded_record = active(DataSource).load_one(sample.get_key())
     assert loaded_record == override_sample
 
     override_sample = StubDataclassDoubleDerived().build()
-    DataContext.save_one(override_sample)
-    loaded_record = DataContext.load_one(sample.get_key())
+    active(DataSource).save_one(override_sample)
+    loaded_record = active(DataSource).load_one(sample.get_key())
     assert loaded_record == override_sample
 
 
@@ -168,28 +169,28 @@ def test_load_type(multi_db_fixture):
 
     all_samples = base_samples + derived_samples + other_derived_samples
 
-    DataContext.save_many(all_samples)
+    active(DataSource).save_many(all_samples)
 
-    loaded_records = DataContext.load_type(StubDataclass)
+    loaded_records = active(DataSource).load_type(StubDataclass)
     assert PytestUtil.assert_equals_iterable_without_ordering(all_samples, loaded_records)
 
-    loaded_records = DataContext.load_type(StubDataclassDerived)
+    loaded_records = active(DataSource).load_type(StubDataclassDerived)
     assert PytestUtil.assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
 def test_singleton(multi_db_fixture):
     """Test singleton type saving."""
     singleton_sample = StubDataclassSingleton().build()
-    DataContext.save_one(singleton_sample)
-    loaded_sample = DataContext.load_one(
+    active(DataSource).save_one(singleton_sample)
+    loaded_sample = active(DataSource).load_one(
         singleton_sample.get_key(),
         cast_to=StubDataclassSingleton,
     )
     assert loaded_sample == singleton_sample
 
     other_singleton_sample = StubDataclassSingleton(str_field="other").build()
-    DataContext.save_one(other_singleton_sample)
-    all_records = list(DataContext.load_type(other_singleton_sample.__class__))
+    active(DataSource).save_one(other_singleton_sample)
+    all_records = list(active(DataSource).load_type(other_singleton_sample.__class__))
     assert len(all_records) == 1
     assert all_records[0] == other_singleton_sample
 
@@ -197,9 +198,9 @@ def test_singleton(multi_db_fixture):
 def test_repeated(multi_db_fixture):
     """Test including the same object twice in save many."""
     record = StubDataclass().build()
-    DataContext.save_many([record, record])
+    active(DataSource).save_many([record, record])
 
-    loaded_records = list(DataContext.load_many([record.get_key()]))
+    loaded_records = list(active(DataSource).load_many([record.get_key()]))
     assert len(loaded_records) == 1
     assert loaded_records[0] == record
 
@@ -212,15 +213,15 @@ def test_load_where(multi_db_fixture):
         StubDataclassPrimitiveFields(key_str_field="xyz"),
     ]
     records = [x.build() for x in records]
-    DataContext.save_many(records)
+    active(DataSource).save_many(records)
 
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
 
     # Load using a query
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
-    assert to_key_str_field(DataContext.load_where(eq_query)) == ["def"]
-    assert to_key_str_field(DataContext.load_where(in_query)) == ["def", "xyz"]
+    assert to_key_str_field(active(DataSource).load_where(eq_query)) == ["def"]
+    assert to_key_str_field(active(DataSource).load_where(in_query)) == ["def", "xyz"]
 
 
 def test_count_where(multi_db_fixture):
@@ -231,13 +232,13 @@ def test_count_where(multi_db_fixture):
         StubDataclassPrimitiveFields(key_str_field="xyz"),
     ]
     records = [x.build() for x in records]
-    DataContext.save_many(records)
+    active(DataSource).save_many(records)
 
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
 
-    assert DataContext.count_where(eq_query) == 1
-    assert DataContext.count_where(in_query) == 2
+    assert active(DataSource).count_where(eq_query) == 1
+    assert active(DataSource).count_where(in_query) == 2
 
 
 if __name__ == "__main__":

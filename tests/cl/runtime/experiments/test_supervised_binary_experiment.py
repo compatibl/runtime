@@ -14,7 +14,8 @@
 
 import pytest
 import random
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_type import ExperimentType
 from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
@@ -29,8 +30,8 @@ def test_smoke(multi_db_fixture):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
-    DataContext.save_one(exp_type)
-    DataContext.save_one(sc1)
+    active(DataSource).save_one(exp_type)
+    active(DataSource).save_one(sc1)
 
     # Create and run the experiment
     experiment = StubSupervisedBinaryExperiment(
@@ -56,8 +57,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test2"
     ).build()
 
-    DataContext.save_one(exp_type)
-    DataContext.save_many([sc1, sc2])
+    active(DataSource).save_one(exp_type)
+    active(DataSource).save_many([sc1, sc2])
 
     experiment = StubSupervisedBinaryExperiment(
         experiment_type=ExperimentTypeKey(experiment_type_id="Test"),

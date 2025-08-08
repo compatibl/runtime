@@ -290,7 +290,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
         if len(result) == 1:
             return result[0]
         else:
-            raise RuntimeError("DataContext.load_many returned more records than requested.")
+            raise RuntimeError("active(DataSource).load_many returned more records than requested.")
 
     def load_many(
         self,
@@ -322,7 +322,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
             if len(invalid_keys) > 0:
                 invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
                 raise RuntimeError(
-                    f"Parameter 'records_or_keys' of a load method in DataContext includes the following keys\n"
+                    f"Parameter 'records_or_keys' of a load method in DataSource includes the following keys\n"
                     f"whose type is not the same as the key type {TypeUtil.name(key_type)}\n"
                     f"of the cast_to parameter {TypeUtil.name(cast_to)}:\n{invalid_keys_str}"
                 )
@@ -331,7 +331,7 @@ class DataSource(DataSourceKey, RecordMixin, ContextMixin):
             if len(invalid_records) > 0:
                 invalid_records_str = "\n".join(str(x) for x in invalid_records)
                 raise RuntimeError(
-                    f"Parameter 'records_or_keys' of a load method in DataContext includes the following records\n"
+                    f"Parameter 'records_or_keys' of a load method in DataSource includes the following records\n"
                     f"that are not derived from the cast_to parameter {TypeUtil.name(cast_to)}:\n{invalid_records_str}"
                 )
 

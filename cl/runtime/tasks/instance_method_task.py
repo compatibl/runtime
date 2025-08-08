@@ -16,8 +16,9 @@ from dataclasses import dataclass
 from typing import Callable
 from typing_extensions import Self
 from typing_extensions import override
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.log_context import LogContext
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
@@ -60,7 +61,7 @@ class InstanceMethodTask(MethodTask):
         key = _KEY_SERIALIZER.deserialize(self.key_str, type_hint)
 
         # Load record from storage
-        record = DataContext.load_one(key)  # TODO: Require record type?
+        record = active(DataSource).load_one(key)  # TODO: Require record type?
 
         # Convert the name to snake_case and get method callable
         method_name = self.normalized_method_name()

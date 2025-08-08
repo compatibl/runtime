@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from __future__ import annotations
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
@@ -34,7 +35,7 @@ class TypeResponseUtil:
             record_type_name = request.type_name
         else:
             # Get lowest common type bound to the table
-            record_type_name = DataContext.get_lowest_bound_record_type_name(table=request.type_name)
+            record_type_name = active(DataSource).get_lowest_bound_record_type_name(table=request.type_name)
 
         # Get record type from name
         record_type = TypeCache.get_class_from_type_name(record_type_name)

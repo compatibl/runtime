@@ -15,7 +15,8 @@
 from dataclasses import dataclass
 from cl.runtime import RecordView
 from cl.runtime import View
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
@@ -29,5 +30,5 @@ class KeyView(View):
     def materialize(self) -> RecordView:
         """Load record and return RecordView object. KeyView is used only for storage in the DB."""
         # TODO: Fix cast
-        record = DataContext.load_one_or_none(self.key) if self.key else None
+        record = active(DataSource).load_one_or_none(self.key) if self.key else None
         return RecordView(view_for=self.view_for, view_name=self.view_name, record=record)

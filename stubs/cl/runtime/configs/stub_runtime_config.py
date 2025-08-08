@@ -14,7 +14,8 @@
 
 from dataclasses import dataclass
 from cl.runtime.configs.config import Config
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -103,13 +104,13 @@ class StubRuntimeConfig(Config):
         ]
 
         # Build and save to DB
-        DataContext.save_many(record.build() for record in all_records)
+        active(DataSource).save_many(record.build() for record in all_records)
 
     def configure_plots(self) -> None:
         """Configure plots."""
 
         # GroupBarPlot
-        DataContext.save_many(
+        active(DataSource).save_many(
             (
                 StubGroupBarPlots.get_single_group_plot(self.config_id + "stub_group_bar_plots.single_group"),
                 StubGroupBarPlots.get_4_groups_2_bars_plot(self.config_id + "stub_group_bar_plots.4_groups_2_bars"),
@@ -118,10 +119,10 @@ class StubRuntimeConfig(Config):
         )
 
         # HeatMapPlot
-        DataContext.save_many((StubHeatMapPlots.get_basic_plot(self.config_id + "stub_heat_map_plots.basic"),))
+        active(DataSource).save_many((StubHeatMapPlots.get_basic_plot(self.config_id + "stub_heat_map_plots.basic"),))
 
         # LinePlot
-        DataContext.save_many(
+        active(DataSource).save_many(
             (
                 StubLinePlots.get_one_line_plot(self.config_id + "stub_line_plots.one_line"),
                 StubLinePlots.get_two_line_plot(self.config_id + "stub_line_plots.two_line"),

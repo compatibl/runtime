@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.routers.tasks.submit_response_item import SubmitResponseItem
@@ -59,7 +60,7 @@ def test_method(default_db_fixture, celery_queue_fixture):
 
     stub_handlers = StubHandlers().build()
     key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
-    DataContext.save_one(stub_handlers)
+    active(DataSource).save_one(stub_handlers)
 
     for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):
         request_object = SubmitRequest(**request)
@@ -85,7 +86,7 @@ def test_method(default_db_fixture, celery_queue_fixture):
             Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build())
             for response_item in response_items
         ]
-        actual_records = list(DataContext.load_many(expected_keys))
+        actual_records = list(active(DataSource).load_many(expected_keys))
         assert actual_records == expected_records
 
 
@@ -95,7 +96,7 @@ def test_api(celery_queue_fixture):
 
     stub_handlers = StubHandlers()
     key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
-    DataContext.save_one(stub_handlers)
+    active(DataSource).save_one(stub_handlers)
 
     with QaClient() as test_client:
         for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):
@@ -123,7 +124,7 @@ def test_api(celery_queue_fixture):
             request_object = SubmitRequest(**request)
             response_items = SubmitResponseItem.run_tasks(request_object)
             [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
-            actual_records = list(DataContext.load_many(expected_keys))
+            actual_records = list(active(DataSource).load_many(expected_keys))
             assert actual_records == expected_records
 
 

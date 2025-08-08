@@ -15,7 +15,8 @@
 from __future__ import annotations
 from inflection import titleize
 from pydantic import BaseModel
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_cache import TypeCache
@@ -57,7 +58,7 @@ class TypesResponseItem(BaseModel):
         # Add tables to result
         tables_result = [
             TypesResponseItem(name=table, label=table, kind="Table")  # TODO: Make label different from name or remove
-            for table in DataContext.get_tables()
+            for table in active(DataSource).get_tables()
         ]
 
         # Check name collisions between types and tables

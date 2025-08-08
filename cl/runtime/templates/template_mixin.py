@@ -15,7 +15,8 @@
 from abc import ABC
 from abc import abstractmethod
 from cl.runtime import RecordMixin
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.protocols import TData
 from cl.runtime.templates.template_engine import TemplateEngine
 from cl.runtime.templates.template_engine_key import TemplateEngineKey
@@ -39,6 +40,6 @@ class TemplateMixin(RecordMixin, ABC):
 
     def render(self, data: TData) -> str:
         """Render the template by substituting parameters from the specified data object."""
-        engine = DataContext.load_one(self.engine, cast_to=TemplateEngine)
+        engine = active(DataSource).load_one(self.engine, cast_to=TemplateEngine)
         result = engine.render(self.body, data)
         return result

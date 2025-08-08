@@ -16,7 +16,6 @@ import logging
 import os
 import socket
 import threading
-
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.db.data_source import DataSource
@@ -152,7 +151,7 @@ def _make_filter_db_logs():
         # Filter out third-party lib info logs
         third_party_logs = record.levelno <= logging.INFO and record.name.startswith(("uvicorn", "celery"))
 
-        # Filter out if the log was created outside the DataContext
+        # Filter out if the log was created outside the DataSource
         outside_data_context = active_or_none(DataSource) is None
 
         return not any(

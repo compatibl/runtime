@@ -16,7 +16,8 @@ import logging
 from cl.runtime import RecordListView
 from cl.runtime import RecordView
 from cl.runtime import View
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
@@ -52,13 +53,13 @@ class PanelResponseUtil:
             key_type = type_.get_key_type()
         else:
             # Table is passed as type_name
-            key_type = DataContext.get_bound_key_type(table=request.type_name)
+            key_type = active(DataSource).get_bound_key_type(table=request.type_name)
 
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(key_type))
 
         # Load record from the database.
-        record = DataContext.load_one(key_obj)
+        record = active(DataSource).load_one(key_obj)
         if record is None:
             raise RuntimeError(
                 f"Record with type {request.type_name} and key {request.key} is not found in dataset {request.dataset}."

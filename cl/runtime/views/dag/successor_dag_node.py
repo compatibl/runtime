@@ -15,7 +15,8 @@
 from dataclasses import dataclass
 from typing import List
 from cl.runtime import RecordMixin
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -131,7 +132,7 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin):
 
             for field_name, field_value in node_fields.items():
                 if isinstance(field_value, SuccessorDagNodeKey):
-                    loaded_node = DataContext.load_one(field_value, cast_to=SuccessorDagNodeKey)
+                    loaded_node = active(DataSource).load_one(field_value, cast_to=SuccessorDagNodeKey)
                     if loaded_node is None:
                         SuccessorDagNode.__append_empty_node(
                             source_node=source_node,
@@ -166,7 +167,7 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin):
                             if edges_names and len(edges_names) == len(field_value):
                                 edge_label = edges_names[index - 1]
 
-                        loaded_node = DataContext.load_one(node_key, cast_to=SuccessorDagNodeKey)
+                        loaded_node = active(DataSource).load_one(node_key, cast_to=SuccessorDagNodeKey)
                         if loaded_node is None:
                             SuccessorDagNode.__append_empty_node(
                                 source_node=source_node,

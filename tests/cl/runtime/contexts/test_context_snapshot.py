@@ -14,8 +14,8 @@
 
 import pytest
 from typing import List
-
-from cl.runtime.contexts.context_manager import active_or_none, activate
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.contexts.trial_context import TrialContext
 from cl.runtime.records.protocols import RecordProtocol

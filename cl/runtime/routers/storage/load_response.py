@@ -15,7 +15,8 @@
 from __future__ import annotations
 from cl.runtime.backend.core.ui_type_state import UiTypeState
 from cl.runtime.backend.core.ui_type_state_key import UiTypeStateKey
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
@@ -46,7 +47,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         if TypeCache.is_type(request.load_keys[0].type):
             record_type_name = request.load_keys[0].type
         else:
-            bound_type_names = DataContext.get_bound_record_type_names(table=request.load_keys[0].type)
+            bound_type_names = active(DataSource).get_bound_record_type_names(table=request.load_keys[0].type)
             record_type_name = bound_type_names[0]
         record_type = TypeCache.get_class_from_type_name(record_type_name)
         key_type = record_type.get_key_type()
@@ -58,7 +59,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         )
 
         # Load and serialize records
-        loaded_records = DataContext.load_many(keys)
+        loaded_records = active(DataSource).load_many(keys)
 
         # Find the lowest common base of the loaded types except None
         loaded_record_type_names = tuple(TypeUtil.name(x) for x in loaded_records if x is not None)

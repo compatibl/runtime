@@ -14,7 +14,8 @@
 
 from dataclasses import dataclass
 from typing import List
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.tasks.task import Task
 from cl.runtime.workflows.workflow_phase import WorkflowPhase
@@ -30,7 +31,7 @@ class WorkflowTask(Task):
 
     def _execute(self) -> None:
         # Check that phases do not specify prerequisites
-        phases = DataContext.load_many(self.phases, cast_to=WorkflowPhase)  # TODO: Error message if not found
+        phases = active(DataSource).load_many(self.phases, cast_to=WorkflowPhase)  # TODO: Error message if not found
         if any(phase.prerequisites is not None for phase in phases):
             # TODO: Support checking for prerequisites
             raise RuntimeError("Checking for prerequisites is not yet supported.")

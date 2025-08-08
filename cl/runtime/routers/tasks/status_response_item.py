@@ -14,7 +14,8 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.status_request import StatusRequest
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
@@ -56,7 +57,7 @@ class StatusResponseItem(BaseModel):
         """Get status for tasks in request."""
 
         task_keys = [TaskKey(task_id=x).build() for x in request.task_run_ids]  # TODO: Update if task_run_id is UUID
-        tasks = DataContext.load_many(task_keys, cast_to=Task)
+        tasks = active(DataSource).load_many(task_keys, cast_to=Task)
 
         response_items = []
         for task in tasks:

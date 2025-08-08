@@ -28,7 +28,7 @@ class SseQueryUtil:
     def query_sorted_desc_and_limited(cls, table: str, *, limit: int | None = None):
         """Query 'table' with sort by 'timestamp' in descending order and limit."""
 
-        # TODO (Roman): Refactor to use DataContext. Needed features:
+        # TODO (Roman): Refactor to use active(DataSource). Needed features:
         #   - sort by specific field in descending order
         #   - limit sorted result
 

@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.contexts.context_manager import activate
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.local.local_cache import LocalCache
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
@@ -34,9 +33,9 @@ def test_smoke():
         dataset = None  # TODO: Support datasets "\\sample_dataset"
 
         # Save a single record
-        DataContext.save_many([record])
+        active(DataSource).save_many([record])
 
-        loaded_records = DataContext.load_many([record, key, None])
+        loaded_records = active(DataSource).load_many([record, key, None])
         assert loaded_records[0] is record  # Same object is returned without lookup
         assert loaded_records[1] is record  # In case of local cache only, also the same object
         assert loaded_records[2] is None

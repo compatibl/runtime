@@ -15,7 +15,8 @@
 import pytest
 from typing import Dict
 from typing import List
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.result_request import ResultRequest
 from cl.runtime.routers.tasks.result_response_item import ResultResponseItem
@@ -38,7 +39,7 @@ def _save_tasks_and_get_requests() -> List[Dict]:
         ).build()
         for i in range(2)
     ]
-    DataContext.save_many(tasks)
+    active(DataSource).save_many(tasks)
 
     requests = [
         {

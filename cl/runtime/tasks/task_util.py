@@ -13,7 +13,8 @@
 # limitations under the License.
 
 from cl.runtime import TypeCache
-from cl.runtime.contexts.data_context import DataContext
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
@@ -55,7 +56,7 @@ class TaskUtil:
                     key_type = TypeCache.get_class_from_type_name(request.type).get_key_type()  # noqa
                 else:
                     # Get key type from table
-                    key_type = DataContext.get_bound_key_type(table=request.type)
+                    key_type = active(DataSource).get_bound_key_type(table=request.type)
 
                 key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
                 label = f"{TypeUtil.name(key_type)};{serialized_key};{handler_name}"
