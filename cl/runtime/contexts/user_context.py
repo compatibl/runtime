@@ -24,7 +24,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class UserContext(ContextMixin, DataMixin):
+class UserContext(DataMixin):
     """User-specific settings and data."""
 
     user: UserKey = required()
@@ -37,16 +37,14 @@ class UserContext(ContextMixin, DataMixin):
     def get_base_type(cls) -> type:
         return UserContext
 
-    @classmethod
-    def get_user(cls) -> UserKey:
-        """Return the user specified in current UserContext, or user reported by OS outside the outermost 'with'."""
-        if (user_context := UserContext.current_or_none()) is not None:
-            # User for the current UserContext
-            return user_context.user
-        elif ProcessContext.is_testing():
-            # Use process namespace as the user
-            return UserKey(username=QaUtil.get_test_name_from_call_stack())
-        else:
-            # User reported by OS
-            os_user_id = getuser()
-            return UserKey(username=os_user_id)
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.user is None:
+            # Set default username if none was specified explicitly
+            if ProcessContext.is_testing():
+                # Username is test name if testing
+                self.user = UserKey(username=QaUtil.get_test_name_from_call_stack())
+            else:
+                # Use the username reported by OS if not testing
+                os_user_id = getuser()
+                self.user = UserKey(username=os_user_id)

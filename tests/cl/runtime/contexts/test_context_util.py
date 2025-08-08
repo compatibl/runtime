@@ -19,6 +19,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
+
+from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.contexts.context_util import UserContextUtil
 from cl.runtime.contexts.user_context import UserContext
 
@@ -56,7 +58,7 @@ def test_decrypt_secret():
     key = "test_key"
     value = "secret_value"
     encrypted_value = _encrypt_value(value)
-    user_context = UserContext.current_or_none()
+    user_context = active_or_default(UserContext)
     user_context.encrypted_secrets[key] = encrypted_value
     secret_value_decrypted = UserContextUtil.decrypt_secret(key)
     assert secret_value_decrypted == value

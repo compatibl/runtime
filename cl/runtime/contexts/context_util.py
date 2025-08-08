@@ -17,6 +17,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
+
+from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.contexts.user_context import UserContext
 
 
@@ -25,10 +27,10 @@ class UserContextUtil:
 
     @classmethod
     def decrypt_secret(cls, key: str) -> str | None:
-        """Decrypt the specified secret in UserContext, None if no current UserContext or key is not found."""
+        """Decrypt the specified secret in UserContext, None if no active UserContext or the secret is not found."""
 
         # Get secrets field of the current context, return None if not specified
-        user_context = UserContext.current_or_none()
+        user_context = active_or_default(UserContext)
         if (encrypted_secrets := user_context.encrypted_secrets if user_context is not None else None) is None:
             return None
 
