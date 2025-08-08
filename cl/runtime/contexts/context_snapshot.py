@@ -18,8 +18,8 @@ from typing import Dict
 from typing import List
 from typing import Sequence
 from typing_extensions import Self
-from cl.runtime.contexts.context_mixin import _CONTEXT_STACK_DICT_VAR
-from cl.runtime.contexts.context_mixin import ContextMixin
+from cl.runtime.contexts.context_manager import _CONTEXT_STACK_DICT_VAR
+from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 _CONTEXT_SERIALIZER = DataSerializers.FOR_JSON
@@ -30,10 +30,10 @@ _CONTEXT_SERIALIZER = DataSerializers.FOR_JSON
 class ContextSnapshot:
     """Records current context for each context key type and restores them during out-of-process task execution."""
 
-    _all_contexts: List[ContextMixin] | None = None
+    _all_contexts: List[RecordProtocol] | None = None
     """All contexts that will be entered into during out-of-process task execution."""
 
-    _entered_contexts: List[ContextMixin] | None = None
+    _entered_contexts: List[RecordProtocol] | None = None
     """
     Contexts for which __enter__ method has been called inside ContextSnapshot.__enter__ so far.
     For each of these contexts, __exit__ will be invoked in case of an error in ContextSnapshot.__enter__ method.
@@ -54,12 +54,6 @@ class ContextSnapshot:
         if data:
             self._all_contexts = _CONTEXT_SERIALIZER.deserialize(data)
             for context in self._all_contexts:
-                # Ensure context is derived from Context
-                if not isinstance(context, ContextMixin):
-                    raise RuntimeError(
-                        f"Context {type(context).__name__} cannot be activated by ContextSnapshot "
-                        f"because it is not derived from {ContextMixin.__name__}."
-                    )
                 # Build the deserialized record
                 context.build()
 
@@ -127,14 +121,14 @@ class ContextSnapshot:
         """Serialize all current contexts to a list of dicts, each dict represents one serialized context."""
 
         # Get current contexts for all key types
-        contexts = ContextMixin.current_contexts()
+        contexts = active_contexts()
 
         # Serialize
         result = cls._serialize_contexts(contexts)
         return result
 
     @classmethod
-    def _serialize_contexts(cls, contexts: Sequence[ContextMixin]) -> Sequence[Dict]:
+    def _serialize_contexts(cls, contexts: Sequence[RecordProtocol]) -> Sequence[Dict]:
         """Serialize argument contexts to a list of dicts, each dict represents one serialized context."""
 
         # Use serializer
