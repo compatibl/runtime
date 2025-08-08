@@ -19,7 +19,7 @@ from cl.runtime.records.data_mixin import DataMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class StubContext(ContextMixin, DataMixin):
+class StubContext(DataMixin):
     """Stub context."""
 
     stub_context_id: str = "abc"
@@ -56,32 +56,11 @@ class StubContext(ContextMixin, DataMixin):
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource initialization and disposal."""
 
-        # Call __enter__ method of base class
-        ContextMixin.__enter__(self)
-
-        try:
-            if self.error_on_enter:
-                raise RuntimeError("StubContext.error_on_enter is set.")
-        except Exception as e:
-            # Treat the exception as though it happened outside the 'with' clause:
-            #   - Call __exit__ method of base class without passing exception details
-            #   - Then rethrow the exception
-            ContextMixin.__exit__(self, None, None, None)
-            raise e
-        return self
+        if self.error_on_enter:
+            raise RuntimeError("StubContext.error_on_enter is set.")
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
 
-        try:
-            if self.error_on_exit:
-                raise RuntimeError("StubContext.error_on_exit is set.")
-        except Exception as e:
-            # Treat the exception as though it happened outside the 'with' clause:
-            #   - Call __exit__ method of base class without passing exception details
-            #   - Then rethrow the exception
-            ContextMixin.__exit__(self, None, None, None)
-            raise e
-        else:
-            # Otherwise delegate to the __exit__ method of base
-            ContextMixin.__exit__(self, exc_type, exc_val, exc_tb)
+        if self.error_on_exit:
+            raise RuntimeError("StubContext.error_on_exit is set.")

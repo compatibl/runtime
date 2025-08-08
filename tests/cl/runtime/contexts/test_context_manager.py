@@ -153,7 +153,7 @@ def test_error_handling():
 
     # Outer context raises on __post__init__
     with pytest.raises(RuntimeError):
-        with StubContext(error_on_post_init=True).build():
+        with activate(StubContext(error_on_post_init=True).build()):
             with activate(stub_context_1):
                 pass
     assert active_or_none(StubContext) is None
@@ -161,13 +161,13 @@ def test_error_handling():
     # Inner context raises on __post__init__
     with pytest.raises(RuntimeError):
         with activate(stub_context_1):
-            with StubContext(error_on_post_init=True).build():
+            with activate(StubContext(error_on_post_init=True).build()):
                 pass
     assert active_or_none(StubContext) is None
 
     # Outer context raises on init
     with pytest.raises(RuntimeError):
-        with StubContext(error_on_init=True).build():
+        with activate(StubContext(error_on_init=True).build()):
             with activate(stub_context_1):
                 pass
     assert active_or_none(StubContext) is None
@@ -175,13 +175,13 @@ def test_error_handling():
     # Inner context raises on init
     with pytest.raises(RuntimeError):
         with activate(stub_context_1):
-            with StubContext(error_on_init=True).build():
+            with activate(StubContext(error_on_init=True).build()):
                 pass
     assert active_or_none(StubContext) is None
 
     # Outer context raises on enter
     with pytest.raises(RuntimeError):
-        with StubContext(error_on_enter=True).build():
+        with activate(StubContext(error_on_enter=True).build()):
             with activate(stub_context_1):
                 pass
     assert active_or_none(StubContext) is None
@@ -189,13 +189,13 @@ def test_error_handling():
     # Inner context raises on enter
     with pytest.raises(RuntimeError):
         with activate(stub_context_1):
-            with StubContext(error_on_enter=True).build():
+            with activate(StubContext(error_on_enter=True).build()):
                 pass
     assert active_or_none(StubContext) is None
 
     # Outer context raises on exit
     with pytest.raises(RuntimeError):
-        with StubContext(error_on_exit=True).build():
+        with activate(StubContext(error_on_exit=True).build()):
             with activate(stub_context_1):
                 pass
     assert active_or_none(StubContext) is None
@@ -203,7 +203,7 @@ def test_error_handling():
     # Inner context raises on exit
     with pytest.raises(RuntimeError):
         with activate(stub_context_1):
-            with StubContext(error_on_exit=True).build():
+            with activate(StubContext(error_on_exit=True).build()):
                 pass
     assert active_or_none(StubContext) is None
 

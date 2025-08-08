@@ -92,7 +92,13 @@ class ContextSnapshot:
                     self._processed_context_stacks.append(context_stack)
                 except Exception as e:
                     # Deactivate directly bypassing 'with' clause in reverse order all processed context
-                    _deactivate_and_check_stack(self._processed_contexts.pop(), self._processed_context_stacks.pop())
+                    _deactivate_and_check_stack(
+                        self._processed_contexts.pop(),
+                        self._processed_context_stacks.pop(),
+                        type(e),
+                        e,
+                        e.__traceback__,
+                    )
                     # Rethrow
                     raise e
         return self
@@ -104,7 +110,13 @@ class ContextSnapshot:
             # Remove (pop) from the list and deactivate in reverse order the contexts entered into so far
             while self._processed_contexts:
                 # Deactivate directly bypassing 'with' clause in reverse order all processed context
-                _deactivate_and_check_stack(self._processed_contexts.pop(), self._processed_context_stacks.pop())
+                _deactivate_and_check_stack(
+                    self._processed_contexts.pop(),
+                    self._processed_context_stacks.pop(),
+                    exc_type,
+                    exc_val,
+                    exc_tb,
+                )
         finally:
             # Restore ContextVar to its previous state after async task execution using a token
             # from 'save_and_clear_state' whether or not an exception occurred
