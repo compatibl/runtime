@@ -46,7 +46,7 @@ class PytestUtil:
         return data
 
     @classmethod
-    def get_test_path(cls, request: FixtureRequest, *, format_as: Literal["name", "dir"]) -> str:
+    def get_test_path_from_request(cls, request: FixtureRequest, *, format_as: Literal["name", "dir"]) -> str:
         """
         Return test_module<delim>test_function or test_module<delim>test_class<delim>test_function
         using the data from FixtureRequest, collapsing levels with identical name into one,
