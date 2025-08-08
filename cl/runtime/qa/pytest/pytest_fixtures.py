@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest import mock
-
 import pytest
 import os
 import uuid
 from typing import Iterator
+from unittest import mock
 from _pytest.fixtures import FixtureRequest
 from bson import UUID_SUBTYPE
 from bson import Binary

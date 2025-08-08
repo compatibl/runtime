@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import pytest
-import os
-from typing import Any, Literal
+from typing import Any
 from typing import Iterable
+from typing import Literal
 from _pytest.fixtures import FixtureRequest
-from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES

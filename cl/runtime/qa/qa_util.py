@@ -15,7 +15,6 @@
 import inspect
 import os
 from typing import Literal
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 
@@ -96,7 +95,8 @@ class QaUtil:
         # Error if not inside a test function or method
         raise RuntimeError(
             f"Attempting to get test information from the call stack before the test function or method is called,\n"
-            f"of the test function or method name does not match the pattern '{test_function_pattern}'.")
+            f"of the test function or method name does not match the pattern '{test_function_pattern}'."
+        )
 
     @classmethod
     def get_test_path(

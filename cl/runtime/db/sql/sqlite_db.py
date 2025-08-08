@@ -16,7 +16,6 @@ import os
 import re
 import sqlite3
 from dataclasses import dataclass
-from typing import Iterable
 from typing import Sequence
 from typing import cast
 from cl.runtime import Db
@@ -245,7 +244,7 @@ class SqliteDb(Db):
         *,
         dataset: str,
         restrict_to: type | None = None,
-        ) -> int:
+    ) -> int:
 
         # Check dataset
         self._check_dataset(dataset)
