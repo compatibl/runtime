@@ -50,7 +50,7 @@ _LOGGER = getLogger(__name__)
 
 
 @dataclass(slots=True, kw_only=True)
-class DataSource(DataSourceKey, RecordMixin, ContextMixin):
+class DataSource(DataSourceKey, RecordMixin):
     """Rules for hierarchical lookup in multiple databases and datasets with data access control."""
 
     db: DbKey = required()
