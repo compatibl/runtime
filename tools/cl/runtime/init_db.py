@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from cl.runtime import Db
+from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.data_context import DataContext
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.settings.preload_settings import PreloadSettings
@@ -21,7 +22,7 @@ from tools.cl.runtime.init_type_info import init_type_info
 
 def init_db() -> None:
     """Drop old DB, create and populate new DB."""
-    with DataSource(db=Db.create()).build():
+    with activate(DataSource(db=Db.create()).build()):
 
         # Ask for confirmation before dropping the DB
         confirmation = input(

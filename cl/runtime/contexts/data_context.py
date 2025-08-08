@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from typing import Sequence
+
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -31,7 +33,7 @@ _KEY_SERIALIZER = KeySerializers.TUPLE
 
 
 class DataContext:
-    """Methods to access the current data source context."""
+    """Methods to access the active data source context."""
 
     @classmethod
     def get_bindings(cls) -> tuple[TableBinding, ...]:
@@ -39,12 +41,12 @@ class DataContext:
         Return table to record type bindings in alphabetical order of table name followed by record type name.
         More than one table can exist for the same record type and vice versa.
         """
-        return DataSource.current().get_bindings()
+        return active(DataSource).get_bindings()
 
     @classmethod
     def get_tables(cls) -> tuple[str, ...]:
         """Return DB table names in alphabetical order of PascalCase format."""
-        return DataSource.current().get_tables()
+        return active(DataSource).get_tables()
 
     @classmethod
     def get_record_type_names(cls) -> tuple[str, ...]:
@@ -52,7 +54,7 @@ class DataContext:
         Return PascalCase record type names in alphabetical order for records stored in this DB.
         More than one table can exist for the same record type.
         """
-        return DataSource.current().get_record_type_names()
+        return active(DataSource).get_record_type_names()
 
     @classmethod
     def get_bound_tables(cls, *, record_type: type[RecordProtocol] | str) -> tuple[str, ...]:
@@ -62,7 +64,7 @@ class DataContext:
         Args:
             record_type: Record type or type name for which the tables are returned.
         """
-        return DataSource.current().get_bound_tables(record_type=record_type)
+        return active(DataSource).get_bound_tables(record_type=record_type)
 
     @classmethod
     def get_bound_key_type(cls, *, table: str) -> type:
@@ -72,7 +74,7 @@ class DataContext:
         Args:
             table: Table name in PascalCase format.
         """
-        return DataSource.current().get_bound_key_type(table=table)
+        return active(DataSource).get_bound_key_type(table=table)
 
     @classmethod
     def get_bound_record_type_names(cls, *, table: str) -> tuple[str, ...]:
@@ -82,7 +84,7 @@ class DataContext:
         Args:
             table: Table name in PascalCase format.
         """
-        return DataSource.current().get_bound_record_type_names(table=table)
+        return active(DataSource).get_bound_record_type_names(table=table)
 
     @classmethod
     def get_allowed_record_type_names(cls, *, table: str) -> tuple[str, ...]:
@@ -92,7 +94,7 @@ class DataContext:
         Args:
             table: Table name in PascalCase format.
         """
-        return DataSource.current().get_allowed_record_type_names(table=table)
+        return active(DataSource).get_allowed_record_type_names(table=table)
 
     @classmethod
     def get_lowest_bound_record_type_name(cls, *, table: str) -> str:
@@ -102,7 +104,7 @@ class DataContext:
         Args:
             table: Table name in PascalCase format.
         """
-        return DataSource.current().get_lowest_bound_record_type_name(table=table)
+        return active(DataSource).get_lowest_bound_record_type_name(table=table)
 
     @classmethod
     def load_one(
@@ -118,7 +120,7 @@ class DataContext:
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-        return DataSource.current().load_one(
+        return active(DataSource).load_one(
             record_or_key,
             cast_to=cast_to,
         )
@@ -138,7 +140,7 @@ class DataContext:
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-        return DataSource.current().load_one_or_none(
+        return active(DataSource).load_one_or_none(
             record_or_key,
             cast_to=cast_to,
         )
@@ -158,7 +160,7 @@ class DataContext:
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-        return DataSource.current().load_many(
+        return active(DataSource).load_many(
             records_or_keys,
             cast_to=cast_to,
         )
@@ -183,7 +185,7 @@ class DataContext:
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        return DataSource.current().load_type(
+        return active(DataSource).load_type(
             restrict_to,
             cast_to=cast_to,
             project_to=project_to,
@@ -213,7 +215,7 @@ class DataContext:
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        return DataSource.current().load_table(
+        return active(DataSource).load_table(
             table,
             cast_to=cast_to,
             restrict_to=restrict_to,
@@ -244,7 +246,7 @@ class DataContext:
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        return DataSource.current().load_where(
+        return active(DataSource).load_where(
             query,
             cast_to=cast_to,
             restrict_to=restrict_to,
@@ -267,7 +269,7 @@ class DataContext:
             query: Contains query conditions to match
             restrict_to: Count only the subtypes of this type (defaults to the query target type)
         """
-        return DataSource.current().count_where(
+        return active(DataSource).count_where(
             query,
             restrict_to=restrict_to,
         )
@@ -278,7 +280,7 @@ class DataContext:
         record: RecordProtocol,
     ) -> None:
         """Save the specified record to storage, replace rather than update individual fields if it exists."""
-        DataSource.current().save_one(
+        active(DataSource).save_one(
             record,
         )
 
@@ -288,7 +290,7 @@ class DataContext:
         records: Sequence[RecordProtocol],
     ) -> None:
         """Save the specified records to storage, replace rather than update individual fields for those that exist."""
-        DataSource.current().save_many(
+        active(DataSource).save_many(
             records,
         )
 
@@ -298,7 +300,7 @@ class DataContext:
         key: KeyProtocol | tuple | str,
     ) -> None:
         """Delete record for the specified key in object, tuple or string format (no error if not found)."""
-        return DataSource.current().delete_one(key)
+        return active(DataSource).delete_one(key)
 
     @classmethod
     def delete_many(
@@ -306,7 +308,7 @@ class DataContext:
         keys: Sequence[KeyProtocol | tuple | str],
     ) -> None:
         """Delete records for the specified keys in object, tuple or string format (no error if not found)."""
-        return DataSource.current().delete_many(keys)
+        return active(DataSource).delete_many(keys)
 
     @classmethod
     def drop_test_db(cls) -> None:
@@ -317,7 +319,7 @@ class DataContext:
         - The method is invoked from a unit test based on ProcessContext.is_testing()
         - db_id starts with db_test_prefix specified in settings.yaml (the default prefix is 'test_')
         """
-        DataSource.current().drop_test_db()
+        active(DataSource).drop_test_db()
 
     @classmethod
     def drop_temp_db(cls, *, user_approval: bool) -> None:
@@ -328,7 +330,7 @@ class DataContext:
         - user_approval is true
         - db_id starts with db_temp_prefix specified in settings.yaml (the default prefix is 'temp_')
         """
-        DataSource.current().drop_temp_db(user_approval=user_approval)
+        active(DataSource).drop_temp_db(user_approval=user_approval)
 
     @classmethod
     def _pre_save_check(cls, record: RecordProtocol) -> None:
