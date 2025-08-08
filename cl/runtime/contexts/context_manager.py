@@ -15,104 +15,104 @@
 from contextlib import contextmanager
 from contextvars import ContextVar
 from collections import defaultdict
-from typing import Type, TypeVar, DefaultDict, List, Optional, cast
-
+from typing import Type, DefaultDict, List, Optional, cast
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.protocols import RecordProtocol, TRecord
+from cl.runtime.records.type_util import TypeUtil
 
-# Dict: { class -> [instances stack] } kept per async context
-_CONTEXT_STACK_DICT_VAR: ContextVar[Optional[defaultdict[type, list[RecordProtocol]]]] = ContextVar(
-    "_CONTEXT_STACK_DICT_VAR", default=None
+_STACK_DICT_VAR: ContextVar[Optional[defaultdict[type, list[RecordProtocol]]]] = ContextVar(
+    "_STACK_DICT_VAR",
+    default=None,
 )
+"""
+The argument of activate(...) is added to the stack on __enter__ and removed on __exit__ using its key type as dict key.
+Each asynchronous environment has its own stack dictionary.
+"""
 
-def _typename(obj_or_type) -> str:
-    try:
-        return obj_or_type.__name__ if isinstance(obj_or_type, type) else type(obj_or_type).__name__
-    except Exception:
-        return str(obj_or_type)
+def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
+    """Get or create stack dictionary for the current asynchronous environment."""
+    stack_dict = _STACK_DICT_VAR.get()
+    if stack_dict is None:
+        stack_dict = defaultdict(list)
+        _STACK_DICT_VAR.set(stack_dict)
+    return stack_dict
 
-def _stacks_dict() -> DefaultDict[Type, List[object]]:
-    stacks = _CONTEXT_STACK_DICT_VAR.get()
-    if stacks is None:
-        stacks = defaultdict(list)
-        _CONTEXT_STACK_DICT_VAR.set(stacks)
-    return stacks
-
-def _stack_for(cls: Type) -> List[object]:
-    key_type = cls.get_base_type()
-    return _stacks_dict()[key_type]
+def _get_or_create_stack(context_type: Type[RecordProtocol]) -> List[RecordProtocol]:
+    """Get or create stack for the key type of the context in the current asynchronous environment."""
+    key_type = context_type.get_base_type()
+    return _get_or_create_stack_dict()[key_type]
 
 @contextmanager
 def activate(context: TRecord):
-    """
-    Push `instance` onto its class-specific context stack for the current async context,
-    then pop it on exit. Validates that the stack isn't mutated from the inside.
-    """
-    context_type = type(context)
+    """Set active context using 'with activate(context)' clause."""
 
-    # Optional parity with your mixin: enforce "frozen" contract if present
-    if hasattr(context, "is_frozen") and callable(getattr(context, "is_frozen")):
-        if not context.is_frozen():  # type: ignore[attr-defined]
+    # Check that the context is frozen, error otherwise
+    context.check_frozen()
+
+    # Get context stack for the __enter__ method in the current asynchronous environment
+    enter_stack = _get_or_create_stack(type(context))
+
+    # Activate the argument context by appending it to the context stack
+    enter_stack.append(context)
+
+    try:
+        # Pass control to the code inside 'with activate(context)' clause
+        yield context
+
+    # Executes after the code inside 'with activate(context)' completes execution or raises an exception
+    finally:
+
+        # Get context stack for the __exit__ method in the current asynchronous environment
+        exit_stack = _get_or_create_stack(type(context))
+
+        # Validate stack integrity and restore previous current
+        if not exit_stack:
             raise RuntimeError(
-                f"Context instance of type {_typename(context)} must be frozen before "
-                f"entering 'with' clause. Invoke 'build' or 'freeze' first."
-            )
+                f"Context stack for {TypeUtil.name(context)} has been cleared inside 'with activate(...)' clause.")
+        elif exit_stack is not enter_stack:
+            raise RuntimeError(
+                f"Context stack for {TypeUtil.name(context)} has been changed inside 'with activate(...)' clause.")
 
-    stack = _stack_for(context_type)
+        # Deactivate the currently active context by removing it from the context stack
+        deactivated = exit_stack.pop()
+        if deactivated is not context:
+            # Error message if it is not the same context as the argument
+            raise RuntimeError(
+                f"Active context of type {TypeUtil.name(context)} has been changed bypassing the context manager.")
 
-    # Prevent double-activating the *same* instance at the top
-    if stack and stack[-1] is context:
+def active(context_type: type[TRecord]) -> TRecord:
+    """
+    Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
+    or raise an error outside such 'with' clause.
+    """
+    stack = _get_or_create_stack(context_type)
+    if stack:
+        return CastUtil.cast(context_type, stack[-1])
+    else:
         raise RuntimeError(
-            f"The {_typename(context)} instance activated using 'with' operator is already current."
+            f"The function active({TypeUtil.name(context_type)}) is invoked outside 'with activate(...)'\n"
+            f"clause for the corresponding key type {TypeUtil.name(context_type.get_base_type())}.\n"
+            f"Use active_or_none(...) to receive None instead of an exception."
         )
 
-    stack.append(context)
-    try:
-        yield context
-    finally:
-        # Validate stack integrity and restore previous current
-        cur_stack = _stack_for(context_type)
-        if not cur_stack:
-            raise RuntimeError(
-                f"Current {_typename(context)} stack has been cleared inside "
-                f"'with {_typename(context)}(...)' clause."
-            )
-        current = cur_stack.pop()
-        if current is not context:
-            raise RuntimeError(
-                f"Current {_typename(context)} has been modified inside "
-                f"'with {_typename(context)}(...)' clause."
-            )
-
-def active(cls: Type[TRecord]) -> TRecord:
+def active_or_none(context_type: type[TRecord]) -> TRecord | None:
     """
-    Return the current (innermost) active instance for `cls`.
-    Raises outside the outermost `with activate(...)` block.
+    Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
+    or None outside such 'with' clause.
     """
-    stack = _stack_for(cls)
-    if stack:
-        return cast(TRecord, stack[-1])
-    raise RuntimeError(
-        f"{_typename(cls)} is undefined outside the outermost "
-        f"'with activate({_typename(cls)}(...))' clause.\n"
-        f"Use active_or_none({_typename(cls)}) if you prefer None."
-    )
+    stack = _get_or_create_stack(context_type)
+    return CastUtil.cast(context_type, stack[-1]) if stack else None
 
-def active_or_none(cls: Type[TRecord]) -> Optional[TRecord]:
-    """Optional helper: returns the current instance or None when none is active."""
-    stack = _stack_for(cls)
-    return cast(Optional[TRecord], stack[-1]) if stack else None
-
-def active_contexts() -> List[RecordProtocol]:
+def active_contexts() -> tuple[RecordProtocol, ...]:
     """
-    Return the list of current contexts across all key types, or an empty list if none exist.
-    This method is used by the ContextSnapshot to restore the current contexts for out-of-process
+    Return a tuple of active contexts across all key types, or an empty tuple if none exist.
+    This method is used by the ContextSnapshot to restore the active contexts for out-of-process
     task execution.
     """
-    context_stack_dict = _CONTEXT_STACK_DICT_VAR.get()
-    if context_stack_dict is not None:
-        # Get current contexts as last in each context stack, skip those that are None or empty
-        result = [context_stack[-1] for context_stack in context_stack_dict.values() if context_stack]
+    stack_dict = _STACK_DICT_VAR.get()
+    if stack_dict is not None:
+        # Each active contexts is last in its context stack, skip those that are None or empty
+        return tuple(context_stack[-1] for context_stack in stack_dict.values() if context_stack)
     else:
-        # Otherwise return an empty list
-        result = []
-    return result
+        # Otherwise return an empty tuple
+        return tuple()

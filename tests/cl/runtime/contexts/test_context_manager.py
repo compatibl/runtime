@@ -71,13 +71,14 @@ def _perform_testing(
             assert active(StubDerivedContext) is stub_context_2
 
         assert active(StubContext) is stub_context_1
-        assert active(StubDerivedContext) is stub_context_1
+        with pytest.raises(RuntimeError, match="Cannot cast an object of type StubContext to type StubDerivedContext"):
+            assert active(StubDerivedContext) is stub_context_1
 
     # Ensure current context is not leaked outside 'with' clauses after the test
     assert active_or_none(StubContext) is None
 
-    with pytest.raises(RuntimeError, match="outside the outermost"):
-        # Ensure calling 'current' outside 'with clause' raises
+    with pytest.raises(RuntimeError, match="is invoked outside"):
+        # Ensure calling active(...) outside 'with' clause raises
         active(StubContext)
 
 
@@ -114,13 +115,14 @@ async def _perform_testing_async(
             assert active(StubDerivedContext) is stub_context_2
 
         assert active(StubContext) is stub_context_1
-        assert active(StubDerivedContext) is stub_context_1
+        with pytest.raises(RuntimeError, match="Cannot cast an object of type StubContext to type StubDerivedContext"):
+            assert active(StubDerivedContext) is stub_context_1
 
     # Ensure current context is not leaked outside 'with' clauses after the test
     assert active_or_none(StubContext) is None
 
-    with pytest.raises(RuntimeError, match="outside the outermost"):
-        # Ensure calling 'current' outside 'with clause' raises
+    with pytest.raises(RuntimeError, match="is invoked outside"):
+        # Ensure calling active(...) outside 'with' clause raises
         active(StubContext)
 
 
