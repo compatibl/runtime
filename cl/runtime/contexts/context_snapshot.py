@@ -18,7 +18,8 @@ from typing import Dict
 from typing import List
 from typing import Sequence
 from typing_extensions import Self
-from cl.runtime.contexts.context_manager import _CONTEXT_STACK_DICT_VAR
+from cl.runtime.contexts.context_manager import _STACK_DICT_VAR, active_contexts, _activate_and_return_stack, \
+    _deactivate_and_check_stack
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serializers.data_serializers import DataSerializers
 
@@ -30,14 +31,17 @@ _CONTEXT_SERIALIZER = DataSerializers.FOR_JSON
 class ContextSnapshot:
     """Records current context for each context key type and restores them during out-of-process task execution."""
 
-    _all_contexts: List[RecordProtocol] | None = None
+    _active_contexts: List[RecordProtocol] | None = None
     """All contexts that will be entered into during out-of-process task execution."""
 
-    _entered_contexts: List[RecordProtocol] | None = None
+    _processed_contexts: List[RecordProtocol] | None = None
     """
     Contexts for which __enter__ method has been called inside ContextSnapshot.__enter__ so far.
-    For each of these contexts, __exit__ will be invoked in case of an error in ContextSnapshot.__enter__ method.
+    For each of these contexts, __exit__ will be invoked in case of an exception.
     """
+
+    _processed_context_stacks: List[List[RecordProtocol]] | None = None
+    """Context stacks for which __enter__ method has been called inside ContextSnapshot.__enter__ so far."""
 
     _token: Token | None = None
     """Stores the state of all context stacks saved in __enter__ and restored in __exit__ of this class."""
@@ -46,14 +50,15 @@ class ContextSnapshot:
         """Create from contexts serialized into a list of dicts."""
 
         # Assign default values for each field to avoid not initialized errors
-        self._all_contexts = None
-        self._entered_contexts = None
+        self._active_contexts = None
+        self._processed_contexts = None
+        self._processed_context_stacks = None
         self._token = None
 
         # Deserialize and build if _all_contexts is not empty
         if data:
-            self._all_contexts = _CONTEXT_SERIALIZER.deserialize(data)
-            for context in self._all_contexts:
+            self._active_contexts = _CONTEXT_SERIALIZER.deserialize(data)
+            for context in self._active_contexts:
                 # Build the deserialized record
                 context.build()
 
@@ -67,23 +72,25 @@ class ContextSnapshot:
             raise RuntimeError("Nested 'with' clauses are not permitted or necessary with ContextSnapshot.")
 
         # Ensure there are no stale entered contexts
-        if self._entered_contexts:
+        if self._processed_contexts:
             # Check if any exist
             raise RuntimeError("Stale context entry status detected in ContextSnapshot.")
         else:
             # Assign empty list as it could be None
-            self._entered_contexts = []
+            self._processed_contexts = []
+            self._processed_context_stacks = []
 
         # Enter into each context in the order specified
-        if self._all_contexts:
-            for context in self._all_contexts:
+        if self._active_contexts:
+            for context in self._active_contexts:
                 try:
-                    context.__enter__()
-                    self._entered_contexts.append(context)
+                    # Activate context directly bypassing 'with' clause
+                    context_stack = _activate_and_return_stack(context)
+                    self._processed_contexts.append(context)
+                    self._processed_context_stacks.append(context_stack)
                 except Exception as e:
-                    # This will call __exit__ in reverse order for all contexts entered into so far
-                    # The exception is not passed to these __exit__ calls as it did not occur inside these contexts
-                    self.__exit__(None, None, None)
+                    # Deactivate directly bypassing 'with' clause in reverse order all processed context
+                    _deactivate_and_check_stack(self._processed_contexts.pop(), self._processed_context_stacks.pop())
                     # Rethrow
                     raise e
         return self
@@ -92,12 +99,10 @@ class ContextSnapshot:
         """Invoke __exit__ for each item in the 'contexts' field."""
 
         try:
-            # Remove (pop) from the list and call __exit__ in reverse entry order on the contexts entered into so far
-            while self._entered_contexts:
-                # Remove the last remaining element
-                entered_context = self._entered_contexts.pop()
-                # Run __exit__ on the removed element with exception parameters
-                entered_context.__exit__(exc_type, exc_val, exc_tb)
+            # Remove (pop) from the list and deactivate in reverse order the contexts entered into so far
+            while self._processed_contexts:
+                # Deactivate directly bypassing 'with' clause in reverse order all processed context
+                _deactivate_and_check_stack(self._processed_contexts.pop(), self._processed_context_stacks.pop())
         finally:
             # Restore ContextVar to its previous state after async task execution using a token
             # from 'save_and_clear_state' whether or not an exception occurred
@@ -109,12 +114,12 @@ class ContextSnapshot:
     @classmethod
     def save_and_clear_state(cls) -> Token:
         """Save state for all context stacks into a token, then clear state."""
-        return _CONTEXT_STACK_DICT_VAR.set(None)
+        return _STACK_DICT_VAR.set(None)
 
     @classmethod
     def restore_state(cls, token: Token) -> None:
         """Restore state for all context stacks from the token returned by 'save_and_clear_state'."""
-        _CONTEXT_STACK_DICT_VAR.reset(token)
+        _STACK_DICT_VAR.reset(token)
 
     @classmethod
     def serialize_current_contexts(cls) -> Sequence[Dict]:

@@ -14,13 +14,15 @@
 
 import pytest
 from typing import List
-from cl.runtime.contexts.context_mixin import ContextMixin
+
+from cl.runtime.contexts.context_manager import active_or_none, activate
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.contexts.trial_context import TrialContext
+from cl.runtime.records.protocols import RecordProtocol
 from stubs.cl.runtime.contexts.stub_context import StubContext
 
 
-def _perform_serialization_test(contexts: List[ContextMixin]):
+def _perform_serialization_test(contexts: List[RecordProtocol]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Serialize current contexts into data and then deserialize data into a ContextSnapshot instance
@@ -29,16 +31,16 @@ def _perform_serialization_test(contexts: List[ContextMixin]):
 
     # Ensure the deserialized list is identical to the argument
     if not contexts:
-        assert not deserialized_context_snapshot._all_contexts  # noqa
+        assert not deserialized_context_snapshot._active_contexts  # noqa
     else:
-        assert len(contexts) == len(deserialized_context_snapshot._all_contexts)  # noqa
+        assert len(contexts) == len(deserialized_context_snapshot._active_contexts)  # noqa
 
         # Check that the contexts passed match the contexts in ContextSnapshot regardless of order.
-        not_in_contexts = [ctx for ctx in contexts if ctx not in deserialized_context_snapshot._all_contexts]  # noqa
+        not_in_contexts = [ctx for ctx in contexts if ctx not in deserialized_context_snapshot._active_contexts]  # noqa
         assert len(not_in_contexts) == 0
 
 
-def _perform_manager_test(contexts: List[ContextMixin]):
+def _perform_manager_test(contexts: List[RecordProtocol]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Set ContextVar=None before async task execution, get a token for restoring its previous state
@@ -50,7 +52,7 @@ def _perform_manager_test(contexts: List[ContextMixin]):
         with ContextSnapshot(serialized_data):
             if contexts:
                 for context in contexts:
-                    current_context = type(context).current_or_none()
+                    current_context = active_or_none(type(context))
                     assert context == current_context
     finally:
         # Restore ContextVar to its previous state after async task execution using a token
@@ -70,21 +72,21 @@ def test_context_snapshot():
     _perform_manager_test([context_external])
 
     # Inside a single 'with StubContext()' clause
-    with StubContext().build() as context_1:
+    with activate(StubContext().build()) as context_1:
         _perform_serialization_test([context_1])
     # Recreate using ContextSnapshot
     _perform_manager_test([context_1])
 
     # Inside two nested 'with' clauses for the same key type StubContext
-    with StubContext().build() as context_1:
-        with StubContext(stub_context_id="modified_stub_context_id").build() as context_2:
+    with activate(StubContext().build()):
+        with activate(StubContext(stub_context_id="modified_stub_context_id").build()) as context_2:
             _perform_serialization_test([context_2])
     # Recreate using ContextSnapshot
     _perform_manager_test([context_2])
 
     # Inside two nested 'with' clauses for different same key types
-    with StubContext().build() as context_1:
-        with TrialContext.append_token("modified_trial") as context_2:
+    with activate(StubContext().build()) as context_1:
+        with activate(TrialContext.append_token("modified_trial")) as context_2:
             _perform_serialization_test([context_1, context_2])
     # Recreate using ContextSnapshot
     _perform_manager_test([context_1, context_2])
