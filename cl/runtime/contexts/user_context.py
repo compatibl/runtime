@@ -12,15 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 from dataclasses import dataclass
 from getpass import getuser
 from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cl.runtime.contexts.context_manager import active_or_default
+from cl.runtime.contexts.user_context import UserContext
 
 
 @dataclass(slots=True, kw_only=True)
@@ -48,3 +54,36 @@ class UserContext(DataMixin):
                 # Use the username reported by OS if not testing
                 os_user_id = getuser()
                 self.user = UserKey(username=os_user_id)
+
+    def decrypt_secret(self, secret_name: str) -> str | None:
+        """Decrypt the specified secret in UserContext, None if no active UserContext or the secret is not found."""
+
+        # Get secrets field of the current context, return None if not specified
+        user_context = active_or_default(UserContext)
+        if (encrypted_secrets := user_context.encrypted_secrets if user_context is not None else None) is None:
+            return None
+
+        # Get secret by key, return None if key is not present
+        encrypted_value = encrypted_secrets.get(secret_name)
+        if encrypted_value is None:
+            return None
+
+        # Decode base64 encoded encrypted value
+        encrypted_value_bytes = base64.b64decode(encrypted_value)
+
+        # PEM encoded private key
+        return None  # TODO: Temporarily return None
+        private_key_pem: str = None
+
+        # Load the private key
+        private_key = serialization.load_pem_private_key(
+            private_key_pem.encode(), password=None, backend=default_backend()
+        )
+
+        # Decrypt the value
+        decrypted_value_bytes = private_key.decrypt(
+            encrypted_value_bytes,
+            padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()), algorithm=hashes.SHA256(), label=None),
+        )
+
+        return decrypted_value_bytes.decode("utf-8")
