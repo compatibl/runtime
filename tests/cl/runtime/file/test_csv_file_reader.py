@@ -27,7 +27,7 @@ def test_csv_file_reader(default_db_fixture):
     """Test CsvFileReader class."""
 
     # Create a new instance of local cache for the test
-    env_dir = QaUtil.get_test_dir()
+    env_dir = QaUtil.get_test_dir_from_call_stack()
     file_path = os.path.join(env_dir, "StubDataclassDerived.csv")
     # TODO: Change the API not to take record type or make it optional
     file_reader = CsvFileReader(file_path=file_path)

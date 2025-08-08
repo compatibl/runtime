@@ -65,7 +65,7 @@ class MatplotlibPlot(Plot, ABC):
         fig = self._create_figure()
 
         # Create directory if does not exist
-        base_dir = QaUtil.get_test_dir()
+        base_dir = QaUtil.get_test_dir_from_call_stack()  # TODO: This must also work outside tests
         if not os.path.exists(base_dir):
             os.makedirs(base_dir)
 

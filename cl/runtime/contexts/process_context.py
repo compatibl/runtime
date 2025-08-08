@@ -63,6 +63,6 @@ class ProcessContext(ContextMixin, DataMixin):
             # Otherwise set based on the current process
             if Settings.is_inside_test:
                 # Return test_module.test_module or test_module.test_class.test_method inside a test
-                return QaUtil.get_test_name()
+                return QaUtil.get_test_name_from_call_stack()
             else:
                 return DbSettings.instance().db_id  # TODO: Pass f-string parameters

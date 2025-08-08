@@ -189,7 +189,7 @@ class Db(DbKey, RecordMixin, ABC):
     def _get_test_db_name(cls) -> str:  # TODO: Use fixture instead
         """Get SQLite database with name based on test namespace."""
         if ProcessContext.is_testing():
-            result = f"temp;{QaUtil.get_test_name().replace('.', ';')}"
+            result = f"temp;{QaUtil.get_test_name_from_call_stack().replace('.', ';')}"
             return result
         else:
             raise RuntimeError("Attempting to get test DB name outside a test.")

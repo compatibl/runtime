@@ -45,7 +45,7 @@ class QaUtil:
         return False
 
     @classmethod
-    def get_test_dir(cls) -> str:
+    def get_test_dir_from_call_stack(cls) -> str:
         """
         Return test_dir/test_module/test_function or test_dir/test_module/test_class/test_method
         collapsing repeated adjacent names into one.

@@ -45,7 +45,7 @@ class UserContext(ContextMixin, DataMixin):
             return user_context.user
         elif ProcessContext.is_testing():
             # Use process namespace as the user
-            return UserKey(username=QaUtil.get_test_name())
+            return UserKey(username=QaUtil.get_test_name_from_call_stack())
         else:
             # User reported by OS
             os_user_id = getuser()

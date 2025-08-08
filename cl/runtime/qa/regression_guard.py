@@ -97,7 +97,7 @@ class RegressionGuard:
         """
 
         # Find base path by examining call stack
-        base_path = QaUtil.get_test_dir()
+        base_path = QaUtil.get_test_dir_from_call_stack()
 
         # Make channel the filename prefix with dot delimiter if specified
         if channel is not None and channel != "":
