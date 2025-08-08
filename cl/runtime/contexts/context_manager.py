@@ -49,8 +49,8 @@ def _get_or_create_stack(context_type: Type[RecordProtocol]) -> List[RecordProto
     return _get_or_create_stack_dict()[key_type]
 
 
-def activate_and_return_stack(context: TRecord) -> List[RecordProtocol]:
-    """Helper method for activate(...), returns context stack rather than the argument."""
+def enter_active_and_return_stack(context: TRecord) -> List[RecordProtocol]:
+    """Similar to enter_active(...) but returns context stack rather than the argument."""
 
     # Invoke context.__enter__ method before making the context active if it is implemented
     # If this method raises an exception, the context will not be activated
@@ -72,7 +72,20 @@ def activate_and_return_stack(context: TRecord) -> List[RecordProtocol]:
     # Return for error checking purposes only
     return context_stack
 
-def deactivate(
+
+def enter_active(context: TRecord) -> TRecord:
+    """
+    Make context active without automatic deactivation, invokes __enter__ if it is implemented.
+    Do not use this method for the 'with' clause as it is not a context manager and therefore it
+    requires that exit_active is invoked explicitly.
+    """
+
+    # Add to the context stack for the context key type in the current asynchronous environment
+    enter_active_and_return_stack(context)
+    return context
+
+
+def exit_active(
         context: TRecord,
         *,
         exc_type: Any = None,
@@ -81,8 +94,8 @@ def deactivate(
         expected_stack: List[RecordProtocol] | None = None,
 ) -> None:
     """
-    Make context inactive, do not invoke this method explicitly if activation was performed using
-    'with activate(...)' clause because it will be invoked by the context manager.
+    Exit and revert to the previous active context, do not invoke this method explicitly if activation was performed
+    using 'with activate(...)' clause because exit_active will be invoked by the context manager in this case.
     Invokes __exit___ if it is implemented.
 
     Args:
@@ -120,15 +133,6 @@ def deactivate(
     if hasattr(context, "__exit__"):
         context.__exit__(exc_type, exc_val, exc_tb)
 
-def make_active(context: TRecord) -> TRecord:
-    """
-    Make context active without automatic deactivation, do not use this method inside 'with' clause.
-    Invokes __enter__ if it is implemented.
-    """
-
-    # Add to the context stack for the context key type in the current asynchronous environment
-    activate_and_return_stack(context)
-    return context
 
 @contextmanager
 def activate(context: TRecord):
@@ -138,7 +142,7 @@ def activate(context: TRecord):
     """
 
     # Add to the context stack for the context key type in the current asynchronous environment
-    context_stack = activate_and_return_stack(context)
+    context_stack = enter_active_and_return_stack(context)
 
     try:
         # Pass control to the code inside 'with activate(context)' clause, deactivate on return
@@ -146,7 +150,7 @@ def activate(context: TRecord):
     except Exception as exc:
         # If the code inside 'with activate(context)' raises an exception, remove context from the stack
         # and pass exception details to context.__exit__ if it is implemented
-        deactivate(
+        exit_active(
             context,
             exc_type=type(exc),
             exc_val=exc,
@@ -157,7 +161,7 @@ def activate(context: TRecord):
         raise exc
     else:
         # Remove context from the stack
-        deactivate(
+        exit_active(
             context,
             expected_stack=context_stack
         )

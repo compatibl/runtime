@@ -16,7 +16,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from typing_extensions import Self
 
-from cl.runtime.contexts.context_manager import activate, deactivate, make_active
+from cl.runtime.contexts.context_manager import activate, exit_active, enter_active
 from cl.runtime.contexts.process_context import ProcessContext
 from cl.runtime.routers.server_util import ServerUtil
 
@@ -43,7 +43,7 @@ class QaClient(TestClient):
         TestClient.__enter__(self)
 
         # Create and activate ProcessContext
-        self.process_context = make_active(ProcessContext().build())
+        self.process_context = enter_active(ProcessContext().build())
 
         # Return self
         return self
@@ -52,7 +52,7 @@ class QaClient(TestClient):
         """Supports 'with' operator for resource initialization and disposal."""
 
         # Deactivate ProcessContext
-        deactivate(
+        exit_active(
             self.process_context,
             exc_type=exc_type,
             exc_val=exc_val,
