@@ -87,7 +87,6 @@ class RegressionGuard:
         *,
         ext: str = None,
         channel: str | None = None,
-        test_function_pattern: str | None = None,
     ):
         """
         Initialize the regression guard, optionally specifying channel.
@@ -95,11 +94,10 @@ class RegressionGuard:
         Args:
             ext: File extension (format) without the dot prefix, defaults to 'txt'
             channel: Dot-delimited string for the channel or None for no channel
-            test_function_pattern: Glob pattern for function or method in stack frame, defaults to 'test_*'
         """
 
         # Find base path by examining call stack
-        base_path = QaUtil.get_test_dir(test_function_pattern=test_function_pattern)
+        base_path = QaUtil.get_test_dir()
 
         # Make channel the filename prefix with dot delimiter if specified
         if channel is not None and channel != "":

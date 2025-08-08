@@ -45,84 +45,33 @@ class QaUtil:
         return False
 
     @classmethod
-    def get_test_dir(
-        cls,
-        *,
-        test_function_pattern: str | None = None,
-    ) -> str:
+    def get_test_dir(cls) -> str:
         """
-        Return module_dir/test_module/test_function or module_dir/test_module/test_class/test_method,
-        collapsing levels with identical name into one.
-
-        Notes:
-            Implemented by searching the stack frame for 'test_' or a custom test function name pattern.
-
-        Args:
-            test_function_pattern: Glob pattern for function or method in stack frame, defaults to 'test_*'
+        Return test_dir/test_module/test_function or test_dir/test_module/test_class/test_method
+        collapsing repeated adjacent names into one.
         """
-        result = cls.get_test_path_from_call_stack(
-            format_as="dir",
-            test_function_pattern=test_function_pattern,
-        )
-
-        # Error if not inside a test
-        if result is None:
-            raise RuntimeError("Attempting to get test dir outside a test.")
-
-        return result
+        return cls.get_test_path_from_call_stack(format_as="dir")
 
     @classmethod
-    def get_test_name(
-        cls,
-        *,
-        test_function_pattern: str | None = None,
-    ) -> str:
+    def get_test_name_from_call_stack(cls) -> str:
         """
         Return test_module.test_function or test_module.test_class.test_method,
-        collapsing levels with identical name into one.
-
-        Notes:
-            Implemented by searching the stack frame for 'test_' or a custom test function name pattern.
-
-        Args:
-            test_function_pattern: Glob pattern for function or method in stack frame, defaults to 'test_*'
+        collapsing repeated adjacent names into one.
         """
-
-        # Get test environment if inside test
-        result = cls.get_test_path_from_call_stack(
-            format_as="name",
-            test_function_pattern=test_function_pattern,
-        )
-
-        # Error if not inside a test
-        if result is None:
-            raise RuntimeError("Attempting to get test name outside a test.")
-
-        return result
+        return cls.get_test_path_from_call_stack(format_as="name")
 
     @classmethod
-    def get_test_path_from_call_stack(
-        cls,
-        *,
-        format_as: Literal["name", "dir"],
-        test_function_pattern: str | None = None,
-    ) -> str | None:
+    def get_test_path_from_call_stack(cls, *, format_as: Literal["name", "dir"]) -> str | None:
         """
-        Return test_module<delim>test_function or test_module<delim>test_class<delim>test_function
-        by searching the call stack for test_function_pattern and collapsing levels with identical name into one,
-        where <delim> is period when is_name is True and os.sep when is_name is False.
-
-        Notes:
-            Implemented by searching the stack frame for 'test_' or a custom test function name pattern.
+        Return test_module.test_function or test_module.test_class.test_method if format_as is "name" and
+        test_dir/test_module/test_function or test_dir/test_module/test_class/test_method if format_as is "dir"
+        by inspecting the call stack, collapse repeated adjacent names into one.
 
         Args:
-            is_name: If True, return dot delimited name, otherwise return directory path
-            test_function_pattern: Glob pattern for function or method in stack frame, defaults to 'test_*'
+            format_as: If "name", return dot delimited name, if "dir", return directory path
         """
 
-        if test_function_pattern is not None:
-            # TODO: Support custom patterns
-            raise RuntimeError("Custom test function or method name patterns are not yet supported.")
+        # TODO: Make it possible to modify this in QaSettings
         test_function_pattern = "test_"
 
         stack = inspect.stack()
@@ -144,8 +93,10 @@ class QaUtil:
                     format_as=format_as,
                 )
 
-        # Not inside test, return None
-        return None
+        # Error if not inside a test function or method
+        raise RuntimeError(
+            f"Attempting to get test information from the call stack before the test function or method is called,\n"
+            f"of the test function or method name does not match the pattern '{test_function_pattern}'.")
 
     @classmethod
     def get_test_path(
@@ -157,7 +108,7 @@ class QaUtil:
         format_as: Literal["name", "dir"],
     ) -> str | None:
         """
-        Return test name test_module.test_function or test_module.test_class.test_method if format_as is "name" and
+        Return test_module.test_function or test_module.test_class.test_method if format_as is "name" and
         test_dir/test_module/test_function or test_dir/test_module/test_class/test_method if format_as is "dir",
         collapsing repeated adjacent names into one.
 
