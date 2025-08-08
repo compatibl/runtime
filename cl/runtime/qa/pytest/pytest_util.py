@@ -14,7 +14,7 @@
 
 import pytest
 import os
-from typing import Any
+from typing import Any, Literal
 from typing import Iterable
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.primitive.case_util import CaseUtil
@@ -46,23 +46,7 @@ class PytestUtil:
         return data
 
     @classmethod
-    def get_test_dir(cls, request: FixtureRequest) -> str:
-        """
-        Return module_dir/test_module/test_function or module_dir/test_module/test_class/test_method
-        using the data from FixtureRequest, collapsing levels with identical name into one.
-        """
-        return cls._get_test_dir_or_name(request, is_name=False)
-
-    @classmethod
-    def get_test_name(cls, request: FixtureRequest) -> str:
-        """
-        Return module_dir/test_module.test_function or module_dir/test_module.test_class.test_method
-        using the data from FixtureRequest, collapsing levels with identical name into one.
-        """
-        return cls._get_test_dir_or_name(request, is_name=True)
-
-    @classmethod
-    def _get_test_dir_or_name(cls, request: FixtureRequest, *, is_name: bool) -> str:
+    def get_test_path(cls, request: FixtureRequest, *, format_as: Literal["name", "dir"]) -> str:
         """
         Return test_module<delim>test_function or test_module<delim>test_class<delim>test_function
         using the data from FixtureRequest, collapsing levels with identical name into one,
@@ -79,11 +63,11 @@ class PytestUtil:
         test_name = test_name_and_params.split("[")[0]
 
         # Convert to test path or name
-        return QaUtil.get_test_dir_or_name(
+        return QaUtil.get_test_path(
             test_file=test_file,
             class_name=class_name,
             test_name=test_name,
-            is_name=is_name,
+            format_as=format_as,
         )
 
     @classmethod

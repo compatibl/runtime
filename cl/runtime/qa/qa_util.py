@@ -14,6 +14,8 @@
 
 import inspect
 import os
+from typing import Literal
+
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 
@@ -59,7 +61,7 @@ class QaUtil:
             test_function_pattern: Glob pattern for function or method in stack frame, defaults to 'test_*'
         """
         result = cls._get_test_dir_or_name(
-            is_name=False,
+            format_as="dir",
             test_function_pattern=test_function_pattern,
         )
 
@@ -88,7 +90,7 @@ class QaUtil:
 
         # Get test environment if inside test
         result = cls._get_test_dir_or_name(
-            is_name=True,
+            format_as="name",
             test_function_pattern=test_function_pattern,
         )
 
@@ -102,7 +104,7 @@ class QaUtil:
     def _get_test_dir_or_name(
         cls,
         *,
-        is_name: bool,
+        format_as: Literal["name", "dir"],
         test_function_pattern: str | None = None,
     ) -> str | None:
         """
@@ -135,34 +137,35 @@ class QaUtil:
                 class_name = TypeUtil.name(cls_instance) if cls_instance else None
 
                 # Convert to test path or name
-                return cls.get_test_dir_or_name(
+                return cls.get_test_path(
                     test_file=test_file,
                     class_name=class_name,
                     test_name=test_name,
-                    is_name=is_name,
+                    format_as=format_as,
                 )
 
         # Not inside test, return None
         return None
 
     @classmethod
-    def get_test_dir_or_name(
+    def get_test_path(
         cls,
         *,
         test_file: str,
         class_name: str | None = None,
         test_name: str,
-        is_name: bool,
+        format_as: Literal["name", "dir"],
     ) -> str | None:
         """
-        Return the path test_dir/test_dir/test_module/test_function or test_dir/test_module/test_class/test_function
-        and the name test_module.test_function or test_module.test_class.test_function depending on is_name param.
+        Return test name test_module.test_function or test_module.test_class.test_method if format_as is "name" and
+        test_dir/test_module/test_function or test_dir/test_module/test_class/test_method if format_as is "dir",
+        collapsing repeated adjacent names into one.
 
         Args:
-            test_file: Test module file path with .py extension
-            class_name: Test class name if the test is a method inside class, None otherwise
-            test_name: Test function or method name
-            is_name: If True, return dot delimited name, otherwise return directory path
+            test_module: Test module file path with .py extension
+            test_class: Test class name if the test is a method inside class, None otherwise
+            test_function: Test function or method name
+            format_as: If "name", return dot delimited name, if "dir", return directory path
         """
 
         if test_file.endswith(".py"):
@@ -170,8 +173,15 @@ class QaUtil:
         else:
             raise RuntimeError(f"Test file path {test_file} does not end with '.py'.")
 
-        # Determine delimiter based on is_name flag
-        delim = "." if is_name else os.sep
+        # Determine delimiter based on format_as parameter
+        if format_as == "name":
+            is_dir = False
+            delim = "."
+        elif format_as == "dir":
+            is_dir = True
+            delim = os.sep
+        else:
+            raise RuntimeError(f"Parameter format_as={format_as} is not supported, valid values are 'name' and 'dir'.")
 
         module_dir = os.path.dirname(test_file_without_ext)
         module_name = os.path.basename(test_file_without_ext)
@@ -196,6 +206,8 @@ class QaUtil:
                     result = delim.join((module_name, test_name))
                 else:
                     result = module_name
-        if not is_name:
+
+        if is_dir:
+            # Concatenate with the directory where the test is located if format_as is "dir"
             result = os.path.join(module_dir, result)
         return result

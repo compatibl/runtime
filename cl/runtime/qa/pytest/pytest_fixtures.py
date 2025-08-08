@@ -35,7 +35,7 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
     """Setup and teardown a temporary databases in DB of the specified type."""
 
     # Set test DB name to test name in dot-delimited snake_case format, prefixed by 'temp_'
-    test_name = PytestUtil.get_test_name(request)
+    test_name = PytestUtil.get_test_path(request, format_as="name")
 
     # Replace dots by semicolons
     db_id = test_name.replace(".", ";")
@@ -109,7 +109,7 @@ def celery_queue_fixture():
 def work_dir_fixture(request: FixtureRequest) -> Iterator[str]:
     """Pytest module fixture to make test module directory the local directory during test execution."""
 
-    work_dir = PytestUtil.get_test_dir(request)
+    work_dir = PytestUtil.get_test_path(request, format_as="dir")
 
     # Change test working directory, create if does not exist
     if not os.path.exists(work_dir):
