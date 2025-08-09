@@ -16,9 +16,9 @@ from enum import IntEnum
 from enum import auto
 
 
-class EnvType(IntEnum):
+class EnvKind(IntEnum):
     """
-    The environment type determines the policies for data protection and retention
+    The environment kind determines the policies for data protection and retention
     and is used to select the Dynaconf environment.
     """
 

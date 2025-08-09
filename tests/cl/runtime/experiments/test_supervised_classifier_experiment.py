@@ -17,17 +17,17 @@ import random
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.experiments.experiment_scenario import ExperimentScenario
-from cl.runtime.experiments.experiment_type import ExperimentType
-from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
+from cl.runtime.experiments.experiment_kind import ExperimentKind
+from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
 from stubs.cl.runtime.experiments.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
 
 
 def test_smoke(multi_db_fixture):
     """Test for BinaryExperiment class with supervised=True."""
 
-    exp_type = ExperimentType(experiment_type_id="Test").build()
+    exp_type = ExperimentKind(kind_id="Test").build()
     sc1 = ExperimentScenario(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
+        experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
     ).build()
 
     active(DataSource).save_one(exp_type)
@@ -35,13 +35,13 @@ def test_smoke(multi_db_fixture):
 
     # Create and run the experiment
     experiment = StubSupervisedClassifierExperiment(
-        experiment_type=ExperimentTypeKey(experiment_type_id="TestSupervisedClassifierExperiment"),
+        experiment_kind=ExperimentKindKey(kind_id="TestSupervisedClassifierExperiment"),
         experiment_id="test_supervised_classifier_experiment.test_smoke",
         class_labels=["A", "B", "C"],
         max_trials=5,
         scenarios=[
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
+                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
             ),
         ],
     )
@@ -50,32 +50,32 @@ def test_smoke(multi_db_fixture):
 
 def test_plot(multi_db_fixture, work_dir_fixture):
 
-    exp_type = ExperimentType(experiment_type_id="Test").build()
+    exp_type = ExperimentKind(kind_id="Test").build()
     sc1 = ExperimentScenario(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
+        experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
     ).build()
     sc2 = ExperimentScenario(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test2"
+        experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2"
     ).build()
 
     active(DataSource).save_one(exp_type)
     active(DataSource).save_many([sc1, sc2])
 
     experiment = StubSupervisedClassifierExperiment(
-        experiment_type=ExperimentTypeKey(experiment_type_id="Test"),
+        experiment_kind=ExperimentKindKey(kind_id="Test"),
         experiment_id="Test",
         scenarios=[
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test1"
+                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
             ),
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test2"
+                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2"
             ),
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test3"
+                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test3"
             ),
             ExperimentScenario(
-                experiment_type=ExperimentTypeKey(experiment_type_id="Test"), experiment_scenario_id="Test4"
+                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test4"
             ),
         ],
         max_trials=15,

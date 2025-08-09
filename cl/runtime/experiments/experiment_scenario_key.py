@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
+from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
@@ -22,8 +22,8 @@ from cl.runtime.records.key_mixin import KeyMixin
 class ExperimentScenarioKey(KeyMixin):
     """One of multiple scenarios for an experiment."""
 
-    experiment_type: ExperimentTypeKey = required()
-    """Experiment scenarios are assigned to separate tables for each experiment type."""
+    experiment_kind: ExperimentKindKey = required()
+    """Experiment scenarios are separated by experiment kind."""
 
     experiment_scenario_id: str = required()
     """Unique experiment scenario identifier."""
@@ -33,4 +33,4 @@ class ExperimentScenarioKey(KeyMixin):
         return ExperimentScenarioKey
 
     def get_table(self) -> str:
-        return self.experiment_type.experiment_type_id + "Scenario"
+        return self.experiment_kind.kind_id + "Scenario"

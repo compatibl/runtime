@@ -1,3 +1,3 @@
-experiment_type,experiment_id,scenarios,max_trials,max_parallel
-StubBinaryExperimentType1,StubBinaryExperiment11,"[""StubBinaryExperimentType1;StubBinaryExperimentScenario11A"",""StubBinaryExperimentType1;StubBinaryExperimentScenario11B""]",,
-StubBinaryExperimentType2,StubBinaryExperiment21,"[""StubBinaryExperimentType2;StubBinaryExperimentScenario11A"",""StubBinaryExperimentType2;StubBinaryExperimentScenario11B""]","""5""","""2"""
+experiment_kind,experiment_id,scenarios,max_trials,max_parallel
+StubBinaryExperimentKind1,StubBinaryExperiment11,"[""StubBinaryExperimentKind1;StubBinaryExperimentScenario11A"",""StubBinaryExperimentKind1;StubBinaryExperimentScenario11B""]",,
+StubBinaryExperimentKind2,StubBinaryExperiment21,"[""StubBinaryExperimentKind2;StubBinaryExperimentScenario11A"",""StubBinaryExperimentKind2;StubBinaryExperimentScenario11B""]","""5""","""2"""

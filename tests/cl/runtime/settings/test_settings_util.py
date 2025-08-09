@@ -13,26 +13,26 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.settings.env_type import EnvType
+from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.settings_util import SettingsUtil
 
 
 def test_to_enum():
     """Test SettingsUtil.to_str_tuple method."""
-    assert SettingsUtil.to_enum("PROD", enum_type=EnvType) == EnvType.PROD
+    assert SettingsUtil.to_enum("PROD", enum_type=EnvKind) == EnvKind.PROD
     with pytest.raises(RuntimeError):
-        SettingsUtil.to_enum(None, enum_type=EnvType)
+        SettingsUtil.to_enum(None, enum_type=EnvKind)
 
 
 def test_to_enum_or_none():
     """Test SettingsUtil.to_str_tuple method."""
-    assert SettingsUtil.to_enum_or_none(None, enum_type=EnvType) is None
-    assert SettingsUtil.to_enum_or_none("", enum_type=EnvType) is None
-    assert SettingsUtil.to_enum_or_none("PROD", enum_type=EnvType) == EnvType.PROD
-    assert SettingsUtil.to_enum_or_none("Prod", enum_type=EnvType) == EnvType.PROD
-    assert SettingsUtil.to_enum_or_none("prod", enum_type=EnvType) == EnvType.PROD
+    assert SettingsUtil.to_enum_or_none(None, enum_type=EnvKind) is None
+    assert SettingsUtil.to_enum_or_none("", enum_type=EnvKind) is None
+    assert SettingsUtil.to_enum_or_none("PROD", enum_type=EnvKind) == EnvKind.PROD
+    assert SettingsUtil.to_enum_or_none("Prod", enum_type=EnvKind) == EnvKind.PROD
+    assert SettingsUtil.to_enum_or_none("prod", enum_type=EnvKind) == EnvKind.PROD
     with pytest.raises(RuntimeError):
-        SettingsUtil.to_enum("UNKNOWN", enum_type=EnvType)
+        SettingsUtil.to_enum("UNKNOWN", enum_type=EnvKind)
 
 
 def test_to_str_tuple():

@@ -19,7 +19,7 @@ from typing_extensions import final
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.settings.env_type import EnvType
+from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.settings import Settings
 from cl.runtime.settings.settings_util import SettingsUtil
 
@@ -32,7 +32,7 @@ class EnvSettings(Settings):
     env_packages: Tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
-    env_type: EnvType | None = None  # TODO: Make required
+    env_kind: EnvKind | None = None  # TODO: Make required
     """Determines the default settings for multiuser access and data retention."""
 
     env_name: str | None = None
@@ -50,23 +50,23 @@ class EnvSettings(Settings):
         # Convert to tuple
         self.env_packages = SettingsUtil.to_str_tuple(self.env_packages)
 
-        if self.env_type is not None:
-            # Convert from string to EnvType enum if necessary
-            if isinstance(self.env_type, str):
-                if self.env_type.islower():
+        if self.env_kind is not None:
+            # Convert from string to EnvKind enum if necessary
+            if isinstance(self.env_kind, str):
+                if self.env_kind.islower():
                     # Create enum after converting to uppercase if the string is in lowercase
-                    if (item := self.env_type.upper()) in EnvType:
-                        self.env_type = EnvType[item]  # noqa
+                    if (item := self.env_kind.upper()) in EnvKind:
+                        self.env_kind = EnvKind[item]  # noqa
                     else:
-                        valid_items = "\n".join(item.name.lower() for item in EnvType)
+                        valid_items = "\n".join(item.name.lower() for item in EnvKind)
                         raise RuntimeError(
-                            f"Enum EnvType does not include the item {str(self.env_type)}.\n"
+                            f"Enum EnvKind does not include the item {str(self.env_kind)}.\n"
                             f"Valid items are:\n{valid_items}\n"
                         )
                 else:
-                    raise RuntimeError(f"Invalid environment name {self.env_type}, it should be lowercase.")
-            elif not isinstance(self.env_type, EnvType):
-                raise RuntimeError(f"The value of env should be a string or an instance of EnvType.")
+                    raise RuntimeError(f"Invalid environment name {self.env_kind}, it should be lowercase.")
+            elif not isinstance(self.env_kind, EnvKind):
+                raise RuntimeError(f"The value of env should be a string or an instance of EnvKind.")
 
         if self.env_user is None:
             # Set default username if not specified in settings.yaml
@@ -80,18 +80,18 @@ class EnvSettings(Settings):
 
     def cleanup_before(self) -> bool:
         """Cleanup deployment data (except logs) before each run if true."""
-        if self.env_type in (EnvType.PROD, EnvType.STAGING):
+        if self.env_kind in (EnvKind.PROD, EnvKind.STAGING):
             return False
-        elif self.env_type in (EnvType.DEV, EnvType.TEMP):
+        elif self.env_kind in (EnvKind.DEV, EnvKind.TEMP):
             return True
         else:
-            raise ErrorUtil.enum_value_error(self.env_type, EnvType)
+            raise ErrorUtil.enum_value_error(self.env_kind, EnvKind)
 
     def cleanup_after(self) -> bool:
         """Cleanup deployment data (except logs) after each run if true."""
-        if self.env_type in (EnvType.PROD, EnvType.STAGING, EnvType.DEV):
+        if self.env_kind in (EnvKind.PROD, EnvKind.STAGING, EnvKind.DEV):
             return False
-        elif self.env_type == EnvType.TEMP:
+        elif self.env_kind == EnvKind.TEMP:
             return True
         else:
-            raise ErrorUtil.enum_value_error(self.env_type, EnvType)
+            raise ErrorUtil.enum_value_error(self.env_kind, EnvKind)

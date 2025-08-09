@@ -14,13 +14,13 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
+from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
 from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class ExperimentType(ExperimentTypeKey, RecordMixin, ABC):
-    """Experiment and trial records are assigned to separate tables for each experiment type."""
+class ExperimentKind(ExperimentKindKey, RecordMixin, ABC):
+    """Experiment and trial records are separated for each experiment kind."""
 
-    def get_key(self) -> ExperimentTypeKey:
-        return ExperimentTypeKey(experiment_type_id=self.experiment_type_id).build()
+    def get_key(self) -> ExperimentKindKey:
+        return ExperimentKindKey(kind_id=self.kind_id).build()

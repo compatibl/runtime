@@ -33,4 +33,4 @@ class TrialKey(KeyMixin):
         return TrialKey
 
     def get_table(self) -> str:
-        return self.experiment.experiment_type.experiment_type_id + "Trial"
+        return self.experiment.experiment_kind.kind_id + "Trial"

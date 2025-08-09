@@ -19,7 +19,7 @@ from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.settings.env_settings import EnvSettings
-from cl.runtime.settings.env_type import EnvType
+from cl.runtime.settings.env_kind import EnvKind
 
 
 @dataclass(slots=True, kw_only=True)
@@ -29,7 +29,7 @@ class Env(DataMixin):
     testing: bool | None = None
     """True for the root process or worker processes of a test, False when not a test."""
 
-    env: EnvType = required()
+    env: EnvKind = required()
     """Determines the default settings for multiuser access and data retention."""
 
     name: str = required()
@@ -55,20 +55,20 @@ class Env(DataMixin):
 
         # Default values are based on settings (which may still be None) if not specified in the context
         app_settings = EnvSettings.instance()
-        self.env = self.env if self.env is not None else app_settings.env_type
+        self.env = self.env if self.env is not None else app_settings.env_kind
         self.name = self.name if self.name is not None else app_settings.env_name
         self.user = self.user if self.user is not None else app_settings.env_user
         self.user_scoped = self.user_scoped if self.user_scoped is not None else app_settings.env_shared
 
     @classmethod
-    def get_env(cls) -> EnvType:
+    def get_env(cls) -> EnvKind:
         """Determines the default settings for multiuser access and data retention."""
-        env = context.env if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_type
+        env = context.env if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_kind
         if env is not None:
             return env
         else:
             # Default to DEV if not specified
-            return EnvType.DEV
+            return EnvKind.DEV
 
     @classmethod
     def get_name(cls) -> str:
@@ -100,31 +100,31 @@ class Env(DataMixin):
             return user_scoped
         else:
             # Default user-scoped setting is based on env
-            if (env := cls.get_env()) in (EnvType.PROD, EnvType.STAGING):
+            if (env := cls.get_env()) in (EnvKind.PROD, EnvKind.STAGING):
                 # Data is shared between users by default for PROD and STAGING environments
                 return True
-            elif env in (EnvType.DEV, EnvType.TEMP):
+            elif env in (EnvKind.DEV, EnvKind.TEMP):
                 # Data is specific to each user by default for DEV and TEMP environments
                 return False
             else:
-                raise ErrorUtil.enum_value_error(env, EnvType)
+                raise ErrorUtil.enum_value_error(env, EnvKind)
 
     @classmethod
     def is_cleanup_before(cls) -> bool:
         """Cleanup deployment data (except logs) before each run if true."""
-        if (env := cls.get_env()) in (EnvType.PROD, EnvType.STAGING):
+        if (env := cls.get_env()) in (EnvKind.PROD, EnvKind.STAGING):
             return False
-        elif env in (EnvType.DEV, EnvType.TEMP):
+        elif env in (EnvKind.DEV, EnvKind.TEMP):
             return True
         else:
-            raise ErrorUtil.enum_value_error(env, EnvType)
+            raise ErrorUtil.enum_value_error(env, EnvKind)
 
     @classmethod
     def is_cleanup_after(cls) -> bool:
         """Cleanup deployment data (except logs) after each run if true."""
-        if (env := cls.get_env()) in (EnvType.PROD, EnvType.STAGING, EnvType.DEV):
+        if (env := cls.get_env()) in (EnvKind.PROD, EnvKind.STAGING, EnvKind.DEV):
             return False
-        elif env == EnvType.TEMP:
+        elif env == EnvKind.TEMP:
             return True
         else:
-            raise ErrorUtil.enum_value_error(env, EnvType)
+            raise ErrorUtil.enum_value_error(env, EnvKind)

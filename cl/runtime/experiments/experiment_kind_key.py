@@ -18,12 +18,12 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ExperimentTypeKey(KeyMixin):
-    """Experiment and trial records are assigned to separate tables for each experiment type."""
+class ExperimentKindKey(KeyMixin):
+    """Experiment and trial records are separated for each experiment kind."""
 
-    experiment_type_id: str = required()
-    """Unique experiment type identifier."""
+    kind_id: str = required()
+    """Unique experiment kind identifier."""
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return ExperimentTypeKey
+        return ExperimentKindKey

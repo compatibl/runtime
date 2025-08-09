@@ -24,5 +24,5 @@ class ExperimentScenario(ExperimentScenarioKey, RecordMixin, ABC):
 
     def get_key(self) -> ExperimentScenarioKey:
         return ExperimentScenarioKey(
-            experiment_type=self.experiment_type, experiment_scenario_id=self.experiment_scenario_id
+            experiment_kind=self.experiment_kind, experiment_scenario_id=self.experiment_scenario_id
         ).build()

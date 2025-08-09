@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.experiments.experiment_key import ExperimentKey
-from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
+from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
@@ -23,16 +23,16 @@ from cl.runtime.records.query_mixin import QueryMixin
 
 @dataclass(slots=True, kw_only=True)
 class ExperimentKeyQuery(QueryMixin):
-    """Query for ExperimentKey by the experiment_type and experiment_id fields."""
+    """Query for ExperimentKey by the experiment_kind and experiment_id fields."""
 
-    experiment_type: ExperimentTypeKey = required()
-    """Experiment records are assigned to separate tables for each experiment type."""
+    experiment_kind: ExperimentKindKey = required()
+    """Experiment records are separated for each experiment kind."""
 
     experiment_id: str | Condition[str] | None = None
-    """Experiment identifier must be unique for each experiment type but not globally."""
+    """Experiment identifier must be unique for each experiment kind but not globally."""
 
     def get_target_type(self) -> type[KeyMixin]:
         return ExperimentKey
 
     def get_table(self) -> str:
-        return self.experiment_type.experiment_type_id
+        return self.experiment_kind.kind_id

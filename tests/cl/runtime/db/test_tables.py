@@ -17,7 +17,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.experiments.experiment import Experiment
 from cl.runtime.experiments.experiment_key_query import ExperimentKeyQuery
-from cl.runtime.experiments.experiment_type_key import ExperimentTypeKey
+from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
 from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 from stubs.cl.runtime.experiments.stub_classifier_experiment import StubClassifierExperiment
@@ -28,30 +28,30 @@ def _multiple_table_records():
 
     stub_experiments_table_1 = [
         StubBinaryExperiment(
-            experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1"),
+            experiment_kind=ExperimentKindKey(kind_id="ExperimentTable1"),
             experiment_id="StubExperiment11",
         ).build(),
         StubBinaryExperiment(
-            experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1"),
+            experiment_kind=ExperimentKindKey(kind_id="ExperimentTable1"),
             experiment_id="StubExperiment12",
         ).build(),
         StubClassifierExperiment(
-            experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1"),
+            experiment_kind=ExperimentKindKey(kind_id="ExperimentTable1"),
             experiment_id="StubExperiment13",
         ).build(),
     ]
 
     stub_experiments_table_2 = [
         StubBinaryExperiment(
-            experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2"),
+            experiment_kind=ExperimentKindKey(kind_id="ExperimentTable2"),
             experiment_id="StubExperiment21",
         ).build(),
         StubClassifierExperiment(
-            experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2"),
+            experiment_kind=ExperimentKindKey(kind_id="ExperimentTable2"),
             experiment_id="StubExperiment22",
         ).build(),
         StubBinaryExperiment(
-            experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2"),
+            experiment_kind=ExperimentKindKey(kind_id="ExperimentTable2"),
             experiment_id="StubExperiment23",
         ).build(),
     ]
@@ -119,12 +119,12 @@ def test_load_where(multi_db_fixture):
     active(DataSource).save_many(records)
 
     # Load table 'ExperimentTable1'
-    query_1 = ExperimentKeyQuery(experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable1")).build()
+    query_1 = ExperimentKeyQuery(experiment_kind=ExperimentKindKey(kind_id="ExperimentTable1")).build()
     result_1 = active(DataSource).load_where(query_1)
     assert result_1 == (records[0], records[1], records[2])
 
     # Load table 'ExperimentTable2'
-    query_2 = ExperimentKeyQuery(experiment_type=ExperimentTypeKey(experiment_type_id="ExperimentTable2")).build()
+    query_2 = ExperimentKeyQuery(experiment_kind=ExperimentKindKey(kind_id="ExperimentTable2")).build()
     result_2 = active(DataSource).load_where(query_2)
     assert result_2 == (records[3], records[4], records[5])
 
