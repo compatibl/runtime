@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Tuple
 from typing_extensions import Self
+
+from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.data_mixin import DataMixin
@@ -27,7 +29,7 @@ from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
 @dataclass(slots=True, kw_only=True)
-class TrialContext(ContextMixin, DataMixin):
+class TrialContext(DataMixin):
     """Context for a trial in an experiment."""
 
     trial_chain: Tuple[str, ...]
@@ -55,7 +57,7 @@ class TrialContext(ContextMixin, DataMixin):
         """
 
         # Get trial chain from the current context
-        previous_chain = context.trial_chain if (context := cls.current_or_none()) is not None else None
+        previous_chain = context.trial_chain if (context := active_or_none(cls)) is not None else None
 
         # Convert iterable to sequence, skipping None and checking each token for validity
         tokens = tuple(cls._checked_token(token) for token in tokens if token is not None)
@@ -76,7 +78,7 @@ class TrialContext(ContextMixin, DataMixin):
     @classmethod
     def get_trial(cls) -> str | None:
         """Concatenates trial identifiers from the context stack, returns None if no current context or all are None."""
-        if (context := cls.current_or_none()) is not None and context.trial_chain:
+        if (context := active_or_none(cls)) is not None and context.trial_chain:
             # Concatenate trial chain tokens from the current context if not None or empty
             return "\\".join(context.trial_chain)
         else:
