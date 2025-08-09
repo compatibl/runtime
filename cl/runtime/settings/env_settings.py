@@ -29,20 +29,20 @@ from cl.runtime.settings.settings_util import SettingsUtil
 class EnvSettings(Settings):
     """Settings for the naming and location of the app data."""
 
-    env_packages: Tuple[str, ...] = required()
-    """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
+    env_id: str | None = None
+    """Unique environment identifier."""
 
     env_kind: EnvKind | None = None  # TODO: Make required
     """Determines the default settings for multiuser access and data retention."""
-
-    env_name: str | None = None
-    """Identifies the environment or test."""
 
     env_user: str | None = None  # TODO: Determine if this should be here or in UserContext, keep one
     """Identifies the user."""
 
     env_shared: bool | None = None  # TODO: Determine if this should be here or in UserContext, keep one
-    """Data is shared by users if True and fully isolated by user if false (the user must be specified either way)."""
+    """Data is shared by users if True and fully isolated by user if False (the user must be specified either way)."""
+
+    env_packages: Tuple[str, ...] = required()
+    """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

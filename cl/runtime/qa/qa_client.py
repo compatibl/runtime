@@ -24,8 +24,8 @@ from cl.runtime.routers.server_util import ServerUtil
 class QaClient(TestClient):
     """Creates FastAPI TestClient and enters into Env."""
 
-    process_context: Env
-    """Process context is used to pass the information to out-of-process subtasks."""
+    env: Env
+    """Active application environment during the execution of tasks invoked by this client."""
 
     def __init__(self):
         """Initialize process_context field."""
@@ -42,8 +42,8 @@ class QaClient(TestClient):
         # Call '__enter__' method of base first
         TestClient.__enter__(self)
 
-        # Create and activate Env
-        self.process_context = enter_active(Env().build())
+        # Create and activate the application environment
+        self.env = enter_active(Env().build())
 
         # Return self
         return self
@@ -51,8 +51,8 @@ class QaClient(TestClient):
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
 
-        # Deactivate Env
-        exit_active(self.process_context, exc_type=exc_type, exc_val=exc_val, exc_tb=exc_tb)
+        # Deactivate the application environment
+        exit_active(self.env, exc_type=exc_type, exc_val=exc_val, exc_tb=exc_tb)
 
         # Call '__exit___' method of base last
         TestClient.__exit__(self, exc_type, exc_val, exc_tb)

@@ -16,10 +16,6 @@ import pytest
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.env import Env
-from cl.runtime.settings.env_settings import EnvSettings
-
-app_settings = EnvSettings.instance()
-
 
 def test_process_context():
     """Smoke test."""
