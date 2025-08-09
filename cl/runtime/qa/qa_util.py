@@ -15,6 +15,10 @@
 import fnmatch
 import inspect
 import os
+import sys
+
+from memoization import cached
+
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 
@@ -23,46 +27,16 @@ class QaUtil:
     """Helper methods for environment selection."""
 
     # TODO: Make it possible to modify this in QaSettings
-    _test_module_patterns = ("test_*", "conftest")
-    """Test function or method name pattern in glob format."""
-
-    # TODO: Make it possible to modify this in QaSettings
     _test_function_pattern = "test_*"
     """Test function or method name pattern in glob format."""
 
-    _is_root_test_process: bool | None = None
-    """True for the root test process, None for the workers launched from the test or when not a test."""
-
     @classmethod
-    def configure(cls) -> None:
-        """Perform configuration steps for testing."""
-
-        # Switch to testing Dynaconf environment
-        os.environ.setdefault("CL_SETTINGS_ENV", "testing")
-
-        # Set flag for the root test process
-        cls._is_root_test_process = True
-
-    @classmethod
-    def is_root_test_process(cls) -> bool | None:
-        """True for the root test process, None for the workers launched from the test or when not a test."""
-        return cls._is_root_test_process
-
-    @classmethod
-    def inspect_stack_for_test_module_patterns(cls, *, test_module_patterns: tuple[str, ...] | None = None) -> bool:
-        """
-        Return True if invoked from a test, detection is based on test module pattern.
-
-        Args:
-            test_module_patterns: Glob patterns to identify a running test, defaults to test_* and conftest
-        """
-        stack = inspect.stack()
-        for frame_info in stack:
-            filename = os.path.basename(frame_info.filename)
-            if filename.endswith(".py") and any(
-                    fnmatch.fnmatch(filename, pattern) for pattern in cls._test_module_patterns):
-                return True
-        return False
+    @cached
+    def is_test_root_process(cls) -> bool:
+        """True for the root process of a test, False for the worker processes of a test or when not a test."""
+        # Detect by checking if pytest is imported, will not work for other unit test frameworks (unittest, nose, etc.)
+        result = "pytest" in sys.modules
+        return result
 
     @classmethod
     def get_test_dir_from_call_stack(cls) -> str:
@@ -78,7 +52,6 @@ class QaUtil:
                 f"of the test function or method name does not match the pattern '{cls._test_function_pattern}'."
             )
         return result
-
 
     @classmethod
     def get_test_dir_from_call_stack_or_none(cls) -> str:

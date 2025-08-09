@@ -38,6 +38,10 @@ load_dotenv()
 _process_timestamp = Timestamp.create()
 """Unique UUIDv7-based timestamp set during the Python process launch."""
 
+# Switch to testing Dynaconf environment if inside a root test process
+if QaUtil.is_test_root_process():
+    os.environ.setdefault("CL_SETTINGS_ENV", "testing")
+
 _all_settings = Dynaconf(
     environments=True,
     envvar_prefix="CL",

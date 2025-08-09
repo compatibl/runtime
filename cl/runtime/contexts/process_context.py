@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
-from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
 
@@ -24,7 +22,7 @@ class ProcessContext(DataMixin):
     """Provides information about the currently running test."""
 
     testing: bool | None = None
-    """True inside a the root test process, False if not a test or inside a separate test worker process."""
+    """True for the root process or worker processes of a test, False when not a test."""
 
     @classmethod
     def get_base_type(cls) -> type:
@@ -33,4 +31,6 @@ class ProcessContext(DataMixin):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.testing is None:
-            self.testing = QaUtil.is_root_test_process()
+            # Can be set here based on detecting the root process of a test because ContextSnapshot
+            # will initialize this field for the worker processes launched by the test
+            self.testing = QaUtil.is_test_root_process()

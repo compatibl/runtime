@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.qa.qa_util import QaUtil
-
-# Configure settings for the root test process
-QaUtil.configure()
-
 # Use noqa to prevent linters from removing the imports
 from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_db_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_mock_db_fixture  # noqa
