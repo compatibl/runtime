@@ -21,7 +21,6 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.contexts.context_util import UserContextUtil
 from cl.runtime.contexts.user_context import UserContext
 
 
@@ -54,13 +53,13 @@ def _encrypt_value(value: str) -> str:
 
 @pytest.mark.skip("Requires RSA key to decrypt.")
 def test_decrypt_secret():
-    """Test UserContextUtil.decrypt_secret method."""
+    """Test UserContext.decrypt_secret method."""
     key = "test_key"
     value = "secret_value"
     encrypted_value = _encrypt_value(value)
     user_context = active_or_default(UserContext)
     user_context.encrypted_secrets[key] = encrypted_value
-    secret_value_decrypted = UserContextUtil.decrypt_secret(key)
+    secret_value_decrypted = user_context.decrypt_secret(key)
     assert secret_value_decrypted == value
 
 

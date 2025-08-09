@@ -26,15 +26,11 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.contexts.user_context import UserContext
 
 
 @dataclass(slots=True, kw_only=True)
-class UserContext(DataMixin):
+class UserContext(DataMixin):  # TODO: Rename to SecretsContext?
     """User-specific settings and data."""
-
-    user: UserKey = required()
-    """Current user."""
 
     encrypted_secrets: Dict[str, str] | None = None
     """User secrets specified here take precedence over those defined via Dynaconf."""
@@ -42,18 +38,6 @@ class UserContext(DataMixin):
     @classmethod
     def get_base_type(cls) -> type:
         return UserContext
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.user is None:
-            # Set default username if none was specified explicitly
-            if ProcessContext.is_testing():
-                # Username is test name if testing
-                self.user = UserKey(username=QaUtil.get_test_name_from_call_stack())
-            else:
-                # Use the username reported by OS if not testing
-                os_user_id = getuser()
-                self.user = UserKey(username=os_user_id)
 
     def decrypt_secret(self, secret_name: str) -> str | None:
         """Decrypt the specified secret in UserContext, None if no active UserContext or the secret is not found."""
