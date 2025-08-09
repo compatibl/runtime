@@ -45,11 +45,15 @@ class PytestUtil:
         return data
 
     @classmethod
-    def get_test_path_from_request(cls, request: FixtureRequest, *, format_as: Literal["name", "dir"]) -> str:
+    def get_test_path_from_request(cls, request: FixtureRequest, *, name_only: bool) -> str:
         """
-        Return test_module<delim>test_function or test_module<delim>test_class<delim>test_function
-        using the data from FixtureRequest, collapsing levels with identical name into one,
-        where <delim> is period when is_name is True and os.sep when is_name is False.
+        Return test_module.test_function or test_module.test_class.test_method if name_only is True and
+        test_dir/test_module/test_function or test_dir/test_module/test_class/test_method if name_only is False
+        by inspecting the request, collapse repeated adjacent names into one.
+
+        Args:
+            request: Pytest fixture request
+            name_only: If true, return only a dot delimited name, otherwise return the entire directory path
         """
 
         # Get test information from the request, call stack inspection like in QaUtil
@@ -62,11 +66,11 @@ class PytestUtil:
         test_name = test_name_and_params.split("[")[0]
 
         # Convert to test path or name
-        return QaUtil.get_test_path(
+        return QaUtil.format_test_path(
             test_file=test_file,
             test_class=class_name,
             test_function=test_name,
-            format_as=format_as,
+            name_only=name_only,
         )
 
     @classmethod

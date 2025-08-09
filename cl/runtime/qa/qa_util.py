@@ -12,15 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import fnmatch
 import inspect
 import os
-from typing import Literal
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 
 
 class QaUtil:
     """Helper methods for environment selection."""
+
+    # TODO: Make it possible to modify this in QaSettings
+    _test_module_patterns = ("test_*", "conftest")
+    """Test function or method name pattern in glob format."""
+
+    # TODO: Make it possible to modify this in QaSettings
+    _test_function_pattern = "test_*"
+    """Test function or method name pattern in glob format."""
+
+    _is_root_test_process: bool | None = None
+    """True for the root test process, None for the workers launched from the test or when not a test."""
+
+    @classmethod
+    def configure(cls) -> None:
+        """Perform configuration steps for testing."""
+
+        # Switch to testing Dynaconf environment
+        os.environ.setdefault("CL_SETTINGS_ENV", "testing")
+
+        # Set flag for the root test process
+        cls._is_root_test_process = True
+
+    @classmethod
+    def is_root_test_process(cls) -> bool | None:
+        """True for the root test process, None for the workers launched from the test or when not a test."""
+        return cls._is_root_test_process
 
     @classmethod
     def inspect_stack_for_test_module_patterns(cls, *, test_module_patterns: tuple[str, ...] | None = None) -> bool:
@@ -30,16 +56,11 @@ class QaUtil:
         Args:
             test_module_patterns: Glob patterns to identify a running test, defaults to test_* and conftest
         """
-
-        if test_module_patterns is not None:
-            # TODO: test_module_patterns custom patterns
-            raise RuntimeError("Custom test module patterns are not yet supported.")
-        test_module_patterns = ("test_", "conftest")
-
         stack = inspect.stack()
         for frame_info in stack:
             filename = os.path.basename(frame_info.filename)
-            if filename.startswith(test_module_patterns) and filename.endswith(".py"):
+            if filename.endswith(".py") and any(
+                    fnmatch.fnmatch(filename, pattern) for pattern in cls._test_module_patterns):
                 return True
         return False
 
@@ -49,7 +70,23 @@ class QaUtil:
         Return test_dir/test_module/test_function or test_dir/test_module/test_class/test_method
         collapsing repeated adjacent names into one.
         """
-        return cls.get_test_path_from_call_stack(format_as="dir")
+        result = cls.get_test_dir_from_call_stack_or_none()
+        if result is None:
+            # Error if not inside a test function or method
+            raise RuntimeError(
+                f"Attempting to get test directory from the call stack before the test function or method is called,\n"
+                f"of the test function or method name does not match the pattern '{cls._test_function_pattern}'."
+            )
+        return result
+
+
+    @classmethod
+    def get_test_dir_from_call_stack_or_none(cls) -> str:
+        """
+        Return test_dir/test_module/test_function or test_dir/test_module/test_class/test_method
+        collapsing repeated adjacent names into one.
+        """
+        return cls.get_test_path_from_call_stack_or_none(name_only=False)
 
     @classmethod
     def get_test_name_from_call_stack(cls) -> str:
@@ -57,25 +94,37 @@ class QaUtil:
         Return test_module.test_function or test_module.test_class.test_method,
         collapsing repeated adjacent names into one.
         """
-        return cls.get_test_path_from_call_stack(format_as="name")
+        result = cls.get_test_name_from_call_stack_or_none()
+        if result is None:
+            # Error if not inside a test function or method
+            raise RuntimeError(
+                f"Attempting to get test name from the call stack before the test function or method is called,\n"
+                f"of the test function or method name does not match the pattern '{cls._test_function_pattern}'."
+            )
+        return result
 
     @classmethod
-    def get_test_path_from_call_stack(cls, *, format_as: Literal["name", "dir"]) -> str | None:
+    def get_test_name_from_call_stack_or_none(cls) -> str | None:
         """
-        Return test_module.test_function or test_module.test_class.test_method if format_as is "name" and
-        test_dir/test_module/test_function or test_dir/test_module/test_class/test_method if format_as is "dir"
+        Return test_module.test_function or test_module.test_class.test_method,
+        collapsing repeated adjacent names into one.
+        """
+        return cls.get_test_path_from_call_stack_or_none(name_only=True)
+
+    @classmethod
+    def get_test_path_from_call_stack_or_none(cls, *, name_only: bool) -> str | None:
+        """
+        Return test_module.test_function or test_module.test_class.test_method if name_only is True and
+        test_dir/test_module/test_function or test_dir/test_module/test_class/test_method if name_only is False
         by inspecting the call stack, collapse repeated adjacent names into one.
 
         Args:
-            format_as: If "name", return dot delimited name, if "dir", return directory path
+            name_only: If true, return only a dot delimited name, otherwise return the entire directory path
         """
-
-        # TODO: Make it possible to modify this in QaSettings
-        test_function_pattern = "test_"
 
         stack = inspect.stack()
         for frame_info in stack:
-            if frame_info.function.startswith(test_function_pattern):
+            if fnmatch.fnmatch(frame_info.function, cls._test_function_pattern):
 
                 # Get test information from the call stack
                 frame_globals = frame_info.frame.f_globals
@@ -85,38 +134,35 @@ class QaUtil:
                 class_name = TypeUtil.name(cls_instance) if cls_instance else None
 
                 # Convert to test path or name
-                return cls.get_test_path(
+                return cls.format_test_path(
                     test_file=test_file,
                     test_class=class_name,
                     test_function=test_name,
-                    format_as=format_as,
+                    name_only=name_only,
                 )
 
-        # Error if not inside a test function or method
-        raise RuntimeError(
-            f"Attempting to get test information from the call stack before the test function or method is called,\n"
-            f"of the test function or method name does not match the pattern '{test_function_pattern}'."
-        )
+        # Return None if not inside a test function or method
+        return None
 
     @classmethod
-    def get_test_path(
+    def format_test_path(
         cls,
         *,
         test_file: str,
         test_class: str | None = None,
         test_function: str,
-        format_as: Literal["name", "dir"],
+        name_only: bool,
     ) -> str | None:
         """
-        Return test_module.test_function or test_module.test_class.test_method if format_as is "name" and
-        test_dir/test_module/test_function or test_dir/test_module/test_class/test_method if format_as is "dir",
+        Return test_module.test_function or test_module.test_class.test_method if name_only is True and
+        test_dir/test_module/test_function or test_dir/test_module/test_class/test_method if name_only is False,
         collapsing repeated adjacent names into one.
 
         Args:
             test_file: Test file inclusive of directory path and .py extension
             test_class: Test class name if the test is a method inside class, None otherwise
             test_function: Test function or method name
-            format_as: If "name", return dot delimited name, if "dir", return directory path
+            name_only: If true, return only a dot delimited name, otherwise return the entire directory path
         """
 
         if test_file.endswith(".py"):
@@ -125,14 +171,12 @@ class QaUtil:
             raise RuntimeError(f"Test file path {test_file} does not end with '.py'.")
 
         # Determine delimiter based on format_as parameter
-        if format_as == "name":
+        if name_only:
             is_dir = False
             delim = "."
-        elif format_as == "dir":
+        else:
             is_dir = True
             delim = os.sep
-        else:
-            raise RuntimeError(f"Parameter format_as={format_as} is not supported, valid values are 'name' and 'dir'.")
 
         module_dir = os.path.dirname(test_file_without_ext)
         module_name = os.path.basename(test_file_without_ext)
