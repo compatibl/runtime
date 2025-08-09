@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class EnvInfo(DataMixin):
+class EnvInfo(DataMixin):  # TODO: Change name to avoid confusion with Env and EnvSettings
 
     name: str = required()
     """Name of the environment."""

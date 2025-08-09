@@ -21,18 +21,18 @@ from cl.runtime._version import __api_schema_version__
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.routers.settings.env_info import EnvInfo
-from cl.runtime.settings.app_settings import AppSettings
+from cl.runtime.settings.env_settings import EnvSettings
 
 
 def _collect_package_versions() -> dict[str, str]:
     """
-    Collects versions of all packages listed in AppSettings.
+    Collects versions of all packages listed in EnvSettings.
 
     Returns:
         dict: Mapping of package names to their version strings.
     """
     result = {}
-    packages = AppSettings.instance().app_packages
+    packages = EnvSettings.instance().env_packages
 
     for package in packages:
         version = "0.1.0"  # TODO: Use another code for the default version

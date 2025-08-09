@@ -16,17 +16,32 @@ from enum import IntEnum
 from enum import auto
 
 
-class AppEnv(IntEnum):
-    """The deployment environment setting determines the policies for data retention and deletion."""
+class EnvType(IntEnum):
+    """
+    The environment type determines the policies for data protection and retention
+    and is used to select the Dynaconf environment.
+    """
 
     PROD = auto()
-    """Production environment, persistent across runs, destructive actions via the API are prohibited."""
+    """
+    Production environment, persistent across runs, destructive actions via the API are prohibited.
+    Activates Dynaconf setting 'production'.
+    """
 
     STAGING = auto()
-    """Staging environment, persistent across runs, destructive actions via the API are permitted."""
+    """
+    Staging environment, persistent across runs, destructive actions via the API are permitted.
+    Activates Dynaconf setting 'staging'.
+    """
 
     DEV = auto()
-    """Development environment, initialized on each run, destructive actions via the API are permitted."""
+    """
+    Development environment, initialized on each run, destructive actions via the API are permitted.
+    Activates Dynaconf setting 'development'.
+    """
 
-    TEMP = auto()
-    """Temporary environment, initialized on each run, deleted automatically at the end of the run."""
+    TEST = auto()
+    """
+    Temporary environment, initialized on each run, deleted automatically at the end of the run.
+    Activates Dynaconf setting 'testing'. 
+    """

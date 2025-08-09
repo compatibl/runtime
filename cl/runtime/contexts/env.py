@@ -18,18 +18,18 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.settings.app_env import AppEnv
-from cl.runtime.settings.app_settings import AppSettings
+from cl.runtime.settings.env_type import EnvType
+from cl.runtime.settings.env_settings import EnvSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class AppContext(DataMixin):
+class EnvContext(DataMixin):
     """Context for the naming and location of the app data."""
 
     testing: bool | None = None
     """True for the root process or worker processes of a test, False when not a test."""
 
-    env: AppEnv = required()
+    env: EnvType = required()
     """Determines the default settings for multiuser access and data retention."""
 
     name: str = required()
@@ -43,7 +43,7 @@ class AppContext(DataMixin):
 
     @classmethod
     def get_base_type(cls) -> type:
-        return AppContext
+        return EnvContext
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
@@ -54,26 +54,26 @@ class AppContext(DataMixin):
             self.testing = QaUtil.is_test_root_process()
 
         # Default values are based on settings (which may still be None) if not specified in the context
-        app_settings = AppSettings.instance()
-        self.env = self.env if self.env is not None else app_settings.app_env
-        self.name = self.name if self.name is not None else app_settings.app_name
-        self.user = self.user if self.user is not None else app_settings.app_user
-        self.user_scoped = self.user_scoped if self.user_scoped is not None else app_settings.app_user_scoped
+        app_settings = EnvSettings.instance()
+        self.env = self.env if self.env is not None else app_settings.env_type
+        self.name = self.name if self.name is not None else app_settings.env_name
+        self.user = self.user if self.user is not None else app_settings.env_user
+        self.user_scoped = self.user_scoped if self.user_scoped is not None else app_settings.env_shared
 
     @classmethod
-    def get_env(cls) -> AppEnv:
+    def get_env(cls) -> EnvType:
         """Determines the default settings for multiuser access and data retention."""
-        env = context.env if (context := cls.current_or_none()) is not None else AppSettings.instance().app_env
+        env = context.env if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_type
         if env is not None:
             return env
         else:
             # Default to DEV if not specified
-            return AppEnv.DEV
+            return EnvType.DEV
 
     @classmethod
     def get_name(cls) -> str:
         """Identifies the application or test."""
-        name = context.name if (context := cls.current_or_none()) is not None else AppSettings.instance().app_name
+        name = context.name if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_name
         if name is not None:
             return name
         else:
@@ -83,7 +83,7 @@ class AppContext(DataMixin):
     @classmethod
     def get_user(cls) -> str:
         """Identifies the application or test user."""
-        user = context.user if (context := cls.current_or_none()) is not None else AppSettings.instance().app_user
+        user = context.user if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_user
         if user is not None:
             return user
         else:
@@ -96,37 +96,37 @@ class AppContext(DataMixin):
         user_scoped = (
             context.user_scoped
             if (context := cls.current_or_none()) is not None
-            else AppSettings.instance().app_user_scoped
+            else EnvSettings.instance().env_shared
         )
         if user_scoped is not None:
             return user_scoped
         else:
             # Default user-scoped setting is based on env
-            if (env := cls.get_env()) in (AppEnv.PROD, AppEnv.STAGING):
+            if (env := cls.get_env()) in (EnvType.PROD, EnvType.STAGING):
                 # Data is shared between users by default for PROD and STAGING environments
                 return True
-            elif env in (AppEnv.DEV, AppEnv.TEMP):
+            elif env in (EnvType.DEV, EnvType.TEMP):
                 # Data is specific to each user by default for DEV and TEMP environments
                 return False
             else:
-                raise ErrorUtil.enum_value_error(env, AppEnv)
+                raise ErrorUtil.enum_value_error(env, EnvType)
 
     @classmethod
     def is_cleanup_before(cls) -> bool:
         """Cleanup deployment data (except logs) before each run if true."""
-        if (env := cls.get_env()) in (AppEnv.PROD, AppEnv.STAGING):
+        if (env := cls.get_env()) in (EnvType.PROD, EnvType.STAGING):
             return False
-        elif env in (AppEnv.DEV, AppEnv.TEMP):
+        elif env in (EnvType.DEV, EnvType.TEMP):
             return True
         else:
-            raise ErrorUtil.enum_value_error(env, AppEnv)
+            raise ErrorUtil.enum_value_error(env, EnvType)
 
     @classmethod
     def is_cleanup_after(cls) -> bool:
         """Cleanup deployment data (except logs) after each run if true."""
-        if (env := cls.get_env()) in (AppEnv.PROD, AppEnv.STAGING, AppEnv.DEV):
+        if (env := cls.get_env()) in (EnvType.PROD, EnvType.STAGING, EnvType.DEV):
             return False
-        elif env == AppEnv.TEMP:
+        elif env == EnvType.TEMP:
             return True
         else:
-            raise ErrorUtil.enum_value_error(env, AppEnv)
+            raise ErrorUtil.enum_value_error(env, EnvType)

@@ -13,21 +13,21 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.app_context import AppContext
+from cl.runtime.contexts.env import EnvContext
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active_or_none
-from cl.runtime.settings.app_settings import AppSettings
+from cl.runtime.settings.env_settings import EnvSettings
 
-app_settings = AppSettings.instance()
+app_settings = EnvSettings.instance()
 
 
 def test_process_context():
     """Smoke test."""
 
-    assert active_or_none(AppContext) is None
-    with activate(AppContext().build()):
+    assert active_or_none(EnvContext) is None
+    with activate(EnvContext().build()):
         pass
-        # TODO: assert active(AppContext).env_name == "test_process_context"
+        # TODO: assert active(EnvContext).env_name == "test_process_context"
 
 
 if __name__ == "__main__":

@@ -33,7 +33,7 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
-from cl.runtime.settings.app_settings import AppSettings
+from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
 
@@ -275,7 +275,7 @@ class TypeCache:
         """Get the list of packages specified in settings."""
         if cls._packages is None:
             # Get the list of packages from settings
-            cls._packages = tuple(AppSettings.instance().app_packages)
+            cls._packages = tuple(EnvSettings.instance().env_packages)
         return cls._packages
 
     @classmethod

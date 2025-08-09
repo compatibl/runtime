@@ -85,9 +85,9 @@ class Settings(DataMixin, ABC):
 
     Notes:
       - Environment variable prefix is the global prefix (CL_ by default) followed by UPPER_CASE settings field name,
-        for example 'CL_APP_USER' for the field 'app_user' in AppSettings
+        for example 'CL_ENV_USER' for the field 'env_user' in EnvSettings
       - Dynaconf (settings.yaml) field is snake_case settings field name,
-        for example 'app_user' for the field 'user' in AppSettings
+        for example 'env_user' for the field 'env_user' in EnvSettings
     """
 
     process_timestamp: ClassVar[str] = _process_timestamp

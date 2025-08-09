@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from cl.runtime.settings.app_settings import AppSettings
+from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
 
@@ -37,7 +37,7 @@ class InitFileUtil:
         """
 
         # The list of packages from context settings
-        packages = AppSettings.instance().app_packages
+        packages = EnvSettings.instance().env_packages
 
         missing_files = []
         all_root_paths = set()

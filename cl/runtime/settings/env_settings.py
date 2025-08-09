@@ -21,101 +21,79 @@ from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.settings.app_env import AppEnv
+from cl.runtime.settings.env_type import EnvType
 from cl.runtime.settings.settings import Settings
+from cl.runtime.settings.settings_util import SettingsUtil
 
 
 @dataclass(slots=True, kw_only=True)
 @final
-class AppSettings(Settings):
+class EnvSettings(Settings):
     """Settings for the naming and location of the app data."""
 
-    app_packages: Tuple[str, ...] = required()
+    env_packages: Tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
-    app_env: AppEnv | None = None  # TODO: Make required
+    env_type: EnvType | None = None  # TODO: Make required
     """Determines the default settings for multiuser access and data retention."""
 
-    app_name: str | None = None
-    """Identifies the application or test."""
+    env_name: str | None = None
+    """Identifies the environment or test."""
 
-    app_user: str | None = None  # TODO: Determine if this should be here or in UserContext, keep one
-    """Identifies the application or test user."""
+    env_user: str | None = None  # TODO: Determine if this should be here or in UserContext, keep one
+    """Identifies the user."""
 
-    app_user_scoped: bool | None = None  # TODO: Determine if this should be here or in UserContext, keep one
-    """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
+    env_shared: bool | None = None  # TODO: Determine if this should be here or in UserContext, keep one
+    """Data is shared by users if True and fully isolated by user if false (the user must be specified either way)."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert to tuple
-        if self.app_packages is None:
-            raise RuntimeError(f"No packages are specified in {TypeUtil.name(self)}, specify at least one.")
-        elif is_sequence(self.app_packages):
-            # Convert sequence to tuple
-            self.app_packages = tuple(self.app_packages)
-        elif isinstance(self.app_packages, str):
-            # Deserialize from string in comma-delimited format
-            self.app_packages = tuple(token.strip() for token in self.app_packages.split(","))
-        else:
-            raise RuntimeError(f"Field '{TypeUtil.name(self)}.packages' must be a string or an iterable of strings.")
+        self.env_packages = SettingsUtil.to_str_tuple(self.env_packages)
 
-        # Check that each element is a string and is not empty
-        package_errors = [
-            (
-                f"- Element at index {index} of field '{TypeUtil.name(self)}.packages is not a string:\n"
-                f"  Value: {element} Type: {TypeUtil.name(element)})\n"
-                if not isinstance(element, str)
-                else f"- Element at index {index} of field '{TypeUtil.name(self)} is an empty string.\n"
-            )
-            for index, element in enumerate(self.app_packages)
-            if not isinstance(element, str) or element == ""
-        ]
-        if package_errors:
-            raise ValueError("\n".join(package_errors))
-
-        if self.app_env is not None:
-            # Convert from string to AppEnv enum if necessary
-            if isinstance(self.app_env, str):
-                if self.app_env.islower():
+        if self.env_type is not None:
+            # Convert from string to EnvType enum if necessary
+            if isinstance(self.env_type, str):
+                if self.env_type.islower():
                     # Create enum after converting to uppercase if the string is in lowercase
-                    if (item := self.app_env.upper()) in AppEnv:
-                        self.app_env = AppEnv[item]  # noqa
+                    if (item := self.env_type.upper()) in EnvType:
+                        self.env_type = EnvType[item]  # noqa
                     else:
-                        valid_items = "\n".join(item.name.lower() for item in AppEnv)
+                        valid_items = "\n".join(item.name.lower() for item in EnvType)
                         raise RuntimeError(
-                            f"Enum AppEnv does not include the item {str(self.app_env)}.\n"
+                            f"Enum EnvType does not include the item {str(self.env_type)}.\n"
                             f"Valid items are:\n{valid_items}\n"
                         )
                 else:
-                    raise RuntimeError(f"Invalid environment name {self.app_env}, it should be lowercase.")
-            elif not isinstance(self.app_env, AppEnv):
-                raise RuntimeError(f"The value of env should be a string or an instance of AppEnv.")
+                    raise RuntimeError(f"Invalid environment name {self.env_type}, it should be lowercase.")
+            elif not isinstance(self.env_type, EnvType):
+                raise RuntimeError(f"The value of env should be a string or an instance of EnvType.")
 
-        if self.app_user is None:
+        if self.env_user is None:
             # Set default username if not specified in settings.yaml
             if (test_name_from_call_stack := QaUtil.get_test_name_from_call_stack_or_none()) is not None:
                 # App user is test name from call stack if inside a test
-                self.app_user = test_name_from_call_stack
+                self.env_user = test_name_from_call_stack
             else:
                 # Use the username reported by OS if not testing
                 os_user_id = getuser()
-                self.app_user = os_user_id
+                self.env_user = os_user_id
 
     def cleanup_before(self) -> bool:
         """Cleanup deployment data (except logs) before each run if true."""
-        if self.app_env in (AppEnv.PROD, AppEnv.STAGING):
+        if self.env_type in (EnvType.PROD, EnvType.STAGING):
             return False
-        elif self.app_env in (AppEnv.DEV, AppEnv.TEMP):
+        elif self.env_type in (EnvType.DEV, EnvType.TEMP):
             return True
         else:
-            raise ErrorUtil.enum_value_error(self.app_env, AppEnv)
+            raise ErrorUtil.enum_value_error(self.env_type, EnvType)
 
     def cleanup_after(self) -> bool:
         """Cleanup deployment data (except logs) after each run if true."""
-        if self.app_env in (AppEnv.PROD, AppEnv.STAGING, AppEnv.DEV):
+        if self.env_type in (EnvType.PROD, EnvType.STAGING, EnvType.DEV):
             return False
-        elif self.app_env == AppEnv.TEMP:
+        elif self.env_type == EnvType.TEMP:
             return True
         else:
-            raise ErrorUtil.enum_value_error(self.app_env, AppEnv)
+            raise ErrorUtil.enum_value_error(self.env_type, EnvType)

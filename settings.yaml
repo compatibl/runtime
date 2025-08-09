@@ -5,8 +5,8 @@ default:
   log_level: info
   log_filename_prefix: main
 
-  # Documented in AppSettings class
-  app_packages:
+  # Documented in EnvSettings class
+  env_packages:
     - cl.runtime
     - stubs.cl.runtime
 

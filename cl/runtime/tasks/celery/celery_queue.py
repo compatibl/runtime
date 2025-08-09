@@ -21,7 +21,7 @@ from typing import Final
 from typing import List
 from celery import Celery
 from celery.signals import setup_logging
-from cl.runtime.contexts.app_context import AppContext
+from cl.runtime.contexts.env import EnvContext
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
@@ -142,8 +142,8 @@ class CeleryQueue(TaskQueue):
 
     def submit_task(self, task: TaskKey):
 
-        # Wrap into AppContext
-        with activate(AppContext().build()):
+        # Wrap into EnvContext
+        with activate(EnvContext().build()):
 
             # Get and serialize current context
             context_snapshot_data = ContextSnapshot.serialize_current_contexts()
