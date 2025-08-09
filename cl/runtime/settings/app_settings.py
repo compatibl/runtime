@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from getpass import getuser
 from typing import Tuple
 from typing_extensions import final
+from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil
@@ -30,16 +33,16 @@ class AppSettings(Settings):
     app_packages: Tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
-    app_env: AppEnv | None = None
+    app_env: AppEnv | None = None  # TODO: Make required
     """Determines the default settings for multiuser access and data retention."""
 
     app_name: str | None = None
     """Identifies the application or test."""
 
-    app_user: str | None = None
+    app_user: str | None = None  # TODO: Determine if this should be here or in UserContext, keep one
     """Identifies the application or test user."""
 
-    app_user_scoped: bool | None = None
+    app_user_scoped: bool | None = None  # TODO: Determine if this should be here or in UserContext, keep one
     """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
 
     def __init(self) -> None:
@@ -88,3 +91,31 @@ class AppSettings(Settings):
                     raise RuntimeError(f"Invalid environment name {self.app_env}, it should be lowercase.")
             elif not isinstance(self.app_env, AppEnv):
                 raise RuntimeError(f"The value of env should be a string or an instance of AppEnv.")
+
+        if self.app_user is None:
+            # Set default username if not specified in settings.yaml
+            if (test_name_from_call_stack := QaUtil.get_test_name_from_call_stack_or_none()) is not None:
+                # App user is test name from call stack if inside a test
+                self.app_user = test_name_from_call_stack
+            else:
+                # Use the username reported by OS if not testing
+                os_user_id = getuser()
+                self.app_user = os_user_id
+
+    def cleanup_before(self) -> bool:
+        """Cleanup deployment data (except logs) before each run if true."""
+        if self.app_env in (AppEnv.PROD, AppEnv.STAGING):
+            return False
+        elif self.app_env in (AppEnv.DEV, AppEnv.TEMP):
+            return True
+        else:
+            raise ErrorUtil.enum_value_error(self.app_env, AppEnv)
+
+    def cleanup_after(self) -> bool:
+        """Cleanup deployment data (except logs) after each run if true."""
+        if self.app_env in (AppEnv.PROD, AppEnv.STAGING, AppEnv.DEV):
+            return False
+        elif self.app_env == AppEnv.TEMP:
+            return True
+        else:
+            raise ErrorUtil.enum_value_error(self.app_env, AppEnv)

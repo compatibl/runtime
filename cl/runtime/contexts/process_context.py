@@ -15,23 +15,16 @@
 from dataclasses import dataclass
 
 from cl.runtime.contexts.context_manager import active_or_none
-from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.settings.db_settings import DbSettings
-from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
 class ProcessContext(DataMixin):
     """Provides information about the currently running test."""
 
-    testing: bool = False
-    """True inside a test, False otherwise (this field is passed to out-of-process tasks)."""
-
-    env_name: str = required()
-    """Used to set database name and similar parameters (this field is passed to out-of-process tasks)."""
+    testing: bool | None = None
+    """True inside a the root test process, False if not a test or inside a separate test worker process."""
 
     @classmethod
     def get_base_type(cls) -> type:
@@ -39,32 +32,5 @@ class ProcessContext(DataMixin):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-
-        # If not specified, set based on the current context
         if self.testing is None:
-            self.testing = self.is_testing()
-        if self.env_name is None:
-            self.env_name = self.get_env_name()
-
-    @classmethod
-    def is_testing(cls) -> bool:
-        """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
-        if (current_context := active_or_none(ProcessContext)) is not None:
-            # Get from the current ProcessContext if exists
-            return current_context.testing
-        else:
-            # Otherwise set based on the current process
-            return Settings.is_inside_test
-
-    def get_env_name(self) -> str:
-        """Return test_module.test_module or test_module.test_class.test_method inside a test, None outside a test."""
-        if (current_context := active_or_none(ProcessContext)) is not None:
-            # Get from the current ProcessContext if exists
-            return current_context.env_name
-        else:
-            # Otherwise set based on the current process
-            if Settings.is_inside_test:
-                # Return test_module.test_module or test_module.test_class.test_method inside a test
-                return QaUtil.get_test_name_from_call_stack()
-            else:
-                return DbSettings.instance().db_id  # TODO: Pass f-string parameters
+            self.testing = QaUtil.is_root_test_process()
