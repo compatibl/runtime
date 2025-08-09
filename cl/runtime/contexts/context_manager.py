@@ -197,8 +197,9 @@ def active_or_default(context_type: type[TRecord]) -> TRecord:
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
     or create a default instance using 'context_type()' if outside a 'with' clause.
     """
+    # Return the top context in stack if exists, otherwise build a new context instance with all values set to default
     stack = _get_or_create_stack(context_type)
-    return CastUtil.cast(context_type, stack[-1]) if stack else context_type()
+    return CastUtil.cast(context_type, stack[-1]) if stack else context_type().build()
 
 
 def active_contexts() -> tuple[RecordProtocol, ...]:
