@@ -54,11 +54,11 @@ class Env(DataMixin):
             self.testing = QaUtil.is_test_root_process()
 
         # Default values are based on settings (which may still be None) if not specified in the context
-        app_settings = EnvSettings.instance()
-        self.env = self.env if self.env is not None else app_settings.env_kind
-        self.name = self.name if self.name is not None else app_settings.env_name
-        self.user = self.user if self.user is not None else app_settings.env_user
-        self.user_scoped = self.user_scoped if self.user_scoped is not None else app_settings.env_shared
+        env_settings = EnvSettings.instance()
+        self.env = self.env if self.env is not None else env_settings.env_kind
+        self.name = self.name if self.name is not None else env_settings.env_id
+        self.user = self.user if self.user is not None else env_settings.env_user
+        self.user_scoped = self.user_scoped if self.user_scoped is not None else env_settings.env_shared
 
     @classmethod
     def get_env(cls) -> EnvKind:
@@ -73,7 +73,7 @@ class Env(DataMixin):
     @classmethod
     def get_name(cls) -> str:
         """Identifies the application or test."""
-        name = context.name if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_name
+        name = context.name if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_id
         if name is not None:
             return name
         else:

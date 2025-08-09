@@ -15,8 +15,8 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from typing_extensions import Self
-from cl.runtime.contexts.context_manager import enter_active
-from cl.runtime.contexts.context_manager import exit_active
+from cl.runtime.contexts.context_manager import make_active
+from cl.runtime.contexts.context_manager import make_inactive
 from cl.runtime.contexts.env import Env
 from cl.runtime.routers.server_util import ServerUtil
 
@@ -43,7 +43,7 @@ class QaClient(TestClient):
         TestClient.__enter__(self)
 
         # Create and activate the application environment
-        self.env = enter_active(Env().build())
+        self.env = make_active(Env().build())
 
         # Return self
         return self
@@ -52,7 +52,7 @@ class QaClient(TestClient):
         """Supports 'with' operator for resource initialization and disposal."""
 
         # Deactivate the application environment
-        exit_active(self.env, exc_type=exc_type, exc_val=exc_val, exc_tb=exc_tb)
+        make_inactive(self.env, exc_type=exc_type, exc_val=exc_val, exc_tb=exc_tb)
 
         # Call '__exit___' method of base last
         TestClient.__exit__(self, exc_type, exc_val, exc_tb)
