@@ -14,8 +14,8 @@
 
 from dataclasses import dataclass
 from getpass import getuser
-from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.settings.app_env import AppEnv
@@ -23,8 +23,11 @@ from cl.runtime.settings.app_settings import AppSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class AppContext(ContextMixin, DataMixin):
+class AppContext(DataMixin):
     """Context for the naming and location of the app data."""
+
+    testing: bool | None = None
+    """True for the root process or worker processes of a test, False when not a test."""
 
     env: AppEnv = required()
     """Determines the default settings for multiuser access and data retention."""
@@ -44,6 +47,11 @@ class AppContext(ContextMixin, DataMixin):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        if self.testing is None:
+            # Can be set here based on detecting the root process of a test because ContextSnapshot
+            # will initialize this field for the worker processes launched by the test
+            self.testing = QaUtil.is_test_root_process()
 
         # Default values are based on settings (which may still be None) if not specified in the context
         app_settings = AppSettings.instance()

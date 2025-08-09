@@ -19,7 +19,7 @@ from typing import Sequence
 from more_itertools import consume
 
 from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.contexts.process_context import ProcessContext
+from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.key_mixin import KeyMixin
@@ -169,7 +169,7 @@ class Db(DbKey, RecordMixin, ABC):
         Drop a database as part of a unit test.
 
         EVERY IMPLEMENTATION OF THIS METHOD MUST FAIL UNLESS THE FOLLOWING CONDITIONS ARE MET:
-        - The method is invoked from a unit test based on active_or_default(ProcessContext).testing
+        - The method is invoked from a unit test based on active_or_default(AppContext).testing
         - db_id starts with db_test_prefix specified in settings.yaml (the default prefix is 'test_')
         """
 
@@ -190,7 +190,7 @@ class Db(DbKey, RecordMixin, ABC):
     @classmethod
     def _get_test_db_name(cls) -> str:  # TODO: Use fixture instead
         """Get SQLite database with name based on test namespace."""
-        if active_or_default(ProcessContext).testing:
+        if active_or_default(AppContext).testing:
             result = f"temp;{QaUtil.get_test_name_from_call_stack().replace('.', ';')}"
             return result
         else:
@@ -209,7 +209,7 @@ class Db(DbKey, RecordMixin, ABC):
 
         # Get DB identifier if not specified
         if db_id is None:
-            if not active_or_default(ProcessContext).testing:
+            if not active_or_default(AppContext).testing:
                 db_id = db_settings.db_id
             else:
                 raise RuntimeError("Use pytest fixtures to create temporary DBs inside tests.")
@@ -220,7 +220,7 @@ class Db(DbKey, RecordMixin, ABC):
 
     def check_drop_test_db_preconditions(self) -> None:
         """Error if db_id does not start from db_test_prefix specified in settings.yaml (defaults to 'test_')."""
-        if not active_or_default(ProcessContext).testing:
+        if not active_or_default(AppContext).testing:
             raise RuntimeError(f"Cannot drop a unit test DB when not invoked from a running unit test.")
 
         db_settings = DbSettings.instance()

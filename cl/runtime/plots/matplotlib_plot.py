@@ -21,7 +21,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 from cl.runtime.backend.core.ui_app_state import UiAppState
 from cl.runtime.contexts.context_manager import active, active_or_default
-from cl.runtime.contexts.process_context import ProcessContext
+from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.plots.plot import Plot
 from cl.runtime.qa.qa_util import QaUtil
@@ -94,7 +94,7 @@ class MatplotlibPlot(Plot, ABC):
     @classmethod
     def is_dark_theme(cls) -> bool:
         """True if dark UI theme when invoked from a process, and False inside tests."""
-        if active_or_default(ProcessContext).testing:
+        if active_or_default(AppContext).testing:
             result = False
         else:
             result = UiAppState.get_current_user_app_theme() == "Dark"  # TODO: Move to PlotSettings

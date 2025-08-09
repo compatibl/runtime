@@ -15,7 +15,7 @@
 import pytest
 
 from cl.runtime.contexts.context_manager import activate, active, active_or_none
-from cl.runtime.contexts.process_context import ProcessContext
+from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.settings.app_settings import AppSettings
 
 app_settings = AppSettings.instance()
@@ -24,10 +24,10 @@ app_settings = AppSettings.instance()
 def test_process_context():
     """Smoke test."""
 
-    assert active_or_none(ProcessContext) is None
-    with activate(ProcessContext().build()):
+    assert active_or_none(AppContext) is None
+    with activate(AppContext().build()):
         pass
-        # TODO: assert active(ProcessContext).env_name == "test_process_context"
+        # TODO: assert active(AppContext).env_name == "test_process_context"
 
 
 if __name__ == "__main__":

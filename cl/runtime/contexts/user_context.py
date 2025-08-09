@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from getpass import getuser
 from typing import Dict
 from cl.runtime.backend.core.user_key import UserKey
-from cl.runtime.contexts.process_context import ProcessContext
+from cl.runtime.contexts.app_context import AppContext
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
