@@ -18,8 +18,8 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.settings.env_type import EnvType
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.env_type import EnvType
 
 
 @dataclass(slots=True, kw_only=True)
@@ -94,9 +94,7 @@ class Env(DataMixin):
     def is_user_scoped(cls) -> bool:
         """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
         user_scoped = (
-            context.user_scoped
-            if (context := cls.current_or_none()) is not None
-            else EnvSettings.instance().env_shared
+            context.user_scoped if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_shared
         )
         if user_scoped is not None:
             return user_scoped

@@ -19,8 +19,6 @@ from typing_extensions import final
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_sequence
-from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.settings.env_type import EnvType
 from cl.runtime.settings.settings import Settings
 from cl.runtime.settings.settings_util import SettingsUtil

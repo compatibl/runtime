@@ -14,15 +14,16 @@
 
 from typing import Any
 from typing import cast
-from cl.runtime.records.protocols import is_primitive, TEnum
+from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.protocols import TEnum
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.primitive.case_util import CaseUtil
 
 
 class SettingsUtil:
     """Helper methods for Dynaconf settings."""
-    
+
     @classmethod
     def to_enum(
         cls,
@@ -45,7 +46,7 @@ class SettingsUtil:
             )
         else:
             raise RuntimeError(f"Required {cls._what(field_name, settings_type)} is empty.")
-        
+
     @classmethod
     def to_enum_or_none(
         cls,
@@ -69,8 +70,10 @@ class SettingsUtil:
         elif CaseUtil.is_snake_case(value):
             upper_case_value = CaseUtil.snake_to_upper_case(value)
         else:
-            raise RuntimeError(f"Value '{value}' for {cls._what(field_name, settings_type)}\n"
-                               f"must be UPPER_CASE, PascalCase, or snake_case.")
+            raise RuntimeError(
+                f"Value '{value}' for {cls._what(field_name, settings_type)}\n"
+                f"must be UPPER_CASE, PascalCase, or snake_case."
+            )
 
         # Check if the converted value is in the enum
         if upper_case_value in enum_type.__members__:
@@ -139,9 +142,9 @@ class SettingsUtil:
     @classmethod
     def parse_comma_delimited_string(cls, value: str) -> tuple[str, ...]:
         # Remove square brackets if present
-        value = value.strip().strip('[]')
+        value = value.strip().strip("[]")
         # Split by commas and strip whitespace from each value
-        return tuple(item.strip() for item in value.split(',') if item.strip())
+        return tuple(item.strip() for item in value.split(",") if item.strip())
 
     @classmethod
     def _what(cls, field_name: str | None, settings_type: type | None) -> str:

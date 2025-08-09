@@ -13,15 +13,16 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.settings.env_type import EnvType
 from cl.runtime.settings.settings_util import SettingsUtil
+
 
 def test_to_enum():
     """Test SettingsUtil.to_str_tuple method."""
     assert SettingsUtil.to_enum("PROD", enum_type=EnvType) == EnvType.PROD
     with pytest.raises(RuntimeError):
         SettingsUtil.to_enum(None, enum_type=EnvType)
+
 
 def test_to_enum_or_none():
     """Test SettingsUtil.to_str_tuple method."""
@@ -33,6 +34,7 @@ def test_to_enum_or_none():
     with pytest.raises(RuntimeError):
         SettingsUtil.to_enum("UNKNOWN", enum_type=EnvType)
 
+
 def test_to_str_tuple():
     """Test SettingsUtil.to_str_tuple method."""
     assert SettingsUtil.to_str_tuple_or_none("a") == ("a",)
@@ -40,6 +42,7 @@ def test_to_str_tuple():
         SettingsUtil.to_str_tuple(None)
     with pytest.raises(RuntimeError):
         SettingsUtil.to_str_tuple([])
+
 
 def test_to_str_tuple_or_none():
     """Test SettingsUtil.to_str_tuple_or_none method."""
