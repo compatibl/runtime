@@ -32,5 +32,5 @@ class QaSettings(Settings):
         self.qa_db_types = SettingsUtil.to_str_tuple(
             self.qa_db_types,
             field_name="qa_db_types",
-            type_name=TypeUtil.name(self),
+            settings_type=type(self),
         )

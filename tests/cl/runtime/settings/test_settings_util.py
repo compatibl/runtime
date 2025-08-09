@@ -13,12 +13,36 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime.settings.env_type import EnvType
 from cl.runtime.settings.settings_util import SettingsUtil
 
+def test_to_enum():
+    """Test SettingsUtil.to_str_tuple method."""
+    assert SettingsUtil.to_enum("PROD", enum_type=EnvType) == EnvType.PROD
+    with pytest.raises(RuntimeError):
+        SettingsUtil.to_enum(None, enum_type=EnvType)
+
+def test_to_enum_or_none():
+    """Test SettingsUtil.to_str_tuple method."""
+    assert SettingsUtil.to_enum_or_none(None, enum_type=EnvType) is None
+    assert SettingsUtil.to_enum_or_none("", enum_type=EnvType) is None
+    assert SettingsUtil.to_enum_or_none("PROD", enum_type=EnvType) == EnvType.PROD
+    assert SettingsUtil.to_enum_or_none("Prod", enum_type=EnvType) == EnvType.PROD
+    assert SettingsUtil.to_enum_or_none("prod", enum_type=EnvType) == EnvType.PROD
+    with pytest.raises(RuntimeError):
+        SettingsUtil.to_enum("UNKNOWN", enum_type=EnvType)
+
+def test_to_str_tuple():
+    """Test SettingsUtil.to_str_tuple method."""
+    assert SettingsUtil.to_str_tuple_or_none("a") == ("a",)
+    with pytest.raises(RuntimeError):
+        SettingsUtil.to_str_tuple(None)
+    with pytest.raises(RuntimeError):
+        SettingsUtil.to_str_tuple([])
 
 def test_to_str_tuple_or_none():
     """Test SettingsUtil.to_str_tuple_or_none method."""
-
     assert SettingsUtil.to_str_tuple_or_none(None) is None
     assert SettingsUtil.to_str_tuple_or_none([]) is None
     assert SettingsUtil.to_str_tuple_or_none("a") == ("a",)
@@ -27,15 +51,6 @@ def test_to_str_tuple_or_none():
     assert SettingsUtil.to_str_tuple_or_none("a,b,c") == ("a", "b", "c")
     assert SettingsUtil.to_str_tuple_or_none("a, b, c") == ("a", "b", "c")
     assert SettingsUtil.to_str_tuple_or_none("[a, b, c]") == ("a", "b", "c")
-
-
-def test_to_str_tuple():
-    """Test SettingsUtil.to_str_tuple method."""
-
-    with pytest.raises(RuntimeError):
-        SettingsUtil.to_str_tuple(None)
-    with pytest.raises(RuntimeError):
-        SettingsUtil.to_str_tuple([])
 
 
 if __name__ == "__main__":
