@@ -18,7 +18,6 @@ from typing import Tuple
 from typing_extensions import Self
 
 from cl.runtime.contexts.context_manager import active_or_none
-from cl.runtime.contexts.context_mixin import ContextMixin
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
