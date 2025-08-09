@@ -23,7 +23,7 @@ from cl.runtime.settings.env_settings import EnvSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class EnvContext(DataMixin):
+class Env(DataMixin):
     """Context for the naming and location of the app data."""
 
     testing: bool | None = None
@@ -43,7 +43,7 @@ class EnvContext(DataMixin):
 
     @classmethod
     def get_base_type(cls) -> type:
-        return EnvContext
+        return Env
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

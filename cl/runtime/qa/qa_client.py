@@ -15,16 +15,16 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from typing_extensions import Self
-from cl.runtime.contexts.env import EnvContext
+from cl.runtime.contexts.env import Env
 from cl.runtime.contexts.context_manager import enter_active
 from cl.runtime.contexts.context_manager import exit_active
 from cl.runtime.routers.server_util import ServerUtil
 
 
 class QaClient(TestClient):
-    """Creates FastAPI TestClient and enters into EnvContext."""
+    """Creates FastAPI TestClient and enters into Env."""
 
-    process_context: EnvContext
+    process_context: Env
     """Process context is used to pass the information to out-of-process subtasks."""
 
     def __init__(self):
@@ -42,8 +42,8 @@ class QaClient(TestClient):
         # Call '__enter__' method of base first
         TestClient.__enter__(self)
 
-        # Create and activate EnvContext
-        self.process_context = enter_active(EnvContext().build())
+        # Create and activate Env
+        self.process_context = enter_active(Env().build())
 
         # Return self
         return self
@@ -51,7 +51,7 @@ class QaClient(TestClient):
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
         """Supports 'with' operator for resource initialization and disposal."""
 
-        # Deactivate EnvContext
+        # Deactivate Env
         exit_active(self.process_context, exc_type=exc_type, exc_val=exc_val, exc_tb=exc_tb)
 
         # Call '__exit___' method of base last

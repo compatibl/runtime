@@ -14,14 +14,14 @@
 
 from starlette.types import ASGIApp
 from cl.runtime import Db
-from cl.runtime.contexts.env import EnvContext
+from cl.runtime.contexts.env import Env
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.db.data_source import DataSource
 
 
 class ContextMiddleware:
-    """Middleware to wrap EnvContext around the implementation."""
+    """Middleware to wrap Env around the implementation."""
 
     def __init__(self, app: ASGIApp):
         self.app = app
@@ -34,7 +34,7 @@ class ContextMiddleware:
         # Set ContextVar=None before async task execution, get a token for restoring its previous state
         token = ContextSnapshot.save_and_clear_state()
         try:
-            with activate(EnvContext().build()):
+            with activate(Env().build()):
                 with activate(DataSource(db=Db.create()).build()):
                     # TODO: Create a test setting to enable this other than by uncommenting
                     # await asyncio.sleep(duration)
