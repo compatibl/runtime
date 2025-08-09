@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.records.for_dataclasses.extensions import required

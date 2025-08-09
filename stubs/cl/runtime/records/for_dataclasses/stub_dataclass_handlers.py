@@ -18,8 +18,7 @@ import time
 from dataclasses import dataclass
 from logging import getLogger
 from uuid import UUID
-
-from cl.runtime.contexts.context_manager import active, active_or_default
+from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
@@ -215,13 +214,17 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     def run_instance_method_with_binary_param(self, pdf_file: FileData, note_param: str):
         """Stub method."""
         _log_method_info()
-        active_or_default(LogContext).get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
+        active_or_default(LogContext).get_logger(module_name=__name__).info(
+            f"Binary_data len={len(pdf_file.file_bytes)}"
+        )
 
     @staticmethod
     def run_class_method_with_binary_param(pdf_file: FileData):
         """Stub method."""
         _log_method_info()
-        active_or_default(LogContext).get_logger(module_name=__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
+        active_or_default(LogContext).get_logger(module_name=__name__).info(
+            f"Binary_data len={len(pdf_file.file_bytes)}"
+        )
 
     def run_long_handler_with_error(self):
         _logger = getLogger(__name__)

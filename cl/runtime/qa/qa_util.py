@@ -16,9 +16,7 @@ import fnmatch
 import inspect
 import os
 import sys
-
 from memoization import cached
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.type_util import TypeUtil
 

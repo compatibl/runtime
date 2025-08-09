@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from typing import Iterable
 from typing import Tuple
 from typing_extensions import Self
-
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.data_mixin import DataMixin

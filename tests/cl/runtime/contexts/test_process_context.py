@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import pytest
-
-from cl.runtime.contexts.context_manager import activate, active, active_or_none
 from cl.runtime.contexts.app_context import AppContext
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.settings.app_settings import AppSettings
 
 app_settings = AppSettings.instance()

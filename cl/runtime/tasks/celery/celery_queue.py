@@ -21,9 +21,10 @@ from typing import Final
 from typing import List
 from celery import Celery
 from celery.signals import setup_logging
-from cl.runtime.contexts.context_manager import active, activate
-from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.contexts.app_context import AppContext
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.log_config import celery_empty_logging_config
 from cl.runtime.log.log_config import logging_config

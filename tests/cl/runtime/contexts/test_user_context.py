@@ -19,7 +19,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import rsa
-
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.contexts.user_context import UserContext
 

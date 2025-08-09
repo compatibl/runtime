@@ -17,7 +17,9 @@ import time
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from cl.runtime.contexts.context_manager import active, active_or_default, activate
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.contexts.log_context import LogContext
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.datetime_util import DatetimeUtil

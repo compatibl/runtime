@@ -19,9 +19,9 @@ from typing import List
 from typing import Sequence
 from typing_extensions import Self
 from cl.runtime.contexts.context_manager import _STACK_DICT_VAR
+from cl.runtime.contexts.context_manager import active_contexts
 from cl.runtime.contexts.context_manager import enter_active_and_return_stack
 from cl.runtime.contexts.context_manager import exit_active
-from cl.runtime.contexts.context_manager import active_contexts
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.serializers.data_serializers import DataSerializers
 

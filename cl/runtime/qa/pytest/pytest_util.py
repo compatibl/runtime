@@ -15,7 +15,6 @@
 import pytest
 from typing import Any
 from typing import Iterable
-from typing import Literal
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES

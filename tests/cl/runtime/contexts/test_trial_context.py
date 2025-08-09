@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.trial_context import TrialContext
 from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.trial_context import TrialContext
 from stubs.cl.runtime import StubDataclass
 
 

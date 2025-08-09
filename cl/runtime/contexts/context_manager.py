@@ -15,7 +15,8 @@
 from collections import defaultdict
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import DefaultDict, Any, Generator
+from typing import Any
+from typing import DefaultDict
 from typing import List
 from typing import Optional
 from typing import Type
@@ -86,12 +87,12 @@ def enter_active(context: TRecord) -> TRecord:
 
 
 def exit_active(
-        context: TRecord,
-        *,
-        exc_type: Any = None,
-        exc_val: Any = None,
-        exc_tb: Any = None,
-        expected_stack: List[RecordProtocol] | None = None,
+    context: TRecord,
+    *,
+    exc_type: Any = None,
+    exc_val: Any = None,
+    exc_tb: Any = None,
+    expected_stack: List[RecordProtocol] | None = None,
 ) -> None:
     """
     Exit and revert to the previous active context, do not invoke this method explicitly if activation was performed
@@ -150,21 +151,12 @@ def activate(context: TRecord):
     except Exception as exc:
         # If the code inside 'with activate(context)' raises an exception, remove context from the stack
         # and pass exception details to context.__exit__ if it is implemented
-        exit_active(
-            context,
-            exc_type=type(exc),
-            exc_val=exc,
-            exc_tb=exc.__traceback__,
-            expected_stack=context_stack
-        )
+        exit_active(context, exc_type=type(exc), exc_val=exc, exc_tb=exc.__traceback__, expected_stack=context_stack)
         # Rethrow
         raise exc
     else:
         # Remove context from the stack
-        exit_active(
-            context,
-            expected_stack=context_stack
-        )
+        exit_active(context, expected_stack=context_stack)
 
 
 def active(context_type: type[TRecord]) -> TRecord:

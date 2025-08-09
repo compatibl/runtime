@@ -13,8 +13,7 @@
 # limitations under the License.
 
 import pytest
-
-from cl.runtime.contexts.context_manager import active, active_or_default
+from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.contexts.log_context import LogContext
 
 
