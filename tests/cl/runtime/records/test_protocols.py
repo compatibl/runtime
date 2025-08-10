@@ -29,39 +29,35 @@ from stubs.cl.runtime import StubDataclassKey
 def test_functions():
     """Test functions defined in the protocols module."""
 
-    # Classes
-    key_mixin_class = KeyMixin
-    non_data_class = RecordUtil
-    data_class = StubDataclassData
-    key_class = StubDataclassKey
-    record_class = StubDataclass
-    derived_class = StubDataclassDerived
-
     # Class groups
     all_classes = (
-        key_mixin_class,
-        non_data_class,
-        data_class,
-        key_class,
-        record_class,
-        derived_class,
+        KeyMixin,
+        RecordUtil,
+        StubDataclassData,
+        StubDataclassKey,
+        StubDataclass,
+        StubDataclassDerived,
     )
-    abstract_classes = (key_mixin_class,)
+    abstract_classes = (
+        KeyMixin,
+    )
     data_classes = (
-        data_class,
-        key_class,
-        record_class,
-        derived_class,
+        StubDataclassData,
+        StubDataclassKey,
+        StubDataclass,
+        StubDataclassDerived,
     )
     key_or_record_classes = (
-        key_class,
-        record_class,
-        derived_class,
+        StubDataclassKey,
+        StubDataclass,
+        StubDataclassDerived,
     )
-    key_classes = (key_class,)
+    key_classes = (
+        StubDataclassKey,
+    )
     record_classes = (
-        record_class,
-        derived_class,
+        StubDataclass,
+        StubDataclassDerived,
     )
 
     # Test is_abstract
