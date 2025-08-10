@@ -25,7 +25,7 @@ from typing import Sequence
 from typing import Tuple
 from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -39,7 +39,7 @@ from cl.runtime.settings.project_settings import ProjectSettings
 
 def is_schema_type(class_: type) -> bool:
     """Return true if the type should be included in schema, includes data classes and enums."""
-    return isclass(class_) and (is_data(class_) or is_enum(class_)) and not class_.__name__.endswith("Mixin")
+    return isclass(class_) and (is_data_key_or_record(class_) or is_enum(class_)) and not class_.__name__.endswith("Mixin")
 
 
 _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildNames")
@@ -315,7 +315,7 @@ class TypeCache:
             return TypeKind.KEY
         elif is_record(class_):
             return TypeKind.RECORD
-        elif is_data(class_):
+        elif is_data_key_or_record(class_):
             return TypeKind.DATA
         else:
             # Return None if not a framework class
@@ -340,7 +340,7 @@ class TypeCache:
     def _build_child_names(cls, class_: type) -> Tuple[str, ...]:
         """Return a tuple subclasses (inclusive of self) that match the predicate, sorted by type name."""
         # This must run after all classes are loaded
-        subclasses = [TypeUtil.name(class_)] if is_data(class_) else []  # Include self in subclasses
+        subclasses = [TypeUtil.name(class_)] if is_data_key_or_record(class_) else []  # Include self in subclasses
         for subclass in class_.__subclasses__():
             # Exclude self from subclasses
             if subclass is not class_:
@@ -355,7 +355,7 @@ class TypeCache:
     def _build_parent_names(cls, class_: type) -> Tuple[str, ...]:
         """Return a tuple superclasses (inclusive of self) that match the predicate, not cached."""
         # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
-        return tuple(sorted(set(TypeUtil.name(x) for x in class_.mro() if is_data(x))))
+        return tuple(sorted(set(TypeUtil.name(x) for x in class_.mro() if is_data_key_or_record(x))))
 
     @classmethod
     def _add_class(cls, class_: type, *, subtype: str | None = None) -> None:
@@ -388,7 +388,7 @@ class TypeCache:
         qual_name = cls.get_qual_name_from_class(class_)
 
         # Get parent and child class names for data, keys or records
-        if is_data(class_):
+        if is_data_key_or_record(class_):
             # Build parent and child name lists
             parent_names = cls._build_parent_names(class_)
             child_names = cls._build_child_names(class_)

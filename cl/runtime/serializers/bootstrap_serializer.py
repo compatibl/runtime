@@ -35,7 +35,7 @@ from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_hint import TypeHint
@@ -271,7 +271,7 @@ class BootstrapSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormat)
 
-        elif is_data(data):
+        elif is_data_key_or_record(data):
 
             # Use key serializer for key types
             if is_key(data):

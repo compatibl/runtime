@@ -21,7 +21,7 @@ from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
@@ -84,7 +84,7 @@ class BuildUtil:
         elif is_enum(data):
             type_hint.validate_for_enum()
             return data
-        elif is_data(data):
+        elif is_data_key_or_record(data):
 
             # Has slots, process as data, key or record
             if data.is_frozen():

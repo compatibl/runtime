@@ -226,7 +226,7 @@ def is_abstract(instance_or_type: Any) -> bool:
     return bool(getattr(type_, "__abstractmethods__", None))
 
 
-def is_data(instance_or_type: Any) -> TypeGuard[TData]:  # TODO: Rename to is_data_key_or_record
+def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[TData]:
     """
     True if the argument has 'build' method and is not a mixin (includes data, keys and records).
     Excludes classes whose name starts from underscore.

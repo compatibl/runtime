@@ -18,7 +18,7 @@ from cl.runtime import RecordMixin
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_abstract
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
@@ -79,9 +79,11 @@ def test_functions():
 
     # Test is_data
     for class_ in all_classes:
-        assert is_data(class_) == (class_ in data_classes), f"{class_} is not a data class"
+        assert is_data_key_or_record(class_) == (class_ in data_classes), f"{class_} is not a data, key or record class"
         if class_ not in abstract_classes:
-            assert is_data(class_()) == (class_ in data_classes), f"{class_} is not a data class instance"
+            assert is_data_key_or_record(class_()) == (
+                class_ in data_classes
+            ), f"{class_} is not a data, key or record class instance"
 
     # Test is_key_or_record
     for class_ in all_classes:

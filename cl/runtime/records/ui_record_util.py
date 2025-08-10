@@ -22,7 +22,7 @@ from cl.runtime import View
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.type_util import TypeUtil
@@ -193,7 +193,7 @@ class UiRecordUtil(DataMixin):
             return KeyView(view_for=view_for, view_name=view_name, key=viewer_result)
 
         # If the result is a Record, convert it to a RecordView.
-        elif is_data(viewer_result):
+        elif is_data_key_or_record(viewer_result):
             return RecordView(view_for=view_for, view_name=view_name, record=viewer_result)
 
         # If the result is a list of keys or list of records, convert it to an appropriate View.

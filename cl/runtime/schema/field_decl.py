@@ -21,7 +21,7 @@ from typing_extensions import Self
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -226,7 +226,7 @@ class FieldDecl(DataMixin):
             elif is_record(field_type):
                 # Field is a record (excludes keys)
                 result.field_kind = TypeKind.RECORD
-            elif is_data(field_type):
+            elif is_data_key_or_record(field_type):
                 # Field is a slotted data type (excludes keys and records)
                 result.field_kind = TypeKind.DATA
             else:

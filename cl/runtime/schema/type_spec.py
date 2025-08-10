@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from typing_extensions import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -59,7 +59,7 @@ class TypeSpec(BootstrapMixin, ABC):
             self.type_kind = TypeKind.KEY
         elif is_record(self._class):
             self.type_kind = TypeKind.RECORD
-        elif is_data(self._class):
+        elif is_data_key_or_record(self._class):
             self.type_kind = TypeKind.DATA
         else:
             # This should not happen because this method is only invoked for data types, but just in case

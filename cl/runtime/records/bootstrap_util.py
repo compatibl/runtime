@@ -18,7 +18,7 @@ from frozendict import frozendict
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -50,7 +50,7 @@ class BootstrapUtil:
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Convert a mapping type to frozendict after applying build to each item
             return frozendict((k, cls.build(v)) for k, v in data.items())
-        elif is_data(data):
+        elif is_data_key_or_record(data):
             # Has slots, process as data, key or record
             if data.is_frozen():
                 # Pass through if already frozen to prevent repeat initialization of shared instances

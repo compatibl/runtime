@@ -26,7 +26,7 @@ from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_AND_MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_util import TypeUtil
@@ -138,7 +138,7 @@ class DataSerializer(Serializer):
                 for dict_key, dict_value in data.items()
                 if not DataUtil.is_empty(dict_value)
             )  # TODO: Replace by frozendict
-        elif is_data(data):
+        elif is_data_key_or_record(data):
             # Use key serializer for key types if specified
             if self.key_serializer is not None and is_key(data):
                 return self.key_serializer.serialize(data, type_hint)
@@ -152,7 +152,7 @@ class DataSerializer(Serializer):
                 # If schema type is specified, ensure that data is an instance of the specified type
                 schema_type_spec = TypeSchema.for_type_name(schema_type_name)
                 schema_type_name = schema_type_spec.type_name
-                if not is_data(schema_class := schema_type_spec.get_class()):
+                if not is_data_key_or_record(schema_class := schema_type_spec.get_class()):
                     raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
                 if not isinstance(data, schema_class):
                     raise RuntimeError(
@@ -325,7 +325,7 @@ class DataSerializer(Serializer):
                 else:
                     # Otherwise use key serializer to deserialize
                     return self.key_serializer.deserialize(data, type_hint)
-            elif self.inner_encoder is not None and is_data(schema_class):
+            elif self.inner_encoder is not None and is_data_key_or_record(schema_class):
                 # Deserialize using inner_serializer and inner_encoder if provided, otherwise use self
                 return self._deserialize_inner(data, type_hint)
             elif is_enum(schema_class):
