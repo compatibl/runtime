@@ -26,10 +26,20 @@ class TypeKind(IntEnum):
     """Enum type (must be derived from IntEnum), is_enum returns True."""
 
     DATA = auto()
-    """Data type other than key or record, is_data returns True, is_key and is_record return False."""
+    """Data type (excludes keys and records), is_data returns True."""
 
     KEY = auto()
-    """Key type (excludes records), is_key returns True."""
+    """Key type (excludes records even if they are derived from key), is_key returns True."""
 
     RECORD = auto()
-    """Record type (excludes keys), is_record returns True."""
+    """Record type, is_record returns True."""
+
+    MIXIN = auto()
+    """Abstract mixin type (excludes classes derived from the mixin), is_mixin returns True."""
+
+    PROTOCOL = auto()
+    """Abstract protocol type (excludes classes implementing the protocol), is_protocol returns True."""
+
+    ANY = auto()
+    """Any type (includes all other types), is_any returns True."""
+

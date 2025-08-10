@@ -223,7 +223,7 @@ def is_abstract(instance_or_type: Any) -> bool:
     """True if the argument is an abstract class or a mixin (even if the mixin is not formally abstract)."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     # Mixin classes are treated as abstract even if they are not formally abstract
-    return bool(getattr(type_, "__abstractmethods__", None)) or type_.__name__.endswith("Mixin")
+    return bool(getattr(type_, "__abstractmethods__", None))
 
 
 def is_data(instance_or_type: Any) -> TypeGuard[TData]:  # TODO: Rename to is_data_key_or_record
@@ -232,7 +232,7 @@ def is_data(instance_or_type: Any) -> TypeGuard[TData]:  # TODO: Rename to is_da
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "build") and not type_.__name__.startswith("_") and not type_.__name__.endswith("Mixin")
+    return hasattr(type_, "build") and not type_.__name__.startswith("_")
 
 
 def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
@@ -242,7 +242,7 @@ def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return (
-        hasattr(type_, "get_key_type") and not type_.__name__.startswith("_") and not type_.__name__.endswith("Mixin")
+        hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
     )
 
 
@@ -256,17 +256,16 @@ def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
         hasattr(type_, "get_key_type")
         and not type_.__name__.startswith("_")
         and not hasattr(type_, "get_key")
-        and not is_abstract(type_)
     )
 
 
 def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
     """
-    Return True if the argument has 'get_key' method and is not a mixin.
+    Return True if the argument has 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_key") and not type_.__name__.startswith("_") and not type_.__name__.endswith("Mixin")
+    return hasattr(type_, "get_key") and not type_.__name__.startswith("_")
 
 
 def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere and review logic

@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import pytest
+
+from cl.runtime import RecordMixin
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_data
@@ -31,8 +34,10 @@ def test_functions():
 
     # Class groups
     all_classes = (
-        KeyMixin,
         RecordUtil,
+        DataMixin,
+        KeyMixin,
+        RecordMixin,
         StubDataclassData,
         StubDataclassKey,
         StubDataclass,
@@ -40,22 +45,30 @@ def test_functions():
     )
     abstract_classes = (
         KeyMixin,
+        RecordMixin,
     )
     data_classes = (
+        DataMixin,
+        KeyMixin,
+        RecordMixin,
         StubDataclassData,
         StubDataclassKey,
         StubDataclass,
         StubDataclassDerived,
     )
     key_or_record_classes = (
+        KeyMixin,
+        RecordMixin,
         StubDataclassKey,
         StubDataclass,
         StubDataclassDerived,
     )
     key_classes = (
+        KeyMixin,
         StubDataclassKey,
     )
     record_classes = (
+        RecordMixin,
         StubDataclass,
         StubDataclassDerived,
     )

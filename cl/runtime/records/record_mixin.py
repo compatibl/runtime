@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-class RecordMixin:
+class RecordMixin(KeyMixin, ABC):
     """Mixin for a non-partitioned record, derive MyRecord from MyRecord(MyKey, RecordMixin)."""
 
     __slots__ = ()
