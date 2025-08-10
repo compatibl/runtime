@@ -47,7 +47,7 @@ def test_method(celery_queue_fixture):
     task_key = _create_task(queue.get_key())
 
     # Call 'execute_task' method in-process
-    context_snapshot_data = ContextSnapshot.serialize_current_contexts()
+    context_snapshot_data = ContextSnapshot.to_json()
     execute_task(
         task_key.task_id,
         context_snapshot_data,

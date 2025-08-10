@@ -67,12 +67,12 @@ def config_loggers(*args, **kwargs):
 @celery_app.task(max_retries=0)  # Do not retry failed tasks
 def execute_task(
     task_id: str,
-    context_snapshot_data: List[TDataDict],
+    context_snapshot_json: str,
 ) -> None:
     """Invoke 'run_task' method of the specified task."""
 
     # Deserialize context from 'context_data' parameter to run with the same settings as the caller context
-    with ContextSnapshot(context_snapshot_data):
+    with ContextSnapshot.from_json(context_snapshot_json):
 
         # Load and run the task
         task_key = TaskKey(task_id=task_id).build()
@@ -146,12 +146,12 @@ class CeleryQueue(TaskQueue):
         with activate(Env().build()):
 
             # Get and serialize current context
-            context_snapshot_data = ContextSnapshot.serialize_current_contexts()
+            context_snapshot_json = ContextSnapshot.capture_active().to_json()
 
             # Pass parameters to the Celery task signature
             execute_task_signature = execute_task.s(
                 task.task_id,
-                context_snapshot_data,
+                context_snapshot_json,
             )
 
             # Submit task to Celery with completed and error links

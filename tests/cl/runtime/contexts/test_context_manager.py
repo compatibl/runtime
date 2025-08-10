@@ -78,7 +78,7 @@ def _perform_testing(
     # Ensure current context is not leaked outside 'with' clauses after the test
     assert active_or_none(StubContext) is None
 
-    with pytest.raises(RuntimeError, match="is invoked outside"):
+    with pytest.raises(RuntimeError, match="invoked outside"):
         # Ensure calling active(...) outside 'with' clause raises
         active(StubContext)
 
@@ -122,19 +122,16 @@ async def _perform_testing_async(
     # Ensure current context is not leaked outside 'with' clauses after the test
     assert active_or_none(StubContext) is None
 
-    with pytest.raises(RuntimeError, match="is invoked outside"):
+    with pytest.raises(RuntimeError, match="invoked outside"):
         # Ensure calling active(...) outside 'with' clause raises
         active(StubContext)
 
 
-async def _gather(rnd: Random):
+async def _gather(context_snapshot_json: str, rnd: Random):
     """Gather async functions."""
-    token = ContextSnapshot.save_and_clear_state()
-    try:
+    with ContextSnapshot.from_json(context_snapshot_json):
         tasks = [_perform_testing_async(task_index=i, rnd=rnd) for i in range(TASK_COUNT)]
         await asyncio.gather(*tasks)
-    finally:
-        ContextSnapshot.restore_state(token)
 
 
 # TODO: Restore after creating the standard way to init context classes
@@ -237,17 +234,14 @@ def test_in_threads():
 def test_in_async_loop():
     """Test in different async environments."""
 
-    # Save previous state of context stack before async method execution
-    token = ContextSnapshot.save_and_clear_state()
-    try:
-        # Create a local random instance with seed
-        rnd = Random(0)
+    # Capture active contexts and serialize to JSON
+    context_snapshot_json = ContextSnapshot().capture_active().to_json()
 
-        # Run using cooperative multitasking (asyncio)
-        asyncio.run(_gather(rnd))
-    finally:
-        # Restore previous state of context stack after async method execution even if an exception occurred
-        ContextSnapshot.restore_state(token)
+    # Create a local random instance with seed
+    rnd = Random(0)
+
+    # Run using cooperative multitasking (asyncio)
+    asyncio.run(_gather(context_snapshot_json, rnd))
 
 
 if __name__ == "__main__":

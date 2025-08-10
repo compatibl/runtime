@@ -14,7 +14,7 @@
 
 import pytest
 from typing import List
-from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import activate, get_active_contexts_and_ids
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.contexts.trial_context import TrialContext
@@ -26,38 +26,46 @@ def _perform_serialization_test(contexts: List[RecordProtocol]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Serialize current contexts into data and then deserialize data into a ContextSnapshot instance
-    serialized_data = ContextSnapshot.serialize_current_contexts()
-    deserialized_context_snapshot = ContextSnapshot(serialized_data)
+    original = ContextSnapshot.capture_active()
+    json_str = original.to_json()
+    deserialized = ContextSnapshot.from_json(json_str)
 
-    # Ensure the deserialized list is identical to the argument
-    if not contexts:
-        assert not deserialized_context_snapshot._active_contexts  # noqa
-    else:
-        assert len(contexts) == len(deserialized_context_snapshot._active_contexts)  # noqa
-
-        # Check that the contexts passed match the contexts in ContextSnapshot regardless of order.
-        not_in_contexts = [ctx for ctx in contexts if ctx not in deserialized_context_snapshot._active_contexts]  # noqa
+    # Check that the contexts passed to this method match captured contexts
+    # after serialization roundtrip regardless of order
+    if contexts:
+        not_in_contexts = [ctx for ctx in contexts if ctx not in deserialized.contexts]
         assert len(not_in_contexts) == 0
+    else:
+        assert not deserialized.contexts
 
 
 def _perform_manager_test(contexts: List[RecordProtocol]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
-    # Set ContextVar=None before async task execution, get a token for restoring its previous state
-    token = ContextSnapshot.save_and_clear_state()
+    # Capture active contexts before
+    before = ContextSnapshot.capture_active()
 
-    try:
-        # Serialize current contexts into data and then deserialize data into a ContextSnapshot instance
-        serialized_data = ContextSnapshot._serialize_contexts(contexts)  # noqa
-        with ContextSnapshot(serialized_data):
-            if contexts:
-                for context in contexts:
-                    current_context = active_or_none(type(context))
-                    assert context == current_context
-    finally:
-        # Restore ContextVar to its previous state after async task execution using a token
-        # from 'save_and_clear_state' whether or not an exception occurred
-        ContextSnapshot.restore_state(token)
+    # Serialize current contexts into data and then deserialize data into a ContextSnapshot instance
+    json_str = before.to_json()
+    with ContextSnapshot.from_json(json_str):
+        # Check that ContextSnapshot activated the captured contexts on __enter__
+        contexts, context_ids = get_active_contexts_and_ids()
+        if before.contexts:
+            for context, context_id in zip(contexts, context_ids):
+                active_context = active_or_none(type(context), context_id)
+                assert context == active_context
+
+    # Capture active contexts after
+    after = ContextSnapshot.capture_active()
+
+    # Check that the state was restored correctly
+    if before.contexts is not None:
+        assert len(before.contexts) == len(after.contexts)
+        assert len([ctx for ctx in before.contexts if ctx not in after.contexts]) == 0
+    else:
+        assert after.contexts is None
+
+
 
 
 def test_context_snapshot():

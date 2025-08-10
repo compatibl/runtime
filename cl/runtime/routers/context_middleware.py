@@ -31,18 +31,16 @@ class ContextMiddleware:
         # duration = random.uniform(0, 10)
         # print(f"Before request processing: {duration}")
 
-        # Set ContextVar=None before async task execution, get a token for restoring its previous state
-        token = ContextSnapshot.save_and_clear_state()
-        try:
+        # Capture active contexts on __enter__ to clear the asynchronous environment of any
+        # previously activated contexts, the original state will be restored on __exit__
+        with ContextSnapshot().build():
+
+            # Activate contexts for this call
             with activate(Env().build()):
                 with activate(DataSource(db=Db.create()).build()):
                     # TODO: Create a test setting to enable this other than by uncommenting
                     # await asyncio.sleep(duration)
                     await self.app(scope, receive, send)
-        finally:
-            # Restore ContextVar to its previous state after async task execution using a token
-            # from 'save_and_clear_state' whether or not an exception occurred
-            ContextSnapshot.restore_state(token)
 
         # TODO: Create a test setting to enable this other than by uncommenting
         # print(f"After request processing: {duration}")

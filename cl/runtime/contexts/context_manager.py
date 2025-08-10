@@ -25,7 +25,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.type_util import TypeUtil
 
-_STACK_DICT_VAR: ContextVar[Optional[defaultdict[type, list[RecordProtocol]]]] = ContextVar(
+_STACK_DICT_VAR: ContextVar[Optional[defaultdict[tuple[type, str | None], list[RecordProtocol]]]] = ContextVar(
     "_STACK_DICT_VAR",
     default=None,
 )
@@ -35,8 +35,8 @@ Each asynchronous environment has its own stack dictionary.
 """
 
 
-def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
-    """Get or create stack dictionary for the current asynchronous environment."""
+def _get_or_create_stack_dict() -> defaultdict[tuple[type, str | None], list[RecordProtocol]]:
+    """Get or create stack dictionary for the current asynchronous environment indexed by context key."""
     stack_dict = _STACK_DICT_VAR.get()
     if stack_dict is None:
         stack_dict = defaultdict(list)
@@ -44,14 +44,29 @@ def _get_or_create_stack_dict() -> DefaultDict[Type, List[RecordProtocol]]:
     return stack_dict
 
 
-def _get_or_create_stack(context_type: Type[RecordProtocol]) -> List[RecordProtocol]:
-    """Get or create stack for the key type of the context in the current asynchronous environment."""
-    key_type = context_type.get_base_type()
-    return _get_or_create_stack_dict()[key_type]
+def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | None = None) -> List[RecordProtocol]:
+    """
+    Get or create stack for the (context_key_type, context_id) pair in the current asynchronous environment.
+    
+    Args:
+        context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
+    """
+    key_type_name = TypeUtil.name(context_type.get_base_type())  # TODO: Use key_type
+    return _get_or_create_stack_dict()[(key_type_name, context_id)]
 
 
-def make_active_and_return_stack(context: TRecord) -> List[RecordProtocol]:
-    """Similar to make_active(...) but returns context stack rather than the context."""
+def make_active_and_return_stack(context: TRecord, context_id: str | None = None) -> List[RecordProtocol]:
+    """
+    Similar to make_active(...) but returns context stack rather than the context.
+    
+    Args:
+        context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
+    """
+
+    # Check that the context is frozen, error otherwise
+    context.check_frozen()
 
     # Invoke context.__enter__ method before making the context active if it is implemented
     # If this method raises an exception, the context will not be activated
@@ -61,11 +76,8 @@ def make_active_and_return_stack(context: TRecord) -> List[RecordProtocol]:
         if returned_context is not None and returned_context is not context:
             raise RuntimeError("To use activate(context), context.__enter__() must return self or None.")
 
-    # Check that the context is frozen, error otherwise
-    context.check_frozen()
-
     # Get context stack for the __enter__ method in the current asynchronous environment
-    context_stack = _get_or_create_stack(type(context))
+    context_stack = _get_or_create_stack(type(context), context_id)
 
     # Activate the argument context by appending it to the context stack
     context_stack.append(context)
@@ -74,24 +86,29 @@ def make_active_and_return_stack(context: TRecord) -> List[RecordProtocol]:
     return context_stack
 
 
-def make_active(context: TRecord) -> TRecord:
+def make_active(context: TRecord, context_id: str | None = None) -> TRecord:
     """
     Make context active without automatic deactivation, invokes context.__enter__ if it is implemented.
 
     Notes:
         - If the context is activated by make_active method, it must be explicitly deactivated by make_inactive method
-        - Do not use this method for contexts activated using 'with activate(...)' clause as it is will not
-          automatically deactivate on 'with' clause exit
+        - Do not use this method for 'with' clause as it is will not automatically deactivate on 'with' clause exit,
+          use 'with activate(...)' instead
         - This method invokes context.__enter__ method if present
+    
+    Args:
+        context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
 
-    # Add to the context stack for the context key type in the current asynchronous environment
-    make_active_and_return_stack(context)
+    # Add to the context stack for the (context_key_type, context_id) pair in the current asynchronous environment
+    make_active_and_return_stack(context, context_id)
     return context
 
 
 def make_inactive(
     context: TRecord,
+    context_id: str | None = None,
     *,
     exc_type: Any = None,
     exc_val: Any = None,
@@ -103,12 +120,13 @@ def make_inactive(
 
     Notes:
         - This method must be called explicitly for contexts activated by make_active method
-        - Do not use this method for contexts activated using 'with activate(...)' clause as
-          they will be automatically deactivated on 'with' clause exit
+        - Do not use this method for contexts activated using 'with activate(...)' clause as they will be
+          automatically deactivated on 'with' clause exit and do not require explicit deactivation
         - This method invokes context.__exit__ method if present
-
+    
     Args:
-        context: The context being deactivated.
+        context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
         exc_type: Exception type (None if no exception)
         exc_val: Exception instance (None if no exception)
         exc_tb: The traceback object containing call stack information (None if no exception)
@@ -116,17 +134,19 @@ def make_inactive(
     """
 
     # Get context stack for the __exit__ method in the current asynchronous environment
-    context_stack = _get_or_create_stack(type(context))
+    context_stack = _get_or_create_stack(type(context), context_id)
 
     # Validate stack integrity and restore previous current
     if not context_stack:
         raise RuntimeError(
-            f"Context stack for {TypeUtil.name(context)} has been cleared inside 'with activate(...)' clause."
+            f"Context stack for context type {TypeUtil.name(context)} and context_id={context_id}\n"
+            f"has been cleared inside 'with activate(...)' clause."
         )
     elif expected_stack and context_stack is not expected_stack:
         # Perform this check only if expected_stack is not None
         raise RuntimeError(
-            f"Context stack for {TypeUtil.name(context)} has been changed inside 'with activate(...)' clause."
+            f"Context stack for context type {TypeUtil.name(context)} and context_id={context_id}\n"
+            f"has been changed inside 'with activate(...)' clause."
         )
 
     # Deactivate the currently active context by removing it from the context stack
@@ -134,7 +154,8 @@ def make_inactive(
     if deactivated is not context:
         # Error message if it is not the same context as the argument
         raise RuntimeError(
-            f"Active context of type {TypeUtil.name(context)} has been changed bypassing the context manager."
+            f"Active context for context type {TypeUtil.name(context)} and context_id={context_id}\n"
+            f"has been changed bypassing the context manager."
         )
 
     # After making the context inactive, invoke context.__exit__ method if it is implemented
@@ -144,14 +165,18 @@ def make_inactive(
 
 
 @contextmanager
-def activate(context: TRecord):
+def activate(context: TRecord, context_id: str | None = None):
     """
     Set active context using 'with activate(context)' clause, invokes __enter__ and __exit__ if they are implemented.
     If an exception is raised inside 'with activate(context)' clause, its details will be passed to __exit__.
+    
+    Args:
+        context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
 
     # Add to the context stack for the context key type in the current asynchronous environment
-    context_stack = make_active_and_return_stack(context)
+    context_stack = make_active_and_return_stack(context, context_id)
 
     try:
         # Pass control to the code inside 'with activate(context)' clause, deactivate on return
@@ -159,59 +184,95 @@ def activate(context: TRecord):
     except Exception as exc:
         # If the code inside 'with activate(context)' raises an exception, remove context from the stack
         # and pass exception details to context.__exit__ if it is implemented
-        make_inactive(context, exc_type=type(exc), exc_val=exc, exc_tb=exc.__traceback__, expected_stack=context_stack)
+        make_inactive(
+            context,
+            context_id,
+            exc_type=type(exc),
+            exc_val=exc,
+            exc_tb=exc.__traceback__, expected_stack=context_stack,
+        )
         # Rethrow
         raise exc
     else:
         # Remove context from the stack
-        make_inactive(context, expected_stack=context_stack)
+        make_inactive(
+            context,
+            context_id,
+            expected_stack=context_stack,
+        )
 
 
-def active(context_type: type[TRecord]) -> TRecord:
+def active(context_type: type[TRecord], context_id: str | None = None) -> TRecord:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
-    or raise an error outside a 'with' clause.
+    or raise an error outside a 'with' clause for the corresponding (context_key_type, context_id) pair.
+    
+    Args:
+        context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
-    stack = _get_or_create_stack(context_type)
-    if stack:
-        return CastUtil.cast(context_type, stack[-1])
+    result = active_or_none(context_type, context_id)
+    if result is not None:
+        return result
     else:
         raise RuntimeError(
-            f"The function active({TypeUtil.name(context_type)}) is invoked outside 'with activate(...)'\n"
-            f"clause for the corresponding key type {TypeUtil.name(context_type.get_base_type())}.\n"
+            f"Function active(context_type={TypeUtil.name(context_type)}, context_id={context_id}) invoked outside\n"
+            f"'with activate(...) clause for the corresponding (context_key_type, context_id) pair.\n"
             f"Use active_or_none(...) to receive None instead of an exception."
         )
 
 
-def active_or_none(context_type: type[TRecord]) -> TRecord | None:
+def active_or_none(context_type: type[TRecord], context_id: str | None = None) -> TRecord | None:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
-    or None outside a 'with' clause.
+    or None outside a 'with' clause for the corresponding (context_key_type, context_id) pair.
+    
+    Args:
+        context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
-    stack = _get_or_create_stack(context_type)
+    stack = _get_or_create_stack(context_type, context_id)
     return CastUtil.cast(context_type, stack[-1]) if stack else None
 
 
-def active_or_default(context_type: type[TRecord]) -> TRecord:
+def active_or_default(context_type: type[TRecord], context_id: str | None = None) -> TRecord:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
-    or create a default instance using 'context_type()' if outside a 'with' clause.
+    or create a default instance using 'context_type()' if outside a 'with' clause for the corresponding
+    (context_key_type, context_id) pair.
+    
+    Args:
+        context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
     # Return the top context in stack if exists, otherwise build a new context instance with all values set to default
-    stack = _get_or_create_stack(context_type)
-    return CastUtil.cast(context_type, stack[-1]) if stack else context_type().build()
+    result = active_or_none(context_type, context_id)
+    if result is None:
+        # Build with default parameters if no active context is found for the (context_key_type, context_id) pair
+        result = context_type().build()
+    return result
 
 
-def active_contexts() -> tuple[RecordProtocol, ...]:
+def get_active_contexts_and_ids() -> tuple[tuple[RecordProtocol, ...], tuple[str | None, ...]]:
     """
-    Return a tuple of active contexts across all key types, or an empty tuple if none exist.
-    This method is used by the ContextSnapshot to restore the active contexts for out-of-process
-    task execution.
+    Return a tuple of (contexts, context_ids) for all active contexts, with empty tuples if no contexts are active.
+    This method is used by the ContextSnapshot to restore the active contexts for out-of-process task execution.
     """
     stack_dict = _STACK_DICT_VAR.get()
     if stack_dict is not None:
-        # Each active contexts is last in its context stack, skip those that are None or empty
-        return tuple(context_stack[-1] for context_stack in stack_dict.values() if context_stack)
+        # Combine top context in each context stack with context_id or None, skip those that are None or empty
+        context_and_id_pairs = tuple(
+            (context_stack[-1], context_key[1])
+            for context_key, context_stack
+            in stack_dict.items() if context_stack
+        )
+        if context_and_id_pairs:
+            contexts, context_ids = zip(*context_and_id_pairs)
+            return contexts, context_ids
+        else:
+            # Return an empty dict if there are no active contexts
+            return (), ()
     else:
-        # Otherwise return an empty tuple
-        return tuple()
+        # Return an empty dict if there are no active contexts
+        return (), ()
+
