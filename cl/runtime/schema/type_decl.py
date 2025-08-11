@@ -193,10 +193,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
         for mro_type in record_type.__mro__:
             # TODO: Refactor to make it work not only for dataclasses
             mro_type_name = TypeUtil.name(mro_type)
-            if (
-                mro_type is not record_type
-                and dataclasses.is_dataclass(mro_type)
-            ):
+            if mro_type is not record_type and dataclasses.is_dataclass(mro_type):
                 if not result.inherit:
                     # The first class in MRO sequence other than self is the direct parent
                     mro_type_module = ModuleDeclKey().build()

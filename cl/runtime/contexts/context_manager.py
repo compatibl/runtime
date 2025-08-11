@@ -16,7 +16,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any
-from typing import DefaultDict
 from typing import List
 from typing import Optional
 from typing import Type
@@ -47,7 +46,7 @@ def _get_or_create_stack_dict() -> defaultdict[tuple[type, str | None], list[Rec
 def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | None = None) -> List[RecordProtocol]:
     """
     Get or create stack for the (context_key_type, context_id) pair in the current asynchronous environment.
-    
+
     Args:
         context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
@@ -59,7 +58,7 @@ def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | N
 def make_active_and_return_stack(context: TRecord, context_id: str | None = None) -> List[RecordProtocol]:
     """
     Similar to make_active(...) but returns context stack rather than the context.
-    
+
     Args:
         context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
@@ -95,7 +94,7 @@ def make_active(context: TRecord, context_id: str | None = None) -> TRecord:
         - Do not use this method for 'with' clause as it is will not automatically deactivate on 'with' clause exit,
           use 'with activate(...)' instead
         - This method invokes context.__enter__ method if present
-    
+
     Args:
         context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
@@ -123,7 +122,7 @@ def make_inactive(
         - Do not use this method for contexts activated using 'with activate(...)' clause as they will be
           automatically deactivated on 'with' clause exit and do not require explicit deactivation
         - This method invokes context.__exit__ method if present
-    
+
     Args:
         context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
@@ -169,7 +168,7 @@ def activate(context: TRecord, context_id: str | None = None):
     """
     Set active context using 'with activate(context)' clause, invokes __enter__ and __exit__ if they are implemented.
     If an exception is raised inside 'with activate(context)' clause, its details will be passed to __exit__.
-    
+
     Args:
         context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
@@ -189,7 +188,8 @@ def activate(context: TRecord, context_id: str | None = None):
             context_id,
             exc_type=type(exc),
             exc_val=exc,
-            exc_tb=exc.__traceback__, expected_stack=context_stack,
+            exc_tb=exc.__traceback__,
+            expected_stack=context_stack,
         )
         # Rethrow
         raise exc
@@ -206,7 +206,7 @@ def active(context_type: type[TRecord], context_id: str | None = None) -> TRecor
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
     or raise an error outside a 'with' clause for the corresponding (context_key_type, context_id) pair.
-    
+
     Args:
         context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
@@ -226,7 +226,7 @@ def active_or_none(context_type: type[TRecord], context_id: str | None = None) -
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
     or None outside a 'with' clause for the corresponding (context_key_type, context_id) pair.
-    
+
     Args:
         context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
@@ -240,7 +240,7 @@ def active_or_default(context_type: type[TRecord], context_id: str | None = None
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
     or create a default instance using 'context_type()' if outside a 'with' clause for the corresponding
     (context_key_type, context_id) pair.
-    
+
     Args:
         context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
@@ -262,9 +262,7 @@ def get_active_contexts_and_ids() -> tuple[tuple[RecordProtocol, ...], tuple[str
     if stack_dict is not None:
         # Combine top context in each context stack with context_id or None, skip those that are None or empty
         context_and_id_pairs = tuple(
-            (context_stack[-1], context_key[1])
-            for context_key, context_stack
-            in stack_dict.items() if context_stack
+            (context_stack[-1], context_key[1]) for context_key, context_stack in stack_dict.items() if context_stack
         )
         if context_and_id_pairs:
             contexts, context_ids = zip(*context_and_id_pairs)
@@ -275,4 +273,3 @@ def get_active_contexts_and_ids() -> tuple[tuple[RecordProtocol, ...], tuple[str
     else:
         # Return an empty dict if there are no active contexts
         return (), ()
-

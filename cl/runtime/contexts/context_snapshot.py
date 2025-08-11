@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 from contextvars import Token
 from dataclasses import dataclass
-from typing import Any
 from typing import List
 from typing_extensions import Self
-
-from cl.runtime import RecordMixin
-from cl.runtime.contexts.context_manager import _STACK_DICT_VAR, get_active_contexts_and_ids
+from cl.runtime.contexts.context_manager import _STACK_DICT_VAR
+from cl.runtime.contexts.context_manager import get_active_contexts_and_ids
 from cl.runtime.contexts.context_manager import make_active_and_return_stack
 from cl.runtime.contexts.context_manager import make_inactive
 from cl.runtime.records.data_mixin import DataMixin
@@ -41,7 +38,7 @@ class ContextSnapshot(DataMixin):
     in the asynchronous environment it was called in and restores the active contexts it saves on __enter__,
     and reverses these steps on __exit__.
     """
-    
+
     contexts: tuple[DataMixin, ...] = required()
     """Sequence of contexts for each unique (context_key_type, context_id) pair."""
 
@@ -73,8 +70,10 @@ class ContextSnapshot(DataMixin):
 
         # Ensure the same length
         if (num_context_ids := len(self.context_ids)) != (num_contexts := len(self.contexts)):
-            raise RuntimeError(f"The number of contexts {num_contexts} in ContextSnapshot does not match\n"
-                               f"the number of context identifiers {num_context_ids} ")
+            raise RuntimeError(
+                f"The number of contexts {num_contexts} in ContextSnapshot does not match\n"
+                f"the number of context identifiers {num_context_ids} "
+            )
 
     def __enter__(self) -> Self:
         """Backup _STACK_DICT_VAR and invoke __enter__ for each item in 'contexts'."""
@@ -90,7 +89,8 @@ class ContextSnapshot(DataMixin):
         else:
             raise RuntimeError(
                 "Attempting to run __enter__ on a ContextSnapshot instance where __exit__\n"
-                "did not complete or raised an exception.")
+                "did not complete or raised an exception."
+            )
 
         # Enter into each context in the order specified
         if self.contexts:
@@ -140,9 +140,11 @@ class ContextSnapshot(DataMixin):
         finally:
             # Restore _STACK_DICT_VAR and clear instance variables
             if (
-                    self._token is not None
-                    and self._processed_contexts is not None and len(self._processed_contexts) == 0
-                    and self._processed_context_stacks is not None and len(self._processed_context_stacks) == 0
+                self._token is not None
+                and self._processed_contexts is not None
+                and len(self._processed_contexts) == 0
+                and self._processed_context_stacks is not None
+                and len(self._processed_context_stacks) == 0
             ):
                 _STACK_DICT_VAR.reset(self._token)
                 self._token = None
@@ -151,7 +153,8 @@ class ContextSnapshot(DataMixin):
             else:
                 raise RuntimeError(
                     "Attempting to run __exit__ on a ContextSnapshot instance where __enter__\n"
-                    "did not complete or raised an exception.")
+                    "did not complete or raised an exception."
+                )
 
     def to_json(self) -> str:
         """Serialize to JSON."""

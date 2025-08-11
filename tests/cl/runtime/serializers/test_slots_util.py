@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.serializers.slots_util import SlotsUtil
 from stubs.cl.runtime import StubDataclassDerivedData
 
 

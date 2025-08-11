@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from abc import ABC
-
 from memoization import cached
 from typing_extensions import Self
 from cl.runtime.records.builder_mixin import BuilderMixin

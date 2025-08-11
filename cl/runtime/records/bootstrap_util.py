@@ -21,7 +21,6 @@ from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class BootstrapUtil:

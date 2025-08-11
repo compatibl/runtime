@@ -16,9 +16,9 @@ import pytest
 import random
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_kind import ExperimentKind
 from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
+from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from stubs.cl.runtime.experiments.stub_supervised_binary_experiment import StubSupervisedBinaryExperiment
 
 
@@ -26,9 +26,7 @@ def test_smoke(multi_db_fixture):
     """Test for SupervisedBinaryExperiment class."""
 
     exp_type = ExperimentKind(kind_id="Test").build()
-    sc1 = ExperimentScenario(
-        experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-    ).build()
+    sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
 
     active(DataSource).save_one(exp_type)
     active(DataSource).save_one(sc1)
@@ -39,9 +37,7 @@ def test_smoke(multi_db_fixture):
         experiment_id="test_supervised_binary_experiment.test_smoke",
         max_trials=5,
         scenarios=[
-            ExperimentScenario(
-                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-            ),
+            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
         ],
     )
     experiment.run_all()
@@ -50,12 +46,8 @@ def test_smoke(multi_db_fixture):
 def test_plot(multi_db_fixture, work_dir_fixture):
 
     exp_type = ExperimentKind(kind_id="Test").build()
-    sc1 = ExperimentScenario(
-        experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-    ).build()
-    sc2 = ExperimentScenario(
-        experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2"
-    ).build()
+    sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
+    sc2 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2").build()
 
     active(DataSource).save_one(exp_type)
     active(DataSource).save_many([sc1, sc2])
@@ -64,12 +56,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
         experiment_kind=ExperimentKindKey(kind_id="Test"),
         experiment_id="Test",
         scenarios=[
-            ExperimentScenario(
-                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-            ),
-            ExperimentScenario(
-                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2"
-            ),
+            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
+            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2"),
         ],
         max_trials=5,
     )

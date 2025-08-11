@@ -52,7 +52,6 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.long_format import LongFormat
 from cl.runtime.serializers.none_format import NoneFormat
 from cl.runtime.serializers.serializer import Serializer
-from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.serializers.string_format import StringFormat
 from cl.runtime.serializers.time_format import TimeFormat
 from cl.runtime.serializers.timestamp_format import TimestampFormat

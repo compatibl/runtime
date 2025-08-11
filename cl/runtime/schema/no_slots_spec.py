@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import dataclasses
 from dataclasses import dataclass
 from typing_extensions import Self
-
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
-from cl.runtime.schema.field_spec import FieldSpec
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
@@ -35,10 +32,10 @@ class NoSlotsSpec(DataSpec):
         type_name = TypeUtil.name(class_)
         if not is_data_key_or_record(class_):
             raise RuntimeError(
-                f"Cannot create {cls.__name__} for class {type_name} because it is not data, key or record.")
+                f"Cannot create {cls.__name__} for class {type_name} because it is not data, key or record."
+            )
         if SlotsUtil.get_slots(class_):
-            raise RuntimeError(
-                f"Cannot create {cls.__name__} for class {type_name} because it has slots.")
+            raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it has slots.")
         if subtype is not None:
             raise RuntimeError(
                 f"Subtype {subtype} is specified for non-primitive class {type_name}.\n"

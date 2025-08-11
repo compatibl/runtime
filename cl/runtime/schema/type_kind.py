@@ -42,4 +42,3 @@ class TypeKind(IntEnum):
 
     ANY = auto()
     """Any type (includes all other types), is_any returns True."""
-

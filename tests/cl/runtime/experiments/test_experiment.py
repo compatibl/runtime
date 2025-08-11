@@ -15,9 +15,9 @@
 import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from cl.runtime.experiments.experiment_kind import ExperimentKind
 from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
+from cl.runtime.experiments.experiment_scenario import ExperimentScenario
 from stubs.cl.runtime.experiments.stub_binary_experiment import StubBinaryExperiment
 
 
@@ -25,9 +25,7 @@ def test_run_many(multi_db_fixture):
     """Test for the functionality of base Experiment class."""
 
     exp_type = ExperimentKind(kind_id="Test").build()
-    sc1 = ExperimentScenario(
-        experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-    ).build()
+    sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
 
     active(DataSource).save_one(exp_type)
     active(DataSource).save_one(sc1)
@@ -37,9 +35,7 @@ def test_run_many(multi_db_fixture):
         experiment_kind=ExperimentKindKey(kind_id="TestExperiment"),
         experiment_id="test_run_many.max_trials_not_set",
         scenarios=[
-            ExperimentScenario(
-                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-            ),
+            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
         ],
     )
 
@@ -59,9 +55,7 @@ def test_run_many(multi_db_fixture):
         experiment_id="test_run_many.max_trials_set",
         max_trials=5,
         scenarios=[
-            ExperimentScenario(
-                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-            ),
+            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
         ],
     )
 
@@ -93,9 +87,7 @@ def test_run_all(multi_db_fixture):
     """Test for the functionality of base Experiment class."""
 
     exp_type = ExperimentKind(kind_id="Test").build()
-    sc1 = ExperimentScenario(
-        experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-    ).build()
+    sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
 
     active(DataSource).save_one(exp_type)
     active(DataSource).save_one(sc1)
@@ -105,9 +97,7 @@ def test_run_all(multi_db_fixture):
         experiment_kind=ExperimentKindKey(kind_id="TestExperiment"),
         experiment_id="test_run_all.max_trials_not_set",
         scenarios=[
-            ExperimentScenario(
-                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-            ),
+            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
         ],
     )
 
@@ -121,9 +111,7 @@ def test_run_all(multi_db_fixture):
         experiment_id="test_run_all.max_trials_set",
         max_trials=5,
         scenarios=[
-            ExperimentScenario(
-                experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"
-            ),
+            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
         ],
     )
 

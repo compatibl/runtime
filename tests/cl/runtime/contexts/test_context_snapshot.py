@@ -14,8 +14,9 @@
 
 import pytest
 from typing import List
-from cl.runtime.contexts.context_manager import activate, get_active_contexts_and_ids
+from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active_or_none
+from cl.runtime.contexts.context_manager import get_active_contexts_and_ids
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.contexts.trial_context import TrialContext
 from cl.runtime.records.protocols import RecordProtocol
@@ -64,8 +65,6 @@ def _perform_manager_test(contexts: List[RecordProtocol]):
         assert len([ctx for ctx in before.contexts if ctx not in after.contexts]) == 0
     else:
         assert after.contexts is None
-
-
 
 
 def test_context_snapshot():

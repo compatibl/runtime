@@ -20,7 +20,6 @@ from typing import Dict
 from typing import Mapping
 from typing import Tuple
 from uuid import UUID
-
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.dataclass_spec import DataclassSpec

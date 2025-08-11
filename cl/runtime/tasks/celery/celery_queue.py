@@ -18,7 +18,6 @@ import os
 from dataclasses import dataclass
 from typing import Dict
 from typing import Final
-from typing import List
 from celery import Celery
 from celery.signals import setup_logging
 from cl.runtime.contexts.context_manager import activate
@@ -28,7 +27,6 @@ from cl.runtime.contexts.env import Env
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.log_config import celery_empty_logging_config
 from cl.runtime.log.log_config import logging_config
-from cl.runtime.records.protocols import TDataDict
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
