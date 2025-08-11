@@ -42,7 +42,7 @@ class ContextSnapshot(DataMixin):
     and reverses these steps on __exit__.
     """
     
-    contexts: tuple[RecordProtocol, ...] = required()
+    contexts: tuple[DataMixin, ...] = required()
     """Sequence of contexts for each unique (context_key_type, context_id) pair."""
 
     context_ids: tuple[str | None, ...] = required()
