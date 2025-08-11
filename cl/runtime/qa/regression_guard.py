@@ -155,13 +155,16 @@ class RegressionGuard:
             self.__delegate_to.write(value)
             return
 
-        if self.__verified:
+        received_path = self._get_file_path("received")
+        if self.__verified:  # TODO: Improve logic to avoid rerunning in this case
             raise RuntimeError(
-                f"Regression output file {self._get_file_path('received')} is already verified "
-                f"and can no longer be written to."
+                f"Cannot write to a received file for RegressionGuard because a difference between\n"
+                f"received and expected file occurred during a previous test for the same file,\n"
+                f"or the expected file was not found. Rerun the test if this occurred during\n"
+                f"the creation of the expected file.\n"
+                f"File path: {received_path}"
             )
 
-        received_path = self._get_file_path("received")
         received_dir = os.path.dirname(received_path)
         if not os.path.exists(received_dir):
             # Create the directory if does not exist
