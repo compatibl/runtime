@@ -20,7 +20,7 @@ from stubs.cl.runtime import StubDataclassDoubleDerivedData
 
 
 def test_cast():
-    """Test FreezableMixin.cast method."""
+    """Test BuilderMixin.cast method."""
 
     # Create target from source
     source = StubDataclassDerivedData(str_field="xyz", int_field=789, derived_str_field="derived_field")
@@ -34,7 +34,7 @@ def test_cast():
 
 
 def test_clone():
-    """Test FreezableMixin.clone method."""
+    """Test BuilderMixin.clone method."""
 
     # Create target from source
     guard = RegressionGuard()
@@ -51,7 +51,7 @@ def test_clone():
 
 
 def test_clone_as():
-    """Test FreezableMixin.clone_as method."""
+    """Test BuilderMixin.clone_as method."""
 
     # Create target from source
     guard = RegressionGuard()

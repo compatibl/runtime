@@ -29,11 +29,15 @@ _FROZEN_FINALIZERS = dict()
 
 
 # TODO: Consider renaming to BuilderMixin
-class FreezableMixin(ABC):
+class BuilderMixin(ABC):
     """Framework-neutral mixin for freezable fields support."""
 
     __slots__ = ("__weakref__",)
     """To prevent creation of __dict__ in derived types."""
+
+    @abstractmethod
+    def build(self) -> Self:
+        """Configure the instance and freeze to prevent further modifications."""
 
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
@@ -61,10 +65,6 @@ class FreezableMixin(ABC):
             type_name = TypeUtil.name(self)
             raise RuntimeError(f"Cannot modify public field {type_name}.{key} because the instance is frozen.")
         object.__setattr__(self, key, value)
-
-    @abstractmethod
-    def build(self) -> Self:
-        """Configure the instance and freeze to prevent further modifications."""
 
     def cast(self, result_type: type[TData]) -> TData:
         """

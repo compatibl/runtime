@@ -15,14 +15,14 @@
 from abc import ABC
 from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
-from cl.runtime.records.freezable_mixin import FreezableMixin
+from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
-class DataMixin(FreezableMixin, ABC):
+class DataMixin(BuilderMixin, ABC):
     """Framework-neutral mixin adding 'build' and related methods to the class."""
 
-    __slots__ = SlotsUtil.merge_slots(FreezableMixin)
+    __slots__ = SlotsUtil.merge_slots(BuilderMixin)
     """To prevent creation of __dict__ in derived types."""
 
     def build(self) -> Self:

@@ -14,14 +14,14 @@
 
 from abc import ABC
 from typing_extensions import Self
-from cl.runtime.records.freezable_mixin import FreezableMixin
+from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
-class BootstrapMixin(FreezableMixin, ABC):
+class BootstrapMixin(BuilderMixin, ABC):
     """Dataclasses base for lightweight classes that do not require validation against the schema."""
 
-    __slots__ = SlotsUtil.merge_slots(FreezableMixin)
+    __slots__ = SlotsUtil.merge_slots(BuilderMixin)
     """To prevent creation of __dict__ in derived types."""
 
     def build(self) -> Self:

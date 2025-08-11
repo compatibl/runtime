@@ -1,9 +1,9 @@
 - BinaryExperiment
+- BuilderMixin
 - ClassifierExperiment
 - DataMixin
 - Experiment
 - ExperimentKey
-- FreezableMixin
 - KeyMixin
 - RecordMixin
 - StubBinaryExperiment
