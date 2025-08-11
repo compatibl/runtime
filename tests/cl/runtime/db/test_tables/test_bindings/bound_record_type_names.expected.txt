@@ -1,5 +1,4 @@
 - BinaryExperiment
-- BuilderMixin
 - ClassifierExperiment
 - DataMixin
 - Experiment

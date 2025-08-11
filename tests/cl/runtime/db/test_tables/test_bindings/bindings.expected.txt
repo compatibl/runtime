@@ -2,9 +2,6 @@
   record_type: BinaryExperiment
   key_type: ExperimentKey
 - table: ExperimentTable1
-  record_type: BuilderMixin
-  key_type: ExperimentKey
-- table: ExperimentTable1
   record_type: ClassifierExperiment
   key_type: ExperimentKey
 - table: ExperimentTable1
@@ -32,9 +29,6 @@
   record_type: BinaryExperiment
   key_type: ExperimentKey
 - table: ExperimentTable2
-  record_type: BuilderMixin
-  key_type: ExperimentKey
-- table: ExperimentTable2
   record_type: ClassifierExperiment
   key_type: ExperimentKey
 - table: ExperimentTable2
@@ -58,9 +52,6 @@
 - table: ExperimentTable2
   record_type: StubClassifierExperiment
   key_type: ExperimentKey
-- table: TableBindingKey
-  record_type: BuilderMixin
-  key_type: TableBindingKey
 - table: TableBindingKey
   record_type: DataMixin
   key_type: TableBindingKey
