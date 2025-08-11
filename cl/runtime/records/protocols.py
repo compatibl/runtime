@@ -220,24 +220,32 @@ def is_mapping(instance_or_type: Any) -> TypeGuard[TSequence]:
 
 
 def is_abstract(instance_or_type: Any) -> bool:
-    """True if the argument is an abstract class or a mixin (even if the mixin is not formally abstract)."""
+    """True if the argument is an abstract class."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    # Mixin classes are treated as abstract even if they are not formally abstract
     return bool(getattr(type_, "__abstractmethods__", None))
 
 
-def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[TData]:
+def is_builder(instance_or_type: Any) -> TypeGuard[TData]:
     """
-    True if the argument has 'build' method and is not a mixin (includes data, keys and records).
+    True if the argument has 'build' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return hasattr(type_, "build") and not type_.__name__.startswith("_")
 
 
+def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[TData]:
+    """
+    True if the argument has 'get_slots' method (includes data, keys and records), may be abstract or a mixin.
+    Excludes classes whose name starts from underscore.
+    """
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    return hasattr(type_, "get_slots") and not type_.__name__.startswith("_")
+
+
 def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
     """
-    True if the argument has 'get_key_type' method and is not a mixin.
+    True if the argument has 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
@@ -246,16 +254,28 @@ def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
     )
 
 
+def is_data(instance_or_type: Any) -> TypeGuard[TKey]:
+    """
+    True if the argument has 'get_slots' method but not 'get_key_type' method, may be abstract or a mixin.
+    Excludes classes whose name starts from underscore.
+    """
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    return (
+        hasattr(type_, "get_slots")
+        and not hasattr(type_, "get_key_type")
+        and not type_.__name__.startswith("_")
+    )
+
 def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
     """
-    True if the argument has 'get_key_type' method but not 'get_key' method and is not abstract or a mixin.
+    True if the argument has 'get_key_type' method but not 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return (
         hasattr(type_, "get_key_type")
-        and not type_.__name__.startswith("_")
         and not hasattr(type_, "get_key")
+        and not type_.__name__.startswith("_")
     )
 
 
