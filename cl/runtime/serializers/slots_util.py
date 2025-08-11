@@ -30,11 +30,7 @@ class SlotsUtil:
     def get_slots(cls, data_type: type) -> Tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
 
-        if hasattr(data_type, "get_slots"):
-            # Providing @classmethod get_slots makes it possible to serialize
-            # a non-slotted class or override the default slots
-            return data_type.get_slots()
-        elif hasattr(data_type, "__slots__"):
+        if hasattr(data_type, "__slots__"):
             # Traverse the class hierarchy from base to derived (reverse MRO order) collecting slots as specified
             if _INHERITED_SLOTS:
                 # For v3.11 and later, __slots__ includes fields for this class only, use MRO to collect

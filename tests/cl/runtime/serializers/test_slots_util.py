@@ -19,7 +19,7 @@ from stubs.cl.runtime import StubDataclassDerivedData
 
 def test_get_slots():
     """Test get_slots method."""
-    assert SlotsUtil.get_slots(StubDataclassDerivedData) == ("str_field", "int_field", "derived_str_field")
+    assert StubDataclassDerivedData.get_slots() == ("str_field", "int_field", "derived_str_field")
 
 
 if __name__ == "__main__":

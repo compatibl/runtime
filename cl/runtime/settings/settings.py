@@ -135,7 +135,7 @@ class Settings(DataMixin, ABC):
             # This may include fields that are not specified in the settings class
             settings_dict = {k: v for k, v in _user_settings.items() if k.startswith(prefix)}
 
-            slots = SlotsUtil.get_slots(cls)
+            slots = cls.get_slots()
             slots_without_prefix = [slot for slot in slots if not slot.startswith(prefix)]
             if slots_without_prefix:
                 slots_without_prefix_str = "\n".join(slots_without_prefix)

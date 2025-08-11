@@ -73,7 +73,7 @@ class BootstrapUtil:
             # Apply updates to the data object
             tuple(
                 setattr(data, k, cls.build(v))
-                for k in SlotsUtil.get_slots(data)
+                for k in data.get_slots()
                 if (
                     # Exclude those types that are passed through
                     (v := getattr(data, k)) is not None

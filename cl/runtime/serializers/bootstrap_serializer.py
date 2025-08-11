@@ -327,7 +327,7 @@ class BootstrapSerializer(Serializer):
                 include_type_last = False
 
             # Slotted class, get slots from this class and its bases in the order of declaration from base to derived
-            slots = SlotsUtil.get_slots(type(data))
+            slots = data.get_slots()
 
             # Include type information first based on include_type_first flag
             result = {self.type_field: type_field} if include_type_first else {}

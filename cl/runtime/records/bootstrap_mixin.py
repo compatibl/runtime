@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from abc import ABC
+
+from memoization import cached
 from typing_extensions import Self
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -23,6 +25,12 @@ class BootstrapMixin(BuilderMixin, ABC):
 
     __slots__ = SlotsUtil.merge_slots(BuilderMixin)
     """To prevent creation of __dict__ in derived types."""
+
+    @classmethod
+    @cached
+    def get_slots(cls) -> tuple[str, ...]:
+        """Return slots the order of declaration from base to derived."""
+        return SlotsUtil.get_slots(cls)
 
     def build(self) -> Self:
         """
