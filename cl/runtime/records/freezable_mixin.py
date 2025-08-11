@@ -28,6 +28,7 @@ _FROZEN_FINALIZERS = dict()
 """Adding a finalizer to this global dictionary prevents it from being collected before it is executed."""
 
 
+# TODO: Consider renaming to BuilderMixin
 class FreezableMixin(ABC):
     """Framework-neutral mixin for freezable fields support."""
 

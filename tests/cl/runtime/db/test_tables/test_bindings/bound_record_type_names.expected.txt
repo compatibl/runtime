@@ -1,7 +1,11 @@
 - BinaryExperiment
 - ClassifierExperiment
+- DataMixin
 - Experiment
 - ExperimentKey
+- FreezableMixin
+- KeyMixin
+- RecordMixin
 - StubBinaryExperiment
 - StubClassifierExperiment
 

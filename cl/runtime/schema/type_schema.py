@@ -20,12 +20,16 @@ from typing import Dict
 from typing import Mapping
 from typing import Tuple
 from uuid import UUID
+
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
+from cl.runtime.schema.no_slots_spec import NoSlotsSpec
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_spec import TypeSpec
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class TypeSchema:
@@ -80,14 +84,20 @@ class TypeSchema:
             # Get class for the specified type name
             class_ = TypeCache.get_class_from_type_name(type_name)
 
+            # TODO: Use mapping records to avoid hardcoding the list of data frameworks
             # Get class for the type spec
             if issubclass(class_, Enum):
+                # Enum class
                 spec_class = EnumSpec
             elif dataclasses.is_dataclass(class_):
+                # Uses dataclasses
                 spec_class = DataclassSpec
+            elif is_data_key_or_record(class_) and not SlotsUtil.get_slots(class_):
+                # Base class of data, key or record with no slots
+                spec_class = NoSlotsSpec
             else:
                 raise RuntimeError(
-                    f"Class {class_.__name__} implements build method but does not\n"
+                    f"Class {TypeUtil.name(class_)} implements build method but does not\n"
                     f"use one of the supported dataclass frameworks and does not\n"
                     f"have a method to generate type spec."
                 )

@@ -45,7 +45,6 @@ class DataclassSpec(DataSpec):
             if not field.name.startswith("_")
         ]
 
-        # Create the enum spec
         result = DataclassSpec(
             type_name=type_name,
             _class=class_,

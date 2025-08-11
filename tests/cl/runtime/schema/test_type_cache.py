@@ -87,35 +87,43 @@ def test_get_classes():
 
     # Included in data types
     data_types = TypeCache.get_classes(type_kind=TypeKind.DATA)
+    assert DataMixin in data_types
     assert StubDataclassData in data_types
     # Excluded from data types
-    assert DataMixin not in data_types
+    assert KeyMixin not in data_types
     assert RecordMixin not in data_types
     assert _StubDataclassUnderscore not in data_types
     assert __StubDataclassDoubleUnderscore not in data_types
 
     # Included in record types
     record_types = TypeCache.get_classes(type_kind=TypeKind.RECORD)
+    assert RecordMixin in record_types
     assert StubDataclass in record_types
     assert TypeDecl in record_types
     # Excluded from record types
-    assert RecordMixin not in record_types
+    assert DataMixin not in record_types
+    assert KeyMixin not in record_types
     assert StubDataclassKey not in record_types
     assert StubDataclassData not in record_types
 
     # Included in key types
     key_types = TypeCache.get_classes(type_kind=TypeKind.KEY)
+    assert KeyMixin in key_types
     assert StubDataclassKey in key_types
     # Excluded from key types
-    assert KeyMixin not in record_types
+    assert DataMixin not in key_types
+    assert RecordMixin not in key_types
     assert StubDataclassData not in key_types
 
     # Included in enum types
     enum_types = TypeCache.get_classes(type_kind=TypeKind.ENUM)
     assert StubIntEnum in enum_types
     # Excluded from enum types
-    assert Enum not in enum_types
-    assert IntEnum not in enum_types
+    assert Enum not in enum_types  # TODO: Enum base is excluded, review
+    assert IntEnum not in enum_types  # TODO: IntEnum base is excluded, review
+    assert DataMixin not in enum_types
+    assert KeyMixin not in enum_types
+    assert RecordMixin not in enum_types
 
 
 if __name__ == "__main__":

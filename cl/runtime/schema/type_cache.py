@@ -39,7 +39,7 @@ from cl.runtime.settings.project_settings import ProjectSettings
 
 def is_schema_type(class_: type) -> bool:
     """Return true if the type should be included in schema, includes data classes and enums."""
-    return isclass(class_) and (is_data_key_or_record(class_) or is_enum(class_)) and not class_.__name__.endswith("Mixin")
+    return isclass(class_) and (is_data_key_or_record(class_) or is_enum(class_))
 
 
 _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildNames")
