@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from __future__ import annotations
-from cl.runtime.backend.core.ui_type_state import UiTypeState
-from cl.runtime.backend.core.ui_type_state_key import UiTypeStateKey
+from cl.runtime.ui.ui_type_state import UiTypeState
+from cl.runtime.ui.ui_type_state_key import UiTypeStateKey
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.type_util import TypeUtil

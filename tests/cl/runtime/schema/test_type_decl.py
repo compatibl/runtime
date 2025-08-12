@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.backend.core.ui_app_state import UiAppState
+from cl.runtime.ui.ui_app_state import UiAppState
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl

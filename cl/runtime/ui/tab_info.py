@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.backend.core.base_type_info import BaseTypeInfo
+from cl.runtime.ui.base_type_info import BaseTypeInfo
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
