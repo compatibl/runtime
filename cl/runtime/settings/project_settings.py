@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import ClassVar
 from typing import Iterable
 from typing import List
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_util import TypeUtil
 

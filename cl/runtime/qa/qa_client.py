@@ -14,7 +14,7 @@
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.contexts.context_manager import make_active
 from cl.runtime.contexts.context_manager import make_inactive
 from cl.runtime.contexts.env import Env

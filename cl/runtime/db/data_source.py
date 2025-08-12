@@ -19,7 +19,7 @@ from typing import List
 from typing import Sequence
 from typing import cast
 from more_itertools import consume
-from typing_extensions import Self
+from typing import Self
 from cl.runtime import Db
 from cl.runtime import KeyUtil
 from cl.runtime import TypeCache

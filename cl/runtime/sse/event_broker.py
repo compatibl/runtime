@@ -17,7 +17,7 @@ from abc import ABC
 from abc import abstractmethod
 from typing import AsyncGenerator
 from fastapi import Request
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.sse.event import Event
 
 

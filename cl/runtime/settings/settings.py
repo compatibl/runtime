@@ -22,7 +22,7 @@ from typing import Dict
 from dotenv import find_dotenv
 from dotenv import load_dotenv
 from dynaconf import Dynaconf
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil

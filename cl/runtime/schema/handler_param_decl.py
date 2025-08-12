@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from memoization import cached
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 

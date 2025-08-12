@@ -25,7 +25,7 @@ from typing import TypeVar
 from uuid import UUID
 from bson import Int64
 from frozendict import frozendict
-from typing_extensions import Self
+from typing import Self
 
 PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes)
 """The list of Python classes used to store primitive types, not the same as type names."""

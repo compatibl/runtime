@@ -16,7 +16,7 @@ import importlib
 import os
 from dataclasses import field
 from pydantic import BaseModel
-from typing_extensions import Self
+from typing import Self
 from cl.runtime._version import __api_schema_version__
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional

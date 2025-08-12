@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.type_util import TypeUtil
 
 

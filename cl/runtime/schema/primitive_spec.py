@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_spec import TypeSpec

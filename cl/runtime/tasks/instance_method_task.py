@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Callable
-from typing_extensions import Self
+from typing import Self
 from typing_extensions import override
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.log_context import LogContext

@@ -19,7 +19,7 @@ from typing import Union
 from typing import get_args
 from typing import get_origin
 from memoization import cached
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.schema.member_decl import MemberDecl

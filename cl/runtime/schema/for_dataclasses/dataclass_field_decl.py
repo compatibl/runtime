@@ -14,7 +14,7 @@
 
 from dataclasses import Field
 from dataclasses import dataclass
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.primitive_decl_keys import PrimitiveDeclKeys
 

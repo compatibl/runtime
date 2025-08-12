@@ -16,7 +16,7 @@ from abc import ABC
 from typing import cast
 
 from memoization import cached
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.protocols import TData, TObj

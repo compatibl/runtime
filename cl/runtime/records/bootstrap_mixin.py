@@ -14,7 +14,7 @@
 
 from abc import ABC
 from memoization import cached
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
 

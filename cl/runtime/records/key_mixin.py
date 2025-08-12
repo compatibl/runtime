@@ -14,7 +14,7 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.slots_util import SlotsUtil

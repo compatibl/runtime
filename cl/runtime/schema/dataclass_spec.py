@@ -14,7 +14,7 @@
 
 import dataclasses
 from dataclasses import dataclass
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.field_spec import FieldSpec

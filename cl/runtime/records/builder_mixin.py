@@ -15,7 +15,7 @@
 import weakref
 from abc import ABC
 from abc import abstractmethod
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.protocols import TData
 from cl.runtime.records.type_util import TypeUtil

@@ -15,7 +15,7 @@
 import os.path
 from dataclasses import dataclass
 from typing import Any
-from typing_extensions import Self
+from typing import Self
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.storage.text_file import TextFile
