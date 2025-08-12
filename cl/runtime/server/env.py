@@ -14,17 +14,19 @@
 
 from dataclasses import dataclass
 from getpass import getuser
+
+from cl.runtime import RecordMixin
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.qa.qa_util import QaUtil
-from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.server.env_key import EnvKey
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.env_settings import EnvSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class Env(DataMixin):
-    """Context for the naming and location of the app data."""
+class Env(EnvKey, RecordMixin):
+    """Application environment parameters."""
 
     testing: bool | None = None
     """True for the root process or worker processes of a test, False when not a test."""
@@ -41,9 +43,8 @@ class Env(DataMixin):
     user_scoped: bool = required()  # TODO: Refactor and make the names more clear
     """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
 
-    @classmethod
-    def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
-        return Env
+    def get_key(self) -> EnvKey:
+        return EnvKey(env_id=self.env_id).build()
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
@@ -55,6 +56,7 @@ class Env(DataMixin):
 
         # Default values are based on settings (which may still be None) if not specified in the context
         env_settings = EnvSettings.instance()
+        self.env_id = self.env_id if self.env_id is not None else env_settings.env_id
         self.env = self.env if self.env is not None else env_settings.env_kind
         self.name = self.name if self.name is not None else env_settings.env_id
         self.user = self.user if self.user is not None else env_settings.env_user

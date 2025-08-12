@@ -28,7 +28,7 @@ from cl.runtime.settings.settings_util import SettingsUtil
 class EnvSettings(Settings):
     """Settings for the naming and location of the app data."""
 
-    env_id: str | None = None
+    env_id: str = required()
     """Unique environment identifier."""
 
     env_kind: EnvKind | None = None  # TODO: Make required
