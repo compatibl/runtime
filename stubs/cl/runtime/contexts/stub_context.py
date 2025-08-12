@@ -22,10 +22,6 @@ from stubs.cl.runtime.contexts.stub_context_key import StubContextKey
 class StubContext(StubContextKey, RecordMixin):
     """Stub context."""
 
-    @classmethod
-    def get_base_type(cls) -> type:
-        return StubContext
-
     error_on_post_init: bool = False
     """If True, an error will be raised inside '__post_init__' method for testing purposes."""
 

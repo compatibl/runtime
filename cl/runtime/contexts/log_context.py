@@ -34,7 +34,7 @@ class LogContext(DataMixin):
     """Task run id."""
 
     @classmethod
-    def get_base_type(cls) -> type:
+    def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
         return LogContext
 
     def get_logger(

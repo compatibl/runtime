@@ -33,7 +33,7 @@ class TrialContext(DataMixin):
     """Tuple of trial identifiers in the trial context stack."""
 
     @classmethod
-    def get_base_type(cls) -> type:
+    def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
         return TrialContext
 
     @classmethod

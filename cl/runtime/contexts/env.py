@@ -42,7 +42,7 @@ class Env(DataMixin):
     """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
 
     @classmethod
-    def get_base_type(cls) -> type:
+    def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
         return Env
 
     def __init(self) -> None:

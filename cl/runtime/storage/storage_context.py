@@ -21,5 +21,5 @@ class StorageContext(DataMixin):
     """Provides access to storage."""
 
     @classmethod
-    def get_base_type(cls) -> type:
+    def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
         return StorageContext

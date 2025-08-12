@@ -72,10 +72,6 @@ class DataSource(DataSourceKey, RecordMixin):
     def get_key(self) -> DataSourceKey:
         return DataSourceKey(data_source_id=self.data_source_id).build()
 
-    @classmethod
-    def get_base_type(cls) -> type:
-        return DataSource
-
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 

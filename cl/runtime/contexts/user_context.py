@@ -30,7 +30,7 @@ class UserContext(DataMixin):  # TODO: Rename to SecretsContext?
     """User secrets specified here take precedence over those defined via Dynaconf."""
 
     @classmethod
-    def get_base_type(cls) -> type:
+    def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
         return UserContext
 
     def decrypt_secret(self, secret_name: str) -> str | None:

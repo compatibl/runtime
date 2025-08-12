@@ -52,7 +52,7 @@ def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | N
     if context_id == "":
         raise RuntimeError("Using an empty string as context_id is ambiguous, use None instead.")
 
-    key_type_name = TypeUtil.name(context_type.get_base_type())  # TODO: Use key_type
+    key_type_name = TypeUtil.name(context_type.get_key_type())
     return _get_or_create_stack_dict()[(key_type_name, context_id)]
 
 
