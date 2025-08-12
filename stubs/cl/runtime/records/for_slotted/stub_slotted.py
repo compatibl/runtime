@@ -20,11 +20,15 @@ from stubs.cl.runtime.records.for_slotted.stub_slotted_key import StubSlottedKey
 class StubSlotted(StubSlottedKey, RecordMixin):
     """Stub record base class not using any dataclass framework."""
 
-    __slots__ = SlotsUtil.merge_slots(StubSlottedKey)
+    __slots__ = ("record_field",)
 
-    def __init__(self, record_id: str = "abc") -> None:
+    record_field: str
+    """Field of the record object."""
+
+    def __init__(self, key_field: str = "abc", record_field: str = "def") -> None:
         """Initialize instance attributes."""
-        super().__init__(record_id)
+        super().__init__(key_field)
+        self.record_field = record_field
 
     def get_key(self) -> StubSlottedKey:
-        return StubSlottedKey(record_id=self.record_id).build()
+        return StubSlottedKey(key_field=self.key_field).build()

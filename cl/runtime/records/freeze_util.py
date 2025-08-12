@@ -15,7 +15,7 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
-from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES, is_data_key_or_record
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.type_util import TypeUtil
@@ -41,10 +41,14 @@ class FreezeUtil:
             # Convert all mapping types to frozendict
             return frozendict((k, cls.freeze(v)) for k, v in data.items())
         elif hasattr(data, "mark_frozen"):
-            # Recreate with frozen fields and freeze the result
-            return type(data)(
-                **{k: cls.freeze(getattr(data, k)) for k in SlotsUtil.get_slots(type(data))}
-            ).mark_frozen()
+            if is_data_key_or_record(data):
+                # Recreate with frozen fields and freeze the result
+                return type(data)(
+                    **{k: cls.freeze(getattr(data, k)) for k in SlotsUtil.get_slots(type(data))}
+                ).mark_frozen()
+            else:
+                # Mark frozen and return
+                return data.mark_frozen()
         else:
             raise RuntimeError(
                 f"Cannot freeze data of type {TypeUtil.name(data)} because it is not a\n"

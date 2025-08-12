@@ -13,18 +13,20 @@
 # limitations under the License.
 
 from abc import ABC
+from typing import cast
+
 from memoization import cached
 from typing_extensions import Self
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.builder_mixin import BuilderMixin
+from cl.runtime.records.protocols import TData, TObj
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class DataMixin(BuilderMixin, ABC):
     """Framework-neutral mixin adding 'build' and related methods to the class."""
 
-    __slots__ = SlotsUtil.merge_slots(BuilderMixin)
-    """To prevent creation of __dict__ in derived types."""
+    __slots__ = ()
 
     @classmethod
     @cached
@@ -40,3 +42,13 @@ class DataMixin(BuilderMixin, ABC):
         (3) Validates root level object against the schema and calls its 'mark_frozen' method
         """
         return BuildUtil.typed_build(self)
+
+    def clone(self) -> Self:
+        """Return an unfrozen object of the same type populated by shallow copies of public fields."""
+        return self.clone_as(type(self))
+
+    def clone_as(self, result_type: type[TObj]) -> TObj:
+        """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
+        return result_type(
+            **{k: getattr(self, k) for k in self.get_slots()}
+        )

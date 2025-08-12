@@ -17,7 +17,6 @@ from abc import ABC
 from abc import abstractmethod
 from typing_extensions import Self
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.clone_util import CloneUtil
 from cl.runtime.records.protocols import TData
 from cl.runtime.records.type_util import TypeUtil
 
@@ -30,7 +29,7 @@ _FROZEN_FINALIZERS = dict()
 
 # TODO: Consider renaming to BuilderMixin
 class BuilderMixin(ABC):
-    """Framework-neutral mixin for freezable fields support."""
+    """Framework-neutral mixin for freezable fields and builder pattern support."""
 
     __slots__ = ("__weakref__",)
     """To prevent creation of __dict__ in derived types."""
@@ -73,11 +72,3 @@ class BuilderMixin(ABC):
         Pass through None.
         """
         return CastUtil.cast(result_type, self)
-
-    def clone(self) -> Self:
-        """Return an unfrozen object of the same type constructed from shallow copies of the public fields of self."""
-        return CloneUtil.clone(self)
-
-    def clone_as(self, result_type: type[TData]) -> TData:
-        """Return an unfrozen object of the specified type populated by shallow copies of public fields of self."""
-        return CloneUtil.clone_as(self, result_type)

@@ -19,15 +19,15 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 class StubSlottedKey(KeyMixin):
     """Stub record base class not using any dataclass framework."""
 
-    __slots__ = SlotsUtil.merge_slots(KeyMixin, "record_id")
+    __slots__ = ("key_field",)
 
-    record_id: str
-    """Unique identifier."""
+    key_field: str
+    """Field of the key object."""
 
-    def __init__(self, record_id: str = "abc") -> None:
+    def __init__(self, *, key_field: str = "abc") -> None:
         """Initialize instance attributes."""
         super().__init__()
-        self.record_id = record_id
+        self.key_field = key_field
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:

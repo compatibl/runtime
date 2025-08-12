@@ -22,8 +22,7 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 class BootstrapMixin(BuilderMixin, ABC):
     """Dataclasses base for lightweight classes that do not require validation against the schema."""
 
-    __slots__ = SlotsUtil.merge_slots(BuilderMixin)
-    """To prevent creation of __dict__ in derived types."""
+    __slots__ = ()
 
     @classmethod
     @cached

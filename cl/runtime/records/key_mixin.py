@@ -23,8 +23,7 @@ from cl.runtime.serializers.slots_util import SlotsUtil
 class KeyMixin(DataMixin, ABC):
     """Mixin class for a key."""
 
-    __slots__ = SlotsUtil.merge_slots(DataMixin)
-    """To prevent creation of __dict__ in derived types."""
+    __slots__ = ()
 
     @classmethod
     @abstractmethod

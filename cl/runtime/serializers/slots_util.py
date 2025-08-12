@@ -64,13 +64,3 @@ class SlotsUtil:
                 f"Class {TypeUtil.name(data_type)} cannot be serialized because it does not have\n"
                 f"the '__slots__' attribute and does not define a custom @classmethod 'get_slots'."
             )
-
-    @classmethod
-    def merge_slots(cls, base: type, *slots: str) -> Tuple[str, ...]:
-        """
-        When not using any data class framework, merge slots from this class
-        and base in a way that works for Python 3.10 where slots are not inherited
-        and Python 3.11+ where they are.
-        """
-        # Slots are merged automatically
-        return tuple(slots)
