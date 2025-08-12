@@ -14,15 +14,17 @@
 
 from dataclasses import dataclass
 from typing import Self
-from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime import RecordMixin
+from stubs.cl.runtime.contexts.stub_context_key import StubContextKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StubContext(DataMixin):
+class StubContext(StubContextKey, RecordMixin):
     """Stub context."""
 
-    stub_context_id: str = "abc"
-    """Stub context identifier."""
+    @classmethod
+    def get_base_type(cls) -> type:
+        return StubContext
 
     error_on_post_init: bool = False
     """If True, an error will be raised inside '__post_init__' method for testing purposes."""
@@ -36,9 +38,8 @@ class StubContext(DataMixin):
     error_on_exit: bool = False
     """If True, an error will be raised inside __exit__ method for testing purposes."""
 
-    @classmethod
-    def get_base_type(cls) -> type:
-        return StubContext
+    def get_key(self) -> StubContextKey:
+        return StubContextKey(id=self.id).build()
 
     def __post_init__(self):
         """Runs after __init__."""
