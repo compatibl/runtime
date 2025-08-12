@@ -85,7 +85,7 @@ def test_context_snapshot():
 
     # Inside two nested 'with' clauses for the same key type StubContext
     with activate(StubContext().build()):
-        with activate(StubContext(stub_context_id="modified_stub_context_id").build()) as context_2:
+        with activate(StubContext(id="modified_id").build()) as context_2:
             _perform_serialization_test([context_2])
     # Recreate using ContextSnapshot
     _perform_manager_test([context_2])

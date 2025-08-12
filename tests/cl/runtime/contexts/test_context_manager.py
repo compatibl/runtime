@@ -17,7 +17,7 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
-from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import activate, activate_or_none
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
@@ -59,7 +59,7 @@ def _perform_testing(
         # Ensure that current context is not leaked outside the 'with clause' before the test
         active(StubContext)
 
-    stub_context_1 = StubContext(stub_context_id="stub_context_1").build()
+    stub_context_1 = StubContext(id="stub_context_1").build()
     with activate(stub_context_1):
 
         _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
@@ -103,7 +103,7 @@ async def _perform_testing_async(
         # Ensure that current context is not leaked outside the 'with clause' before the test
         active(StubContext)
 
-    stub_context_1 = StubContext(stub_context_id="stub_context_1").build()
+    stub_context_1 = StubContext(id="stub_context_1").build()
     with activate(stub_context_1):
 
         await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
@@ -134,12 +134,52 @@ async def _gather(context_snapshot_json: str, rnd: Random):
         await asyncio.gather(*tasks)
 
 
-# TODO: Restore after creating the standard way to init context classes
+def test_activate():
+    """Test activate method."""
+    with activate(StubContext(id="0").build()) as stub_context_0:
+        with activate(StubContext(id="1").build(), context_id="1") as stub_context_1:
+            assert stub_context_0.id == "0"
+            assert stub_context_1.id == "1"
+            assert active(StubContext) is stub_context_0
+            assert active(StubContext, context_id="1") is stub_context_1
+        assert active_or_none(StubContext) is stub_context_0
+        assert active_or_none(StubContext, context_id="1") is None
+    assert active_or_none(StubContext) is None
+    assert active_or_none(StubContext, context_id="1") is None
+
+
+def test_activate_or_none():
+    """Test activate_or_none method."""
+
+    # Invoke with contexts
+    with activate_or_none(StubContext(id="0").build()) as stub_context_0:
+        with activate_or_none(StubContext(id="1").build(), context_id="1") as stub_context_1:
+            assert stub_context_0.id == "0"
+            assert stub_context_1.id == "1"
+            assert active(StubContext) is stub_context_0
+            assert active(StubContext, context_id="1") is stub_context_1
+        assert active_or_none(StubContext) is stub_context_0
+        assert active_or_none(StubContext, context_id="1") is None
+    assert active_or_none(StubContext) is None
+    assert active_or_none(StubContext, context_id="1") is None
+
+    # Invoke with None - should have no-op behavior
+    with activate_or_none(None) as result:
+        assert result is None
+        # Should not affect any active contexts
+        assert active_or_none(StubContext) is None
+    
+    # Test that None with context_id raises error
+    with pytest.raises(RuntimeError, match="If context is None, context_id must also be None"):
+        with activate_or_none(None, context_id="test"):
+            pass
+        
+    
 def test_error_handling():
     """Test error handling in specifying extensions."""
 
-    stub_context_1 = StubContext(stub_context_id="stub_context_1").build()
-    stub_context_2 = StubDerivedContext(stub_context_id="stub_context_2").build()
+    stub_context_1 = StubContext(id="stub_context_1").build()
+    stub_context_2 = StubDerivedContext(id="stub_context_2").build()
 
     # Outer context all of the fields of the inner context, ok
     assert active_or_none(StubContext) is None

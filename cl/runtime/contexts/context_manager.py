@@ -49,6 +49,9 @@ def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | N
         context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
+    if context_id == "":
+        raise RuntimeError("Using an empty string as context_id is ambiguous, use None instead.")
+
     key_type_name = TypeUtil.name(context_type.get_base_type())  # TODO: Use key_type
     return _get_or_create_stack_dict()[(key_type_name, context_id)]
 
@@ -200,7 +203,31 @@ def activate(context: TRecord, context_id: str | None = None):
         )
 
 
-def active(context_type: type[TRecord], context_id: str | None = None) -> TRecord:
+@contextmanager
+def activate_or_none(context: TRecord | None, context_id: str | None = None):
+    """
+    Set active context using 'with activate(context)' clause, invokes __enter__ and __exit__ if they are implemented.
+    If an exception is raised inside 'with activate(context)' clause, its details will be passed to __exit__.
+
+    Notes:
+        Do nothing when context is None, this can be used for activating a context conditionally.
+
+    Args:
+        context: Context object, active contexts are separate for each (context_key_type, context_id) pair.
+        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
+    """
+    if context is not None:
+        # Delegate to activate(...) when context is not None
+        with activate(context, context_id) as activated_context:
+            yield activated_context
+    else:
+        # Do nothing when context is None, this can be used for activating a context conditionally
+        if context_id is not None:
+            raise RuntimeError("If context is None, context_id must also be None.")
+        yield None
+
+
+def active(context_type: type[TRecord] | None, context_id: str | None = None) -> TRecord:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
     or raise an error outside a 'with' clause for the corresponding (context_key_type, context_id) pair.
@@ -271,3 +298,5 @@ def get_active_contexts_and_ids() -> tuple[tuple[RecordProtocol, ...], tuple[str
     else:
         # Return an empty dict if there are no active contexts
         return (), ()
+
+
