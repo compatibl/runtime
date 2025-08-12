@@ -15,7 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import List
 from typing import Sequence
 from typing import TypeVar
 from cl.runtime.contexts.context_manager import active

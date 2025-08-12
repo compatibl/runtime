@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import Any
-from typing import Dict
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 

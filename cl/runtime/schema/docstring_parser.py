@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import re
-from typing import Dict
 from typing import Pattern
 
 # Regexp for docstring parsing

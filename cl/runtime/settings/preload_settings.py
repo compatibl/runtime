@@ -14,7 +14,6 @@
 
 import os
 from dataclasses import dataclass
-from typing import List
 from typing import final
 from typing_extensions import final
 from cl.runtime.configs.config import Config

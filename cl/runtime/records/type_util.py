@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import Any
-from typing import Dict
 from typing import TypeGuard
 from typing import get_origin
 from cl.runtime.records.protocols import TObj

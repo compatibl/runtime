@@ -16,7 +16,6 @@ import csv
 import os
 from dataclasses import dataclass
 from typing import Any
-from typing import Dict
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.reader import Reader

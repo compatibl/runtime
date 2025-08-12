@@ -15,7 +15,6 @@
 import re
 from dataclasses import dataclass
 from typing import Any
-from typing import Dict
 from typing import Iterable
 from typing import Sequence
 from typing import cast

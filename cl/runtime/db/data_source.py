@@ -15,7 +15,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger
-from typing import List
 from typing import Self
 from typing import Sequence
 from typing import cast

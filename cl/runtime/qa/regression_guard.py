@@ -18,7 +18,6 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from typing import ClassVar
-from typing import Dict
 from typing import Self
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List
 import networkx as nx
 from cl.runtime import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required

@@ -15,7 +15,6 @@
 from abc import ABC
 from collections import Counter
 from dataclasses import dataclass
-from typing import List
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.experiments.classifier_trial import ClassifierTrial

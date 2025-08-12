@@ -14,7 +14,6 @@
 
 import datetime as dt
 from dataclasses import dataclass
-from typing import Tuple
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass

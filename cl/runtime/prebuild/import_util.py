@@ -14,7 +14,6 @@
 
 import importlib
 import pkgutil
-from typing import List
 from cl.runtime.settings.env_settings import EnvSettings
 
 

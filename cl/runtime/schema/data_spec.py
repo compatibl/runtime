@@ -14,8 +14,6 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Dict
-from typing import List
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.field_spec import FieldSpec
 from cl.runtime.schema.type_spec import TypeSpec

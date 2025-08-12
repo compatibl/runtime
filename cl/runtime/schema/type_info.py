@@ -14,7 +14,6 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Tuple
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.schema.type_kind import TypeKind
 

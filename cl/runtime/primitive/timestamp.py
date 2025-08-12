@@ -14,7 +14,6 @@
 
 import datetime as dt
 import re
-from typing import List
 from uuid import UUID
 import uuid_utils
 from cl.runtime.exceptions.error_util import ErrorUtil

@@ -14,7 +14,6 @@
 
 import pytest
 import inspect
-from typing import List
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.entity.panels_request import PanelsRequest

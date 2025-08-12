@@ -16,7 +16,6 @@ from collections import defaultdict
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any
-from typing import List
 from typing import Optional
 from typing import Type
 from cl.runtime.records.protocols import RecordProtocol

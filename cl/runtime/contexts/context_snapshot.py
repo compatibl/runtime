@@ -14,7 +14,6 @@
 
 from contextvars import Token
 from dataclasses import dataclass
-from typing import List
 from typing import Self
 from cl.runtime.contexts.context_manager import _STACK_DICT_VAR
 from cl.runtime.contexts.context_manager import get_active_contexts_and_ids

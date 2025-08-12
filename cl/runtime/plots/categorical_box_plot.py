@@ -13,10 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Dict
-from typing import List
 from typing import Optional
-from typing import Tuple
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt

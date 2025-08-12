@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
 from typing import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.schema.enum_member_spec import EnumMemberSpec

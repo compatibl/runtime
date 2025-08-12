@@ -14,7 +14,6 @@
 
 import os
 from fnmatch import fnmatch
-from typing import List
 from cl.runtime.csv_util import CsvUtil
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings

@@ -15,7 +15,6 @@
 import dataclasses
 import datetime as dt
 from typing import Any
-from typing import Dict
 from uuid import UUID
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec

@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import Any
-from typing import List
 from cl.runtime import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import optional
 from stubs.cl.runtime import StubDataclass

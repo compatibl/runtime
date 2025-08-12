@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List
 from cl.runtime import RecordListView
 from cl.runtime import View
 from cl.runtime.contexts.context_manager import active

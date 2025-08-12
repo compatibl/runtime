@@ -14,8 +14,6 @@
 
 import pytest
 import datetime as dt
-from typing import List
-from typing import Tuple
 from zoneinfo import ZoneInfo
 from cl.runtime.primitive.time_util import TimeUtil
 

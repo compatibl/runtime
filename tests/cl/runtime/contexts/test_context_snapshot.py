@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from typing import List
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_manager import get_active_contexts_and_ids

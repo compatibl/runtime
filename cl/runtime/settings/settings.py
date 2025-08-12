@@ -18,7 +18,6 @@ from abc import ABC
 from dataclasses import MISSING
 from dataclasses import dataclass
 from typing import ClassVar
-from typing import Dict
 from typing import Self
 from dotenv import find_dotenv
 from dotenv import load_dotenv

@@ -15,7 +15,6 @@
 import ast
 import inspect
 import textwrap
-from typing import List
 from typing import Sequence
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import KeyProtocol

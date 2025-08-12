@@ -17,7 +17,6 @@ from dataclasses import dataclass
 from types import FunctionType
 from types import MethodType
 from typing import Iterable
-from typing import List
 from inflection import humanize
 from inflection import titleize
 from cl.runtime.primitive.case_util import CaseUtil

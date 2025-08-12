@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from getpass import getuser
-from typing import Tuple
 from typing_extensions import final
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.qa.qa_util import QaUtil

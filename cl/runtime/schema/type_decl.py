@@ -20,7 +20,6 @@ from dataclasses import dataclass
 from enum import Enum
 from itertools import tee
 from typing import Dict
-from typing import List
 from typing import Self
 from typing import Set
 from typing import get_type_hints  # TODO: Use TypeHint class instead

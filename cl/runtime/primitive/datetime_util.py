@@ -17,7 +17,6 @@ import re
 from math import ceil
 from math import floor
 from typing import Callable
-from typing import Tuple
 from cl.runtime.primitive.timestamp import Timestamp
 
 # Compile the regex pattern for datetime in ISO-8601 format yyyy-mm-ddThh:mm:ss.fffZ

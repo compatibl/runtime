@@ -15,7 +15,6 @@
 from enum import Enum
 from textwrap import TextWrapper
 from typing import Any
-from typing import List
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.string_util import StringUtil

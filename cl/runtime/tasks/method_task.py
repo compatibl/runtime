@@ -19,7 +19,6 @@ from collections import namedtuple
 from dataclasses import dataclass
 from types import FunctionType
 from types import MethodType
-from typing import Dict
 from inflection import underscore
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import optional

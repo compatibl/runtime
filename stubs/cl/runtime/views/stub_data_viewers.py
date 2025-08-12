@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassKey

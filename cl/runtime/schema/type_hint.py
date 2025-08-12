@@ -16,7 +16,6 @@ import types
 import typing
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
 from typing import Self
 from uuid import UUID
 from frozendict import frozendict

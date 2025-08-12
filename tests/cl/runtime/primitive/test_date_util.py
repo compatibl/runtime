@@ -13,8 +13,6 @@
 # limitations under the License.
 
 import pytest
-from typing import List
-from typing import Tuple
 from cl.runtime.primitive.date_util import DateUtil
 
 

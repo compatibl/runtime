@@ -15,8 +15,6 @@
 import pytest
 from pathlib import Path
 from typing import Iterable
-from typing import List
-from typing import Tuple
 import pandas as pd
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource

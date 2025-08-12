@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List
 from cl.runtime import RecordMixin
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource

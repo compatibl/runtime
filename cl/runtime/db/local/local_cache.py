@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Dict
 from typing import Self
 from typing import Sequence
 from cl.runtime import Db

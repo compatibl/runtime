@@ -14,7 +14,6 @@
 
 import pytest
 from dataclasses import dataclass
-from typing import List
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.patches import Rectangle

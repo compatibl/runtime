@@ -13,9 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Dict
-from typing import List
-from typing import Tuple
 import numpy as np
 from matplotlib import pyplot as plt
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot

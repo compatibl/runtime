@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Dict
-from typing import List
 from cl.runtime.backend.core.tab_info import TabInfo
 from cl.runtime.backend.core.ui_app_state_key import UiAppStateKey
 from cl.runtime.backend.core.user_key import UserKey

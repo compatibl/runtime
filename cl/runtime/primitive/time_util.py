@@ -14,7 +14,6 @@
 
 import datetime as dt
 import re
-from typing import Tuple
 
 # Compile the regex pattern for time in ISO-8601 format hh:mm:ss.fff without timezone
 time_pattern = re.compile(r"^\d{2}:\d{2}:\d{2}\.\d{3}$")

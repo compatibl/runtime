@@ -14,8 +14,6 @@
 
 import datetime as dt
 from dataclasses import dataclass
-from typing import Dict
-from typing import List
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.for_dataclasses.extensions import required
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass

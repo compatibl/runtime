@@ -15,7 +15,6 @@
 from abc import ABC
 from typing import Generic
 from typing import Sequence
-from typing import Tuple
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_primitive

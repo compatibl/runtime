@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import List
 import matplotlib.ticker as mticker
 import pandas as pd
 from matplotlib import pyplot as plt
