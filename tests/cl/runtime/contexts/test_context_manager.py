@@ -20,6 +20,7 @@ from random import Random
 from cl.runtime.contexts.context_manager import activate, activate_or_none
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_manager import active_or_none
+from cl.runtime.contexts.context_manager import make_active, make_inactive
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from stubs.cl.runtime.contexts.stub_context import StubContext
 from stubs.cl.runtime.contexts.stub_derived_context import StubDerivedContext
@@ -173,7 +174,69 @@ def test_activate_or_none():
     with pytest.raises(RuntimeError, match="If context is None, context_id must also be None"):
         with activate_or_none(None, context_id="test"):
             pass
-        
+
+
+def test_make_active():
+    """Test make_active and make_inactive methods."""
+
+    # Test basic make_active and make_inactive functionality
+    stub_context_0 = StubContext(id="0").build()
+    stub_context_1 = StubContext(id="1").build()
+
+    # Ensure no active context initially
+    assert active_or_none(StubContext) is None
+    assert active_or_none(StubContext, context_id="1") is None
+
+    # Activate first context
+    make_active(stub_context_0)
+    assert active(StubContext) is stub_context_0
+    assert active_or_none(StubContext, context_id="1") is None
+
+    # Activate second context with different context_id
+    make_active(stub_context_1, context_id="1")
+    assert active(StubContext) is stub_context_0
+    assert active(StubContext, context_id="1") is stub_context_1
+
+    # Deactivate contexts in reverse order
+    make_inactive(stub_context_1, context_id="1")
+    assert active(StubContext) is stub_context_0
+    assert active_or_none(StubContext, context_id="1") is None
+
+    make_inactive(stub_context_0)
+    assert active_or_none(StubContext) is None
+    assert active_or_none(StubContext, context_id="1") is None
+
+    # Test nested activation with different context types
+    stub_context_2 = StubDerivedContext(derived_field="stub_context_2").build()
+
+    # Activate base context
+    make_active(stub_context_0)
+    assert active(StubContext) is stub_context_0
+
+    # Activate derived context
+    make_active(stub_context_2)
+    assert active(StubContext) is stub_context_2
+    assert active(StubDerivedContext) is stub_context_2
+
+    # Deactivate derived context
+    make_inactive(stub_context_2)
+    assert active(StubContext) is stub_context_0
+    with pytest.raises(RuntimeError, match="Cannot cast an object of type StubContext to type StubDerivedContext"):
+        active(StubDerivedContext)
+
+    # Deactivate base context
+    make_inactive(stub_context_0)
+    assert active_or_none(StubContext) is None
+
+    # Test error handling - trying to deactivate when no context is active
+    with pytest.raises(RuntimeError, match="has been cleared inside"):
+        make_inactive(stub_context_0)
+
+    # Test error handling - trying to deactivate wrong context
+    make_active(stub_context_0)
+    with pytest.raises(RuntimeError, match="has been changed bypassing the context manager"):
+        make_inactive(stub_context_1)  # Different context object
+    make_inactive(stub_context_0)  # Clean up
     
 def test_error_handling():
     """Test error handling in specifying extensions."""
