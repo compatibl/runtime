@@ -16,10 +16,10 @@ from collections import defaultdict
 from dataclasses import dataclass
 from logging import getLogger
 from typing import List
+from typing import Self
 from typing import Sequence
 from typing import cast
 from more_itertools import consume
-from typing import Self
 from cl.runtime import Db
 from cl.runtime import KeyUtil
 from cl.runtime import TypeCache

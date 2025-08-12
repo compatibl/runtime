@@ -14,10 +14,10 @@
 
 import dataclasses
 from dataclasses import dataclass
+from typing import Self
 from typing import Set
 from typing import get_type_hints  # TODO: Use TypeHint class instead
 from memoization import cached
-from typing import Self
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.element_decl import ElementDecl
 from cl.runtime.schema.for_dataclasses.dataclass_field_decl import DataclassFieldDecl

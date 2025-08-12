@@ -21,11 +21,11 @@ from enum import Enum
 from itertools import tee
 from typing import Dict
 from typing import List
+from typing import Self
 from typing import Set
 from typing import get_type_hints  # TODO: Use TypeHint class instead
 from inflection import titleize
 from memoization import cached
-from typing import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil

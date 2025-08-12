@@ -16,8 +16,8 @@ import logging
 from abc import ABC
 from abc import abstractmethod
 from typing import AsyncGenerator
-from fastapi import Request
 from typing import Self
+from fastapi import Request
 from cl.runtime.sse.event import Event
 
 

@@ -28,7 +28,6 @@ from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class SelectResponse(RecordsWithSchemaResponse):

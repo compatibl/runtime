@@ -14,8 +14,8 @@
 
 from dataclasses import dataclass
 from typing import Dict
-from typing import Sequence
 from typing import Self
+from typing import Sequence
 from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required

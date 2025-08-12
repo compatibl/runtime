@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from memoization import cached
 from typing import Self
+from memoization import cached
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 

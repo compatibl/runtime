@@ -17,7 +17,6 @@ from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_AND_MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class DataUtil:

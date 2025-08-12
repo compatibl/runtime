@@ -13,13 +13,11 @@
 # limitations under the License.
 
 from abc import ABC
-from typing import cast
-
-from memoization import cached
 from typing import Self
+from memoization import cached
 from cl.runtime.records.build_util import BuildUtil
 from cl.runtime.records.builder_mixin import BuilderMixin
-from cl.runtime.records.protocols import TData, TObj
+from cl.runtime.records.protocols import TObj
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
@@ -49,6 +47,4 @@ class DataMixin(BuilderMixin, ABC):
 
     def clone_as(self, result_type: type[TObj]) -> TObj:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
-        return result_type(
-            **{k: getattr(self, k) for k in self.get_slots()}
-        )
+        return result_type(**{k: getattr(self, k) for k in self.get_slots()})

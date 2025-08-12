@@ -17,7 +17,7 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Self
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.protocols import TData, TObj
+from cl.runtime.records.protocols import TObj
 from cl.runtime.records.type_util import TypeUtil
 
 _FROZEN_IDS = set()

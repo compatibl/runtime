@@ -17,9 +17,9 @@ import typing
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
+from typing import Self
 from uuid import UUID
 from frozendict import frozendict
-from typing import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES

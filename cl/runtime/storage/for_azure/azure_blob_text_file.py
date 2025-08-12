@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Self
 from azure.core.exceptions import ResourceNotFoundError
 from azure.storage.blob import BlobClient
 from azure.storage.blob import ContentSettings
-from typing import Self
 from cl.runtime.storage.text_file import TextFile
 
 _CONTENT_SETTINGS = ContentSettings(content_type=f"text/plain; charset=utf-8")

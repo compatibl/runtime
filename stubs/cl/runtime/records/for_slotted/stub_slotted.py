@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.serializers.slots_util import SlotsUtil
 from stubs.cl.runtime.records.for_slotted.stub_slotted_key import StubSlottedKey
 
 

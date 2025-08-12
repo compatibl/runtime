@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from typing import Self
 from azure.core.exceptions import ResourceExistsError
 from azure.storage.blob import BlobClient
 from azure.storage.blob import BlobServiceClient
-from typing import Self
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.storage.binary_file import BinaryFile
 from cl.runtime.storage.binary_file_mode import BinaryFileMode

@@ -16,8 +16,8 @@ import datetime as dt
 import types
 import typing
 from dataclasses import dataclass
-from uuid import UUID
 from typing import Self
+from uuid import UUID
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES

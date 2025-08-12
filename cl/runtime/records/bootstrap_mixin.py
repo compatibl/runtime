@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from abc import ABC
-from memoization import cached
 from typing import Self
+from memoization import cached
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
 

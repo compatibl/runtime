@@ -20,9 +20,11 @@ from cl.runtime.records.type_util import TypeUtil
 
 # We rely on __slots__ from base being included in __slots__ of descendants in Python 3.11+
 if sys.version_info < (3, 11):
-    raise RuntimeError(f"We rely on __slots__ from base being included in __slots__ of descendants.\n"
-                       f"This feature requires Python 3.11+, while this version is: "
-                       f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+    raise RuntimeError(
+        f"We rely on __slots__ from base being included in __slots__ of descendants.\n"
+        f"This feature requires Python 3.11+, while this version is: "
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    )
 
 
 class SlotsUtil:

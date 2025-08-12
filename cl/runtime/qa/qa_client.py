@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Self
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from typing import Self
 from cl.runtime.contexts.context_manager import make_active
 from cl.runtime.contexts.context_manager import make_inactive
 from cl.runtime.contexts.env import Env

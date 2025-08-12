@@ -19,13 +19,13 @@ from typing import Dict
 from typing import List
 from typing import Mapping
 from typing import Protocol
+from typing import Self
 from typing import Sequence
 from typing import TypeGuard
 from typing import TypeVar
 from uuid import UUID
 from bson import Int64
 from frozendict import frozendict
-from typing import Self
 
 PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes)
 """The list of Python classes used to store primitive types, not the same as type names."""
@@ -81,6 +81,7 @@ SEQUENCE_AND_MAPPING_TYPE_NAMES = tuple(x for x in (*SEQUENCE_TYPE_NAMES, *MAPPI
 TObj = TypeVar("TObj")
 """Generic type parameter for any object."""
 
+
 class BuilderProtocol(Protocol):
     """Protocol for freezable fields and builder pattern support."""
 
@@ -115,6 +116,7 @@ class BuilderProtocol(Protocol):
         This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
         """
         ...
+
 
 class DataProtocol(BuilderProtocol):
     """Protocol for a class that has slots and implements the builder pattern."""

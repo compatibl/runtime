@@ -16,11 +16,13 @@ import dataclasses
 import datetime as dt
 from enum import Enum
 from types import ModuleType
-from typing import Dict, cast
+from typing import Dict
 from typing import Mapping
 from typing import Tuple
+from typing import cast
 from uuid import UUID
-from cl.runtime.records.protocols import is_data_key_or_record, DataProtocol
+from cl.runtime.records.protocols import DataProtocol
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec

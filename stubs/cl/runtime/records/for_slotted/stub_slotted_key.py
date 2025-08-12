@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class StubSlottedKey(KeyMixin):

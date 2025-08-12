@@ -27,7 +27,6 @@ from pymongo.synchronous.collection import Collection
 from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
-from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
