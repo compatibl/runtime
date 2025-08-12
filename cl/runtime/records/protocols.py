@@ -109,6 +109,13 @@ class BuilderProtocol(Protocol):
         """
         ...
 
+    def cast(self, cast_to: type[TObj]) -> TObj:
+        """
+        Cast self to type cast_to after checking it is an instance of cast_to, error message otherwise.
+        This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
+        """
+        ...
+
 class DataProtocol(BuilderProtocol):
     """Protocol for a class that has slots and implements the builder pattern."""
 

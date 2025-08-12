@@ -201,7 +201,7 @@ class BasicMongoDb(Db):
             record = data_serializer.deserialize(serialized_record)
 
             # Apply cast (error if not a subtype)
-            record = CastUtil.cast(cast_to, record)
+            record = record.cast(cast_to)
             result.append(record)
 
         return tuple(result)

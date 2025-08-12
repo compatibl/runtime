@@ -21,15 +21,25 @@ class CastUtil:
     """Helper class for safe downcasting."""
 
     @classmethod
-    def cast(cls, result_type: type[TObj], obj: Any) -> TObj:
+    def cast(cls, cast_to: type[TObj], obj: Any) -> TObj:
         """
-        Cast obj to result_type after checking it is an instance of result_type, error message otherwise.
+        Cast obj to type cast_to after checking it is an instance of cast_to, error message otherwise.
         This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
-        Pass through None.
         """
-        if obj is None or isinstance(obj, result_type):
+        if obj is not None:
+            return cls.cast_or_none(cast_to, obj)
+        else:
+            raise RuntimeError(f"Cannot cast None to type {TypeUtil.name(cast_to)}, use cast_or_none to allow.")
+
+    @classmethod
+    def cast_or_none(cls, cast_to: type[TObj], obj: Any) -> TObj:
+        """
+        Cast obj to type cast_to after checking it is an instance of cast_to or None, error message otherwise.
+        This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
+        """
+        if obj is None or isinstance(obj, cast_to):
             return obj
         else:
             raise RuntimeError(
-                f"Cannot cast an object of type {TypeUtil.name(obj)} to type {TypeUtil.name(result_type)}."
+                f"Cannot cast an object of type {TypeUtil.name(obj)} to type {TypeUtil.name(cast_to)}."
             )

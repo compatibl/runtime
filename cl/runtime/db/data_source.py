@@ -362,9 +362,9 @@ class DataSource(DataSourceKey, RecordMixin):
             for x in records_or_keys
         )
 
-        # Cast to cast_to if specified
+        # Cast to cast_to if specified, pass through None
         if cast_to is not None:
-            result = tuple(CastUtil.cast(cast_to, x) for x in result)
+            result = tuple(CastUtil.cast_or_none(cast_to, x) for x in result)
         return result
 
     def load_type(

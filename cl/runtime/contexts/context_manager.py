@@ -232,7 +232,7 @@ def active_or_none(context_type: type[TRecord], context_id: str | None = None) -
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
     stack = _get_or_create_stack(context_type, context_id)
-    return CastUtil.cast(context_type, stack[-1]) if stack else None
+    return stack[-1].cast(context_type) if stack else None
 
 
 def active_or_default(context_type: type[TRecord], context_id: str | None = None) -> TRecord:

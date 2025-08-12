@@ -17,7 +17,7 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Self
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.protocols import TData
+from cl.runtime.records.protocols import TData, TObj
 from cl.runtime.records.type_util import TypeUtil
 
 _FROZEN_IDS = set()
@@ -65,10 +65,10 @@ class BuilderMixin(ABC):
             raise RuntimeError(f"Cannot modify public field {type_name}.{key} because the instance is frozen.")
         object.__setattr__(self, key, value)
 
-    def cast(self, result_type: type[TData]) -> TData:
+    def cast(self, cast_to: type[TObj]) -> TObj:
         """
-        Cast obj to result_type after checking it is an instance of result_type, error message otherwise.
+        Cast self to type cast_to after checking it is an instance of cast_to, error message otherwise.
         This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
-        Pass through None.
         """
-        return CastUtil.cast(result_type, self)
+        # Self is never None but cast_or_none performs one less check than cast, use for performance reasons
+        return CastUtil.cast_or_none(cast_to, self)
