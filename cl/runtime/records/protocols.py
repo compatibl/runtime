@@ -78,69 +78,65 @@ SEQUENCE_AND_MAPPING_CLASS_NAMES = tuple(x for x in (*SEQUENCE_CLASS_NAMES, *MAP
 SEQUENCE_AND_MAPPING_TYPE_NAMES = tuple(x for x in (*SEQUENCE_TYPE_NAMES, *MAPPING_TYPE_NAMES))
 """Names of classes that may be used to represent mappings, excluding abstract base classes."""
 
+TObj = TypeVar("TObj")
+"""Generic type parameter for any object."""
 
-class DataProtocol(Protocol):
+class BuilderProtocol(Protocol):
+    """Protocol for freezable fields and builder pattern support."""
+
+    def is_frozen(self) -> bool:
+        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
+        ...
+
+    def mark_frozen(self) -> Self:
+        """
+        Mark the instance as frozen without actually freezing it, which is the responsibility of build method.
+        The action of marking the instance frozen cannot be reversed. Can be called more than once.
+        """
+        ...
+
+    def check_frozen(self) -> None:
+        """Raise an error if the instance is not frozen."""
+        ...
+
+    def build(self) -> Self:
+        """
+        This method performs the following steps:
+        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
+        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
+        (2) Invokes 'freeze' method of this class
+        Returns self to enable method chaining.
+        """
+        ...
+
+class DataProtocol(BuilderProtocol):
     """Protocol for a class that has slots and implements the builder pattern."""
 
-    def is_frozen(self) -> bool:
-        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
+    @classmethod
+    def get_slots(cls) -> tuple[str, ...]:
+        """Return slots the order of declaration from base to derived."""
         ...
 
-    def build(self) -> Self:
-        """
-        This method performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
-        """
+    def clone(self) -> Self:
+        """Return an unfrozen object of the same type populated by shallow copies of public fields."""
+        ...
+
+    def clone_as(self, result_type: type[TObj]) -> TObj:
+        """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
         ...
 
 
-class KeyProtocol(Protocol):
+class KeyProtocol(DataProtocol):
     """Protocol implemented by both keys and records."""
 
-    def is_frozen(self) -> bool:
-        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
-        ...
-
-    def build(self) -> Self:
-        """
-        This method performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
-        """
-        ...
-
     @classmethod
     def get_key_type(cls) -> type:
         """Return key type even when called from a record."""
         ...
 
 
-class RecordProtocol(Protocol):
+class RecordProtocol(KeyProtocol):
     """Protocol implemented by records."""
-
-    def is_frozen(self) -> bool:
-        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
-        ...
-
-    def build(self) -> Self:
-        """
-        This method performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
-        """
-        ...
-
-    @classmethod
-    def get_key_type(cls) -> type:
-        """Return key type even when called from a record."""
-        ...
 
     def get_key(self) -> KeyProtocol:
         """Return a new key object whose fields populated from self, do not return self."""
