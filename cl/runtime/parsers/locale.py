@@ -22,7 +22,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 
 @dataclass(slots=True, kw_only=True)
 class Locale(LocaleKey, RecordMixin, ABC):
-    """Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)."""
+    """Locale and related conventions."""
 
     language: str = required()
     """

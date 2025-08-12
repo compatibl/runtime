@@ -13,17 +13,14 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.key_mixin import KeyMixin
+from typing_extensions import final
+from cl.runtime.settings.settings import Settings
 
 
-@dataclass(slots=True)
-class LocaleKey(KeyMixin):
-    """Locale and related conventions."""
+@dataclass(slots=True, kw_only=True)
+@final
+class LocaleSettings(Settings):
+    """Settings for the locale and related conventions."""
 
-    locale_id: str = required()
+    locale_id: str = "en-US"
     """Locale in BCP 47 language-country format, for example en-US (second token must be country, not region)."""
-
-    @classmethod
-    def get_key_type(cls) -> type[KeyMixin]:
-        return LocaleKey
