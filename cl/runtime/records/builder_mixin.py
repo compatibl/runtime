@@ -34,6 +34,11 @@ class BuilderMixin(ABC):
     __slots__ = ("__weakref__",)
     """To prevent creation of __dict__ in derived types."""
 
+    @classmethod
+    def default(cls) -> Self:
+        """Create a default instance of this type, derived types may override."""
+        return cls().build()
+
     @abstractmethod
     def build(self) -> Self:
         """Configure the instance and freeze to prevent further modifications."""

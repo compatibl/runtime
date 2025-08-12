@@ -261,21 +261,25 @@ def active_or_none(context_type: type[TRecord], context_id: str | None = None) -
     return stack[-1].cast(context_type) if stack else None
 
 
-def active_or_default(context_type: type[TRecord], context_id: str | None = None) -> TRecord:
+def active_or_default(context_type: type[TRecord]) -> TRecord:
     """
     Return the argument of the innermost `with activate(...)` clause for the key type of context_type,
     or create a default instance using 'context_type()' if outside a 'with' clause for the corresponding
-    (context_key_type, context_id) pair.
+    context_key_type.
+
+    Notes:
+        Context_id parameter not accepted for this method because default context is defined only for context_id == None
 
     Args:
         context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
-        context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
     # Return the top context in stack if exists, otherwise build a new context instance with all values set to default
-    result = active_or_none(context_type, context_id)
+    # Context_id parameter not accepted for this method because default context is defined only for context_id == None
+    result = active_or_none(context_type, context_id=None)
     if result is None:
-        # Build with default parameters if no active context is found for the (context_key_type, context_id) pair
-        result = context_type().build()
+        # Create a default instance if no active context is found for the (context_key_type, context_id) pair
+        # The method 'default' is implemented in BuilderMixin to return cls().build(), derived types can override
+        result = context_type.default()
     return result
 
 

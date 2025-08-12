@@ -83,6 +83,11 @@ TObj = TypeVar("TObj")
 class BuilderProtocol(Protocol):
     """Protocol for freezable fields and builder pattern support."""
 
+    @classmethod
+    def default(cls) -> Self:
+        """Create a default instance of this type, derived types may override."""
+        ...
+
     def is_frozen(self) -> bool:
         """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
         ...
@@ -114,6 +119,7 @@ class BuilderProtocol(Protocol):
         This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
         """
         ...
+
 
 
 class DataProtocol(BuilderProtocol):

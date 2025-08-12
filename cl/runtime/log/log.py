@@ -42,6 +42,7 @@ class Log(LogKey, RecordMixin, ABC):
     def default(cls) -> Self:
         """Default log is initialized from settings and cannot be modified in code."""
 
+        # TODO: Review and change based on LogSettings
         if Log.__default is None:
             # Create the class specified in settings and invoke its constructor
             log_type = TypeCache.get_class_from_type_name(LogSettings.instance().log_type)
