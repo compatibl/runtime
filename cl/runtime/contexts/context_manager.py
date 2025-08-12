@@ -150,9 +150,10 @@ def make_inactive(
         )
 
     # Deactivate the currently active context by removing it from the context stack
-    deactivated = context_stack.pop()
-    if deactivated is not context:
-        # Error message if it is not the same context as the argument
+    if context_stack[-1] is context:
+        # Remove the top item in stack only if it is the same as context passed to this method
+        context_stack.pop()
+    else:
         raise RuntimeError(
             f"Active context for context type {TypeUtil.name(context)} and context_id={context_id}\n"
             f"has been changed bypassing the context manager."
