@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from collections import defaultdict
 from dataclasses import dataclass
-from logging import getLogger
 from typing import Self
 from typing import Sequence
 from typing import cast
@@ -44,6 +44,8 @@ from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQ
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(slots=True, kw_only=True)
@@ -80,7 +82,7 @@ class DataSource(DataSourceKey, RecordMixin):
         elif is_key(self.db):
             self.db = self.load_one(self.db)
 
-        getLogger(__name__).info(f"Connected to DB type '{TypeUtil.name(self.db)}', db_id = '{self.db.db_id}'.")
+        _LOGGER.info(f"Connected to DB type '{TypeUtil.name(self.db)}', db_id = '{self.db.db_id}'.")
 
         # Load dataset, use root dataset if not specified
         if self.dataset is None:

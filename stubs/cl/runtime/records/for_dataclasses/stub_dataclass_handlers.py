@@ -23,13 +23,13 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
+_LOGGER = logging.getLogger(__name__)
+
 
 def _log_method_info():  # TODO: Move into testing directory
     """Print information about the caller method using stack inspection."""
 
     # Get logger from TaskLog
-    logger = logging.getLogger(__name__)
-
     # Record method information from stack frame
     current_frame = inspect.currentframe()
     assert current_frame is not None
@@ -46,7 +46,7 @@ def _log_method_info():  # TODO: Move into testing directory
 
     # Log information
     params_output = ",".join(f"{arg}={values[arg]}" for arg in args)
-    logger.info(f"Called {method_name}({params_output})")
+    _LOGGER.info(f"Called {method_name}({params_output})")
 
 
 @dataclass(slots=True, kw_only=True)
@@ -87,7 +87,7 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     def run_instance_method_2a_with_params(self, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
         _log_method_info()
-        logging.getLogger(__name__).info(f"param_1={param_1} param_2={param_2}")
+        _LOGGER.info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters()
     def run_instance_method_2b(self, param_1: str, param_2: str | None = None) -> None:
@@ -119,7 +119,7 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     def run_class_method_2a_with_params(cls, param_1: str, param_2: str) -> None:
         """Stub handler."""
         _log_method_info()
-        logging.getLogger(__name__).info(f"param_1={param_1} param_2={param_2}")
+        _LOGGER.info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
@@ -181,7 +181,7 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     #     enum_arg: StubIntEnum,
     #     data_arg: Any,
     # ) -> None:
-    #     logging.getLogger(__name__).info(
+    #     _LOGGER.info(
     #         f"handler_with_arguments(int_arg={int_arg} datetime_arg={datetime_arg}"
     #         f"enum_arg={enum_arg} data_arg={data_arg})"
     #     )
@@ -212,31 +212,29 @@ class StubHandlers(StubHandlersKey, RecordMixin):
     def run_instance_method_with_binary_param(self, pdf_file: FileData, note_param: str):
         """Stub method."""
         _log_method_info()
-        logging.getLogger(__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
+        _LOGGER.info(f"Binary_data len={len(pdf_file.file_bytes)}")
 
     @staticmethod
     def run_class_method_with_binary_param(pdf_file: FileData):
         """Stub method."""
         _log_method_info()
-        logging.getLogger(__name__).info(f"Binary_data len={len(pdf_file.file_bytes)}")
+        _LOGGER.info(f"Binary_data len={len(pdf_file.file_bytes)}")
 
     def run_long_handler_with_error(self):
-        _logger = logging.getLogger(__name__)
         for i in range(10):
-            _logger.info(f"Message {i}")
+            _LOGGER.info(f"Message {i}")
             time.sleep(3)
         raise RuntimeError("Error in handler.")
 
     def run_long_handler(self):
-        _logger = logging.getLogger(__name__)
         for i in range(10):
-            _logger.info(f"Message {i}")
+            _LOGGER.info(f"Message {i}")
             time.sleep(3)
-        _logger.info("Finished.")
+        _LOGGER.info("Finished.")
 
     # TODO (Roman): Uncomment for tasks/test_submit.
     # def run_save_to_db(self):
     #     """Stub method."""
     #     record_to_save = StubDataclass(id="saved_from_handler").build()
     #     active(DataSource).save_one(record_to_save)
-    #     logging.getLogger(__name__).info(f"Record {record_to_save} has been saved to db from handler.")
+    #     _LOGGER.info(f"Record {record_to_save} has been saved to db from handler.")

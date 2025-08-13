@@ -27,18 +27,19 @@ from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_broker import EventBroker
 from cl.runtime.sse.sse_query_util import SseQueryUtil
 
+_LOGGER = logging.getLogger(__name__)
+
 _PULL_EVENTS_DELAY = 5.0
 """Delay in seconds to check new events in DB."""
 
 
 def _handle_async_task_exception(task: asyncio.Task):
     """Log error if pull events task failed."""
-    _logger = logging.getLogger(__name__)
 
     try:
         task.result()
     except Exception:
-        _logger.error("DB SSE pull events task failed.", exc_info=True)
+        _LOGGER.error("DB SSE pull events task failed.", exc_info=True)
 
 
 class DbEventBroker(EventBroker):
@@ -99,15 +100,13 @@ class DbEventBroker(EventBroker):
             self._pull_events_task.cancel()
 
     async def _pull_events(self):
-        _logger = logging.getLogger(__name__)
-
         while True:
             # Get unprocessed events from the DB, sorted by ascending timestamp
             # TODO (Roman): Replace with DataSource.query() when supported
             new_events = self._get_unprocessed_events()
 
             if new_events:
-                _logger.debug(f"SSE: Found {len(new_events)} events in DB.")
+                _LOGGER.debug(f"SSE: Found {len(new_events)} events in DB.")
 
             # Put events to queue
             for event in new_events:

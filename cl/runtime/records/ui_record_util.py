@@ -37,6 +37,8 @@ from cl.runtime.views.key_view import KeyView
 from cl.runtime.views.script import Script
 from cl.runtime.views.script_language import ScriptLanguage
 
+_LOGGER = logging.getLogger(__name__)
+
 # Create serializers
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 _UI_SERIALIZER = DataSerializers.FOR_UI
@@ -93,8 +95,7 @@ class UiRecordUtil(DataMixin):
             return {"Result": cls._get_panel_content(type_name, key, panel_id, params)}
         except Exception as e:
             # Log exception manually because the FastAPI logger will not be triggered.
-            logger = logging.getLogger(__name__)
-            logger.error(str(e), exc_info=True)
+            _LOGGER.error(str(e), exc_info=True)
 
             error_view = RecordView(
                 view_for=key,

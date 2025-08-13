@@ -15,26 +15,26 @@
 import pytest
 import logging
 
+_LOGGER = logging.getLogger(__name__)
+
 
 def test_smoke():
     """Smoke test."""
 
     # Get logger from TaskLog outside the outermost 'with TaskLog(...)' clause
-    logger = logging.getLogger(__name__)
-
     # Standard messages
     module_name = __name__
-    logger.debug(f"Debug log message in {module_name}")
-    logger.info(f"Info log message in {module_name}")
-    logger.warning(f"Warning log message in {module_name}")
-    logger.error(f"Error log message in {module_name}")
-    logger.critical(f"Critical log message in {module_name}")
+    _LOGGER.debug(f"Debug log message in {module_name}")
+    _LOGGER.info(f"Info log message in {module_name}")
+    _LOGGER.warning(f"Warning log message in {module_name}")
+    _LOGGER.error(f"Error log message in {module_name}")
+    _LOGGER.critical(f"Critical log message in {module_name}")
 
     # Exception message
     try:
         raise RuntimeError(f"Sample RuntimeError text in {module_name}")
     except RuntimeError:
-        logger.exception(f"Exception log message in {module_name}")
+        _LOGGER.exception(f"Exception log message in {module_name}")
 
 
 if __name__ == "__main__":

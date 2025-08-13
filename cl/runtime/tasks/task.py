@@ -33,6 +33,8 @@ from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from cl.runtime.tasks.task_status import TaskStatus
 
+_LOGGER = logging.getLogger(__name__)
+
 
 @dataclass(slots=True, kw_only=True)
 class Task(TaskKey, RecordMixin, ABC):
@@ -97,12 +99,11 @@ class Task(TaskKey, RecordMixin, ABC):
 
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
-        logger = logging.getLogger(__name__)
 
         # Activate logging context for the task
         with activate(self._create_log_context()):
             try:
-                logger.info("Start task execution.", extra={"event": TaskEvent(event_type=EventType.TASK_STARTED)})
+                _LOGGER.info("Start task execution.", extra={"event": TaskEvent(event_type=EventType.TASK_STARTED)})
 
                 # Save with Running status
                 update = self.clone()
@@ -114,7 +115,7 @@ class Task(TaskKey, RecordMixin, ABC):
 
             except Exception as e:  # noqa
 
-                logger.error(
+                _LOGGER.error(
                     "Task failed with exception.",
                     exc_info=True,
                     extra={
@@ -132,7 +133,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 active(DataSource).save_one(update.build())
             else:
 
-                logger.info(
+                _LOGGER.info(
                     "Task completed successfully.",
                     extra={
                         "event": TaskFinishedEvent(event_type=EventType.TASK_FINISHED, status=TaskStatus.COMPLETED),

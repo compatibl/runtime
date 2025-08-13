@@ -27,6 +27,8 @@ from cl.runtime.routers.sse.sse_router import _event_generator as original_event
 from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_type import EventType
 
+_LOGGER = logging.getLogger(__name__)
+
 
 async def _listen_events(client):
     headers = {"Accept": "text/event-stream"}
@@ -41,22 +43,20 @@ async def _listen_events(client):
 
 
 async def _publish_events(client):
-    logger = logging.getLogger(__name__)
-
     await asyncio.sleep(0.3)
-    logger.info("1 - Info")
+    _LOGGER.info("1 - Info")
     await asyncio.sleep(0.1)
-    logger.info("2 - Info", extra={"event": Event(event_type=EventType.TASK_STARTED)})
+    _LOGGER.info("2 - Info", extra={"event": Event(event_type=EventType.TASK_STARTED)})
     await asyncio.sleep(0.3)
-    logger.warning("3 - Warning")
+    _LOGGER.warning("3 - Warning")
     await asyncio.sleep(0.2)
-    logger.error("4 - Error")
+    _LOGGER.error("4 - Error")
     await asyncio.sleep(0.1)
-    logger.info("5 - Info", extra={"event": Event(event_type=EventType.TASK_FINISHED)})
+    _LOGGER.info("5 - Info", extra={"event": Event(event_type=EventType.TASK_FINISHED)})
 
     # Ensure reaching limit in event generator to avoid timeout error
     for i in range(10):
-        logger.info(f"Event to reach limit - #{i}.")
+        _LOGGER.info(f"Event to reach limit - #{i}.")
 
 
 async def _publish_and_listen_events():

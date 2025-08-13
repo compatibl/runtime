@@ -20,6 +20,8 @@ from typing import Self
 from fastapi import Request
 from cl.runtime.sse.event import Event
 
+_LOGGER = logging.getLogger(__name__)
+
 
 class EventBroker(ABC):
     """Base class for event broker."""
@@ -46,11 +48,9 @@ class EventBroker(ABC):
         Should return an async generator yielding events.
         """
 
-        _logger = logging.getLogger(__name__)
-
         while True:
             if request and await request.is_disconnected():
-                _logger.debug("SSE: Client disconnected from SSE. Stop sending events.")
+                _LOGGER.debug("SSE: Client disconnected from SSE. Stop sending events.")
                 break
 
             # Wait for the next event from the queue
