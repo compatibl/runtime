@@ -13,11 +13,15 @@
 # limitations under the License.
 
 import pytest
+import logging.config
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.log.log_config import logging_config
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers
+
+TASK_COUNT = 3
 
 
 def test_smoke(default_db_fixture):
@@ -55,6 +59,35 @@ def test_smoke(default_db_fixture):
             method_callable=method_callable,
         ).build()
         task.run_task()
+
+
+def _run_task(task_index: int):
+    instance = StubHandlers(stub_id=f"abc{task_index}").build()
+    active(DataSource).save_one(instance)
+
+    task = InstanceMethodTask.create(
+        queue=TaskQueueKey(queue_id="Sample Queue"),
+        record_or_key=instance,
+        method_callable=instance.run_instance_method_1a,
+    ).build()
+
+    task.run_task()
+
+
+def test_task_logger(default_db_fixture, capsys):
+    """Test task logger don't share contextual properties."""
+
+    # Set up logging config
+    logging.config.dictConfig(logging_config)
+
+    [_run_task(task_index) for task_index in range(TASK_COUNT)]
+
+    # Get stdout lines
+    captured_lines = capsys.readouterr().out.splitlines()
+
+    # Check that the stdout lines are not empty and are unique, as they contain specific contextual information
+    assert bool(captured_lines)
+    assert len(captured_lines) == len(set(captured_lines))
 
 
 if __name__ == "__main__":

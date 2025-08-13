@@ -17,8 +17,8 @@ import os
 import socket
 import threading
 from cl.runtime.contexts.context_manager import active_or_none
-from cl.runtime.log.task_log import TaskLog
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.settings.log_settings import LogSettings
@@ -180,6 +180,7 @@ uvicorn_empty_logging_config = {
 
 logging_config = {
     "version": 1,
+    "disable_existing_loggers": False,
     "formatters": {
         "file_formatter": {
             "format": "%(readable_time)s - PID=%(pid)s - %(host)s - %(name)s - %(type)s - %(handler)s - %(key)s - "

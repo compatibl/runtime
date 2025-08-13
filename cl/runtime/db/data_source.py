@@ -44,8 +44,6 @@ from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQ
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-_LOGGER = getLogger(__name__)
-
 
 @dataclass(slots=True, kw_only=True)
 class DataSource(DataSourceKey, RecordMixin):
@@ -80,7 +78,8 @@ class DataSource(DataSourceKey, RecordMixin):
             self.db = Db.create()  # TODO: Move initialization code here?
         elif is_key(self.db):
             self.db = self.load_one(self.db)
-        _LOGGER.info(f"Connected to DB type '{TypeUtil.name(self.db)}', db_id = '{self.db.db_id}'.")
+
+        getLogger(__name__).info(f"Connected to DB type '{TypeUtil.name(self.db)}', db_id = '{self.db.db_id}'.")
 
         # Load dataset, use root dataset if not specified
         if self.dataset is None:
