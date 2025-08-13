@@ -17,7 +17,7 @@ import os
 import socket
 import threading
 from cl.runtime.contexts.context_manager import active_or_none
-from cl.runtime.contexts.log_context import LogContext
+from cl.runtime.log.task_log import TaskLog
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
@@ -95,7 +95,7 @@ def _make_filter_add_contextual_info(default_empty=None):
     _default_empty = default_empty
 
     def filter_(record):
-        log_context = active_or_none(LogContext)
+        log_context = active_or_none(TaskLog)
 
         type_and_handler = ""
         if log_context:

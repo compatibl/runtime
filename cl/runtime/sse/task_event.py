@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active_or_none
-from cl.runtime.contexts.log_context import LogContext
+from cl.runtime.log.task_log import TaskLog
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.sse.event import Event
 
@@ -37,19 +37,19 @@ class TaskEvent(Event):
 
     def __init(self):
         if self.task_run_id is None:
-            log_context = active_or_none(LogContext)
+            log_context = active_or_none(TaskLog)
 
             if log_context is None:
-                raise RuntimeError("TaskEvent can only be created inside a LogContext.")
+                raise RuntimeError("TaskEvent can only be created inside a TaskLog.")
 
             if log_context.task_run_id is None:
-                raise RuntimeError("LogContext.task_run_id is required to create TaskEvent.")
+                raise RuntimeError("TaskLog.task_run_id is required to create TaskEvent.")
 
             if log_context.record_type is None:
-                raise RuntimeError("LogContext.type is required to create TaskEvent.")
+                raise RuntimeError("TaskLog.type is required to create TaskEvent.")
 
             if log_context.handler is None:
-                raise RuntimeError("LogContext.handler is required to create TaskEvent.")
+                raise RuntimeError("TaskLog.handler is required to create TaskEvent.")
 
             # Fill in Event fields from Context
             self.task_run_id = log_context.task_run_id

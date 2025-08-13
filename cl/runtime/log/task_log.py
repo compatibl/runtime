@@ -14,11 +14,11 @@
 
 import logging
 from dataclasses import dataclass
-from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.log.log import Log
 
 
 @dataclass(slots=True, kw_only=True)
-class LogContext(DataMixin):
+class TaskLog(Log):  # TODO: Refactor Log class hierarchy
     """Provides get_logger() method returning a configured logger."""
 
     handler: str | None = None
@@ -35,7 +35,7 @@ class LogContext(DataMixin):
 
     @classmethod
     def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
-        return LogContext
+        return TaskLog
 
     def get_logger(
         self,

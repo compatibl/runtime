@@ -14,14 +14,14 @@
 
 import pytest
 from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.contexts.log_context import LogContext
+from cl.runtime.log.task_log import TaskLog
 
 
 def test_smoke():
     """Smoke test."""
 
-    # Get logger from LogContext outside the outermost 'with LogContext(...)' clause
-    logger = active_or_default(LogContext).get_logger(module_name=__name__)
+    # Get logger from TaskLog outside the outermost 'with TaskLog(...)' clause
+    logger = active_or_default(TaskLog).get_logger(module_name=__name__)
 
     # Standard messages
     module_name = __name__

@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.contexts.log_context import LogContext
+from cl.runtime.log.task_log import TaskLog
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
@@ -91,13 +91,13 @@ class Task(TaskKey, RecordMixin, ABC):
     def _execute(self):
         """Run payload without updating status or handling exceptions (protected, callers should invoke 'run_task')."""
 
-    def _create_log_context(self) -> LogContext:
-        """Create LogContext with task specific info."""
-        return LogContext(task_run_id=self.task_id).build()
+    def _create_log_context(self) -> TaskLog:
+        """Create TaskLog with task specific info."""
+        return TaskLog(task_run_id=self.task_id).build()
 
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
-        logger = active_or_default(LogContext).get_logger(module_name=__name__)
+        logger = active_or_default(TaskLog).get_logger(module_name=__name__)
 
         # Activate logging context for the task
         with activate(self._create_log_context()):
