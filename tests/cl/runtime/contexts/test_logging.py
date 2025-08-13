@@ -12,11 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-
 import pytest
-from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.log.task_log import TaskLog
+import logging
 
 
 def test_smoke():

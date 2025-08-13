@@ -17,10 +17,12 @@ import asyncio
 import time
 from concurrent.futures import ThreadPoolExecutor
 from random import Random
-from cl.runtime.contexts.context_manager import activate, activate_or_none
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import activate_or_none
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_manager import active_or_none
-from cl.runtime.contexts.context_manager import make_active, make_inactive
+from cl.runtime.contexts.context_manager import make_active
+from cl.runtime.contexts.context_manager import make_inactive
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from stubs.cl.runtime.contexts.stub_context import StubContext
 from stubs.cl.runtime.contexts.stub_derived_context import StubDerivedContext
@@ -169,7 +171,7 @@ def test_activate_or_none():
         assert result is None
         # Should not affect any active contexts
         assert active_or_none(StubContext) is None
-    
+
     # Test that None with context_id raises error
     with pytest.raises(RuntimeError, match="If context is None, context_id must also be None"):
         with activate_or_none(None, context_id="test"):
@@ -237,7 +239,8 @@ def test_make_active():
     with pytest.raises(RuntimeError, match="has been changed bypassing the context manager"):
         make_inactive(stub_context_1)  # Different context object
     make_inactive(stub_context_0)  # Clean up
-    
+
+
 def test_error_handling():
     """Test error handling in specifying extensions."""
 

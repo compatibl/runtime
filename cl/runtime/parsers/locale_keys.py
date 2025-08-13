@@ -14,9 +14,9 @@
 
 from cl.runtime.parsers.locale_key import LocaleKey
 
+
 class LocaleKeys:
     """Standard locale keys."""
 
     EN_US = LocaleKey(locale_id="en-US")
     """English (United States)."""
-

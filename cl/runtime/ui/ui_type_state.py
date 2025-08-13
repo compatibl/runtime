@@ -14,8 +14,8 @@
 
 from dataclasses import dataclass
 from typing_extensions import final
-from cl.runtime.ui.ui_type_state_key import UiTypeStateKey
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.ui.ui_type_state_key import UiTypeStateKey
 
 
 @final

@@ -19,12 +19,12 @@ from abc import abstractmethod
 from dataclasses import dataclass
 import matplotlib
 from matplotlib import pyplot as plt
-from cl.runtime.ui.ui_app_state import UiAppState
 from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.server.env import Env
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
 from cl.runtime.plots.plot import Plot
 from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.server.env import Env
+from cl.runtime.ui.ui_app_state import UiAppState
 from cl.runtime.views.png_view import PngView
 
 # Use non-UI matplotlib backend to prevent Tkl/Tk errors

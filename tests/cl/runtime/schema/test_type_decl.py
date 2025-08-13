@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.ui.ui_app_state import UiAppState
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
+from cl.runtime.ui.ui_app_state import UiAppState
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived

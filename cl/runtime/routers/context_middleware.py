@@ -16,8 +16,8 @@ from starlette.types import ASGIApp
 from cl.runtime import Db
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
-from cl.runtime.server.env import Env
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.server.env import Env
 
 
 class ContextMiddleware:

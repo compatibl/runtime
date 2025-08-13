@@ -121,7 +121,6 @@ class BuilderProtocol(Protocol):
         ...
 
 
-
 class DataProtocol(BuilderProtocol):
     """Protocol for a class that has slots and implements the builder pattern."""
 

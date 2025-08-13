@@ -303,5 +303,3 @@ def get_active_contexts_and_ids() -> tuple[tuple[RecordProtocol, ...], tuple[str
     else:
         # Return an empty dict if there are no active contexts
         return (), ()
-
-

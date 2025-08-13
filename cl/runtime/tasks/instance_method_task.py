@@ -17,8 +17,8 @@ from typing import Callable
 from typing import Self
 from typing_extensions import override
 from cl.runtime.contexts.context_manager import active
-from cl.runtime.log.task_log import TaskLog
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol

@@ -20,9 +20,8 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
-from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.log.task_log import TaskLog
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required

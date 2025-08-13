@@ -17,8 +17,8 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from cl.runtime.contexts.context_manager import make_active
 from cl.runtime.contexts.context_manager import make_inactive
-from cl.runtime.server.env import Env
 from cl.runtime.routers.server_util import ServerUtil
+from cl.runtime.server.env import Env
 
 
 class QaClient(TestClient):

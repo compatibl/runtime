@@ -18,7 +18,6 @@ from dataclasses import dataclass
 from typing import Sequence
 from more_itertools import consume
 from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.server.env import Env
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.key_mixin import KeyMixin
@@ -30,6 +29,7 @@ from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 
 

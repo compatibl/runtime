@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-from cl.runtime.ui.ui_type_state import UiTypeState
-from cl.runtime.ui.ui_type_state_key import UiTypeStateKey
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.type_util import TypeUtil
@@ -25,6 +23,8 @@ from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.ui.ui_type_state import UiTypeState
+from cl.runtime.ui.ui_type_state_key import UiTypeStateKey
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 _UI_SERIALIZER = DataSerializers.FOR_UI

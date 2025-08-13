@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.ui.tab_info import TabInfo
-from cl.runtime.ui.ui_app_state_key import UiAppStateKey
-from cl.runtime.ui.user_key import UserKey
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.ui.tab_info import TabInfo
+from cl.runtime.ui.ui_app_state_key import UiAppStateKey
+from cl.runtime.ui.user_key import UserKey
 
 
 @dataclass(slots=True, kw_only=True)
