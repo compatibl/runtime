@@ -335,16 +335,16 @@ class DataSource(DataSourceKey, RecordMixin):
         keys_to_load = [x for x in records_or_keys if is_key(x)]
 
         # Group keys by table
-        keys_to_load_grouped_by_table = self._group_inputs_by_table(keys_to_load)
+        keys_to_load_grouped_by_key_type = self._group_inputs_by_key_type(keys_to_load)
 
         # Get records from DB, the result is unsorted and grouped by table
-        loaded_records_grouped_by_table = [
-            self.get_db().load_many_unsorted(table, table_keys, dataset=self.dataset.dataset_id)
-            for table, table_keys in keys_to_load_grouped_by_table.items()
+        loaded_records_grouped_by_key_type = [
+            self.get_db().load_many_unsorted(key_type, keys_for_key_type, dataset=self.dataset.dataset_id)
+            for key_type, keys_for_key_type in keys_to_load_grouped_by_key_type.items()
         ]
 
         # Concatenated list
-        loaded_records = [item for sublist in loaded_records_grouped_by_table for item in sublist]
+        loaded_records = [item for sublist in loaded_records_grouped_by_key_type for item in sublist]
         serialized_loaded_keys = [KeySerializers.TUPLE.serialize(x.get_key()) for x in loaded_records]
 
         # Create a dictionary with pairs consisting of serialized key (after normalization) and the record for this key
@@ -380,107 +380,20 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-
-        # Get the list of tables where this type is stored
-        tables = self.get_bound_tables(record_type=restrict_to)
-
-        tables_len = len(tables)
-        if tables_len == 0:
-
-            # There are no tables where this type is stored, return an empty tuple
-            return tuple()
-        elif tables_len == 1:
-
-            # Handle static tables (one table per type) separately by delegating to load_table
-            return self.load_table(
-                tables[0],
-                cast_to=cast_to,
-                restrict_to=restrict_to,
-                project_to=project_to,
-                limit=limit,
-                skip=skip,
-            )
-        else:
-            # Handle the case of multiple tables
-
-            # Validate limit and handle the limit=0 case separately
-            if limit is not None:
-                if limit > 0:
-                    # Limit is set
-                    remaining_limit = limit
-                elif limit == 0:
-                    # Handle limit=0 separately because pymongo interprets limit=0 as no limit,
-                    # while we return an empty tuple
-                    return tuple()
-                else:
-                    raise RuntimeError(f"Parameter limit={limit} is negative.")
-            else:
-                # No limit
-                remaining_limit = None
-
-            # Validate skip and replace None by 0 (both mean do not skip)
-            if skip is not None:
-                if skip >= 0:
-                    # Positive or zero values are both valid
-                    remaining_skip = skip
-                else:
-                    raise RuntimeError(f"Parameter skip={skip} is negative.")
-            else:
-                # Normalize to 0 for do not skip
-                remaining_skip = 0
-
-            result = []
-            for table in tables:
-
-                if remaining_limit is not None:
-                    # Handle the case with limit
-                    if remaining_limit > 0:
-                        # Pull enough rows from this table to satisfy remaining skip + limit
-                        table_limit = remaining_skip + remaining_limit
-                    elif remaining_limit == 0:
-                        # Limit reached, break the loop over tables
-                        break
-                    else:
-                        # The update logic should guarantee non-negative value, handle a possible error
-                        raise RuntimeError(f"Parameter remaining_limit={remaining_limit} must be positive.")
-                else:
-                    # Otherwise pull from this table with no limit
-                    table_limit = None
-
-                table_result = self.load_table(
-                    table,
-                    cast_to=cast_to,
-                    restrict_to=restrict_to,
-                    project_to=project_to,
-                    limit=table_limit,
-                    skip=None,  # Global skip is handled below
-                )
-
-                # Apply global skip
-                if remaining_skip:
-                    if remaining_skip >= len(table_result):
-                        remaining_skip -= len(table_result)
-                        continue
-                    table_result = table_result[remaining_skip:]
-                    remaining_skip = 0
-
-                # Apply global limit
-                if remaining_limit is not None:
-                    if remaining_limit >= len(table_result):
-                        result.extend(table_result)
-                        remaining_limit -= len(table_result)
-                    else:
-                        result.extend(table_result[:remaining_limit])
-                        break
-                else:
-                    # No limit is set
-                    result.extend(table_result)
-
-            return tuple(result)
+        # Load table for the key type of 'restrict_to' parameter
+        return self.get_db().load_table(
+            restrict_to.get_key_type(),
+            dataset=self.dataset.dataset_id,
+            cast_to=cast_to,
+            restrict_to=restrict_to,
+            project_to=project_to,
+            limit=limit,
+            skip=skip,
+        )
 
     def load_table(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         *,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
@@ -489,10 +402,10 @@ class DataSource(DataSourceKey, RecordMixin):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
         """
-        Load all records from the specified table.
+        Load all records for the specified key type.
 
         Args:
-            table: The table from which the records are loaded
+            key_type: Key type determines the database table
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -500,7 +413,7 @@ class DataSource(DataSourceKey, RecordMixin):
             skip: Number of records to skip (for pagination)
         """
         return self.get_db().load_table(
-            table,
+            key_type=key_type,
             dataset=self.dataset.dataset_id,
             cast_to=cast_to,
             restrict_to=restrict_to,
@@ -576,12 +489,12 @@ class DataSource(DataSourceKey, RecordMixin):
         self._check_frozen_inputs(records)
 
         # Group records by table
-        records_grouped_by_table = self._group_inputs_by_table(records)
+        records_grouped_by_key_type = self._group_inputs_by_key_type(records)
 
         # Save records for each table
         [
-            self.get_db().save_many_grouped(table, table_records, dataset=self.dataset.dataset_id)
-            for table, table_records in records_grouped_by_table.items()
+            self.get_db().save_many_grouped(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+            for key_type, records_for_key_type in records_grouped_by_key_type.items()
         ]
 
     def delete_one(
@@ -604,11 +517,11 @@ class DataSource(DataSourceKey, RecordMixin):
         self._check_invalid_inputs(keys, record_allowed=False)
         self._check_frozen_inputs(keys)
 
-        keys_grouped_by_table = self._group_inputs_by_table(keys)
+        keys_grouped_by_key_type = self._group_inputs_by_key_type(keys)
 
         [
-            self.get_db().delete_many_grouped(table, table_records, dataset=self.dataset.dataset_id)
-            for table, table_records in keys_grouped_by_table.items()
+            self.get_db().delete_many_grouped(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+            for key_type, records_for_key_type in keys_grouped_by_key_type.items()
         ]
 
     @classmethod
@@ -671,9 +584,11 @@ class DataSource(DataSourceKey, RecordMixin):
             )
 
     @classmethod
-    def _group_inputs_by_table(cls, inputs: Sequence[TRecord | TKey | None]) -> dict[str, list]:
-        """Group inputs by table. None are allowed, but will be skipped during grouping."""
-
-        inputs_grouped_by_table = defaultdict(list)
-        consume(inputs_grouped_by_table[x.get_table()].append(x) for x in inputs if x is not None)
-        return inputs_grouped_by_table
+    def _group_inputs_by_key_type(
+            cls,
+            inputs: Sequence[TRecord | TKey | None]
+        ) -> dict[type[KeyProtocol], Sequence[TRecord | TKey | None]]:
+        """Group inputs by key type, skipping sequence elements that are None."""
+        result = defaultdict(list)
+        consume(result[x.get_key_type()].append(x) for x in inputs if x is not None)
+        return result

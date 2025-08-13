@@ -21,7 +21,7 @@ from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
@@ -46,7 +46,7 @@ class Db(DbKey, RecordMixin, ABC):
     @abstractmethod
     def load_table(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         *,
         dataset: str,
         cast_to: type[TRecord] | None = None,
@@ -56,10 +56,10 @@ class Db(DbKey, RecordMixin, ABC):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
         """
-        Load all records from the specified table.
+        Load all records for the specified key type.
 
         Args:
-            table: The table from which the records are loaded
+            key_type: Key type determines the database table
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
@@ -71,17 +71,18 @@ class Db(DbKey, RecordMixin, ABC):
     @abstractmethod
     def load_many_unsorted(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
     ) -> Sequence[RecordMixin]:
         """
-        Load records from the specified table for a sequence of primary key tuples.
-        The result is unsorted and skips the records that are not found.
+        Load records for the specified keys of a single key type.
+        The result is not sorted in the order of provided keys and skips the records that are not found.
 
         Args:
-            table: Logical database table name, may be different from the physical name or the key type name
+            key_type: Key type determines the database table
+            keys: Sequence of keys, type(key) must match the key_type argument for each key
             keys: A sequence of keys in (key_type_or_type_name, *primary_keys) format
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
         """
@@ -131,34 +132,34 @@ class Db(DbKey, RecordMixin, ABC):
     @abstractmethod
     def save_many_grouped(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         records: Sequence[RecordProtocol],
         *,
         dataset: str,
     ) -> None:
         """
-        Save records grouped by table to the specified table in storage.
+        Save multiple records, all of which must have the specified key type.
 
         Args:
-            table: Logical database table name, may be different from the physical name or the key type name
-            records: Sequence of records
+            key_type: Key type determines the database table
+            records: Sequence of records to save, record.get_key_type() must match the key_type argument for each record
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
         """
 
     @abstractmethod
     def delete_many_grouped(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
     ) -> None:
         """
-        Delete records using an iterable of keys grouped by table.
+        Delete multiple records, all of which must have the specified key type.
 
         Args:
-            table: Logical database table name, may be different from the physical name or the key type name
-            keys: Sequence of keys
+            key_type: Key type determines the database table
+            keys: Sequence of keys to delete, type(key) must match the key_type argument for each key
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
         """
 
@@ -304,7 +305,7 @@ class Db(DbKey, RecordMixin, ABC):
             )
 
             # Save bindings to the dataset
-            binding_tables = tuple(set(binding.get_table() for binding in bindings))
+            binding_tables = tuple(set(TypeUtil.name(binding.get_key_type()) for binding in bindings))
             if len(binding_tables) != 1:
                 raise RuntimeError("Bindings must be stored in a single table.")
             binding_table = binding_tables[0]

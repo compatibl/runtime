@@ -16,7 +16,6 @@ from abc import ABC
 from abc import abstractmethod
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.type_util import TypeUtil
 
 
 class QueryMixin(DataMixin, ABC):
@@ -28,7 +27,3 @@ class QueryMixin(DataMixin, ABC):
     @abstractmethod
     def get_target_type(self) -> type[KeyMixin]:
         """The query will return only the subtypes of this type (each derived query must override)."""
-
-    def get_table(self) -> str:
-        """DB table in PascalCase format (defaults to key type name with Key suffix removed)."""
-        return TypeUtil.name(self.get_target_type().get_key_type())

@@ -33,6 +33,3 @@ class TrialKeyQuery(QueryMixin):
 
     def get_target_type(self) -> type[KeyMixin]:
         return TrialKey
-
-    def get_table(self) -> str:
-        return self.experiment.experiment_kind.kind_id + "Trial"

@@ -31,6 +31,3 @@ class ExperimentScenarioKey(KeyMixin):
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
         return ExperimentScenarioKey
-
-    def get_table(self) -> str:
-        return self.experiment_kind.kind_id + "Scenario"

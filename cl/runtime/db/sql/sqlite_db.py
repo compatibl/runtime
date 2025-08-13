@@ -25,7 +25,7 @@ from cl.runtime import TypeCache
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
@@ -44,8 +44,11 @@ _DATA_SERIALIZER = DataSerializers.FOR_SQLITE
 _connection_dict: dict[str, sqlite3.Connection] = {}
 """Dict of Connection instances with db_id key stored outside the class to avoid serialization."""
 
-# Regex for a safe SQLite identifier (letters, digits, underscores, start with letter or underscore)
-IDENTIFIER_REGEX = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+# Regex for a safe SQLite table name (letters, digits, underscores, start with letter or underscore)
+_TABLE_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+# Regex for a safe SQLite column name (letters, digits, underscores, start with letter or underscore)
+_COLUMN_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
 @dataclass(slots=True, kw_only=True)
@@ -53,7 +56,7 @@ class SqliteDb(Db):
 
     def load_table(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         *,
         dataset: str,
         cast_to: type[TRecord] | None = None,
@@ -69,13 +72,13 @@ class SqliteDb(Db):
         if project_to is not None:
             raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
 
-        # Validate table name
-        self._check_safe_identifier(table)
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
 
-        if not self._is_table_exists(table):
+        if not self._is_table_exists(table_name):
             return tuple()
 
-        select_sql, values = f"SELECT * FROM {self._quote_identifier(table)}", []
+        select_sql, values = f"SELECT * FROM {self._quote_identifier(table_name)}", []
 
         if restrict_to is not None:
             # Add filter condition on type
@@ -112,7 +115,7 @@ class SqliteDb(Db):
 
     def load_many_unsorted(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
@@ -124,17 +127,17 @@ class SqliteDb(Db):
         if not keys:
             return []
 
-        # Validate table name
-        self._check_safe_identifier(table)
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
 
-        if not self._is_table_exists(table):
+        if not self._is_table_exists(table_name):
             return []
 
         serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
 
         # Build SQL query to select records by keys
         placeholders = ",".join("?" for _ in serialized_keys)
-        select_sql = f'SELECT * FROM {self._quote_identifier(table)} WHERE "_key" IN ({placeholders})'
+        select_sql = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_key" IN ({placeholders})'
 
         # Execute SQL query
         conn = self._get_connection()
@@ -158,20 +161,19 @@ class SqliteDb(Db):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
 
+        # Check that query has been frozen
+        query.check_frozen()
+
         # Check dataset
         self._check_dataset(dataset)
 
         if project_to is not None:
             raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
 
-        # Check that query has been frozen
-        query.check_frozen()
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
 
-        # Validate table name
-        table = query.get_table()
-        self._check_safe_identifier(table)
-
-        if not self._is_table_exists(table):
+        if not self._is_table_exists(table_name):
             return tuple()
 
         # Serialize the query
@@ -202,7 +204,7 @@ class SqliteDb(Db):
             where += f'"_type" IN ({placeholders})'
             values += subtype_names
 
-        select_sql = f"SELECT * FROM {self._quote_identifier(table)}"
+        select_sql = f"SELECT * FROM {self._quote_identifier(table_name)}"
 
         if where:
             select_sql += f" WHERE {where}"
@@ -246,17 +248,16 @@ class SqliteDb(Db):
         restrict_to: type | None = None,
     ) -> int:
 
-        # Check dataset
-        self._check_dataset(dataset)
-
         # Check that query has been frozen
         query.check_frozen()
 
-        # Validate table name
-        table = query.get_table()
-        self._check_safe_identifier(table)
+        # Check dataset
+        self._check_dataset(dataset)
 
-        if not self._is_table_exists(table):
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
+
+        if not self._is_table_exists(table_name):
             return 0
 
         # TODO (Roman): Use a specialized serializer for SQL query.
@@ -288,7 +289,7 @@ class SqliteDb(Db):
             where += f'"_type" IN ({placeholders})'
             values += subtype_names
 
-        select_sql = f"SELECT COUNT(*) FROM {self._quote_identifier(table)}"
+        select_sql = f"SELECT COUNT(*) FROM {self._quote_identifier(table_name)}"
 
         if where:
             select_sql += f" WHERE {where}"
@@ -302,7 +303,7 @@ class SqliteDb(Db):
 
     def save_many_grouped(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         records: Sequence[RecordProtocol],
         *,
         dataset: str,
@@ -314,19 +315,16 @@ class SqliteDb(Db):
         if not records:
             return
 
-        # Validate table name
-        self._check_safe_identifier(table)
-
-        # Ensure all keys within the table have the same type and get that type, error otherwise
-        key_type = KeyUtil.get_key_type(table=table, records_or_keys=records)
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
 
         # Create table if not exists using key_type as source for table schema
-        self._create_table(table, key_type)
+        self._create_table(key_type=key_type)
 
         serialized_records = []
         for record in records:
             # Add table binding
-            self._add_binding(table=table, record_type=type(record), dataset=dataset)
+            self._add_binding(table=table_name, record_type=type(record), dataset=dataset)
 
             serialized_record = _DATA_SERIALIZER.serialize(record)
             serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
@@ -336,10 +334,10 @@ class SqliteDb(Db):
         columns_for_query = sorted(set(k for data in serialized_records for k in data.keys()))
 
         # Build SQL query to insert records
-        quoted_cols = [self._quote_identifier(c) for c in columns_for_query if self._check_safe_identifier(c)]
+        quoted_cols = [self._quote_identifier(self._get_validated_column_name(c)) for c in columns_for_query]
         placeholders = ", ".join("?" for _ in quoted_cols)
         insert_sql = (
-            f"INSERT OR REPLACE INTO {self._quote_identifier(table)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
+            f"INSERT OR REPLACE INTO {self._quote_identifier(table_name)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
         )
 
         # Build values for SQL query
@@ -352,7 +350,7 @@ class SqliteDb(Db):
 
     def delete_many_grouped(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
@@ -364,17 +362,17 @@ class SqliteDb(Db):
         if not keys:
             return
 
-        # Validate table name
-        self._check_safe_identifier(table)
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
 
-        if not self._is_table_exists(table):
+        if not self._is_table_exists(table_name):
             return
 
         serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
 
         # Build SQL query to delete records by keys
         placeholders = ",".join("?" for _ in serialized_keys)
-        select_sql = f'DELETE FROM {self._quote_identifier(table)} WHERE "_key" IN ({placeholders})'
+        select_sql = f'DELETE FROM {self._quote_identifier(table_name)} WHERE "_key" IN ({placeholders})'
 
         # Execute SQL query
         conn = self._get_connection()
@@ -445,11 +443,11 @@ class SqliteDb(Db):
 
         return conn
 
-    def _create_table(self, table: str, key_type: type[TKey]) -> None:
+    def _create_table(self, *, key_type: type[KeyProtocol]) -> None:
         """Create a table if not exists with a structure corresponding to the key_type hierarchy."""
 
-        # Validate table name
-        self._check_safe_identifier(table)
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
 
         # List of columns that are present in the table by default
         column_defs = ["_key PRIMARY KEY", "_type"]
@@ -457,13 +455,12 @@ class SqliteDb(Db):
         # Validate and quote data type columns
         column_defs.extend(
             (
-                self._quote_identifier(x)
-                for x in self._extract_columns_for_key_type(key_type)
-                if self._check_safe_identifier(x)
+                self._quote_identifier(self._get_validated_column_name(column_name))
+                for column_name in self._extract_columns_for_key_type(key_type)
             )
         )
 
-        sql = f"CREATE TABLE IF NOT EXISTS {self._quote_identifier(table)} ({', '.join(column_defs)})"
+        sql = f"CREATE TABLE IF NOT EXISTS {self._quote_identifier(table_name)} ({', '.join(column_defs)})"
 
         conn = self._get_connection()
         conn.execute(sql)
@@ -543,15 +540,19 @@ class SqliteDb(Db):
         return sorted(result_columns_set)
 
     @classmethod
-    def _check_safe_identifier(cls, identifier: str) -> bool:
-        """Check whether the SQLite identifier does not contain prohibited characters."""
-
-        is_safe = IDENTIFIER_REGEX.fullmatch(identifier) is not None
-
-        if not is_safe:
-            raise RuntimeError(f"Unsafe identifier: {identifier}")
-
-        return is_safe
+    def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
+        """Get table name from key type and check that it has an acceptable format or length, error otherwise."""
+        table_name = TypeUtil.name(key_type)
+        if _TABLE_NAME_RE.fullmatch(table_name) is None:
+            raise RuntimeError(f"Table name '{table_name}' is not valid for {TypeUtil.name(cls)}")
+        return table_name
+    
+    @classmethod
+    def _get_validated_column_name(cls, column_name: str) -> str:
+        """Return column name if it has an acceptable format or length, error otherwise."""
+        if _COLUMN_NAME_RE.fullmatch(column_name) is None:
+            raise RuntimeError(f"Column name '{column_name}' is not valid for {TypeUtil.name(cls)}")
+        return column_name
 
     @classmethod
     def _quote_identifier(cls, identifier: str) -> str:

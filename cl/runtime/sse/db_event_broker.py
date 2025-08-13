@@ -22,6 +22,7 @@ from starlette.requests import Request
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_broker import EventBroker
 from cl.runtime.sse.sse_query_util import SseQueryUtil
@@ -124,7 +125,9 @@ class DbEventBroker(EventBroker):
             reversed(
                 [
                     x
-                    for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_table(), limit=100)
+                    for x in SseQueryUtil.query_sorted_desc_and_limited(
+                        TypeUtil.name(Event().get_key_type()), limit=100
+                    )
                     if x.timestamp > self._from_timestamp and x.timestamp not in sent_event_set
                 ]
             )

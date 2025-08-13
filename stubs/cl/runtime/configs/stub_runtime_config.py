@@ -36,7 +36,6 @@ from stubs.cl.runtime import StubPlotViewers
 from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dynamic import StubDataclassDynamic
 
 
 @dataclass(slots=True, kw_only=True)
@@ -77,13 +76,6 @@ class StubRuntimeConfig(Config):
             StubMediaViewers(stub_id=f"StubMediaViewers"),
         ]
 
-        stub_polymorphic_records = [
-            StubDataclassDynamic(table_field="PolymorphicTable1", key_field="stub_key1", record_field="stub_record1"),
-            StubDataclassDynamic(table_field="PolymorphicTable1", key_field="stub_key2", record_field="stub_record2"),
-            StubDataclassDynamic(table_field="PolymorphicTable2", key_field="stub_key3", record_field="stub_record3"),
-            StubDataclassDynamic(table_field="PolymorphicTable2", key_field="stub_key4", record_field="stub_record4"),
-        ]
-
         all_records = [
             *stub_dataclass_composite,
             *stub_dataclass_records,
@@ -100,7 +92,6 @@ class StubRuntimeConfig(Config):
             *stub_dataclass_singleton_record,
             *stub_viewers_records,
             *stub_handlers_records,
-            *stub_polymorphic_records,
         ]
 
         # Build and save to DB

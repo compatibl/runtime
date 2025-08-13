@@ -21,6 +21,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.task_logs import TaskLogs
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.sse.sse_query_util import SseQueryUtil
 from cl.runtime.tasks.task_query import TaskQuery
@@ -41,7 +42,11 @@ class UiLogUtil(DataMixin):
         """Return a list of the last N log messages, sorted by timestamp in ascending order."""
 
         log_messages = reversed(
-            list(SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT))
+            list(
+                SseQueryUtil.query_sorted_desc_and_limited(
+                    TypeUtil.name(LogMessage().get_key_type()), limit=_LOG_HISTORY_LIMIT
+                )
+            )
         )
         return cls._wrap_to_result(log_messages)
 
@@ -52,7 +57,9 @@ class UiLogUtil(DataMixin):
         log_messages = reversed(
             [
                 x
-                for x in SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT)
+                for x in SseQueryUtil.query_sorted_desc_and_limited(
+                    TypeUtil.name(LogMessage().get_key_type()), limit=_LOG_HISTORY_LIMIT
+                )
                 if x.level.lower() == "error"
             ]
         )
@@ -79,7 +86,11 @@ class UiLogUtil(DataMixin):
 
         result = {}
         for log_message in reversed(
-            list(SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_table(), limit=_LOG_HISTORY_LIMIT))
+            list(
+                SseQueryUtil.query_sorted_desc_and_limited(
+                    TypeUtil.name(LogMessage().get_key_type()), limit=_LOG_HISTORY_LIMIT
+                )
+            )
         ):
             task_run_id = log_message.task_run_id
 

@@ -27,7 +27,7 @@ from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
@@ -69,7 +69,7 @@ class BasicMongoDb(Db):
 
     def load_table(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         *,
         dataset: str,
         cast_to: type[TRecord] | None = None,
@@ -82,8 +82,11 @@ class BasicMongoDb(Db):
         # Check dataset
         self._check_dataset(dataset)
 
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
+
         # Get collection
-        collection = self._get_mongo_collection(table)
+        collection = self._get_mongo_collection(table_name)
 
         # Filter by type
         query_dict = {}
@@ -110,7 +113,7 @@ class BasicMongoDb(Db):
 
     def load_many_unsorted(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
@@ -119,8 +122,11 @@ class BasicMongoDb(Db):
         # Check dataset
         self._check_dataset(dataset)
 
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
+
         # Get Mongo collection using table name
-        collection = self._get_mongo_collection(table)
+        collection = self._get_mongo_collection(table_name)
         result = []
         for key in keys:
             # TODO: Implement using a more performant approach
@@ -147,15 +153,17 @@ class BasicMongoDb(Db):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
 
-        # Check dataset
-        self._check_dataset(dataset)
-
         # Check that query has been frozen
         query.check_frozen()
 
+        # Check dataset
+        self._check_dataset(dataset)
+
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
+
         # Get collection using table name from the query
-        table = query.get_table()
-        collection = self._get_mongo_collection(table)
+        collection = self._get_mongo_collection(table_name)
 
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
@@ -212,16 +220,17 @@ class BasicMongoDb(Db):
         restrict_to: type | None = None,
     ) -> int:
 
-        # Check dataset
-        self._check_dataset(dataset)
-
-        """Return the count of documents matching the query using MongoDB's count_documents."""
         # Check that query has been frozen
         query.check_frozen()
 
+        # Check dataset
+        self._check_dataset(dataset)
+
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
+
         # Get collection using table name from the query
-        table = query.get_table()
-        collection = self._get_mongo_collection(table)
+        collection = self._get_mongo_collection(table_name)
 
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
@@ -251,7 +260,7 @@ class BasicMongoDb(Db):
 
     def save_many_grouped(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         records: Sequence[RecordProtocol],
         *,
         dataset: str,
@@ -260,15 +269,17 @@ class BasicMongoDb(Db):
         # Check dataset
         self._check_dataset(dataset)
 
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
+
         # TODO: Provide a more performant implementation
         for record in records:
-            table = record.get_table()
 
             # Add table binding
-            self._add_binding(table=table, record_type=type(record), dataset=dataset)
+            self._add_binding(table=table_name, record_type=type(record), dataset=dataset)
 
             db = self._get_mongo_db()
-            collection = db[table]
+            collection = db[table_name]
 
             # Serialize data, this also executes 'init_all' method
             serialized_record = data_serializer.serialize(record)
@@ -284,7 +295,7 @@ class BasicMongoDb(Db):
 
     def delete_many_grouped(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
@@ -293,8 +304,11 @@ class BasicMongoDb(Db):
         # Check dataset
         self._check_dataset(dataset)
 
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
+
         # Get Mongo collection using table name
-        collection = self._get_mongo_collection(table)
+        collection = self._get_mongo_collection(table_name)
         for key in keys:
             # TODO: Implement using a more performant approach
             serialized_primary_key = _KEY_SERIALIZER.serialize(key)
@@ -449,3 +463,9 @@ class BasicMongoDb(Db):
     def is_empty(self) -> bool:
         """Return True if db has no collections."""
         return len(self._get_mongo_db().list_collection_names()) == 0
+
+    @classmethod
+    def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
+        """Get table name from key type and check that it has an acceptable format."""
+        # TODO: Add validation for length and permitted characters
+        return TypeUtil.name(key_type)

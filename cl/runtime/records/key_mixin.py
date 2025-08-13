@@ -16,7 +16,6 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Self
 from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.type_util import TypeUtil
 
 
 class KeyMixin(DataMixin, ABC):
@@ -28,7 +27,3 @@ class KeyMixin(DataMixin, ABC):
     @abstractmethod
     def get_key_type(cls) -> type[Self]:
         """Return key type even when called from a record."""
-
-    def get_table(self) -> str:
-        """DB table in PascalCase format (defaults to key type name with Key suffix removed)."""
-        return TypeUtil.name(self.get_key_type())

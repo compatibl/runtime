@@ -142,7 +142,7 @@ class KeyProtocol(DataProtocol):
     """Protocol implemented by both keys and records."""
 
     @classmethod
-    def get_key_type(cls) -> type:
+    def get_key_type(cls) -> type["KeyProtocol"]:
         """Return key type even when called from a record."""
         ...
 

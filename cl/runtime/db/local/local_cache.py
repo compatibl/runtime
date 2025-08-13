@@ -19,7 +19,7 @@ from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
@@ -44,7 +44,7 @@ class LocalCache(Db):
 
     def load_table(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         *,
         dataset: str,
         cast_to: type[TRecord] | None = None,
@@ -57,7 +57,7 @@ class LocalCache(Db):
 
     def load_many_unsorted(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
@@ -66,7 +66,10 @@ class LocalCache(Db):
         # Check dataset
         self._check_dataset(dataset)
 
-        if (table_cache := self.__cache.get(table, None)) is not None:
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
+
+        if (table_cache := self.__cache.get(table_name, None)) is not None:
             result = []
             for key in keys:
                 # Look up the record, defaults to None
@@ -102,7 +105,7 @@ class LocalCache(Db):
 
     def save_many_grouped(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         records: Sequence[RecordProtocol],
         *,
         dataset: str,
@@ -111,12 +114,13 @@ class LocalCache(Db):
         # Check dataset
         self._check_dataset(dataset)
 
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
+
         # TODO: Provide a more performant implementation
         for record in records:
-            # Try to retrieve table dictionary using 'key_type' as key, insert if it does not yet exist
-            key_type = record.get_key_type()
-            key_type_name = TypeUtil.name(key_type)
-            table_cache = self.__cache.setdefault(key_type_name, {})
+            # Try to retrieve table dictionary, insert if it does not yet exist
+            table_cache = self.__cache.setdefault(table_name, {})
 
             # Serialize both key and record
             key = record.get_key()
@@ -127,12 +131,11 @@ class LocalCache(Db):
 
     def delete_many_grouped(
         self,
-        table: str,
+        key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
     ) -> None:
-        # Validate the dataset and if necessary convert to delimited string
         raise NotImplementedError()
 
     def drop_test_db(self) -> None:
@@ -165,3 +168,9 @@ class LocalCache(Db):
             # Create if does not yet exist
             _local_cache_instance = LocalCache()
         return _local_cache_instance
+
+    @classmethod
+    def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
+        """Get table name from key type and check that it has an acceptable format."""
+        # TODO: Add validation for length and permitted characters
+        return TypeUtil.name(key_type)
