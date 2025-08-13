@@ -15,7 +15,7 @@
 import os
 
 
-class OsUtil:
+class OsUtil:  # TODO: Review how this class is used
     """Helper methods for the operating system."""
 
     @classmethod
