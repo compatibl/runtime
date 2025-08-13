@@ -50,6 +50,3 @@ class Log(LogKey, RecordMixin, ABC):
 
         return Log.__default
 
-    @abstractmethod
-    def get_log_handlers(self) -> Iterable[logging.Handler]:
-        """Return an iterable of log handlers to be added to the logger."""

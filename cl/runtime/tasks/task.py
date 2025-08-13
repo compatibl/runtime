@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import datetime as dt
+import logging
 import time
 from abc import ABC
 from abc import abstractmethod
@@ -97,7 +98,7 @@ class Task(TaskKey, RecordMixin, ABC):
 
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
-        logger = active_or_default(TaskLog).get_logger(module_name=__name__)
+        logger = logging.getLogger(__name__)
 
         # Activate logging context for the task
         with activate(self._create_log_context()):

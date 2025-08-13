@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 import pytest
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.log.task_log import TaskLog
@@ -21,7 +23,7 @@ def test_smoke():
     """Smoke test."""
 
     # Get logger from TaskLog outside the outermost 'with TaskLog(...)' clause
-    logger = active_or_default(TaskLog).get_logger(module_name=__name__)
+    logger = logging.getLogger(__name__)
 
     # Standard messages
     module_name = __name__

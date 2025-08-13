@@ -19,7 +19,7 @@ from cl.runtime.log.log import Log
 
 @dataclass(slots=True, kw_only=True)
 class TaskLog(Log):  # TODO: Refactor Log class hierarchy
-    """Provides get_logger() method returning a configured logger."""
+    """Provides logging for task execution."""
 
     handler: str | None = None
     """Name of the called handler."""
@@ -36,11 +36,3 @@ class TaskLog(Log):  # TODO: Refactor Log class hierarchy
     @classmethod
     def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
         return TaskLog
-
-    def get_logger(
-        self,
-        *,
-        module_name: str,
-    ) -> logging.Logger:
-        """Get logger for the specified module name, invoke with __name__ as the argument."""
-        return logging.getLogger(module_name)  # TODO: Should this be specific to logger?
