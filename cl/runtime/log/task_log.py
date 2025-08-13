@@ -33,6 +33,3 @@ class TaskLog(Log):
     task_run_id: str | None = None
     """Task run id."""
 
-    @classmethod
-    def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
-        return TaskLog

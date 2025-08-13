@@ -17,8 +17,8 @@ from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_manager import get_active_contexts_and_ids
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
-from cl.runtime.contexts.trial_context import TrialContext
 from cl.runtime.records.protocols import RecordProtocol
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime.contexts.stub_context import StubContext
 
 
@@ -92,7 +92,7 @@ def test_context_snapshot():
 
     # Inside two nested 'with' clauses for different same key types
     with activate(StubContext().build()) as context_1:
-        with activate(TrialContext.append_token("modified_trial")) as context_2:
+        with activate(StubDataclass().build()) as context_2:
             _perform_serialization_test([context_1, context_2])
     # Recreate using ContextSnapshot
     _perform_manager_test([context_1, context_2])
