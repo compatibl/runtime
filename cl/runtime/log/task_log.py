@@ -18,7 +18,7 @@ from cl.runtime.log.log import Log
 
 
 @dataclass(slots=True, kw_only=True)
-class TaskLog(Log):  # TODO: Refactor Log class hierarchy
+class TaskLog(Log):
     """Provides logging for task execution."""
 
     handler: str | None = None
