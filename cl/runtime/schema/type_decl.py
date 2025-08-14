@@ -109,10 +109,6 @@ class TypeDecl(TypeDeclKey, RecordMixin):
     keys: list[str] | None = None
     """Array of key element names (specify in base class only)."""
 
-    # TODO: Consider moving to Table class
-    # indexes: list[TypeIndexDecl] | None = None
-    """Defines indexes for the type."""
-
     abstract: bool | None = None
     """True if the class is abstract."""
 
@@ -122,7 +118,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
     permanent: bool | None = None
     """When the record is saved, also save it permanently."""
 
-    def get_key(self) -> typeDeclKey:
+    def get_key(self) -> TypeDeclKey:
         return TypeDeclKey(module=self.module, name=self.name).build()
 
     def __init(self) -> None:
