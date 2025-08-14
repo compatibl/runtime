@@ -72,7 +72,7 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
-    def load_many_grouped(
+    def load_many(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
@@ -136,7 +136,7 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
-    def save_many_grouped(
+    def save_many(
         self,
         key_type: type[KeyProtocol],
         records: Sequence[RecordProtocol],
@@ -153,7 +153,7 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
-    def delete_many_grouped(
+    def delete_many(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
@@ -315,7 +315,7 @@ class Db(DbKey, RecordMixin, ABC):
             if len(binding_tables) != 1:
                 raise RuntimeError("Bindings must be stored in a single table.")
             binding_table = binding_tables[0]
-            self.save_many_grouped(binding_table, bindings, dataset=dataset)
+            self.save_many(binding_table, bindings, dataset=dataset)
 
     @classmethod
     def _check_dataset(cls, dataset: str) -> None:

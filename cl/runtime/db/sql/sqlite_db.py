@@ -114,7 +114,7 @@ class SqliteDb(Db):
 
         return tuple(result)
 
-    def load_many_grouped(
+    def load_many(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
@@ -304,7 +304,7 @@ class SqliteDb(Db):
         count = cursor.fetchone()[0]
         return count
 
-    def save_many_grouped(
+    def save_many(
         self,
         key_type: type[KeyProtocol],
         records: Sequence[RecordProtocol],
@@ -351,7 +351,7 @@ class SqliteDb(Db):
         conn.executemany(insert_sql, values_for_query)
         conn.commit()
 
-    def delete_many_grouped(
+    def delete_many(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],

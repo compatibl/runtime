@@ -57,7 +57,7 @@ class LocalCache(Db):
     ) -> tuple[TRecord, ...]:
         raise NotImplementedError()
 
-    def load_many_grouped(
+    def load_many(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
@@ -107,7 +107,7 @@ class LocalCache(Db):
     ) -> int:
         raise NotImplementedError()
 
-    def save_many_grouped(
+    def save_many(
         self,
         key_type: type[KeyProtocol],
         records: Sequence[RecordProtocol],
@@ -133,7 +133,7 @@ class LocalCache(Db):
             # Add record to cache, overwriting an existing record if present
             table_cache[serialized_key] = record
 
-    def delete_many_grouped(
+    def delete_many(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],

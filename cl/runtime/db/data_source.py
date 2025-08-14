@@ -345,7 +345,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_key_type = [
-            self.get_db().load_many_grouped(key_type, keys_for_key_type, dataset=self.dataset.dataset_id)
+            self.get_db().load_many(key_type, keys_for_key_type, dataset=self.dataset.dataset_id)
             for key_type, keys_for_key_type in keys_to_load_grouped_by_key_type.items()
         ]
 
@@ -508,7 +508,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Save records for each table
         [
-            self.get_db().save_many_grouped(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+            self.get_db().save_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
             for key_type, records_for_key_type in records_grouped_by_key_type.items()
         ]
 
@@ -535,7 +535,7 @@ class DataSource(DataSourceKey, RecordMixin):
         keys_grouped_by_key_type = self._group_inputs_by_key_type(keys)
 
         [
-            self.get_db().delete_many_grouped(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+            self.get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
             for key_type, records_for_key_type in keys_grouped_by_key_type.items()
         ]
 

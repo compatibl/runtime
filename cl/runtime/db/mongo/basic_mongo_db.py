@@ -113,7 +113,7 @@ class BasicMongoDb(Db):
         )
         return cast(tuple[TRecord, ...], result)
 
-    def load_many_grouped(
+    def load_many(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
@@ -262,7 +262,7 @@ class BasicMongoDb(Db):
         count = collection.count_documents(query_dict)
         return count
 
-    def save_many_grouped(
+    def save_many(
         self,
         key_type: type[KeyProtocol],
         records: Sequence[RecordProtocol],
@@ -297,7 +297,7 @@ class BasicMongoDb(Db):
             serialized_record["_key"] = serialized_key
             collection.replace_one({"_key": serialized_key}, serialized_record, upsert=True)
 
-    def delete_many_grouped(
+    def delete_many(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
