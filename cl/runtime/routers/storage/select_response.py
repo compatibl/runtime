@@ -59,7 +59,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         else:
             # Get records for a table
             table = request.type_
-            records = active(DataSource).load_table(table)
+            records = active(DataSource).load_all(table)
             # Get lowest common type to the records stored in the table
             record_type_name = active(DataSource).get_lowest_bound_record_type_name(table=table)
             record_type = TypeCache.get_class_from_type_name(record_type_name)

@@ -17,6 +17,7 @@ from typing import Self
 from typing import Sequence
 from cl.runtime import Db
 from cl.runtime import RecordMixin
+from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
@@ -39,14 +40,15 @@ class LocalCache(Db):
     __cache: dict[str, dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
-    def load_tables(self) -> Sequence[str]:
+    def load_alls(self) -> Sequence[str]:
         raise NotImplementedError()
 
-    def load_table(
+    def load_all(
         self,
         key_type: type[KeyProtocol],
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -55,12 +57,13 @@ class LocalCache(Db):
     ) -> tuple[TRecord, ...]:
         raise NotImplementedError()
 
-    def load_many_unsorted(
+    def load_many_grouped(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[RecordMixin]:
 
         # Check dataset
@@ -86,6 +89,7 @@ class LocalCache(Db):
         query: QueryMixin,
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,

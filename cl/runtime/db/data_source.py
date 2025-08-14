@@ -26,6 +26,7 @@ from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.resource_key import ResourceKey
+from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
@@ -290,6 +291,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         records_or_keys: Sequence[TRecord | TKey | None] | None,
         *,
+        sort_order: SortOrder = SortOrder.INPUT,
         cast_to: type[TRecord] | None = None,
     ) -> Sequence[TRecord | None] | None:
         """
@@ -298,6 +300,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
+            sort_order: Sort in the order of 'records_or_keys' parameter for INPUT (default), or as specified
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
 
@@ -340,7 +343,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_key_type = [
-            self.get_db().load_many_unsorted(key_type, keys_for_key_type, dataset=self.dataset.dataset_id)
+            self.get_db().load_many_grouped(key_type, keys_for_key_type, dataset=self.dataset.dataset_id)
             for key_type, keys_for_key_type in keys_to_load_grouped_by_key_type.items()
         ]
 
@@ -366,6 +369,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         restrict_to: type[TRecord],
         *,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         limit: int | None = None,
@@ -376,15 +380,17 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             restrict_to: The query will return only this type and its subtypes
+            sort_order: Sort in the specified order for each key field, defaults to ASC for this method
             cast_to: Cast the result to this type (error if not a subtype)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
         # Load table for the key type of 'restrict_to' parameter
-        return self.get_db().load_table(
+        return self.get_db().load_all(
             restrict_to.get_key_type(),
             dataset=self.dataset.dataset_id,
+            sort_order=sort_order,
             cast_to=cast_to,
             restrict_to=restrict_to,
             project_to=project_to,
@@ -392,10 +398,11 @@ class DataSource(DataSourceKey, RecordMixin):
             skip=skip,
         )
 
-    def load_table(
+    def load_all(
         self,
         key_type: type[KeyProtocol],
         *,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -407,15 +414,17 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             key_type: Key type determines the database table
+            sort_order: Sort in the specified order for each key field, defaults to ASC for this method
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        return self.get_db().load_table(
+        return self.get_db().load_all(
             key_type=key_type,
             dataset=self.dataset.dataset_id,
+            sort_order=sort_order,
             cast_to=cast_to,
             restrict_to=restrict_to,
             project_to=project_to,
@@ -427,6 +436,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         query: QueryMixin,
         *,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -438,6 +448,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             query: Contains query conditions to match
+            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC in query class
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -447,6 +458,7 @@ class DataSource(DataSourceKey, RecordMixin):
         return self.get_db().load_where(
             query,
             dataset=self.dataset.dataset_id,
+            sort_order=sort_order,
             cast_to=cast_to,
             restrict_to=restrict_to,
             project_to=project_to,

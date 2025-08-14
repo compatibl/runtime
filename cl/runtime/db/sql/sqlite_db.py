@@ -21,6 +21,7 @@ from typing import cast
 from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime import TypeCache
+from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
@@ -53,11 +54,12 @@ _COLUMN_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 @dataclass(slots=True, kw_only=True)
 class SqliteDb(Db):
 
-    def load_table(
+    def load_all(
         self,
         key_type: type[KeyProtocol],
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -112,12 +114,13 @@ class SqliteDb(Db):
 
         return tuple(result)
 
-    def load_many_unsorted(
+    def load_many_grouped(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[RecordMixin]:
 
         # Check dataset
@@ -153,6 +156,7 @@ class SqliteDb(Db):
         query: QueryMixin,
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,

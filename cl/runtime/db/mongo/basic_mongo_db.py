@@ -26,6 +26,7 @@ from pymongo.synchronous.collection import Collection
 from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
+from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
 from cl.runtime.records.protocols import TRecord
@@ -67,11 +68,12 @@ class BasicMongoDb(Db):
     client_uri: str = "mongodb://localhost:27017/"
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
 
-    def load_table(
+    def load_all(
         self,
         key_type: type[KeyProtocol],
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -111,12 +113,13 @@ class BasicMongoDb(Db):
         )
         return cast(tuple[TRecord, ...], result)
 
-    def load_many_unsorted(
+    def load_many_grouped(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[RecordMixin]:
 
         # Check dataset
@@ -146,6 +149,7 @@ class BasicMongoDb(Db):
         query: QueryMixin,
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,

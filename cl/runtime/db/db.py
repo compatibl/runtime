@@ -19,6 +19,7 @@ from typing import Sequence
 from more_itertools import consume
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.db.db_key import DbKey
+from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
@@ -44,11 +45,12 @@ class Db(DbKey, RecordMixin, ABC):
         return DbKey(db_id=self.db_id).build()
 
     @abstractmethod
-    def load_table(
+    def load_all(
         self,
         key_type: type[KeyProtocol],
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -56,11 +58,12 @@ class Db(DbKey, RecordMixin, ABC):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
         """
-        Load all records for the specified key type.
+        Load all records for the specified key type, sorted by key in the specified sort order.
 
         Args:
             key_type: Key type determines the database table
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            sort_order: Sort in the specified order for each key field, defaults to ASC for this method
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -69,22 +72,23 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
-    def load_many_unsorted(
+    def load_many_grouped(
         self,
         key_type: type[KeyProtocol],
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[RecordMixin]:
         """
-        Load records for the specified keys of a single key type.
+        Load records for the specified keys, all of which must have the specified key type.
         The result is not sorted in the order of provided keys and skips the records that are not found.
 
         Args:
             key_type: Key type determines the database table
             keys: Sequence of keys, type(key) must match the key_type argument for each key
-            keys: A sequence of keys in (key_type_or_type_name, *primary_keys) format
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            sort_order: Sort in the order of 'keys' parameter for INPUT (default), or as specified
         """
 
     @abstractmethod
@@ -93,6 +97,7 @@ class Db(DbKey, RecordMixin, ABC):
         query: QueryMixin,
         *,
         dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -105,6 +110,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC in query class
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
             project_to: Use some or all fields from the stored record to create and return instances of this type
