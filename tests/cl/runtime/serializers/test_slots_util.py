@@ -16,9 +16,9 @@ import pytest
 from stubs.cl.runtime import StubDataclassDerivedData
 
 
-def test_get_slots():
-    """Test get_slots method."""
-    assert StubDataclassDerivedData.get_slots() == ("str_field", "int_field", "derived_str_field")
+def test_get_field_names():
+    """Test get_field_names method."""
+    assert StubDataclassDerivedData.get_field_names() == ("str_field", "int_field", "derived_str_field")
 
 
 if __name__ == "__main__":

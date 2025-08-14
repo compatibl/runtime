@@ -90,7 +90,7 @@ class TypeSchema:
             elif dataclasses.is_dataclass(class_):
                 # Uses dataclasses
                 spec_class = DataclassSpec
-            elif is_data_key_or_record(class_) and not cast(DataProtocol, class_).get_slots():
+            elif is_data_key_or_record(class_) and not cast(DataProtocol, class_).get_field_names():
                 # Base class of data, key or record with no slots
                 spec_class = NoSlotsSpec
             else:

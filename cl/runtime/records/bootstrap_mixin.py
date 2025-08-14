@@ -26,9 +26,9 @@ class BootstrapMixin(BuilderMixin, ABC):
 
     @classmethod
     @cached
-    def get_slots(cls) -> tuple[str, ...]:
+    def get_field_names(cls) -> tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
-        return SlotsUtil.get_slots(cls)
+        return SlotsUtil.get_field_names(cls)
 
     def build(self) -> Self:
         """

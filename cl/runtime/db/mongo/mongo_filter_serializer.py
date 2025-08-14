@@ -35,7 +35,7 @@ class MongoFilterSerializer(DataMixin):  # TODO: Standardize API and derive from
         """Serialize record for use as a MongoDB query filter."""
 
         # Get slots from this class and its bases in the order of declaration from base to derived
-        all_slots = data.get_slots()
+        all_slots = data.get_field_names()
         # Serialize slot values in the order of declaration except those that are None
         result = {
             k: v if v.__class__.__name__ in self.primitive_type_names else self._not_primitive_field_error(data, k, v)

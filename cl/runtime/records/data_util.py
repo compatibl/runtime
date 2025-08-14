@@ -34,7 +34,7 @@ class DataUtil:
             return type(data)(
                 **{
                     key: cls.remove_none(value)
-                    for key in data.get_slots()
+                    for key in data.get_field_names()
                     if (value := getattr(data, key, None)) is not None
                 }
             )

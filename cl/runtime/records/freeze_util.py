@@ -45,7 +45,7 @@ class FreezeUtil:
             if is_data_key_or_record(data):
                 # Recreate with frozen fields and freeze the result
                 return type(data)(
-                    **{k: cls.freeze(getattr(data, k)) for k in SlotsUtil.get_slots(type(data))}
+                    **{k: cls.freeze(getattr(data, k)) for k in data.get_field_names()}
                 ).mark_frozen()
             else:
                 # Mark frozen and return

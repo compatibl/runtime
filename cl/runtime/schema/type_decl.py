@@ -211,7 +211,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
 
         # Get key fields if a record
         if result.type_kind == TypeKind.RECORD:
-            snake_case_key_fields = record_type.get_key_type().get_slots()  # noqa
+            snake_case_key_fields = record_type.get_key_type().get_field_names()  # noqa
             if snake_case_key_fields is not None:
                 pascal_case_key_fields = [CaseUtil.snake_to_pascal_case(x) for x in snake_case_key_fields]
                 result.keys = pascal_case_key_fields  # TODO: Use slots of key type when present?

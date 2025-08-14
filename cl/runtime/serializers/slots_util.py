@@ -31,8 +31,10 @@ class SlotsUtil:
 
     @classmethod
     @cached
-    def get_slots(cls, data_type: type) -> tuple[str, ...]:
-        """Return slots the order of declaration from base to derived."""
+    def get_field_names(cls, data_type: type) -> tuple[str, ...]:
+        """
+        Get field names by iterating over slots the order of declaration within the class, and continuing to parents.
+        """
 
         if hasattr(data_type, "__slots__"):
             # Use MRO to collect slots by traversing the entire class hierarchy,
@@ -62,6 +64,6 @@ class SlotsUtil:
         else:
             # Error message if no __slots__ attribute is found
             raise RuntimeError(
-                f"Class {TypeUtil.name(data_type)} cannot be serialized because it does not have\n"
-                f"the '__slots__' attribute and does not define a custom @classmethod 'get_slots'."
+                f"Cannot obtain field names from slots for type {TypeUtil.name(data_type)}\n"
+                f"because it does not have the '__slots__' attribute."
             )

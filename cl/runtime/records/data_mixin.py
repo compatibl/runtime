@@ -28,9 +28,9 @@ class DataMixin(BuilderMixin, ABC):
 
     @classmethod
     @cached
-    def get_slots(cls) -> tuple[str, ...]:
+    def get_field_names(cls) -> tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
-        return SlotsUtil.get_slots(cls)
+        return SlotsUtil.get_field_names(cls)
 
     def build(self) -> Self:
         """
@@ -47,4 +47,4 @@ class DataMixin(BuilderMixin, ABC):
 
     def clone_as(self, result_type: type[TObj]) -> TObj:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
-        return result_type(**{k: getattr(self, k) for k in self.get_slots()})
+        return result_type(**{k: getattr(self, k) for k in self.get_field_names()})

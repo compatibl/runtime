@@ -79,7 +79,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         Contains only fields of supported types, _key and _t will be added based on record.
         """
 
-        all_slots = record.get_slots()
+        all_slots = record.get_field_names()
 
         # Get subset of slots which supported in table format.
         table_fields = {

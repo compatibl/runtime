@@ -33,7 +33,7 @@ class NoSlotsSpec(DataSpec):
             raise RuntimeError(
                 f"Cannot create {cls.__name__} for class {type_name} because it is not data, key or record."
             )
-        elif class_.get_slots():
+        elif class_.get_field_names():
             raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it has slots.")
 
         # Subtypes are only for primitive types

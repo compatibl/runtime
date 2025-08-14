@@ -125,7 +125,7 @@ class DataProtocol(BuilderProtocol):
     """Protocol for a class that has slots and implements the builder pattern."""
 
     @classmethod
-    def get_slots(cls) -> tuple[str, ...]:
+    def get_field_names(cls) -> tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
         ...
 
@@ -244,11 +244,11 @@ def is_builder(instance_or_type: Any) -> TypeGuard[TData]:
 
 def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[TData]:
     """
-    True if the argument has 'get_slots' method (includes data, keys and records), may be abstract or a mixin.
+    True if the argument has 'get_field_names' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_slots") and not type_.__name__.startswith("_")
+    return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
 
 
 def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
@@ -262,11 +262,11 @@ def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
 
 def is_data(instance_or_type: Any) -> TypeGuard[TKey]:
     """
-    True if the argument has 'get_slots' method but not 'get_key_type' method, may be abstract or a mixin.
+    True if the argument has 'get_field_names' method but not 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_slots") and not hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
+    return hasattr(type_, "get_field_names") and not hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
@@ -293,4 +293,4 @@ def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere and review 
         raise RuntimeError("Function 'is_singleton_key' is called on an object that is not a key.")
     if not hasattr(instance_or_type, "__slots__"):
         raise RuntimeError("Function 'is_singleton' is called on an object that has no __slots__ attribute.")
-    return all(name.startswith("_") for name in instance_or_type.get_slots())
+    return all(name.startswith("_") for name in instance_or_type.get_field_names())
