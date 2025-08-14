@@ -27,7 +27,6 @@ from inflection import titleize
 from memoization import cached
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.record_mixin import RecordMixin
@@ -210,11 +209,12 @@ class TypeDecl(TypeDeclKey, RecordMixin):
             if handlers_block.handlers:
                 result.declare = handlers_block
 
-        # Get key fields by parsing the source of 'get_key' method and convert to PascalCase
-        snake_case_key_fields = KeyUtil.get_key_fields(record_type)
-        if snake_case_key_fields is not None:
-            pascal_case_key_fields = [CaseUtil.snake_to_pascal_case(x) for x in snake_case_key_fields]
-            result.keys = pascal_case_key_fields  # TODO: Use slots of key type when present?
+        # Get key fields if a record
+        if result.type_kind == TypeKind.RECORD:
+            snake_case_key_fields = record_type.get_key_type().get_slots()  # noqa
+            if snake_case_key_fields is not None:
+                pascal_case_key_fields = [CaseUtil.snake_to_pascal_case(x) for x in snake_case_key_fields]
+                result.keys = pascal_case_key_fields  # TODO: Use slots of key type when present?
 
         # Use this flag to skip fields generation when the method is invoked from a derived class
         if not skip_fields:

@@ -20,7 +20,6 @@ from typing import Sequence
 from typing import cast
 from more_itertools import consume
 from cl.runtime import Db
-from cl.runtime import KeyUtil
 from cl.runtime import TypeCache
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
@@ -42,6 +41,7 @@ from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key_query_by_record_type import TableBindingKeyQueryByRecordType
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 
@@ -247,9 +247,10 @@ class DataSource(DataSourceKey, RecordMixin):
         if record_or_key is not None:
             result = self.load_one_or_none(record_or_key, cast_to=cast_to)
             if result is None:
+                key_str = KeySerializers.DELIMITED.serialize(record_or_key.get_key())
                 cast_to_str = f"\nwhen loading type {TypeUtil.name(cast_to)}" if cast_to else ""
                 raise RuntimeError(
-                    f"Record not found for key {KeyUtil.format(record_or_key)}{cast_to_str}.\n"
+                    f"Record not found for key {key_str}{cast_to_str}.\n"
                     f"Use 'load_one_or_none' method to return None instead of raising an error."
                 )
             return result

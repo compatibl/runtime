@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from typing import Sequence
 from typing import cast
 from cl.runtime import Db
-from cl.runtime import KeyUtil
 from cl.runtime import RecordMixin
 from cl.runtime import TypeCache
 from cl.runtime.file.file_util import FileUtil
