@@ -468,4 +468,4 @@ class BasicMongoDb(Db):
     def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
         """Get table name from key type and check that it has an acceptable format."""
         # TODO: Add validation for length and permitted characters
-        return TypeUtil.name(key_type)
+        return TypeUtil.name(key_type).removesuffix("Key")

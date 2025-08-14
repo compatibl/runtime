@@ -541,7 +541,7 @@ class SqliteDb(Db):
     @classmethod
     def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
         """Get table name from key type and check that it has an acceptable format or length, error otherwise."""
-        table_name = TypeUtil.name(key_type)
+        table_name = TypeUtil.name(key_type).removesuffix("Key")
         if _TABLE_NAME_RE.fullmatch(table_name) is None:
             raise RuntimeError(f"Table name '{table_name}' is not valid for {TypeUtil.name(cls)}")
         return table_name
