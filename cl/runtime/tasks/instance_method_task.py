@@ -46,7 +46,7 @@ class InstanceMethodTask(MethodTask):
     def _create_log_context(self) -> TaskLog:
         """Create TaskLog with task specific info."""
         return TaskLog(
-            record_type=TypeUtil.name(TypeCache.get_class_from_qual_name(self.key_type_str)),
+            record_type=TypeUtil.name(TypeCache.from_qual_name(self.key_type_str)),
             handler=self._title_handler_name(self.method_name),
             task_run_id=self.task_id,
             record_key=self.key_str,
@@ -56,7 +56,7 @@ class InstanceMethodTask(MethodTask):
     def _execute(self):
         """Invoke the specified instance method."""
 
-        key_type = TypeCache.get_class_from_qual_name(self.key_type_str)
+        key_type = TypeCache.from_qual_name(self.key_type_str)
         type_hint = TypeHint.for_class(key_type)
         key = _KEY_SERIALIZER.deserialize(self.key_str, type_hint)
 

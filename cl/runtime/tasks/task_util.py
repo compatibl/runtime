@@ -53,7 +53,7 @@ class TaskUtil:
 
                 if TypeCache.is_type(request.type):
                     # Get key type based on table in request
-                    key_type = TypeCache.get_class_from_type_name(request.type).get_key_type()  # noqa
+                    key_type = TypeCache.from_type_name(request.type).get_key_type()  # noqa
                 else:
                     # Get key type from table
                     key_type = active(DataSource).get_bound_key_type(table=request.type)
@@ -71,7 +71,7 @@ class TaskUtil:
                 tasks.append(handler_task)
             else:
                 # Key is None, this is a @classmethod or @staticmethod
-                record_type = TypeCache.get_class_from_type_name(request.type)
+                record_type = TypeCache.from_type_name(request.type)
                 record_type_str = f"{record_type.__module__}.{TypeUtil.name(record_type)}"
                 label = f"{TypeUtil.name(record_type)};{handler_name}"
                 handler_task = StaticMethodTask(

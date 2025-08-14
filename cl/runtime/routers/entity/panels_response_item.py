@@ -50,7 +50,7 @@ class PanelsResponseItem(BaseModel):
         else:
             bound_type_names = active(DataSource).get_bound_record_type_names(table=request.type_name)
             record_type_name = bound_type_names[0]
-        record_type = TypeCache.get_class_from_type_name(record_type_name)
+        record_type = TypeCache.from_type_name(record_type_name)
         key_type = record_type.get_key_type()
 
         # Get actual type from record if request.key is not None
@@ -60,9 +60,9 @@ class PanelsResponseItem(BaseModel):
 
             # If the record is not found, display panel tabs for the base type
             record = active(DataSource).load_one_or_none(key)
-            actual_type = TypeCache.get_class_from_type_name(record_type_name) if record is None else type(record)
+            actual_type = TypeCache.from_type_name(record_type_name) if record is None else type(record)
         else:
-            actual_type = TypeCache.get_class_from_type_name(record_type_name)
+            actual_type = TypeCache.from_type_name(record_type_name)
 
         # Get handlers from TypeDecl
         handlers = declare.handlers if (declare := TypeDecl.for_type(actual_type).declare) is not None else None

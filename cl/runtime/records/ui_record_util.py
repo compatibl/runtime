@@ -55,7 +55,7 @@ class UiRecordUtil(DataMixin):
         """Get list of record's viewers with their types."""
 
         # TODO: Return saved view names
-        request_type = TypeCache.get_class_from_type_name(type_name)
+        request_type = TypeCache.from_type_name(type_name)
 
         # Get actual type from record if request.key is not None
         if key is not None:
@@ -130,7 +130,7 @@ class UiRecordUtil(DataMixin):
         """Run viewer and process result."""
 
         # Get type of the record.
-        type_ = TypeCache.get_class_from_type_name(type_name)
+        type_ = TypeCache.from_type_name(type_name)
 
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(key, TypeHint.for_class(type_.get_key_type()))

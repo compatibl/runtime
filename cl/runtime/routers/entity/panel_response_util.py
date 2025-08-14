@@ -51,7 +51,7 @@ class PanelResponseUtil:
         # Get the key type
         if TypeCache.is_type(request.type_name):
             # Static type is passed as type_name
-            type_ = TypeCache.get_class_from_type_name(request.type_name)
+            type_ = TypeCache.from_type_name(request.type_name)
             key_type = type_.get_key_type()
         else:
             # Table is passed as type_name

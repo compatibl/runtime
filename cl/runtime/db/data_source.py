@@ -184,7 +184,7 @@ class DataSource(DataSourceKey, RecordMixin):
         
         if bound_type_names:
             # Find the common base name
-            result = TypeCache.get_common_base_record_type_name(
+            result = TypeCache.get_common_base_type_name(
                 types_or_names=bound_type_names,
                 type_kind=TypeKind.RECORD,
             )

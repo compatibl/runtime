@@ -41,7 +41,7 @@ class TypeSuccessorsResponseItem(BaseModel):
 
         # Getting child record type names
         base_record_type_name = request.type_name
-        child_record_type_names = TypeCache.get_child_record_type_names(base_record_type_name, type_kind=TypeKind.RECORD)
+        child_record_type_names = TypeCache.get_child_type_names(base_record_type_name, type_kind=TypeKind.RECORD)
         result = [
             TypeSuccessorsResponseItem(name=type_name, label=titleize(type_name))
             for type_name in child_record_type_names

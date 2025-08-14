@@ -42,18 +42,18 @@ def test_get_qual_name():
 
     # Base class
     base_path = f"{StubDataclass.__module__}.{StubDataclass.__name__}"
-    assert TypeCache.get_qual_name_from_class(StubDataclass) == base_path
+    assert TypeCache.to_qual_name(StubDataclass) == base_path
 
     # Derived class
     derived_path = f"{StubDataclassDerived.__module__}.{StubDataclassDerived.__name__}"
-    assert TypeCache.get_qual_name_from_class(StubDataclassDerived) == derived_path
+    assert TypeCache.to_qual_name(StubDataclassDerived) == derived_path
 
 
 def test_from_type_name():
     """Test getting class from type names."""
 
-    assert TypeCache.get_class_from_type_name("TypeDecl") is TypeDecl
-    assert TypeCache.get_class_from_type_name("StubDataclass") is StubDataclass
+    assert TypeCache.from_type_name("TypeDecl") is TypeDecl
+    assert TypeCache.from_type_name("StubDataclass") is StubDataclass
 
 
 def test_from_qual_name():
@@ -62,31 +62,31 @@ def test_from_qual_name():
     # Classes that is already imported
     for imported_class in [TypeCache, TypeDecl, StubDataclass]:
         class_info_path = f"{imported_class.__module__}.{imported_class.__name__}"
-        assert TypeCache.get_class_from_qual_name(class_info_path) == imported_class
+        assert TypeCache.from_qual_name(class_info_path) == imported_class
 
     # Class that is dynamically imported on demand
     do_no_import_class_path = (
         "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.StubDataclassDoNotImport"
     )
-    do_no_import_class = TypeCache.get_class_from_qual_name(do_no_import_class_path)
+    do_no_import_class = TypeCache.from_qual_name(do_no_import_class_path)
     assert do_no_import_class_path == f"{do_no_import_class.__module__}.{do_no_import_class.__name__}"
 
     # Module does not exist error
     with pytest.raises(RuntimeError):
         path_with_unknown_module = "unknown_module.StubDataclassDoNotImport"
-        TypeCache.get_class_from_qual_name(path_with_unknown_module)
+        TypeCache.from_qual_name(path_with_unknown_module)
 
     # Class does not exist error
     with pytest.raises(RuntimeError):
         path_with_unknown_class = "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.UnknownClass"
-        TypeCache.get_class_from_qual_name(path_with_unknown_class)
+        TypeCache.from_qual_name(path_with_unknown_class)
 
 
 def test_get_classes():
     """Test TypeCache.get_classes method."""
 
     # Included in data types
-    data_types = TypeCache.get_classes(type_kind=TypeKind.DATA)
+    data_types = TypeCache.get_types(type_kind=TypeKind.DATA)
     assert DataMixin in data_types
     assert StubDataclassData in data_types
     # Excluded from data types
@@ -96,7 +96,7 @@ def test_get_classes():
     assert __StubDataclassDoubleUnderscore not in data_types
 
     # Included in record types
-    record_types = TypeCache.get_classes(type_kind=TypeKind.RECORD)
+    record_types = TypeCache.get_types(type_kind=TypeKind.RECORD)
     assert RecordMixin in record_types
     assert StubDataclass in record_types
     assert TypeDecl in record_types
@@ -107,7 +107,7 @@ def test_get_classes():
     assert StubDataclassData not in record_types
 
     # Included in key types
-    key_types = TypeCache.get_classes(type_kind=TypeKind.KEY)
+    key_types = TypeCache.get_types(type_kind=TypeKind.KEY)
     assert KeyMixin in key_types
     assert StubDataclassKey in key_types
     # Excluded from key types
@@ -116,7 +116,7 @@ def test_get_classes():
     assert StubDataclassData not in key_types
 
     # Included in enum types
-    enum_types = TypeCache.get_classes(type_kind=TypeKind.ENUM)
+    enum_types = TypeCache.get_types(type_kind=TypeKind.ENUM)
     assert StubIntEnum in enum_types
     # Excluded from enum types
     assert Enum not in enum_types  # TODO: Enum base is excluded, review

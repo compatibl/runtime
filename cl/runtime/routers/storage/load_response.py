@@ -50,7 +50,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         else:
             bound_type_names = active(DataSource).get_bound_record_type_names(table=request.load_keys[0].type)
             record_type_name = bound_type_names[0]
-        record_type = TypeCache.get_class_from_type_name(record_type_name)
+        record_type = TypeCache.from_type_name(record_type_name)
         key_type = record_type.get_key_type()
 
         # Deserialize keys in request
@@ -71,11 +71,11 @@ class LoadResponse(RecordsWithSchemaResponse):
             serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
             # Find a common base
-            common_base_name = TypeCache.get_common_base_record_type_name(
+            common_base_name = TypeCache.get_common_base_type_name(
                 types_or_names=loaded_record_type_names,
                 type_kind=TypeKind.RECORD,
             )
-            common_base = TypeCache.get_class_from_type_name(common_base_name)
+            common_base = TypeCache.from_type_name(common_base_name)
 
             # Create schema dict for the common base
             schema_dict = cls._get_schema_dict(common_base)
@@ -90,7 +90,7 @@ class LoadResponse(RecordsWithSchemaResponse):
     def _get_default_ui_type_state(cls, ui_type_state_requested_key: UiTypeStateKey) -> UiTypeState:
         """Return default UiTypeState with pinned all handlers."""
 
-        type_state_record_type = TypeCache.get_class_from_type_name(ui_type_state_requested_key.type_.name)
+        type_state_record_type = TypeCache.from_type_name(ui_type_state_requested_key.type_.name)
         type_state_record_type_schema = TypeDecl.as_dict_with_dependencies(type_state_record_type)
 
         # Iterate over type declarations to get all handlers

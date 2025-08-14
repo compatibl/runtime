@@ -36,7 +36,7 @@ class StaticMethodTask(MethodTask):
     def _create_log_context(self) -> TaskLog:
         """Create TaskLog with task specific info."""
         return TaskLog(
-            record_type=TypeUtil.name(TypeCache.get_class_from_qual_name(self.type_str)),
+            record_type=TypeUtil.name(TypeCache.from_qual_name(self.type_str)),
             handler=self._title_handler_name(self.method_name),
             task_run_id=self.task_id,
         ).build()
@@ -46,7 +46,7 @@ class StaticMethodTask(MethodTask):
         """Invoke the specified @staticmethod or @classmethod."""
 
         # Get record type from fully qualified name in module.ClassName format
-        record_type = TypeCache.get_class_from_qual_name(self.type_str)
+        record_type = TypeCache.from_qual_name(self.type_str)
 
         # Method callable is already bound to cls, it is not necessary to pass cls as an explicit parameter
         method_name = self.normalized_method_name()

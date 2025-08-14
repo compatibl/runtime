@@ -124,7 +124,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_record_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            subtype_names = TypeCache.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             select_sql += f' WHERE "_type" IN ({placeholders})'
@@ -202,7 +202,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_record_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            subtype_names = TypeCache.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             if where:
@@ -287,7 +287,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_record_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            subtype_names = TypeCache.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             if where:
@@ -521,7 +521,7 @@ class SqliteDb(Db):
         """Get columns according to the fields of all descendant classes from the specified key."""
 
         # Get child type names for key_type
-        child_record_type_names = TypeCache.get_child_record_type_names(key_type, type_kind=TypeKind.RECORD)
+        child_record_type_names = TypeCache.get_child_type_names(key_type, type_kind=TypeKind.RECORD)
         result_columns = []
 
         # Iterate through child types and add unique columns.

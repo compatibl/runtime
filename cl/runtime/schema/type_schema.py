@@ -68,7 +68,7 @@ class TypeSchema:
             return result
         else:
             # Get class for the specified type name and use it to get type spec
-            class_ = TypeCache.get_class_from_type_name(type_name)
+            class_ = TypeCache.from_type_name(type_name)
             return cls.for_class(class_)
 
     @classmethod
@@ -80,7 +80,7 @@ class TypeSchema:
             return result
         else:
             # Get class for the specified type name
-            class_ = TypeCache.get_class_from_type_name(type_name)
+            class_ = TypeCache.from_type_name(type_name)
 
             # TODO: Use mapping records to avoid hardcoding the list of data frameworks
             # Get class for the type spec

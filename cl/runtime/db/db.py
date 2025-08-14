@@ -212,7 +212,7 @@ class Db(DbKey, RecordMixin, ABC):
 
         # Get DB type from context settings if not specified
         if db_type is None:
-            db_type = TypeCache.get_class_from_type_name(db_settings.db_type)
+            db_type = TypeCache.from_type_name(db_settings.db_type)
 
         # Get DB identifier if not specified
         if db_id is None:
@@ -290,7 +290,7 @@ class Db(DbKey, RecordMixin, ABC):
             # to DB as it is faster to overwrite than to check for each parent
 
             # Create binding for each parent and self
-            parent_type_names = TypeCache.get_parent_record_type_names(record_type, type_kind=TypeKind.RECORD)
+            parent_type_names = TypeCache.get_parent_type_names(record_type, type_kind=TypeKind.RECORD)
             bindings = tuple(
                 TableBinding(
                     record_type=parent_type_name,

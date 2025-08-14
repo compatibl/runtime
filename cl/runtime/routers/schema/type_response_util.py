@@ -38,7 +38,7 @@ class TypeResponseUtil:
             record_type_name = active(DataSource).get_common_base_record_type_name(table=request.type_name)
 
         # Get record type from name
-        record_type = TypeCache.get_class_from_type_name(record_type_name)
+        record_type = TypeCache.from_type_name(record_type_name)
 
         handler_args_elements = dict()
         result = TypeDecl.as_dict_with_dependencies(record_type)

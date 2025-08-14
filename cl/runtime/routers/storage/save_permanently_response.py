@@ -34,7 +34,7 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 def get_type_to_records_map(request: SavePermanentlyRequest) -> defaultdict[type, TRecord]:
     """Fetch records from the database and return them."""
 
-    request_type = TypeCache.get_class_from_type_name(request.type)
+    request_type = TypeCache.from_type_name(request.type)
     type_hint = TypeHint.for_class(request_type, optional=True)
 
     key_objs = [_KEY_SERIALIZER.deserialize(key, type_hint) for key in request.keys]

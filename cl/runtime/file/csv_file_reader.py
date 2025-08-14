@@ -80,7 +80,7 @@ class CsvFileReader(Reader):
             )
 
         # Get record type
-        record_type = TypeCache.get_class_from_type_name(filename_without_extension)
+        record_type = TypeCache.from_type_name(filename_without_extension)
 
         # Normalize chars and set None for empty strings
         row_dict = {CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()}
