@@ -33,8 +33,8 @@ class SseQueryUtil:
         #   - sort by specific field in descending order
         #   - limit sorted result
 
-        table = TypeUtil.name(key_type).removesuffix("Key")
-        db = active(DataSource).get_db()  # TODO: !!! Refactor to stop bypassing DataSource logic
+        table = TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
+        db = active(DataSource)._get_db()  # TODO: !!! Refactor to stop bypassing DataSource logic
 
         if isinstance(db, SqliteDb):
             return cls._query_sorted_desc_and_limited_sqlite(

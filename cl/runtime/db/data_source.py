@@ -39,10 +39,10 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
-from cl.runtime.records.table_binding_key_query_by_record_type import TableBindingKeyQueryByRecordType
+from cl.runtime.records.table_binding_key import TableBindingKey
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.serializers.key_serializer import KeySerializer
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _LOGGER = logging.getLogger(__name__)
@@ -98,135 +98,101 @@ class DataSource(DataSourceKey, RecordMixin):
         if self.designated is not None:
             raise RuntimeError("DataSource.designated is not yet supported.")
 
-    def get_db(self) -> Db:
-        """Cast db key type to record type, the record is already loaded by the __init method."""
-        return cast(Db, self.db)
-
-    def get_parent(self) -> Self:
-        """Cast parent key types to record type, the record is already loaded by the __init method."""
-        return cast(Self, self.parent)
-
     def get_bindings(self) -> tuple[TableBinding, ...]:
-        """
-        Return table to record type bindings in alphabetical order of table name followed by record type name.
-        More than one table can exist for the same record type and vice versa.
-        """
-        # Load from DB as cache may be out of date
-        bindings = self.load_type(TableBinding, cast_to=TableBinding)
+        """Return table to record type bindings in alphabetical order of table name followed by record type name."""
 
-        # Sort bindings by table name and then by key type
+        # Load from DB as cache may be out of date
+        bindings = self.load_type(TableBinding)
+        # Sort bindings by table name first and then by record type in alphabetical order
         return tuple(sorted(bindings, key=lambda x: (x.table, x.record_type)))
 
     def get_tables(self) -> tuple[str, ...]:
         """Return DB table names in alphabetical order of PascalCase format."""
 
-        # Bindings may include multiple entries with the same table name
-        bindings = self.get_bindings()
-
+        # Load from DB as cache may be out of date
+        bindings = self.load_type(TableBinding)
         # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
         return tuple(sorted(set(binding.table for binding in bindings)))
 
-    def get_record_type_names(self) -> tuple[str, ...]:
-        """
-        Return PascalCase record type names in alphabetical order for records stored in this DB.
-        More than one table can exist for the same record type.
-        """
-        # Bindings may include multiple entries with the same record type
-        bindings = self.get_bindings()
+    def get_table(self, *, record_type_name: str) -> str:
+        """Return DB table name for the specified record type name, error if the record type is not stored."""
 
-        # Convert to set to remove duplicates and then back to tuple with sorting in alphabetical order
-        return tuple(sorted(set(binding.record_type for binding in bindings)))
+        # Load from DB as cache may be out of date
+        binding = self.load_one_or_none(TableBindingKey(record_type_name=record_type_name))
+        if binding:
+            return binding.table
+        else:
+            raise RuntimeError(f"Records of type {record_type_name} not found.")
 
-    def get_bound_tables(self, *, record_type: type[RecordProtocol] | str) -> tuple[str, ...]:
+    def get_key_type_name(self, *, table: str) -> str:
         """
-        Return PascalCase tables for the specified record type or name in alphabetical order.
-
-        Args:
-            record_type: Record type or type name for which the tables are returned.
-        """
-        # Query by record type, each parent type has its own binding record
-        record_type = TypeUtil.name(record_type) if isinstance(record_type, type) else record_type
-        query = TableBindingKeyQueryByRecordType(record_type=record_type).build()
-        bindings = self.load_where(query, cast_to=TableBinding)
-
-        # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
-        return tuple(sorted(set(binding.table for binding in bindings)))
-
-    def get_bound_key_type(self, *, table: str) -> type:
-        """
-        Key type for the specified table, the table must exist.
+        Return PascalCase key type name for the specified table name.
 
         Args:
-            table: Table name in PascalCase format.
+            table: Table name in PascalCase format (optional, filter by table if specified).
         """
-        # Query by record type, each parent type has its own binding record
+
+        # Load from DB as cache may be out of date
         query = TableBindingKeyQueryByTable(table=table).build()
         bindings = self.load_where(query, cast_to=TableBinding)
-        if not bindings:
-            raise RuntimeError(f"Table {table} is not found.")
 
-        # Convert to set to remove duplicates
+        # Eliminate duplicates
         key_type_names = tuple(set(binding.key_type for binding in bindings))
 
-        # Error if more than one key type is found
-        if len(key_type_names) > 1:
-            key_type_names_str = "\n".join(sorted(key_type_names))
-            raise RuntimeError(f"Multiple key types found in table {table}:\n{key_type_names_str}")
+        if len(key_type_names) == 1:
+            return key_type_names[0]
+        elif len(key_type_names) == 0:
+            raise RuntimeError(f"No records found for table {table}.")
+        else:
+            raise RuntimeError(f"Multiple key types found for table {table}.")
 
-        key_type = TypeCache.get_class_from_type_name(key_type_names[0])
-        return key_type
+        # Sort in alphabetical order of record_type (not the same as query sort order) and convert to tuple
+        return tuple(sorted(binding.record_type for binding in bindings))
 
-    def get_bound_record_type_names(self, *, table: str) -> tuple[str, ...]:
+    def get_record_type_names(self, *, table: str | None = None) -> tuple[str, ...]:
         """
-        Record type names actually stored in the specified table, the table must exist.
+        Return PascalCase record type names in alphabetical order for records stored in this DB,
+        with optional filtering by table name.
 
         Returns:
             Tuple of PascalCase record type names in alphabetical order or an empty tuple.
 
         Args:
-            table: Table name in PascalCase format.
+            table: Table name in PascalCase format (optional, filter by table if specified).
         """
-        # Query by record type, each parent type has its own binding record
+
+        # Load from DB as cache may be out of date
         query = TableBindingKeyQueryByTable(table=table).build()
         bindings = self.load_where(query, cast_to=TableBinding)
-        if not bindings:
-            raise RuntimeError(f"Table {table} is not found.")
 
-        # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
-        return tuple(sorted(set(binding.record_type for binding in bindings)))
+        # Sort in alphabetical order of record_type (not the same as query sort order) and convert to tuple
+        return tuple(sorted(binding.record_type for binding in bindings))
 
-    def get_allowed_record_type_names(self, *, table: str) -> tuple[str, ...]:
+    def get_common_base_record_type_name(self, *, table: str) -> str:
         """
-        Record type names that may be stored in the specified table, the table must exist.
+        Return the name of the common type for all records stored in this table, error if the table is empty.
 
         Args:
-            table: Table name in PascalCase format.
+            table: Table name in PascalCase format (required).
         """
+        
+        if not table:
+            raise RuntimeError("Table name is required in get_common_base_record_type_name method.")
 
-        # Bound key type exists if the table exists
-        key_type = self.get_bound_key_type(table=table)
-
-        # Return child names of the bound key type
-        result = TypeCache.get_child_names(key_type)
-        return result
-
-    def get_lowest_bound_record_type_name(self, *, table: str) -> str:
-        """
-        Return the name of the lowest common type for the record types bound to the table, error if the table is empty.
-
-        Args:
-            table: Table name in PascalCase format.
-        """
-
-        # The result may be empty if the table is empty
-        bound_type_names = self.get_bound_record_type_names(table=table)
-
-        # The case of empty bound_type_names can only occur if table name is stale because bindings
-        # will include at least one record type when data is added, raise an error
-        if not bound_type_names:
-            raise RuntimeError(f"Table {table} is not found.")
-        result = TypeCache.get_common_base_name(record_types=bound_type_names) if bound_type_names else None
-        return result
+        # Get record type names stored in this table
+        bound_type_names = self.get_record_type_names(table=table)
+        
+        if bound_type_names:
+            # Find the common base name
+            result = TypeCache.get_common_base_record_type_name(
+                types_or_names=bound_type_names,
+                type_kind=TypeKind.RECORD,
+            )
+            return result
+        else:
+            # The case of empty bound_type_names can only occur if table name is stale because bindings
+            # will include at least one record type when data is added, raise an error
+            raise RuntimeError(f"Table {table} is empty.")
 
     def load_one(
         self,
@@ -345,7 +311,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_key_type = [
-            self.get_db().load_many(key_type, keys_for_key_type, dataset=self.dataset.dataset_id)
+            self._get_db().load_many(key_type, keys_for_key_type, dataset=self.dataset.dataset_id)
             for key_type, keys_for_key_type in keys_to_load_grouped_by_key_type.items()
         ]
 
@@ -389,7 +355,7 @@ class DataSource(DataSourceKey, RecordMixin):
             skip: Number of records to skip (for pagination)
         """
         # Load table for the key type of 'restrict_to' parameter
-        return self.get_db().load_all(
+        return self._get_db().load_all(
             restrict_to.get_key_type(),
             dataset=self.dataset.dataset_id,
             sort_order=sort_order,
@@ -423,7 +389,7 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        return self.get_db().load_all(
+        return self._get_db().load_all(
             key_type=key_type,
             dataset=self.dataset.dataset_id,
             sort_order=sort_order,
@@ -457,7 +423,7 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        return self.get_db().load_where(
+        return self._get_db().load_where(
             query,
             dataset=self.dataset.dataset_id,
             sort_order=sort_order,
@@ -481,7 +447,7 @@ class DataSource(DataSourceKey, RecordMixin):
             query: Contains query conditions to match
             restrict_to: Count only the subtypes of this type (defaults to the query target type)
         """
-        return self.get_db().count_where(query, dataset=self.dataset.dataset_id, restrict_to=restrict_to)
+        return self._get_db().count_where(query, dataset=self.dataset.dataset_id, restrict_to=restrict_to)
 
     def save_one(
         self,
@@ -508,20 +474,20 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Save records for each table
         [
-            self.get_db().save_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+            self._get_db().save_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
             for key_type, records_for_key_type in records_grouped_by_key_type.items()
         ]
 
     def delete_one(
         self,
-        key: KeyProtocol | tuple | str,
+        key: KeyProtocol,
     ) -> None:
         """Delete record for the specified key in object, tuple or string format (no error if not found)."""
         return self.delete_many([key])
 
     def delete_many(
         self,
-        keys: Sequence[KeyProtocol | tuple | str],
+        keys: Sequence[KeyProtocol],
     ) -> None:
         """Delete records for the specified keys in object, tuple or string format (no error if not found)."""
 
@@ -535,9 +501,17 @@ class DataSource(DataSourceKey, RecordMixin):
         keys_grouped_by_key_type = self._group_inputs_by_key_type(keys)
 
         [
-            self.get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+            self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
             for key_type, records_for_key_type in keys_grouped_by_key_type.items()
         ]
+
+    def _get_db(self) -> Db:
+        """Cast db key type to record type, the record is already loaded by the __init method."""
+        return cast(Db, self.db)
+
+    def _get_parent(self) -> Self:
+        """Cast parent key types to record type, the record is already loaded by the __init method."""
+        return cast(Self, self.parent)
 
     @classmethod
     def _check_frozen_inputs(cls, inputs: Sequence[TRecord | TKey | None]) -> None:

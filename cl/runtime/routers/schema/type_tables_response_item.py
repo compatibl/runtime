@@ -37,7 +37,6 @@ class TypeTablesResponseItem(BaseModel):
     def get_type_tables(cls, request: TypeRequest) -> list[TypeTablesResponseItem]:
         """Implements /schema/type-tables route."""
 
-        bound_type_name = request.type_name
-        bindings = active(DataSource).get_bound_tables(record_type=bound_type_name)
-
-        return [TypeTablesResponseItem(name=type_name) for type_name in bindings]
+        # TODO(Roman): Refactor to return a single table
+        table = active(DataSource).get_table(record_type_name=request.type_name)
+        return [TypeTablesResponseItem(name=table)]

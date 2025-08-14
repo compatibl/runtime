@@ -49,26 +49,31 @@ class SelectResponse(RecordsWithSchemaResponse):
         if request.limit is not None:
             raise RuntimeError("Select with 'limit' currently is not supported.")
 
+        ds = active(DataSource)
+
         # TODO(Roman): !!! Implement separate methods for table and type
         if TypeCache.is_type(type_name=request.type_, type_kind=TypeKind.RECORD):
             # Get records for a type
             record_type_name = request.type_
             record_type = TypeCache.get_class_from_type_name(record_type_name)
             # Load records for the type
-            records = active(DataSource).load_type(record_type)
+            records = ds.load_type(record_type)
+            common_base_record_type = record_type
         else:
             # Get records for a table
             table = request.type_
-            records = active(DataSource).load_all(table)
+            key_type_name = ds.get_key_type_name(table=table)
+            key_type = TypeCache.get_class_from_type_name(key_type_name)
+            records = ds.load_all(key_type)
             # Get lowest common type to the records stored in the table
-            record_type_name = active(DataSource).get_lowest_bound_record_type_name(table=table)
-            record_type = TypeCache.get_class_from_type_name(record_type_name)
+            common_base_record_type_name = ds.get_common_base_record_type_name(table=table)
+            common_base_record_type = TypeCache.get_class_from_type_name(common_base_record_type_name)
 
         # Serialize records for table.
         serialized_records = [cls._serialize_record_for_table(record) for record in records]
 
         # Get schema dict for type.
-        schema_dict = cls._get_schema_dict(record_type)
+        schema_dict = cls._get_schema_dict(common_base_record_type)
 
         return SelectResponse(schema_=schema_dict, data=serialized_records)  # noqa
 

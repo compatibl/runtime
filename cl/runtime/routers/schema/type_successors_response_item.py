@@ -19,6 +19,7 @@ from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_kind import TypeKind
 
 
 class TypeSuccessorsResponseItem(BaseModel):
@@ -38,15 +39,11 @@ class TypeSuccessorsResponseItem(BaseModel):
     def get_type_successors(cls, request: TypeRequest) -> list[TypeSuccessorsResponseItem]:
         """Implements /schema/type-successors route."""
 
-        base_type_name = request.type_name
-
-        # Getting type's successor names
-        base_type = TypeCache.get_class_from_type_name(base_type_name)
-        # TODO: Modify the method for removing types to also cover non-abstract Mixins
-        successor_types = [t for t in base_type.__subclasses__() if not inspect.isabstract(t)]
-        all_type_names = list(set([s_type.__name__ for s_type in successor_types]))
-        if not inspect.isabstract(base_type):
-            all_type_names.append(base_type_name)
-
-        result = [TypeSuccessorsResponseItem(name=type_name, label=titleize(type_name)) for type_name in all_type_names]
+        # Getting child record type names
+        base_record_type_name = request.type_name
+        child_record_type_names = TypeCache.get_child_record_type_names(base_record_type_name, type_kind=TypeKind.RECORD)
+        result = [
+            TypeSuccessorsResponseItem(name=type_name, label=titleize(type_name))
+            for type_name in child_record_type_names
+        ]
         return result

@@ -233,6 +233,12 @@ def is_abstract(instance_or_type: Any) -> bool:
     return bool(getattr(type_, "__abstractmethods__", None))
 
 
+def is_mixin(instance_or_type: Any) -> bool:
+    """True if the argument is a mixin class, detect base on Mixin name suffix only."""
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    return type_.__name__.endswith("Mixin")
+
+
 def is_builder(instance_or_type: Any) -> TypeGuard[TData]:
     """
     True if the argument has 'build' method (includes data, keys and records), may be abstract or a mixin.

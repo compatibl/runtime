@@ -22,14 +22,15 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
+from cl.runtime.records.protocols import RecordProtocol, KeyProtocol, is_key, is_record, is_sequence
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
-from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
+from cl.runtime.records.table_binding_key import TableBindingKey
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 
@@ -48,7 +49,7 @@ class Db(DbKey, RecordMixin, ABC):
     def load_many(
         self,
         key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
+        keys: Sequence[KeyProtocol],
         *,
         dataset: str,
         sort_order: SortOrder = SortOrder.INPUT,
@@ -156,7 +157,7 @@ class Db(DbKey, RecordMixin, ABC):
     def delete_many(
         self,
         key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
+        keys: Sequence[KeyProtocol],
         *,
         dataset: str,
     ) -> None:
@@ -261,42 +262,40 @@ class Db(DbKey, RecordMixin, ABC):
         if not self._table_binding_cache:
             self._table_binding_cache = {}
         if (result := self._table_binding_cache.get(dataset)) is None:
-            query = TableBindingKeyQueryByTable().build()
-            bindings = self.load_where(query, cast_to=TableBinding, dataset=dataset)
-            result = {(binding.table, binding.record_type): binding for binding in bindings}
+            bindings = self.load_all(TableBindingKey, cast_to=TableBinding, dataset=dataset)
+            result = {(binding.record_type, binding.table): binding for binding in bindings}
             self._table_binding_cache[dataset] = result
         return result
 
     def _add_binding(
         self,
         *,
-        table: str,
         record_type: type[RecordProtocol],
+        table: str,
         dataset: str,
     ) -> None:
         """
-        Record the table to record type binding in the DB if not found in cache, update cache.
+        Record table for the specified record type and its parents if not found in cache, update cache.
 
         Args:
-            table: Table name in PascalCase format
             record_type: Record type bound to the table
+            table: Table name in PascalCase format
         """
 
         record_type_name = TypeUtil.name(record_type)
-        cache_key = (table, record_type_name)
+        cache_key = (record_type_name, table)
         if cache_key not in self._get_dataset_table_binding_cache(dataset=dataset):
 
             # If the binding is not yet in cache, write bindings for this and all parent record types
             # to DB as it is faster to overwrite than to check for each parent
 
             # Create binding for each parent and self
-            parent_type_names = TypeCache.get_parent_names(record_type)
-            key_type_name = TypeUtil.name(record_type.get_key_type())
+            parent_type_names = TypeCache.get_parent_record_type_names(record_type, type_kind=TypeKind.RECORD)
             bindings = tuple(
                 TableBinding(
-                    table=table,
                     record_type=parent_type_name,
-                    key_type=key_type_name,
+                    key_type=TypeUtil.name(record_type.get_key_type()),
+                    table=table,
                 ).build()
                 for parent_type_name in parent_type_names
             )
@@ -304,18 +303,42 @@ class Db(DbKey, RecordMixin, ABC):
             # Add to cache
             consume(
                 self._get_dataset_table_binding_cache(dataset=dataset).setdefault(
-                    (binding.table, binding.record_type),
+                    (binding.record_type, binding.table),
                     binding,
                 )
                 for binding in bindings
             )
 
             # Save bindings to the dataset
-            binding_tables = tuple(set(TypeUtil.name(binding.get_key_type()) for binding in bindings))
-            if len(binding_tables) != 1:
-                raise RuntimeError("Bindings must be stored in a single table.")
-            binding_table = binding_tables[0]
-            self.save_many(binding_table, bindings, dataset=dataset)
+            self.save_many(TableBindingKey, bindings, dataset=dataset)
+
+    @classmethod
+    def _check_key_type(cls, key_type: type) -> None:
+        """Error if the argument is not a key type."""
+        if not isinstance(key_type, type) or not is_key(key_type):
+            raise RuntimeError(f"Parameter {TypeUtil.name(key_type)} is not a key type.")
+
+    @classmethod
+    def _check_key_sequence(cls, keys: Sequence[KeyProtocol]) -> None:
+        """Error if the argument is not a record sequence (generator is not accepted)."""
+        if is_sequence(keys):
+            consume(cls._check_key_type(type(x)) for x in keys)
+        else:
+            raise RuntimeError(f"Parameter {TypeUtil.name(keys)} is not a sequence (generator is not accepted).")
+
+    @classmethod
+    def _check_record_type(cls, record_type: type) -> None:
+        """Error if the argument is not a record type."""
+        if not isinstance(record_type, type) or not is_record(record_type):
+            raise RuntimeError(f"Parameter {TypeUtil.name(record_type)} is not a record type.")
+
+    @classmethod
+    def _check_record_sequence(cls, records: Sequence[RecordProtocol]) -> None:
+        """Error if the argument is not a record sequence (generator is not accepted)."""
+        if is_sequence(records):
+            consume(cls._check_record_type(type(x)) for x in records)
+        else:
+            raise RuntimeError(f"Parameter {TypeUtil.name(records)} is not a sequence (generator is not accepted).")
 
     @classmethod
     def _check_dataset(cls, dataset: str) -> None:

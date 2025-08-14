@@ -28,11 +28,12 @@ from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
+from cl.runtime.records.protocols import RecordProtocol, KeyProtocol, is_key, is_record
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -71,13 +72,15 @@ class BasicMongoDb(Db):
     def load_many(
         self,
         key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
+        keys: Sequence[KeyProtocol],
         *,
         dataset: str,
         sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[RecordMixin]:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
+        self._check_key_sequence(keys)
         self._check_dataset(dataset)
 
         # Get table name from key type and check it has an acceptable format
@@ -112,7 +115,8 @@ class BasicMongoDb(Db):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
         self._check_dataset(dataset)
 
         # Get table name from key type and check it has an acceptable format
@@ -121,12 +125,11 @@ class BasicMongoDb(Db):
         # Get collection
         collection = self._get_mongo_collection(table_name)
 
-        # Filter by type
+        # Create a query dictionary
         query_dict = {}
-        if restrict_to is not None:
-            # Add filter condition on type
-            subtype_names = TypeCache.get_child_names(restrict_to)
-            query_dict["_type"] = {"$in": subtype_names}
+
+        # Filter by restrict_to if specified
+        self._apply_restrict_to(query_dict=query_dict, key_type=key_type, restrict_to=restrict_to)
 
         # TODO: Filter by keys
         # serialized_primary_key = _KEY_SERIALIZER.serialize(key)
@@ -164,7 +167,9 @@ class BasicMongoDb(Db):
         self._check_dataset(dataset)
 
         # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
+        query_target_type = query.get_target_type()
+        key_type = query_target_type.get_key_type()
+        table_name = self._get_validated_table_name(key_type=key_type)
 
         # Get collection using table name from the query
         collection = self._get_mongo_collection(table_name)
@@ -179,17 +184,16 @@ class BasicMongoDb(Db):
         # Validate restrict_to or use the query target type if not specified
         if restrict_to is None:
             # Default to the query target type
-            restrict_to = query.get_target_type()
-        elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
+            restrict_to = query_target_type
+        elif not issubclass(restrict_to, query_target_type):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
                 f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
-                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+                f"of the query target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
             )
 
-        # Add filter condition on type
-        subtype_names = TypeCache.get_child_names(restrict_to)
-        query_dict["_type"] = {"$in": subtype_names}
+        # Filter by restrict_to if specified
+        self._apply_restrict_to(query_dict=query_dict, key_type=key_type, restrict_to=restrict_to)
 
         # Get iterable from the query sorted by '_key', execution is deferred
         serialized_records = collection.find(query_dict).sort("_key")
@@ -231,7 +235,9 @@ class BasicMongoDb(Db):
         self._check_dataset(dataset)
 
         # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
+        query_target_type = query.get_target_type()
+        key_type = query_target_type.get_key_type()
+        table_name = self._get_validated_table_name(key_type=key_type)
 
         # Get collection using table name from the query
         collection = self._get_mongo_collection(table_name)
@@ -246,17 +252,16 @@ class BasicMongoDb(Db):
         # Validate restrict_to or use the query target type if not specified
         if restrict_to is None:
             # Default to the query target type
-            restrict_to = query.get_target_type()
-        elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
+            restrict_to = query_target_type
+        elif not issubclass(restrict_to, query_target_type):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
                 f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
                 f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
             )
 
-        # Add filter condition on type
-        subtype_names = TypeCache.get_child_names(restrict_to)
-        query_dict["_type"] = {"$in": subtype_names}
+        # Filter by restrict_to if specified
+        self._apply_restrict_to(query_dict=query_dict, key_type=key_type, restrict_to=restrict_to)
 
         # Use count_documents to get the count
         count = collection.count_documents(query_dict)
@@ -270,7 +275,9 @@ class BasicMongoDb(Db):
         dataset: str,
     ) -> None:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
+        self._check_record_sequence(records)
         self._check_dataset(dataset)
 
         # Get table name from key type and check it has an acceptable format
@@ -300,12 +307,14 @@ class BasicMongoDb(Db):
     def delete_many(
         self,
         key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
+        keys: Sequence[KeyProtocol],
         *,
         dataset: str,
     ) -> None:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
+        self._check_key_sequence(keys)
         self._check_dataset(dataset)
 
         # Get table name from key type and check it has an acceptable format
@@ -431,6 +440,32 @@ class BasicMongoDb(Db):
         return self.db_id
 
     @classmethod
+    def _apply_restrict_to(
+        cls,
+        *,
+        query_dict: dict,
+        key_type: type,
+        restrict_to: type | None,
+    ) -> None:
+        """Add filter by the specified type to the query dictionary."""
+        if restrict_to is None:
+            # Do nothing if restrict_to is not specified
+            return
+        if is_record(restrict_to):
+            # Add filter condition on type if it is a record type
+            child_record_type_names = TypeCache.get_child_record_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            query_dict["_type"] = {"$in": child_record_type_names}
+        elif is_key(restrict_to):
+            # Check that it matches the key type obtained from the query
+            if restrict_to != key_type:
+                raise RuntimeError(
+                    f"Parameter restrict_to={TypeUtil.name(restrict_to)} does not match "
+                    f"key_type={TypeUtil.name(key_type)}."
+                )
+        else:
+            raise RuntimeError(f"Parameter restrict_to={TypeUtil.name(restrict_to)} is not a key or record.")
+
+    @classmethod
     def _apply_limit_and_skip(
         cls,
         serialized_records: Iterable,
@@ -472,4 +507,4 @@ class BasicMongoDb(Db):
     def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
         """Get table name from key type and check that it has an acceptable format."""
         # TODO: Add validation for length and permitted characters
-        return TypeUtil.name(key_type).removesuffix("Key")
+        return TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")

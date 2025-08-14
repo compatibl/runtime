@@ -19,13 +19,10 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 @dataclass(slots=True)
 class TableBindingKey(KeyMixin):
-    """Specifies table binding to key type."""
-
-    table: str = required()
-    """Unique table identifier in PascalCase format."""
+    """Indicates that the record type is stored in the specified table."""
 
     record_type: str = required()
-    """Record type name in PascalCase format."""
+    """Stored record type name in PascalCase format."""
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:

@@ -27,7 +27,7 @@ from inflection import titleize
 from memoization import cached
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_abstract
+from cl.runtime.records.protocols import is_abstract, is_record, is_key, is_data, is_enum
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
@@ -160,22 +160,29 @@ class TypeDecl(TypeDeclKey, RecordMixin):
             skip_handlers: Use this flag to skip handlers generation when the method is invoked internal methods
         """
 
-        if issubclass(record_type, Enum):
-            raise RuntimeError(f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} because it is an enum.")
-        if issubclass(record_type, tuple):
-            raise RuntimeError(f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} because it is a tuple.")
-
-        # Create instance of the final type
+        # Create instance of the result
         result = cls()
+
+        # Set type kind
+        if is_record(record_type):
+            result.type_kind = TypeKind.RECORD
+        elif is_key(record_type):
+            result.type_kind = TypeKind.DATA  # TODO: Review, should be KEY
+        elif is_data(record_type):
+            result.type_kind = TypeKind.DATA
+        elif is_enum(record_type):
+            raise RuntimeError(f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} because it is an enum.")
+        elif issubclass(record_type, tuple):
+            raise RuntimeError(f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} because it is a tuple.")
+        else:
+            raise RuntimeError(
+                f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} "
+                f"because it is not a record, key or data.")
 
         result.module = ModuleDeclKey().build()
         result.name = TypeUtil.name(record_type)
         result.label = titleize(result.name)  # TODO: Add override from settings
         result.comment = record_type.__doc__
-
-        # Set type kind by detecting the presence of 'get_key' method to indicate a record vs. an element
-        is_record = hasattr(record_type, "get_key")
-        result.type_kind = TypeKind.RECORD if is_record else TypeKind.DATA
 
         # Set abstract flag, use None instead of False
         result.abstract = True if is_abstract(record_type) else None
@@ -249,7 +256,8 @@ class TypeDecl(TypeDeclKey, RecordMixin):
                     # Iterate over only the added dependencies
                     for dep in added_dependencies:
                         # Call recursively on all added dependencies unless already in dependencies or primitive
-                        if not is_primitive(dep) and dep not in dependencies:
+                        # TODO(Sasha): Review if enum declarations should be in dependencies
+                        if not is_primitive(dep) and not is_enum(dep) and dep not in dependencies:
                             cls.for_type(
                                 dep, dependencies=dependencies, skip_fields=skip_fields, skip_handlers=skip_handlers
                             )

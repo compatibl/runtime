@@ -22,6 +22,8 @@ from pkgutil import walk_packages
 from types import ModuleType
 from typing import Sequence
 from more_itertools import consume
+
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.records.protocols import is_data_key_or_record, is_mixin
 from cl.runtime.records.protocols import is_enum
@@ -40,7 +42,7 @@ _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildN
 
 def is_schema_type(class_: type) -> bool:
     """Return true if the type should be included in schema, includes data classes (except mixin classes) and enums."""
-    return isclass(class_) and ((is_data_key_or_record(class_) and not is_mixin(class_)) or is_enum(class_))
+    return isclass(class_) and (is_data_key_or_record(class_) or is_enum(class_))
 
 
 class TypeCache:
@@ -62,8 +64,19 @@ class TypeCache:
     """List of packages to include in the cache."""
 
     @classmethod
-    def is_type(cls, type_name: str, *, type_kind: TypeKind | None = None) -> bool:
-        """Get fully qualified name in module.ClassName format from the class, filter by TypeKind if specified."""
+    def is_type(
+        cls,
+        type_name: str,
+        *,
+        type_kind: TypeKind | None = None
+        ) -> bool:
+        """
+        Get fully qualified name in module.ClassName format from the class, filter by TypeKind if specified.
+
+        Args:
+            type_name: Type name in PascalCase format
+            type_kind: Restrict to the specified type kind if provided (optional)
+        """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
@@ -76,7 +89,7 @@ class TypeCache:
                 # No restrictions on type, return True
                 return True
             else:
-                # Return true only if type_kind is in the permitted list
+                # Return true only if matches type_kind
                 return type_info.type_kind == type_kind
         else:
             # Not found, return False
@@ -153,87 +166,120 @@ class TypeCache:
             raise cls._type_name_not_found_error(type_name)
 
     @classmethod
-    def get_parent_record_type_names(cls, record_type: type | str) -> tuple[str, ...]:
+    def get_parent_record_type_names(
+            cls,
+            type_or_name: type | str,
+            *,
+            type_kind: TypeKind | None = None
+    ) -> tuple[str, ...]:
         """
         Return a tuple of type names for parent classes (inclusive of self) that match the predicate.
 
         Args:
-            record_type: Record type or name in PascalCase format.
+            type_or_name: Type or type name in PascalCase format
+            type_kind: Restrict to the specified type kind if provided (optional)
         """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
-        # Convert record type to string
-        record_type = TypeUtil.name(record_type) if isinstance(record_type, type) else record_type
-        if not isinstance(record_type, str):
-            raise RuntimeError("Argument of get_parent_record_type_names must be a record type or string type name.")
+        # Convert type to type name if not already a string
+        record_type = cls._get_type_name(type_or_name)
 
         # Get from cached TypeInfo
         if (type_info := cls._type_info_by_type_name_dict.get(record_type, None)) is not None:
-            return type_info.parent_record_type_names
+            result = type_info.parent_record_type_names
+            if type_kind is not None:
+                result = tuple(x for x in result if cls.is_type(x, type_kind=type_kind))
+            return result
         else:
             raise cls._type_name_not_found_error(record_type)
 
     @classmethod
-    def get_child_record_type_names(cls, record_type: type | str) -> tuple[str, ...]:
+    def get_child_record_type_names(
+            cls,
+            type_or_name: type | str,
+            *,
+            type_kind: TypeKind | None = None
+    ) -> tuple[str, ...]:
         """
         Return a tuple of type names for child classes (inclusive of self) that match the predicate.
         Result is sorted by depth in hierarchy.
 
         Args:
-            record_type: Record type or name in PascalCase format.
+            type_or_name: Type or type name in PascalCase format
+            type_kind: Restrict to the specified type kind if provided (optional)
         """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
+        # Convert type to type name if not already a string
+        type_name = cls._get_type_name(type_or_name)
+
         # Get from cached TypeInfo
-        type_name = TypeUtil.name(record_type) if isinstance(record_type, type) else record_type
         if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
             child_record_type_names = type_info.child_record_type_names
+            if type_kind is not None:
+                child_record_type_names = tuple(
+                    x for x in child_record_type_names if cls.is_type(x, type_kind=type_kind)
+                )
 
             # Sort child classes by depth in hierarchy
-            depth_dict = {x: len(TypeCache.get_parent_record_type_names(x)) for x in child_record_type_names}
+            depth_dict = {
+                x: len(TypeCache.get_parent_record_type_names(x, type_kind=type_kind))
+                for x in child_record_type_names
+            }
             sorted_child_record_type_names = tuple(
-                child_record_type_name for child_record_type_name, depth in sorted(depth_dict.items(), key=lambda item: item[1])
+                child_record_type_name
+                for child_record_type_name, depth in sorted(depth_dict.items(), key=lambda item: item[1])
             )
-
             return sorted_child_record_type_names
         else:
             raise cls._type_name_not_found_error(type_name)
 
     @classmethod
-    def get_classes(cls, *, type_kind: TypeKind | None) -> tuple[type, ...]:
-        """Return already cached classes that match the predicate, filter by TypeKind if specified."""
+    def get_classes(cls, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
+        """
+        Return already cached classes that match the predicate, filter by TypeKind if specified.
+
+        Args:
+            type_kind: Restrict to the specified type kind if provided (optional)
+        """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
         # Filter by type_kind if specified
         type_info_values = cls._type_info_by_type_name_dict.values()
-        if type_kind:
+        if type_kind is not None:
             type_info_values = [type_info for type_info in type_info_values if type_info.type_kind == type_kind]
         result = tuple(cls.get_class_from_qual_name(x.qual_name) for x in type_info_values)
         return result
 
     @classmethod
-    def get_common_base_record_type_name(cls, *, record_types: Sequence[type | str]) -> str:
+    def get_common_base_record_type_name(
+            cls,
+            types_or_names: Sequence[type | str],
+            *,
+            type_kind: TypeKind | None = None,
+    ) -> str:
         """
         Return PascalCase record type name of the closest common base to the argument types.
 
         Args:
-            record_types: Record types or names in PascalCase format
+            types_or_names: Types or type names in PascalCase format
+            type_kind: Restrict to the specified type kind if provided (optional)
         """
 
         # Ensure the argument is not empty
-        if not record_types:
-            raise RuntimeError("The argument of get_common_base_record_type_name is empty.")
+        if not types_or_names:
+            raise RuntimeError("The argument of get_common_base_type_name is empty.")
 
-        # Convert to names
-        record_type_names = tuple(TypeUtil.name(x) if isinstance(x, type) else x for x in record_types if x is not None)
+        # Convert types to type names if not already strings
+        type_names = tuple(cls._get_type_name(x) for x in types_or_names if x is not None)
 
-        parent_dict = {x: TypeCache.get_parent_record_type_names(x) for x in record_type_names}
+        parent_dict = {x: TypeCache.get_parent_record_type_names(x, type_kind=type_kind) for x in type_names}
         depth_dict = {x: len(parent_dict[x]) for x in parent_dict}
         sorted_depth_dict = dict(sorted(depth_dict.items(), key=lambda item: item[1]))
         result = None
@@ -251,7 +297,7 @@ class TypeCache:
             return result
         else:
             # Handle the case when common base is not found
-            record_type_names_str = "\n".join(record_type_names)
+            record_type_names_str = "\n".join(type_names)
             raise RuntimeError(f"No common base is found for the following records:\n{record_type_names_str}")
 
     @classmethod
@@ -537,6 +583,15 @@ class TypeCache:
         """Get the filename for the qual name cache."""
         resources_root = ProjectSettings.get_resources_root()
         result = os.path.join(resources_root, "bootstrap/TypeInfo.csv")
+        return result
+
+    @classmethod
+    def _get_type_name(cls, type_or_name: type | str) -> str:
+        """Convert to string if type is provided and validate."""
+        result = TypeUtil.name(type_or_name) if isinstance(type_or_name, type) else type_or_name
+        if not isinstance(result, str):
+            raise RuntimeError("Parameter must be a type or a string type name.")
+        CaseUtil.check_pascal_case(result)
         return result
 
     @classmethod

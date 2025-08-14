@@ -32,6 +32,7 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.data_spec import DataSpec
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -57,13 +58,15 @@ class SqliteDb(Db):
     def load_many(
         self,
         key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
+        keys: Sequence[KeyProtocol],
         *,
         dataset: str,
         sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[RecordMixin]:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
+        self._check_key_sequence(keys)
         self._check_dataset(dataset)
 
         if not keys:
@@ -104,7 +107,8 @@ class SqliteDb(Db):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
         self._check_dataset(dataset)
 
         if project_to is not None:
@@ -120,7 +124,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_names(restrict_to)
+            subtype_names = TypeCache.get_child_record_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             select_sql += f' WHERE "_type" IN ({placeholders})'
@@ -198,7 +202,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_names(restrict_to)
+            subtype_names = TypeCache.get_child_record_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             if where:
@@ -283,7 +287,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_names(restrict_to)
+            subtype_names = TypeCache.get_child_record_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             if where:
@@ -312,7 +316,9 @@ class SqliteDb(Db):
         dataset: str,
     ) -> None:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
+        self._check_record_sequence(records)
         self._check_dataset(dataset)
 
         if not records:
@@ -354,12 +360,14 @@ class SqliteDb(Db):
     def delete_many(
         self,
         key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
+        keys: Sequence[KeyProtocol],
         *,
         dataset: str,
     ) -> None:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
+        self._check_key_sequence(keys)
         self._check_dataset(dataset)
 
         if not keys:
@@ -513,12 +521,12 @@ class SqliteDb(Db):
         """Get columns according to the fields of all descendant classes from the specified key."""
 
         # Get child type names for key_type
-        child_names = TypeCache.get_child_names(key_type)
+        child_record_type_names = TypeCache.get_child_record_type_names(key_type, type_kind=TypeKind.RECORD)
         result_columns = []
 
         # Iterate through child types and add unique columns.
         # Since child types are sorted by depth in the hierarchy, the base fields will be at the beginning.
-        for child in child_names:
+        for child in child_record_type_names:
             # Get child type spec
             child_type_spec = TypeSchema.for_type_name(child)
             child_type_spec = cast(DataSpec, child_type_spec)
@@ -545,7 +553,7 @@ class SqliteDb(Db):
     @classmethod
     def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
         """Get table name from key type and check that it has an acceptable format or length, error otherwise."""
-        table_name = TypeUtil.name(key_type).removesuffix("Key")
+        table_name = TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
         if _TABLE_NAME_RE.fullmatch(table_name) is None:
             raise RuntimeError(f"Table name '{table_name}' is not valid for {TypeUtil.name(cls)}")
         return table_name

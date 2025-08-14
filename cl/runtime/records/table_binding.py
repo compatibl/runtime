@@ -20,10 +20,13 @@ from cl.runtime.records.table_binding_key import TableBindingKey
 
 @dataclass(slots=True, kw_only=True)
 class TableBinding(TableBindingKey, RecordMixin):
-    """Specifies table binding to key type."""
+    """Indicates that the record type is stored in the specified table."""
 
     key_type: str = required()
-    """Key type for the records in this table."""
+    """Key type name for the stored record in PascalCase format."""
+
+    table: str = required()
+    """Unique table identifier in PascalCase format."""
 
     def get_key(self) -> TableBindingKey:
-        return TableBindingKey(table=self.table, record_type=self.record_type).build()
+        return TableBindingKey(record_type=self.record_type).build()

@@ -21,7 +21,7 @@ from cl.runtime.records.table_binding_key import TableBindingKey
 
 @dataclass(slots=True, kw_only=True)
 class TableBindingKeyQueryByTable(QueryMixin):
-    """Query for TableBindingKey by table field only."""
+    """Query for TableBindingKey by table field."""
 
     table: str | Condition[str] | None = None
     """Unique table identifier in PascalCase format."""

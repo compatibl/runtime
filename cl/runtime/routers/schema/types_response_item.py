@@ -43,22 +43,23 @@ class TypesResponseItem(BaseModel):
     def get_types(cls) -> list[TypesResponseItem]:  # TODO(Roman): !!! Separate routes for types and tables
         """Implements /schema/types route."""
 
-        # Get cached classes (does not rebuild cache)
-        record_types = TypeCache.get_classes(type_kind=TypeKind.RECORD)
+        # Get types stored in DB
+        ds = active(DataSource)
+        record_type_names = ds.get_record_type_names()
 
         # Add types to result
         types_result = [
             TypesResponseItem(
-                name=TypeUtil.name(record_type),
-                label=titleize(TypeUtil.name(record_type)),  # TODO: Make label different from name or remove
+                name=record_type_name,
+                label=titleize(record_type_name),  # TODO: Make label different from name or remove
             )
-            for record_type in record_types
+            for record_type_name in record_type_names
         ]
 
         # Add tables to result
         tables_result = [
             TypesResponseItem(name=table, label=table, kind="Table")  # TODO: Make label different from name or remove
-            for table in active(DataSource).get_tables()
+            for table in ds.get_tables()
         ]
 
         # Check name collisions between types and tables

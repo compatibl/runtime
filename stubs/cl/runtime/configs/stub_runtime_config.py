@@ -95,7 +95,7 @@ class StubRuntimeConfig(Config):
         ]
 
         # Build and save to DB
-        active(DataSource).save_many(record.build() for record in all_records)
+        active(DataSource).save_many([record.build() for record in all_records])
 
     def configure_plots(self) -> None:
         """Configure plots."""

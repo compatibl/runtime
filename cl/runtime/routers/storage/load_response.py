@@ -21,6 +21,7 @@ from cl.runtime.routers.storage.records_with_schema_response import RecordsWithS
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.ui.ui_type_state import UiTypeState
@@ -70,7 +71,10 @@ class LoadResponse(RecordsWithSchemaResponse):
             serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
             # Find a common base
-            common_base_name = TypeCache.get_common_base_name(record_types=loaded_record_type_names)
+            common_base_name = TypeCache.get_common_base_record_type_name(
+                types_or_names=loaded_record_type_names,
+                type_kind=TypeKind.RECORD,
+            )
             common_base = TypeCache.get_class_from_type_name(common_base_name)
 
             # Create schema dict for the common base

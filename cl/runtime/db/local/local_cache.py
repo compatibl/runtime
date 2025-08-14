@@ -43,13 +43,15 @@ class LocalCache(Db):
     def load_many(
         self,
         key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
+        keys: Sequence[KeyProtocol],
         *,
         dataset: str,
         sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[RecordMixin]:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
+        self._check_key_sequence(keys)
         self._check_dataset(dataset)
 
         # Get table name from key type and check it has an acceptable format
@@ -112,7 +114,9 @@ class LocalCache(Db):
         dataset: str,
     ) -> None:
 
-        # Check dataset
+        # Check params
+        self._check_key_type(key_type)
+        self._check_record_sequence(records)
         self._check_dataset(dataset)
 
         # Get table name from key type and check it has an acceptable format
@@ -133,7 +137,7 @@ class LocalCache(Db):
     def delete_many(
         self,
         key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
+        keys: Sequence[KeyProtocol],
         *,
         dataset: str,
     ) -> None:
@@ -174,4 +178,4 @@ class LocalCache(Db):
     def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
         """Get table name from key type and check that it has an acceptable format."""
         # TODO: Add validation for length and permitted characters
-        return TypeUtil.name(key_type).removesuffix("Key")
+        return TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
