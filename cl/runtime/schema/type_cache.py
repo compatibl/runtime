@@ -23,7 +23,7 @@ from types import ModuleType
 from typing import Sequence
 from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record, is_mixin
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -34,14 +34,13 @@ from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
-
-def is_schema_type(class_: type) -> bool:
-    """Return true if the type should be included in schema, includes data classes and enums."""
-    return isclass(class_) and (is_data_key_or_record(class_) or is_enum(class_))
-
-
 _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildNames")
 """Headers of TypeInfo preload file."""
+
+
+def is_schema_type(class_: type) -> bool:
+    """Return true if the type should be included in schema, includes data classes (except mixin classes) and enums."""
+    return isclass(class_) and ((is_data_key_or_record(class_) and not is_mixin(class_)) or is_enum(class_))
 
 
 class TypeCache:
@@ -154,7 +153,7 @@ class TypeCache:
             raise cls._type_name_not_found_error(type_name)
 
     @classmethod
-    def get_parent_names(cls, record_type: type | str) -> tuple[str, ...]:
+    def get_parent_record_type_names(cls, record_type: type | str) -> tuple[str, ...]:
         """
         Return a tuple of type names for parent classes (inclusive of self) that match the predicate.
 
@@ -168,16 +167,16 @@ class TypeCache:
         # Convert record type to string
         record_type = TypeUtil.name(record_type) if isinstance(record_type, type) else record_type
         if not isinstance(record_type, str):
-            raise RuntimeError("Argument of get_parent_names must be a record type or string type name.")
+            raise RuntimeError("Argument of get_parent_record_type_names must be a record type or string type name.")
 
         # Get from cached TypeInfo
         if (type_info := cls._type_info_by_type_name_dict.get(record_type, None)) is not None:
-            return type_info.parent_names
+            return type_info.parent_record_type_names
         else:
             raise cls._type_name_not_found_error(record_type)
 
     @classmethod
-    def get_child_names(cls, record_type: type | str) -> tuple[str, ...]:
+    def get_child_record_type_names(cls, record_type: type | str) -> tuple[str, ...]:
         """
         Return a tuple of type names for child classes (inclusive of self) that match the predicate.
         Result is sorted by depth in hierarchy.
@@ -192,15 +191,15 @@ class TypeCache:
         # Get from cached TypeInfo
         type_name = TypeUtil.name(record_type) if isinstance(record_type, type) else record_type
         if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
-            child_names = type_info.child_names
+            child_record_type_names = type_info.child_record_type_names
 
             # Sort child classes by depth in hierarchy
-            depth_dict = {x: len(TypeCache.get_parent_names(x)) for x in child_names}
-            sorted_child_names = tuple(
-                child_name for child_name, depth in sorted(depth_dict.items(), key=lambda item: item[1])
+            depth_dict = {x: len(TypeCache.get_parent_record_type_names(x)) for x in child_record_type_names}
+            sorted_child_record_type_names = tuple(
+                child_record_type_name for child_record_type_name, depth in sorted(depth_dict.items(), key=lambda item: item[1])
             )
 
-            return sorted_child_names
+            return sorted_child_record_type_names
         else:
             raise cls._type_name_not_found_error(type_name)
 
@@ -219,7 +218,7 @@ class TypeCache:
         return result
 
     @classmethod
-    def get_common_base_name(cls, *, record_types: Sequence[type | str]) -> str:
+    def get_common_base_record_type_name(cls, *, record_types: Sequence[type | str]) -> str:
         """
         Return PascalCase record type name of the closest common base to the argument types.
 
@@ -229,12 +228,12 @@ class TypeCache:
 
         # Ensure the argument is not empty
         if not record_types:
-            raise RuntimeError("The argument of get_common_base_name is empty.")
+            raise RuntimeError("The argument of get_common_base_record_type_name is empty.")
 
         # Convert to names
         record_type_names = tuple(TypeUtil.name(x) if isinstance(x, type) else x for x in record_types if x is not None)
 
-        parent_dict = {x: TypeCache.get_parent_names(x) for x in record_type_names}
+        parent_dict = {x: TypeCache.get_parent_record_type_names(x) for x in record_type_names}
         depth_dict = {x: len(parent_dict[x]) for x in parent_dict}
         sorted_depth_dict = dict(sorted(depth_dict.items(), key=lambda item: item[1]))
         result = None
@@ -335,7 +334,7 @@ class TypeCache:
             )
 
     @classmethod
-    def _build_child_names(cls, class_: type) -> tuple[str, ...]:
+    def _build_child_record_type_names(cls, class_: type) -> tuple[str, ...]:
         """Return a tuple subclasses (inclusive of self) that match the predicate, sorted by type name."""
         # This must run after all classes are loaded
         subclasses = [TypeUtil.name(class_)] if is_data_key_or_record(class_) else []  # Include self in subclasses
@@ -345,15 +344,15 @@ class TypeCache:
                 # Check that the subclass is in the package list
                 cls._check_class(subclass)
                 # Recurse into the subclass hierarchy, avoid adding duplicates
-                subclasses.extend(x for x in cls._build_child_names(subclass) if x not in subclasses)
+                subclasses.extend(x for x in cls._build_child_record_type_names(subclass) if x not in subclasses)
         # Eliminate duplicates (they should not be present but just to be sure) and sort the names
         return tuple(sorted(set(subclasses)))
 
     @classmethod
-    def _build_parent_names(cls, class_: type) -> tuple[str, ...]:
+    def _build_parent_record_type_names(cls, class_: type) -> tuple[str, ...]:
         """Return a tuple superclasses (inclusive of self) that match the predicate, not cached."""
         # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
-        return tuple(sorted(set(TypeUtil.name(x) for x in class_.mro() if is_data_key_or_record(x))))
+        return tuple(sorted(set(TypeUtil.name(x) for x in class_.mro() if is_record(x))))
 
     @classmethod
     def _add_class(cls, class_: type, *, subtype: str | None = None) -> None:
@@ -388,24 +387,24 @@ class TypeCache:
         # Get parent and child class names for data, keys or records
         if is_data_key_or_record(class_):
             # Build parent and child name lists
-            parent_names = cls._build_parent_names(class_)
-            child_names = cls._build_child_names(class_)
+            parent_record_type_names = cls._build_parent_record_type_names(class_)
+            child_record_type_names = cls._build_child_record_type_names(class_)
 
             # Use None if empty
-            parent_names = parent_names if parent_names else None
-            child_names = child_names if child_names else None
+            parent_record_type_names = parent_record_type_names if parent_record_type_names else None
+            child_record_type_names = child_record_type_names if child_record_type_names else None
         else:
             # Do not generate if not data
-            parent_names = None
-            child_names = None
+            parent_record_type_names = None
+            child_record_type_names = None
 
         # Get type info without subclass names (which will be done on second pass after all classes are loaded)
         type_info = TypeInfo(
             type_name=type_name,
             type_kind=type_kind,
             qual_name=qual_name,
-            parent_names=parent_names,
-            child_names=child_names,
+            parent_record_type_names=parent_record_type_names,
+            child_record_type_names=child_record_type_names,
         )
 
         # Populate the dictionary
@@ -466,7 +465,7 @@ class TypeCache:
                 # Parse a type info row
                 if len(row_tokens) == len(_TYPE_INFO_HEADERS):
                     # Extract the type name and qual name from the tokens
-                    type_name, type_kind, qual_name, parent_names, child_names = row_tokens
+                    type_name, type_kind, qual_name, parent_record_type_names, child_record_type_names = row_tokens
                 else:
                     expected_num_tokens = len(_TYPE_INFO_HEADERS)
                     actual_num_tokens = len(row_tokens)
@@ -482,8 +481,8 @@ class TypeCache:
                     type_name=type_name,
                     type_kind=EnumUtil.from_str(TypeKind, type_kind),
                     qual_name=qual_name,
-                    parent_names=tuple(parent_names.split(";")) if parent_names else None,
-                    child_names=tuple(child_names.split(";")) if child_names else None,
+                    parent_record_type_names=tuple(parent_record_type_names.split(";")) if parent_record_type_names else None,
+                    child_record_type_names=tuple(child_record_type_names.split(";")) if child_record_type_names else None,
                 )
 
                 # Add to the type info dictionary
@@ -518,11 +517,11 @@ class TypeCache:
                 qual_name = type_info.qual_name
 
                 # Sort parent and child names (they should already be sorted, just to be sure)
-                parent_names_str = ";".join(sorted(type_info.parent_names)) if type_info.parent_names else ""
-                child_names_str = ";".join(sorted(type_info.child_names)) if type_info.child_names else ""
+                parent_record_type_names_str = ";".join(sorted(type_info.parent_record_type_names)) if type_info.parent_record_type_names else ""
+                child_record_type_names_str = ";".join(sorted(type_info.child_record_type_names)) if type_info.child_record_type_names else ""
 
                 # Write comma-separated values for each token, with semicolons-separated lists
-                file.write(f"{type_name},{type_kind_str},{qual_name},{parent_names_str},{child_names_str}\n")
+                file.write(f"{type_name},{type_kind_str},{qual_name},{parent_record_type_names_str},{child_record_type_names_str}\n")
 
     @classmethod
     def _clear(cls) -> None:

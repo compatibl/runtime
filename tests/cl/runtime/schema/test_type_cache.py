@@ -87,7 +87,7 @@ def test_get_classes():
 
     # Included in data types
     data_types = TypeCache.get_classes(type_kind=TypeKind.DATA)
-    assert DataMixin in data_types
+    assert DataMixin not in data_types
     assert StubDataclassData in data_types
     # Excluded from data types
     assert KeyMixin not in data_types
@@ -97,7 +97,7 @@ def test_get_classes():
 
     # Included in record types
     record_types = TypeCache.get_classes(type_kind=TypeKind.RECORD)
-    assert RecordMixin in record_types
+    assert RecordMixin not in record_types
     assert StubDataclass in record_types
     assert TypeDecl in record_types
     # Excluded from record types
@@ -108,7 +108,7 @@ def test_get_classes():
 
     # Included in key types
     key_types = TypeCache.get_classes(type_kind=TypeKind.KEY)
-    assert KeyMixin in key_types
+    assert KeyMixin not in key_types
     assert StubDataclassKey in key_types
     # Excluded from key types
     assert DataMixin not in key_types
