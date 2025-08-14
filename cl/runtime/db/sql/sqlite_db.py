@@ -54,6 +54,43 @@ _COLUMN_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 @dataclass(slots=True, kw_only=True)
 class SqliteDb(Db):
 
+    def load_many(
+        self,
+        key_type: type[KeyProtocol],
+        keys: Sequence[KeyMixin],
+        *,
+        dataset: str,
+        sort_order: SortOrder = SortOrder.INPUT,
+    ) -> Sequence[RecordMixin]:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
+        if not keys:
+            return []
+
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
+
+        if not self._is_table_exists(table_name):
+            return []
+
+        serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
+
+        # Build SQL query to select records by keys
+        placeholders = ",".join("?" for _ in serialized_keys)
+        select_sql = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_key" IN ({placeholders})'
+
+        # Execute SQL query
+        conn = self._get_connection()
+        cursor = conn.execute(select_sql, serialized_keys)
+
+        # Deserialize records and return
+        return [
+            _DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None})
+            for row in cursor.fetchall()
+        ]
+
     def load_all(
         self,
         key_type: type[KeyProtocol],
@@ -113,43 +150,6 @@ class SqliteDb(Db):
             result.append(record)
 
         return tuple(result)
-
-    def load_many(
-        self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
-        *,
-        dataset: str,
-        sort_order: SortOrder = SortOrder.INPUT,
-    ) -> Sequence[RecordMixin]:
-
-        # Check dataset
-        self._check_dataset(dataset)
-
-        if not keys:
-            return []
-
-        # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=key_type)
-
-        if not self._is_table_exists(table_name):
-            return []
-
-        serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
-
-        # Build SQL query to select records by keys
-        placeholders = ",".join("?" for _ in serialized_keys)
-        select_sql = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_key" IN ({placeholders})'
-
-        # Execute SQL query
-        conn = self._get_connection()
-        cursor = conn.execute(select_sql, serialized_keys)
-
-        # Deserialize records and return
-        return [
-            _DATA_SERIALIZER.deserialize({k: row[k] for k in row.keys() if row[k] is not None})
-            for row in cursor.fetchall()
-        ]
 
     def load_where(
         self,

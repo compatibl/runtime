@@ -45,6 +45,26 @@ class Db(DbKey, RecordMixin, ABC):
         return DbKey(db_id=self.db_id).build()
 
     @abstractmethod
+    def load_many(
+        self,
+        key_type: type[KeyProtocol],
+        keys: Sequence[KeyMixin],
+        *,
+        dataset: str,
+        sort_order: SortOrder = SortOrder.INPUT,
+    ) -> Sequence[RecordMixin]:
+        """
+        Load records for the specified keys, all of which must have the specified key type.
+        The result is not sorted in the order of provided keys and skips the records that are not found.
+
+        Args:
+            key_type: Key type determines the database table
+            keys: Sequence of keys, type(key) must match the key_type argument for each key
+            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            sort_order: Sort in the order of 'keys' parameter for INPUT (default), or as specified
+        """
+
+    @abstractmethod
     def load_all(
         self,
         key_type: type[KeyProtocol],
@@ -69,26 +89,6 @@ class Db(DbKey, RecordMixin, ABC):
             project_to: Use some or all fields from the stored record to create and return instances of this type
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
-        """
-
-    @abstractmethod
-    def load_many(
-        self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
-        *,
-        dataset: str,
-        sort_order: SortOrder = SortOrder.INPUT,
-    ) -> Sequence[RecordMixin]:
-        """
-        Load records for the specified keys, all of which must have the specified key type.
-        The result is not sorted in the order of provided keys and skips the records that are not found.
-
-        Args:
-            key_type: Key type determines the database table
-            keys: Sequence of keys, type(key) must match the key_type argument for each key
-            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
-            sort_order: Sort in the order of 'keys' parameter for INPUT (default), or as specified
         """
 
     @abstractmethod

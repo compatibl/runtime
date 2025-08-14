@@ -40,23 +40,6 @@ class LocalCache(Db):
     __cache: dict[str, dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
-    def load_alls(self) -> Sequence[str]:
-        raise NotImplementedError()
-
-    def load_all(
-        self,
-        key_type: type[KeyProtocol],
-        *,
-        dataset: str,
-        sort_order: SortOrder = SortOrder.ASC,
-        cast_to: type[TRecord] | None = None,
-        restrict_to: type[TRecord] | None = None,
-        project_to: type[TRecord] | None = None,
-        limit: int | None = None,
-        skip: int | None = None,
-    ) -> tuple[TRecord, ...]:
-        raise NotImplementedError()
-
     def load_many(
         self,
         key_type: type[KeyProtocol],
@@ -83,6 +66,20 @@ class LocalCache(Db):
         else:
             # Tables are created on demand, table not found means no records with this key type are stored
             return []
+
+    def load_all(
+        self,
+        key_type: type[KeyProtocol],
+        *,
+        dataset: str,
+        sort_order: SortOrder = SortOrder.ASC,
+        cast_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TRecord, ...]:
+        raise NotImplementedError()
 
     def load_where(
         self,

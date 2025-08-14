@@ -68,6 +68,37 @@ class BasicMongoDb(Db):
     client_uri: str = "mongodb://localhost:27017/"
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
 
+    def load_many(
+        self,
+        key_type: type[KeyProtocol],
+        keys: Sequence[KeyMixin],
+        *,
+        dataset: str,
+        sort_order: SortOrder = SortOrder.INPUT,
+    ) -> Sequence[RecordMixin]:
+
+        # Check dataset
+        self._check_dataset(dataset)
+
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=key_type)
+
+        # Get Mongo collection using table name
+        collection = self._get_mongo_collection(table_name)
+        result = []
+        for key in keys:
+            # TODO: Implement using a more performant approach
+            serialized_primary_key = _KEY_SERIALIZER.serialize(key)
+            serialized_record = collection.find_one({"_key": serialized_primary_key})
+
+            # Do not include None if the record is not found, skip instead
+            if serialized_record is not None:
+                del serialized_record["_id"]
+                del serialized_record["_key"]
+                record = data_serializer.deserialize(serialized_record)
+                result.append(record)
+        return result
+
     def load_all(
         self,
         key_type: type[KeyProtocol],
@@ -112,37 +143,6 @@ class BasicMongoDb(Db):
             for serialized_record in serialized_records
         )
         return cast(tuple[TRecord, ...], result)
-
-    def load_many(
-        self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyMixin],
-        *,
-        dataset: str,
-        sort_order: SortOrder = SortOrder.INPUT,
-    ) -> Sequence[RecordMixin]:
-
-        # Check dataset
-        self._check_dataset(dataset)
-
-        # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=key_type)
-
-        # Get Mongo collection using table name
-        collection = self._get_mongo_collection(table_name)
-        result = []
-        for key in keys:
-            # TODO: Implement using a more performant approach
-            serialized_primary_key = _KEY_SERIALIZER.serialize(key)
-            serialized_record = collection.find_one({"_key": serialized_primary_key})
-
-            # Do not include None if the record is not found, skip instead
-            if serialized_record is not None:
-                del serialized_record["_id"]
-                del serialized_record["_key"]
-                record = data_serializer.deserialize(serialized_record)
-                result.append(record)
-        return result
 
     def load_where(
         self,
