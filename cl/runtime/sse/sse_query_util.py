@@ -17,7 +17,8 @@ from cl.runtime import SqliteDb
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
-from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.protocols import TRecord, KeyProtocol
+from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 
@@ -25,13 +26,14 @@ class SseQueryUtil:
     """Temporary util to perform query with simple conditions."""
 
     @classmethod
-    def query_sorted_desc_and_limited(cls, table: str, *, limit: int | None = None):
+    def query_sorted_desc_and_limited(cls, key_type: type[KeyProtocol], *, limit: int | None = None):
         """Query 'table' with sort by 'timestamp' in descending order and limit."""
 
         # TODO (Roman): Refactor to use active(DataSource). Needed features:
         #   - sort by specific field in descending order
         #   - limit sorted result
 
+        table = TypeUtil.name(key_type).removesuffix("Key")
         db = active(DataSource).get_db()  # TODO: !!! Refactor to stop bypassing DataSource logic
 
         if isinstance(db, SqliteDb):

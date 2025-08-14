@@ -125,9 +125,7 @@ class DbEventBroker(EventBroker):
             reversed(
                 [
                     x
-                    for x in SseQueryUtil.query_sorted_desc_and_limited(
-                        TypeUtil.name(Event().get_key_type()), limit=100
-                    )
+                    for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_key_type(), limit=100)
                     if x.timestamp > self._from_timestamp and x.timestamp not in sent_event_set
                 ]
             )

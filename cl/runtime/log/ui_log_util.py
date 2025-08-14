@@ -43,9 +43,7 @@ class UiLogUtil(DataMixin):
 
         log_messages = reversed(
             list(
-                SseQueryUtil.query_sorted_desc_and_limited(
-                    TypeUtil.name(LogMessage().get_key_type()), limit=_LOG_HISTORY_LIMIT
-                )
+                SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT)
             )
         )
         return cls._wrap_to_result(log_messages)
@@ -58,7 +56,7 @@ class UiLogUtil(DataMixin):
             [
                 x
                 for x in SseQueryUtil.query_sorted_desc_and_limited(
-                    TypeUtil.name(LogMessage().get_key_type()), limit=_LOG_HISTORY_LIMIT
+                    LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT
                 )
                 if x.level.lower() == "error"
             ]
@@ -88,7 +86,7 @@ class UiLogUtil(DataMixin):
         for log_message in reversed(
             list(
                 SseQueryUtil.query_sorted_desc_and_limited(
-                    TypeUtil.name(LogMessage().get_key_type()), limit=_LOG_HISTORY_LIMIT
+                    LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT
                 )
             )
         ):
