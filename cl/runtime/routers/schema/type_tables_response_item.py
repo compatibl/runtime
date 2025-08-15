@@ -38,5 +38,5 @@ class TypeTablesResponseItem(BaseModel):
         """Implements /schema/type-tables route."""
 
         # TODO(Roman): Refactor to return a single table
-        table = active(DataSource).get_table(record_type_name=request.type_name)
-        return [TypeTablesResponseItem(name=table)]
+        table_name = active(DataSource).get_table_name(record_type_name=request.type_name)
+        return [TypeTablesResponseItem(name=table_name)]

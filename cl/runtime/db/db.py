@@ -266,7 +266,7 @@ class Db(DbKey, RecordMixin, ABC):
             self._table_binding_cache = {}
         if (result := self._table_binding_cache.get(dataset)) is None:
             bindings = self.load_all(TableBindingKey, cast_to=TableBinding, dataset=dataset)
-            result = {(binding.record_type, binding.table): binding for binding in bindings}
+            result = {(binding.record_type, binding.table_name): binding for binding in bindings}
             self._table_binding_cache[dataset] = result
         return result
 
@@ -274,7 +274,7 @@ class Db(DbKey, RecordMixin, ABC):
         self,
         *,
         record_type: type[RecordProtocol],
-        table: str,
+        table_name: str,
         dataset: str,
     ) -> None:
         """
@@ -282,11 +282,11 @@ class Db(DbKey, RecordMixin, ABC):
 
         Args:
             record_type: Record type bound to the table
-            table: Table name in PascalCase format
+            table_name: Table name in PascalCase format
         """
 
         record_type_name = TypeUtil.name(record_type)
-        cache_key = (record_type_name, table)
+        cache_key = (record_type_name, table_name)
         if cache_key not in self._get_dataset_table_binding_cache(dataset=dataset):
 
             # If the binding is not yet in cache, write bindings for this and all parent record types
@@ -298,7 +298,7 @@ class Db(DbKey, RecordMixin, ABC):
                 TableBinding(
                     record_type=parent_type_name,
                     key_type=TypeUtil.name(record_type.get_key_type()),
-                    table=table,
+                    table_name=table_name,
                 ).build()
                 for parent_type_name in parent_type_names
             )
@@ -306,7 +306,7 @@ class Db(DbKey, RecordMixin, ABC):
             # Add to cache
             consume(
                 self._get_dataset_table_binding_cache(dataset=dataset).setdefault(
-                    (binding.record_type, binding.table),
+                    (binding.record_type, binding.table_name),
                     binding,
                 )
                 for binding in bindings

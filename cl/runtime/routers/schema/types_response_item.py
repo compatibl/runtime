@@ -56,7 +56,7 @@ class TypesResponseItem(BaseModel):
         # Add tables to result
         tables_result = [
             TypesResponseItem(name=table, label=table, kind="Table")  # TODO: Make label different from name or remove
-            for table in ds.get_tables()
+            for table in ds.get_table_names()
         ]
 
         # Check name collisions between types and tables

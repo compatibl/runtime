@@ -34,20 +34,20 @@ class SseQueryUtil:
         #   - sort by specific field in descending order
         #   - limit sorted result
 
-        table = TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
+        table_name = TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
         db = active(DataSource)._get_db()  # TODO: !!! Refactor to stop bypassing DataSource logic
 
         if isinstance(db, SqliteDb):
             return cls._query_sorted_desc_and_limited_sqlite(
                 db,
-                table,
+                table_name,
                 sort_by_desc="timestamp",
                 limit=limit,
             )
         elif isinstance(db, BasicMongoDb):
             return cls._query_sorted_mongo(
                 db,
-                table,
+                table_name,
                 sort_by_desc="timestamp",
                 limit=limit,
             )
@@ -58,16 +58,16 @@ class SseQueryUtil:
     def _query_sorted_desc_and_limited_sqlite(
         cls,
         db: SqliteDb,
-        table: str,
+        table_name: str,
         *,
         sort_by_desc: str,
         limit: int | None,
     ) -> Iterable[TRecord]:
 
-        if not db._is_table_exists(table):
+        if not db._is_table_exists(table_name):
             return tuple()
 
-        select_sql, values = f"SELECT * FROM {db._quote_identifier(table)}", []
+        select_sql, values = f"SELECT * FROM {db._quote_identifier(table_name)}", []
 
         # Add order by '_key' condition
         select_sql += f" ORDER BY {db._quote_identifier(sort_by_desc)} DESC"
@@ -98,14 +98,14 @@ class SseQueryUtil:
     def _query_sorted_mongo(
         cls,
         db: BasicMongoDb,
-        table: str,
+        table_name: str,
         *,
         sort_by_desc: str,
         limit: int | None,
     ) -> Iterable[TRecord]:
 
         # Get collection
-        collection = db._get_mongo_collection(table)
+        collection = db._get_mongo_collection(table_name)
 
         # Get iterable from the query, execution is deferred
         serialized_records = collection.find().sort(sort_by_desc, direction=-1)

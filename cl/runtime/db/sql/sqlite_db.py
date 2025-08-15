@@ -333,7 +333,7 @@ class SqliteDb(Db):
         serialized_records = []
         for record in records:
             # Add table binding
-            self._add_binding(table=table_name, record_type=type(record), dataset=dataset)
+            self._add_binding(table_name=table_name, record_type=type(record), dataset=dataset)
 
             serialized_record = _DATA_SERIALIZER.serialize(record)
             serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
@@ -475,12 +475,12 @@ class SqliteDb(Db):
         conn.execute(sql)
         conn.commit()
 
-    def _is_table_exists(self, table: str) -> bool:
+    def _is_table_exists(self, table_name: str) -> bool:
         """Check if specified table exists in DB."""
 
         check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
         conn = self._get_connection()
-        return conn.execute(check_sql, (table,)).fetchone()
+        return conn.execute(check_sql, (table_name,)).fetchone()
 
     def _drop_db(self):
         """Delete db file."""

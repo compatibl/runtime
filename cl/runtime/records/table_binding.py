@@ -25,8 +25,8 @@ class TableBinding(TableBindingKey, RecordMixin):
     key_type: str = required()
     """Key type name for the stored record in PascalCase format."""
 
-    table: str = required()
-    """Unique table identifier in PascalCase format."""
+    table_name: str = required()
+    """Unique table name in PascalCase format."""
 
     def get_key(self) -> TableBindingKey:
         return TableBindingKey(record_type=self.record_type).build()

@@ -289,7 +289,7 @@ class BasicMongoDb(Db):
         for record in records:
 
             # Add table binding
-            self._add_binding(table=table_name, record_type=type(record), dataset=dataset)
+            self._add_binding(table_name=table_name, record_type=type(record), dataset=dataset)
 
             db = self._get_mongo_db()
             collection = db[table_name]
@@ -381,11 +381,11 @@ class BasicMongoDb(Db):
 
         return result
 
-    def _get_mongo_collection(self, table: str) -> Collection:
+    def _get_mongo_collection(self, table_name: str) -> Collection:
         """Get PyMongo collection for the specified table."""
         mongo_db = self._get_mongo_db()
         # TODO: Perform table name validation and correction here
-        collection_name = table
+        collection_name = table_name
         result = mongo_db[collection_name]
         return result
 
