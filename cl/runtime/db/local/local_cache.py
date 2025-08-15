@@ -37,7 +37,7 @@ _local_cache_instance = None
 class LocalCache(Db):
     """In-memory cache for objects without serialization."""
 
-    __cache: dict[str, dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
+    __cache: dict[type[KeyProtocol], dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
     def load_many(
@@ -54,10 +54,7 @@ class LocalCache(Db):
         self._check_key_sequence(keys)
         self._check_dataset(dataset)
 
-        # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=key_type)
-
-        if (table_cache := self.__cache.get(table_name, None)) is not None:
+        if (table_cache := self.__cache.get(key_type, None)) is not None:
             result = []
             for key in keys:
                 # Look up the record, defaults to None
@@ -119,13 +116,10 @@ class LocalCache(Db):
         self._check_record_sequence(records)
         self._check_dataset(dataset)
 
-        # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=key_type)
-
         # TODO: Provide a more performant implementation
         for record in records:
             # Try to retrieve table dictionary, insert if it does not yet exist
-            table_cache = self.__cache.setdefault(table_name, {})
+            table_cache = self.__cache.setdefault(key_type, {})
 
             # Serialize both key and record
             key = record.get_key()
@@ -161,21 +155,5 @@ class LocalCache(Db):
 
     def close_connection(self) -> None:
         """Close database connection to releasing resource locks."""
+        # TODO: Review if this should be in __exit__ method
         # Do nothing here, as this is an in-memory cache which does not require a connection
-
-    @classmethod
-    def instance(cls) -> Self:
-        """Return singleton instance."""
-
-        # Check if cached value exists, load if not found
-        global _local_cache_instance
-        if _local_cache_instance is None:
-            # Create if does not yet exist
-            _local_cache_instance = LocalCache()
-        return _local_cache_instance
-
-    @classmethod
-    def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
-        """Get table name from key type and check that it has an acceptable format."""
-        # TODO: Add validation for length and permitted characters
-        return TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
