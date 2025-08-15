@@ -92,7 +92,7 @@ class TypeCheck:
         of types or string type names in PascalCase format.
         """
         if is_sequence(types_or_names):
-            return all(cls.is_type_or_name(type(x), raise_on_fail=raise_on_fail) for x in types_or_names)
+            return all(cls.is_type_or_name(x, raise_on_fail=raise_on_fail) for x in types_or_names)
         else:
             if raise_on_fail:
                 raise RuntimeError(
