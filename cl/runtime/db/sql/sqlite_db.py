@@ -30,7 +30,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec

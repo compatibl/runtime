@@ -36,7 +36,7 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
