@@ -85,11 +85,8 @@ class BasicMongoDb(Db):
         self._check_key_sequence(keys)
         self._check_dataset(dataset)
 
-        # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=key_type)
-
         # Get Mongo collection using table name
-        collection = self._get_mongo_collection(table_name)
+        collection = self._get_mongo_collection(key_type=key_type)
         result = []
         for key in keys:
             # TODO: Implement using a more performant approach
@@ -121,11 +118,8 @@ class BasicMongoDb(Db):
         self._check_key_type(key_type)
         self._check_dataset(dataset)
 
-        # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=key_type)
-
         # Get collection
-        collection = self._get_mongo_collection(table_name)
+        collection = self._get_mongo_collection(key_type=key_type)
 
         # Create a query dictionary
         query_dict = {}
@@ -171,10 +165,9 @@ class BasicMongoDb(Db):
         # Get table name from key type and check it has an acceptable format
         query_target_type = query.get_target_type()
         key_type = query_target_type.get_key_type()
-        table_name = self._get_validated_table_name(key_type=key_type)
 
         # Get collection using table name from the query
-        collection = self._get_mongo_collection(table_name)
+        collection = self._get_mongo_collection(key_type=key_type)
 
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
@@ -239,10 +232,9 @@ class BasicMongoDb(Db):
         # Get table name from key type and check it has an acceptable format
         query_target_type = query.get_target_type()
         key_type = query_target_type.get_key_type()
-        table_name = self._get_validated_table_name(key_type=key_type)
 
         # Get collection using table name from the query
-        collection = self._get_mongo_collection(table_name)
+        collection = self._get_mongo_collection(key_type=key_type)
 
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
@@ -288,8 +280,8 @@ class BasicMongoDb(Db):
         # TODO: Provide a more performant implementation
         for record in records:
 
-            # Add table binding
-            self._add_binding(table_name=table_name, record_type=type(record), dataset=dataset)
+            # Add to the cache of stored types for the specified dataset
+            self._add_record_type(record_type=type(record), dataset=dataset)
 
             db = self._get_mongo_db()
             collection = db[table_name]
@@ -319,11 +311,8 @@ class BasicMongoDb(Db):
         self._check_key_sequence(keys)
         self._check_dataset(dataset)
 
-        # Get table name from key type and check it has an acceptable format
-        table_name = self._get_validated_table_name(key_type=key_type)
-
         # Get Mongo collection using table name
-        collection = self._get_mongo_collection(table_name)
+        collection = self._get_mongo_collection(key_type=key_type)
         for key in keys:
             # TODO: Implement using a more performant approach
             serialized_primary_key = _KEY_SERIALIZER.serialize(key)
@@ -381,11 +370,11 @@ class BasicMongoDb(Db):
 
         return result
 
-    def _get_mongo_collection(self, table_name: str) -> Collection:
+    def _get_mongo_collection(self, key_type: type[KeyProtocol]) -> Collection:
         """Get PyMongo collection for the specified table."""
         mongo_db = self._get_mongo_db()
         # TODO: Perform table name validation and correction here
-        collection_name = table_name
+        collection_name = TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
         result = mongo_db[collection_name]
         return result
 

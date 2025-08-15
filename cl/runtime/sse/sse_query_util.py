@@ -34,20 +34,18 @@ class SseQueryUtil:
         #   - sort by specific field in descending order
         #   - limit sorted result
 
-        table_name = TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
         db = active(DataSource)._get_db()  # TODO: !!! Refactor to stop bypassing DataSource logic
-
         if isinstance(db, SqliteDb):
             return cls._query_sorted_desc_and_limited_sqlite(
                 db,
-                table_name,
+                key_type,
                 sort_by_desc="timestamp",
                 limit=limit,
             )
         elif isinstance(db, BasicMongoDb):
             return cls._query_sorted_mongo(
                 db,
-                table_name,
+                key_type,
                 sort_by_desc="timestamp",
                 limit=limit,
             )
@@ -58,16 +56,16 @@ class SseQueryUtil:
     def _query_sorted_desc_and_limited_sqlite(
         cls,
         db: SqliteDb,
-        table_name: str,
+        key_type: type[KeyProtocol],
         *,
         sort_by_desc: str,
         limit: int | None,
     ) -> Iterable[TRecord]:
 
-        if not db._is_table_exists(table_name):
+        if not db._table_exists(key_type_name):
             return tuple()
 
-        select_sql, values = f"SELECT * FROM {db._quote_identifier(table_name)}", []
+        select_sql, values = f"SELECT * FROM {db._quote_identifier(key_type_name)}", []
 
         # Add order by '_key' condition
         select_sql += f" ORDER BY {db._quote_identifier(sort_by_desc)} DESC"
@@ -98,14 +96,14 @@ class SseQueryUtil:
     def _query_sorted_mongo(
         cls,
         db: BasicMongoDb,
-        table_name: str,
+        key_type: type[KeyProtocol],
         *,
         sort_by_desc: str,
         limit: int | None,
     ) -> Iterable[TRecord]:
 
         # Get collection
-        collection = db._get_mongo_collection(table_name)
+        collection = db._get_mongo_collection(key_type)
 
         # Get iterable from the query, execution is deferred
         serialized_records = collection.find().sort(sort_by_desc, direction=-1)

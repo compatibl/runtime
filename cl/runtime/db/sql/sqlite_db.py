@@ -74,9 +74,9 @@ class SqliteDb(Db):
 
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=key_type)
-
-        if not self._is_table_exists(table_name):
-            return []
+        
+        if not self._table_exists(table_name=table_name):
+            return tuple()
 
         serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
 
@@ -117,7 +117,7 @@ class SqliteDb(Db):
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=key_type)
 
-        if not self._is_table_exists(table_name):
+        if not self._table_exists(table_name=table_name):
             return tuple()
 
         select_sql, values = f"SELECT * FROM {self._quote_identifier(table_name)}", []
@@ -180,7 +180,7 @@ class SqliteDb(Db):
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
 
-        if not self._is_table_exists(table_name):
+        if not self._table_exists(table_name=table_name):
             return tuple()
 
         # Serialize the query
@@ -264,7 +264,7 @@ class SqliteDb(Db):
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
 
-        if not self._is_table_exists(table_name):
+        if not self._table_exists(table_name=table_name):
             return 0
 
         # TODO (Roman): Use a specialized serializer for SQL query.
@@ -332,8 +332,8 @@ class SqliteDb(Db):
 
         serialized_records = []
         for record in records:
-            # Add table binding
-            self._add_binding(table_name=table_name, record_type=type(record), dataset=dataset)
+            # Add to the cache of stored types for the specified dataset
+            self._add_record_type(record_type=type(record), dataset=dataset)
 
             serialized_record = _DATA_SERIALIZER.serialize(record)
             serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
@@ -374,7 +374,7 @@ class SqliteDb(Db):
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=key_type)
 
-        if not self._is_table_exists(table_name):
+        if not self._table_exists(table_name=table_name):
             return
 
         serialized_keys = [_KEY_SERIALIZER.serialize(key) for key in keys]
@@ -475,7 +475,7 @@ class SqliteDb(Db):
         conn.execute(sql)
         conn.commit()
 
-    def _is_table_exists(self, table_name: str) -> bool:
+    def _table_exists(self, *, table_name: str) -> bool:
         """Check if specified table exists in DB."""
 
         check_sql = "SELECT name FROM sqlite_master WHERE type='table' AND name=?"
@@ -551,7 +551,7 @@ class SqliteDb(Db):
     @classmethod
     def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
         """Get table name from key type and check that it has an acceptable format or length, error otherwise."""
-        table_name = TypeUtil.name(key_type)  # TODO: REFACTORING .removesuffix("Key")
+        table_name = TypeUtil.name(key_type).removesuffix("Key")
         if _TABLE_NAME_RE.fullmatch(table_name) is None:
             raise RuntimeError(f"Table name '{table_name}' is not valid for {TypeUtil.name(cls)}")
         return table_name

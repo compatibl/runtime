@@ -23,8 +23,8 @@ from cl.runtime.records.table_binding_key import TableBindingKey
 class TableBindingKeyQueryByTable(QueryMixin):
     """Query for TableBindingKey by table field."""
 
-    table_name: str | Condition[str] | None = None
-    """Unique table name in PascalCase format."""
+    key_type_name: str | Condition[str] | None = None
+    """Key type name in PascalCase format."""
 
     def get_target_type(self) -> type[KeyMixin]:
         return TableBindingKey

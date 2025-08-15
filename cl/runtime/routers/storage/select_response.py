@@ -61,12 +61,11 @@ class SelectResponse(RecordsWithSchemaResponse):
             common_base_record_type = record_type
         else:
             # Get records for a table
-            table_name = request.type_
-            key_type_name = ds.get_key_type_name(table_name=table_name)
+            key_type_name = request.type_
             key_type = TypeCache.from_type_name(key_type_name)
             records = ds.load_all(key_type)
             # Get lowest common type to the records stored in the table
-            common_base_record_type_name = ds.get_common_base_record_type_name(table_name=table_name)
+            common_base_record_type_name = ds.get_common_base_record_type_name(key_type_name=key_type_name)
             common_base_record_type = TypeCache.from_type_name(common_base_record_type_name)
 
         # Serialize records for table.

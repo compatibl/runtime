@@ -14,8 +14,8 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-from cl.runtime.contexts.context_manager import active
-from cl.runtime.db.data_source import DataSource
+
+from cl.runtime import TypeCache
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
 
@@ -24,7 +24,7 @@ class TypeTablesResponseItem(BaseModel):
     """Single item of the list returned by the /schema/type-tables route."""
 
     name: str
-    """Table name (may be customized in settings)."""
+    """Key type name (may be customized in settings)."""
 
     label: str | None = None
     """Table label displayed in the UI is humanized class name (may be customized in settings)."""
@@ -38,5 +38,7 @@ class TypeTablesResponseItem(BaseModel):
         """Implements /schema/type-tables route."""
 
         # TODO(Roman): Refactor to return a single table
-        table_name = active(DataSource).get_table_name(record_type_name=request.type_name)
-        return [TypeTablesResponseItem(name=table_name)]
+        record_type_name = request.type_name
+        record_type = TypeCache.from_type_name(record_type_name)
+        key_type_name = TypeUtil.name(record_type.get_key_type())  # noqa
+        return [TypeTablesResponseItem(name=key_type_name)]

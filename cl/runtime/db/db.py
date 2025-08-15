@@ -15,12 +15,13 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Sequence, cast
 from more_itertools import consume
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
@@ -42,8 +43,8 @@ from cl.runtime.settings.db_settings import DbSettings
 class Db(DbKey, RecordMixin, ABC):
     """Polymorphic data storage with dataset isolation."""
 
-    _table_binding_cache: dict[str, dict[tuple[str, str], TableBinding]] | None = None
-    """Cache of table to record type bindings for records stored in this DB, indexed by dataset and TableBindingKey."""
+    _record_type_name_cache: dict[str, set] | None = None
+    """Dict of record type name sets for each dataset."""
 
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id).build()
@@ -255,65 +256,43 @@ class Db(DbKey, RecordMixin, ABC):
                 f"does not start from temporary DB prefix '{db_settings.db_temp_prefix}'."
             )
 
-    def _get_dataset_table_binding_cache(
-        self,
-        *,
-        dataset: str,
-    ) -> dict[tuple[str, str], TableBinding]:
-        """Get table binding cache for the specified dataset."""
+    def _get_record_type_set(self, dataset: str) -> set:
+        """Get the set of record types for the specified dataset."""
 
-        if not self._table_binding_cache:
-            self._table_binding_cache = {}
-        if (result := self._table_binding_cache.get(dataset)) is None:
+        if not self._record_type_name_cache:
+            self._record_type_name_cache = {}
+        if (result := self._record_type_name_cache.get(dataset)) is None:
+            # Load from disk if does not exist
             bindings = self.load_all(TableBindingKey, cast_to=TableBinding, dataset=dataset)
-            result = {(binding.record_type_name, binding.table_name): binding for binding in bindings}
-            self._table_binding_cache[dataset] = result
+            result = {binding.record_type_name for binding in bindings}
+            self._record_type_name_cache[dataset] = result
         return result
 
-    def _add_binding(
-        self,
-        *,
-        record_type: type[RecordProtocol],
-        table_name: str,
-        dataset: str,
-    ) -> None:
-        """
-        Record table for the specified record type and its parents if not found in cache, update cache.
+    def _add_record_type(self, *, record_type: type[RecordProtocol], dataset: str) -> None:
+        """Add record type to cache for the specified dataset."""
 
-        Args:
-            record_type: Record type bound to the table
-            table_name: Table name in PascalCase format
-        """
+        if record_type == TableBinding:
+            # Do not register TableBinding record, as a result it will not be present in REST API
+            return
 
         record_type_name = TypeUtil.name(record_type)
-        cache_key = (record_type_name, table_name)
-        if cache_key not in self._get_dataset_table_binding_cache(dataset=dataset):
+        if record_type_name not in (record_type_name_set := self._get_record_type_set(dataset=dataset)):
 
-            # If the binding is not yet in cache, write bindings for this and all parent record types
-            # to DB as it is faster to overwrite than to check for each parent
-
-            # Create binding for each parent and self
+            # If the record type is not yet in cache, add parent types to DB and cache
             parent_type_names = TypeCache.get_parent_type_names(record_type, type_kind=TypeKind.RECORD)
             bindings = tuple(
                 TableBinding(
                     record_type_name=parent_type_name,
                     key_type_name=TypeUtil.name(record_type.get_key_type()),
-                    table_name=table_name,
                 ).build()
                 for parent_type_name in parent_type_names
             )
 
-            # Add to cache
-            consume(
-                self._get_dataset_table_binding_cache(dataset=dataset).setdefault(
-                    (binding.record_type_name, binding.table_name),
-                    binding,
-                )
-                for binding in bindings
-            )
-
-            # Save bindings to the dataset
+            # Save bindings to the dataset, it is faster to write all than determine which records are already present
             self.save_many(TableBindingKey, bindings, dataset=dataset)
+
+            # Add to cache
+            record_type_name_set.add(parent_type_names)
 
     @classmethod
     def _check_key_type(cls, key_type: type) -> None:
