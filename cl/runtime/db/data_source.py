@@ -41,6 +41,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_guard_util import TypeGuardUtil
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -111,11 +112,6 @@ class DataSource(DataSourceKey, RecordMixin):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-
-        # TODO: This is a temporary safeguard, remove after verification
-        if isinstance(record_or_key, type):
-            raise RuntimeError("Code update error for load_one signature.")
-
         if record_or_key is not None:
             result = self.load_one_or_none(record_or_key, cast_to=cast_to)
             if result is None:
@@ -147,11 +143,6 @@ class DataSource(DataSourceKey, RecordMixin):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-
-        # TODO: This is a temporary safeguard, remove after verification
-        if isinstance(record_or_key, type):
-            raise RuntimeError("Code update error for load_one_or_none signature.")
-
         result = self.load_many([record_or_key], cast_to=cast_to)
         if len(result) == 1:
             return result[0]
@@ -174,7 +165,6 @@ class DataSource(DataSourceKey, RecordMixin):
             sort_order: Sort in the order of 'records_or_keys' parameter for INPUT (default), or as specified
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
         """
-
         # Pass through None or an empty sequence
         if not records_or_keys:
             return records_or_keys

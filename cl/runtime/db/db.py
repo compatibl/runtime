@@ -295,34 +295,6 @@ class Db(DbKey, RecordMixin, ABC):
             record_type_name_set.add(parent_type_names)
 
     @classmethod
-    def _check_key_type(cls, key_type: type) -> None:
-        """Error if the argument is not a key type."""
-        if not isinstance(key_type, type) or not is_key(key_type):
-            raise RuntimeError(f"Parameter {TypeUtil.name(key_type)} is not a key type.")
-
-    @classmethod
-    def _check_key_sequence(cls, keys: Sequence[KeyProtocol]) -> None:
-        """Error if the argument is not a record sequence (generator is not accepted)."""
-        if is_sequence(keys):
-            consume(cls._check_key_type(type(x)) for x in keys)
-        else:
-            raise RuntimeError(f"Parameter {TypeUtil.name(keys)} is not a sequence (generator is not accepted).")
-
-    @classmethod
-    def _check_record_type(cls, record_type: type) -> None:
-        """Error if the argument is not a record type."""
-        if not isinstance(record_type, type) or not is_record(record_type):
-            raise RuntimeError(f"Parameter {TypeUtil.name(record_type)} is not a record type.")
-
-    @classmethod
-    def _check_record_sequence(cls, records: Sequence[RecordProtocol]) -> None:
-        """Error if the argument is not a record sequence (generator is not accepted)."""
-        if is_sequence(records):
-            consume(cls._check_record_type(type(x)) for x in records)
-        else:
-            raise RuntimeError(f"Parameter {TypeUtil.name(records)} is not a sequence (generator is not accepted).")
-
-    @classmethod
     def _check_dataset(cls, dataset: str) -> None:
         """Error if dataset is None, an empty string, or has invalid format."""
         if dataset is None:

@@ -24,6 +24,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.schema.type_guard_util import TypeGuardUtil
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.TUPLE
@@ -50,8 +51,8 @@ class LocalCache(Db):
     ) -> Sequence[RecordMixin]:
 
         # Check params
-        self._check_key_type(key_type)
-        self._check_key_sequence(keys)
+        assert TypeGuardUtil.is_key_type(key_type)
+        assert TypeGuardUtil.is_key_sequence(keys)
         self._check_dataset(dataset)
 
         if (table_cache := self.__cache.get(key_type, None)) is not None:
@@ -112,8 +113,8 @@ class LocalCache(Db):
     ) -> None:
 
         # Check params
-        self._check_key_type(key_type)
-        self._check_record_sequence(records)
+        assert TypeGuardUtil.is_key_type(key_type)
+        assert TypeGuardUtil.is_record_sequence(records)
         self._check_dataset(dataset)
 
         # TODO: Provide a more performant implementation
