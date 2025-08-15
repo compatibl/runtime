@@ -272,7 +272,9 @@ def is_data(instance_or_type: Any) -> TypeGuard[TKey]:
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_field_names") and not hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
+    return (
+        hasattr(type_, "get_field_names") and not hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
+    )
 
 
 def is_key(instance_or_type: Any) -> TypeGuard[TKey]:

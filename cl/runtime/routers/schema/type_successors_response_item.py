@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from __future__ import annotations
-import inspect
 from inflection import titleize
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil

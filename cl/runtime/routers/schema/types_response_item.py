@@ -18,9 +18,6 @@ from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.schema.type_cache import TypeCache
-from cl.runtime.schema.type_kind import TypeKind
 
 
 class TypesResponseItem(BaseModel):

@@ -27,8 +27,12 @@ from inflection import titleize
 from memoization import cached
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_abstract, is_record, is_key, is_data, is_enum
+from cl.runtime.records.protocols import is_abstract
+from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.element_decl import ElementDecl
@@ -177,7 +181,8 @@ class TypeDecl(TypeDeclKey, RecordMixin):
         else:
             raise RuntimeError(
                 f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} "
-                f"because it is not a record, key or data.")
+                f"because it is not a record, key or data."
+            )
 
         result.module = ModuleDeclKey().build()
         result.name = TypeUtil.name(record_type)

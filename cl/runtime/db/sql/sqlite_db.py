@@ -24,8 +24,8 @@ from cl.runtime import TypeCache
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
@@ -345,9 +345,7 @@ class SqliteDb(Db):
         # Build SQL query to insert records
         quoted_cols = [self._quote_identifier(self._get_validated_column_name(c)) for c in columns_for_query]
         placeholders = ", ".join("?" for _ in quoted_cols)
-        insert_sql = (
-            f"INSERT OR REPLACE INTO {self._quote_identifier(table_name)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
-        )
+        insert_sql = f"INSERT OR REPLACE INTO {self._quote_identifier(table_name)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
 
         # Build values for SQL query
         values_for_query = [tuple(data.get(col) for col in columns_for_query) for data in serialized_records]
@@ -557,7 +555,7 @@ class SqliteDb(Db):
         if _TABLE_NAME_RE.fullmatch(table_name) is None:
             raise RuntimeError(f"Table name '{table_name}' is not valid for {TypeUtil.name(cls)}")
         return table_name
-    
+
     @classmethod
     def _get_validated_column_name(cls, column_name: str) -> str:
         """Return column name if it has an acceptable format or length, error otherwise."""

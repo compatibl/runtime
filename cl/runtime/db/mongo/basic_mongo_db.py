@@ -27,9 +27,11 @@ from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.mongo_filter_serializer import MongoFilterSerializer
 from cl.runtime.db.sort_order import SortOrder
-from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol, KeyProtocol, is_key, is_record
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.schema.type_cache import TypeCache

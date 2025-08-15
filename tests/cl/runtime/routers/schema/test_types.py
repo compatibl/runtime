@@ -14,7 +14,6 @@
 
 import pytest
 from fastapi import FastAPI
-
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.qa_client import QaClient
@@ -43,6 +42,7 @@ def test_method(default_db_fixture):
 
     type_decl_item = next(x for x in result if x.name == "StubDataclass")
     assert type_decl_item == TypesResponseItem(**expected_result)
+
 
 def test_api(default_db_fixture):
     """Test REST API for /schema/types route."""

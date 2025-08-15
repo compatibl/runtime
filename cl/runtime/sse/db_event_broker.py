@@ -22,7 +22,6 @@ from starlette.requests import Request
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.timestamp import Timestamp
-from cl.runtime.records.type_util import TypeUtil
 from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_broker import EventBroker
 from cl.runtime.sse.sse_query_util import SseQueryUtil

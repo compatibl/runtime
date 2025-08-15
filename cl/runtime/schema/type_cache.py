@@ -22,10 +22,9 @@ from pkgutil import walk_packages
 from types import ModuleType
 from typing import Sequence
 from more_itertools import consume
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data_key_or_record, is_mixin
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -64,12 +63,7 @@ class TypeCache:
     """List of packages to include in the cache."""
 
     @classmethod
-    def is_type(
-        cls,
-        type_name: str,
-        *,
-        type_kind: TypeKind | None = None
-        ) -> bool:
+    def is_type(cls, type_name: str, *, type_kind: TypeKind | None = None) -> bool:
         """
         Get fully qualified name in module.ClassName format from the class, filter by TypeKind if specified.
 
@@ -174,12 +168,7 @@ class TypeCache:
             )
 
     @classmethod
-    def get_parent_type_names(
-            cls,
-            type_or_name: type | str,
-            *,
-            type_kind: TypeKind | None = None
-    ) -> tuple[str, ...]:
+    def get_parent_type_names(cls, type_or_name: type | str, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
         """
         Return a tuple of type names for parent types (inclusive of self) that match the predicate.
 
@@ -204,12 +193,7 @@ class TypeCache:
             raise cls._type_name_not_found_error(record_type)
 
     @classmethod
-    def get_child_type_names(
-            cls,
-            type_or_name: type | str,
-            *,
-            type_kind: TypeKind | None = None
-    ) -> tuple[str, ...]:
+    def get_child_type_names(cls, type_or_name: type | str, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
         """
         Return a tuple of type names for child types (inclusive of self) that match the predicate.
         Result is sorted by depth in hierarchy.
@@ -235,8 +219,7 @@ class TypeCache:
 
             # Sort child types by depth in hierarchy
             depth_dict = {
-                x: len(TypeCache.get_parent_type_names(x, type_kind=type_kind))
-                for x in child_record_type_names
+                x: len(TypeCache.get_parent_type_names(x, type_kind=type_kind)) for x in child_record_type_names
             }
             sorted_child_record_type_names = tuple(
                 child_record_type_name
@@ -267,10 +250,10 @@ class TypeCache:
 
     @classmethod
     def get_common_base_type_name(
-            cls,
-            types_or_names: Sequence[type | str],
-            *,
-            type_kind: TypeKind | None = None,
+        cls,
+        types_or_names: Sequence[type | str],
+        *,
+        type_kind: TypeKind | None = None,
     ) -> str:
         """
         Return PascalCase record type name of the closest common base to the argument types.
@@ -535,8 +518,12 @@ class TypeCache:
                     type_name=type_name,
                     type_kind=EnumUtil.from_str(TypeKind, type_kind),
                     qual_name=qual_name,
-                    parent_record_type_names=tuple(parent_record_type_names.split(";")) if parent_record_type_names else None,
-                    child_record_type_names=tuple(child_record_type_names.split(";")) if child_record_type_names else None,
+                    parent_record_type_names=(
+                        tuple(parent_record_type_names.split(";")) if parent_record_type_names else None
+                    ),
+                    child_record_type_names=(
+                        tuple(child_record_type_names.split(";")) if child_record_type_names else None
+                    ),
                 )
 
                 # Add to the type info dictionary
@@ -571,11 +558,17 @@ class TypeCache:
                 qual_name = type_info.qual_name
 
                 # Sort parent and child names (they should already be sorted, just to be sure)
-                parent_record_type_names_str = ";".join(sorted(type_info.parent_record_type_names)) if type_info.parent_record_type_names else ""
-                child_record_type_names_str = ";".join(sorted(type_info.child_record_type_names)) if type_info.child_record_type_names else ""
+                parent_record_type_names_str = (
+                    ";".join(sorted(type_info.parent_record_type_names)) if type_info.parent_record_type_names else ""
+                )
+                child_record_type_names_str = (
+                    ";".join(sorted(type_info.child_record_type_names)) if type_info.child_record_type_names else ""
+                )
 
                 # Write comma-separated values for each token, with semicolons-separated lists
-                file.write(f"{type_name},{type_kind_str},{qual_name},{parent_record_type_names_str},{child_record_type_names_str}\n")
+                file.write(
+                    f"{type_name},{type_kind_str},{qual_name},{parent_record_type_names_str},{child_record_type_names_str}\n"
+                )
 
     @classmethod
     def _clear(cls) -> None:

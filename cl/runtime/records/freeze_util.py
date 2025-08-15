@@ -20,7 +20,6 @@ from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.type_util import TypeUtil
-from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class FreezeUtil:
@@ -44,9 +43,7 @@ class FreezeUtil:
         elif hasattr(data, "mark_frozen"):
             if is_data_key_or_record(data):
                 # Recreate with frozen fields and freeze the result
-                return type(data)(
-                    **{k: cls.freeze(getattr(data, k)) for k in data.get_field_names()}
-                ).mark_frozen()
+                return type(data)(**{k: cls.freeze(getattr(data, k)) for k in data.get_field_names()}).mark_frozen()
             else:
                 # Mark frozen and return
                 return data.mark_frozen()

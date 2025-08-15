@@ -175,13 +175,13 @@ class DataSource(DataSourceKey, RecordMixin):
         Args:
             table: Table name in PascalCase format (required).
         """
-        
+
         if not table:
             raise RuntimeError("Table name is required in get_common_base_record_type_name method.")
 
         # Get record type names stored in this table
         bound_type_names = self.get_record_type_names(table=table)
-        
+
         if bound_type_names:
             # Find the common base name
             result = TypeCache.get_common_base_type_name(
@@ -574,9 +574,8 @@ class DataSource(DataSourceKey, RecordMixin):
 
     @classmethod
     def _group_inputs_by_key_type(
-            cls,
-            inputs: Sequence[TRecord | TKey | None]
-        ) -> dict[type[KeyProtocol], Sequence[TRecord | TKey | None]]:
+        cls, inputs: Sequence[TRecord | TKey | None]
+    ) -> dict[type[KeyProtocol], Sequence[TRecord | TKey | None]]:
         """Group inputs by key type, skipping sequence elements that are None."""
         result = defaultdict(list)
         consume(result[x.get_key_type()].append(x) for x in inputs if x is not None)

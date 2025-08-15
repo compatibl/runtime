@@ -19,8 +19,8 @@ from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import RecordProtocol, KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.type_util import TypeUtil
