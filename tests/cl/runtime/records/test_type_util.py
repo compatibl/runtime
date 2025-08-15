@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.typename import typename
-from stubs.cl.runtime import StubDataclass
+
+from cl.runtime.records.type_util import TypeUtil
+from stubs.cl.runtime import StubDataclass, StubDataclassKey
 from stubs.cl.runtime import StubDataclassDerived
 
 
@@ -39,6 +40,16 @@ def test_check_subtype():
         TypeUtil.check_subtype(int, float)
     with pytest.raises(Exception):
         TypeUtil.check_subtype(int, StubDataclass)
+
+
+def test_is_key_type():
+    """Test for is_key_type method."""
+    TypeUtil.is_key_type(StubDataclassKey)
+    with pytest.raises(Exception):
+        TypeUtil.is_key_type(StubDataclass)
+    with pytest.raises(Exception):
+        TypeUtil.is_key_type(int)
+
 
 
 if __name__ == "__main__":

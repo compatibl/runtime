@@ -12,28 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
-from typing import TypeGuard
-from typing import get_origin
 from cl.runtime.records.protocols import TObj
+from typing import TypeGuard, Sequence, Iterable, Any
+
+from memoization import cached
+
+from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.protocols import KeyProtocol, is_sequence, is_key, is_record, RecordProtocol, is_key_or_record
+from cl.runtime.records.typename import typename
 
 
 class TypeUtil:
-    """Helper class for type checking."""
-
-    # TODO: Cache output (convert to use type only, not instance). Consider eliminating instance_or_type.
-    @classmethod
-    def name(cls, instance_or_type: Any) -> str:
-        """Returns TypeAlias.alias if specified and type.name otherwise."""
-        # Get generic type origin if the type is generic
-        instance_or_type = origin if (origin := get_origin(instance_or_type)) is not None else instance_or_type
-        # Accept instance or type
-        type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-        # Handle renames
-        result = cls._get_alias_dict().get(type_, type_.__name__)
-        return result
+    """Performs runtime type checks and returns TypeGuard instance."""
 
     @classmethod
+    @cached
     def check_type(
         cls,
         instance_or_type: Any,
@@ -65,6 +58,7 @@ class TypeUtil:
             return True
 
     @classmethod
+    @cached
     def check_subtype(
         cls,
         instance_or_type: Any,
@@ -93,7 +87,113 @@ class TypeUtil:
             return True
 
     @classmethod
-    def _get_alias_dict(cls) -> dict[type, str]:
-        """Get or create a dict of type aliases."""
-        # TODO: Implement type aliases
-        return {}
+    @cached
+    def is_type_or_name(cls, type_or_name: Any, *, raise_on_fail: bool = True) -> TypeGuard[type | str]:
+        """Error if the argument is not a type or a string type name in PascalCase format."""
+        if (
+                not isinstance(type_or_name, type) and
+                not (isinstance(type_or_name, str) and CaseUtil.is_pascal_case(type_or_name))
+        ):
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Parameter {typename(type_or_name)} is not\n"
+                    f"a type or a string type name in PascalCase format.")
+            else:
+                return False
+        return True
+
+    @classmethod
+    def is_type_or_name_sequence(
+            cls, 
+            types_or_names: Any,
+            *,
+            raise_on_fail: bool = True) -> TypeGuard[Sequence[type | str]]:
+        """
+        Error if the argument is not a sequence (iterable generator is not accepted)
+        of types or string type names in PascalCase format.
+        """
+        if is_sequence(types_or_names):
+            return all(cls.is_type_or_name(type(x), raise_on_fail=raise_on_fail) for x in types_or_names)
+        else:
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Parameter {typename(types_or_names)} is not a sequence\n"
+                    f"(iterable generator is not accepted) of types or\n"
+                    f"string type names in PascalCase format.")
+            else:
+                return False
+
+    @classmethod
+    @cached
+    def is_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+        """Error if the argument is not a key type."""
+        if not isinstance(key_type, type) or not is_key(key_type):
+            if raise_on_fail:
+                raise RuntimeError(f"Parameter {typename(key_type)} is not a key type.")
+            else:
+                return False
+        return True
+
+    @classmethod
+    def is_key_sequence(cls, keys: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[KeyProtocol]]:
+        """Error if the argument is not a record sequence (iterable generator is not accepted)."""
+        if is_sequence(keys):
+            return all(cls.is_key_type(type(x), raise_on_fail=raise_on_fail) for x in keys)
+        else:
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Parameter {typename(keys)} is not a sequence (iterable generator is not accepted).")
+            else:
+                return False
+
+    @classmethod
+    @cached
+    def is_record_type(cls, record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
+        """Error if the argument is not a record type."""
+        if not isinstance(record_type, type) or not is_record(record_type):
+            if raise_on_fail:
+                raise RuntimeError(f"Parameter {typename(record_type)} is not a record type.")
+            else:
+                return False
+        return True
+
+    @classmethod
+    def is_record_sequence(cls, records: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[RecordProtocol]]:
+        """Error if the argument is not a record sequence (iterable generator is not accepted)."""
+        if is_sequence(records):
+            return all(cls.is_record_type(type(x), raise_on_fail=raise_on_fail) for x in records)
+        else:
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Parameter {typename(records)} is not a sequence (iterable generator is not accepted).")
+            else:
+                return False
+
+    @classmethod
+    @cached
+    def is_key_or_record_type(cls, key_or_record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+        """Error if the argument is not a record type."""
+        if not isinstance(key_or_record_type, type) or not is_key_or_record(key_or_record_type):
+            if raise_on_fail:
+                raise RuntimeError(f"Parameter {typename(key_or_record_type)} is not a key or record type.")
+            else:
+                return False
+        return True
+
+    @classmethod
+    def is_key_or_record_sequence(
+            cls,
+            keys_or_records: Any,
+            *,
+            raise_on_fail: bool = True,
+    ) -> TypeGuard[Sequence[KeyProtocol]]:
+        """Error if the argument is not a record sequence (iterable generator is not accepted)."""
+        if is_sequence(keys_or_records):
+            return all(cls.is_key_or_record_type(type(x), raise_on_fail=raise_on_fail) for x in keys_or_records)
+        else:
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Parameter {typename(keys_or_records)} is not a sequence "
+                    f"(iterable generator is not accepted).")
+            else:
+                return False
