@@ -51,17 +51,24 @@ class Db(DbKey, RecordMixin, ABC):
         keys: Sequence[KeyProtocol],
         *,
         dataset: str,
-        sort_order: SortOrder = SortOrder.INPUT,
+        restrict_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
+        limit: int | None = None,
+        skip: int | None = None,
     ) -> Sequence[RecordMixin]:
         """
-        Load records for the specified keys, all of which must have the specified key type.
-        The result is not sorted in the order of provided keys and skips the records that are not found.
+        Load records for the specified keys, skipping the records that are not found.
 
         Args:
             key_type: Key type determines the database table
             keys: Sequence of keys, type(key) must match the key_type argument for each key
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
-            sort_order: Sort in the order of 'keys' parameter for INPUT (default), or as specified
+            restrict_to: The query will return only this type and its subtypes
+            project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
         """
 
     @abstractmethod
@@ -70,10 +77,10 @@ class Db(DbKey, RecordMixin, ABC):
         key_type: type[KeyProtocol],
         *,
         dataset: str,
-        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.ASC,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
@@ -83,10 +90,10 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             key_type: Key type determines the database table
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
-            sort_order: Sort in the specified order for each key field, defaults to ASC for this method
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only this type and its subtypes
             project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
@@ -97,10 +104,10 @@ class Db(DbKey, RecordMixin, ABC):
         query: QueryMixin,
         *,
         dataset: str,
-        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.ASC,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
@@ -110,10 +117,10 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
-            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC in query class
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only this type and its subtypes
             project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
@@ -132,7 +139,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
-            restrict_to: Count only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only this type and its subtypes
         """
 
     @abstractmethod

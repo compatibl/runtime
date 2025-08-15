@@ -64,6 +64,9 @@ class SqliteDb(Db):
         *,
         dataset: str,
         sort_order: SortOrder = SortOrder.INPUT,
+        project_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
     ) -> Sequence[RecordMixin]:
 
         # Check params
@@ -101,10 +104,10 @@ class SqliteDb(Db):
         key_type: type[KeyProtocol],
         *,
         dataset: str,
-        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.ASC,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
@@ -162,10 +165,10 @@ class SqliteDb(Db):
         query: QueryMixin,
         *,
         dataset: str,
-        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.ASC,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:

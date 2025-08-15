@@ -17,7 +17,6 @@ import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.filter import Filter
-from cl.runtime.db.filter_key import FilterKey
 from cl.runtime.db.filter_many import FilterMany
 from cl.runtime.db.filter_where import FilterWhere
 from cl.runtime.records.typename import typename

@@ -105,6 +105,9 @@ class DataSource(DataSourceKey, RecordMixin):
         record_or_key: KeyProtocol,
         *,
         cast_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
     ) -> TRecord:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
@@ -113,9 +116,18 @@ class DataSource(DataSourceKey, RecordMixin):
         Args:
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            project_to: Use some or all fields from the stored record to create and return instances of this type
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
         """
         if record_or_key is not None:
-            result = self.load_one_or_none(record_or_key, cast_to=cast_to)
+            result = self.load_one_or_none(
+                record_or_key,
+                cast_to=cast_to,
+                project_to=project_to,
+                limit=limit,
+                skip=skip,
+            )
             if result is None:
                 key_str = KeySerializers.DELIMITED.serialize(record_or_key.get_key())
                 cast_to_str = f"\nwhen loading type {typename(cast_to)}" if cast_to else ""
@@ -136,6 +148,9 @@ class DataSource(DataSourceKey, RecordMixin):
         record_or_key: KeyProtocol | None,
         *,
         cast_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
     ) -> TRecord | None:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
@@ -144,8 +159,17 @@ class DataSource(DataSourceKey, RecordMixin):
         Args:
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            project_to: Use some or all fields from the stored record to create and return instances of this type
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
         """
-        result = self.load_many([record_or_key], cast_to=cast_to)
+        result = self.load_many(
+            [record_or_key],
+            cast_to=cast_to,
+            project_to=project_to,
+            limit=limit,
+            skip=skip,
+        )
         if len(result) == 1:
             return result[0]
         else:
@@ -155,8 +179,12 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         records_or_keys: Sequence[TRecord | KeyProtocol | None] | None,
         *,
-        sort_order: SortOrder = SortOrder.INPUT,
         cast_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.INPUT,
+        limit: int | None = None,
+        skip: int | None = None,
     ) -> Sequence[TRecord | None] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
@@ -164,8 +192,12 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
-            sort_order: Sort in the order of 'records_or_keys' parameter for INPUT (default), or as specified
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            restrict_to: The query will return only this type and its subtypes
+            project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
         """
         # Pass through None or an empty sequence
         if not records_or_keys:
@@ -232,9 +264,9 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         restrict_to: type[TRecord],
         *,
-        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.ASC,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
@@ -243,9 +275,9 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             restrict_to: The query will return only this type and its subtypes
-            sort_order: Sort in the specified order for each key field, defaults to ASC for this method
             cast_to: Cast the result to this type (error if not a subtype)
             project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
@@ -253,10 +285,10 @@ class DataSource(DataSourceKey, RecordMixin):
         return self._get_db().load_all(
             restrict_to.get_key_type(),
             dataset=self.dataset.dataset_id,
-            sort_order=sort_order,
             cast_to=cast_to,
             restrict_to=restrict_to,
             project_to=project_to,
+            sort_order=sort_order,
             limit=limit,
             skip=skip,
         )
@@ -265,10 +297,10 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         key_type: type[KeyProtocol],
         *,
-        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.ASC,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
@@ -277,20 +309,20 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             key_type: Key type determines the database table
-            sort_order: Sort in the specified order for each key field, defaults to ASC for this method
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only this type and its subtypes
             project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
         return self._get_db().load_all(
             key_type=key_type,
             dataset=self.dataset.dataset_id,
-            sort_order=sort_order,
             cast_to=cast_to,
             restrict_to=restrict_to,
             project_to=project_to,
+            sort_order=sort_order,
             limit=limit,
             skip=skip,
         )
@@ -299,10 +331,10 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         filter: Filter,
         *,
-        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.ASC,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
@@ -311,28 +343,32 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             filter: Filter used to select the records to load
-            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC in query class
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only this type and its subtypes
             project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
         if isinstance(filter, FilterWhere):
             return self.load_where(
                 filter.query,
-                sort_order=sort_order,
                 cast_to=cast_to,
                 restrict_to=restrict_to,
                 project_to=project_to,
+                sort_order=sort_order,
                 limit=limit,
                 skip=skip,
             )
         elif isinstance(filter, FilterMany):
             return self.load_many(
                 filter.keys,
-                sort_order=sort_order,
                 cast_to=cast_to,
+                restrict_to=restrict_to,
+                project_to=project_to,
+                sort_order=sort_order,
+                limit=limit,
+                skip=skip,
             )
         else:
             raise RuntimeError(f"Filter type {typename(filter)} not supported by the data source.")
@@ -341,10 +377,10 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         query: QueryMixin,
         *,
-        sort_order: SortOrder = SortOrder.ASC,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.ASC,
         limit: int | None = None,
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
@@ -353,20 +389,20 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             query: Contains query conditions to match
-            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC in query class
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only this type and its subtypes
             project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
         return self._get_db().load_where(
             query,
             dataset=self.dataset.dataset_id,
-            sort_order=sort_order,
             cast_to=cast_to,
             restrict_to=restrict_to,
             project_to=project_to,
+            sort_order=sort_order,
             limit=limit,
             skip=skip,
         )
@@ -382,9 +418,13 @@ class DataSource(DataSourceKey, RecordMixin):
 
         Args:
             query: Contains query conditions to match
-            restrict_to: Count only the subtypes of this type (defaults to the query target type)
+            restrict_to: The query will return only this type and its subtypes
         """
-        return self._get_db().count_where(query, dataset=self.dataset.dataset_id, restrict_to=restrict_to)
+        return self._get_db().count_where(
+            query,
+            dataset=self.dataset.dataset_id,
+            restrict_to=restrict_to,
+        )
 
     def save_one(
         self,
