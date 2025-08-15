@@ -43,7 +43,7 @@ class LogMessage(LogMessageKey, RecordMixin):
     traceback: str | None = None
     """Traceback."""
 
-    record_type: str | None = None
+    record_type_name: str | None = None
     """Type on which the handler is running."""
 
     handler_name: str | None = None

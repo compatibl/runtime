@@ -266,7 +266,7 @@ class Db(DbKey, RecordMixin, ABC):
             self._table_binding_cache = {}
         if (result := self._table_binding_cache.get(dataset)) is None:
             bindings = self.load_all(TableBindingKey, cast_to=TableBinding, dataset=dataset)
-            result = {(binding.record_type, binding.table_name): binding for binding in bindings}
+            result = {(binding.record_type_name, binding.table_name): binding for binding in bindings}
             self._table_binding_cache[dataset] = result
         return result
 
@@ -296,8 +296,8 @@ class Db(DbKey, RecordMixin, ABC):
             parent_type_names = TypeCache.get_parent_type_names(record_type, type_kind=TypeKind.RECORD)
             bindings = tuple(
                 TableBinding(
-                    record_type=parent_type_name,
-                    key_type=TypeUtil.name(record_type.get_key_type()),
+                    record_type_name=parent_type_name,
+                    key_type_name=TypeUtil.name(record_type.get_key_type()),
                     table_name=table_name,
                 ).build()
                 for parent_type_name in parent_type_names
@@ -306,7 +306,7 @@ class Db(DbKey, RecordMixin, ABC):
             # Add to cache
             consume(
                 self._get_dataset_table_binding_cache(dataset=dataset).setdefault(
-                    (binding.record_type, binding.table_name),
+                    (binding.record_type_name, binding.table_name),
                     binding,
                 )
                 for binding in bindings

@@ -26,7 +26,7 @@ class TaskLogs(DataMixin):
     task_run_id: str = required()
     """Unique task run identifier."""
 
-    record_type: str = required()
+    record_type_name: str = required()
     """Record Type on which handler is run."""
 
     handler_name: str = required()

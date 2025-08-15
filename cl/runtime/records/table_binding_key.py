@@ -21,7 +21,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class TableBindingKey(KeyMixin):
     """Indicates that the record type is stored in the specified table."""
 
-    record_type: str = required()
+    record_type_name: str = required()
     """Stored record type name in PascalCase format."""
 
     @classmethod

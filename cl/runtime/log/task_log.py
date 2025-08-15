@@ -23,7 +23,7 @@ class TaskLog(Log):
     handler: str | None = None
     """Name of the called handler."""
 
-    record_type: str | None = None
+    record_type_name: str | None = None
     """Type name."""
 
     record_key: str | None = None

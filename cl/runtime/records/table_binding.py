@@ -22,11 +22,11 @@ from cl.runtime.records.table_binding_key import TableBindingKey
 class TableBinding(TableBindingKey, RecordMixin):
     """Indicates that the record type is stored in the specified table."""
 
-    key_type: str = required()
+    key_type_name: str = required()
     """Key type name for the stored record in PascalCase format."""
 
     table_name: str = required()
     """Unique table name in PascalCase format."""
 
     def get_key(self) -> TableBindingKey:
-        return TableBindingKey(record_type=self.record_type).build()
+        return TableBindingKey(record_type_name=self.record_type_name).build()

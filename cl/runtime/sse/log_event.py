@@ -30,7 +30,7 @@ class LogEvent(Event):
     readable_time: str | None = None
     """Human-readable time when the log record was created in UTC."""
 
-    record_type: str | None = None
+    record_type_name: str | None = None
     """Type on which the handler is running."""
 
     handler_name: str | None = None

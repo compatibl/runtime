@@ -415,7 +415,7 @@ class DataSource(DataSourceKey, RecordMixin):
         # Load from DB as cache may be out of date
         bindings = self.load_type(TableBinding)
         # Sort bindings by table name first and then by record type in alphabetical order
-        return tuple(sorted(bindings, key=lambda x: (x.table_name, x.record_type)))
+        return tuple(sorted(bindings, key=lambda x: (x.table_name, x.record_type_name)))
 
     def get_table_names(self) -> tuple[str, ...]:
         """Return DB table names in alphabetical order of PascalCase format."""
@@ -448,7 +448,7 @@ class DataSource(DataSourceKey, RecordMixin):
         bindings = self.load_where(query, cast_to=TableBinding)
 
         # Eliminate duplicates
-        key_type_names = tuple(set(binding.key_type for binding in bindings))
+        key_type_names = tuple(set(binding.key_type_name for binding in bindings))
 
         if len(key_type_names) == 1:
             return key_type_names[0]
@@ -474,7 +474,7 @@ class DataSource(DataSourceKey, RecordMixin):
         bindings = self.load_where(query, cast_to=TableBinding)
 
         # Sort in alphabetical order of record_type (not the same as query sort order) and convert to tuple
-        return tuple(sorted(binding.record_type for binding in bindings))
+        return tuple(sorted(binding.record_type_name for binding in bindings))
 
     def get_common_base_record_type_name(self, *, table_name: str) -> str:
         """

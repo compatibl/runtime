@@ -92,7 +92,7 @@ class UiLogUtil(DataMixin):
                 task_status = cls._get_task_status(task_run_id)
                 result[task_run_id] = TaskLogs(
                     task_run_id=task_run_id,
-                    record_type=log_message.record_type,
+                    record_type_name=log_message.record_type_name,
                     record_key=log_message.record_key,
                     handler_name=log_message.handler_name,
                     status=task_status,

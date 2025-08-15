@@ -107,7 +107,7 @@ class QaUtil:
                 # Convert to test path or name
                 return cls.format_test_path(
                     test_file=test_file,
-                    test_class=class_name,
+                    test_class_name=class_name,
                     test_function=test_name,
                     name_only=name_only,
                 )
@@ -120,7 +120,7 @@ class QaUtil:
         cls,
         *,
         test_file: str,
-        test_class: str | None = None,
+        test_class_name: str | None = None,
         test_function: str,
         name_only: bool,
     ) -> str | None:
@@ -131,7 +131,7 @@ class QaUtil:
 
         Args:
             test_file: Test file inclusive of directory path and .py extension
-            test_class: Test class name if the test is a method inside class, None otherwise
+            test_class_name: Test class name if the test is a method inside class, None otherwise
             test_function: Test function or method name
             name_only: If true, return only a dot delimited name, otherwise return the entire directory path
         """
@@ -151,7 +151,7 @@ class QaUtil:
 
         module_dir = os.path.dirname(test_file_without_ext)
         module_name = os.path.basename(test_file_without_ext)
-        if test_class is None:
+        if test_class_name is None:
             # Remove repeated identical tokens to shorten the path
             if module_name != test_function:
                 result = delim.join((module_name, test_function))
@@ -159,14 +159,14 @@ class QaUtil:
                 result = module_name
         else:
             # Convert class name to snake_case
-            test_class = CaseUtil.pascal_to_snake_case(test_class)
+            test_class_name = CaseUtil.pascal_to_snake_case(test_class_name)
 
             # Remove repeated identical tokens to shorten the path
-            if module_name != test_class:
-                if test_class != test_function:
-                    result = delim.join((module_name, test_class, test_function))
+            if module_name != test_class_name:
+                if test_class_name != test_function:
+                    result = delim.join((module_name, test_class_name, test_function))
                 else:
-                    result = delim.join((module_name, test_class))
+                    result = delim.join((module_name, test_class_name))
             else:
                 if module_name != test_function:
                     result = delim.join((module_name, test_function))

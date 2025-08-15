@@ -34,7 +34,7 @@ class EventLogHandler(logging.Handler):
             level=CaseUtil.upper_to_pascal_case(record.levelname),
             message=record.getMessage(),
             readable_time=getattr(record, "readable_time", None),
-            record_type=getattr(record, "type", None),
+            record_type_name=getattr(record, "type", None),
             handler_name=getattr(record, "handler", None),
             record_key=getattr(record, "key", None),
             task_run_id=getattr(record, "task_run_id", None),
