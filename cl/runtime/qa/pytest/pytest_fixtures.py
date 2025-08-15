@@ -63,7 +63,7 @@ def default_db_fixture(request: FixtureRequest) -> Iterator[Db]:
 @pytest.fixture(scope="function")
 def sqlite_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using SqliteDB."""
-    yield from _db_fixture(request, db_type=BasicMongoMockDb)
+    yield from _db_fixture(request, db_type=SqliteDb)
 
 
 @pytest.fixture(scope="function")
@@ -84,7 +84,7 @@ def basic_mongo_mock_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     yield from _db_fixture(request, db_type=BasicMongoMockDb)
 
 
-@pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb])
+@pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb])  # TODO: Load the list from settings instead
 def multi_db_fixture(request) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types
