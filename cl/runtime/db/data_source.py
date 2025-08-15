@@ -38,8 +38,8 @@ from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.table_binding import TableBinding
-from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
+from cl.runtime.records.record_type_binding import RecordTypeBinding
+from cl.runtime.records.record_type_binding_query import RecordTypeBindingQuery
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -397,11 +397,11 @@ class DataSource(DataSourceKey, RecordMixin):
             for key_type, records_for_key_type in keys_grouped_by_key_type.items()
         ]
 
-    def get_bindings(self) -> tuple[TableBinding, ...]:
+    def get_bindings(self) -> tuple[RecordTypeBinding, ...]:
         """Return record type bindings in alphabetical order of key type name followed by record type name."""
 
         # Load from DB as cache may be out of date
-        bindings = self.load_type(TableBinding)
+        bindings = self.load_type(RecordTypeBinding)
         # Sort bindings by key type name first and then by record type in alphabetical order
         return tuple(sorted(bindings, key=lambda x: (x.key_type_name, x.record_type_name)))
 
@@ -409,7 +409,7 @@ class DataSource(DataSourceKey, RecordMixin):
         """Return stored key type names in alphabetical order of PascalCase format."""
 
         # Load from DB as cache may be out of date
-        bindings = self.load_type(TableBinding)
+        bindings = self.load_type(RecordTypeBinding)
         # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
         return tuple(sorted(set(binding.key_type_name for binding in bindings)))
 
@@ -426,8 +426,8 @@ class DataSource(DataSourceKey, RecordMixin):
         """
 
         # Load from DB as cache may be out of date
-        query = TableBindingKeyQueryByTable(key_type_name=key_type_name).build()
-        bindings = self.load_where(query, cast_to=TableBinding)
+        query = RecordTypeBindingQuery(key_type_name=key_type_name).build()
+        bindings = self.load_where(query, cast_to=RecordTypeBinding)
 
         # Sort in alphabetical order of record_type (not the same as query sort order) and convert to tuple
         return tuple(sorted(binding.record_type_name for binding in bindings))

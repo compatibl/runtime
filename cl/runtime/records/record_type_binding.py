@@ -15,15 +15,15 @@
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.table_binding_key import TableBindingKey
+from cl.runtime.records.record_type_binding_key import RecordTypeBindingKey
 
 
 @dataclass(slots=True, kw_only=True)
-class TableBinding(TableBindingKey, RecordMixin):
+class RecordTypeBinding(RecordTypeBindingKey, RecordMixin):
     """Indicates that the record type is stored in the specified table."""
 
     key_type_name: str = required()
     """Key type name for the stored record in PascalCase format."""
 
-    def get_key(self) -> TableBindingKey:
-        return TableBindingKey(record_type_name=self.record_type_name).build()
+    def get_key(self) -> RecordTypeBindingKey:
+        return RecordTypeBindingKey(record_type_name=self.record_type_name).build()

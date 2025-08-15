@@ -25,8 +25,8 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.table_binding import TableBinding
-from cl.runtime.records.table_binding_key import TableBindingKey
+from cl.runtime.records.record_type_binding import RecordTypeBinding
+from cl.runtime.records.record_type_binding_key import RecordTypeBindingKey
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
@@ -258,7 +258,7 @@ class Db(DbKey, RecordMixin, ABC):
             self._record_type_name_cache = {}
         if (result := self._record_type_name_cache.get(dataset)) is None:
             # Load from disk if does not exist
-            bindings = self.load_all(TableBindingKey, cast_to=TableBinding, dataset=dataset)
+            bindings = self.load_all(RecordTypeBindingKey, cast_to=RecordTypeBinding, dataset=dataset)
             result = {binding.record_type_name for binding in bindings}
             self._record_type_name_cache[dataset] = result
         return result
@@ -266,8 +266,8 @@ class Db(DbKey, RecordMixin, ABC):
     def _add_record_type(self, *, record_type: type[RecordProtocol], dataset: str) -> None:
         """Add record type to cache for the specified dataset."""
 
-        if record_type == TableBinding:
-            # Do not register TableBinding record, as a result it will not be present in REST API
+        if record_type == RecordTypeBinding:
+            # Do not register RecordTypeBinding record, as a result it will not be present in REST API
             return
 
         record_type_name = typename(record_type)
@@ -276,7 +276,7 @@ class Db(DbKey, RecordMixin, ABC):
             # If the record type is not yet in cache, add parent types to DB and cache
             parent_type_names = TypeCache.get_parent_type_names(record_type, type_kind=TypeKind.RECORD)
             bindings = tuple(
-                TableBinding(
+                RecordTypeBinding(
                     record_type_name=parent_type_name,
                     key_type_name=typename(record_type.get_key_type()),
                 ).build()
@@ -284,7 +284,7 @@ class Db(DbKey, RecordMixin, ABC):
             )
 
             # Save bindings to the dataset, it is faster to write all than determine which records are already present
-            self.save_many(TableBindingKey, bindings, dataset=dataset)
+            self.save_many(RecordTypeBindingKey, bindings, dataset=dataset)
 
             # Add to cache
             record_type_name_set.add(parent_type_names)

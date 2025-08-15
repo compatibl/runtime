@@ -18,7 +18,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class TableBindingKey(KeyMixin):
+class RecordTypeBindingKey(KeyMixin):
     """Indicates that the record type is stored in the specified table."""
 
     record_type_name: str = required()
@@ -26,4 +26,4 @@ class TableBindingKey(KeyMixin):
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return TableBindingKey
+        return RecordTypeBindingKey
