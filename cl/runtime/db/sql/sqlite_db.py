@@ -35,7 +35,7 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
@@ -69,8 +69,8 @@ class SqliteDb(Db):
     ) -> Sequence[RecordMixin]:
 
         # Check params
-        assert TypeUtil.is_key_type(key_type)
-        assert TypeUtil.is_key_sequence(keys)
+        assert TypeCheck.is_key_type(key_type)
+        assert TypeCheck.is_key_sequence(keys)
         self._check_dataset(dataset)
 
         if not keys:
@@ -112,7 +112,7 @@ class SqliteDb(Db):
     ) -> tuple[TRecord, ...]:
 
         # Check params
-        assert TypeUtil.is_key_type(key_type)
+        assert TypeCheck.is_key_type(key_type)
         self._check_dataset(dataset)
 
         if project_to is not None:
@@ -321,8 +321,8 @@ class SqliteDb(Db):
     ) -> None:
 
         # Check params
-        assert TypeUtil.is_key_type(key_type)
-        assert TypeUtil.is_record_sequence(records)
+        assert TypeCheck.is_key_type(key_type)
+        assert TypeCheck.is_record_sequence(records)
         self._check_dataset(dataset)
 
         if not records:
@@ -368,8 +368,8 @@ class SqliteDb(Db):
     ) -> None:
 
         # Check params
-        assert TypeUtil.is_key_type(key_type)
-        assert TypeUtil.is_key_sequence(keys)
+        assert TypeCheck.is_key_type(key_type)
+        assert TypeCheck.is_key_sequence(keys)
         self._check_dataset(dataset)
 
         if not keys:

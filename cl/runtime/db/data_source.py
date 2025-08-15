@@ -41,7 +41,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
 from cl.runtime.records.typename import typename
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.key_serializers import KeySerializers
 

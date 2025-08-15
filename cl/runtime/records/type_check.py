@@ -22,7 +22,7 @@ from cl.runtime.records.protocols import KeyProtocol, is_sequence, is_key, is_re
 from cl.runtime.records.typename import typename
 
 
-class TypeUtil:
+class TypeCheck:
     """Performs runtime type checks and returns TypeGuard instance."""
 
     @classmethod

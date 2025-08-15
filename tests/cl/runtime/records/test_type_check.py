@@ -14,41 +14,41 @@
 
 import pytest
 
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.type_check import TypeCheck
 from stubs.cl.runtime import StubDataclass, StubDataclassKey
 from stubs.cl.runtime import StubDataclassDerived
 
 
 def test_check_type():
     """Test for TypeCheck.check_type method."""
-    TypeUtil.check_type(int, int)
-    TypeUtil.check_type(StubDataclass, StubDataclass)
+    TypeCheck.check_type(int, int)
+    TypeCheck.check_type(StubDataclass, StubDataclass)
     with pytest.raises(Exception):
-        TypeUtil.check_type(int, float)
+        TypeCheck.check_type(int, float)
     with pytest.raises(Exception):
-        TypeUtil.check_type(int, StubDataclass)
+        TypeCheck.check_type(int, StubDataclass)
     with pytest.raises(Exception):
-        TypeUtil.check_type(StubDataclassDerived, StubDataclass)
+        TypeCheck.check_type(StubDataclassDerived, StubDataclass)
 
 
 def test_check_subtype():
     """Test for TypeCheck.check_subtype method."""
-    TypeUtil.check_subtype(int, int)
-    TypeUtil.check_subtype(StubDataclass, StubDataclass)
-    TypeUtil.check_subtype(StubDataclassDerived, StubDataclass)
+    TypeCheck.check_subtype(int, int)
+    TypeCheck.check_subtype(StubDataclass, StubDataclass)
+    TypeCheck.check_subtype(StubDataclassDerived, StubDataclass)
     with pytest.raises(Exception):
-        TypeUtil.check_subtype(int, float)
+        TypeCheck.check_subtype(int, float)
     with pytest.raises(Exception):
-        TypeUtil.check_subtype(int, StubDataclass)
+        TypeCheck.check_subtype(int, StubDataclass)
 
 
 def test_is_key_type():
     """Test for is_key_type method."""
-    TypeUtil.is_key_type(StubDataclassKey)
+    TypeCheck.is_key_type(StubDataclassKey)
     with pytest.raises(Exception):
-        TypeUtil.is_key_type(StubDataclass)
+        TypeCheck.is_key_type(StubDataclass)
     with pytest.raises(Exception):
-        TypeUtil.is_key_type(int)
+        TypeCheck.is_key_type(int)
 
 
 

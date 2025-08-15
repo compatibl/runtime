@@ -34,7 +34,7 @@ from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -85,8 +85,8 @@ class BasicMongoDb(Db):
     ) -> Sequence[RecordMixin]:
 
         # Check params
-        assert TypeUtil.is_key_type(key_type)
-        assert TypeUtil.is_key_sequence(keys)
+        assert TypeCheck.is_key_type(key_type)
+        assert TypeCheck.is_key_sequence(keys)
         self._check_dataset(dataset)
 
         # Get MongoDB collection for the key type
@@ -119,7 +119,7 @@ class BasicMongoDb(Db):
     ) -> tuple[TRecord, ...]:
 
         # Check params
-        assert TypeUtil.is_key_type(key_type)
+        assert TypeCheck.is_key_type(key_type)
         self._check_dataset(dataset)
 
         # Get MongoDB collection for the key type
@@ -274,8 +274,8 @@ class BasicMongoDb(Db):
     ) -> None:
 
         # Check params
-        assert TypeUtil.is_key_type(key_type)
-        assert TypeUtil.is_record_sequence(records)
+        assert TypeCheck.is_key_type(key_type)
+        assert TypeCheck.is_record_sequence(records)
         self._check_dataset(dataset)
 
         # Get MongoDB collection for the key type
@@ -308,8 +308,8 @@ class BasicMongoDb(Db):
     ) -> None:
 
         # Check params
-        assert TypeUtil.is_key_type(key_type)
-        assert TypeUtil.is_key_sequence(keys)
+        assert TypeCheck.is_key_type(key_type)
+        assert TypeCheck.is_key_sequence(keys)
         self._check_dataset(dataset)
 
         # Get MongoDB collection for the key type
