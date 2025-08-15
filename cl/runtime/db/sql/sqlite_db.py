@@ -18,6 +18,9 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Sequence
 from typing import cast
+
+from memoization import cached
+
 from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime import TypeCache
@@ -549,6 +552,7 @@ class SqliteDb(Db):
         return sorted(result_columns_set)
 
     @classmethod
+    @cached
     def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
         """Get table name from key type and check that it has an acceptable format or length, error otherwise."""
         table_name = TypeUtil.name(key_type).removesuffix("Key")
@@ -557,6 +561,7 @@ class SqliteDb(Db):
         return table_name
 
     @classmethod
+    @cached
     def _get_validated_column_name(cls, column_name: str) -> str:
         """Return column name if it has an acceptable format or length, error otherwise."""
         if _COLUMN_NAME_RE.fullmatch(column_name) is None:
@@ -564,6 +569,7 @@ class SqliteDb(Db):
         return column_name
 
     @classmethod
+    @cached
     def _quote_identifier(cls, identifier: str) -> str:
         """Quote SQLite identifier."""
 
