@@ -15,13 +15,13 @@
 import importlib
 import os
 import sys
-from memoization import cached
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pkgutil import walk_packages
 from types import ModuleType
 from typing import Sequence
+from memoization import cached
 from more_itertools import consume
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil

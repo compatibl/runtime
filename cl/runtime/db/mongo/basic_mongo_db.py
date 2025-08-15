@@ -18,8 +18,6 @@ from typing import Any
 from typing import Iterable
 from typing import Sequence
 from typing import cast
-
-from memoization import cached
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.synchronous.collection import Collection
@@ -32,9 +30,9 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
-from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -379,7 +377,9 @@ class BasicMongoDb(Db):
                 # The suffix Key is enforced in type cache, add another check here for  safety before removing the suffix
                 collection_name = key_type_name.removesuffix("Key")
             else:
-                raise RuntimeError("By convention, key type name or its alias (if defined) must end with the suffix Key.")
+                raise RuntimeError(
+                    "By convention, key type name or its alias (if defined) must end with the suffix Key."
+                )
             result = mongo_db[collection_name]
             self._mongo_collection_dict[key_type] = result
         return result
@@ -448,8 +448,7 @@ class BasicMongoDb(Db):
             # Check that it matches the key type obtained from the query
             if restrict_to != key_type:
                 raise RuntimeError(
-                    f"Parameter restrict_to={typename(restrict_to)} does not match "
-                    f"key_type={typename(key_type)}."
+                    f"Parameter restrict_to={typename(restrict_to)} does not match " f"key_type={typename(key_type)}."
                 )
         else:
             raise RuntimeError(f"Parameter restrict_to={typename(restrict_to)} is not a key or record.")

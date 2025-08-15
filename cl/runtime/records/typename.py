@@ -14,6 +14,7 @@
 
 from typing import Any
 
+
 def typename(instance_or_type: Any) -> str:
     """Returns type name in PascalCase, or an alias if provided."""
     # TODO: Add support for aliases

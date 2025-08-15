@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.records.type_check import TypeCheck
-from stubs.cl.runtime import StubDataclass, StubDataclassKey
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclassKey
 
 
 def test_is_same_type():
@@ -48,12 +48,12 @@ def test_is_type_or_name():
     TypeCheck.is_type_or_name(int)
     TypeCheck.is_type_or_name(StubDataclass)
     TypeCheck.is_type_or_name(StubDataclassKey)
-    
+
     # Valid PascalCase strings
     TypeCheck.is_type_or_name("ValidPascalCase")
     TypeCheck.is_type_or_name("AnotherValidPascalCase")
     TypeCheck.is_type_or_name("ValidPascalCaseWithDigits2")
-    
+
     # Invalid cases
     with pytest.raises(Exception):
         TypeCheck.is_type_or_name("invalid_pascal_case")
@@ -70,11 +70,11 @@ def test_is_type_or_name_sequence():
     # Valid sequences of types
     TypeCheck.is_type_or_name_sequence([int, float, str])
     TypeCheck.is_type_or_name_sequence([StubDataclass, StubDataclassKey])
-    
+
     # Valid sequences of PascalCase strings
     TypeCheck.is_type_or_name_sequence(["ValidPascalCase", "AnotherValidPascalCase"])
     TypeCheck.is_type_or_name_sequence(["ValidPascalCase", int, "AnotherValidPascalCase"])
-    
+
     # Invalid cases
     with pytest.raises(Exception):
         TypeCheck.is_type_or_name_sequence("not_a_sequence")
@@ -100,7 +100,7 @@ def test_is_key_sequence():
     # Valid key sequences
     TypeCheck.is_key_sequence([StubDataclassKey()])
     TypeCheck.is_key_sequence([StubDataclassKey(), StubDataclassKey()])
-    
+
     # Invalid cases
     with pytest.raises(Exception):
         TypeCheck.is_key_sequence("not_a_sequence")
@@ -117,7 +117,7 @@ def test_is_record_type():
     # Valid record types
     TypeCheck.is_record_type(StubDataclass)
     TypeCheck.is_record_type(StubDataclassDerived)
-    
+
     # Invalid cases
     with pytest.raises(Exception):
         TypeCheck.is_record_type(int)
@@ -134,7 +134,7 @@ def test_is_record_sequence():
     # Valid record sequences
     TypeCheck.is_record_sequence([StubDataclass()])
     TypeCheck.is_record_sequence([StubDataclass(), StubDataclassDerived()])
-    
+
     # Invalid cases
     with pytest.raises(Exception):
         TypeCheck.is_record_sequence("not_a_sequence")
@@ -154,7 +154,7 @@ def test_is_key_or_record_type():
     TypeCheck.is_key_or_record_type(StubDataclass)
     TypeCheck.is_key_or_record_type(StubDataclassKey)
     TypeCheck.is_key_or_record_type(StubDataclassDerived)
-    
+
     # Invalid cases
     with pytest.raises(Exception):
         TypeCheck.is_key_or_record_type(int)
@@ -171,7 +171,7 @@ def test_is_key_or_record_sequence():
     TypeCheck.is_key_or_record_sequence([StubDataclassKey()])
     TypeCheck.is_key_or_record_sequence([StubDataclass(), StubDataclassKey()])
     TypeCheck.is_key_or_record_sequence([StubDataclassDerived()])
-    
+
     # Invalid cases
     with pytest.raises(Exception):
         TypeCheck.is_key_or_record_sequence("not_a_sequence")

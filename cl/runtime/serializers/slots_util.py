@@ -57,8 +57,7 @@ class SlotsUtil:
                 duplicates = [slot for slot, count in counts.items() if count > 1]
                 duplicates_str = ", ".join(duplicates)
                 raise RuntimeError(
-                    f"Duplicate field names found in class hierarchy "
-                    f"for {typename(data_type)}: {duplicates_str}."
+                    f"Duplicate field names found in class hierarchy " f"for {typename(data_type)}: {duplicates_str}."
                 )
             return result
         else:

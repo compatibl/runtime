@@ -13,10 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from memoization import cached
-
-from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from mongomock import MongoClient as MongoClientMock
+from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 
 
 @dataclass(slots=True, kw_only=True)
@@ -26,4 +24,3 @@ class BasicMongoMockDb(BasicMongoDb):
     def _get_mongo_client_type(self) -> type:
         """Get the type of MongoDB client object, this method overrides base to return the mongomock class."""
         return MongoClientMock
-

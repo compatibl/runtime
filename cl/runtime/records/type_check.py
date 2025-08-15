@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.records.protocols import TObj
-from typing import TypeGuard, Sequence, Iterable, Any
-
+from typing import Any
+from typing import Sequence
+from typing import TypeGuard
 from memoization import cached
-
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.protocols import KeyProtocol, is_sequence, is_key, is_record, RecordProtocol, is_key_or_record
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_or_record
+from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 
 
@@ -28,11 +33,7 @@ class TypeCheck:
     @classmethod
     @cached
     def is_same_type(
-        cls,
-        instance_or_type: Any,
-        expected_type: type[TObj],
-        *,
-        raise_on_fail: bool = True
+        cls, instance_or_type: Any, expected_type: type[TObj], *, raise_on_fail: bool = True
     ) -> TypeGuard[TObj]:
         """Check if the type of 'instance_or_type' is 'expected_type', subclasses are not permitted."""
         # Accept instance or type
@@ -48,11 +49,7 @@ class TypeCheck:
     @classmethod
     @cached
     def is_same_type_or_subtype(
-        cls,
-        instance_or_type: Any,
-        expected_type: type[TObj],
-        *,
-        raise_on_fail: bool = True
+        cls, instance_or_type: Any, expected_type: type[TObj], *, raise_on_fail: bool = True
     ) -> TypeGuard[TObj]:
         """Check if the type of 'instance_or_type' is the same type or subtype (subclass) of 'expected_type'."""
         # Accept instance or type
@@ -69,24 +66,21 @@ class TypeCheck:
     @cached
     def is_type_or_name(cls, type_or_name: Any, *, raise_on_fail: bool = True) -> TypeGuard[type | str]:
         """Check if the argument is not a type or a string type name in PascalCase format."""
-        if (
-                not isinstance(type_or_name, type) and
-                not (isinstance(type_or_name, str) and CaseUtil.is_pascal_case(type_or_name))
+        if not isinstance(type_or_name, type) and not (
+            isinstance(type_or_name, str) and CaseUtil.is_pascal_case(type_or_name)
         ):
             if raise_on_fail:
                 raise RuntimeError(
-                    f"Parameter {typename(type_or_name)} is not\n"
-                    f"a type or a string type name in PascalCase format.")
+                    f"Parameter {typename(type_or_name)} is not\n" f"a type or a string type name in PascalCase format."
+                )
             else:
                 return False
         return True
 
     @classmethod
     def is_type_or_name_sequence(
-            cls, 
-            types_or_names: Any,
-            *,
-            raise_on_fail: bool = True) -> TypeGuard[Sequence[type | str]]:
+        cls, types_or_names: Any, *, raise_on_fail: bool = True
+    ) -> TypeGuard[Sequence[type | str]]:
         """
         Check if the argument is not a sequence (iterable generator is not accepted)
         of types or string type names in PascalCase format.
@@ -98,7 +92,8 @@ class TypeCheck:
                 raise RuntimeError(
                     f"Parameter {typename(types_or_names)} is not a sequence\n"
                     f"(iterable generator is not accepted) of types or\n"
-                    f"string type names in PascalCase format.")
+                    f"string type names in PascalCase format."
+                )
             else:
                 return False
 
@@ -121,7 +116,8 @@ class TypeCheck:
         else:
             if raise_on_fail:
                 raise RuntimeError(
-                    f"Parameter {typename(keys)} is not a sequence (iterable generator is not accepted).")
+                    f"Parameter {typename(keys)} is not a sequence (iterable generator is not accepted)."
+                )
             else:
                 return False
 
@@ -144,7 +140,8 @@ class TypeCheck:
         else:
             if raise_on_fail:
                 raise RuntimeError(
-                    f"Parameter {typename(records)} is not a sequence (iterable generator is not accepted).")
+                    f"Parameter {typename(records)} is not a sequence (iterable generator is not accepted)."
+                )
             else:
                 return False
 
@@ -161,10 +158,10 @@ class TypeCheck:
 
     @classmethod
     def is_key_or_record_sequence(
-            cls,
-            keys_or_records: Any,
-            *,
-            raise_on_fail: bool = True,
+        cls,
+        keys_or_records: Any,
+        *,
+        raise_on_fail: bool = True,
     ) -> TypeGuard[Sequence[KeyProtocol]]:
         """Check if the argument is not a record sequence (iterable generator is not accepted)."""
         if is_sequence(keys_or_records):
@@ -172,7 +169,7 @@ class TypeCheck:
         else:
             if raise_on_fail:
                 raise RuntimeError(
-                    f"Parameter {typename(keys_or_records)} is not a sequence "
-                    f"(iterable generator is not accepted).")
+                    f"Parameter {typename(keys_or_records)} is not a sequence " f"(iterable generator is not accepted)."
+                )
             else:
                 return False

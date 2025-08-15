@@ -18,9 +18,7 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Sequence
 from typing import cast
-
 from memoization import cached
-
 from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime import TypeCache
@@ -33,9 +31,9 @@ from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
+from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
-from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
@@ -78,7 +76,7 @@ class SqliteDb(Db):
 
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=key_type)
-        
+
         if not self._table_exists(table_name=table_name):
             return tuple()
 
