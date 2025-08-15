@@ -165,11 +165,12 @@ def _make_filter_db_logs():
 
 
 # Empty config to suppress default celery logger. Used to propagate all logs to root logger.
-celery_empty_logging_config = {"version": 1, "loggers": {"celery": {}}}
+celery_empty_logging_config = {"version": 1, "disable_existing_loggers": False, "loggers": {"celery": {}}}
 
 # Empty config to suppress default uvicorn logger. Used to propagate all logs to root logger.
 uvicorn_empty_logging_config = {
     "version": 1,
+    "disable_existing_loggers": False,
     "loggers": {
         "uvicorn": {},
         "uvicorn.error": {},
