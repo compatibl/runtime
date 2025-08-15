@@ -33,7 +33,7 @@ from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_guard_util import TypeGuardUtil
 from cl.runtime.schema.type_kind import TypeKind
@@ -116,7 +116,7 @@ class SqliteDb(Db):
         self._check_dataset(dataset)
 
         if project_to is not None:
-            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
+            raise RuntimeError(f"{typename(self)} does not currently support 'project_to' option.")
 
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=key_type)
@@ -179,7 +179,7 @@ class SqliteDb(Db):
         self._check_dataset(dataset)
 
         if project_to is not None:
-            raise RuntimeError(f"{TypeUtil.name(self)} does not currently support 'project_to' option.")
+            raise RuntimeError(f"{typename(self)} does not currently support 'project_to' option.")
 
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
@@ -197,8 +197,8 @@ class SqliteDb(Db):
         elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
-                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+                f"In {typename(self)}.load_where, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 
         # Build SQL query to select records in table by conditions
@@ -282,8 +282,8 @@ class SqliteDb(Db):
         elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
-                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+                f"In {typename(self)}.load_where, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 
         # Build SQL query to count records in table by conditions
@@ -556,9 +556,9 @@ class SqliteDb(Db):
     @cached
     def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
         """Get table name from key type and check that it has an acceptable format or length, error otherwise."""
-        table_name = TypeUtil.name(key_type).removesuffix("Key")
+        table_name = typename(key_type).removesuffix("Key")
         if _TABLE_NAME_RE.fullmatch(table_name) is None:
-            raise RuntimeError(f"Table name '{table_name}' is not valid for {TypeUtil.name(cls)}")
+            raise RuntimeError(f"Table name '{table_name}' is not valid for {typename(cls)}")
         return table_name
 
     @classmethod
@@ -566,7 +566,7 @@ class SqliteDb(Db):
     def _get_validated_column_name(cls, column_name: str) -> str:
         """Return column name if it has an acceptable format or length, error otherwise."""
         if _COLUMN_NAME_RE.fullmatch(column_name) is None:
-            raise RuntimeError(f"Column name '{column_name}' is not valid for {TypeUtil.name(cls)}")
+            raise RuntimeError(f"Column name '{column_name}' is not valid for {typename(cls)}")
         return column_name
 
     @classmethod

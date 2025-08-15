@@ -21,7 +21,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
@@ -93,7 +93,7 @@ class SavePermanentlyResponse(BaseModel):
         """Save records to the database on the disk."""
 
         for record_type, records in get_type_to_records_map(request).items():
-            filename = f"{TypeUtil.name(record_type)}.{cls._get_extension()}"
+            filename = f"{typename(record_type)}.{cls._get_extension()}"
             FileUtil.check_valid_filename(filename)
             file_path = cls._get_path_to_save_permanently_folder() / filename
             file_path.parent.mkdir(parents=True, exist_ok=True)

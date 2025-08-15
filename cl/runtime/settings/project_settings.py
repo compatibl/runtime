@@ -20,7 +20,7 @@ from typing import ClassVar
 from typing import Iterable
 from typing import Self
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 SETTINGS_FILES_ENVVAR = "CL_SETTINGS_FILES"
 """The name of environment variable used to override the settings file(s) names or locations."""
@@ -238,7 +238,7 @@ class ProjectSettings:
             paths = list(field_value)
         else:
             raise RuntimeError(
-                f"Field '{field_name}' with value '{field_value}' in class '{TypeUtil.name(cls)}' "
+                f"Field '{field_name}' with value '{field_value}' in class '{typename(cls)}' "
                 f"must be a string or an iterable of strings."
             )
 
@@ -250,13 +250,13 @@ class ProjectSettings:
         """Convert to absolute path if path relative to the location of .env or Dynaconf file is specified."""
 
         if field_value is None or field_value == "":
-            raise RuntimeError(f"Field '{field_name}' in class '{TypeUtil.name(cls)}' has an empty element.")
+            raise RuntimeError(f"Field '{field_name}' in class '{typename(cls)}' has an empty element.")
         elif isinstance(field_value, str):
             # Check that 'field_value' is a string
             result = field_value
         else:
             raise RuntimeError(
-                f"Field '{field_name}' in class '{TypeUtil.name(cls)}' has an element "
+                f"Field '{field_name}' in class '{typename(cls)}' has an element "
                 f"with type {type(field_value)} which is not a string."
             )
 

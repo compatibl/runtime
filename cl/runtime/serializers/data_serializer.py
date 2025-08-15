@@ -29,7 +29,7 @@ from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
@@ -88,7 +88,7 @@ class DataSerializer(Serializer):
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
         # Get the class of data, which may be NoneType
-        data_class_name = TypeUtil.name(data)
+        data_class_name = typename(data)
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
@@ -240,7 +240,7 @@ class DataSerializer(Serializer):
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
         # Get the class of data, which may be NoneType
-        data_class_name = TypeUtil.name(data)
+        data_class_name = typename(data)
 
         if type_hint is None:
             if data_class_name in MAPPING_CLASS_NAMES:

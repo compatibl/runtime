@@ -18,7 +18,7 @@ from abc import abstractmethod
 from typing import Self
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.protocols import TObj
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 _FROZEN_IDS = set()
 """Global registry to track frozen status of Python object id's."""
@@ -61,12 +61,12 @@ class BuilderMixin(ABC):
     def check_frozen(self) -> None:
         """Raise an error if the instance is not frozen."""
         if not self.is_frozen():
-            raise RuntimeError(f"{TypeUtil.name(self)} not frozen, invoke build method before first use.")
+            raise RuntimeError(f"{typename(self)} not frozen, invoke build method before first use.")
 
     def __setattr__(self, key, value):
         """Raise an error on attempt to modify a public field for a frozen instance."""
         if self.is_frozen() and not key.startswith("_"):
-            type_name = TypeUtil.name(self)
+            type_name = typename(self)
             raise RuntimeError(f"Cannot modify public field {type_name}.{key} because the instance is frozen.")
         object.__setattr__(self, key, value)
 

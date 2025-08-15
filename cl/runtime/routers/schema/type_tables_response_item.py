@@ -40,5 +40,5 @@ class TypeTablesResponseItem(BaseModel):
         # TODO(Roman): Refactor to return a single table
         record_type_name = request.type_name
         record_type = TypeCache.from_type_name(record_type_name)
-        key_type_name = TypeUtil.name(record_type.get_key_type())  # noqa
+        key_type_name = typename(record_type.get_key_type())  # noqa
         return [TypeTablesResponseItem(name=key_type_name)]

@@ -16,7 +16,7 @@ import dataclasses
 import datetime as dt
 from typing import Any
 from uuid import UUID
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
@@ -47,7 +47,7 @@ class DataSpecUtil:
     def from_class(cls, instance_or_type: Any) -> DataSpec:
         """Get or create type spec for the specified class."""
         type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-        type_name = TypeUtil.name(type_)
+        type_name = typename(type_)
         if (result := cls._spec_dict.get(type_name, None)) is not None:
             # Already created, return from spec dictionary
             return result

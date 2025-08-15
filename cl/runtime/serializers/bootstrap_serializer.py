@@ -37,7 +37,7 @@ from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format import BoolFormat
 from cl.runtime.serializers.bytes_format import BytesFormat
@@ -285,7 +285,7 @@ class BootstrapSerializer(Serializer):
                     pass
 
             # Data type name taking into account aliases
-            data_type_name = TypeUtil.name(data)
+            data_type_name = typename(data)
 
             # Include type in output according to the type_inclusion setting
             if self.type_inclusion == TypeInclusion.ALWAYS:
@@ -347,8 +347,8 @@ class BootstrapSerializer(Serializer):
             return result
         else:
             # Did not match a supported data type
-            raise RuntimeError(f"Cannot serialize data of type '{TypeUtil.name(data)}'.")
+            raise RuntimeError(f"Cannot serialize data of type '{typename(data)}'.")
 
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
-        raise RuntimeError(f"{TypeUtil.name(self)} does not support deserialization.")
+        raise RuntimeError(f"{typename(self)} does not support deserialization.")

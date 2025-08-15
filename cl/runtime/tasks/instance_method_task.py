@@ -23,7 +23,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -46,7 +46,7 @@ class InstanceMethodTask(MethodTask):
     def _create_log_context(self) -> TaskLog:
         """Create TaskLog with task specific info."""
         return TaskLog(
-            record_type_name=TypeUtil.name(TypeCache.from_qual_name(self.key_type_str)),
+            record_type_name=typename(TypeCache.from_qual_name(self.key_type_str)),
             handler=self._title_handler_name(self.method_name),
             task_run_id=self.task_id,
             record_key=self.key_str,
@@ -95,7 +95,7 @@ class InstanceMethodTask(MethodTask):
 
         # Get key type and key
         key_type = record_or_key.get_key_type()
-        result.key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
+        result.key_type_str = f"{key_type.__module__}.{typename(key_type)}"
         key = record_or_key.get_key() if is_record(record_or_key) else record_or_key
         result.key_str = _KEY_SERIALIZER.serialize(key)
 
@@ -112,5 +112,5 @@ class InstanceMethodTask(MethodTask):
 
         # Set label and return
         method_name_pascal_case = CaseUtil.snake_to_pascal_case(result.method_name)
-        result.label = f"{TypeUtil.name(key_type)};{result.key_str};{method_name_pascal_case}"
+        result.label = f"{typename(key_type)};{result.key_str};{method_name_pascal_case}"
         return result

@@ -18,7 +18,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import TEnum
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 class SettingsUtil:
@@ -82,7 +82,7 @@ class SettingsUtil:
             valid_values = "\n".join(CaseUtil.upper_to_pascal_case(item) for item in enum_type.__members__.keys())
             raise RuntimeError(
                 f"Value '{value}' for {cls._what(field_name, settings_type)} does not match\n"
-                f"any of the {TypeUtil.name(enum_type)} items. The list of accepted values is below.\n"
+                f"any of the {typename(enum_type)} items. The list of accepted values is below.\n"
                 f"The format can be UPPER_CASE, PascalCase, or snake_case.\n\n{valid_values}\n"
             )
 
@@ -135,7 +135,7 @@ class SettingsUtil:
                 return (value,)
         else:
             raise RuntimeError(
-                f"Cannot convert {cls._what(field_name, settings_type)} of type {TypeUtil.name(value)}\n"
+                f"Cannot convert {cls._what(field_name, settings_type)} of type {typename(value)}\n"
                 f"with value {value} to a string or a sequence of comma-delimited strings."
             )
 
@@ -150,5 +150,5 @@ class SettingsUtil:
     def _what(cls, field_name: str | None, settings_type: type | None) -> str:
         """Return a string describing the settings and its class."""
         field_name = f"setting '{field_name}'" if field_name else "a setting"
-        settings_type_name = TypeUtil.name(settings_type) or "a settings class"
+        settings_type_name = typename(settings_type) or "a settings class"
         return f"{field_name} in {settings_type_name}"

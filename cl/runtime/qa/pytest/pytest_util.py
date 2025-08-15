@@ -19,7 +19,7 @@ from _pytest.fixtures import FixtureRequest
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 class PytestUtil:
@@ -58,7 +58,7 @@ class PytestUtil:
         # Get test information from the request, call stack inspection like in QaUtil
         # will not work here because this code is executed before the test function
         test_file = str(request.path)
-        class_name = TypeUtil.name(request.cls) if request.cls is not None else None
+        class_name = typename(request.cls) if request.cls is not None else None
         test_name_and_params = request.node.name
 
         # If the test is parameterized 'test_method[Params]', remove the parameters and set test_name to 'test_method'

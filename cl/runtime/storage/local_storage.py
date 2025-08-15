@@ -15,7 +15,7 @@
 import os
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.storage.binary_file import BinaryFile
 from cl.runtime.storage.binary_file_mode import BinaryFileMode
@@ -47,7 +47,7 @@ class LocalStorage(Storage):
         if not os.path.isabs(self.rel_dir):
             self._abs_dir = os.path.join(ProjectSettings.get_project_root(), self.rel_dir)
         else:
-            raise RuntimeError(f"{TypeUtil.name(self)}.rel_dir is not a relative path:\n{self.rel_dir}")
+            raise RuntimeError(f"{typename(self)}.rel_dir is not a relative path:\n{self.rel_dir}")
 
         # Create storage root directory if does not exist
         if not os.path.exists(self._abs_dir):

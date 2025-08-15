@@ -17,7 +17,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.load_response import LoadResponse
@@ -32,7 +32,7 @@ def test_method(default_db_fixture):
     active(DataSource).save_one(record)
 
     # Run the coroutine wrapper added by the FastAPI decorator and get the result.
-    load_request = LoadRequest(load_keys=[KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclass))])
+    load_request = LoadRequest(load_keys=[KeyRequestItem(key=record.id, type=typename(StubDataclass))])
     result = LoadResponse.get_response(load_request)
 
     # Check if the result is a LoadResponse instance.
@@ -56,7 +56,7 @@ def test_api(default_db_fixture):
         active(DataSource).save_one(record)
 
         # Request body.
-        request_body = [KeyRequestItem(key=record.id, type=TypeUtil.name(StubDataclass)).model_dump()]
+        request_body = [KeyRequestItem(key=record.id, type=typename(StubDataclass)).model_dump()]
 
         # Get response.
         response = test_client.post("/storage/load", json=request_body)

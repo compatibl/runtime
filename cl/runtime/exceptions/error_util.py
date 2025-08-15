@@ -18,7 +18,7 @@ from typing import Any
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.string_util import StringUtil
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 class ErrorUtil:
@@ -70,7 +70,7 @@ class ErrorUtil:
             callable_name: Function name in snake_case format or method name in ClassName.method_name format (optional)
             param_name: Snake case parameter name (optional)
         """
-        type_str = TypeUtil.name(value)
+        type_str = typename(value)
         details_str = cls.wrap(details) if details else ""
         callable_str = f"Method {callable_name}" if "." in callable_name else f"Function {callable_name}"
         param_str = f"type {type_str} for parameter '{param_name}'" if param_name else f"parameter type {type_str}"
@@ -106,18 +106,18 @@ class ErrorUtil:
     @classmethod
     def enum_value_error(cls, value: Enum | str, schema_type: type | str | None = None) -> Exception:
         """Error message on unknown format enum."""
-        schema_type = schema_type if isinstance(schema_type, str) else TypeUtil.name(schema_type)
+        schema_type = schema_type if isinstance(schema_type, str) else typename(schema_type)
         if value is None:
             type_str = f"the enum type {schema_type}" if schema_type is not None else "an enum type"
             return RuntimeError(f"Value of None is passed for {type_str}.")
         else:
             # Check that schema type matches if specified
-            if schema_type is not None and schema_type != (value_type_name := TypeUtil.name(type(value))):
+            if schema_type is not None and schema_type != (value_type_name := typename(type(value))):
                 return RuntimeError(
                     f"Type {value_type_name} of enum value does not match the type in schema {schema_type}"
                 )
             else:
-                enum_type_name = TypeUtil.name(value)
+                enum_type_name = typename(value)
                 enum_value_str = value.name if isinstance(value, Enum) else str(value)
                 valid_items = "\n".join(item.name for item in value.__class__)
                 return RuntimeError(

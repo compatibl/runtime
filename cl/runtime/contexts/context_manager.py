@@ -20,7 +20,7 @@ from typing import Optional
 from typing import Type
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 _STACK_DICT_VAR: ContextVar[Optional[defaultdict[tuple[type, str | None], list[RecordProtocol]]]] = ContextVar(
     "_STACK_DICT_VAR",
@@ -52,7 +52,7 @@ def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | N
     if context_id == "":
         raise RuntimeError("Using an empty string as context_id is ambiguous, use None instead.")
 
-    key_type_name = TypeUtil.name(context_type.get_key_type())
+    key_type_name = typename(context_type.get_key_type())
     return _get_or_create_stack_dict()[(key_type_name, context_id)]
 
 
@@ -139,13 +139,13 @@ def make_inactive(
     # Validate stack integrity and restore previous current
     if not context_stack:
         raise RuntimeError(
-            f"Context stack for context type {TypeUtil.name(context)} and context_id={context_id}\n"
+            f"Context stack for context type {typename(context)} and context_id={context_id}\n"
             f"has been cleared inside 'with activate(...)' clause."
         )
     elif expected_stack and context_stack is not expected_stack:
         # Perform this check only if expected_stack is not None
         raise RuntimeError(
-            f"Context stack for context type {TypeUtil.name(context)} and context_id={context_id}\n"
+            f"Context stack for context type {typename(context)} and context_id={context_id}\n"
             f"has been changed inside 'with activate(...)' clause."
         )
 
@@ -155,7 +155,7 @@ def make_inactive(
         context_stack.pop()
     else:
         raise RuntimeError(
-            f"Active context for context type {TypeUtil.name(context)} and context_id={context_id}\n"
+            f"Active context for context type {typename(context)} and context_id={context_id}\n"
             f"has been changed bypassing the context manager."
         )
 
@@ -242,7 +242,7 @@ def active(context_type: type[TRecord] | None, context_id: str | None = None) ->
         return result
     else:
         raise RuntimeError(
-            f"Function active(context_type={TypeUtil.name(context_type)}, context_id={context_id}) invoked outside\n"
+            f"Function active(context_type={typename(context_type)}, context_id={context_id}) invoked outside\n"
             f"'with activate(...) clause for the corresponding (context_key_type, context_id) pair.\n"
             f"Use active_or_none(...) to receive None instead of an exception."
         )

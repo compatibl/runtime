@@ -26,7 +26,7 @@ from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind import ContainerKind
 from cl.runtime.schema.type_decl_key import TypeDeclKey
@@ -110,7 +110,7 @@ class FieldDecl(DataMixin):
             if len(field_args) != 2 or field_args[1] is not type(None):
                 raise RuntimeError(
                     f"Union type hint '{field_type}' for field '{field_name}'\n"
-                    f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                    f"in record '{typename(record_type)}' is not supported for DB schema\n"
                     f"because it is not an optional value using the syntax 'Type | None',\n"
                     f"where None is placed second per the standard convention.\n"
                     f"It cannot be used to specify a choice between two types.\n"
@@ -134,7 +134,7 @@ class FieldDecl(DataMixin):
                 if len(field_args) != 1:
                     raise RuntimeError(
                         f"List type hint '{field_type}' for field '{field_name}'\n"
-                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                        f"in record '{typename(record_type)}' is not supported for DB schema\n"
                         f"because it is not a list of elements using the syntax 'list[type]'.\n"
                         f"Other list type hint formats are not supported.\n"
                     )
@@ -144,7 +144,7 @@ class FieldDecl(DataMixin):
                 if len(field_args) == 1 or (len(field_args) > 1 and field_args[1] is not Ellipsis):
                     raise RuntimeError(
                         f"Tuple type hint '{field_type}' for field '{field_name}'\n"
-                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                        f"in record '{typename(record_type)}' is not supported for DB schema\n"
                         f"because it is not a variable-length tuple using the syntax 'tuple[type, ...]',\n"
                         f"where ellipsis '...' is placed second per the standard convention.\n"
                         f"It cannot be used to specify a fixed size tuple or a tuple with\n"
@@ -156,13 +156,13 @@ class FieldDecl(DataMixin):
                 if len(field_args) != 2 and field_args[0] is not str:
                     raise RuntimeError(
                         f"Dict type hint '{field_type}' for field '{field_name}'\n"
-                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                        f"in record '{typename(record_type)}' is not supported for DB schema\n"
                         f"because it is not a dictionary with string keys using the syntax 'dict[str, type]'.\n"
                         f"It cannot be used to specify a dictionary with keys of a different type.\n"
                     )
                 # TODO: Support dict[str, list[x]]
             else:
-                supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
+                supported_container_names = ", ".join([typename(x) for x in supported_containers])
                 raise RuntimeError(
                     f"Type {field_origin.__name__} is not one of the supported container types "
                     f"{supported_container_names}."
@@ -180,7 +180,7 @@ class FieldDecl(DataMixin):
                     raise RuntimeError(
                         f"Union type hint '{field_type}' for an element of\n"
                         f"the {container.container_kind.name}field '{field_name}'\n"
-                        f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
+                        f"in record '{typename(record_type)}' is not supported for DB schema\n"
                         f"because it is not an optional value using the syntax 'Type | None',\n"
                         f"where None is placed second per the standard convention.\n"
                         f"It cannot be used to specify a choice between two types.\n"

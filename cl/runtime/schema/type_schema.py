@@ -21,7 +21,7 @@ from typing import cast
 from uuid import UUID
 from cl.runtime.records.protocols import DataProtocol
 from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.no_slots_spec import NoSlotsSpec
@@ -74,7 +74,7 @@ class TypeSchema:
     @classmethod
     def for_class(cls, class_: type) -> TypeSpec:
         """Get or create type spec for the specified class."""
-        type_name = TypeUtil.name(class_)
+        type_name = typename(class_)
         if (result := cls._spec_dict.get(type_name, None)) is not None:
             # Already created, return from spec dictionary
             return result
@@ -95,7 +95,7 @@ class TypeSchema:
                 spec_class = NoSlotsSpec
             else:
                 raise RuntimeError(
-                    f"Class {TypeUtil.name(class_)} implements build method but does not\n"
+                    f"Class {typename(class_)} implements build method but does not\n"
                     f"use one of the supported dataclass frameworks and does not\n"
                     f"have a method to generate type spec."
                 )

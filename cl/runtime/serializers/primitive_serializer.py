@@ -34,7 +34,7 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import TPrimitive
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format import BoolFormat
 from cl.runtime.serializers.bytes_format import BytesFormat
@@ -105,7 +105,7 @@ class PrimitiveSerializer(Serializer):
         """
 
         # Get the class of data
-        data_class_name = TypeUtil.name(data)
+        data_class_name = typename(data)
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
@@ -561,14 +561,14 @@ class PrimitiveSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         else:
-            value_class_name = TypeUtil.name(data)
-            serializer_type_name = TypeUtil.name(self)
+            value_class_name = typename(data)
+            serializer_type_name = typename(self)
             raise RuntimeError(f"Class {value_class_name} cannot be serialized using {serializer_type_name}.")
 
     @classmethod
     def _deserialization_error(cls, value: TPrimitive | None, type_name: str, type_format: IntEnum) -> Exception:
         """Error message on deserialization failure."""
-        value_type_name = TypeUtil.name(type(value))
+        value_type_name = typename(type(value))
         value_format_str = f"{type_format.__class__} set to {type_format.name}"
         value_str = f"\n{value}\n" if isinstance(value, str) and "\n" in value else value
         return RuntimeError(

@@ -26,7 +26,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR
 from cl.runtime.settings.project_settings import ProjectSettings
 
@@ -104,7 +104,7 @@ class Settings(DataMixin, ABC):
             - If this method provides an override of the default prefix, the returned prefix must be lowercase
             - and must not start or end with underscore (but may include underscore separators)
         """
-        result = CaseUtil.pascal_to_snake_case(TypeUtil.name(cls)).removesuffix("_settings")
+        result = CaseUtil.pascal_to_snake_case(typename(cls)).removesuffix("_settings")
         result = result if result.endswith("_") else f"{result}_"
         return result
 
@@ -117,7 +117,7 @@ class Settings(DataMixin, ABC):
 
             # Get and validate the field prefix to filter Dynaconf fields for this settings class
             prefix = cls.get_prefix()
-            prefix_description = f"Dynaconf settings prefix '{prefix}' for {TypeUtil.name(cls)}"
+            prefix_description = f"Dynaconf settings prefix '{prefix}' for {typename(cls)}"
             if prefix is None:
                 raise RuntimeError(f"{prefix_description} is None.")
             if prefix == "":
@@ -138,8 +138,8 @@ class Settings(DataMixin, ABC):
             if slots_without_prefix:
                 slots_without_prefix_str = "\n".join(slots_without_prefix)
                 message = (
-                    f"The following fields in {TypeUtil.name(cls)} do not start with the prefix '{prefix}'\n"
-                    f"returned by the '{TypeUtil.name(cls)}.get_prefix' method:\n{slots_without_prefix_str}"
+                    f"The following fields in {typename(cls)} do not start with the prefix '{prefix}'\n"
+                    f"returned by the '{typename(cls)}.get_prefix' method:\n{slots_without_prefix_str}"
                 )
                 raise RuntimeError(message)
 
@@ -185,7 +185,7 @@ class Settings(DataMixin, ABC):
 
                 # Raise exception with detailed information
                 raise ValueError(
-                    f"Required settings field(s) for {TypeUtil.name(cls)} not found:\n{fields_error_msg_str}\n"
+                    f"Required settings field(s) for {typename(cls)} not found:\n{fields_error_msg_str}\n"
                     f"Settings sources searched in the order of priority:\n{settings_sources_str}"
                 )
 

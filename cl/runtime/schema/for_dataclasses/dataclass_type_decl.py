@@ -18,7 +18,7 @@ from typing import Self
 from typing import Set
 from typing import get_type_hints  # TODO: Use TypeHint class instead
 from memoization import cached
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.element_decl import ElementDecl
 from cl.runtime.schema.for_dataclasses.dataclass_field_decl import DataclassFieldDecl
 from cl.runtime.schema.type_decl import TypeDecl
@@ -50,7 +50,7 @@ class DataclassTypeDecl(TypeDecl):
         """
 
         if not dataclasses.is_dataclass(record_type):
-            raise RuntimeError(f"DataclassTypeDecl used for {TypeUtil.name(record_type)} which is not a dataclass.")
+            raise RuntimeError(f"DataclassTypeDecl used for {typename(record_type)} which is not a dataclass.")
 
         # Populate using TypeDecl base
         result = TypeDecl.for_type(record_type, dependencies=dependencies, skip_fields=True)

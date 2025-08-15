@@ -19,7 +19,7 @@ from more_itertools import consume
 
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import KeyProtocol, is_sequence, is_key, is_record, RecordProtocol, is_key_or_record
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 class TypeGuardUtil:
@@ -35,7 +35,7 @@ class TypeGuardUtil:
         ):
             if error_on_fail:
                 raise RuntimeError(
-                    f"Parameter {TypeUtil.name(type_or_name)} is not\n"
+                    f"Parameter {typename(type_or_name)} is not\n"
                     f"a type or a string type name in PascalCase format.")
             else:
                 return False
@@ -52,7 +52,7 @@ class TypeGuardUtil:
         else:
             if error_on_fail:
                 raise RuntimeError(
-                    f"Parameter {TypeUtil.name(types_or_names)} is not a sequence\n"
+                    f"Parameter {typename(types_or_names)} is not a sequence\n"
                     f"(iterable generator is not accepted) of types or\n"
                     f"string type names in PascalCase format.")
             else:
@@ -65,7 +65,7 @@ class TypeGuardUtil:
         """Error if the argument is not a key type."""
         if not isinstance(key_type, type) or not is_key(key_type):
             if error_on_fail:
-                raise RuntimeError(f"Parameter {TypeUtil.name(key_type)} is not a key type.")
+                raise RuntimeError(f"Parameter {typename(key_type)} is not a key type.")
             else:
                 return False
         return True
@@ -78,7 +78,7 @@ class TypeGuardUtil:
         else:
             if error_on_fail:
                 raise RuntimeError(
-                    f"Parameter {TypeUtil.name(keys)} is not a sequence (iterable generator is not accepted).")
+                    f"Parameter {typename(keys)} is not a sequence (iterable generator is not accepted).")
             else:
                 return False
         return True
@@ -89,7 +89,7 @@ class TypeGuardUtil:
         """Error if the argument is not a record type."""
         if not isinstance(record_type, type) or not is_record(record_type):
             if error_on_fail:
-                raise RuntimeError(f"Parameter {TypeUtil.name(record_type)} is not a record type.")
+                raise RuntimeError(f"Parameter {typename(record_type)} is not a record type.")
             else:
                 return False
         return True
@@ -102,7 +102,7 @@ class TypeGuardUtil:
         else:
             if error_on_fail:
                 raise RuntimeError(
-                    f"Parameter {TypeUtil.name(records)} is not a sequence (iterable generator is not accepted).")
+                    f"Parameter {typename(records)} is not a sequence (iterable generator is not accepted).")
             else:
                 return False
         return True
@@ -113,7 +113,7 @@ class TypeGuardUtil:
         """Error if the argument is not a record type."""
         if not isinstance(key_or_record_type, type) or not is_key_or_record(key_or_record_type):
             if error_on_fail:
-                raise RuntimeError(f"Parameter {TypeUtil.name(key_or_record_type)} is not a key or record type.")
+                raise RuntimeError(f"Parameter {typename(key_or_record_type)} is not a key or record type.")
             else:
                 return False
         return True
@@ -131,7 +131,7 @@ class TypeGuardUtil:
         else:
             if error_on_fail:
                 raise RuntimeError(
-                    f"Parameter {TypeUtil.name(keys_or_records)} is not a sequence "
+                    f"Parameter {typename(keys_or_records)} is not a sequence "
                     f"(iterable generator is not accepted).")
             else:
                 return False

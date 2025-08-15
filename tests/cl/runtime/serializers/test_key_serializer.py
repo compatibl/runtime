@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataclassCompositeKey
@@ -48,7 +48,7 @@ def test_serialization():  # TODO: Rename to test_delimited
         assert sample == PytestUtil.approx(deserialized)
 
         # Write to regression guard
-        snake_case_type_name = CaseUtil.pascal_to_snake_case(TypeUtil.name(sample))
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(sample))
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(serialized)
     RegressionGuard().verify_all()
@@ -65,7 +65,7 @@ def test_for_sqlite():
         assert sample == PytestUtil.approx(deserialized)
 
         # Write to regression guard
-        snake_case_type_name = CaseUtil.pascal_to_snake_case(TypeUtil.name(sample))
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(sample))
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(serialized)
     RegressionGuard().verify_all()

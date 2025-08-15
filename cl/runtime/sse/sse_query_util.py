@@ -19,7 +19,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 

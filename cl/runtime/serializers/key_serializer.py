@@ -30,7 +30,7 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_sequence
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
@@ -55,7 +55,7 @@ class KeySerializer(Serializer):
         """Serialize key into a delimited string or a flattened sequence of primitive types."""
 
         # Get the class of data, which may be NoneType
-        data_class_name = TypeUtil.name(data)
+        data_class_name = typename(data)
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
@@ -85,7 +85,7 @@ class KeySerializer(Serializer):
             sequence = self._to_tuple(data)
         else:
             raise RuntimeError(
-                f"{TypeUtil.name(self)} cannot serialize {type(data)}.\n"
+                f"{typename(self)} cannot serialize {type(data)}.\n"
                 f"The input must be a key object, key tuple or None."
             )
 
@@ -94,7 +94,7 @@ class KeySerializer(Serializer):
         if len(invalid_tokens) > 0:
             invalid_tokens_str = "\n".join(str(x) for x in invalid_tokens)
             raise RuntimeError(
-                f"Tuple argument of {TypeUtil.name(self)}.serialize includes non-primitive/non-enum tokens:\n"
+                f"Tuple argument of {typename(self)}.serialize includes non-primitive/non-enum tokens:\n"
                 f"{invalid_tokens_str}"
             )
 
@@ -121,7 +121,7 @@ class KeySerializer(Serializer):
             key_type = schema_class
         else:
             raise RuntimeError(
-                f"Type {TypeUtil.name(schema_class)} passed to {TypeUtil.name(self)}\n"
+                f"Type {typename(schema_class)} passed to {typename(self)}\n"
                 f"is not a key or record type, cannot serialize."
             )
 
@@ -131,7 +131,7 @@ class KeySerializer(Serializer):
             if not isinstance(data, str):
                 raise RuntimeError(
                     f"Key format is DELIMITED but data passed to\n"
-                    f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
+                    f"KeySerializer.deserialize method has type {typename(data)}"
                 )
             sequence = data.split(";")
         elif key_format == KeyFormat.TUPLE:
@@ -139,7 +139,7 @@ class KeySerializer(Serializer):
             if not is_sequence(data):
                 raise RuntimeError(
                     f"Key format is SEQUENCE but data passed to\n"
-                    f"KeySerializer.deserialize method has type {TypeUtil.name(data)}"
+                    f"KeySerializer.deserialize method has type {typename(data)}"
                 )
             # Check each token and create a deque so popleft is available
             sequence = [self._checked_value(x) for x in data]
@@ -150,7 +150,7 @@ class KeySerializer(Serializer):
         tokens = deque(self._checked_value(x) for x in sequence)
 
         # Perform deserialization
-        key_type_hint = (TypeUtil.name(key_type),)
+        key_type_hint = (typename(key_type),)
         result = self._from_sequence(tokens, key_type, key_type_hint, key_type)
 
         # Check if any tokens are remaining
@@ -173,7 +173,7 @@ class KeySerializer(Serializer):
             type_spec = TypeSchema.for_class(type(data))
             if not isinstance(type_spec, DataSpec):
                 raise RuntimeError(
-                    f"Key serializer cannot serialize '{TypeUtil.name(data)}'\nbecause it is not a slotted class."
+                    f"Key serializer cannot serialize '{typename(data)}'\nbecause it is not a slotted class."
                 )
             field_dict = type_spec.get_field_dict()
             # Serialize slot values in the order of declaration packing primitive types into size-one lists
@@ -216,13 +216,13 @@ class KeySerializer(Serializer):
                 )
             if not isinstance(type_spec, DataSpec):
                 raise RuntimeError(
-                    f"Key serializer cannot serialize '{TypeUtil.name(data)}'\nbecause it is not a slotted class."
+                    f"Key serializer cannot serialize '{typename(data)}'\nbecause it is not a slotted class."
                 )
             # Get fields in the order of declaration
             field_dict = type_spec.get_field_dict()
             field_specs = field_dict.values()
             if (primitive_keys_count := len(primitive_keys)) != (field_count := len(field_specs)):
-                key_type_name = TypeUtil.name(key_type) if isinstance(key_type, type) else key_type
+                key_type_name = typename(key_type) if isinstance(key_type, type) else key_type
                 raise RuntimeError(
                     f"The number of primitive keys {primitive_keys_count} does not match the number of\n"
                     f"key fields {field_count} for key type {key_type_name}."
@@ -249,7 +249,7 @@ class KeySerializer(Serializer):
             )
         else:
             raise RuntimeError(
-                f"An inner key field {TypeUtil.name(data)} is not a primitive type, enum, tuple or key object."
+                f"An inner key field {typename(data)} is not a primitive type, enum, tuple or key object."
             )
 
         # Flatten by unpacking the inner tuples

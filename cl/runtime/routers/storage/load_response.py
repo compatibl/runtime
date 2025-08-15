@@ -15,7 +15,7 @@
 from __future__ import annotations
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.schema.type_cache import TypeCache
@@ -63,7 +63,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         loaded_records = active(DataSource).load_many(keys)
 
         # Find the lowest common base of the loaded types except None
-        loaded_record_type_names = tuple(TypeUtil.name(x) for x in loaded_records if x is not None)
+        loaded_record_type_names = tuple(typename(x) for x in loaded_records if x is not None)
 
         # TODO: Decide if this is the right logic to return empty response if records not found
         if loaded_record_type_names:

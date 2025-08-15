@@ -20,7 +20,7 @@ from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 class BootstrapUtil:
@@ -37,7 +37,7 @@ class BootstrapUtil:
         if data is None:
             # Pass through None
             return data
-        elif (data_class_name := TypeUtil.name(data)) in PRIMITIVE_CLASS_NAMES:
+        elif (data_class_name := typename(data)) in PRIMITIVE_CLASS_NAMES:
             # Pass through primitive types
             return data
         elif is_enum(data):
@@ -90,7 +90,7 @@ class BootstrapUtil:
 
     @classmethod
     def _unsupported_object_error(cls, obj: Any) -> Exception:
-        obj_type_name = TypeUtil.name(obj)
+        obj_type_name = typename(obj)
         return RuntimeError(
             f"Class {obj_type_name} cannot be a record or its field. Supported types include:\n"
             f"  1. Classes that implement 'build' method;\n"

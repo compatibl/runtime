@@ -22,7 +22,7 @@ from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
@@ -74,7 +74,7 @@ def save_records_to_csv(records: Iterable, file_path: str) -> None:
 
 
 def save_test_records(entries: list[RecordProtocol]) -> tuple[list[RecordProtocol], Path]:
-    file_path = Path(__file__).parent.joinpath(f"{TypeUtil.name(entries[0])}.csv")
+    file_path = Path(__file__).parent.joinpath(f"{typename(entries[0])}.csv")
     save_records_to_csv(entries, str(file_path.absolute()))
     return entries, file_path
 

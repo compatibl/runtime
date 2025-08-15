@@ -27,7 +27,7 @@ from cl.runtime.experiments.trial_key_query import TrialKeyQuery
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.plots.plot import Plot
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.views.png_view import PngView
 
 TTrial = TypeVar("TTrial", bound=Trial)
@@ -53,11 +53,11 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.max_trials is not None and self.max_trials <= 0:
             raise RuntimeError(
-                f"{TypeUtil.name(self)}.max_trials={self.max_trials}. It must be None or a positive number."
+                f"{typename(self)}.max_trials={self.max_trials}. It must be None or a positive number."
             )
         if self.max_parallel is not None and self.max_parallel <= 0:
             raise RuntimeError(
-                f"{TypeUtil.name(self)}.max_parallel={self.max_parallel}. It must be None or a positive number."
+                f"{typename(self)}.max_parallel={self.max_parallel}. It must be None or a positive number."
             )
 
     @abstractmethod
@@ -177,7 +177,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         if result == 0:
             raise RuntimeError(
                 f"The maximum number of trials ({self.max_trials}) has already been reached\n"
-                f"for {TypeUtil.name(self)} with experiment_id={self.experiment_id}."
+                f"for {typename(self)} with experiment_id={self.experiment_id}."
             )
         return result
 

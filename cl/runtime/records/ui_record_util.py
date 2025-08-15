@@ -25,7 +25,7 @@ from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
@@ -147,7 +147,7 @@ class UiRecordUtil(DataMixin):
         if not handlers or not (
             viewer_name := next((h.name for h in handlers if h.label == panel_id and h.type_ == "Viewer"), None)
         ):
-            raise RuntimeError(f"Type {TypeUtil.name(record)} has no view named '{panel_id}'.")
+            raise RuntimeError(f"Type {typename(record)} has no view named '{panel_id}'.")
 
         # Call viewer method and get the result.
         viewer = getattr(record, f"view_{viewer_name}")

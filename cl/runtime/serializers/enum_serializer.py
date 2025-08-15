@@ -18,7 +18,7 @@ from typing import Any
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.enum_format import EnumFormat
 from cl.runtime.serializers.none_format import NoneFormat
@@ -46,7 +46,7 @@ class EnumSerializer(Serializer):
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
         elif isinstance(data, Enum):
             # Check that schema type matches if specified
-            if type_hint is not None and type_hint.schema_type_name != (data_type_name := TypeUtil.name(data)):
+            if type_hint is not None and type_hint.schema_type_name != (data_type_name := typename(data)):
                 raise RuntimeError(
                     f"Enum value type {data_type_name} does not match the schema type {type_hint.schema_type_name}."
                 )
@@ -60,7 +60,7 @@ class EnumSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormat)
         else:
-            value_type_name = TypeUtil.name(type(data))
+            value_type_name = typename(type(data))
             raise RuntimeError(f"Type {value_type_name} provided to {self.__class__.__name__} is not an enum type.")
 
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
@@ -85,12 +85,12 @@ class EnumSerializer(Serializer):
                     # Serialized value is name without type in PascalCase, convert to UPPER_CASE
                     return enum_type[CaseUtil.pascal_to_upper_case(data)]
                 except KeyError:
-                    enum_type_name = TypeUtil.name(enum_type)
+                    enum_type_name = typename(enum_type)
                     raise RuntimeError(f"Enum type {enum_type_name} does not include the item {data}.")
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormat)
         else:
-            schema_type_name = TypeUtil.name(enum_type)
+            schema_type_name = typename(enum_type)
             raise RuntimeError(
                 f"Schema type {schema_type_name} provided to {self.__class__.__name__} is not an enum type."
             )

@@ -32,7 +32,7 @@ from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key import TableBindingKey
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.server.env import Env
@@ -275,7 +275,7 @@ class Db(DbKey, RecordMixin, ABC):
             # Do not register TableBinding record, as a result it will not be present in REST API
             return
 
-        record_type_name = TypeUtil.name(record_type)
+        record_type_name = typename(record_type)
         if record_type_name not in (record_type_name_set := self._get_record_type_set(dataset=dataset)):
 
             # If the record type is not yet in cache, add parent types to DB and cache
@@ -283,7 +283,7 @@ class Db(DbKey, RecordMixin, ABC):
             bindings = tuple(
                 TableBinding(
                     record_type_name=parent_type_name,
-                    key_type_name=TypeUtil.name(record_type.get_key_type()),
+                    key_type_name=typename(record_type.get_key_type()),
                 ).build()
                 for parent_type_name in parent_type_names
             )

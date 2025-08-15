@@ -15,7 +15,7 @@
 import sys
 from collections import Counter
 from memoization import cached
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 # We rely on __slots__ from base being included in __slots__ of descendants in Python 3.11+
 if sys.version_info < (3, 11):
@@ -58,12 +58,12 @@ class SlotsUtil:
                 duplicates_str = ", ".join(duplicates)
                 raise RuntimeError(
                     f"Duplicate field names found in class hierarchy "
-                    f"for {TypeUtil.name(data_type)}: {duplicates_str}."
+                    f"for {typename(data_type)}: {duplicates_str}."
                 )
             return result
         else:
             # Error message if no __slots__ attribute is found
             raise RuntimeError(
-                f"Cannot obtain field names from slots for type {TypeUtil.name(data_type)}\n"
+                f"Cannot obtain field names from slots for type {typename(data_type)}\n"
                 f"because it does not have the '__slots__' attribute."
             )

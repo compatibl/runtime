@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from typing import Self
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 class LifecycleMixin:
@@ -29,12 +29,12 @@ class LifecycleMixin:
         """Supports 'with' operator for resource initialization and disposal."""
         if self.__entered:
             raise RuntimeError(
-                f"{TypeUtil.name(self)}.__enter__ is called twice, which may happen\n"
+                f"{typename(self)}.__enter__ is called twice, which may happen\n"
                 f"when the same instance is used in two nested 'with' clauses."
             )
         if self.__exited:
             raise RuntimeError(
-                f"{TypeUtil.name(self)}.__enter__ is called after __exit__, which may happen\n"
+                f"{typename(self)}.__enter__ is called after __exit__, which may happen\n"
                 f"when the same instance is used in two separate 'with' clauses."
             )
         self.__entered = True
@@ -44,12 +44,12 @@ class LifecycleMixin:
         """Supports 'with' operator for resource initialization and disposal."""
         if not self.__entered:
             raise RuntimeError(
-                f"{TypeUtil.name(self)}.__exit__ is called before __enter__, which may happen\n"
+                f"{typename(self)}.__exit__ is called before __enter__, which may happen\n"
                 f"when the same instance is used in two interleaved 'with' clauses."
             )
         if self.__exited:
             raise RuntimeError(
-                f"{TypeUtil.name(self)}.__exit__ is called twice, which may happen\n"
+                f"{typename(self)}.__exit__ is called twice, which may happen\n"
                 f"when the same instance is used in two interleaved 'with' clauses."
             )
         self.__exited = True
@@ -58,6 +58,6 @@ class LifecycleMixin:
         """Check that __enter__ has been invoked but __exit__ has not."""
         self.check_frozen()  # noqa Implemented in DataMixin
         if not self.__entered:
-            raise RuntimeError(f"{TypeUtil.name(self)} is used outside of a 'with' clause.")
+            raise RuntimeError(f"{typename(self)} is used outside of a 'with' clause.")
         if self.__exited:
-            raise RuntimeError(f"{TypeUtil.name(self)} is used after exit from a 'with' clause.")
+            raise RuntimeError(f"{typename(self)} is used after exit from a 'with' clause.")

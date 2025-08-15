@@ -15,7 +15,7 @@
 import dataclasses
 from dataclasses import dataclass
 from typing import Self
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.field_spec import FieldSpec
 
@@ -29,7 +29,7 @@ class DataclassSpec(DataSpec):
         """Create spec from class, subtype is not permitted."""
 
         # Perform checks
-        type_name = TypeUtil.name(class_)
+        type_name = typename(class_)
         if not dataclasses.is_dataclass(class_):
             raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it is not a dataclass.")
         if subtype is not None:

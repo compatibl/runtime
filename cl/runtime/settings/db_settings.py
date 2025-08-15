@@ -16,7 +16,7 @@ import os
 from dataclasses import dataclass
 from typing_extensions import final
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
 
@@ -65,7 +65,7 @@ class DbSettings(Settings):
             raise RuntimeError(f"Field 'db_name' in settings.yaml must be None or a string.")
 
         if not isinstance(self.db_type, str):
-            raise RuntimeError(f"{TypeUtil.name(self)} field 'db_type' must be Db class name in PascalCase format.")
+            raise RuntimeError(f"{typename(self)} field 'db_type' must be Db class name in PascalCase format.")
 
     @classmethod
     def get_db_dir(cls) -> str:

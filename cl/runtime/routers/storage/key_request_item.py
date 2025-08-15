@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -48,6 +48,6 @@ class KeyRequestItem(BaseModel):
             raise RuntimeError(f"The object {str(record_or_key)}) is neither a record nor a key.")
 
         key_ = _KEY_SERIALIZER.serialize(key)
-        type_ = TypeUtil.name(key)
+        type_ = typename(key)
 
         return cls(key=key_, type=type_)

@@ -20,7 +20,7 @@ from typing_extensions import override
 from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
@@ -36,7 +36,7 @@ class StaticMethodTask(MethodTask):
     def _create_log_context(self) -> TaskLog:
         """Create TaskLog with task specific info."""
         return TaskLog(
-            record_type_name=TypeUtil.name(TypeCache.from_qual_name(self.type_str)),
+            record_type_name=typename(TypeCache.from_qual_name(self.type_str)),
             handler=self._title_handler_name(self.method_name),
             task_run_id=self.task_id,
         ).build()
@@ -67,7 +67,7 @@ class StaticMethodTask(MethodTask):
 
         # Populate known fields
         result = cls(queue=queue)
-        result.type_str = f"{record_type.__module__}.{TypeUtil.name(record_type)}"
+        result.type_str = f"{record_type.__module__}.{typename(record_type)}"
 
         # Check that __self__ is either absent (@staticmethod) or is a class (@classmethod)
         if (method_cls := getattr(method_callable, "__self__", None)) is not None and not inspect.isclass(method_cls):
@@ -90,5 +90,5 @@ class StaticMethodTask(MethodTask):
 
         # Set label and return
         method_name_pascal_case = CaseUtil.snake_to_pascal_case(result.method_name)
-        result.label = f"{TypeUtil.name(record_type)};{method_name_pascal_case}"
+        result.label = f"{typename(record_type)};{method_name_pascal_case}"
         return result

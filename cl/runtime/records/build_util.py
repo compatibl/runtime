@@ -23,7 +23,7 @@ from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.data_spec_util import DataSpecUtil
 from cl.runtime.schema.type_hint import TypeHint
@@ -42,7 +42,7 @@ class BuildUtil:
         (3) Validates root level object against the schema and calls its 'mark_frozen' method
         """
         # Get the class of data, which may be NoneType
-        data_class_name = TypeUtil.name(data)
+        data_class_name = typename(data)
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
@@ -145,7 +145,7 @@ class BuildUtil:
 
     @classmethod
     def _unsupported_object_error(cls, obj: Any) -> Exception:
-        obj_type_name = TypeUtil.name(obj)
+        obj_type_name = typename(obj)
         return RuntimeError(
             f"Class {obj_type_name} cannot be a record or its field. Supported types include:\n"
             f"  1. Classes that implement 'build' method;\n"

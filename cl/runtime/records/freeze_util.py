@@ -19,7 +19,7 @@ from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 class FreezeUtil:
@@ -49,6 +49,6 @@ class FreezeUtil:
                 return data.mark_frozen()
         else:
             raise RuntimeError(
-                f"Cannot freeze data of type {TypeUtil.name(data)} because it is not a\n"
+                f"Cannot freeze data of type {typename(data)} because it is not a\n"
                 f"primitive type, enum, sequence, mapping or a freezable class."
             )

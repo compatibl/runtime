@@ -14,7 +14,7 @@
 
 from typing import Any
 from cl.runtime.records.protocols import TObj
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 class CastUtil:
@@ -29,7 +29,7 @@ class CastUtil:
         if obj is not None:
             return cls.cast_or_none(cast_to, obj)
         else:
-            raise RuntimeError(f"Cannot cast None to type {TypeUtil.name(cast_to)}, use cast_or_none to allow.")
+            raise RuntimeError(f"Cannot cast None to type {typename(cast_to)}, use cast_or_none to allow.")
 
     @classmethod
     def cast_or_none(cls, cast_to: type[TObj], obj: Any) -> TObj:
@@ -40,4 +40,4 @@ class CastUtil:
         if obj is None or isinstance(obj, cast_to):
             return obj
         else:
-            raise RuntimeError(f"Cannot cast an object of type {TypeUtil.name(obj)} to type {TypeUtil.name(cast_to)}.")
+            raise RuntimeError(f"Cannot cast an object of type {typename(obj)} to type {typename(cast_to)}.")

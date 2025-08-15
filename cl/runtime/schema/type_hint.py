@@ -24,7 +24,7 @@ from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 
 
 @dataclass(slots=True, kw_only=True)
@@ -105,7 +105,7 @@ class TypeHint(BootstrapMixin):
     ) -> Self:
         """Create type hint for a class with optional parameters."""
 
-        class_name = TypeUtil.name(class_)
+        class_name = typename(class_)
         if (
             schema_type_name is None
             or (schema_type_name == "long" and class_ is int)
@@ -186,7 +186,7 @@ class TypeHint(BootstrapMixin):
                 if len(args) != 1:
                     raise RuntimeError(
                         f"Union type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                        f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported.\n"
+                        f"for field {field_name} in {typename(containing_type)} is not supported.\n"
                         f"Expected forms: 'T', 'T | None', 'T | Condition[T]', or 'T | Condition[T] | None'.\n"
                     )
 
@@ -211,7 +211,7 @@ class TypeHint(BootstrapMixin):
                     if len(type_alias_args) != 1:
                         raise RuntimeError(
                             f"List type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                            f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
+                            f"for field {field_name} in {typename(containing_type)} is not supported\n"
                             f"because it is not a list of elements using the syntax 'list[type]'\n"
                         )
                     # Populate container data and extract inner type alias
@@ -228,7 +228,7 @@ class TypeHint(BootstrapMixin):
                     if len(type_alias_args) != 2 or type_alias_args[1] is not Ellipsis:
                         raise RuntimeError(
                             f"Tuple type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                            f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
+                            f"for field {field_name} in {typename(containing_type)} is not supported\n"
                             f"because it is not a variable-length tuple using the syntax 'tuple[type, ...]'\n"
                         )
                     type_alias = type_alias_args[0]
@@ -244,7 +244,7 @@ class TypeHint(BootstrapMixin):
                     if len(type_alias_args) != 2 or type_alias_args[0] is not str:
                         raise RuntimeError(
                             f"Dict type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                            f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
+                            f"for field {field_name} in {typename(containing_type)} is not supported\n"
                             f"because it is not a dictionary with string keys using the syntax 'dict[str, type]'\n"
                         )
                     type_alias = type_alias_args[1]
@@ -257,7 +257,7 @@ class TypeHint(BootstrapMixin):
                         )
                     )
                 else:
-                    supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
+                    supported_container_names = ", ".join([typename(x) for x in supported_containers])
                     raise RuntimeError(
                         f"Container type {type_alias_origin.__name__} is not one of the supported container types "
                         f"{supported_container_names}."
@@ -270,7 +270,7 @@ class TypeHint(BootstrapMixin):
                 # Not a container: must be a genuine type (not TypeAlias)
                 if isinstance(type_alias, type):
                     if type_alias_origin is None and not type_alias_args:
-                        schema_type_name = TypeUtil.name(type_alias)
+                        schema_type_name = typename(type_alias)
                         if field_subtype is None or field_subtype == schema_type_name:
                             type_hint_tokens.append(
                                 TypeHint(

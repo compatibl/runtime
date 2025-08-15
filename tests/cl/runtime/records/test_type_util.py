@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassDerived
 

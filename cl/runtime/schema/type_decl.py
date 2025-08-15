@@ -34,7 +34,7 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.element_decl import ElementDecl
 from cl.runtime.schema.field_decl import FieldDecl
 from cl.runtime.schema.handler_declare_block_decl import HandlerDeclareBlockDecl
@@ -54,7 +54,7 @@ def for_type_key_maker(
 ) -> str:
     """Custom key marker for 'for_type' class method."""
     # TODO: Replace by lambda if skip_fields parameter is removed
-    return f"{record_type.__module__}.{TypeUtil.name(record_type)}.{dependencies.__hash__}{skip_fields}{skip_handlers}"
+    return f"{record_type.__module__}.{typename(record_type)}.{dependencies.__hash__}{skip_fields}{skip_handlers}"
 
 
 def get_name_of_type_decl_dict(dict_: dict[str, Dict]) -> str | None:
@@ -175,17 +175,17 @@ class TypeDecl(TypeDeclKey, RecordMixin):
         elif is_data(record_type):
             result.type_kind = TypeKind.DATA
         elif is_enum(record_type):
-            raise RuntimeError(f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} because it is an enum.")
+            raise RuntimeError(f"Cannot create TypeDecl for class {typename(record_type)} because it is an enum.")
         elif issubclass(record_type, tuple):
-            raise RuntimeError(f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} because it is a tuple.")
+            raise RuntimeError(f"Cannot create TypeDecl for class {typename(record_type)} because it is a tuple.")
         else:
             raise RuntimeError(
-                f"Cannot create TypeDecl for class {TypeUtil.name(record_type)} "
+                f"Cannot create TypeDecl for class {typename(record_type)} "
                 f"because it is not a record, key or data."
             )
 
         result.module = ModuleDeclKey().build()
-        result.name = TypeUtil.name(record_type)
+        result.name = typename(record_type)
         result.label = titleize(result.name)  # TODO: Add override from settings
         result.comment = record_type.__doc__
 
@@ -198,7 +198,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
         # Iterate over MRO types
         for mro_type in record_type.__mro__:
             # TODO: Refactor to make it work not only for dataclasses
-            mro_type_name = TypeUtil.name(mro_type)
+            mro_type_name = typename(mro_type)
             if mro_type is not record_type and dataclasses.is_dataclass(mro_type):
                 if not result.inherit:
                     # The first class in MRO sequence other than self is the direct parent
@@ -290,7 +290,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
         type_decl_obj = cls.for_type(record_type, dependencies=dependencies)
 
         # Sort the list of dependencies
-        dependencies = sorted(dependencies, key=lambda x: TypeUtil.name(x))
+        dependencies = sorted(dependencies, key=lambda x: typename(x))
 
         # TODO: Restore after Enum decl generation is supported
         dependencies = [dependency_type for dependency_type in dependencies if not issubclass(dependency_type, Enum)]

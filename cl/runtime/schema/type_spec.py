@@ -23,7 +23,7 @@ from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
 
 
@@ -48,7 +48,7 @@ class TypeSpec(BootstrapMixin, ABC):
 
         # Set type name unless already set
         if self.type_name is None:
-            self.type_name = TypeUtil.name(self._class)
+            self.type_name = typename(self._class)
 
         # Set type kind
         if is_primitive(self._class):

@@ -21,7 +21,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.schema.type_cache import TypeCache
@@ -103,7 +103,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         table_dict = {k: v for k, v in DataSerializers.FOR_UI.serialize(record).items() if k in table_fields}
 
         # Add "_t" and "_key" attributes
-        table_dict["_t"] = TypeUtil.name(record)
+        table_dict["_t"] = typename(record)
         table_dict["_key"] = KeySerializers.DELIMITED.serialize(record.get_key())
 
         return table_dict

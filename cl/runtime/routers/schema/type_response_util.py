@@ -15,7 +15,7 @@
 from __future__ import annotations
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 from cl.runtime.schema.type_cache import TypeCache
@@ -44,7 +44,7 @@ class TypeResponseUtil:
         result = TypeDecl.as_dict_with_dependencies(record_type)
 
         # Find an element in the results for a record type to use as the basis for a synthetic table item
-        record_type_key_in_result = f"{ModuleDeclKey().build().module_name}.{TypeUtil.name(record_type)}"
+        record_type_key_in_result = f"{ModuleDeclKey().build().module_name}.{typename(record_type)}"
         record_type_result = result.get(record_type_key_in_result)
 
         # Add synthetic table item to schema

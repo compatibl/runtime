@@ -40,7 +40,7 @@ from cl.runtime.records.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.table_binding import TableBinding
 from cl.runtime.records.table_binding_key_query_by_table import TableBindingKeyQueryByTable
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_guard_util import TypeGuardUtil
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -82,7 +82,7 @@ class DataSource(DataSourceKey, RecordMixin):
         elif is_key(self.db):
             self.db = self.load_one(self.db)
 
-        _LOGGER.info(f"Connected to DB type '{TypeUtil.name(self.db)}', db_id = '{self.db.db_id}'.")
+        _LOGGER.info(f"Connected to DB type '{typename(self.db)}', db_id = '{self.db.db_id}'.")
 
         # Load dataset, use root dataset if not specified
         if self.dataset is None:
@@ -116,14 +116,14 @@ class DataSource(DataSourceKey, RecordMixin):
             result = self.load_one_or_none(record_or_key, cast_to=cast_to)
             if result is None:
                 key_str = KeySerializers.DELIMITED.serialize(record_or_key.get_key())
-                cast_to_str = f"\nwhen loading type {TypeUtil.name(cast_to)}" if cast_to else ""
+                cast_to_str = f"\nwhen loading type {typename(cast_to)}" if cast_to else ""
                 raise RuntimeError(
                     f"Record not found for key {key_str}{cast_to_str}.\n"
                     f"Use 'load_one_or_none' method to return None instead of raising an error."
                 )
             return result
         else:
-            cast_to_str = f"\nwhen loading type {TypeUtil.name(cast_to)}" if cast_to else ""
+            cast_to_str = f"\nwhen loading type {typename(cast_to)}" if cast_to else ""
             raise RuntimeError(
                 f"Parameter 'record_or_key' is None for load_one method{cast_to_str}.\n"
                 f"Use 'load_one_or_none' method to return None instead of raising an error."
@@ -181,8 +181,8 @@ class DataSource(DataSourceKey, RecordMixin):
                 invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
                 raise RuntimeError(
                     f"Parameter 'records_or_keys' of a load method in DataSource includes the following keys\n"
-                    f"whose type is not the same as the key type {TypeUtil.name(key_type)}\n"
-                    f"of the cast_to parameter {TypeUtil.name(cast_to)}:\n{invalid_keys_str}"
+                    f"whose type is not the same as the key type {typename(key_type)}\n"
+                    f"of the cast_to parameter {typename(cast_to)}:\n{invalid_keys_str}"
                 )
             # Check that the records in the input list are derived from cast_to
             invalid_records = [x for x in records_or_keys if is_record(x) and not isinstance(x, cast_to)]
@@ -190,7 +190,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 invalid_records_str = "\n".join(str(x) for x in invalid_records)
                 raise RuntimeError(
                     f"Parameter 'records_or_keys' of a load method in DataSource includes the following records\n"
-                    f"that are not derived from the cast_to parameter {TypeUtil.name(cast_to)}:\n{invalid_records_str}"
+                    f"that are not derived from the cast_to parameter {typename(cast_to)}:\n{invalid_records_str}"
                 )
 
         # Check that all records or keys in object format are frozen

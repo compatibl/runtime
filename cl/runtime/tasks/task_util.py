@@ -15,7 +15,7 @@
 from cl.runtime import TypeCache
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
@@ -58,8 +58,8 @@ class TaskUtil:
                     # Get key type from table
                     key_type = active(DataSource).get_bound_key_type(table=request.type)
 
-                key_type_str = f"{key_type.__module__}.{TypeUtil.name(key_type)}"
-                label = f"{TypeUtil.name(key_type)};{serialized_key};{handler_name}"
+                key_type_str = f"{key_type.__module__}.{typename(key_type)}"
+                label = f"{typename(key_type)};{serialized_key};{handler_name}"
                 handler_task = InstanceMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),
@@ -72,8 +72,8 @@ class TaskUtil:
             else:
                 # Key is None, this is a @classmethod or @staticmethod
                 record_type = TypeCache.from_type_name(request.type)
-                record_type_str = f"{record_type.__module__}.{TypeUtil.name(record_type)}"
-                label = f"{TypeUtil.name(record_type)};{handler_name}"
+                record_type_str = f"{record_type.__module__}.{typename(record_type)}"
+                label = f"{typename(record_type)};{handler_name}"
                 handler_task = StaticMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),

@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.ui.ui_app_state import UiAppState
@@ -62,7 +62,7 @@ def test_type_decl():
     for record_type in _SAMPLE_TYPES:
 
         # Get type declaration
-        type_name = TypeUtil.name(record_type)
+        type_name = typename(record_type)
         type_decl: TypeDecl = TypeDecl.for_type(record_type)
         assert type_decl is not None
 

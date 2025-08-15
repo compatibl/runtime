@@ -16,7 +16,7 @@ import typing
 from dataclasses import dataclass
 from typing import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 
 
@@ -86,12 +86,12 @@ class FieldSpec(BootstrapMixin):
         if field_optional is not None and field_optional != bool(type_hint.optional):
             if field_optional:
                 raise RuntimeError(
-                    f"Field {TypeUtil.name(containing_type)}.{field_name} uses '= optional()'\n"
+                    f"Field {typename(containing_type)}.{field_name} uses '= optional()'\n"
                     f"but type hint is not a union with None: {type_hint.to_str()}"
                 )
             if not field_optional:
                 raise RuntimeError(
-                    f"Field {TypeUtil.name(containing_type)}.{field_name} uses '= required()'\n"
+                    f"Field {typename(containing_type)}.{field_name} uses '= required()'\n"
                     f"but type hint is a union with None: {type_hint.to_str()}"
                 )
 

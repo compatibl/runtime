@@ -32,7 +32,7 @@ from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.query_mixin import QueryMixin
-from cl.runtime.records.type_util import TypeUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_guard_util import TypeGuardUtil
 from cl.runtime.schema.type_kind import TypeKind
@@ -187,8 +187,8 @@ class BasicMongoDb(Db):
         elif not issubclass(restrict_to, query_target_type):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
-                f"of the query target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+                f"In {typename(self)}.load_where, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"of the query target type {typename(query_target_type)} for {typename(query)}."
             )
 
         # Filter by restrict_to if specified
@@ -254,8 +254,8 @@ class BasicMongoDb(Db):
         elif not issubclass(restrict_to, query_target_type):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {TypeUtil.name(self)}.load_where, restrict_to={TypeUtil.name(restrict_to)} is not a subclass\n"
-                f"of the target type {TypeUtil.name(query_target_type)} for {TypeUtil.name(query)}."
+                f"In {typename(self)}.load_where, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 
         # Filter by restrict_to if specified
@@ -374,7 +374,7 @@ class BasicMongoDb(Db):
             self._mongo_collection_dict = {}
         if (result := self._mongo_collection_dict.get(key_type, None)) is None:
             mongo_db = self._get_mongo_db()
-            key_type_name = TypeUtil.name(key_type)
+            key_type_name = typename(key_type)
             if key_type_name.endswith("Key"):
                 # The suffix Key is enforced in type cache, add another check here for  safety before removing the suffix
                 collection_name = key_type_name.removesuffix("Key")
@@ -448,11 +448,11 @@ class BasicMongoDb(Db):
             # Check that it matches the key type obtained from the query
             if restrict_to != key_type:
                 raise RuntimeError(
-                    f"Parameter restrict_to={TypeUtil.name(restrict_to)} does not match "
-                    f"key_type={TypeUtil.name(key_type)}."
+                    f"Parameter restrict_to={typename(restrict_to)} does not match "
+                    f"key_type={typename(key_type)}."
                 )
         else:
-            raise RuntimeError(f"Parameter restrict_to={TypeUtil.name(restrict_to)} is not a key or record.")
+            raise RuntimeError(f"Parameter restrict_to={typename(restrict_to)} is not a key or record.")
 
     @classmethod
     def _apply_limit_and_skip(
