@@ -19,27 +19,27 @@ from stubs.cl.runtime import StubDataclass, StubDataclassKey
 from stubs.cl.runtime import StubDataclassDerived
 
 
-def test_check_type():
-    """Test for TypeCheck.check_type method."""
-    TypeCheck.check_type(int, int)
-    TypeCheck.check_type(StubDataclass, StubDataclass)
+def test_is_same_type():
+    """Test for is_same_type method."""
+    TypeCheck.is_same_type(int, int)
+    TypeCheck.is_same_type(StubDataclass, StubDataclass)
     with pytest.raises(Exception):
-        TypeCheck.check_type(int, float)
+        TypeCheck.is_same_type(int, float)
     with pytest.raises(Exception):
-        TypeCheck.check_type(int, StubDataclass)
+        TypeCheck.is_same_type(int, StubDataclass)
     with pytest.raises(Exception):
-        TypeCheck.check_type(StubDataclassDerived, StubDataclass)
+        TypeCheck.is_same_type(StubDataclassDerived, StubDataclass)
 
 
-def test_check_subtype():
-    """Test for TypeCheck.check_subtype method."""
-    TypeCheck.check_subtype(int, int)
-    TypeCheck.check_subtype(StubDataclass, StubDataclass)
-    TypeCheck.check_subtype(StubDataclassDerived, StubDataclass)
+def test_is_same_type_or_subtype():
+    """Test for test_is_same_type_or_subtype method."""
+    TypeCheck.is_same_type_or_subtype(int, int)
+    TypeCheck.is_same_type_or_subtype(StubDataclass, StubDataclass)
+    TypeCheck.is_same_type_or_subtype(StubDataclassDerived, StubDataclass)
     with pytest.raises(Exception):
-        TypeCheck.check_subtype(int, float)
+        TypeCheck.is_same_type_or_subtype(int, float)
     with pytest.raises(Exception):
-        TypeCheck.check_subtype(int, StubDataclass)
+        TypeCheck.is_same_type_or_subtype(int, StubDataclass)
 
 
 def test_is_key_type():
@@ -49,7 +49,6 @@ def test_is_key_type():
         TypeCheck.is_key_type(StubDataclass)
     with pytest.raises(Exception):
         TypeCheck.is_key_type(int)
-
 
 
 if __name__ == "__main__":
