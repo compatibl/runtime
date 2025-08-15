@@ -65,13 +65,13 @@ class TypeCache:
 
     @classmethod
     @cached
-    def is_type(cls, type_name: str, *, type_kind: TypeKind | None = None) -> bool:
+    def type_name_found(cls, type_name: str, *, type_kind: TypeKind | None = None) -> bool:
         """
-        Get fully qualified name in module.ClassName format from the class, filter by TypeKind if specified.
+        Return True if type name is found in cache and matches type_kind if provided.
 
         Args:
             type_name: Type name in PascalCase format
-            type_kind: Restrict to the specified type kind if provided (optional)
+            type_kind: True only if matches the specified type kind if provided (optional)
         """
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
@@ -193,7 +193,7 @@ class TypeCache:
         if (type_info := cls._type_info_by_type_name_dict.get(record_type, None)) is not None:
             result = type_info.parent_record_type_names
             if type_kind is not None:
-                result = tuple(x for x in result if cls.is_type(x, type_kind=type_kind))
+                result = tuple(x for x in result if cls.type_name_found(x, type_kind=type_kind))
             return result
         else:
             raise cls._type_name_not_found_error(record_type)
@@ -221,7 +221,7 @@ class TypeCache:
             child_record_type_names = type_info.child_record_type_names
             if type_kind is not None:
                 child_record_type_names = tuple(
-                    x for x in child_record_type_names if cls.is_type(x, type_kind=type_kind)
+                    x for x in child_record_type_names if cls.type_name_found(x, type_kind=type_kind)
                 )
 
             # Sort child types by depth in hierarchy

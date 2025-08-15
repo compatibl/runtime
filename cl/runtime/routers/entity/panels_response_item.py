@@ -45,7 +45,7 @@ class PanelsResponseItem(BaseModel):
         """Implements /entity/panels route."""
 
         # TODO: !!! Do not rely on first element to detect type
-        if TypeCache.is_type(request.type_name):
+        if TypeCache.type_name_found(request.type_name):
             record_type_name = request.type_name
         else:
             bound_type_names = active(DataSource).get_bound_record_type_names(table=request.type_name)

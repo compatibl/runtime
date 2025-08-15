@@ -49,7 +49,7 @@ class PanelResponseUtil:
         """Implements /entity/panel route."""
 
         # Get the key type
-        if TypeCache.is_type(request.type_name):
+        if TypeCache.type_name_found(request.type_name):
             # Static type is passed as type_name
             type_ = TypeCache.from_type_name(request.type_name)
             key_type = type_.get_key_type()
