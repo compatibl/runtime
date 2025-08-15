@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from cl.runtime.db.filter import Filter
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.typename import typename
 
 
 @dataclass(slots=True, kw_only=True)
@@ -24,3 +25,10 @@ class FilterWhere(Filter):
 
     query: QueryMixin = required()
     """Query used to perform filtering."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        # Set key_type_name in this class based on the query target type
+        target_type = self.query.get_target_type()
+        key_type = target_type.get_key_type()
+        self.key_type_name = typename(key_type)

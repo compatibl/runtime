@@ -25,3 +25,4 @@ class Filter(FilterKey, RecordMixin, ABC):
 
     def get_key(self) -> FilterKey:
         return FilterKey(filter_id=self.filter_id, key_type_name=self.key_type_name).build()
+

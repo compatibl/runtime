@@ -45,12 +45,7 @@ def _test_filter(*, filter: Filter, expected_values: Sequence[str]):
     active(DataSource).save_many(records)
 
     # Load records using the filter
-    if isinstance(loaded_filter, FilterWhere):
-        loaded_records = active(DataSource).load_where(loaded_filter.query, cast_to=StubDataclassDerived)
-    elif isinstance(loaded_filter, FilterMany):
-        loaded_records = active(DataSource).load_many(loaded_filter.keys, cast_to=StubDataclassDerived)
-    else:
-        raise RuntimeError(f"Unsupported filter type: {typename(loaded_filter)}")
+    loaded_records = active(DataSource).load_filter(loaded_filter, cast_to=StubDataclassDerived)
 
     # Check if they match the expected values
     assert len(loaded_records) == len(expected_values)

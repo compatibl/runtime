@@ -16,6 +16,9 @@ from dataclasses import dataclass
 from cl.runtime.db.filter import Filter
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.type_check import TypeCheck
+from cl.runtime.records.typename import typename
 
 
 @dataclass(slots=True, kw_only=True)
@@ -24,3 +27,20 @@ class FilterMany(Filter):
 
     keys: list[KeyMixin] = required()
     """The filter selects records with the specified keys."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        # Perform checks to ensure all keys list elements are keys, and all have the same key type
+        assert TypeCheck.is_key_sequence(self.keys)
+        if self.keys:
+            key_type = type(self.keys[0])
+            mismatched_types = [typename(key) for key in self.keys if type(key) != key_type]
+            if mismatched_types:
+                mismatched_types_str = ', '.join(mismatched_types)
+                raise RuntimeError(f"Keys in FilterMany have more than one type: {mismatched_types_str}")
+        else:
+            raise RuntimeError(f"FilterMany must have at least one key.")
+
+        # Set key_type_name in this class based on the key type of self.keys
+        self.key_type_name = typename(key_type)

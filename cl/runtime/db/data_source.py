@@ -25,6 +25,9 @@ from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
 from cl.runtime.db.db_key import DbKey
+from cl.runtime.db.filter import Filter
+from cl.runtime.db.filter_many import FilterMany
+from cl.runtime.db.filter_where import FilterWhere
 from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.cast_util import CastUtil
@@ -99,7 +102,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_one(
         self,
-        record_or_key: TKey,
+        record_or_key: KeyProtocol,
         *,
         cast_to: type[TRecord] | None = None,
     ) -> TRecord:
@@ -130,7 +133,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_one_or_none(
         self,
-        record_or_key: TKey | None,
+        record_or_key: KeyProtocol | None,
         *,
         cast_to: type[TRecord] | None = None,
     ) -> TRecord | None:
@@ -150,7 +153,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_many(
         self,
-        records_or_keys: Sequence[TRecord | TKey | None] | None,
+        records_or_keys: Sequence[TRecord | KeyProtocol | None] | None,
         *,
         sort_order: SortOrder = SortOrder.INPUT,
         cast_to: type[TRecord] | None = None,
@@ -291,6 +294,48 @@ class DataSource(DataSourceKey, RecordMixin):
             limit=limit,
             skip=skip,
         )
+
+    def load_filter(
+        self,
+        filter: Filter,
+        *,
+        sort_order: SortOrder = SortOrder.ASC,
+        cast_to: type[TRecord] | None = None,
+        restrict_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        limit: int | None = None,
+        skip: int | None = None,
+    ) -> tuple[TRecord, ...]:
+        """
+        Load records selected by the specified filter.
+
+        Args:
+            filter: Filter used to select the records to load
+            sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC in query class
+            cast_to: Cast the result to this type (error if not a subtype)
+            restrict_to: The query will return only the subtypes of this type (defaults to the query target type)
+            project_to: Use some or all fields from the stored record to create and return instances of this type
+            limit: Maximum number of records to return (for pagination)
+            skip: Number of records to skip (for pagination)
+        """
+        if isinstance(filter, FilterWhere):
+            return self.load_where(
+                filter.query,
+                sort_order=sort_order,
+                cast_to=cast_to,
+                restrict_to=restrict_to,
+                project_to=project_to,
+                limit=limit,
+                skip=skip,
+            )
+        elif isinstance(filter, FilterMany):
+            return self.load_many(
+                filter.keys,
+                sort_order=sort_order,
+                cast_to=cast_to,
+            )
+        else:
+            raise RuntimeError(f"Filter type {typename(filter)} not supported by the data source.")
 
     def load_where(
         self,
@@ -466,7 +511,7 @@ class DataSource(DataSourceKey, RecordMixin):
         return cast(Self, self.parent)
 
     @classmethod
-    def _check_frozen_inputs(cls, inputs: Sequence[TRecord | TKey | None]) -> None:
+    def _check_frozen_inputs(cls, inputs: Sequence[TRecord | KeyProtocol | None]) -> None:
         """Check that all records and key params are frozen."""
 
         unfrozen_input_keys = [x.get_key() for x in inputs if x is not None and not x.is_frozen()]
@@ -479,7 +524,7 @@ class DataSource(DataSourceKey, RecordMixin):
     @classmethod
     def _check_invalid_inputs(
         cls,
-        inputs: Sequence[TRecord | TKey | None],
+        inputs: Sequence[TRecord | KeyProtocol | None],
         *,
         key_allowed: bool = True,
         record_allowed: bool = True,
@@ -526,8 +571,8 @@ class DataSource(DataSourceKey, RecordMixin):
 
     @classmethod
     def _group_inputs_by_key_type(
-        cls, inputs: Sequence[TRecord | TKey | None]
-    ) -> dict[type[KeyProtocol], Sequence[TRecord | TKey | None]]:
+        cls, inputs: Sequence[RecordProtocol | KeyProtocol | None]
+    ) -> dict[type[KeyProtocol], Sequence[RecordProtocol | KeyProtocol | None]]:
         """Group inputs by key type, skipping sequence elements that are None."""
         result = defaultdict(list)
         consume(result[x.get_key_type()].append(x) for x in inputs if x is not None)
