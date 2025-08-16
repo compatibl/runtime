@@ -23,7 +23,6 @@ from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData
-from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_underscore import (  # noqa
@@ -52,6 +51,7 @@ def test_is_known_type():
     assert not TypeCache.is_known_type(123)
     assert not TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
 
+
 def test_guard_known_type():
     """Test guard_known_type method."""
 
@@ -72,6 +72,7 @@ def test_guard_known_type():
     assert not TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD, raise_on_fail=False)
     with pytest.raises(Exception):
         TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
+
 
 def test_get_type_name():
     """Test get_type_name method."""
@@ -105,6 +106,7 @@ def test_get_qual_name():
     with pytest.raises(Exception):
         # Not a record
         TypeCache.get_qual_name(StubDataclassData, type_kind=TypeKind.RECORD)
+
 
 def test_from_type_name():
     """Test getting class from type names."""

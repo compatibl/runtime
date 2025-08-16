@@ -237,7 +237,9 @@ def test_is_key_or_record_instance():
 
     for allow_none in [True, False]:
 
-        method = TypeCheck.guard_key_or_record_instance_or_none if allow_none else TypeCheck.guard_key_or_record_instance
+        method = (
+            TypeCheck.guard_key_or_record_instance_or_none if allow_none else TypeCheck.guard_key_or_record_instance
+        )
         if allow_none:
             method(None)
         else:
@@ -270,7 +272,9 @@ def test_is_key_or_record_sequence():
 
     for allow_none in [True, False]:
 
-        method = TypeCheck.guard_key_or_record_sequence_or_none if allow_none else TypeCheck.guard_key_or_record_sequence
+        method = (
+            TypeCheck.guard_key_or_record_sequence_or_none if allow_none else TypeCheck.guard_key_or_record_sequence
+        )
         if allow_none:
             method(None)
         else:

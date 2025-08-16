@@ -20,7 +20,6 @@ from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_by_query import FilterByQuery
 from cl.runtime.db.filter_by_type import FilterByType
 from cl.runtime.db.filter_many import FilterMany
-from cl.runtime.records.typename import typename
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassOtherDerived

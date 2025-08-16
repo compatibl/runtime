@@ -21,8 +21,6 @@ from inspect import isclass
 from pkgutil import walk_packages
 from types import ModuleType
 from typing import Sequence
-
-from celery.bin.result import result
 from memoization import cached
 from more_itertools import consume
 from cl.runtime.primitive.case_util import CaseUtil
@@ -111,7 +109,8 @@ class TypeCache:
             elif raise_on_fail:
                 # Type kind mismatch, raise
                 raise RuntimeError(
-                    f"Type {type_name} has type_kind={type_info.type_kind.name} while {type_kind.name} was expected.")
+                    f"Type {type_name} has type_kind={type_info.type_kind.name} while {type_kind.name} was expected."
+                )
             else:
                 # Type kind mismatch, return False
                 return False

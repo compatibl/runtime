@@ -71,7 +71,8 @@ class TypeCheck:
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a key, but its name does not end\n"
-                    f"with the suffix 'Key' which is required to prevent name collusion with records.")
+                    f"with the suffix 'Key' which is required to prevent name collusion with records."
+                )
             else:
                 return False
         elif raise_on_fail:
@@ -93,7 +94,8 @@ class TypeCheck:
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a key, but its name does not end\n"
-                    f"with the suffix 'Key' which is required to prevent name collusion with records.")
+                    f"with the suffix 'Key' which is required to prevent name collusion with records."
+                )
             else:
                 return False
         elif raise_on_fail:
@@ -112,7 +114,8 @@ class TypeCheck:
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a key, but its name does not end\n"
-                    f"with the suffix 'Key' which is required to prevent name collusion with records.")
+                    f"with the suffix 'Key' which is required to prevent name collusion with records."
+                )
             else:
                 return False
         elif raise_on_fail:
@@ -163,7 +166,8 @@ class TypeCheck:
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
-                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys.")
+                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys."
+                )
             else:
                 return False
         elif raise_on_fail:
@@ -182,7 +186,8 @@ class TypeCheck:
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
-                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys.")
+                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys."
+                )
             else:
                 return False
         elif raise_on_fail:
@@ -201,7 +206,8 @@ class TypeCheck:
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
-                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys.")
+                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys."
+                )
             else:
                 return False
         elif raise_on_fail:
@@ -320,7 +326,9 @@ class TypeCheck:
         if keys_or_records is None:
             return True
         elif is_sequence(keys_or_records):
-            return all(cls.guard_key_or_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys_or_records)
+            return all(
+                cls.guard_key_or_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys_or_records
+            )
         else:
             if raise_on_fail:
                 raise RuntimeError(
