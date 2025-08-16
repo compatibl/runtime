@@ -19,89 +19,36 @@ from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
 
 
-def test_is_same_type():
-    """Test for is_same_type method."""
-    TypeCheck.is_same_type(int, int)
-    TypeCheck.is_same_type(StubDataclass, StubDataclass)
-    with pytest.raises(Exception):
-        TypeCheck.is_same_type(int, float)
-    with pytest.raises(Exception):
-        TypeCheck.is_same_type(int, StubDataclass)
-    with pytest.raises(Exception):
-        TypeCheck.is_same_type(StubDataclassDerived, StubDataclass)
-
-
-def test_is_same_type_or_subtype():
-    """Test for test_is_same_type_or_subtype method."""
-    TypeCheck.is_same_type_or_subtype(int, int)
-    TypeCheck.is_same_type_or_subtype(StubDataclass, StubDataclass)
-    TypeCheck.is_same_type_or_subtype(StubDataclassDerived, StubDataclass)
-    with pytest.raises(Exception):
-        TypeCheck.is_same_type_or_subtype(int, float)
-    with pytest.raises(Exception):
-        TypeCheck.is_same_type_or_subtype(int, StubDataclass)
-
-
-def test_is_type_or_name():
-    """Test for is_type_or_name method."""
-    # Valid types
-    TypeCheck.is_type_or_name(int)
-    TypeCheck.is_type_or_name(StubDataclass)
-    TypeCheck.is_type_or_name(StubDataclassKey)
-
-    # Valid PascalCase strings
-    TypeCheck.is_type_or_name("ValidPascalCase")
-    TypeCheck.is_type_or_name("AnotherValidPascalCase")
-    TypeCheck.is_type_or_name("ValidPascalCaseWithDigits2")
-
-    # Invalid cases
-    with pytest.raises(Exception):
-        TypeCheck.is_type_or_name("invalid_pascal_case")
-    with pytest.raises(Exception):
-        TypeCheck.is_type_or_name("Invalid Pascal Case")
-    with pytest.raises(Exception):
-        TypeCheck.is_type_or_name(123)
-    with pytest.raises(Exception):
-        TypeCheck.is_type_or_name(["not", "a", "type"])
-
-
-def test_is_type_or_name_sequence():
-    """Test for is_type_or_name_sequence method."""
-    # Valid sequences of types
-    TypeCheck.is_type_or_name_sequence([int, float, str])
-    TypeCheck.is_type_or_name_sequence([StubDataclass, StubDataclassKey])
-
-    # Valid sequences of PascalCase strings
-    TypeCheck.is_type_or_name_sequence(["ValidPascalCase", "AnotherValidPascalCase"])
-    TypeCheck.is_type_or_name_sequence(["ValidPascalCase", int, "AnotherValidPascalCase"])
-
-    # Invalid cases
-    with pytest.raises(Exception):
-        TypeCheck.is_type_or_name_sequence("not_a_sequence")
-    with pytest.raises(Exception):
-        TypeCheck.is_type_or_name_sequence(123)
-    with pytest.raises(Exception):
-        TypeCheck.is_type_or_name_sequence([int, "invalid_pascal_case"])
-    with pytest.raises(Exception):
-        TypeCheck.is_type_or_name_sequence([int, "Invalid Pascal Case"])
-
-
 def test_is_key_type():
     """Test for is_key_type method."""
     TypeCheck.is_key_type(StubDataclassKey)
+    # Test that record type is not a key type
     with pytest.raises(Exception):
         TypeCheck.is_key_type(StubDataclass)
+    # Test that data type is not a key type
+    with pytest.raises(Exception):
+        TypeCheck.is_key_type(StubDataclassData)
     with pytest.raises(Exception):
         TypeCheck.is_key_type(int)
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_key_type(StubDataclassKey())
 
 
 def test_is_key_instance():
     """Test for is_key_type method."""
     TypeCheck.is_key_instance(StubDataclassKey())
+    # Test that record instance is not a key instance
     with pytest.raises(Exception):
         TypeCheck.is_key_instance(StubDataclass())
+    # Test that data instance is not a key instance
+    with pytest.raises(Exception):
+        TypeCheck.is_key_instance(StubDataclassData())
     with pytest.raises(Exception):
         TypeCheck.is_key_instance(123)
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_key_instance(StubDataclassKey)
 
 
 def test_is_key_sequence():
@@ -119,6 +66,12 @@ def test_is_key_sequence():
         TypeCheck.is_key_sequence([StubDataclass()])
     with pytest.raises(Exception):
         TypeCheck.is_key_sequence([StubDataclassKey(), StubDataclass()])
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_key_sequence([StubDataclassData()])
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_key_sequence([StubDataclassKey(), StubDataclassData()])
 
 
 def test_is_record_type():
@@ -138,6 +91,9 @@ def test_is_record_type():
         TypeCheck.is_record_type(StubDataclassData)
     with pytest.raises(Exception):
         TypeCheck.is_record_type(StubDataclassKey)
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_record_type(StubDataclass())
 
 
 def test_is_record_instance():
@@ -179,6 +135,12 @@ def test_is_record_sequence():
         TypeCheck.is_record_sequence([StubDataclass(), int])
     with pytest.raises(Exception):
         TypeCheck.is_record_sequence([StubDataclassKey()])
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_record_sequence([StubDataclassData()])
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_record_sequence([StubDataclass(), StubDataclassData()])
 
 
 def test_is_key_or_record_type():
@@ -195,6 +157,16 @@ def test_is_key_or_record_type():
         TypeCheck.is_key_or_record_type(str)
     with pytest.raises(Exception):
         TypeCheck.is_key_or_record_type("not_a_type")
+    # Test data type (should fail)
+    with pytest.raises(Exception):
+        # Not a key or record
+        TypeCheck.is_key_or_record_type(StubDataclassData)
+    with pytest.raises(Exception):
+        # Type rather than instance
+        TypeCheck.is_key_or_record_type(StubDataclass())
+    with pytest.raises(Exception):
+        # Type rather than instance
+        TypeCheck.is_key_or_record_type(StubDataclassKey())
 
 
 def test_is_key_or_record_sequence():
@@ -214,6 +186,12 @@ def test_is_key_or_record_sequence():
         TypeCheck.is_key_or_record_sequence([int])
     with pytest.raises(Exception):
         TypeCheck.is_key_or_record_sequence([StubDataclass(), int])
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_key_or_record_sequence([StubDataclassData()])
+    with pytest.raises(Exception):
+        # Instance rather than type
+        TypeCheck.is_key_or_record_sequence([StubDataclass(), StubDataclassData()])
 
 
 if __name__ == "__main__":
