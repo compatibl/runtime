@@ -32,7 +32,7 @@ def test_smoke():
         # Save a single record
         active(DataSource).save_many([record])
 
-        loaded_records = active(DataSource).load_many([record, key, None])
+        loaded_records = active(DataSource).load_many_or_none([record, key, None])
         assert loaded_records[0] is record  # Same object is returned without lookup
         assert loaded_records[1] is record  # In case of local cache only, also the same object
         assert loaded_records[2] is None

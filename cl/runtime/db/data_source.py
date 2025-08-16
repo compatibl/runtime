@@ -106,8 +106,6 @@ class DataSource(DataSourceKey, RecordMixin):
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
-        limit: int | None = None,
-        skip: int | None = None,
     ) -> TRecord:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
@@ -117,16 +115,12 @@ class DataSource(DataSourceKey, RecordMixin):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
             project_to: Use some or all fields from the stored record to create and return instances of this type
-            limit: Maximum number of records to return (for pagination)
-            skip: Number of records to skip (for pagination)
         """
         if record_or_key is not None:
             result = self.load_one_or_none(
                 record_or_key,
                 cast_to=cast_to,
                 project_to=project_to,
-                limit=limit,
-                skip=skip,
             )
             if result is None:
                 TypeCheck.is_key_or_record_type(type(record_or_key))
@@ -154,8 +148,6 @@ class DataSource(DataSourceKey, RecordMixin):
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
-        limit: int | None = None,
-        skip: int | None = None,
     ) -> TRecord | None:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
@@ -165,15 +157,11 @@ class DataSource(DataSourceKey, RecordMixin):
             record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
             project_to: Use some or all fields from the stored record to create and return instances of this type
-            limit: Maximum number of records to return (for pagination)
-            skip: Number of records to skip (for pagination)
         """
-        result = self.load_many(
+        result = self.load_many_or_none(
             [record_or_key],
             cast_to=cast_to,
             project_to=project_to,
-            limit=limit,
-            skip=skip,
         )
         if len(result) == 1:
             return result[0]
@@ -182,36 +170,68 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_many(
         self,
+        records_or_keys: Sequence[TRecord | KeyProtocol],
+        *,
+        cast_to: type[TRecord] | None = None,
+        project_to: type[TRecord] | None = None,
+        sort_order: SortOrder = SortOrder.INPUT,
+    ) -> Sequence[TRecord]:
+        """
+        Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
+        the result must have the same order as 'records_or_keys'.
+
+        Note:
+            - Raise an error if records_or_keys param is None elements or has None elements
+            - Raise an error if any of the records are not found
+
+        Args:
+            records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
+            cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
+            project_to: Use some or all fields from the stored record to create and return instances of this type
+            sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
+        """
+        # Check that the argument is not None and there are no elements that are None
+        TypeCheck.is_key_or_record_sequence(records_or_keys)
+
+        # Delegate to load_many_or_none method
+        result = self.load_many_or_none(
+            records_or_keys,
+            cast_to=cast_to,
+            project_to=project_to,
+            sort_order=sort_order,
+        )
+
+        # Perform checks and return
+        TypeCheck.is_record_sequence(result)
+        return result
+
+    def load_many_or_none(
+        self,
         records_or_keys: Sequence[TRecord | KeyProtocol | None] | None,
         *,
         cast_to: type[TRecord] | None = None,
-        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder = SortOrder.INPUT,
-        limit: int | None = None,
-        skip: int | None = None,
     ) -> Sequence[TRecord | None] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
         the result must have the same order as 'records_or_keys'.
 
+        Note:
+            - Return None for any elements of records_or_keys that are None, or for which the record is not found
+            - The result is None if records_or_keys param is None
+
         Args:
             records_or_keys: Records (returned without lookup) or keys in object, tuple or string format
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
-            restrict_to: The query will return only this type and its subtypes
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
-            limit: Maximum number of records to return (for pagination)
-            skip: Number of records to skip (for pagination)
         """
         assert TypeCheck.is_key_or_record_sequence_or_none(records_or_keys)
 
         # Pass through None or empty
         if not records_or_keys:
             return records_or_keys
-
-        # Check that the input list consists of only None, records, or keys
-        self._check_invalid_inputs(records_or_keys)
 
         # Perform these checks if cast_to is specified
         if cast_to is not None:
@@ -233,9 +253,6 @@ class DataSource(DataSourceKey, RecordMixin):
                     f"Parameter 'records_or_keys' of a load method in DataSource includes the following records\n"
                     f"that are not derived from the cast_to parameter {typename(cast_to)}:\n{invalid_records_str}"
                 )
-
-        # Check that all records or keys in object format are frozen
-        self._check_frozen_inputs(records_or_keys)
 
         # The list of keys to load, skip None and records
         keys_to_load = [x for x in records_or_keys if is_key(x)]
@@ -455,10 +472,6 @@ class DataSource(DataSourceKey, RecordMixin):
         if len(records) == 0:
             return
 
-        # Validate inputs. Allowed values are records and None.
-        self._check_invalid_inputs(records, key_allowed=False)
-        self._check_frozen_inputs(records)
-
         # Group records by key type
         records_grouped_by_key_type = self._group_inputs_by_key_type(records)
 
@@ -486,12 +499,10 @@ class DataSource(DataSourceKey, RecordMixin):
         if len(keys) == 0:
             return
 
-        # Validate inputs. Allowed values are keys and None.
-        self._check_invalid_inputs(keys, record_allowed=False)
-        self._check_frozen_inputs(keys)
-
+        # Group keys by key type
         keys_grouped_by_key_type = self._group_inputs_by_key_type(keys)
 
+        # Perform deletion for every key type
         [
             self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
             for key_type, records_for_key_type in keys_grouped_by_key_type.items()
@@ -564,65 +575,6 @@ class DataSource(DataSourceKey, RecordMixin):
     def _get_parent(self) -> Self:
         """Cast parent key types to record type, the record is already loaded by the __init method."""
         return cast(Self, self.parent)
-
-    @classmethod
-    def _check_frozen_inputs(cls, inputs: Sequence[TRecord | KeyProtocol | None]) -> None:
-        """Check that all records and key params are frozen."""
-
-        unfrozen_input_keys = [x.get_key() for x in inputs if x is not None and not x.is_frozen()]
-        if len(unfrozen_input_keys) > 0:
-            unfrozen_inputs_str = "\n".join(str(x) for x in unfrozen_input_keys)
-            raise RuntimeError(
-                f"Data source method arguments include the following items that are not frozen:\n{unfrozen_inputs_str}"
-            )
-
-    @classmethod
-    def _check_invalid_inputs(
-        cls,
-        inputs: Sequence[TRecord | KeyProtocol | None],
-        *,
-        key_allowed: bool = True,
-        record_allowed: bool = True,
-        none_allowed: bool = True,
-    ) -> None:
-        """
-        Check that the input list consists of only None, records, or keys.
-        Use flags 'key_allowed', 'record_allowed', and 'none_allowed' to control the list of valid types.
-        """
-
-        # Determine which validation function to use
-        if key_allowed and record_allowed:
-            guard_func = is_key_or_record
-        elif key_allowed:
-            guard_func = is_key
-        elif record_allowed:
-            guard_func = is_record
-        else:
-            guard_func = lambda: False
-
-        if none_allowed:
-            validate_func = lambda x: x is None or guard_func(x)
-        else:
-            validate_func = guard_func
-
-        # Check that the input list consists of only None, records, or keys
-        invalid_input_keys = [x.get_key() if x is not None else None for x in inputs if not validate_func(x)]
-
-        if len(invalid_input_keys) > 0:
-            invalid_inputs_str = "\n".join(str(x) for x in invalid_input_keys)
-
-            allowed_values = []
-            if key_allowed:
-                allowed_values += "Key"
-            if record_allowed:
-                allowed_values += "Record"
-            if none_allowed:
-                allowed_values += "None"
-
-            raise RuntimeError(
-                f"Data source method params include the following invalid arguments:\n{invalid_inputs_str}\n"
-                f"Valid argument types: {', '.join(allowed_values)}."
-            )
 
     @classmethod
     def _group_inputs_by_key_type(
