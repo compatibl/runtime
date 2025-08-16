@@ -28,7 +28,7 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_many import FilterMany
 from cl.runtime.db.filter_by_type import FilterByType
-from cl.runtime.db.filter_where import FilterWhere
+from cl.runtime.db.filter_by_query import FilterByQuery
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.sort_order import SortOrder
@@ -284,7 +284,7 @@ class DataSource(DataSourceKey, RecordMixin):
             result = tuple(CastUtil.cast_or_none(cast_to, x) for x in result)
         return result
 
-    def load_type(
+    def load_by_type(
         self,
         restrict_to: type[TRecord],
         *,
@@ -353,7 +353,7 @@ class DataSource(DataSourceKey, RecordMixin):
             skip=skip,
         )
 
-    def load_filter(
+    def load_by_filter(
         self,
         filter_: Filter,
         *,
@@ -378,10 +378,10 @@ class DataSource(DataSourceKey, RecordMixin):
         """
         assert isinstance(filter_, Filter)
 
-        if isinstance(filter_, FilterWhere):
+        if isinstance(filter_, FilterByQuery):
 
             # Load using the query stored in the filter
-            return self.load_where(
+            return self.load_by_query(
                 filter_.query,
                 cast_to=cast_to,
                 restrict_to=restrict_to,
@@ -400,7 +400,7 @@ class DataSource(DataSourceKey, RecordMixin):
             record_type = TypeCache.from_type_name(filter_.record_type_name)
 
             # Load using the type stored in the filter as restrict_to parameter
-            return self.load_type(
+            return self.load_by_type(
                 restrict_to=record_type,  # noqa
                 cast_to=cast_to,
                 project_to=project_to,
@@ -428,7 +428,7 @@ class DataSource(DataSourceKey, RecordMixin):
         else:
             raise RuntimeError(f"Filter type {typename(filter_)} not supported by the data source.")
 
-    def load_where(
+    def load_by_query(
         self,
         query: QueryMixin,
         *,
@@ -451,7 +451,7 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        return self._get_db().load_where(
+        return self._get_db().load_by_query(
             query,
             dataset=self.dataset.dataset_id,
             cast_to=cast_to,
@@ -462,7 +462,7 @@ class DataSource(DataSourceKey, RecordMixin):
             skip=skip,
         )
 
-    def count_where(
+    def count_by_query(
         self,
         query: QueryMixin,
         *,
@@ -475,7 +475,7 @@ class DataSource(DataSourceKey, RecordMixin):
             query: Contains query conditions to match
             restrict_to: The query will return only this type and its subtypes
         """
-        return self._get_db().count_where(
+        return self._get_db().count_by_query(
             query,
             dataset=self.dataset.dataset_id,
             restrict_to=restrict_to,
@@ -539,7 +539,7 @@ class DataSource(DataSourceKey, RecordMixin):
         """Return record type bindings in alphabetical order of key type name followed by record type name."""
 
         # Load from DB as cache may be out of date
-        bindings = self.load_type(RecordTypeBinding)
+        bindings = self.load_by_type(RecordTypeBinding)
         # Sort bindings by key type name first and then by record type in alphabetical order
         return tuple(sorted(bindings, key=lambda x: (x.key_type_name, x.record_type_name)))
 
@@ -547,7 +547,7 @@ class DataSource(DataSourceKey, RecordMixin):
         """Return stored key type names in alphabetical order of PascalCase format."""
 
         # Load from DB as cache may be out of date
-        bindings = self.load_type(RecordTypeBinding)
+        bindings = self.load_by_type(RecordTypeBinding)
         # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
         return tuple(sorted(set(binding.key_type_name for binding in bindings)))
 
@@ -565,7 +565,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Load from DB as cache may be out of date
         query = RecordTypeBindingQuery(key_type_name=key_type_name).build()
-        bindings = self.load_where(query, cast_to=RecordTypeBinding)
+        bindings = self.load_by_query(query, cast_to=RecordTypeBinding)
 
         # Sort in alphabetical order of record_type (not the same as query sort order) and convert to tuple
         return tuple(sorted(binding.record_type_name for binding in bindings))

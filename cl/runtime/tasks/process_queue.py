@@ -49,11 +49,11 @@ class ProcessQueue(TaskQueue):
 
             # Tasks that are awaiting completion of other tasks and will have priority for subsequent execution
             awaiting_query = TaskQuery(queue=queue_key, status=TaskStatus.AWAITING).build()
-            awaiting_tasks = active(DataSource).load_where(awaiting_query, cast_to=Task)
+            awaiting_tasks = active(DataSource).load_by_query(awaiting_query, cast_to=Task)
 
             # The task that have been submitted to the queue but are not yet running
             pending_query = TaskQuery(queue=queue_key, status=TaskStatus.PENDING).build()
-            pending_tasks = active(DataSource).load_where(pending_query, cast_to=Task)
+            pending_tasks = active(DataSource).load_by_query(pending_query, cast_to=Task)
 
             # Awaiting tasks have priority over pending tasks
             queued_tasks = awaiting_tasks + pending_tasks

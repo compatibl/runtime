@@ -141,8 +141,8 @@ def test_record_upsert(multi_db_fixture):
     assert loaded_record == override_sample
 
 
-def test_load_type(multi_db_fixture):
-    """Test 'load_type' method."""
+def test_load_by_type(multi_db_fixture):
+    """Test 'load_by_type' method."""
     base_samples = [
         sample.build()
         for sample in [
@@ -171,10 +171,10 @@ def test_load_type(multi_db_fixture):
 
     active(DataSource).save_many(all_samples)
 
-    loaded_records = active(DataSource).load_type(StubDataclass)
+    loaded_records = active(DataSource).load_by_type(StubDataclass)
     assert PytestUtil.assert_equals_iterable_without_ordering(all_samples, loaded_records)
 
-    loaded_records = active(DataSource).load_type(StubDataclassDerived)
+    loaded_records = active(DataSource).load_by_type(StubDataclassDerived)
     assert PytestUtil.assert_equals_iterable_without_ordering(derived_samples, loaded_records)
 
 
@@ -190,7 +190,7 @@ def test_singleton(multi_db_fixture):
 
     other_singleton_sample = StubDataclassSingleton(str_field="other").build()
     active(DataSource).save_one(other_singleton_sample)
-    all_records = list(active(DataSource).load_type(other_singleton_sample.__class__))
+    all_records = list(active(DataSource).load_by_type(other_singleton_sample.__class__))
     assert len(all_records) == 1
     assert all_records[0] == other_singleton_sample
 
@@ -205,8 +205,8 @@ def test_repeated(multi_db_fixture):
     assert loaded_records[0] == record
 
 
-def test_load_where(multi_db_fixture):
-    """Test count_where for a string field."""
+def test_load_by_query(multi_db_fixture):
+    """Test count_by_query for a string field."""
     records = [
         StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),
         StubDataclassPrimitiveFields(key_str_field="def"),
@@ -220,12 +220,12 @@ def test_load_where(multi_db_fixture):
 
     # Load using a query
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
-    assert to_key_str_field(active(DataSource).load_where(eq_query)) == ["def"]
-    assert to_key_str_field(active(DataSource).load_where(in_query)) == ["def", "xyz"]
+    assert to_key_str_field(active(DataSource).load_by_query(eq_query)) == ["def"]
+    assert to_key_str_field(active(DataSource).load_by_query(in_query)) == ["def", "xyz"]
 
 
-def test_count_where(multi_db_fixture):
-    """Test count_where for a string field."""
+def test_count_by_query(multi_db_fixture):
+    """Test count_by_query for a string field."""
     records = [
         StubDataclassPrimitiveFields(key_str_field="abc", obj_str_field=None),
         StubDataclassPrimitiveFields(key_str_field="def"),
@@ -237,8 +237,8 @@ def test_count_where(multi_db_fixture):
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
 
-    assert active(DataSource).count_where(eq_query) == 1
-    assert active(DataSource).count_where(in_query) == 2
+    assert active(DataSource).count_by_query(eq_query) == 1
+    assert active(DataSource).count_by_query(in_query) == 2
 
 
 if __name__ == "__main__":

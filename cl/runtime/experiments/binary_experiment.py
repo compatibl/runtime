@@ -36,7 +36,7 @@ class BinaryExperiment(Experiment, ABC):
         bar_labels = []
         values = []
         trial_query = TrialKeyQuery(experiment=self.get_key()).build()
-        all_trials = active(DataSource).load_where(trial_query, cast_to=BinaryTrial)
+        all_trials = active(DataSource).load_by_query(trial_query, cast_to=BinaryTrial)
 
         for scenario in self.scenarios:
 

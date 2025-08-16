@@ -57,7 +57,7 @@ class SelectResponse(RecordsWithSchemaResponse):
             record_type_name = request.type_
             record_type = TypeCache.from_type_name(record_type_name)
             # Load records for the type
-            records = ds.load_type(record_type)
+            records = ds.load_by_type(record_type)
             common_base_record_type = record_type
         else:
             # Get records for a table

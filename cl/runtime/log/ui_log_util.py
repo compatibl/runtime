@@ -65,7 +65,7 @@ class UiLogUtil(DataMixin):
         """Return task status by its run_id."""
 
         target_task_query = TaskQuery(task_id=task_run_id).build()
-        tasks = list(active(DataSource).load_where(target_task_query))
+        tasks = list(active(DataSource).load_by_query(target_task_query))
 
         if not tasks:
             raise RuntimeError(f"Not found task for {task_run_id=}")

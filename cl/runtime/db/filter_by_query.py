@@ -20,7 +20,7 @@ from cl.runtime.records.typename import typename
 
 
 @dataclass(slots=True, kw_only=True)
-class FilterWhere(Filter):
+class FilterByQuery(Filter):
     """Selects records matching the query."""
 
     query: QueryMixin = required()

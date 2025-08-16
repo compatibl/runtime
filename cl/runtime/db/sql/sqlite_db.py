@@ -160,7 +160,7 @@ class SqliteDb(Db):
 
         return tuple(result)
 
-    def load_where(
+    def load_by_query(
         self,
         query: QueryMixin,
         *,
@@ -198,7 +198,7 @@ class SqliteDb(Db):
         elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {typename(self)}.load_where, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"In {typename(self)}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
                 f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 
@@ -252,7 +252,7 @@ class SqliteDb(Db):
 
         return tuple(result)
 
-    def count_where(
+    def count_by_query(
         self,
         query: QueryMixin,
         *,
@@ -283,7 +283,7 @@ class SqliteDb(Db):
         elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {typename(self)}.load_where, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"In {typename(self)}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
                 f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 

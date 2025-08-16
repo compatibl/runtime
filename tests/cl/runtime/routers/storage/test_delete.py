@@ -36,7 +36,7 @@ def test_method(default_db_fixture):
     delete_records_request_obj = DeleteRequest(**delete_records_payload)
 
     delete_records_result = DeleteResponseUtil.delete_records(delete_records_request_obj)
-    records_in_db = sorted(active(DataSource).load_type(StubDataclassDerived), key=lambda x: x.id)
+    records_in_db = sorted(active(DataSource).load_by_type(StubDataclassDerived), key=lambda x: x.id)
 
     # Check if result is a list[KeyRequestItem] object.
     assert isinstance(delete_records_result, list)
@@ -65,7 +65,7 @@ def test_api(default_db_fixture):
             json=delete_records_payload,
         )
         delete_records_json = delete_records_response.json()
-        records_in_db = sorted(active(DataSource).load_type(StubDataclassDerived), key=lambda x: x.id)
+        records_in_db = sorted(active(DataSource).load_by_type(StubDataclassDerived), key=lambda x: x.id)
 
         assert delete_records_response.status_code == 200
         assert isinstance(delete_records_json, list)

@@ -65,7 +65,7 @@ class PreloadSettings(Settings):
         # TODO: Process YAML and JSON preloads
 
         # Execute run_config on all preloaded Config records
-        config_records = active(DataSource).load_type(Config)
+        config_records = active(DataSource).load_by_type(Config)
         tuple(config_record.run_configure() for config_record in config_records)
 
     def _get_files(self, ext: str) -> list[str]:

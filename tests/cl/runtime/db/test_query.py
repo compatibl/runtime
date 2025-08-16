@@ -49,13 +49,13 @@ def test_str_query(multi_db_fixture):
 
     # Load using a query
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
-    assert to_key_str_field(active(DataSource).load_where(eq_query)) == ["def"]
-    assert to_key_str_field(active(DataSource).load_where(in_query)) == ["def", "xyz"]
-    assert to_key_str_field(active(DataSource).load_where(not_in_query)) == ["abc"]
-    # assert to_key_str_field(active(DataSource).load_where(or_query)) == ["def", "xyz"]
-    # assert to_key_str_field(active(DataSource).load_where(and_query)) == ["abc"]
-    assert to_key_str_field(active(DataSource).load_where(exists_query)) == ["def", "xyz"]
-    assert to_key_str_field(active(DataSource).load_where(does_not_exist_query)) == ["abc"]
+    assert to_key_str_field(active(DataSource).load_by_query(eq_query)) == ["def"]
+    assert to_key_str_field(active(DataSource).load_by_query(in_query)) == ["def", "xyz"]
+    assert to_key_str_field(active(DataSource).load_by_query(not_in_query)) == ["abc"]
+    # assert to_key_str_field(active(DataSource).load_by_query(or_query)) == ["def", "xyz"]
+    # assert to_key_str_field(active(DataSource).load_by_query(and_query)) == ["abc"]
+    assert to_key_str_field(active(DataSource).load_by_query(exists_query)) == ["def", "xyz"]
+    assert to_key_str_field(active(DataSource).load_by_query(does_not_exist_query)) == ["abc"]
 
 
 if __name__ == "__main__":

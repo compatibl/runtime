@@ -92,7 +92,7 @@ def test_roundtrip(default_db_fixture):
             entry_type = type(expected_entries[0])
 
             read_records_from_csv(file_path, entry_type)
-            actual_records = tuple(active(DataSource).load_type(entry_type))
+            actual_records = tuple(active(DataSource).load_by_type(entry_type))
             assert actual_records == FreezeUtil.freeze(DataUtil.remove_none(expected_entries))
         finally:
             if file_path is not None:

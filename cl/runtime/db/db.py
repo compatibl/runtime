@@ -99,7 +99,7 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
-    def load_where(
+    def load_by_query(
         self,
         query: QueryMixin,
         *,
@@ -126,7 +126,7 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
-    def count_where(
+    def count_by_query(
         self,
         query: QueryMixin,
         *,

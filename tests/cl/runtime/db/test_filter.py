@@ -19,7 +19,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_many import FilterMany
 from cl.runtime.db.filter_by_type import FilterByType
-from cl.runtime.db.filter_where import FilterWhere
+from cl.runtime.db.filter_by_query import FilterByQuery
 from cl.runtime.records.typename import typename
 from stubs.cl.runtime import StubDataclassDerived, StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassKey
@@ -47,7 +47,7 @@ def _test_filter(*, filter: Filter, expected_values: Sequence[str]):
     active(DataSource).save_many(records)
 
     # Load records using the filter
-    loaded_records = active(DataSource).load_filter(loaded_filter, cast_to=StubDataclassDerived)
+    loaded_records = active(DataSource).load_by_filter(loaded_filter, cast_to=StubDataclassDerived)
 
     # Check if they match the expected values
     assert len(loaded_records) == len(expected_values)
@@ -56,9 +56,9 @@ def _test_filter(*, filter: Filter, expected_values: Sequence[str]):
 
 
 def test_filter_by_query(multi_db_fixture):
-    """Test FilterWhere class."""
+    """Test FilterByQuery class."""
     _test_filter(
-        filter=FilterWhere(
+        filter=FilterByQuery(
             filter_id="1",
             key_type_name=typename(StubDataclassKey),
             query=StubDataclassDerivedQuery(
@@ -70,7 +70,7 @@ def test_filter_by_query(multi_db_fixture):
 
 
 def test_filter_by_type(multi_db_fixture):
-    """Test FilterWhere class."""
+    """Test FilterByQuery class."""
     _test_filter(
         filter=FilterByType(
             record_type_name="StubDataclassDerived",
@@ -87,7 +87,7 @@ def test_filter_by_type(multi_db_fixture):
 
 @pytest.mark.skip("Requires KeyMixin serialization")
 def test_filter_by_keys(multi_db_fixture):
-    """Test FilterWhere class."""
+    """Test FilterByQuery class."""
     _test_filter(
         filter=FilterMany(
             filter_id="1",
