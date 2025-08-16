@@ -49,14 +49,29 @@ def test_is_known_type():
     assert TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.DATA)
 
     # Invalid cases
-    assert not TypeCache.is_known_type(123, raise_on_fail=False)
+    assert not TypeCache.is_known_type(123)
+    assert not TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
+
+def test_guard_known_type():
+    """Test guard_known_type method."""
+
+    # Valid cases
+    assert TypeCache.guard_known_type(StubDataclass)
+    assert TypeCache.guard_known_type(StubDataclass, type_kind=TypeKind.RECORD)
+    assert TypeCache.guard_known_type(StubDataclassKey)
+    assert TypeCache.guard_known_type(StubDataclassKey, type_kind=TypeKind.KEY)
+    assert TypeCache.guard_known_type(StubDataclassData)
+    assert TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.DATA)
+
+    # Invalid cases
+    assert not TypeCache.guard_known_type(123, raise_on_fail=False)
     with pytest.raises(Exception):
-        TypeCache.is_known_type(123)
+        TypeCache.guard_known_type(123)
 
     # Not a record
-    assert not TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.RECORD, raise_on_fail=False)
+    assert not TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD, raise_on_fail=False)
     with pytest.raises(Exception):
-        TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
+        TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
 
 def test_get_type_name():
     """Test get_type_name method."""

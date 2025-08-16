@@ -373,19 +373,28 @@ class BasicMongoDb(Db):
         """Get pymongo collection for the specified key type."""
         if self._mongo_collection_dict is None:
             self._mongo_collection_dict = {}
-        if (result := self._mongo_collection_dict.get(key_type, None)) is None:
+        if (collection := self._mongo_collection_dict.get(key_type, None)) is None:
+            # This also checks that the name of key_type has Key suffix
+            assert TypeCheck.is_key_type(key_type)
+
+            # Get collection object
             mongo_db = self._get_mongo_db()
             key_type_name = typename(key_type)
-            if key_type_name.endswith("Key"):
-                # The suffix Key is enforced in type cache, add another check here for  safety before removing the suffix
-                collection_name = key_type_name.removesuffix("Key")
-            else:
-                raise RuntimeError(
-                    "By convention, key type name or its alias (if defined) must end with the suffix Key."
-                )
-            result = mongo_db[collection_name]
-            self._mongo_collection_dict[key_type] = result
-        return result
+            collection_name = key_type_name.removesuffix("Key")
+            collection = mongo_db[collection_name]
+
+            # Add an index on tenant, dataset and key in ascending order
+            collection.create_index(
+                [
+                    # ("_tenant", 1),
+                    # ("_dataset", 1),
+                    ("_key", 1),
+                ],
+            )
+
+            # Cache for reuse
+            self._mongo_collection_dict[key_type] = collection
+        return collection
 
     def _get_mongo_client_type(self) -> type:
         """Get the type of MongoDB client object, BasicMongoMockDb overrides this to return the mongomock version."""
