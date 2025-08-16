@@ -64,7 +64,7 @@ _SAMPLES = [
 ]
 
 
-def test_record_or_key(multi_db_fixture):
+def test_key_or_record(multi_db_fixture):
     """Test passing record instead of a key."""
     # Create test record and populate with sample data
     record = StubDataclass().build()

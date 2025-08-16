@@ -47,5 +47,5 @@ class SaveResponseUtil:
         active(DataSource).save_many(deserialized_records)
 
         # Create KeyRequestItem objects of saved records for response.
-        saved_key_items = [KeyRequestItem.from_record_or_key(record) for record in deserialized_records]
+        saved_key_items = [KeyRequestItem.from_key_or_record(record) for record in deserialized_records]
         return saved_key_items

@@ -51,11 +51,11 @@ def test_smoke(default_db_fixture):
     )
 
     for sample_input in sample_inputs:
-        record_or_key = sample_input[0]
+        key_or_record = sample_input[0]
         method_callable = sample_input[1]
         task = InstanceMethodTask.create(
             queue=TaskQueueKey(queue_id="Sample Queue"),
-            record_or_key=record_or_key,
+            key_or_record=key_or_record,
             method_callable=method_callable,
         ).build()
         task.run_task()
@@ -67,7 +67,7 @@ def _run_task(task_index: int):
 
     task = InstanceMethodTask.create(
         queue=TaskQueueKey(queue_id="Sample Queue"),
-        record_or_key=instance,
+        key_or_record=instance,
         method_callable=instance.run_instance_method_1a,
     ).build()
 

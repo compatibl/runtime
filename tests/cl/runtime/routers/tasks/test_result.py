@@ -33,7 +33,7 @@ def _save_tasks_and_get_requests() -> list[Dict]:
     tasks = [
         InstanceMethodTask.create(
             queue=queue_key,
-            record_or_key=StubHandlersKey(stub_id=f"{i}").build(),
+            key_or_record=StubHandlersKey(stub_id=f"{i}").build(),
             method_callable=StubHandlers.run_instance_method_1a,
         ).build()
         for i in range(2)

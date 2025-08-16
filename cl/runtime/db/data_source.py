@@ -37,7 +37,6 @@ from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_type_binding import RecordTypeBinding
@@ -102,32 +101,32 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_one(
         self,
-        record_or_key: KeyProtocol,
+        key_or_record: KeyProtocol,
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
     ) -> TRecord:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
-        Error message if 'record_or_key' is None or the record is not found in DB.
+        Error message if 'key_or_record' is None or the record is not found in DB.
 
         Args:
-            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
+            key_or_record: If a record, it will be returned without DB lookup
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
             project_to: Use some or all fields from the stored record to create and return instances of this type
         """
-        if record_or_key is not None:
+        if key_or_record is not None:
             result = self.load_one_or_none(
-                record_or_key,
+                key_or_record,
                 cast_to=cast_to,
                 project_to=project_to,
             )
             if result is None:
-                TypeCheck.is_key_or_record_type(type(record_or_key))
-                if is_record(record_or_key):
-                    key = record_or_key.get_key()
+                TypeCheck.is_key_or_record_type(type(key_or_record))
+                if is_record(key_or_record):
+                    key = key_or_record.get_key()
                 else:
-                    key = record_or_key
+                    key = key_or_record
                 key_str = KeySerializers.DELIMITED.serialize(key)
                 cast_to_str = f"\nwhen loading type {typename(cast_to)}" if cast_to else ""
                 raise RuntimeError(
@@ -138,28 +137,28 @@ class DataSource(DataSourceKey, RecordMixin):
         else:
             cast_to_str = f"\nwhen loading type {typename(cast_to)}" if cast_to else ""
             raise RuntimeError(
-                f"Parameter 'record_or_key' is None for load_one method{cast_to_str}.\n"
+                f"Parameter 'key_or_record' is None for load_one method{cast_to_str}.\n"
                 f"Use 'load_one_or_none' method to return None instead of raising an error."
             )
 
     def load_one_or_none(
         self,
-        record_or_key: KeyProtocol | None,
+        key_or_record: KeyProtocol | None,
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
     ) -> TRecord | None:
         """
         Load a single record using a key (if a record is passed instead of a key, it is returned without DB lookup).
-        Return None if 'record_or_key' is None or the record is not found in DB.
+        Return None if 'key_or_record' is None or the record is not found in DB.
 
         Args:
-            record_or_key: Record (returned without lookup), key, or, if there is only one primary key field, its value
+            key_or_record: If a record, it will be returned without DB lookup
             cast_to: Perform runtime checked cast to this class if specified, error if not a subtype
             project_to: Use some or all fields from the stored record to create and return instances of this type
         """
         result = self.load_many_or_none(
-            [record_or_key],
+            [key_or_record],
             cast_to=cast_to,
             project_to=project_to,
         )

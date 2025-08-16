@@ -75,7 +75,7 @@ class InstanceMethodTask(MethodTask):
         cls,
         *,
         queue: TaskQueueKey,
-        record_or_key: KeyProtocol | None = None,
+        key_or_record: KeyProtocol | None = None,
         method_callable: Callable,
     ) -> Self:
         """
@@ -86,7 +86,7 @@ class InstanceMethodTask(MethodTask):
 
         Args:
             queue: Queue that will run the task
-            record_or_key: Record or its key
+            key_or_record: Record or its key
             method_callable: Callable bound to a class (ClassName.method_name) or its instance (obj.method_name)
         """
 
@@ -94,9 +94,9 @@ class InstanceMethodTask(MethodTask):
         result = cls(queue=queue)
 
         # Get key type and key
-        key_type = record_or_key.get_key_type()
+        key_type = key_or_record.get_key_type()
         result.key_type_str = f"{key_type.__module__}.{typename(key_type)}"
-        key = record_or_key.get_key() if is_record(record_or_key) else record_or_key
+        key = key_or_record.get_key() if is_record(key_or_record) else key_or_record
         result.key_str = _KEY_SERIALIZER.serialize(key)
 
         # Two tokens because the callable is bound to a class or its instance

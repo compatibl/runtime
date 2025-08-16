@@ -37,15 +37,15 @@ class KeyRequestItem(BaseModel):
     """Key type name."""
 
     @classmethod
-    def from_record_or_key(cls, record_or_key) -> KeyRequestItem:
+    def from_key_or_record(cls, key_or_record) -> KeyRequestItem:
         """Create KeyRequestItem from record or key."""
 
-        if is_record(record_or_key):
-            key = record_or_key.get_key()
-        elif is_key(record_or_key):
-            key = record_or_key
+        if is_record(key_or_record):
+            key = key_or_record.get_key()
+        elif is_key(key_or_record):
+            key = key_or_record
         else:
-            raise RuntimeError(f"The object {str(record_or_key)}) is neither a record nor a key.")
+            raise RuntimeError(f"The object {str(key_or_record)}) is neither a record nor a key.")
 
         key_ = _KEY_SERIALIZER.serialize(key)
         type_ = typename(key)
