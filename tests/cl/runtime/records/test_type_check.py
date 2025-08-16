@@ -19,6 +19,13 @@ from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
 
+_DATA_INSTANCE = StubDataclassData().build()
+_DATA_INSTANCE_NOT_FROZEN = StubDataclassData()
+_KEY_INSTANCE = StubDataclassKey().build()
+_KEY_INSTANCE_NOT_FROZEN = StubDataclassKey()
+_RECORD_INSTANCE = StubDataclass().build()
+_RECORD_INSTANCE_NOT_FROZEN = StubDataclass()
+_DERIVED_RECORD_INSTANCE = StubDataclassDerived().build()
 
 def test_is_key_type():
     """Test for is_key_type method."""
@@ -34,7 +41,7 @@ def test_is_key_type():
         TypeCheck.is_key_type(int)
     with pytest.raises(Exception):
         # Instance rather than type
-        TypeCheck.is_key_type(StubDataclassKey())
+        TypeCheck.is_key_type(_KEY_INSTANCE)
 
 
 def test_is_key_instance():
@@ -50,14 +57,17 @@ def test_is_key_instance():
                 method(None)
 
         # Valid cases
-        method(StubDataclassKey())
+        method(_KEY_INSTANCE)
 
         with pytest.raises(Exception):
+            # Not frozen
+            method(_KEY_INSTANCE_NOT_FROZEN)
+        with pytest.raises(Exception):
             # Test that record instance is not a key instance
-            method(StubDataclass())
+            method(_RECORD_INSTANCE)
         with pytest.raises(Exception):
             # Test that data instance is not a key instance
-            method(StubDataclassData())
+            method(_DATA_INSTANCE)
         with pytest.raises(Exception):
             method(123)
         with pytest.raises(Exception):
@@ -78,24 +88,27 @@ def test_is_key_sequence():
                 method(None)
 
         # Valid key sequences
-        method([StubDataclassKey()])
-        method([StubDataclassKey(), StubDataclassKey()])
+        method([_KEY_INSTANCE])
+        method([_KEY_INSTANCE, _KEY_INSTANCE])
 
         # Invalid cases
+        with pytest.raises(Exception):
+            # Not frozen
+            method([_KEY_INSTANCE_NOT_FROZEN])
         with pytest.raises(Exception):
             method("not_a_sequence")
         with pytest.raises(Exception):
             method(123)
         with pytest.raises(Exception):
-            method([StubDataclass()])
+            method([_RECORD_INSTANCE])
         with pytest.raises(Exception):
-            method([StubDataclassKey(), StubDataclass()])
-        with pytest.raises(Exception):
-            # Instance rather than type
-            method([StubDataclassData()])
+            method([_KEY_INSTANCE, _RECORD_INSTANCE])
         with pytest.raises(Exception):
             # Instance rather than type
-            method([StubDataclassKey(), StubDataclassData()])
+            method([_DATA_INSTANCE])
+        with pytest.raises(Exception):
+            # Instance rather than type
+            method([_KEY_INSTANCE, _DATA_INSTANCE])
 
 
 def test_is_record_type():
@@ -118,7 +131,7 @@ def test_is_record_type():
         TypeCheck.is_record_type(StubDataclassKey)
     with pytest.raises(Exception):
         # Instance rather than type
-        TypeCheck.is_record_type(StubDataclass())
+        TypeCheck.is_record_type(_RECORD_INSTANCE)
 
 
 def test_is_record_instance():
@@ -134,10 +147,13 @@ def test_is_record_instance():
                 method(None)
 
         # Valid record types
-        method(StubDataclass())
-        method(StubDataclassDerived())
+        method(_RECORD_INSTANCE)
+        method(_DERIVED_RECORD_INSTANCE)
 
         # Invalid cases
+        with pytest.raises(Exception):
+            # Not frozen
+            method(_RECORD_INSTANCE_NOT_FROZEN)
         with pytest.raises(Exception):
             method(123)
         with pytest.raises(Exception):
@@ -147,10 +163,10 @@ def test_is_record_instance():
             method(StubDataclass)
         with pytest.raises(Exception):
             # Not a record
-            method(StubDataclassData())
+            method(_DATA_INSTANCE)
         with pytest.raises(Exception):
             # Not a record
-            method(StubDataclassKey())
+            method(_KEY_INSTANCE)
 
 
 def test_is_record_sequence():
@@ -166,8 +182,8 @@ def test_is_record_sequence():
                 method(None)
 
         # Valid record sequences
-        method([StubDataclass()])
-        method([StubDataclass(), StubDataclassDerived()])
+        method([_RECORD_INSTANCE])
+        method([_RECORD_INSTANCE, _DERIVED_RECORD_INSTANCE])
 
         # Invalid cases
         with pytest.raises(Exception):
@@ -177,15 +193,15 @@ def test_is_record_sequence():
         with pytest.raises(Exception):
             method([int])
         with pytest.raises(Exception):
-            method([StubDataclass(), int])
+            method([_RECORD_INSTANCE, int])
         with pytest.raises(Exception):
-            method([StubDataclassKey()])
-        with pytest.raises(Exception):
-            # Instance rather than type
-            method([StubDataclassData()])
+            method([_KEY_INSTANCE])
         with pytest.raises(Exception):
             # Instance rather than type
-            method([StubDataclass(), StubDataclassData()])
+            method([_DATA_INSTANCE])
+        with pytest.raises(Exception):
+            # Instance rather than type
+            method([_RECORD_INSTANCE, _DATA_INSTANCE])
 
 
 def test_is_key_or_record_type():
@@ -209,10 +225,10 @@ def test_is_key_or_record_type():
         TypeCheck.is_key_or_record_type(StubDataclassData)
     with pytest.raises(Exception):
         # Type rather than instance
-        TypeCheck.is_key_or_record_type(StubDataclass())
+        TypeCheck.is_key_or_record_type(_RECORD_INSTANCE)
     with pytest.raises(Exception):
         # Type rather than instance
-        TypeCheck.is_key_or_record_type(StubDataclassKey())
+        TypeCheck.is_key_or_record_type(_KEY_INSTANCE)
 
 
 def test_is_key_or_record_instance():
@@ -228,11 +244,14 @@ def test_is_key_or_record_instance():
                 method(None)
 
         # Valid key or record types
-        method(StubDataclassKey())
-        method(StubDataclass())
-        method(StubDataclassDerived())
+        method(_KEY_INSTANCE)
+        method(_RECORD_INSTANCE)
+        method(_DERIVED_RECORD_INSTANCE)
 
         # Invalid cases
+        with pytest.raises(Exception):
+            # Not frozen
+            method(_RECORD_INSTANCE_NOT_FROZEN)
         with pytest.raises(Exception):
             method(123)
         with pytest.raises(Exception):
@@ -242,7 +261,7 @@ def test_is_key_or_record_instance():
             method(StubDataclass)
         with pytest.raises(Exception):
             # Not a key or record
-            method(StubDataclassData())
+            method(_DATA_INSTANCE)
 
 
 def test_is_key_or_record_sequence():
@@ -258,12 +277,15 @@ def test_is_key_or_record_sequence():
                 method(None)
 
         # Valid key or record sequences
-        method([StubDataclass()])
-        method([StubDataclassKey()])
-        method([StubDataclass(), StubDataclassKey()])
-        method([StubDataclassDerived()])
+        method([_RECORD_INSTANCE])
+        method([_KEY_INSTANCE])
+        method([_RECORD_INSTANCE, _KEY_INSTANCE])
+        method([_DERIVED_RECORD_INSTANCE])
 
         # Invalid cases
+        with pytest.raises(Exception):
+            # Not frozen
+            method([_RECORD_INSTANCE_NOT_FROZEN])
         with pytest.raises(Exception):
             method("not_a_sequence")
         with pytest.raises(Exception):
@@ -271,13 +293,13 @@ def test_is_key_or_record_sequence():
         with pytest.raises(Exception):
             method([int])
         with pytest.raises(Exception):
-            method([StubDataclass(), int])
+            method([_RECORD_INSTANCE, int])
         with pytest.raises(Exception):
             # Instance rather than type
-            method([StubDataclassData()])
+            method([_DATA_INSTANCE])
         with pytest.raises(Exception):
             # Instance rather than type
-            method([StubDataclass(), StubDataclassData()])
+            method([_RECORD_INSTANCE, _DATA_INSTANCE])
 
 
 if __name__ == "__main__":

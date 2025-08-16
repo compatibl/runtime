@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, cast
 from typing import Sequence
 from typing import TypeGuard
-from memoization import cached
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import KeyProtocol, BuilderProtocol, is_builder
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
@@ -27,9 +26,40 @@ from cl.runtime.records.typename import typename
 
 class TypeCheck:
     """Performs runtime type checks and returns TypeGuard instance."""
+    
+    @classmethod
+    def is_frozen(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol]:
+        """Check if the argument is frozen."""
+        if is_builder(obj):
+            if obj.is_frozen():
+                return True
+            elif raise_on_fail:
+                raise RuntimeError(f"Parameter of type {typename(obj)} is not frozen.")
+            else:
+                return False
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter of type {typename(obj)} does not implement BuilderProtocol.")
+        else:
+            return False
 
     @classmethod
-    @cached
+    def is_frozen_or_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol | None]:
+        """Check if the argument is frozen or None."""
+        if obj is None:
+            return True
+        elif is_builder(obj):
+            if obj.is_frozen():
+                return True
+            elif raise_on_fail:
+                raise RuntimeError(f"Parameter of type {typename(obj)} is not frozen or None.")
+            else:
+                return False
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter of type {typename(obj)} does not implement BuilderProtocol and is not None.")
+        else:
+            return False
+
+    @classmethod
     def is_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key type."""
         if isinstance(key_type, type) and is_key(key_type):
@@ -40,22 +70,22 @@ class TypeCheck:
             return False
 
     @classmethod
-    @cached
     def is_key_instance(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key instance."""
         if not isinstance(key, type) and is_key(key):
-            return True
+            return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter of type {typename(key)} is not a key instance.")
         else:
             return False
 
     @classmethod
-    @cached
     def is_key_instance_or_none(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol | None]:
         """Check if the argument is a key instance or None."""
-        if key is None or (not isinstance(key, type) and is_key(key)):
+        if key is None:
             return True
+        elif not isinstance(key, type) and is_key(key):
+            return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter of type {typename(key)} is not a key instance or None.")
         else:
@@ -96,7 +126,6 @@ class TypeCheck:
                 return False
 
     @classmethod
-    @cached
     def is_record_type(cls, record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
         """Check if the argument is a record type."""
         if isinstance(record_type, type) and is_record(record_type):
@@ -107,22 +136,22 @@ class TypeCheck:
             return False
 
     @classmethod
-    @cached
-    def is_record_instance(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+    def is_record_instance(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
         """Check if the argument is a record."""
         if not isinstance(record, type) and is_record(record):
-            return True
+            return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(record)} is not a record instance.")
         else:
             return False
 
     @classmethod
-    @cached
-    def is_record_instance_or_none(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+    def is_record_instance_or_none(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol | None]:
         """Check if the argument is a record or None."""
-        if record is None or (not isinstance(record, type) and is_record(record)):
+        if record is None:
             return True
+        elif not isinstance(record, type) and is_record(record):
+            return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(record)} is not a record instance or None.")
         else:
@@ -143,8 +172,11 @@ class TypeCheck:
 
     @classmethod
     def is_record_sequence_or_none(
-        cls, records: Any, *, raise_on_fail: bool = True
-    ) -> TypeGuard[Sequence[RecordProtocol]]:
+        cls,
+        records: Any,
+        *,
+        raise_on_fail: bool = True,
+    ) -> TypeGuard[Sequence[RecordProtocol] | None] | None:
         """
         Check if the argument is a sequence of records (iterable generator is not accepted)
         where each element can be None, and the entire sequence can also be None.
@@ -163,7 +195,6 @@ class TypeCheck:
                 return False
 
     @classmethod
-    @cached
     def is_key_or_record_type(cls, key_or_record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key or record type."""
         if isinstance(key_or_record_type, type) and is_key_or_record(key_or_record_type):
@@ -174,27 +205,27 @@ class TypeCheck:
             return False
 
     @classmethod
-    @cached
     def is_key_or_record_instance(cls, key_or_record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key or record."""
         if not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
-            return True
+            return cast(TypeGuard[KeyProtocol], cls.is_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance.")
         else:
             return False
 
     @classmethod
-    @cached
     def is_key_or_record_instance_or_none(
         cls,
         key_or_record: Any,
         *,
         raise_on_fail: bool = True,
-    ) -> TypeGuard[KeyProtocol]:
+    ) -> TypeGuard[KeyProtocol | None]:
         """Check if the argument is a key or record or None."""
-        if key_or_record is None or (not isinstance(key_or_record, type) and is_key_or_record(key_or_record)):
+        if key_or_record is None:
             return True
+        elif not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
+            return cast(TypeGuard[KeyProtocol], cls.is_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance or None.")
         else:
@@ -220,8 +251,11 @@ class TypeCheck:
 
     @classmethod
     def is_key_or_record_sequence_or_none(
-        cls, keys_or_records: Any, *, raise_on_fail: bool = True
-    ) -> TypeGuard[Sequence[RecordProtocol]]:
+        cls,
+        keys_or_records: Any,
+        *,
+        raise_on_fail: bool = True,
+    ) -> TypeGuard[Sequence[RecordProtocol | None] | None]:
         """
         Check if the argument is a sequence of keys or records (iterable generator is not accepted)
         where each element can be None, and the entire sequence can also be None.
