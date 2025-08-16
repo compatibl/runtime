@@ -66,7 +66,14 @@ class TypeCheck:
     def is_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key type."""
         if isinstance(key_type, type) and is_key(key_type):
-            return True
+            if (type_name := typename(key_type)).endswith("Key"):
+                return True
+            elif raise_on_fail:
+                raise RuntimeError(
+                    f"Type {type_name} implements the required methods for a key, but its name does not end\n"
+                    f"with the suffix 'Key' which is required to prevent name collusion with records.")
+            else:
+                return False
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_type)} is not a key type.")
         else:
@@ -76,7 +83,14 @@ class TypeCheck:
     def is_key_instance(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key instance."""
         if not isinstance(key, type) and is_key(key):
-            return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
+            if (type_name := typename(key)).endswith("Key"):
+                return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
+            elif raise_on_fail:
+                raise RuntimeError(
+                    f"Type {type_name} implements the required methods for a key, but its name does not end\n"
+                    f"with the suffix 'Key' which is required to prevent name collusion with records.")
+            else:
+                return False
         elif raise_on_fail:
             raise RuntimeError(f"Parameter of type {typename(key)} is not a key instance.")
         else:
@@ -88,7 +102,14 @@ class TypeCheck:
         if key is None:
             return True
         elif not isinstance(key, type) and is_key(key):
-            return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
+            if (type_name := typename(key)).endswith("Key"):
+                return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
+            elif raise_on_fail:
+                raise RuntimeError(
+                    f"Type {type_name} implements the required methods for a key, but its name does not end\n"
+                    f"with the suffix 'Key' which is required to prevent name collusion with records.")
+            else:
+                return False
         elif raise_on_fail:
             raise RuntimeError(f"Parameter of type {typename(key)} is not a key instance or None.")
         else:
@@ -132,7 +153,14 @@ class TypeCheck:
     def is_record_type(cls, record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
         """Check if the argument is a record type."""
         if isinstance(record_type, type) and is_record(record_type):
-            return True
+            if not (type_name := typename(record_type)).endswith("Key"):
+                return True
+            elif raise_on_fail:
+                raise RuntimeError(
+                    f"Type {type_name} implements the required methods for a record, but its name ends\n"
+                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys.")
+            else:
+                return False
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(record_type)} is not a record type.")
         else:
@@ -142,7 +170,14 @@ class TypeCheck:
     def is_record_instance(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
         """Check if the argument is a record."""
         if not isinstance(record, type) and is_record(record):
-            return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
+            if not (type_name := typename(record)).endswith("Key"):
+                return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
+            elif raise_on_fail:
+                raise RuntimeError(
+                    f"Type {type_name} implements the required methods for a record, but its name ends\n"
+                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys.")
+            else:
+                return False
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(record)} is not a record instance.")
         else:
@@ -154,7 +189,14 @@ class TypeCheck:
         if record is None:
             return True
         elif not isinstance(record, type) and is_record(record):
-            return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
+            if not (type_name := typename(record)).endswith("Key"):
+                return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
+            elif raise_on_fail:
+                raise RuntimeError(
+                    f"Type {type_name} implements the required methods for a record, but its name ends\n"
+                    f"with the suffix 'Key' which is prohibited to prevent name collusion with keys.")
+            else:
+                return False
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(record)} is not a record instance or None.")
         else:
