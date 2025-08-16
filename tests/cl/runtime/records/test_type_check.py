@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.records.type_check import TypeCheck
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclass, StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
 
@@ -95,6 +95,15 @@ def test_is_key_type():
         TypeCheck.is_key_type(int)
 
 
+def test_is_key_instance():
+    """Test for is_key_type method."""
+    TypeCheck.is_key_instance(StubDataclassKey())
+    with pytest.raises(Exception):
+        TypeCheck.is_key_instance(StubDataclass())
+    with pytest.raises(Exception):
+        TypeCheck.is_key_instance(123)
+
+
 def test_is_key_sequence():
     """Test for is_key_sequence method."""
     # Valid key sequences
@@ -126,7 +135,31 @@ def test_is_record_type():
     with pytest.raises(Exception):
         TypeCheck.is_record_type("not_a_type")
     with pytest.raises(Exception):
+        TypeCheck.is_record_type(StubDataclassData)
+    with pytest.raises(Exception):
         TypeCheck.is_record_type(StubDataclassKey)
+
+
+def test_is_record_instance():
+    """Test for is_record method."""
+    # Valid record types
+    TypeCheck.is_record_instance(StubDataclass())
+    TypeCheck.is_record_instance(StubDataclassDerived())
+
+    # Invalid cases
+    with pytest.raises(Exception):
+        TypeCheck.is_record_instance(123)
+    with pytest.raises(Exception):
+        TypeCheck.is_record_instance("abc")
+    with pytest.raises(Exception):
+        # Type rather than instance
+        TypeCheck.is_record_instance(StubDataclass)
+    with pytest.raises(Exception):
+        # Not a record
+        TypeCheck.is_record_instance(StubDataclassData())
+    with pytest.raises(Exception):
+        # Not a record
+        TypeCheck.is_record_instance(StubDataclassKey())
 
 
 def test_is_record_sequence():
