@@ -27,6 +27,7 @@ _RECORD_INSTANCE = StubDataclass().build()
 _RECORD_INSTANCE_NOT_FROZEN = StubDataclass()
 _DERIVED_RECORD_INSTANCE = StubDataclassDerived().build()
 
+
 def test_is_key_type():
     """Test for is_key_type method."""
 

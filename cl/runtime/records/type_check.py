@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, cast
+from typing import Any
 from typing import Sequence
 from typing import TypeGuard
-from cl.runtime.records.protocols import KeyProtocol, BuilderProtocol, is_builder
+from typing import cast
+from cl.runtime.records.protocols import BuilderProtocol
+from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import is_builder
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
@@ -26,7 +29,7 @@ from cl.runtime.records.typename import typename
 
 class TypeCheck:
     """Performs runtime type checks and returns TypeGuard instance."""
-    
+
     @classmethod
     def is_frozen(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol]:
         """Check if the argument is frozen."""

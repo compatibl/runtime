@@ -26,9 +26,9 @@ from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.filter import Filter
-from cl.runtime.db.filter_many import FilterMany
-from cl.runtime.db.filter_by_type import FilterByType
 from cl.runtime.db.filter_by_query import FilterByQuery
+from cl.runtime.db.filter_by_type import FilterByType
+from cl.runtime.db.filter_many import FilterMany
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.sort_order import SortOrder
