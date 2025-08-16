@@ -34,6 +34,9 @@ class EnvSettings(Settings):
     env_kind: EnvKind | None = None  # TODO: Make required
     """Determines the default settings for multiuser access and data retention."""
 
+    env_tenant: str = required()
+    """Unique tenant identifier, tenants are isolated when sharing the same DB."""
+
     env_user: str | None = None  # TODO: Determine if this should be here or in UserContext, keep one
     """Identifies the user."""
 

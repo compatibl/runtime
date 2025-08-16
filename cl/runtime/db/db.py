@@ -32,11 +32,15 @@ from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
+from cl.runtime.settings.env_settings import EnvSettings
 
 
 @dataclass(slots=True, kw_only=True)
 class Db(DbKey, RecordMixin, ABC):
     """Polymorphic data storage with dataset isolation."""
+
+    _tenant: str = EnvSettings.instance().env_tenant
+    """Unique tenant identifier, tenants are isolated when sharing the same DB."""
 
     _record_type_name_cache: dict[str, set] | None = None
     """Dict of record type name sets for each dataset."""
