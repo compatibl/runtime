@@ -32,7 +32,7 @@ class FilterByType(Filter):
 
         # Perform checks
         record_type = TypeCache.from_type_name(self.record_type_name)
-        assert TypeCheck.is_record_type(record_type)
+        assert TypeCheck.guard_record_type(record_type)
 
         # Set key_type_name in this class based on record_type_name
         self.key_type_name = typename(record_type.get_key_type())

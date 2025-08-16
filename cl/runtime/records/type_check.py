@@ -31,7 +31,7 @@ class TypeCheck:
     """Performs runtime type checks and returns TypeGuard instance."""
 
     @classmethod
-    def is_frozen(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol]:
+    def guard_frozen(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol]:
         """Check if the argument is frozen."""
         if is_builder(obj):
             if obj.is_frozen():
@@ -46,7 +46,7 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_frozen_or_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol | None]:
+    def guard_frozen_or_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol | None]:
         """Check if the argument is frozen or None."""
         if obj is None:
             return True
@@ -63,7 +63,7 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+    def guard_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key type."""
         if isinstance(key_type, type) and is_key(key_type):
             if (type_name := typename(key_type)).endswith("Key"):
@@ -80,7 +80,7 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_key_instance(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+    def guard_key_instance(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key instance."""
         if key is None:
             if raise_on_fail:
@@ -89,7 +89,7 @@ class TypeCheck:
                 return False
         if not isinstance(key, type) and is_key(key):
             if (type_name := typename(key)).endswith("Key"):
-                return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[KeyProtocol], cls.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a key, but its name does not end\n"
@@ -102,13 +102,13 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_key_instance_or_none(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol | None]:
+    def guard_key_instance_or_none(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol | None]:
         """Check if the argument is a key instance or None."""
         if key is None:
             return True
         elif not isinstance(key, type) and is_key(key):
             if (type_name := typename(key)).endswith("Key"):
-                return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[KeyProtocol], cls.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a key, but its name does not end\n"
@@ -121,10 +121,10 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_key_sequence(cls, keys: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[KeyProtocol]]:
+    def guard_key_sequence(cls, keys: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[KeyProtocol]]:
         """Check if the argument is a key sequence (iterable generator is not accepted)."""
         if is_sequence(keys):
-            return all(cls.is_key_instance(x, raise_on_fail=raise_on_fail) for x in keys)
+            return all(cls.guard_key_instance(x, raise_on_fail=raise_on_fail) for x in keys)
         else:
             if raise_on_fail:
                 raise RuntimeError(
@@ -134,7 +134,7 @@ class TypeCheck:
                 return False
 
     @classmethod
-    def is_key_sequence_or_none(
+    def guard_key_sequence_or_none(
         cls, keys: Any, *, raise_on_fail: bool = True
     ) -> TypeGuard[Sequence[KeyProtocol] | None] | None:
         """
@@ -144,7 +144,7 @@ class TypeCheck:
         if keys is None:
             return True
         elif is_sequence(keys):
-            return all(cls.is_key_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys)
+            return all(cls.guard_key_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys)
         else:
             if raise_on_fail:
                 raise RuntimeError(
@@ -155,7 +155,7 @@ class TypeCheck:
                 return False
 
     @classmethod
-    def is_record_type(cls, record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
+    def guard_record_type(cls, record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
         """Check if the argument is a record type."""
         if isinstance(record_type, type) and is_record(record_type):
             if not (type_name := typename(record_type)).endswith("Key"):
@@ -172,13 +172,13 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_record_instance(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
+    def guard_record_instance(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
         """Check if the argument is a record."""
         if record is None:
             raise RuntimeError("Expected a record instance but received None.")
         elif not isinstance(record, type) and is_record(record):
             if not (type_name := typename(record)).endswith("Key"):
-                return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[RecordProtocol], cls.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
@@ -191,13 +191,13 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_record_instance_or_none(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol | None]:
+    def guard_record_instance_or_none(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol | None]:
         """Check if the argument is a record or None."""
         if record is None:
             return True
         elif not isinstance(record, type) and is_record(record):
             if not (type_name := typename(record)).endswith("Key"):
-                return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[RecordProtocol], cls.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
@@ -210,10 +210,10 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_record_sequence(cls, records: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[RecordProtocol]]:
+    def guard_record_sequence(cls, records: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[RecordProtocol]]:
         """Check if the argument is a record sequence (iterable generator is not accepted)."""
         if is_sequence(records):
-            return all(cls.is_record_instance(x, raise_on_fail=raise_on_fail) for x in records)
+            return all(cls.guard_record_instance(x, raise_on_fail=raise_on_fail) for x in records)
         else:
             if raise_on_fail:
                 raise RuntimeError(
@@ -223,7 +223,7 @@ class TypeCheck:
                 return False
 
     @classmethod
-    def is_record_sequence_or_none(
+    def guard_record_sequence_or_none(
         cls,
         records: Any,
         *,
@@ -236,7 +236,7 @@ class TypeCheck:
         if records is None:
             return True
         elif is_sequence(records):
-            return all(cls.is_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in records)
+            return all(cls.guard_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in records)
         else:
             if raise_on_fail:
                 raise RuntimeError(
@@ -247,7 +247,7 @@ class TypeCheck:
                 return False
 
     @classmethod
-    def is_key_or_record_type(cls, key_or_record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+    def guard_key_or_record_type(cls, key_or_record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key or record type."""
         if isinstance(key_or_record_type, type) and is_key_or_record(key_or_record_type):
             return True
@@ -257,7 +257,7 @@ class TypeCheck:
             return False
 
     @classmethod
-    def is_key_or_record_instance(cls, key_or_record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+    def guard_key_or_record_instance(cls, key_or_record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key or record."""
         if key_or_record is None:
             if raise_on_fail:
@@ -265,14 +265,14 @@ class TypeCheck:
             else:
                 return False
         elif not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
-            return cast(TypeGuard[KeyProtocol], cls.is_frozen(key_or_record, raise_on_fail=raise_on_fail))
+            return cast(TypeGuard[KeyProtocol], cls.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance.")
         else:
             return False
 
     @classmethod
-    def is_key_or_record_instance_or_none(
+    def guard_key_or_record_instance_or_none(
         cls,
         key_or_record: Any,
         *,
@@ -282,14 +282,14 @@ class TypeCheck:
         if key_or_record is None:
             return True
         elif not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
-            return cast(TypeGuard[KeyProtocol], cls.is_frozen(key_or_record, raise_on_fail=raise_on_fail))
+            return cast(TypeGuard[KeyProtocol], cls.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance or None.")
         else:
             return False
 
     @classmethod
-    def is_key_or_record_sequence(
+    def guard_key_or_record_sequence(
         cls,
         keys_or_records: Any,
         *,
@@ -297,7 +297,7 @@ class TypeCheck:
     ) -> TypeGuard[Sequence[KeyProtocol]]:
         """Check if the argument is a key or record sequence (iterable generator is not accepted)."""
         if is_sequence(keys_or_records):
-            return all(cls.is_key_or_record_instance(x, raise_on_fail=raise_on_fail) for x in keys_or_records)
+            return all(cls.guard_key_or_record_instance(x, raise_on_fail=raise_on_fail) for x in keys_or_records)
         else:
             if raise_on_fail:
                 raise RuntimeError(
@@ -307,7 +307,7 @@ class TypeCheck:
                 return False
 
     @classmethod
-    def is_key_or_record_sequence_or_none(
+    def guard_key_or_record_sequence_or_none(
         cls,
         keys_or_records: Any,
         *,
@@ -320,7 +320,7 @@ class TypeCheck:
         if keys_or_records is None:
             return True
         elif is_sequence(keys_or_records):
-            return all(cls.is_key_or_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys_or_records)
+            return all(cls.guard_key_or_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys_or_records)
         else:
             if raise_on_fail:
                 raise RuntimeError(

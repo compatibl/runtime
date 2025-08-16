@@ -31,7 +31,7 @@ class FilterMany(Filter):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Perform checks to ensure all keys list elements are keys, and all have the same key type
-        assert TypeCheck.is_key_sequence(self.keys)
+        assert TypeCheck.guard_key_sequence(self.keys)
         if self.keys:
             key_type = type(self.keys[0])
             mismatched_types = [typename(key) for key in self.keys if type(key) != key_type]

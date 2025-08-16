@@ -123,7 +123,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 project_to=project_to,
             )
             if result is None:
-                TypeCheck.is_key_or_record_type(type(key_or_record))
+                TypeCheck.guard_key_or_record_type(type(key_or_record))
                 if is_record(key_or_record):
                     key = key_or_record.get_key()
                 else:
@@ -191,7 +191,7 @@ class DataSource(DataSourceKey, RecordMixin):
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
         """
         # Check that the argument is not None and there are no elements that are None
-        TypeCheck.is_key_or_record_sequence(records_or_keys)
+        TypeCheck.guard_key_or_record_sequence(records_or_keys)
 
         # Delegate to load_many_or_none method
         result = self.load_many_or_none(
@@ -202,7 +202,7 @@ class DataSource(DataSourceKey, RecordMixin):
         )
 
         # Perform checks and return
-        TypeCheck.is_record_sequence(result)
+        TypeCheck.guard_record_sequence(result)
         return result
 
     def load_many_or_none(
@@ -227,7 +227,7 @@ class DataSource(DataSourceKey, RecordMixin):
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
         """
-        assert TypeCheck.is_key_or_record_sequence_or_none(records_or_keys)
+        assert TypeCheck.guard_key_or_record_sequence_or_none(records_or_keys)
 
         # Pass through None or empty
         if not records_or_keys:
@@ -340,7 +340,7 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        TypeCheck.is_key_type(key_type)
+        TypeCheck.guard_key_type(key_type)
 
         return self._get_db().load_all(
             key_type=key_type,
@@ -493,7 +493,7 @@ class DataSource(DataSourceKey, RecordMixin):
         records: Sequence[RecordProtocol],
     ) -> None:
         """Save the specified records to storage, replace rather than update individual fields for those that exist."""
-        TypeCheck.is_record_sequence(records)
+        TypeCheck.guard_record_sequence(records)
 
         # Do nothing if empty but error on None
         if len(records) == 0:
@@ -520,7 +520,7 @@ class DataSource(DataSourceKey, RecordMixin):
         keys: Sequence[KeyProtocol],
     ) -> None:
         """Delete records for the specified keys in object, tuple or string format (no error if not found)."""
-        assert TypeCheck.is_key_sequence(keys)
+        assert TypeCheck.guard_key_sequence(keys)
 
         # Do nothing if empty but error on None
         if len(keys) == 0:

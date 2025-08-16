@@ -70,8 +70,8 @@ class SqliteDb(Db):
     ) -> Sequence[RecordMixin]:
 
         # Check params
-        assert TypeCheck.is_key_type(key_type)
-        assert TypeCheck.is_key_sequence(keys)
+        assert TypeCheck.guard_key_type(key_type)
+        assert TypeCheck.guard_key_sequence(keys)
         self._check_dataset(dataset)
 
         if not keys:
@@ -113,7 +113,7 @@ class SqliteDb(Db):
     ) -> tuple[TRecord, ...]:
 
         # Check params
-        assert TypeCheck.is_key_type(key_type)
+        assert TypeCheck.guard_key_type(key_type)
         self._check_dataset(dataset)
 
         if project_to is not None:
@@ -322,8 +322,8 @@ class SqliteDb(Db):
     ) -> None:
 
         # Check params
-        assert TypeCheck.is_key_type(key_type)
-        assert TypeCheck.is_record_sequence(records)
+        assert TypeCheck.guard_key_type(key_type)
+        assert TypeCheck.guard_record_sequence(records)
         self._check_dataset(dataset)
 
         if not records:
@@ -369,8 +369,8 @@ class SqliteDb(Db):
     ) -> None:
 
         # Check params
-        assert TypeCheck.is_key_type(key_type)
-        assert TypeCheck.is_key_sequence(keys)
+        assert TypeCheck.guard_key_type(key_type)
+        assert TypeCheck.guard_key_sequence(keys)
         self._check_dataset(dataset)
 
         if not keys:

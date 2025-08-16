@@ -52,8 +52,8 @@ class LocalCache(Db):
     ) -> Sequence[RecordMixin]:
 
         # Check params
-        assert TypeCheck.is_key_type(key_type)
-        assert TypeCheck.is_key_sequence(keys)
+        assert TypeCheck.guard_key_type(key_type)
+        assert TypeCheck.guard_key_sequence(keys)
         self._check_dataset(dataset)
 
         if (table_cache := self.__cache.get(key_type, None)) is not None:
@@ -114,8 +114,8 @@ class LocalCache(Db):
     ) -> None:
 
         # Check params
-        assert TypeCheck.is_key_type(key_type)
-        assert TypeCheck.is_record_sequence(records)
+        assert TypeCheck.guard_key_type(key_type)
+        assert TypeCheck.guard_record_sequence(records)
         self._check_dataset(dataset)
 
         # TODO: Provide a more performant implementation

@@ -31,18 +31,18 @@ _DERIVED_RECORD_INSTANCE = StubDataclassDerived().build()
 def test_is_key_type():
     """Test for is_key_type method."""
 
-    TypeCheck.is_key_type(StubDataclassKey)
+    TypeCheck.guard_key_type(StubDataclassKey)
     # Test that record type is not a key type
     with pytest.raises(Exception):
-        TypeCheck.is_key_type(StubDataclass)
+        TypeCheck.guard_key_type(StubDataclass)
     # Test that data type is not a key type
     with pytest.raises(Exception):
-        TypeCheck.is_key_type(StubDataclassData)
+        TypeCheck.guard_key_type(StubDataclassData)
     with pytest.raises(Exception):
-        TypeCheck.is_key_type(int)
+        TypeCheck.guard_key_type(int)
     with pytest.raises(Exception):
         # Instance rather than type
-        TypeCheck.is_key_type(_KEY_INSTANCE)
+        TypeCheck.guard_key_type(_KEY_INSTANCE)
 
 
 def test_is_key_instance():
@@ -50,7 +50,7 @@ def test_is_key_instance():
 
     for allow_none in [True, False]:
 
-        method = TypeCheck.is_key_instance_or_none if allow_none else TypeCheck.is_key_instance
+        method = TypeCheck.guard_key_instance_or_none if allow_none else TypeCheck.guard_key_instance
         if allow_none:
             method(None)
         else:
@@ -81,7 +81,7 @@ def test_is_key_sequence():
 
     for allow_none in [True, False]:
 
-        method = TypeCheck.is_key_sequence_or_none if allow_none else TypeCheck.is_key_sequence
+        method = TypeCheck.guard_key_sequence_or_none if allow_none else TypeCheck.guard_key_sequence
         if allow_none:
             method(None)
         else:
@@ -116,23 +116,23 @@ def test_is_record_type():
     """Test for is_record_type method."""
 
     # Valid record types
-    TypeCheck.is_record_type(StubDataclass)
-    TypeCheck.is_record_type(StubDataclassDerived)
+    TypeCheck.guard_record_type(StubDataclass)
+    TypeCheck.guard_record_type(StubDataclassDerived)
 
     # Invalid cases
     with pytest.raises(Exception):
-        TypeCheck.is_record_type(int)
+        TypeCheck.guard_record_type(int)
     with pytest.raises(Exception):
-        TypeCheck.is_record_type(str)
+        TypeCheck.guard_record_type(str)
     with pytest.raises(Exception):
-        TypeCheck.is_record_type("not_a_type")
+        TypeCheck.guard_record_type("not_a_type")
     with pytest.raises(Exception):
-        TypeCheck.is_record_type(StubDataclassData)
+        TypeCheck.guard_record_type(StubDataclassData)
     with pytest.raises(Exception):
-        TypeCheck.is_record_type(StubDataclassKey)
+        TypeCheck.guard_record_type(StubDataclassKey)
     with pytest.raises(Exception):
         # Instance rather than type
-        TypeCheck.is_record_type(_RECORD_INSTANCE)
+        TypeCheck.guard_record_type(_RECORD_INSTANCE)
 
 
 def test_is_record_instance():
@@ -140,7 +140,7 @@ def test_is_record_instance():
 
     for allow_none in [True, False]:
 
-        method = TypeCheck.is_record_instance_or_none if allow_none else TypeCheck.is_record_instance
+        method = TypeCheck.guard_record_instance_or_none if allow_none else TypeCheck.guard_record_instance
         if allow_none:
             method(None)
         else:
@@ -175,7 +175,7 @@ def test_is_record_sequence():
 
     for allow_none in [True, False]:
 
-        method = TypeCheck.is_record_sequence_or_none if allow_none else TypeCheck.is_record_sequence
+        method = TypeCheck.guard_record_sequence_or_none if allow_none else TypeCheck.guard_record_sequence
         if allow_none:
             method(None)
         else:
@@ -209,27 +209,27 @@ def test_is_key_or_record_type():
     """Test for is_key_or_record_type method."""
 
     # Valid key or record types
-    TypeCheck.is_key_or_record_type(StubDataclass)
-    TypeCheck.is_key_or_record_type(StubDataclassKey)
-    TypeCheck.is_key_or_record_type(StubDataclassDerived)
+    TypeCheck.guard_key_or_record_type(StubDataclass)
+    TypeCheck.guard_key_or_record_type(StubDataclassKey)
+    TypeCheck.guard_key_or_record_type(StubDataclassDerived)
 
     # Invalid cases
     with pytest.raises(Exception):
-        TypeCheck.is_key_or_record_type(int)
+        TypeCheck.guard_key_or_record_type(int)
     with pytest.raises(Exception):
-        TypeCheck.is_key_or_record_type(str)
+        TypeCheck.guard_key_or_record_type(str)
     with pytest.raises(Exception):
-        TypeCheck.is_key_or_record_type("not_a_type")
+        TypeCheck.guard_key_or_record_type("not_a_type")
     # Test data type (should fail)
     with pytest.raises(Exception):
         # Not a key or record
-        TypeCheck.is_key_or_record_type(StubDataclassData)
+        TypeCheck.guard_key_or_record_type(StubDataclassData)
     with pytest.raises(Exception):
         # Type rather than instance
-        TypeCheck.is_key_or_record_type(_RECORD_INSTANCE)
+        TypeCheck.guard_key_or_record_type(_RECORD_INSTANCE)
     with pytest.raises(Exception):
         # Type rather than instance
-        TypeCheck.is_key_or_record_type(_KEY_INSTANCE)
+        TypeCheck.guard_key_or_record_type(_KEY_INSTANCE)
 
 
 def test_is_key_or_record_instance():
@@ -237,7 +237,7 @@ def test_is_key_or_record_instance():
 
     for allow_none in [True, False]:
 
-        method = TypeCheck.is_key_or_record_instance_or_none if allow_none else TypeCheck.is_key_or_record_instance
+        method = TypeCheck.guard_key_or_record_instance_or_none if allow_none else TypeCheck.guard_key_or_record_instance
         if allow_none:
             method(None)
         else:
@@ -270,7 +270,7 @@ def test_is_key_or_record_sequence():
 
     for allow_none in [True, False]:
 
-        method = TypeCheck.is_key_or_record_sequence_or_none if allow_none else TypeCheck.is_key_or_record_sequence
+        method = TypeCheck.guard_key_or_record_sequence_or_none if allow_none else TypeCheck.guard_key_or_record_sequence
         if allow_none:
             method(None)
         else:
