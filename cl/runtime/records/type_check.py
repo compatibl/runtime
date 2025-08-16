@@ -82,6 +82,11 @@ class TypeCheck:
     @classmethod
     def is_key_instance(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key instance."""
+        if key is None:
+            if raise_on_fail:
+                raise RuntimeError("Expected a key instance but received None.")
+            else:
+                return False
         if not isinstance(key, type) and is_key(key):
             if (type_name := typename(key)).endswith("Key"):
                 return cast(TypeGuard[KeyProtocol], cls.is_frozen(key, raise_on_fail=raise_on_fail))
@@ -169,7 +174,9 @@ class TypeCheck:
     @classmethod
     def is_record_instance(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
         """Check if the argument is a record."""
-        if not isinstance(record, type) and is_record(record):
+        if record is None:
+            raise RuntimeError("Expected a record instance but received None.")
+        elif not isinstance(record, type) and is_record(record):
             if not (type_name := typename(record)).endswith("Key"):
                 return cast(TypeGuard[RecordProtocol], cls.is_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
@@ -252,7 +259,12 @@ class TypeCheck:
     @classmethod
     def is_key_or_record_instance(cls, key_or_record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key or record."""
-        if not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
+        if key_or_record is None:
+            if raise_on_fail:
+                raise RuntimeError("Expected a key or record instance but received None.")
+            else:
+                return False
+        elif not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
             return cast(TypeGuard[KeyProtocol], cls.is_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance.")
