@@ -44,11 +44,22 @@ class TypeCheck:
     @classmethod
     @cached
     def is_key_instance(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
-        """Check if the argument is a key."""
+        """Check if the argument is a key instance."""
         if not isinstance(key, type) and is_key(key):
             return True
         elif raise_on_fail:
             raise RuntimeError(f"Parameter of type {typename(key)} is not a key instance.")
+        else:
+            return False
+
+    @classmethod
+    @cached
+    def is_key_instance_or_none(cls, key: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol | None]:
+        """Check if the argument is a key instance or None."""
+        if key is None or (not isinstance(key, type) and is_key(key)):
+            return True
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter of type {typename(key)} is not a key instance or None.")
         else:
             return False
 
@@ -61,6 +72,30 @@ class TypeCheck:
             if raise_on_fail:
                 raise RuntimeError(
                     f"Parameter {typename(keys)} is not a sequence (iterable generator is not accepted)."
+                )
+            else:
+                return False
+
+    @classmethod
+    def is_key_sequence_or_none(
+            cls,
+            keys: Any,
+            *,
+            raise_on_fail: bool = True
+    ) -> TypeGuard[Sequence[KeyProtocol] | None] | None:
+        """
+        Check if the argument is a sequence of keys (iterable generator is not accepted)
+        where each element can be None, and the entire sequence can also be None.
+        """
+        if keys is None:
+            return True
+        elif is_sequence(keys):
+            return all(cls.is_key_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys)
+        else:
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Parameter {typename(keys)} is not a sequence of keys (iterable generator is not accepted)\n"
+                    f"where each element can be None, and the entire sequence can also be None."
                 )
             else:
                 return False
@@ -87,6 +122,16 @@ class TypeCheck:
         else:
             return False
 
+    @classmethod
+    @cached
+    def is_record_instance_or_none(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyProtocol]:
+        """Check if the argument is a record or None."""
+        if record is None or (not isinstance(record, type) and is_record(record)):
+            return True
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter {typename(record)} is not a record instance or None.")
+        else:
+            return False
 
     @classmethod
     def is_record_sequence(cls, records: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[RecordProtocol]]:
@@ -97,6 +142,30 @@ class TypeCheck:
             if raise_on_fail:
                 raise RuntimeError(
                     f"Parameter {typename(records)} is not a sequence (iterable generator is not accepted)."
+                )
+            else:
+                return False
+
+    @classmethod
+    def is_record_sequence_or_none(
+            cls,
+            records: Any,
+            *,
+            raise_on_fail: bool = True
+    ) -> TypeGuard[Sequence[RecordProtocol]]:
+        """
+        Check if the argument is a sequence of records (iterable generator is not accepted)
+        where each element can be None, and the entire sequence can also be None.
+        """
+        if records is None:
+            return True
+        elif is_sequence(records):
+            return all(cls.is_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in records)
+        else:
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Parameter {typename(records)} is not a sequence of records (iterable generator is not accepted)\n"
+                    f"where each element can be None, and the entire sequence can also be None."
                 )
             else:
                 return False
@@ -124,6 +193,22 @@ class TypeCheck:
             return False
 
     @classmethod
+    @cached
+    def is_key_or_record_instance_or_none(
+            cls,
+            key_or_record: Any,
+            *,
+            raise_on_fail: bool = True,
+    ) -> TypeGuard[KeyProtocol]:
+        """Check if the argument is a key or record or None."""
+        if key_or_record is None or (not isinstance(key_or_record, type) and is_key_or_record(key_or_record)):
+            return True
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance or None.")
+        else:
+            return False
+
+    @classmethod
     def is_key_or_record_sequence(
         cls,
         keys_or_records: Any,
@@ -137,6 +222,31 @@ class TypeCheck:
             if raise_on_fail:
                 raise RuntimeError(
                     f"Parameter {typename(keys_or_records)} is not a sequence (iterable generator is not accepted)."
+                )
+            else:
+                return False
+
+    @classmethod
+    def is_key_or_record_sequence_or_none(
+            cls,
+            keys_or_records: Any,
+            *,
+            raise_on_fail: bool = True
+    ) -> TypeGuard[Sequence[RecordProtocol]]:
+        """
+        Check if the argument is a sequence of keys or records (iterable generator is not accepted)
+        where each element can be None, and the entire sequence can also be None.
+        """
+        if keys_or_records is None:
+            return True
+        elif is_sequence(keys_or_records):
+            return all(cls.is_key_or_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys_or_records)
+        else:
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Parameter {typename(keys_or_records)} is not a sequence"
+                    f"of keys or records (iterable generator is not accepted)\n"
+                    f"where each element can be None, and the entire sequence can also be None."
                 )
             else:
                 return False
