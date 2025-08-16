@@ -37,17 +37,59 @@ def test_rebuild_cache():
     TypeCache.rebuild()
 
 
+def test_is_known_type():
+    """Test is_known_type method."""
+
+    # Valid cases
+    assert TypeCache.is_known_type(StubDataclass)
+    assert TypeCache.is_known_type(StubDataclass, type_kind=TypeKind.RECORD)
+    assert TypeCache.is_known_type(StubDataclassKey)
+    assert TypeCache.is_known_type(StubDataclassKey, type_kind=TypeKind.KEY)
+    assert TypeCache.is_known_type(StubDataclassData)
+    assert TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.DATA)
+
+    # Invalid cases
+    assert not TypeCache.is_known_type(123, raise_on_fail=False)
+    with pytest.raises(Exception):
+        TypeCache.is_known_type(123)
+
+    # Not a record
+    assert not TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.RECORD, raise_on_fail=False)
+    with pytest.raises(Exception):
+        TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
+
+def test_get_type_name():
+    """Test get_type_name method."""
+
+    # Valid cases
+    assert TypeCache.get_type_name(StubDataclass) == "StubDataclass"
+    assert TypeCache.get_type_name(StubDataclassKey) == "StubDataclassKey"
+    assert TypeCache.get_type_name(StubDataclassData) == "StubDataclassData"
+
+    # Invalid cases
+    with pytest.raises(Exception):
+        # Not a known type
+        TypeCache.get_type_name(123)
+    with pytest.raises(Exception):
+        # Not a record
+        TypeCache.get_type_name(StubDataclassData, type_kind=TypeKind.RECORD)
+
+
 def test_get_qual_name():
-    """Test getting class path from class."""
+    """Test get_qual_name method."""
 
-    # Base class
-    base_path = f"{StubDataclass.__module__}.{StubDataclass.__name__}"
-    assert TypeCache.to_qual_name(StubDataclass) == base_path
+    # Valid cases
+    assert TypeCache.get_qual_name(StubDataclass) == f"{StubDataclass.__module__}.{StubDataclass.__name__}"
+    assert TypeCache.get_qual_name(StubDataclassKey) == f"{StubDataclassKey.__module__}.{StubDataclassKey.__name__}"
+    assert TypeCache.get_qual_name(StubDataclassData) == f"{StubDataclassData.__module__}.{StubDataclassData.__name__}"
 
-    # Derived class
-    derived_path = f"{StubDataclassDerived.__module__}.{StubDataclassDerived.__name__}"
-    assert TypeCache.to_qual_name(StubDataclassDerived) == derived_path
-
+    # Invalid cases
+    with pytest.raises(Exception):
+        # Not a known type
+        TypeCache.get_qual_name(123)
+    with pytest.raises(Exception):
+        # Not a record
+        TypeCache.get_qual_name(StubDataclassData, type_kind=TypeKind.RECORD)
 
 def test_from_type_name():
     """Test getting class from type names."""

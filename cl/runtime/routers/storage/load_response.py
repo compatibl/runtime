@@ -45,7 +45,7 @@ class LoadResponse(RecordsWithSchemaResponse):
             return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa
 
         # TODO: !!! Do not rely on first element to detect type
-        if TypeCache.type_name_found(request.load_keys[0].type):
+        if TypeCache.is_known_type(request.load_keys[0].type):
             record_type_name = request.load_keys[0].type
         else:
             bound_type_names = active(DataSource).get_bound_record_type_names(table=request.load_keys[0].type)

@@ -60,8 +60,6 @@ def test_filter_by_query(multi_db_fixture):
     """Test FilterByQuery class."""
     _test_filter(
         filter=FilterByQuery(
-            filter_id="1",
-            key_type_name=typename(StubDataclassKey),
             query=StubDataclassDerivedQuery(
                 derived_str_field="def",
             ).build(),
@@ -91,8 +89,6 @@ def test_filter_by_keys(multi_db_fixture):
     """Test FilterByQuery class."""
     _test_filter(
         filter=FilterMany(
-            filter_id="1",
-            key_type_name=typename(StubDataclassKey),
             keys=[
                 StubDataclassKey(id="1").build(),
                 StubDataclassKey(id="2").build(),
