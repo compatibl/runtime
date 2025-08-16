@@ -70,6 +70,21 @@ class TypeCache:
         type_or_name: type | str,
         *,
         type_kind: TypeKind | None = None,
+    ) -> bool:
+        # Delegate to guard_known_type but do not raise on fail
+        return cls.guard_known_type(
+            type_or_name,
+            type_kind=type_kind,
+            raise_on_fail=False,
+        )
+
+    @classmethod
+    @cached
+    def guard_known_type(
+        cls,
+        type_or_name: type | str,
+        *,
+        type_kind: TypeKind | None = None,
         raise_on_fail: bool = True,
     ) -> bool:
         """
@@ -94,7 +109,7 @@ class TypeCache:
             elif raise_on_fail:
                 # Type kind mismatch, raise
                 raise RuntimeError(
-                    f"Type {type_name} has type_kind={type_info.type_kind} while {type_kind} was expected.")
+                    f"Type {type_name} has type_kind={type_info.type_kind.name} while {type_kind.name} was expected.")
             else:
                 # Type kind mismatch, return False
                 return False
