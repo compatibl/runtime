@@ -18,9 +18,10 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_many import FilterMany
+from cl.runtime.db.filter_by_type import FilterByType
 from cl.runtime.db.filter_where import FilterWhere
 from cl.runtime.records.typename import typename
-from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclassDerived, StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 
@@ -40,6 +41,7 @@ def _test_filter(*, filter: Filter, expected_values: Sequence[str]):
         StubDataclassDerived(id="1", derived_str_field="abc"),
         StubDataclassDerived(id="2", derived_str_field="def"),
         StubDataclassDerived(id="3", derived_str_field="xyz"),
+        StubDataclassOtherDerived(id="4", other_derived="uvw"),
     ]
     records = [x.build() for x in records]
     active(DataSource).save_many(records)
@@ -50,10 +52,10 @@ def _test_filter(*, filter: Filter, expected_values: Sequence[str]):
     # Check if they match the expected values
     assert len(loaded_records) == len(expected_values)
     for record, expected_value in zip(loaded_records, expected_values):
-        record.derived_str_field == expected_value
+        assert record.id == expected_value
 
 
-def test_filter_where(multi_db_fixture):
+def test_filter_by_query(multi_db_fixture):
     """Test FilterWhere class."""
     _test_filter(
         filter=FilterWhere(
@@ -63,12 +65,28 @@ def test_filter_where(multi_db_fixture):
                 derived_str_field="def",
             ).build(),
         ).build(),
-        expected_values=["def"],
+        expected_values=["2"],
+    )
+
+
+def test_filter_by_type(multi_db_fixture):
+    """Test FilterWhere class."""
+    _test_filter(
+        filter=FilterByType(
+            record_type_name="StubDataclassDerived",
+        ).build(),
+        expected_values=["1", "2", "3"],
+    )
+    _test_filter(
+        filter=FilterByType(
+            record_type_name="StubDataclassOtherDerived",
+        ).build(),
+        expected_values=["4"],
     )
 
 
 @pytest.mark.skip("Requires KeyMixin serialization")
-def test_filter_many(multi_db_fixture):
+def test_filter_by_keys(multi_db_fixture):
     """Test FilterWhere class."""
     _test_filter(
         filter=FilterMany(
@@ -79,7 +97,7 @@ def test_filter_many(multi_db_fixture):
                 StubDataclassKey(id="2").build(),
             ],
         ).build(),
-        expected_values=["abc", "def"],
+        expected_values=["1", "2"],
     )
 
 

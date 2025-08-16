@@ -27,6 +27,7 @@ from cl.runtime.db.dataset_key import DatasetKey
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_many import FilterMany
+from cl.runtime.db.filter_by_type import FilterByType
 from cl.runtime.db.filter_where import FilterWhere
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.resource_key import ResourceKey
@@ -378,6 +379,8 @@ class DataSource(DataSourceKey, RecordMixin):
         assert isinstance(filter_, Filter)
 
         if isinstance(filter_, FilterWhere):
+
+            # Load using the query stored in the filter
             return self.load_where(
                 filter_.query,
                 cast_to=cast_to,
@@ -387,15 +390,40 @@ class DataSource(DataSourceKey, RecordMixin):
                 limit=limit,
                 skip=skip,
             )
-        elif isinstance(filter_, FilterMany):
-            return self.load_many(
-                filter_.keys,
+        elif isinstance(filter_, FilterByType):
+
+            # Perform checks for parameters that cannor be combined with FilterByType type
+            if restrict_to is not None:
+                raise RuntimeError("Param 'restrict_to' cannot be combined with FilterMany type.")
+
+            # Convert type name to type
+            record_type = TypeCache.from_type_name(filter_.record_type_name)
+
+            # Load using the type stored in the filter as restrict_to parameter
+            return self.load_type(
+                restrict_to=record_type,  # noqa
                 cast_to=cast_to,
-                restrict_to=restrict_to,
                 project_to=project_to,
                 sort_order=sort_order,
                 limit=limit,
                 skip=skip,
+            )
+        elif isinstance(filter_, FilterMany):
+
+            # Perform checks for parameters that cannor be combined with FilterMany type
+            if restrict_to is not None:
+                raise RuntimeError("Param 'restrict_to' cannot be combined with FilterMany type.")
+            if limit is not None:
+                raise RuntimeError("Param 'limit' cannot be combined with FilterMany type.")
+            if skip is not None:
+                raise RuntimeError("Param 'skip' cannot be combined with FilterMany type.")
+
+            # Load using the keys stored in the filter
+            return self.load_many(
+                filter_.keys,  # noqa
+                cast_to=cast_to,
+                project_to=project_to,
+                sort_order=sort_order,
             )
         else:
             raise RuntimeError(f"Filter type {typename(filter_)} not supported by the data source.")

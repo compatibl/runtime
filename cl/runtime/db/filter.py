@@ -15,6 +15,7 @@
 from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.db.filter_key import FilterKey
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.record_mixin import RecordMixin
 
 
@@ -24,3 +25,9 @@ class Filter(FilterKey, RecordMixin, ABC):
 
     def get_key(self) -> FilterKey:
         return FilterKey(filter_id=self.filter_id, key_type_name=self.key_type_name).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        # Create a temporary identifier if not specified
+        if self.filter_id is None:
+            self.filter_id = f"_{Timestamp.create()}"
