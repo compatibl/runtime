@@ -18,12 +18,12 @@ from dataclasses import dataclass
 from typing import Sequence
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.db.db_key import DbKey
+from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_type_binding import RecordTypeBinding
 from cl.runtime.records.record_type_binding_key import RecordTypeBindingKey

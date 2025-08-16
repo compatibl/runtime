@@ -28,21 +28,21 @@ from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_many import FilterMany
 from cl.runtime.db.filter_where import FilterWhere
+from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
-from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_type_binding import RecordTypeBinding
 from cl.runtime.records.record_type_binding_query import RecordTypeBindingQuery
+from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -129,7 +129,12 @@ class DataSource(DataSourceKey, RecordMixin):
                 skip=skip,
             )
             if result is None:
-                key_str = KeySerializers.DELIMITED.serialize(record_or_key.get_key())
+                TypeCheck.is_key_or_record_type(type(record_or_key))
+                if is_record(record_or_key):
+                    key = record_or_key.get_key()
+                else:
+                    key = record_or_key
+                key_str = KeySerializers.DELIMITED.serialize(key)
                 cast_to_str = f"\nwhen loading type {typename(cast_to)}" if cast_to else ""
                 raise RuntimeError(
                     f"Record not found for key {key_str}{cast_to_str}.\n"
@@ -173,7 +178,7 @@ class DataSource(DataSourceKey, RecordMixin):
         if len(result) == 1:
             return result[0]
         else:
-            raise RuntimeError("active(DataSource).load_many returned more records than requested.")
+            raise RuntimeError(f"DataSource.load_many returned {len(result)} records when one was requested.")
 
     def load_many(
         self,
@@ -199,7 +204,9 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        # Pass through None or an empty sequence
+        assert TypeCheck.is_key_or_record_sequence_or_none(records_or_keys)
+
+        # Pass through None or empty
         if not records_or_keys:
             return records_or_keys
 
@@ -316,6 +323,8 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
+        TypeCheck.is_key_type(key_type)
+
         return self._get_db().load_all(
             key_type=key_type,
             dataset=self.dataset.dataset_id,
@@ -329,7 +338,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_filter(
         self,
-        filter: Filter,
+        filter_: Filter,
         *,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
@@ -342,7 +351,7 @@ class DataSource(DataSourceKey, RecordMixin):
         Load records selected by the specified filter.
 
         Args:
-            filter: Filter used to select the records to load
+            filter_: Filter used to select the records to load
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: The query will return only this type and its subtypes
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -350,9 +359,11 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        if isinstance(filter, FilterWhere):
+        assert isinstance(filter_, Filter)
+
+        if isinstance(filter_, FilterWhere):
             return self.load_where(
-                filter.query,
+                filter_.query,
                 cast_to=cast_to,
                 restrict_to=restrict_to,
                 project_to=project_to,
@@ -360,9 +371,9 @@ class DataSource(DataSourceKey, RecordMixin):
                 limit=limit,
                 skip=skip,
             )
-        elif isinstance(filter, FilterMany):
+        elif isinstance(filter_, FilterMany):
             return self.load_many(
-                filter.keys,
+                filter_.keys,
                 cast_to=cast_to,
                 restrict_to=restrict_to,
                 project_to=project_to,
@@ -371,7 +382,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 skip=skip,
             )
         else:
-            raise RuntimeError(f"Filter type {typename(filter)} not supported by the data source.")
+            raise RuntimeError(f"Filter type {typename(filter_)} not supported by the data source.")
 
     def load_where(
         self,
@@ -438,8 +449,10 @@ class DataSource(DataSourceKey, RecordMixin):
         records: Sequence[RecordProtocol],
     ) -> None:
         """Save the specified records to storage, replace rather than update individual fields for those that exist."""
+        TypeCheck.is_record_sequence(records)
 
-        if not records:
+        # Do nothing if empty but error on None
+        if len(records) == 0:
             return
 
         # Validate inputs. Allowed values are records and None.
@@ -467,8 +480,10 @@ class DataSource(DataSourceKey, RecordMixin):
         keys: Sequence[KeyProtocol],
     ) -> None:
         """Delete records for the specified keys in object, tuple or string format (no error if not found)."""
+        assert TypeCheck.is_key_sequence(keys)
 
-        if not keys:
+        # Do nothing if empty but error on None
+        if len(keys) == 0:
             return
 
         # Validate inputs. Allowed values are keys and None.

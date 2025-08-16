@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Sequence
 import pytest
+from typing import Sequence
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_many import FilterMany
 from cl.runtime.db.filter_where import FilterWhere
 from cl.runtime.records.typename import typename
-from stubs.cl.runtime import StubDataclassDerived, StubDataclassKey
+from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 
 
@@ -58,12 +59,13 @@ def test_filter_where(multi_db_fixture):
         filter=FilterWhere(
             filter_id="1",
             key_type_name=typename(StubDataclassKey),
-            query = StubDataclassDerivedQuery(
+            query=StubDataclassDerivedQuery(
                 derived_str_field="def",
-            ).build()
+            ).build(),
         ).build(),
         expected_values=["def"],
     )
+
 
 @pytest.mark.skip("Requires KeyMixin serialization")
 def test_filter_many(multi_db_fixture):
@@ -72,10 +74,10 @@ def test_filter_many(multi_db_fixture):
         filter=FilterMany(
             filter_id="1",
             key_type_name=typename(StubDataclassKey),
-            keys = [
+            keys=[
                 StubDataclassKey(id="1").build(),
                 StubDataclassKey(id="2").build(),
-            ]
+            ],
         ).build(),
         expected_values=["abc", "def"],
     )

@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from cl.runtime.db.filter import Filter
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 
@@ -37,7 +36,7 @@ class FilterMany(Filter):
             key_type = type(self.keys[0])
             mismatched_types = [typename(key) for key in self.keys if type(key) != key_type]
             if mismatched_types:
-                mismatched_types_str = ', '.join(mismatched_types)
+                mismatched_types_str = ", ".join(mismatched_types)
                 raise RuntimeError(f"Keys in FilterMany have more than one type: {mismatched_types_str}")
         else:
             raise RuntimeError(f"FilterMany must have at least one key.")

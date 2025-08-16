@@ -13,12 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.experiments.experiment_key import ExperimentKey
 from cl.runtime.experiments.trial_key import TrialKey
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.db.query_mixin import QueryMixin
 
 
 @dataclass(slots=True, kw_only=True)

@@ -14,7 +14,6 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import Self
 from cl.runtime.db.filter_key import FilterKey
 from cl.runtime.records.record_mixin import RecordMixin
 
@@ -25,4 +24,3 @@ class Filter(FilterKey, RecordMixin, ABC):
 
     def get_key(self) -> FilterKey:
         return FilterKey(filter_id=self.filter_id, key_type_name=self.key_type_name).build()
-

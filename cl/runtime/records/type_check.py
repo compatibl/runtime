@@ -16,10 +16,8 @@ from typing import Any
 from typing import Sequence
 from typing import TypeGuard
 from memoization import cached
-from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_record
@@ -78,10 +76,7 @@ class TypeCheck:
 
     @classmethod
     def is_key_sequence_or_none(
-            cls,
-            keys: Any,
-            *,
-            raise_on_fail: bool = True
+        cls, keys: Any, *, raise_on_fail: bool = True
     ) -> TypeGuard[Sequence[KeyProtocol] | None] | None:
         """
         Check if the argument is a sequence of keys (iterable generator is not accepted)
@@ -148,10 +143,7 @@ class TypeCheck:
 
     @classmethod
     def is_record_sequence_or_none(
-            cls,
-            records: Any,
-            *,
-            raise_on_fail: bool = True
+        cls, records: Any, *, raise_on_fail: bool = True
     ) -> TypeGuard[Sequence[RecordProtocol]]:
         """
         Check if the argument is a sequence of records (iterable generator is not accepted)
@@ -195,10 +187,10 @@ class TypeCheck:
     @classmethod
     @cached
     def is_key_or_record_instance_or_none(
-            cls,
-            key_or_record: Any,
-            *,
-            raise_on_fail: bool = True,
+        cls,
+        key_or_record: Any,
+        *,
+        raise_on_fail: bool = True,
     ) -> TypeGuard[KeyProtocol]:
         """Check if the argument is a key or record or None."""
         if key_or_record is None or (not isinstance(key_or_record, type) and is_key_or_record(key_or_record)):
@@ -228,10 +220,7 @@ class TypeCheck:
 
     @classmethod
     def is_key_or_record_sequence_or_none(
-            cls,
-            keys_or_records: Any,
-            *,
-            raise_on_fail: bool = True
+        cls, keys_or_records: Any, *, raise_on_fail: bool = True
     ) -> TypeGuard[Sequence[RecordProtocol]]:
         """
         Check if the argument is a sequence of keys or records (iterable generator is not accepted)

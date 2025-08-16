@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from cl.runtime.tasks.task_status import TaskStatus

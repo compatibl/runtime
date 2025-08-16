@@ -14,14 +14,15 @@
 
 import pytest
 from cl.runtime.records.type_check import TypeCheck
-from stubs.cl.runtime import StubDataclass, StubDataclassData
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
 
 
 def test_is_key_type():
     """Test for is_key_type method."""
-    
+
     TypeCheck.is_key_type(StubDataclassKey)
     # Test that record type is not a key type
     with pytest.raises(Exception):
@@ -212,7 +213,7 @@ def test_is_key_or_record_type():
     with pytest.raises(Exception):
         # Type rather than instance
         TypeCheck.is_key_or_record_type(StubDataclassKey())
-        
+
 
 def test_is_key_or_record_instance():
     """Test for is_key_or_record_instance method."""

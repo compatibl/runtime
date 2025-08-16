@@ -22,6 +22,7 @@ from memoization import cached
 from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime import TypeCache
+from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
@@ -30,7 +31,6 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec

@@ -16,12 +16,12 @@ from dataclasses import dataclass
 from typing import Sequence
 from cl.runtime import Db
 from cl.runtime import RecordMixin
+from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TRecord
-from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.serializers.key_serializers import KeySerializers
 
