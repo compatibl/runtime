@@ -91,17 +91,18 @@ declare:
           name: Name
           comment: Content name.
           optional: true
-        - value:
-            type_: Binary
-          name: FileBytes
-          comment: Embedded binary content to be displayed as the current view.
         - enum:
             module:
               module_name: cl
             name: FileKind
           name: FileKind
-          comment: Embedded binary content type.
+          comment: Format of the file contents, some values match to more than 
+            one file extension.
           optional: true
+        - value:
+            type_: Binary
+          name: FileBytes
+          comment: Embedded binary content to be displayed as the current view.
       name: PdfFile
     static: true
   - name: instance_method_1a
@@ -227,17 +228,18 @@ declare:
           name: Name
           comment: Content name.
           optional: true
-        - value:
-            type_: Binary
-          name: FileBytes
-          comment: Embedded binary content to be displayed as the current view.
         - enum:
             module:
               module_name: cl
             name: FileKind
           name: FileKind
-          comment: Embedded binary content type.
+          comment: Format of the file contents, some values match to more than 
+            one file extension.
           optional: true
+        - value:
+            type_: Binary
+          name: FileBytes
+          comment: Embedded binary content to be displayed as the current view.
       name: PdfFile
     - value:
         type_: String
