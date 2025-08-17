@@ -60,7 +60,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         )
 
         # Load and serialize records
-        loaded_records = active(DataSource).load_many(keys)
+        loaded_records = active(DataSource).load_many_or_none(keys)
 
         # Find the lowest common base of the loaded types except None
         loaded_record_type_names = tuple(typename(x) for x in loaded_records if x is not None)
