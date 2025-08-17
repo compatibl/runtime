@@ -38,7 +38,7 @@ def _save_tasks_and_get_requests() -> list[Dict]:
         ).build()
         for i in range(2)
     ]
-    active(DataSource).save_many(tasks)
+    active(DataSource).insert_many(tasks)
 
     requests = [
         {

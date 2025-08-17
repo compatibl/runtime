@@ -108,7 +108,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 # Save with Running status
                 update = self.clone()
                 update.status = TaskStatus.RUNNING
-                active(DataSource).save_one(update.build())
+                active(DataSource).replace_one(update.build())
 
                 # Invoke out-of-process execution of payload
                 self._execute()
@@ -130,7 +130,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 update.elapsed_sec = 0.0  # TODO: Implement
                 update.remaining_sec = 0.0
                 update.error_message = str(e)
-                active(DataSource).save_one(update.build())
+                active(DataSource).replace_one(update.build())
             else:
 
                 _LOGGER.info(
@@ -150,7 +150,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 update.progress_pct = 100.0
                 update.elapsed_sec = 0.0  # TODO: Implement
                 update.remaining_sec = 0.0
-                active(DataSource).save_one(update.build())
+                active(DataSource).replace_one(update.build())
 
     def run_task_in_process(self):
         return self._execute()

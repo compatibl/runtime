@@ -292,7 +292,7 @@ class Db(DbKey, RecordMixin, ABC):
             )
 
             # Save bindings to the dataset, it is faster to write all than determine which records are already present
-            self.save_many(RecordTypeBindingKey, bindings, dataset=dataset)
+            self.save_many(RecordTypeBindingKey, bindings, dataset=dataset, save_policy=SavePolicy.REPLACE)
 
             # Add to cache
             record_type_name_set.add(parent_type_names)

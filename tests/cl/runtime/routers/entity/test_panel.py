@@ -48,8 +48,8 @@ panel_requests = [
 def test_method(default_db_fixture):
     """Test coroutine for /entity/panel route."""
 
-    active(DataSource).save_one(_stub_data_viewers)
-    active(DataSource).save_one(_stub_media_viewers)
+    active(DataSource).replace_one(_stub_data_viewers)
+    active(DataSource).replace_one(_stub_media_viewers)
 
     for request in panel_requests:
         request_object = PanelRequest(**request)
@@ -64,8 +64,8 @@ def test_method(default_db_fixture):
 def test_api(default_db_fixture):
     """Test REST API for /entity/panel route."""
 
-    active(DataSource).save_one(_stub_data_viewers)
-    active(DataSource).save_one(_stub_media_viewers)
+    active(DataSource).replace_one(_stub_data_viewers)
+    active(DataSource).replace_one(_stub_media_viewers)
 
     with QaClient() as test_client:
         for request in panel_requests:

@@ -24,6 +24,7 @@ from pymongo.synchronous.collection import Collection
 from cl.runtime import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.query_mixin import QueryMixin
+from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
@@ -260,6 +261,7 @@ class BasicMongoDb(Db):
         records: Sequence[RecordProtocol],
         *,
         dataset: str,
+        save_policy: SavePolicy,
     ) -> None:
 
         # Check params
@@ -290,7 +292,12 @@ class BasicMongoDb(Db):
             serialized_record["_dataset"] = dataset
             serialized_record["_key"] = serialized_key
 
-            collection.replace_one(key_dict, serialized_record, upsert=True)
+            if save_policy == SavePolicy.INSERT:
+                collection.insert_one(serialized_record)
+            elif save_policy == SavePolicy.REPLACE:
+                collection.replace_one(key_dict, serialized_record, upsert=True)
+            else:
+                ErrorUtil.enum_value_error(save_policy, SavePolicy)
 
     def delete_many(
         self,

@@ -91,7 +91,7 @@ class DbEventBroker(EventBroker):
 
     def sync_publish(self, topic: str, event: Event) -> None:
         # Publish event by just saving to DB
-        active(DataSource).save_one(event)
+        active(DataSource).replace_one(event)
 
     async def close(self) -> None:
         # Cancel pull events task

@@ -27,8 +27,8 @@ def test_run_many(multi_db_fixture):
     exp_type = ExperimentKind(kind_id="Test").build()
     sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
 
-    active(DataSource).save_one(exp_type)
-    active(DataSource).save_one(sc1)
+    active(DataSource).replace_one(exp_type)
+    active(DataSource).replace_one(sc1)
 
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
@@ -89,8 +89,8 @@ def test_run_all(multi_db_fixture):
     exp_type = ExperimentKind(kind_id="Test").build()
     sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
 
-    active(DataSource).save_one(exp_type)
-    active(DataSource).save_one(sc1)
+    active(DataSource).replace_one(exp_type)
+    active(DataSource).replace_one(sc1)
 
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(

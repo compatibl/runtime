@@ -59,7 +59,7 @@ def test_method(default_db_fixture):
 
     # Test updating existing record.
     existing_record = StubDataclassDerived(id="existing_record", derived_str_field="old_value").build()
-    active(DataSource).save_one(existing_record)
+    active(DataSource).replace_one(existing_record)
     update_record_request_obj = SaveRequest(records=[update_record_payload])
 
     update_record_result = SaveResponseUtil.save_records(update_record_request_obj)
@@ -112,7 +112,7 @@ def test_api(default_db_fixture):
 
         # Test updating existing record
         existing_record = StubDataclassDerived(id="existing_record", derived_str_field="old_value").build()
-        active(DataSource).save_one(existing_record)
+        active(DataSource).replace_one(existing_record)
 
         update_record_response = test_client.post("/storage/save", json=[update_record_payload])
 

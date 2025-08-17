@@ -82,7 +82,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def save_trial(self, scenario: ExperimentScenarioKey) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
         trial = self.create_trial(scenario)
-        active(DataSource).save_one(trial)
+        active(DataSource).replace_one(trial)
 
     def run_one(self) -> None:
         """Run one trial, error if max_trials is already reached or exceeded."""

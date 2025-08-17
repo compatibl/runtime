@@ -33,7 +33,7 @@ def test_process_queue(default_db_fixture):
     # Create and save tasks
     task_count = 2
     tasks = [StubTask(label=f"{i}", queue=queue_key).build() for i in range(task_count)]
-    active(DataSource).save_many(tasks)
+    active(DataSource).insert_many(tasks)
 
     # Start queue
     queue.run_start_queue()

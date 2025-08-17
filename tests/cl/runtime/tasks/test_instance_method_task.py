@@ -32,7 +32,7 @@ def test_smoke(default_db_fixture):
             StubHandlers(stub_id="abc"),
         ]
     ]
-    active(DataSource).save_many(records)
+    active(DataSource).insert_many(records)
 
     object_and_instance_handler_on_object = [(x, x.run_instance_method_1a) for x in records]
     key_and_instance_handler_on_object = [(x.get_key(), x.run_instance_method_1a) for x in records]
@@ -63,7 +63,7 @@ def test_smoke(default_db_fixture):
 
 def _run_task(task_index: int):
     instance = StubHandlers(stub_id=f"abc{task_index}").build()
-    active(DataSource).save_one(instance)
+    active(DataSource).replace_one(instance)
 
     task = InstanceMethodTask.create(
         queue=TaskQueueKey(queue_id="Sample Queue"),

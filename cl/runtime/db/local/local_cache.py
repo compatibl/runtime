@@ -17,6 +17,7 @@ from typing import Sequence
 from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime.db.query_mixin import QueryMixin
+from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
@@ -109,6 +110,7 @@ class LocalCache(Db):
         records: Sequence[RecordProtocol],
         *,
         dataset: str,
+        save_policy: SavePolicy,
     ) -> None:
 
         # Check params
@@ -125,8 +127,16 @@ class LocalCache(Db):
             key = record.get_key()
             serialized_key = _KEY_SERIALIZER.serialize(key)
 
-            # Add record to cache, overwriting an existing record if present
-            table_cache[serialized_key] = record
+            if save_policy == SavePolicy.INSERT:
+                # Insert the record, error if already exists
+                if serialized_key in table_cache:
+                    raise RuntimeError(f"Key {serialized_key} already exists in cache while INSERT policy is selected.")
+                table_cache[serialized_key] = record
+            elif save_policy == SavePolicy.REPLACE:
+                # Add record to cache, overwriting an existing record if present
+                table_cache[serialized_key] = record
+            else:
+                ErrorUtil.enum_value_error(save_policy, SavePolicy)
 
     def delete_many(
         self,

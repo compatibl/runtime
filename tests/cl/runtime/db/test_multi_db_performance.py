@@ -28,14 +28,14 @@ def test_performance(multi_db_fixture):
 
     print(f">>> Test stub type: {StubDataclassPrimitiveFields.__name__}, {n=}.")
     start_time = time.time()
-    active(DataSource).save_many(samples)
+    active(DataSource).replace_many(samples)
     end_time = time.time()
 
     print(f"Save many bulk: {end_time - start_time}s.")
 
     start_time = time.time()
     for sample in samples:
-        active(DataSource).save_one(sample)
+        active(DataSource).replace_one(sample)
     end_time = time.time()
     print(f"Save many one by one: {end_time - start_time}s.")
 

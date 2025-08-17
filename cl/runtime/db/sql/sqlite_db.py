@@ -23,6 +23,7 @@ from cl.runtime import Db
 from cl.runtime import RecordMixin
 from cl.runtime import TypeCache
 from cl.runtime.db.query_mixin import QueryMixin
+from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
@@ -317,6 +318,7 @@ class SqliteDb(Db):
         records: Sequence[RecordProtocol],
         *,
         dataset: str,
+        save_policy: SavePolicy,
     ) -> None:
 
         # Check params
@@ -348,7 +350,17 @@ class SqliteDb(Db):
         # Build SQL query to insert records
         quoted_cols = [self._quote_identifier(self._get_validated_column_name(c)) for c in columns_for_query]
         placeholders = ", ".join("?" for _ in quoted_cols)
-        insert_sql = f"INSERT OR REPLACE INTO {self._quote_identifier(table_name)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
+
+        if save_policy == SavePolicy.INSERT:
+            # Insert the record, error if already exists
+            sql_command = "INSERT"
+        elif save_policy == SavePolicy.REPLACE:
+            # Add record to cache, overwriting an existing record if present
+            sql_command = "INSERT OR REPLACE"
+        else:
+            ErrorUtil.enum_value_error(save_policy, SavePolicy)
+
+        insert_sql = f"{sql_command} INTO {self._quote_identifier(table_name)} ({', '.join(quoted_cols)}) VALUES ({placeholders})"
 
         # Build values for SQL query
         values_for_query = [tuple(data.get(col) for col in columns_for_query) for data in serialized_records]

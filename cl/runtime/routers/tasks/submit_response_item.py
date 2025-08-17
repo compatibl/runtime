@@ -45,7 +45,7 @@ class SubmitResponseItem(BaseModel):
         for handler_task in TaskUtil.create_tasks_for_submit_request(request):
 
             # Save and submit task
-            active(DataSource).save_one(handler_task)
+            active(DataSource).replace_one(handler_task)
             handler_queue.submit_task(handler_task)  # TODO: Rely on query instead
 
             key = handler_task.key_str if isinstance(handler_task, InstanceMethodTask) else None
