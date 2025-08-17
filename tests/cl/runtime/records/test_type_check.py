@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import pytest
+from frozendict import frozendict
+
 from cl.runtime.records.type_check import TypeCheck
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData
@@ -26,6 +28,64 @@ _KEY_INSTANCE_NOT_FROZEN = StubDataclassKey()
 _RECORD_INSTANCE = StubDataclass().build()
 _RECORD_INSTANCE_NOT_FROZEN = StubDataclass()
 _DERIVED_RECORD_INSTANCE = StubDataclassDerived().build()
+
+
+def test_guard_none():
+    """Test for guard_none method."""
+
+    # Valid cases
+    assert TypeCheck.guard_none(None)
+    assert TypeCheck.guard_none(None, raise_on_fail=False)
+
+    # Invalid cases
+    assert not TypeCheck.guard_none(123, raise_on_fail=False)
+    with pytest.raises(Exception):
+        assert not TypeCheck.guard_none(123)
+
+
+def test_guard_not_none():
+    """Test for guard_not_none method."""
+
+    # Valid cases
+    assert TypeCheck.guard_not_none(123)
+    assert TypeCheck.guard_not_none(123, raise_on_fail=False)
+
+    # Invalid cases
+    assert not TypeCheck.guard_not_none(None, raise_on_fail=False)
+    with pytest.raises(Exception):
+        assert not TypeCheck.guard_not_none(None)
+
+
+def test_guard_sequence():
+    """Test for guard_sequence method."""
+
+    # Valid cases
+    assert TypeCheck.guard_sequence(tuple())
+    assert TypeCheck.guard_sequence(tuple(), raise_on_fail=False)
+
+    # Invalid cases
+    assert not TypeCheck.guard_sequence(None, raise_on_fail=False)
+    with pytest.raises(Exception):
+        assert not TypeCheck.guard_sequence(None)
+    assert not TypeCheck.guard_sequence(dict(), raise_on_fail=False)
+    with pytest.raises(Exception):
+        assert not TypeCheck.guard_sequence(dict())
+
+
+def test_guard_mapping():
+    """Test for guard_mapping method."""
+
+    # Valid cases
+    assert TypeCheck.guard_mapping(frozendict())
+    assert TypeCheck.guard_mapping(frozendict(), raise_on_fail=False)
+
+    # Invalid cases
+    assert not TypeCheck.guard_mapping(None, raise_on_fail=False)
+    with pytest.raises(Exception):
+        assert not TypeCheck.guard_mapping(None)
+    assert not TypeCheck.guard_mapping(tuple(), raise_on_fail=False)
+    with pytest.raises(Exception):
+        assert not TypeCheck.guard_mapping(tuple())
 
 
 def test_is_key_type():

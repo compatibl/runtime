@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, Mapping
 from typing import Sequence
 from typing import TypeGuard
 from typing import cast
-from cl.runtime.records.protocols import BuilderProtocol
+from cl.runtime.records.protocols import BuilderProtocol, is_mapping
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_builder
@@ -29,6 +29,56 @@ from cl.runtime.records.typename import typename
 
 class TypeCheck:
     """Performs runtime type checks and returns TypeGuard instance."""
+
+    @classmethod
+    def guard_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[None]:
+        """Confirm that the argument is None."""
+        if obj is None:
+            return True
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter of type {typename(obj)} is not None.")
+        else:
+            return False
+
+    @classmethod
+    def guard_not_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[object]:
+        """Confirm that the argument is not None."""
+        if obj is not None:
+            return True
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter of type {typename(obj)} is None.")
+        else:
+            return False
+
+    @classmethod
+    def guard_sequence(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence]:
+        """Confirm that the argument is an immutable sequence."""
+        if obj is not None:
+            if is_sequence(obj):  # TODO: Exclude mutable sequence
+                return True
+            elif raise_on_fail:
+                raise RuntimeError(f"Parameter of type {typename(obj)} is not a sequence.")
+            else:
+                return False
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter of type {typename(obj)} is None.")
+        else:
+            return False
+
+    @classmethod
+    def guard_mapping(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[Mapping]:
+        """Confirm that the argument is an immutable mapping."""
+        if obj is not None:
+            if is_mapping(obj):  # TODO: Exclude mutable mapping
+                return True
+            elif raise_on_fail:
+                raise RuntimeError(f"Parameter of type {typename(obj)} is not a mapping.")
+            else:
+                return False
+        elif raise_on_fail:
+            raise RuntimeError(f"Parameter of type {typename(obj)} is None.")
+        else:
+            return False
 
     @classmethod
     def guard_frozen(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol]:
