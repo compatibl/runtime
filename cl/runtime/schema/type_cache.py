@@ -214,7 +214,7 @@ class TypeCache:
                     module = cls._module_dict.setdefault(module_name, import_module(module_name))
                 except ModuleNotFoundError:
                     raise RuntimeError(
-                        f"Module {module_name} is not found in TypeInfo preload, " f"run init_type_info to regenerate."
+                        f"Module {module_name} is not found in TypeCache, run init_type_cache to rebuild."
                     )
 
         # Get class from module, report error if not found
@@ -226,7 +226,7 @@ class TypeCache:
             return result
         except AttributeError:
             raise RuntimeError(
-                f"Class {qual_name} is not found in TypeInfo preload,\n" f"run init_type_info to regenerate."
+                f"Class {qual_name} is not found in TypeCache, run init_type_cache to rebuild."
             )
 
     @classmethod
@@ -545,7 +545,7 @@ class TypeCache:
                 rows = file.readlines()
         else:
             # Cache file does not exist, error message
-            raise RuntimeError(f"Cache file is not found at {cache_filename}\n, run init_type_info to regenerate.")
+            raise RuntimeError(f"TypeCache file is not found at {cache_filename}\n, run init_type_cache to create.")
 
         # Iterate over the rows of TypeInfo preload
         for row_index, row in enumerate(rows):
@@ -573,7 +573,7 @@ class TypeCache:
                     expected_num_tokens = len(_TYPE_INFO_HEADERS)
                     actual_num_tokens = len(row_tokens)
                     raise RuntimeError(
-                        f"Invalid number of comma-delimited tokens {actual_num_tokens} in TypeInfo preload, "
+                        f"Invalid number of comma-delimited tokens {actual_num_tokens} in TypeCache, "
                         f"should be {expected_num_tokens}.\n"
                         f"Sample row: TypeName,TypeKind,module.ClassName,Superclass1;Superclass2,Subclass1;Subclass2,\n"
                         f"Invalid row: {row.strip()}\n"
@@ -598,7 +598,7 @@ class TypeCache:
                 # Check for duplicates
                 if existing.qual_name != type_info.qual_name:
                     raise RuntimeError(
-                        f"Two entries in TypeInfo preload share the same type name: {type_name}\n"
+                        f"Two entries in TypeCache share the same type name: {type_name}\n"
                         f"  - {existing.qual_name}\n"
                         f"  - {type_info.qual_name}\n"
                         f"Use TypeAlias to resolve the name collision.\n"
@@ -665,5 +665,5 @@ class TypeCache:
     def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:
         """Return error message for type name not found."""
         return RuntimeError(
-            f"Type {type_name} is not found in TypeInfo preload,\n" f"run init_type_info to regenerate."
+            f"Type {type_name} is not found in TypeCache, run init_type_cache to rebuild."
         )
