@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.file.file_type import FileType
+from cl.runtime.file.file_kind import FileKind
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
@@ -22,11 +22,11 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class FileData(DataMixin):
     """Display the specified embedded binary content."""
 
-    name: str | None = None
+    name: str | None = None  # TODO: Consider revising to filename
     """Content name."""
+
+    file_kind: FileKind | None = None
+    """Format of the file contents, some values match to more than one file extension."""
 
     file_bytes: bytes = required()
     """Embedded binary content to be displayed as the current view."""
-
-    file_type: FileType | None = None
-    """Embedded binary content type."""

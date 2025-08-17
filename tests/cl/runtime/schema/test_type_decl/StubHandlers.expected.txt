@@ -98,8 +98,8 @@ declare:
         - enum:
             module:
               module_name: cl
-            name: FileType
-          name: FileType
+            name: FileKind
+          name: FileKind
           comment: Embedded binary content type.
           optional: true
       name: PdfFile
@@ -234,8 +234,8 @@ declare:
         - enum:
             module:
               module_name: cl
-            name: FileType
-          name: FileType
+            name: FileKind
+          name: FileKind
           comment: Embedded binary content type.
           optional: true
       name: PdfFile

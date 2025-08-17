@@ -16,35 +16,32 @@ from enum import IntEnum
 from enum import auto
 
 
-class FileType(IntEnum):
-    """Binary content type enumeration."""
+class FileKind(IntEnum):
+    """Format of the file contents, some values match to more than one file extension."""
 
     JPG = auto()
-    """Jpg image type."""
-
-    JPEG = auto()
-    """Jpeg image type."""
+    """JPEG image."""
 
     HTML = auto()
-    """Html content type."""
+    """HTML content."""
 
     PLOTLY = auto()
     """The output provided by Plotly Graphing Library."""
 
     PNG = auto()
-    """PNG image type."""
+    """PNG image."""
 
     SVG = auto()
-    """SVG image type."""
+    """SVG image."""
 
-    FOR_CSV = auto()
-    """Csv type."""
+    CSV = auto()
+    """CSV data."""
 
     ZIP = auto()
-    """Zip type."""
+    """ZIP archive."""
 
     PDF = auto()
-    """PDF type."""
+    """PDF document."""
 
     XLSX = auto()
-    """Excel type."""
+    """Excel file."""
