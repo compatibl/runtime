@@ -17,7 +17,7 @@ from fastapi import APIRouter
 from fastapi import Request
 from sse_starlette import EventSourceResponse
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.sse.event_broker import EventBroker
+from cl.runtime.events.event_broker import EventBroker
 
 router = APIRouter()
 

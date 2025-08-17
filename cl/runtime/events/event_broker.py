@@ -18,7 +18,7 @@ from abc import abstractmethod
 from typing import AsyncGenerator
 from typing import Self
 from fastapi import Request
-from cl.runtime.sse.event import Event
+from cl.runtime.events.event import Event
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class EventBroker(ABC):
     def create(cls) -> Self:
         """Factory method to create event broker from settings."""
 
-        from cl.runtime.sse.db_event_broker import DbEventBroker
+        from cl.runtime.events.db_event_broker import DbEventBroker
 
         # TODO (Roman): Get event broker type from settings.
         broker_type = DbEventBroker

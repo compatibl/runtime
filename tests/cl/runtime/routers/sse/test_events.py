@@ -24,8 +24,8 @@ from cl.runtime.log.log_config import logging_config
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.routers.sse.sse_router import _event_generator as original_event_generator  # noqa
-from cl.runtime.sse.event import Event
-from cl.runtime.sse.event_kind import EventKind
+from cl.runtime.events.event import Event
+from cl.runtime.events.event_kind import EventKind
 
 _LOGGER = logging.getLogger(__name__)
 

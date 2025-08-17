@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.log.task_log import TaskLog
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.sse.event import Event
+from cl.runtime.events.event import Event
 
 
 @dataclass(slots=True, kw_only=True)

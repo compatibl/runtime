@@ -26,9 +26,9 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.sse.event_kind import EventKind
-from cl.runtime.sse.task_event import TaskEvent
-from cl.runtime.sse.task_finished_event import TaskFinishedEvent
+from cl.runtime.events.event_kind import EventKind
+from cl.runtime.events.task_event import TaskEvent
+from cl.runtime.events.task_finished_event import TaskFinishedEvent
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from cl.runtime.tasks.task_status import TaskStatus
