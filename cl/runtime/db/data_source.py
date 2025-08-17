@@ -300,7 +300,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_by_type(
         self,
-        restrict_to: type[TRecord],
+        record_type: type[TRecord],
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -312,19 +312,18 @@ class DataSource(DataSourceKey, RecordMixin):
         Load all records of 'restrict_to' type and its subtypes.
 
         Args:
-            restrict_to: The query will return only this type and its subtypes
+            record_type: Load only this type and its subtypes
             cast_to: Cast the result to this type (error if not a subtype)
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        # Delegate to load_all method with 'restrict_to' parameter
-        return self._get_db().load_all(
-            restrict_to.get_key_type(),
-            dataset=self.dataset.dataset_id,
+        # Delegate to load_all method with 'restrict_to' parameter set to record_type
+        return self.load_all(
+            record_type.get_key_type(),
             cast_to=cast_to,
-            restrict_to=restrict_to,
+            restrict_to=record_type,
             project_to=project_to,
             sort_order=sort_order,
             limit=limit,
@@ -348,7 +347,7 @@ class DataSource(DataSourceKey, RecordMixin):
         Args:
             key_type: Key type determines the database table
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only this type and its subtypes
+            restrict_to: Include only this type and its subtypes, skip other types
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
@@ -384,7 +383,7 @@ class DataSource(DataSourceKey, RecordMixin):
         Args:
             filter_: Filter used to select the records to load
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only this type and its subtypes
+            restrict_to: Include only this type and its subtypes, skip other types
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
@@ -415,7 +414,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
             # Load using the type stored in the filter as restrict_to parameter
             return self.load_by_type(
-                restrict_to=record_type,  # noqa
+                record_type=record_type,  # noqa
                 cast_to=cast_to,
                 project_to=project_to,
                 sort_order=sort_order,
@@ -459,7 +458,7 @@ class DataSource(DataSourceKey, RecordMixin):
         Args:
             query: Contains query conditions to match
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only this type and its subtypes
+            restrict_to: Include only this type and its subtypes, skip other types
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
@@ -483,11 +482,11 @@ class DataSource(DataSourceKey, RecordMixin):
         restrict_to: type | None = None,
     ) -> int:
         """
-        Return the count of records that match the specified query using the current context's DB.
+        Return the count of records that match the specified query.
 
         Args:
             query: Contains query conditions to match
-            restrict_to: The query will return only this type and its subtypes
+            restrict_to: Include only this type and its subtypes, skip other types
         """
         return self._get_db().count_by_query(
             query,

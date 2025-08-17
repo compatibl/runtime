@@ -89,7 +89,7 @@ class Db(DbKey, RecordMixin, ABC):
             key_type: Key type determines the database table
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only this type and its subtypes
+            restrict_to: Include only this type and its subtypes, skip other types
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
@@ -116,7 +116,7 @@ class Db(DbKey, RecordMixin, ABC):
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             cast_to: Cast the result to this type (error if not a subtype)
-            restrict_to: The query will return only this type and its subtypes
+            restrict_to: Include only this type and its subtypes, skip other types
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by query fields in the specified order, reversing for fields marked as DESC
             limit: Maximum number of records to return (for pagination)
@@ -137,7 +137,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
-            restrict_to: The query will return only this type and its subtypes
+            restrict_to: Include only this type and its subtypes, skip other types
         """
 
     @abstractmethod
