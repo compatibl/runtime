@@ -375,13 +375,14 @@ class BasicMongoDb(Db):
             collection_name = key_type_name.removesuffix("Key")
             collection = mongo_db[collection_name]
 
-            # Add an index on tenant, dataset and key in ascending order
+            # Add a unique index on tenant, dataset and key in ascending order
             collection.create_index(
                 [
                     ("_tenant", 1),
                     ("_dataset", 1),
                     ("_key", 1),
                 ],
+                unique=True
             )
 
             # Cache for reuse
