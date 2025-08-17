@@ -32,7 +32,7 @@ def test_smoke(default_db_fixture):
             StubHandlers(stub_id="abc"),
         ]
     ]
-    active(DataSource).insert_many(records)
+    active(DataSource).insert_many(records, commit=True)
 
     object_and_instance_handler_on_object = [(x, x.run_instance_method_1a) for x in records]
     key_and_instance_handler_on_object = [(x.get_key(), x.run_instance_method_1a) for x in records]

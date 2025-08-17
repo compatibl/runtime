@@ -535,7 +535,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         record: RecordProtocol,
         *,
-        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
+        commit: bool,
     ) -> None:
         """
         Insert the specified record to DB, error if a record exists for the same key.
@@ -554,7 +554,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         records: RecordProtocol | Sequence[RecordProtocol],
         *,
-        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
+        commit: bool,
     ) -> None:
         """
         Insert the specified records to DB, error if any records exist for the same key.

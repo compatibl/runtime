@@ -30,7 +30,7 @@ def test_smoke():
         key = record.get_key()
 
         # Save a single record
-        active(DataSource).insert_many([record])
+        active(DataSource).insert_many([record], commit=True)
 
         loaded_records = active(DataSource).load_many_or_none([record, key, None])
         assert loaded_records[0] is record  # Same object is returned without lookup

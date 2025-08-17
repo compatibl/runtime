@@ -37,7 +37,7 @@ def test_str_query(multi_db_fixture):
         StubDataclassPrimitiveFields(key_str_field="xyz"),
     ]
     records = [x.build() for x in records]
-    active(DataSource).insert_many(records)
+    active(DataSource).insert_many(records, commit=True)
 
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()

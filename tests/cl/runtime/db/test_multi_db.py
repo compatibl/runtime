@@ -71,7 +71,7 @@ def test_key_or_record(multi_db_fixture):
     key = record.get_key()
 
     # Save a single record
-    active(DataSource).insert_one(record)
+    active(DataSource).insert_one(record, commit=True)
 
     # Load using record or key
     another_record = StubDataclass(id="another").build()
@@ -86,7 +86,7 @@ def test_key_or_record(multi_db_fixture):
 
 def test_insert_many(multi_db_fixture):
     """Test 'insert_many' method for various types."""
-    active(DataSource).insert_many(_SAMPLES)
+    active(DataSource).insert_many(_SAMPLES, commit=True)
 
     sample_keys = [sample.get_key() for sample in _SAMPLES]
     loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
@@ -96,7 +96,7 @@ def test_insert_many(multi_db_fixture):
 
 def test_replace_many(multi_db_fixture):
     """Test 'insert_many' method for various types."""
-    active(DataSource).insert_many(_SAMPLES)
+    active(DataSource).insert_many(_SAMPLES, commit=True)
 
     sample_keys = [sample.get_key() for sample in _SAMPLES]
     loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
@@ -117,7 +117,7 @@ def test_basic_operations(multi_db_fixture):
     assert loaded_records == [None] * len(_SAMPLES)
 
     # Populate tables
-    active(DataSource).insert_many(_SAMPLES)
+    active(DataSource).insert_many(_SAMPLES, commit=True)
 
     # Load one by one for all keys because each type is different
     loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
@@ -182,7 +182,7 @@ def test_load_by_type(multi_db_fixture):
 
     all_samples = base_samples + derived_samples + other_derived_samples
 
-    active(DataSource).insert_many(all_samples)
+    active(DataSource).insert_many(all_samples, commit=True)
 
     loaded_records = active(DataSource).load_by_type(StubDataclass)
     assert PytestUtil.assert_equals_iterable_without_ordering(all_samples, loaded_records)
@@ -226,7 +226,7 @@ def test_load_by_query(multi_db_fixture):
         StubDataclassPrimitiveFields(key_str_field="xyz"),
     ]
     records = [x.build() for x in records]
-    active(DataSource).insert_many(records)
+    active(DataSource).insert_many(records, commit=True)
 
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
@@ -245,7 +245,7 @@ def test_count_by_query(multi_db_fixture):
         StubDataclassPrimitiveFields(key_str_field="xyz"),
     ]
     records = [x.build() for x in records]
-    active(DataSource).insert_many(records)
+    active(DataSource).insert_many(records, commit=True)
 
     eq_query = StubDataclassPrimitiveFieldsQuery(key_str_field="def").build()
     in_query = StubDataclassPrimitiveFieldsQuery(key_str_field=In(["def", "xyz"])).build()
