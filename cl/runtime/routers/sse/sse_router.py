@@ -35,7 +35,7 @@ async def _event_generator(request: Request):
             event_data = orjson.dumps(event_data).decode("utf-8")
 
             # Create dict event in format required by EventSourceResponse
-            processed_event = {"event": event.event_type.name, "data": event_data}
+            processed_event = {"event": event.event_kind.name, "data": event_data}
 
             yield processed_event
 

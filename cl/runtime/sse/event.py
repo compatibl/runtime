@@ -23,7 +23,7 @@ from cl.runtime.sse.event_kind import EventKind
 class Event(EventKey, RecordMixin):
     """Base server event."""
 
-    event_type: EventKind = required()
+    event_kind: EventKind = required()
     """Event type used in event stream."""
 
     def get_key(self) -> EventKey:

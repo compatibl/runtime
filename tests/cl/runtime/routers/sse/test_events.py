@@ -46,13 +46,13 @@ async def _publish_events(client):
     await asyncio.sleep(0.3)
     _LOGGER.info("1 - Info")
     await asyncio.sleep(0.1)
-    _LOGGER.info("2 - Info", extra={"event": Event(event_type=EventKind.TASK_STARTED)})
+    _LOGGER.info("2 - Info", extra={"event": Event(event_kind=EventKind.TASK_STARTED)})
     await asyncio.sleep(0.3)
     _LOGGER.warning("3 - Warning")
     await asyncio.sleep(0.2)
     _LOGGER.error("4 - Error")
     await asyncio.sleep(0.1)
-    _LOGGER.info("5 - Info", extra={"event": Event(event_type=EventKind.TASK_FINISHED)})
+    _LOGGER.info("5 - Info", extra={"event": Event(event_kind=EventKind.TASK_FINISHED)})
 
     # Ensure reaching limit in event generator to avoid timeout error
     for i in range(10):

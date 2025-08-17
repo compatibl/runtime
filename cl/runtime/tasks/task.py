@@ -103,7 +103,7 @@ class Task(TaskKey, RecordMixin, ABC):
         # Activate logging context for the task
         with activate(self._create_log_context()):
             try:
-                _LOGGER.info("Start task execution.", extra={"event": TaskEvent(event_type=EventKind.TASK_STARTED)})
+                _LOGGER.info("Start task execution.", extra={"event": TaskEvent(event_kind=EventKind.TASK_STARTED)})
 
                 # Save with Running status
                 update = self.clone()
@@ -119,7 +119,7 @@ class Task(TaskKey, RecordMixin, ABC):
                     "Task failed with exception.",
                     exc_info=True,
                     extra={
-                        "event": TaskFinishedEvent(event_type=EventKind.TASK_FINISHED, status=TaskStatus.FAILED),
+                        "event": TaskFinishedEvent(event_kind=EventKind.TASK_FINISHED, status=TaskStatus.FAILED),
                     },
                 )
 
@@ -136,7 +136,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 _LOGGER.info(
                     "Task completed successfully.",
                     extra={
-                        "event": TaskFinishedEvent(event_type=EventKind.TASK_FINISHED, status=TaskStatus.COMPLETED),
+                        "event": TaskFinishedEvent(event_kind=EventKind.TASK_FINISHED, status=TaskStatus.COMPLETED),
                     },
                 )
 
