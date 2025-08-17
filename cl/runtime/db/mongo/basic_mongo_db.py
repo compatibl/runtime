@@ -92,7 +92,7 @@ class BasicMongoDb(Db):
         collection = self._get_mongo_collection(key_type=key_type)
         
         # Query for all records in one call using $in operator
-        serialized_records = tuple(collection.find(self._get_keys_filter(keys, dataset=dataset)))
+        serialized_records = tuple(collection.find(self._get_mongo_keys_filter(keys, dataset=dataset)))
         
         # Prune the fields used by Db that are not part of the serialized record data and deserialize
         result = tuple(
@@ -309,7 +309,7 @@ class BasicMongoDb(Db):
         collection = self._get_mongo_collection(key_type=key_type)
 
         # Create filter and delete
-        keys_filter = self._get_keys_filter(keys, dataset=dataset)
+        keys_filter = self._get_mongo_keys_filter(keys, dataset=dataset)
         collection.delete_many(keys_filter)
 
     def drop_test_db(self) -> None:
@@ -506,7 +506,7 @@ class BasicMongoDb(Db):
         
         return record_dict
 
-    def _get_keys_filter(self, keys: Sequence[KeyProtocol], *, dataset: str) -> dict[str, Any]:
+    def _get_mongo_keys_filter(self, keys: Sequence[KeyProtocol], *, dataset: str) -> dict[str, Any]:
         """Get filter for loading records that match one of the specified keys."""
         serialized_keys = tuple(_KEY_SERIALIZER.serialize(key) for key in keys)
         return {
