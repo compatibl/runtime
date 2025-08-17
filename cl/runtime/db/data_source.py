@@ -31,6 +31,7 @@ from cl.runtime.db.filter_by_type import FilterByType
 from cl.runtime.db.filter_many import FilterMany
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.resource_key import ResourceKey
+from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -177,11 +178,10 @@ class DataSource(DataSourceKey, RecordMixin):
         sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[TRecord]:
         """
-        Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
-        the result must have the same order as 'records_or_keys'.
+        Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup).
 
         Note:
-            - Raise an error if records_or_keys param is None elements or has None elements
+            - Raise an error if records_or_keys param is None or has None elements
             - Raise an error if any of the records are not found
 
         Args:
@@ -214,8 +214,7 @@ class DataSource(DataSourceKey, RecordMixin):
         sort_order: SortOrder = SortOrder.INPUT,
     ) -> Sequence[TRecord | None] | None:
         """
-        Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup),
-        the result must have the same order as 'records_or_keys'.
+        Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup).
 
         Note:
             - Return None for any elements of records_or_keys that are None, or for which the record is not found
@@ -494,19 +493,69 @@ class DataSource(DataSourceKey, RecordMixin):
             restrict_to=restrict_to,
         )
 
-    def save_one(
+    def insert_one(
         self,
         record: RecordProtocol,
     ) -> None:
-        """Save the specified record to storage, replace rather than update individual fields if it exists."""
-        self.save_many([record])
+        """Insert the specified record to DB, the entire transaction on data source __exit__ fails if it exists."""
+        self.save_many([record], save_policy=SavePolicy.INSERT)
+
+    def insert_many(
+        self,
+        records: Sequence[RecordProtocol],
+    ) -> None:
+        """Insert the specified records to DB, the entire transaction on data source __exit__ fails if any exist."""
+        self.save_many(records, save_policy=SavePolicy.INSERT)
+
+    def replace_one(
+        self,
+        record: RecordProtocol,
+    ) -> None:
+        """Insert the specified record to DB or replace if it exists."""
+        self.save_many([record], save_policy=SavePolicy.REPLACE)
+
+    def replace_many(
+        self,
+        records: Sequence[RecordProtocol],
+    ) -> None:
+        """Insert the specified record to DB or replace those that exist."""
+        self.save_many(records, save_policy=SavePolicy.REPLACE)
+
+    def save_one(
+        self,
+        record: RecordProtocol,
+        *,
+        save_policy: SavePolicy,
+    ) -> None:
+        """
+        Save the specified record to storage, insert vs. replace behavior is governed by save_policy.
+
+        Notes:
+            The entire transaction on data source __exit__ will fail if INSERT is used but the record exists
+
+        Args:
+            record: Record to save
+            save_policy: Insert vs. replace policy, partial update is not included due to design considerations
+        """
+        self.save_many([record], save_policy=save_policy)
 
     def save_many(
         self,
         records: Sequence[RecordProtocol],
+        save_policy: SavePolicy,
     ) -> None:
-        """Save the specified records to storage, replace rather than update individual fields for those that exist."""
+        """
+        Save the specified records to storage, insert vs. replace behavior is governed by save_policy.
+
+        Notes:
+            The entire transaction on data source __exit__ will fail if INSERT is used but some of the records exist
+
+        Args:
+            records: Sequence of records to save, elements may have different key types
+            save_policy: Insert vs. replace policy, partial update is not included due to design considerations
+        """
         TypeCheck.guard_record_sequence(records)
+        TypeCheck.guard_not_none(save_policy)
 
         # Do nothing if empty but error on None
         if len(records) == 0:
@@ -517,7 +566,12 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Save records for each key type
         [
-            self._get_db().save_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+            self._get_db().save_many(
+                key_type,
+                records_for_key_type,
+                dataset=self.dataset.dataset_id,
+                save_policy=save_policy,
+            )
             for key_type, records_for_key_type in records_grouped_by_key_type.items()
         ]
 

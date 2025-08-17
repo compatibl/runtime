@@ -19,6 +19,7 @@ from typing import Sequence
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.query_mixin import QueryMixin
+from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import KeyProtocol
@@ -147,6 +148,7 @@ class Db(DbKey, RecordMixin, ABC):
         records: Sequence[RecordProtocol],
         *,
         dataset: str,
+        save_policy: SavePolicy,
     ) -> None:
         """
         Save multiple records, all of which must have the specified key type.
@@ -155,6 +157,7 @@ class Db(DbKey, RecordMixin, ABC):
             key_type: Key type determines the database table
             records: Sequence of records to save, record.get_key_type() must match the key_type argument for each record
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            save_policy: Insert vs. replace policy, partial update is not included due to design considerations
         """
 
     @abstractmethod
