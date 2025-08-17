@@ -45,10 +45,8 @@ class LocalCache(Db):
         keys: Sequence[KeyProtocol],
         *,
         dataset: str,
-        sort_order: SortOrder = SortOrder.INPUT,
         project_to: type[TRecord] | None = None,
-        limit: int | None = None,
-        skip: int | None = None,
+        sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
     ) -> Sequence[RecordMixin]:
 
         # Check params

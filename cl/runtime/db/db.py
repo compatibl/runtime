@@ -55,11 +55,8 @@ class Db(DbKey, RecordMixin, ABC):
         keys: Sequence[KeyProtocol],
         *,
         dataset: str,
-        restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
-        limit: int | None = None,
-        skip: int | None = None,
     ) -> Sequence[RecordMixin]:
         """
         Load records for the specified keys, skipping the records that are not found.
@@ -68,11 +65,8 @@ class Db(DbKey, RecordMixin, ABC):
             key_type: Key type determines the database table
             keys: Sequence of keys, type(key) must match the key_type argument for each key
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
-            restrict_to: The query will return only this type and its subtypes
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
-            limit: Maximum number of records to return (for pagination)
-            skip: Number of records to skip (for pagination)
         """
 
     @abstractmethod

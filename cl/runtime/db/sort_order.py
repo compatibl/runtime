@@ -19,7 +19,7 @@ from enum import auto
 class SortOrder(IntEnum):
     """Sort order for database queries and other methods that return a sequence result."""
 
-    UNSORTED = auto()
+    UNORDERED = auto()
     """Not sorted and can be returned in implementation-dependent order."""
 
     ASC = auto()

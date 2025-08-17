@@ -233,7 +233,7 @@ class DataSource(DataSourceKey, RecordMixin):
         if not records_or_keys:
             return records_or_keys
 
-        # Perform these checks if cast_to is specified
+        # TODO: Delegate to TypeCheck
         if cast_to is not None:
             # Check that the keys in the input list have the same type as cast_to.get_key_type()
             key_type = cast_to.get_key_type()
@@ -259,10 +259,24 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Group keys by table
         keys_to_load_grouped_by_key_type = self._group_inputs_by_key_type(keys_to_load)
+        
+        # Select sort order to use for the DB call
+        if sort_order == SortOrder.INPUT:
+            # For INPUT, use UNORDERED for the DB call as
+            # the result will be matched to inputs after loading
+            db_sort_order = SortOrder.UNORDERED
+        else:
+            db_sort_order = sort_order
 
         # Get records from DB, the result is unsorted and grouped by table
         loaded_records_grouped_by_key_type = [
-            self._get_db().load_many(key_type, keys_for_key_type, dataset=self.dataset.dataset_id)
+            self._get_db().load_many(
+                key_type,
+                keys_for_key_type,
+                dataset=self.dataset.dataset_id,
+                project_to=project_to,
+                sort_order=db_sort_order,
+            )
             for key_type, keys_for_key_type in keys_to_load_grouped_by_key_type.items()
         ]
 

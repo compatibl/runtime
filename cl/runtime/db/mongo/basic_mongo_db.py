@@ -79,10 +79,8 @@ class BasicMongoDb(Db):
         keys: Sequence[KeyProtocol],
         *,
         dataset: str,
-        sort_order: SortOrder = SortOrder.INPUT,
         project_to: type[TRecord] | None = None,
-        limit: int | None = None,
-        skip: int | None = None,
+        sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
     ) -> Sequence[RecordMixin]:
 
         # Check params
@@ -92,19 +90,16 @@ class BasicMongoDb(Db):
 
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
-        result = []
-        for key in keys:
-            # TODO: Implement using a more performant approach
-            serialized_primary_key = _KEY_SERIALIZER.serialize(key)
-            serialized_record = collection.find_one({"_key": serialized_primary_key})
-
-            # Do not include None if the record is not found, skip instead
-            if serialized_record is not None:
-                del serialized_record["_id"]
-                del serialized_record["_key"]
-                record = _RECORD_SERIALIZER.deserialize(serialized_record)
-                result.append(record)
-        return result
+        
+        # Query for all records in one call using $in operator
+        serialized_records = tuple(collection.find(self._get_keys_filter(keys, dataset=dataset)))
+        
+        # Prune the fields used by Db that are not part of the serialized record data and deserialize
+        result = tuple(
+            _RECORD_SERIALIZER.deserialize(self._with_pruned_fields(x, expected_dataset=dataset))
+            for x in serialized_records
+        )
+        return cast(tuple[TRecord, ...], result)
 
     def load_all(
         self,
@@ -137,14 +132,15 @@ class BasicMongoDb(Db):
         # serialized_record = collection.find_one({"_key": serialized_primary_key})
 
         # Get iterable from the query sorted by '_key', execution is deferred
-        serialized_records = collection.find(query_dict).sort("_key")
+        serialized_records = tuple(collection.find(query_dict).sort("_key"))
 
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
 
+        # Prune the fields used by Db that are not part of the serialized record data and deserialize
         result = tuple(
-            _RECORD_SERIALIZER.deserialize({k: v for k, v in serialized_record.items() if k not in {"_id", "_key"}})
-            for serialized_record in serialized_records
+            _RECORD_SERIALIZER.deserialize(self._with_pruned_fields(x, expected_dataset=dataset))
+            for x in serialized_records
         )
         return cast(tuple[TRecord, ...], result)
 
@@ -196,7 +192,7 @@ class BasicMongoDb(Db):
         self._apply_restrict_to(query_dict=query_dict, key_type=key_type, restrict_to=restrict_to)
 
         # Get iterable from the query sorted by '_key', execution is deferred
-        serialized_records = collection.find(query_dict).sort("_key")
+        serialized_records = tuple(collection.find(query_dict).sort("_key"))
 
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
@@ -205,20 +201,12 @@ class BasicMongoDb(Db):
         if cast_to is None:
             cast_to = restrict_to
 
-        result: list[TRecord] = []
-        # TODO: Convert to comprehension for performance
-        for serialized_record in serialized_records:
-            del serialized_record["_id"]
-            del serialized_record["_key"]
-
-            # Create a record from the serialized data
-            record = _RECORD_SERIALIZER.deserialize(serialized_record)
-
-            # Apply cast (error if not a subtype)
-            record = record.cast(cast_to)
-            result.append(record)
-
-        return tuple(result)
+        # Prune the fields used by Db that are not part of the serialized record data and deserialize
+        result = tuple(
+            _RECORD_SERIALIZER.deserialize(self._with_pruned_fields(x, expected_dataset=dataset))
+            for x in serialized_records
+        )
+        return cast(tuple[TRecord, ...], result)
 
     def count_by_query(
         self,
@@ -288,17 +276,21 @@ class BasicMongoDb(Db):
             # Add to the cache of stored types for the specified dataset
             self._add_record_type(record_type=type(record), dataset=dataset)
 
-            # Serialize data, this also executes 'init_all' method
-            serialized_record = _RECORD_SERIALIZER.serialize(record)
-
             # Serialize key
-            # TODO: Consider getting the key first instead of serializing the entire record
             serialized_key = _KEY_SERIALIZER.serialize(record.get_key())
+            key_dict = {
+                "_tenant": self._tenant,
+                "_dataset": dataset,
+                "_key": serialized_key,
+            }
 
-            # Use update_one with upsert=True to insert if not present or update if present
-            # TODO (Roman): update_one does not affect fields not presented in record. Changed to replace_one
+            # Serialize record
+            serialized_record = _RECORD_SERIALIZER.serialize(record)
+            serialized_record["_tenant"] = self._tenant
+            serialized_record["_dataset"] = dataset
             serialized_record["_key"] = serialized_key
-            collection.replace_one({"_key": serialized_key}, serialized_record, upsert=True)
+
+            collection.replace_one(key_dict, serialized_record, upsert=True)
 
     def delete_many(
         self,
@@ -315,10 +307,10 @@ class BasicMongoDb(Db):
 
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
-        for key in keys:
-            # TODO: Implement using a more performant approach
-            serialized_primary_key = _KEY_SERIALIZER.serialize(key)
-            collection.delete_one({"_key": serialized_primary_key})
+
+        # Create filter and delete
+        keys_filter = self._get_keys_filter(keys, dataset=dataset)
+        collection.delete_many(keys_filter)
 
     def drop_test_db(self) -> None:
         # Check preconditions
@@ -386,8 +378,8 @@ class BasicMongoDb(Db):
             # Add an index on tenant, dataset and key in ascending order
             collection.create_index(
                 [
-                    # ("_tenant", 1),
-                    # ("_dataset", 1),
+                    ("_tenant", 1),
+                    ("_dataset", 1),
                     ("_key", 1),
                 ],
             )
@@ -497,3 +489,30 @@ class BasicMongoDb(Db):
             else:
                 raise RuntimeError(f"Parameter limit={limit} is negative.")
         return serialized_records
+
+    def _with_pruned_fields(
+            self,
+            record_dict: dict[str, Any],
+            *,
+            expected_dataset: str,
+    ) -> dict[str, Any]:
+        """Prune and validate fields that are not part of the serialized record data and return the same instance."""
+        
+        # Remove or pop and validate
+        del record_dict["_id"]
+        assert record_dict.pop("_tenant") == self._tenant
+        assert record_dict.pop("_dataset") == expected_dataset
+        del record_dict["_key"]
+        
+        return record_dict
+
+    def _get_keys_filter(self, keys: Sequence[KeyProtocol], *, dataset: str) -> dict[str, Any]:
+        """Get filter for loading records that match one of the specified keys."""
+        serialized_keys = tuple(_KEY_SERIALIZER.serialize(key) for key in keys)
+        return {
+            "_tenant": self._tenant,
+            "_dataset": dataset,
+            "_key": {
+                "$in": serialized_keys
+            },
+        }
