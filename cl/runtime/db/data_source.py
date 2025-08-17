@@ -33,6 +33,7 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
@@ -73,6 +74,18 @@ class DataSource(DataSourceKey, RecordMixin):
     designated: list[ResourceKey] | None = None
     """Lookup these resources only here, not in any child or parent (optional)."""
 
+    _pending_deletes: list[KeyProtocol] | None = None
+    """
+    Keys that will be deleted on commit, including keys for which replacement records will be inserted
+    as part of the same commit.
+    """
+
+    _pending_inserts: list[RecordProtocol] | None = None
+    """
+    Records that will be inserted on commit, including replacement records for which are being deleted
+    as part of the same commit.
+    """
+
     def get_key(self) -> DataSourceKey:
         return DataSourceKey(data_source_id=self.data_source_id).build()
 
@@ -101,6 +114,31 @@ class DataSource(DataSourceKey, RecordMixin):
         if self.designated is not None:
             raise RuntimeError("DataSource.designated is not yet supported.")
 
+        # Initialize the list of pending deletes and inserts
+        self._pending_deletes = []
+        self._pending_inserts = []
+
+    def __enter__(self) -> Self:
+        """Supports 'with' operator for resource initialization and disposal."""
+        if self._pending_deletes:
+            raise RuntimeError(
+                "The list of pending deletes is not empty on __enter__.\n"
+                "Call commit or rollback before reusing the data source instance..")
+        if self._pending_inserts:
+            raise RuntimeError(
+                "The list of pending inserts is not empty on __enter__.\n"
+                "Call commit or rollback before reusing the data source instance..")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:
+        """Supports 'with' operator for resource initialization and disposal."""
+        if exc_type is None:
+            # Commit if there is no exception
+            self.commit()
+        else:
+            # Rollback if there is an exception and let the exception propagate (do not suppress)
+            self.rollback()
+
     def load_one(
         self,
         key_or_record: KeyProtocol,
@@ -124,7 +162,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 project_to=project_to,
             )
             if result is None:
-                TypeCheck.guard_key_or_record_type(type(key_or_record))
+                assert TypeCheck.guard_key_or_record_type(type(key_or_record))
                 if is_record(key_or_record):
                     key = key_or_record.get_key()
                 else:
@@ -191,7 +229,7 @@ class DataSource(DataSourceKey, RecordMixin):
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
         """
         # Check that the argument is not None and there are no elements that are None
-        TypeCheck.guard_key_or_record_sequence(records_or_keys)
+        assert TypeCheck.guard_key_or_record_sequence(records_or_keys)
 
         # Delegate to load_many_or_none method
         result = self.load_many_or_none(
@@ -202,7 +240,7 @@ class DataSource(DataSourceKey, RecordMixin):
         )
 
         # Perform checks and return
-        TypeCheck.guard_record_sequence(result)
+        assert TypeCheck.guard_record_sequence(result)
         return result
 
     def load_many_or_none(
@@ -352,7 +390,7 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        TypeCheck.guard_key_type(key_type)
+        assert TypeCheck.guard_key_type(key_type)
 
         return self._get_db().load_all(
             key_type=key_type,
@@ -496,84 +534,141 @@ class DataSource(DataSourceKey, RecordMixin):
     def insert_one(
         self,
         record: RecordProtocol,
+        *,
+        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
     ) -> None:
-        """Insert the specified record to DB, the entire transaction on data source __exit__ fails if it exists."""
-        self.save_many([record], save_policy=SavePolicy.INSERT)
+        """
+        Insert the specified record to DB, error if a record exists for the same key.
+
+        Notes:
+            - DB is written to when commit() is called, or on data source context exit without exception
+            - Pending commits are cancelled when rollback() is called, or on data source context exit with exception
+
+        Args:
+            record: Record to be inserted
+            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
+        """
+        self.save_many([record], commit=commit, save_policy=SavePolicy.INSERT)
 
     def insert_many(
         self,
-        records: Sequence[RecordProtocol],
+        records: RecordProtocol | Sequence[RecordProtocol],
+        *,
+        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
     ) -> None:
-        """Insert the specified records to DB, the entire transaction on data source __exit__ fails if any exist."""
-        self.save_many(records, save_policy=SavePolicy.INSERT)
+        """
+        Insert the specified records to DB, error if any records exist for the same key.
+
+        Notes:
+            - DB is written to when commit() is called, or on data source context exit without exception
+            - Pending commits are cancelled when rollback() is called, or on data source context exit with exception
+
+        Args:
+            records: A sequence of records which may have different key types
+            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
+        """
+        self.save_many(records, commit=commit, save_policy=SavePolicy.INSERT)
 
     def replace_one(
         self,
         record: RecordProtocol,
+        *,
+        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
     ) -> None:
-        """Insert the specified record to DB or replace if it exists."""
-        self.save_many([record], save_policy=SavePolicy.REPLACE)
+        """
+        Insert or replace (if it exists) the specified record.
+
+        Notes:
+            - DB is written to when commit() is called, or on data source context exit without exception
+            - Pending commits are cancelled when rollback() is called, or on data source context exit with exception
+
+        Args:
+            record: Record to be saved
+            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
+        """
+        self.save_many([record], commit=commit, save_policy=SavePolicy.REPLACE)
 
     def replace_many(
         self,
-        records: Sequence[RecordProtocol],
+        records: RecordProtocol | Sequence[RecordProtocol],
+        *,
+        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
     ) -> None:
-        """Insert the specified record to DB or replace those that exist."""
-        self.save_many(records, save_policy=SavePolicy.REPLACE)
+        """
+        Insert or replace (if they exist) the specified records.
+
+        Notes:
+            - DB is written to when commit() is called, or on data source context exit without exception
+            - Pending commits are cancelled when rollback() is called, or on data source context exit with exception
+
+        Args:
+            records: A sequence of records which may have different key types
+            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
+        """
+        self.save_many(records, commit=commit, save_policy=SavePolicy.REPLACE)
 
     def save_one(
         self,
         record: RecordProtocol,
         *,
+        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
         save_policy: SavePolicy,
     ) -> None:
         """
-        Save the specified record to storage, insert vs. replace behavior is governed by save_policy.
+        Save the specified record to DB, insert vs. replace behavior is governed by save_policy.
 
         Notes:
-            The entire transaction on data source __exit__ will fail if INSERT is used but the record exists
+            - Records are saved when commit() is called, or on data source context exit if exception is not raised
+            - Pending saves are cancelled when rollback() is called, or on data source context exit under exception
 
         Args:
-            record: Record to save
+            record: Record to be saved
+            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
             save_policy: Insert vs. replace policy, partial update is not included due to design considerations
         """
-        self.save_many([record], save_policy=save_policy)
+        self.save_many([record], commit=commit, save_policy=save_policy)
 
     def save_many(
         self,
         records: Sequence[RecordProtocol],
+        *,
+        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
         save_policy: SavePolicy,
     ) -> None:
         """
-        Save the specified records to storage, insert vs. replace behavior is governed by save_policy.
+        Save the specified record or record sequence, insert vs. replace behavior is governed by save_policy.
 
         Notes:
-            The entire transaction on data source __exit__ will fail if INSERT is used but some of the records exist
+            - Records are saved when commit() is called, or on data source context exit if exception is not raised
+            - Pending saves are cancelled when rollback() is called, or on data source context exit under exception
 
         Args:
-            records: Sequence of records to save, elements may have different key types
+            records: A sequence of records which may have different key types
+            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
             save_policy: Insert vs. replace policy, partial update is not included due to design considerations
         """
-        TypeCheck.guard_record_sequence(records)
-        TypeCheck.guard_not_none(save_policy)
+        assert TypeCheck.guard_record_sequence(records)
+        assert TypeCheck.guard_not_none(save_policy)
 
         # Do nothing if empty but error on None
         if len(records) == 0:
             return
 
-        # Group records by key type
-        records_grouped_by_key_type = self._group_inputs_by_key_type(records)
+        if save_policy == SavePolicy.INSERT:
+            pass
+        elif save_policy == SavePolicy.REPLACE:
+            # Add to the list of pending deletes, which will execute before the inserts
+            replace_keys = [record.get_key() for record in records]
+            self._pending_deletes.extend(replace_keys)
+        else:
+            ErrorUtil.enum_value_error(save_policy, SavePolicy)
 
-        # Save records for each key type
-        [
-            self._get_db().save_many(
-                key_type,
-                records_for_key_type,
-                dataset=self.dataset.dataset_id,
-                save_policy=save_policy,
-            )
-            for key_type, records_for_key_type in records_grouped_by_key_type.items()
-        ]
+        # Add to the list of pending inserts
+        self._pending_inserts.extend(records)
+
+        # Commit immediately if commit parameter is True
+        if commit:
+            self.commit()
 
     def delete_one(
         self,
@@ -585,22 +680,65 @@ class DataSource(DataSourceKey, RecordMixin):
     def delete_many(
         self,
         keys: Sequence[KeyProtocol],
+        *,
+        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
     ) -> None:
-        """Delete records for the specified keys in object, tuple or string format (no error if not found)."""
+        """
+        Delete the specified key or key sequence from DB on commit.
+
+        Notes:
+            - Records are deleted when commit() is called, or on data source context exit if exception is not raised
+            - Pending deletions are cancelled when rollback() is called, or on data source context exit under exception
+
+        Args:
+            keys: A single key or a sequence of keys which may have different types
+            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
+        """
         assert TypeCheck.guard_key_sequence(keys)
 
         # Do nothing if empty but error on None
         if len(keys) == 0:
             return
 
-        # Group keys by key type
-        keys_grouped_by_key_type = self._group_inputs_by_key_type(keys)
+        # Add to the list of pending deletes
+        self._pending_deletes.extend(keys)
 
-        # Perform deletion for every key type
+        # Commit immediately if commit parameter is True
+        if commit:
+            self.commit()
+
+    def commit(self) -> None:
+        """Commit all pending saves and deletes."""
+
+        # Group pending deletes by key type and clear the field
+        pending_deletes_grouped_by_key_type = self._group_inputs_by_key_type(self._pending_deletes)
+        self._pending_deletes = []
+
+        # Group pending inserts by key type and clear the field
+        pending_inserts_grouped_by_key_type = self._group_inputs_by_key_type(self._pending_inserts)
+        self._pending_inserts = []
+
+        # Delete records for every key type
         [
             self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
-            for key_type, records_for_key_type in keys_grouped_by_key_type.items()
+            for key_type, records_for_key_type in pending_deletes_grouped_by_key_type.items()
         ]
+
+        # Insert records for each key type
+        [
+            self._get_db().save_many(
+                key_type,
+                records_for_key_type,
+                dataset=self.dataset.dataset_id,
+                save_policy=SavePolicy.INSERT,
+            )
+            for key_type, records_for_key_type in pending_inserts_grouped_by_key_type.items()
+        ]
+
+    def rollback(self) -> None:
+        """Cancel all pending saves and deletes."""
+        self._pending_deletes = []
+        self._pending_inserts = []
 
     def get_bindings(self) -> tuple[RecordTypeBinding, ...]:
         """Return record type bindings in alphabetical order of key type name followed by record type name."""
