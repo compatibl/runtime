@@ -21,10 +21,10 @@ from typing import Coroutine
 from starlette.requests import Request
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.events.sse_query_util import SseQueryUtil
+from cl.runtime.primitive.timestamp import Timestamp
 
 _LOGGER = logging.getLogger(__name__)
 

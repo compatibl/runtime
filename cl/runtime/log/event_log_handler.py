@@ -14,11 +14,11 @@
 
 import logging
 from logging import LogRecord
-from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.events.event_kind import EventKind
 from cl.runtime.events.log_event import LogEvent
+from cl.runtime.primitive.case_util import CaseUtil
 
 
 class EventLogHandler(logging.Handler):

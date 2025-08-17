@@ -18,11 +18,11 @@ from typing import Iterable
 from typing_extensions import Final
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.events.sse_query_util import SseQueryUtil
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.task_logs import TaskLogs
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.events.sse_query_util import SseQueryUtil
 from cl.runtime.tasks.task_query import TaskQuery
 from cl.runtime.tasks.task_status import TaskStatus
 

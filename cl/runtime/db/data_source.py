@@ -259,7 +259,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Group keys by table
         keys_to_load_grouped_by_key_type = self._group_inputs_by_key_type(keys_to_load)
-        
+
         # Select sort order to use for the DB call
         if sort_order == SortOrder.INPUT:
             # For INPUT, use UNORDERED for the DB call as

@@ -14,7 +14,6 @@
 
 import pytest
 from frozendict import frozendict
-
 from cl.runtime.records.type_check import TypeCheck
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData

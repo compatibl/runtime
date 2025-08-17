@@ -225,9 +225,7 @@ class TypeCache:
             cls._add_class(result)
             return result
         except AttributeError:
-            raise RuntimeError(
-                f"Class {qual_name} is not found in TypeCache, run init_type_cache to rebuild."
-            )
+            raise RuntimeError(f"Class {qual_name} is not found in TypeCache, run init_type_cache to rebuild.")
 
     @classmethod
     @cached
@@ -664,6 +662,4 @@ class TypeCache:
     @classmethod
     def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:
         """Return error message for type name not found."""
-        return RuntimeError(
-            f"Type {type_name} is not found in TypeCache, run init_type_cache to rebuild."
-        )
+        return RuntimeError(f"Type {type_name} is not found in TypeCache, run init_type_cache to rebuild.")

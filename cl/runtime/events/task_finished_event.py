@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.events.task_event import TaskEvent
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.tasks.task_status import TaskStatus
 
 

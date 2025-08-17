@@ -90,10 +90,10 @@ class BasicMongoDb(Db):
 
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
-        
+
         # Query for all records in one call using $in operator
         serialized_records = tuple(collection.find(self._get_mongo_keys_filter(keys, dataset=dataset)))
-        
+
         # Prune the fields used by Db that are not part of the serialized record data and deserialize
         result = tuple(
             _RECORD_SERIALIZER.deserialize(self._with_pruned_fields(x, expected_dataset=dataset))
@@ -382,7 +382,7 @@ class BasicMongoDb(Db):
                     ("_dataset", 1),
                     ("_key", 1),
                 ],
-                unique=True
+                unique=True,
             )
 
             # Cache for reuse
@@ -492,19 +492,19 @@ class BasicMongoDb(Db):
         return serialized_records
 
     def _with_pruned_fields(
-            self,
-            record_dict: dict[str, Any],
-            *,
-            expected_dataset: str,
+        self,
+        record_dict: dict[str, Any],
+        *,
+        expected_dataset: str,
     ) -> dict[str, Any]:
         """Prune and validate fields that are not part of the serialized record data and return the same instance."""
-        
+
         # Remove or pop and validate
         del record_dict["_id"]
         assert record_dict.pop("_tenant") == self._tenant
         assert record_dict.pop("_dataset") == expected_dataset
         del record_dict["_key"]
-        
+
         return record_dict
 
     def _get_mongo_keys_filter(self, keys: Sequence[KeyProtocol], *, dataset: str) -> dict[str, Any]:
@@ -513,7 +513,5 @@ class BasicMongoDb(Db):
         return {
             "_tenant": self._tenant,
             "_dataset": dataset,
-            "_key": {
-                "$in": serialized_keys
-            },
+            "_key": {"$in": serialized_keys},
         }
