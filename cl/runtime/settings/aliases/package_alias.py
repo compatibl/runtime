@@ -13,25 +13,14 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from memoization import cached
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.serializers.sentinel_type import sentinel_value
 from cl.runtime.settings.aliases.package_alias_key import PackageAliasKey
-
-_package_alias_dict: dict[str, str] = {}
-"""Cached package aliases with module as key for faster lookup."""
-
 
 @dataclass(slots=True, kw_only=True)
 class PackageAlias(PackageAliasKey, RecordMixin):
-    """
-    Custom package alias defined using module glob pattern.
-
-    Notes:
-        - When specified, alias.ClassName is used in storage and REST API, otherwise ClassName is used without a prefix
-        - Use to resolve conflicts when multiple packages use the same class name
-        - Use to organize types and DB tables by package in large projects
-    """
+    """Custom package alias defined using module glob pattern, use to organize types and DB tables by package."""
 
     package_alias: str = required()
     """When specified, alias.ClassName is used in storage and REST API, otherwise ClassName is used without a prefix."""
@@ -40,15 +29,7 @@ class PackageAlias(PackageAliasKey, RecordMixin):
         return PackageAliasKey(package_pattern=self.package_pattern).build()
 
     @classmethod
+    @cached
     def get_alias(cls, module: str) -> str | None:
         """Get alias for the module in dot-delimited format or None if alias is not specified."""
-
-        # Otherwise check if a cached value exists, using missing_value as sentinel
-        if (alias := _package_alias_dict.get(module, sentinel_value)) == sentinel_value:
-            # Cached value is not found, scan PackageAlias records for a matching prefix
-            alias = None
-            # TODO: next((v for k, v in self.package_aliases.items() if module_prefix.startswith(k)), None)
-            # Add to cache
-            _package_alias_dict[module] = alias
-
-        return alias
+        raise NotImplementedError()

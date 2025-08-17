@@ -19,14 +19,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 @dataclass(slots=True)
 class PackageAliasKey(KeyMixin):
-    """
-    Custom package alias defined using module glob pattern.
-
-    Notes:
-        - When specified, alias.ClassName is used in storage and REST API, otherwise ClassName is used without a prefix
-        - Use to resolve conflicts when multiple packages use the same class name
-        - Use to organize types and DB tables by package in large projects
-    """
+    """Custom package alias defined using module glob pattern, use to organize types and DB tables by package."""
 
     package_pattern: str = required()
     """Glob pattern for the dot-delimited module determines if the alias applies to a class."""
