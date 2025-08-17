@@ -16,14 +16,14 @@ from dataclasses import dataclass
 from cl.runtime import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.sse.event_key import EventKey
-from cl.runtime.sse.event_type import EventType
+from cl.runtime.sse.event_kind import EventKind
 
 
 @dataclass(slots=True, kw_only=True)
 class Event(EventKey, RecordMixin):
     """Base server event."""
 
-    event_type: EventType = required()
+    event_type: EventKind = required()
     """Event type used in event stream."""
 
     def get_key(self) -> EventKey:

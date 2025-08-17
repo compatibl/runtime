@@ -16,7 +16,7 @@ from enum import IntEnum
 from enum import auto
 
 
-class EventType(IntEnum):
+class EventKind(IntEnum):
     """Supported server event types."""
 
     ERROR = auto()

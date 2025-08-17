@@ -25,7 +25,7 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.routers.sse.sse_router import _event_generator as original_event_generator  # noqa
 from cl.runtime.sse.event import Event
-from cl.runtime.sse.event_type import EventType
+from cl.runtime.sse.event_kind import EventKind
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,13 +46,13 @@ async def _publish_events(client):
     await asyncio.sleep(0.3)
     _LOGGER.info("1 - Info")
     await asyncio.sleep(0.1)
-    _LOGGER.info("2 - Info", extra={"event": Event(event_type=EventType.TASK_STARTED)})
+    _LOGGER.info("2 - Info", extra={"event": Event(event_type=EventKind.TASK_STARTED)})
     await asyncio.sleep(0.3)
     _LOGGER.warning("3 - Warning")
     await asyncio.sleep(0.2)
     _LOGGER.error("4 - Error")
     await asyncio.sleep(0.1)
-    _LOGGER.info("5 - Info", extra={"event": Event(event_type=EventType.TASK_FINISHED)})
+    _LOGGER.info("5 - Info", extra={"event": Event(event_type=EventKind.TASK_FINISHED)})
 
     # Ensure reaching limit in event generator to avoid timeout error
     for i in range(10):

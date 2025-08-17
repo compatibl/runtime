@@ -17,7 +17,7 @@ from logging import LogRecord
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.sse.event import Event
 from cl.runtime.sse.event_broker import EventBroker
-from cl.runtime.sse.event_type import EventType
+from cl.runtime.sse.event_kind import EventKind
 from cl.runtime.sse.log_event import LogEvent
 
 
@@ -30,7 +30,7 @@ class EventLogHandler(logging.Handler):
 
         return LogEvent(
             timestamp=getattr(record, "timestamp", None),
-            event_type=EventType.LOG,
+            event_type=EventKind.LOG,
             level=CaseUtil.upper_to_pascal_case(record.levelname),
             message=record.getMessage(),
             readable_time=getattr(record, "readable_time", None),
@@ -50,9 +50,9 @@ class EventLogHandler(logging.Handler):
 
             # If log record level is Error or Warning - trigger additional Error or Warning event
             if record.levelno >= logging.ERROR:
-                event_broker.sync_publish("events", Event(event_type=EventType.ERROR).build())
+                event_broker.sync_publish("events", Event(event_type=EventKind.ERROR).build())
             elif record.levelno >= logging.WARNING:
-                event_broker.sync_publish("events", Event(event_type=EventType.WARNING).build())
+                event_broker.sync_publish("events", Event(event_type=EventKind.WARNING).build())
 
             # Publish event from extras
             if (event := getattr(record, "event", None)) is not None:

@@ -26,7 +26,7 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.sse.event_type import EventType
+from cl.runtime.sse.event_kind import EventKind
 from cl.runtime.sse.task_event import TaskEvent
 from cl.runtime.sse.task_finished_event import TaskFinishedEvent
 from cl.runtime.tasks.task_key import TaskKey
@@ -103,7 +103,7 @@ class Task(TaskKey, RecordMixin, ABC):
         # Activate logging context for the task
         with activate(self._create_log_context()):
             try:
-                _LOGGER.info("Start task execution.", extra={"event": TaskEvent(event_type=EventType.TASK_STARTED)})
+                _LOGGER.info("Start task execution.", extra={"event": TaskEvent(event_type=EventKind.TASK_STARTED)})
 
                 # Save with Running status
                 update = self.clone()
@@ -119,7 +119,7 @@ class Task(TaskKey, RecordMixin, ABC):
                     "Task failed with exception.",
                     exc_info=True,
                     extra={
-                        "event": TaskFinishedEvent(event_type=EventType.TASK_FINISHED, status=TaskStatus.FAILED),
+                        "event": TaskFinishedEvent(event_type=EventKind.TASK_FINISHED, status=TaskStatus.FAILED),
                     },
                 )
 
@@ -136,7 +136,7 @@ class Task(TaskKey, RecordMixin, ABC):
                 _LOGGER.info(
                     "Task completed successfully.",
                     extra={
-                        "event": TaskFinishedEvent(event_type=EventType.TASK_FINISHED, status=TaskStatus.COMPLETED),
+                        "event": TaskFinishedEvent(event_type=EventKind.TASK_FINISHED, status=TaskStatus.COMPLETED),
                     },
                 )
 
