@@ -66,6 +66,6 @@ class DbLogHandler(logging.Handler):
         try:
             # Save LogMessage to current db context.
             log_message = self._create_log_message(record)
-            active(DataSource).replace_one(log_message)
+            active(DataSource).replace_one(log_message, commit=True)
         except Exception:
             self.handleError(record)

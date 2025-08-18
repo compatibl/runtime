@@ -29,7 +29,7 @@ def test_method(default_db_fixture):
     """Test coroutine for /schema/types route."""
 
     # Save record
-    active(DataSource).replace_one(StubDataclass().build())
+    active(DataSource).replace_one(StubDataclass().build(), commit=True)
 
     # Run the coroutine wrapper added by the FastAPI decorator and get the result
     result = TypesResponseItem.get_types()
@@ -48,7 +48,7 @@ def test_api(default_db_fixture):
     """Test REST API for /schema/types route."""
 
     # Save record
-    active(DataSource).replace_one(StubDataclass().build())
+    active(DataSource).replace_one(StubDataclass().build(), commit=True)
 
     test_app = FastAPI()
     test_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"])

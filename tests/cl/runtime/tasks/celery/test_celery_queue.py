@@ -30,7 +30,7 @@ def _create_task(queue: TaskQueueKey) -> TaskKey:
 
     method_callable = StubHandlers.run_static_method_1a
     task = StaticMethodTask.create(queue=queue, record_type=StubHandlers, method_callable=method_callable).build()
-    active(DataSource).replace_one(task)
+    active(DataSource).replace_one(task, commit=True)
     return task.get_key()
 
 
@@ -41,7 +41,7 @@ def test_method(celery_queue_fixture):
     # Create queue
     queue_id = f"test_celery_queue.test_method"
     queue = CeleryQueue(queue_id=queue_id)
-    active(DataSource).replace_one(queue)
+    active(DataSource).replace_one(queue, commit=True)
 
     # Create task
     task_key = _create_task(queue.get_key())
@@ -60,7 +60,7 @@ def test_api(celery_queue_fixture):
     # Create queue
     queue_id = f"test_celery_queue.test_api"
     queue = CeleryQueue(queue_id=queue_id)
-    active(DataSource).replace_one(queue)
+    active(DataSource).replace_one(queue, commit=True)
 
     # Create task
     task_key = _create_task(queue.get_key())

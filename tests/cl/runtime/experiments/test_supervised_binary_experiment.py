@@ -28,8 +28,8 @@ def test_smoke(multi_db_fixture):
     exp_type = ExperimentKind(kind_id="Test").build()
     sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
 
-    active(DataSource).replace_one(exp_type)
-    active(DataSource).replace_one(sc1)
+    active(DataSource).replace_one(exp_type, commit=True)
+    active(DataSource).replace_one(sc1, commit=True)
 
     # Create and run the experiment
     experiment = StubSupervisedBinaryExperiment(
@@ -49,8 +49,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
     sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
     sc2 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2").build()
 
-    active(DataSource).replace_one(exp_type)
-    active(DataSource).replace_many([sc1, sc2])
+    active(DataSource).replace_one(exp_type, commit=True)
+    active(DataSource).replace_many([sc1, sc2], commit=True)
 
     experiment = StubSupervisedBinaryExperiment(
         experiment_kind=ExperimentKindKey(kind_id="Test"),

@@ -51,6 +51,6 @@ class DeleteResponseUtil:
         )
 
         # Delete records.
-        active(DataSource).delete_many(deserialized_keys)
+        active(DataSource).delete_many(deserialized_keys, commit=True)
 
         return request.delete_keys

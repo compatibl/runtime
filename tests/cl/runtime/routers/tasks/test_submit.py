@@ -60,7 +60,7 @@ def test_method(default_db_fixture, celery_queue_fixture):
 
     stub_handlers = StubHandlers().build()
     key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
-    active(DataSource).replace_one(stub_handlers)
+    active(DataSource).replace_one(stub_handlers, commit=True)
 
     for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):
         request_object = SubmitRequest(**request)
@@ -96,7 +96,7 @@ def test_api(celery_queue_fixture):
 
     stub_handlers = StubHandlers()
     key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
-    active(DataSource).replace_one(stub_handlers)
+    active(DataSource).replace_one(stub_handlers, commit=True)
 
     with QaClient() as test_client:
         for request in get_simple_requests(key_str) + get_save_to_db_requests(key_str):

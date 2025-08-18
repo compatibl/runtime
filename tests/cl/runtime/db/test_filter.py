@@ -30,7 +30,7 @@ def _test_filter(*, filter: Filter, expected_values: Sequence[str]):
     """Test that the filter can be saved and loaded from storage, and selects the expected values."""
 
     # Save filter to storage
-    active(DataSource).replace_one(filter)
+    active(DataSource).replace_one(filter, commit=True)
     filter_key = filter.get_key()
 
     # Load the filter from storage
@@ -44,7 +44,7 @@ def _test_filter(*, filter: Filter, expected_values: Sequence[str]):
         StubDataclassOtherDerived(id="4", other_derived="uvw"),
     ]
     records = [x.build() for x in records]
-    active(DataSource).replace_many(records)
+    active(DataSource).replace_many(records, commit=True)
 
     # Load records using the filter
     loaded_records = active(DataSource).load_by_filter(loaded_filter, cast_to=StubDataclassDerived)

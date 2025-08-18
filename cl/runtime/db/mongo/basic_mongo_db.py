@@ -293,7 +293,7 @@ class BasicMongoDb(Db):
             serialized_record["_key"] = serialized_key
 
             if save_policy == SavePolicy.INSERT:
-                collection.insert_one(serialized_record, commit=True)
+                collection.insert_one(serialized_record)
             elif save_policy == SavePolicy.REPLACE:
                 collection.replace_one(key_dict, serialized_record, upsert=True)
             else:

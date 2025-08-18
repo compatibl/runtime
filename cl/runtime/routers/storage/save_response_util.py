@@ -44,7 +44,7 @@ class SaveResponseUtil:
             raise RuntimeError("Bulk save records of different key types currently is not supported.")
 
         # Save records to DB.
-        active(DataSource).replace_many(deserialized_records)
+        active(DataSource).replace_many(deserialized_records, commit=True)
 
         # Create KeyRequestItem objects of saved records for response.
         saved_key_items = [KeyRequestItem.from_key_or_record(record) for record in deserialized_records]

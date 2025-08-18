@@ -95,7 +95,7 @@ class StubRuntimeConfig(Config):
         ]
 
         # Build and save to DB
-        active(DataSource).replace_many([record.build() for record in all_records])
+        active(DataSource).replace_many([record.build() for record in all_records], commit=True)
 
     def configure_plots(self) -> None:
         """Configure plots."""
@@ -106,16 +106,21 @@ class StubRuntimeConfig(Config):
                 StubGroupBarPlots.get_single_group_plot(self.config_id + "stub_group_bar_plots.single_group"),
                 StubGroupBarPlots.get_4_groups_2_bars_plot(self.config_id + "stub_group_bar_plots.4_groups_2_bars"),
                 StubGroupBarPlots.get_4_groups_5_bars(self.config_id + "stub_group_bar_plots.4_groups_5_bars"),
-            )
+            ),
+            commit=True,
         )
 
         # HeatMapPlot
-        active(DataSource).replace_many((StubHeatMapPlots.get_basic_plot(self.config_id + "stub_heat_map_plots.basic"),))
+        active(DataSource).replace_many(
+            (StubHeatMapPlots.get_basic_plot(self.config_id + "stub_heat_map_plots.basic"),),
+            commit=True,
+        )
 
         # LinePlot
         active(DataSource).replace_many(
             (
                 StubLinePlots.get_one_line_plot(self.config_id + "stub_line_plots.one_line"),
                 StubLinePlots.get_two_line_plot(self.config_id + "stub_line_plots.two_line"),
-            )
+            ),
+            commit=True,
         )

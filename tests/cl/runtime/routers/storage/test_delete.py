@@ -28,7 +28,7 @@ def test_method(default_db_fixture):
     existing_records = [
         StubDataclassDerived(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build() for i in range(5)
     ]
-    active(DataSource).replace_many(existing_records)
+    active(DataSource).replace_many(existing_records, commit=True)
 
     delete_records_payload = {
         "delete_keys": [{"key": record.id, "type": "StubDataclassDerived"} for record in existing_records[:3]]
@@ -56,7 +56,7 @@ def test_api(default_db_fixture):
         existing_records = [
             StubDataclassDerived(id=f"existing_record_{i}", derived_str_field=f"value_{i}").build() for i in range(5)
         ]
-        active(DataSource).replace_many(existing_records)
+        active(DataSource).replace_many(existing_records, commit=True)
 
         delete_records_payload = [{"Key": record.id, "Type": "StubDataclassDerived"} for record in existing_records[:3]]
 

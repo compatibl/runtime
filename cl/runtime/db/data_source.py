@@ -573,7 +573,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         record: RecordProtocol,
         *,
-        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
+        commit: bool,
     ) -> None:
         """
         Insert or replace (if it exists) the specified record.
@@ -592,7 +592,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         records: RecordProtocol | Sequence[RecordProtocol],
         *,
-        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
+        commit: bool,
     ) -> None:
         """
         Insert or replace (if they exist) the specified records.
@@ -611,7 +611,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         record: RecordProtocol,
         *,
-        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
+        commit: bool,
         save_policy: SavePolicy,
     ) -> None:
         """
@@ -632,7 +632,7 @@ class DataSource(DataSourceKey, RecordMixin):
         self,
         records: Sequence[RecordProtocol],
         *,
-        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
+        commit: bool,
         save_policy: SavePolicy,
     ) -> None:
         """
@@ -673,15 +673,17 @@ class DataSource(DataSourceKey, RecordMixin):
     def delete_one(
         self,
         key: KeyProtocol,
+        *,
+        commit: bool,
     ) -> None:
         """Delete record for the specified key in object, tuple or string format (no error if not found)."""
-        return self.delete_many([key])
+        return self.delete_many([key], commit=commit)
 
     def delete_many(
         self,
         keys: Sequence[KeyProtocol],
         *,
-        commit: bool = True, # Todo(SASHA): Temporarily Allow commit param to be omitted
+        commit: bool,
     ) -> None:
         """
         Delete the specified key or key sequence from DB on commit.

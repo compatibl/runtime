@@ -63,7 +63,7 @@ def test_smoke(default_db_fixture):
 
 def _run_task(task_index: int):
     instance = StubHandlers(stub_id=f"abc{task_index}").build()
-    active(DataSource).replace_one(instance)
+    active(DataSource).replace_one(instance, commit=True)
 
     task = InstanceMethodTask.create(
         queue=TaskQueueKey(queue_id="Sample Queue"),

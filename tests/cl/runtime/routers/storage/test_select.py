@@ -27,7 +27,7 @@ def test_method(default_db_fixture):
 
     # Save test record.
     record = StubDataclass(id=__name__).build()
-    active(DataSource).replace_one(record)
+    active(DataSource).replace_one(record, commit=True)
 
     request_obj = SelectRequest(type_=type(record).__name__)
     result = SelectResponse.get_response(request_obj)
@@ -48,7 +48,7 @@ def test_api(default_db_fixture):
     with QaClient() as test_client:
         # Save test record
         record = StubDataclass(id=__name__).build()
-        active(DataSource).replace_one(record)
+        active(DataSource).replace_one(record, commit=True)
         request_body = {"Type": "StubDataclass"}
 
         # Send POST request
