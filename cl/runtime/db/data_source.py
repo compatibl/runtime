@@ -123,11 +123,13 @@ class DataSource(DataSourceKey, RecordMixin):
         if self._pending_deletes:
             raise RuntimeError(
                 "The list of pending deletes is not empty on __enter__.\n"
-                "Call commit or rollback before reusing the data source instance..")
+                "Call commit or rollback before reusing the data source instance.."
+            )
         if self._pending_inserts:
             raise RuntimeError(
                 "The list of pending inserts is not empty on __enter__.\n"
-                "Call commit or rollback before reusing the data source instance..")
+                "Call commit or rollback before reusing the data source instance.."
+            )
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> bool | None:

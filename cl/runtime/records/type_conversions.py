@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from typing import Sequence
-
-from cl.runtime.records.protocols import KeyProtocol, RecordProtocol
+from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 
@@ -34,7 +34,8 @@ class TypeConversions:
         else:
             raise RuntimeError(
                 f"Parameter 'keys' of type {typename(keys)} is not a key or a sequence of keys\n"
-                f"(iterable generator is not accepted)")
+                f"(iterable generator is not accepted)"
+            )
 
     @classmethod
     def to_record_sequence(cls, records: RecordProtocol | Sequence[RecordProtocol]) -> Sequence[RecordProtocol]:
@@ -48,4 +49,5 @@ class TypeConversions:
         else:
             raise RuntimeError(
                 f"Parameter 'records' of type {typename(records)} is not a record or a sequence of records\n"
-                f"(iterable generator is not accepted)")
+                f"(iterable generator is not accepted)"
+            )

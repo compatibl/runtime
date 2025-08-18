@@ -207,7 +207,10 @@ def test_singleton(multi_db_fixture):
     assert len(all_records) == 1
     assert all_records[0] == other_singleton_sample
 
-@pytest.mark.skip("Temporarily skip a test for repeated record save.")  # TODO(Sasha): Restore if and when tracking repeats is implemented
+
+@pytest.mark.skip(
+    "Temporarily skip a test for repeated record save."
+)  # TODO(Sasha): Restore if and when tracking repeats is implemented
 def test_repeated(multi_db_fixture):
     """Test including the same object twice in save many."""
     record = StubDataclass().build()

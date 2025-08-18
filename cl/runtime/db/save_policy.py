@@ -24,4 +24,3 @@ class SavePolicy(IntEnum):
 
     REPLACE = auto()
     """Insert or replace whether or not a record with the same key exists."""
-
