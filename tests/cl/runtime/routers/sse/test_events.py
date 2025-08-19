@@ -29,6 +29,9 @@ from cl.runtime.routers.sse.sse_router import _event_generator as original_event
 
 _LOGGER = logging.getLogger(__name__)
 
+_test_event_loop = asyncio.new_event_loop()
+asyncio.set_event_loop(_test_event_loop)
+
 
 async def _listen_events(client):
     headers = {"Accept": "text/event-stream"}
@@ -59,13 +62,14 @@ async def _publish_events(client):
         _LOGGER.info(f"Event to reach limit - #{i}.")
 
 
-async def _publish_and_listen_events():
+async def _publish_and_listen_events(listeners_count: int):
     app = FastAPI()
     ServerUtil.include_routers(app)
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        listen_result, _ = await asyncio.gather(_listen_events(client), _publish_events(client))
+        listen_tasks = (_listen_events(client),) * listeners_count
+        *listen_results, _ = await asyncio.gather(*listen_tasks, _publish_events(client))
 
-        return listen_result
+        return listen_results
 
 
 async def mock_event_generator_limited(request):
@@ -114,12 +118,27 @@ def test_events(default_db_fixture):
 
     with patch("cl.runtime.routers.sse.sse_router._event_generator", mock_event_generator_limited):
         # Run coroutines to publish and listen events in parallel asynchronously
-        event_stream_lines = asyncio.run(asyncio.wait_for(_publish_and_listen_events(), timeout=10.0))
+        listen_results = _test_event_loop.run_until_complete(asyncio.wait_for(_publish_and_listen_events(1), timeout=10.0))
+        assert len(listen_results) == 1
+
+        event_stream_lines = listen_results[0]
         event_stream_data = _parse_stream_lines(event_stream_lines)
 
         # Verify output
         RegressionGuard().write(event_stream_data)
         RegressionGuard().verify_all()
+
+
+def test_events_multi_listener(default_db_fixture):
+    # Set up logging config
+    logging.config.dictConfig(logging_config)
+
+    with patch("cl.runtime.routers.sse.sse_router._event_generator", mock_event_generator_limited):
+        # Run coroutines to publish and listen events in parallel asynchronously
+        listen_results = _test_event_loop.run_until_complete(asyncio.wait_for(_publish_and_listen_events(10), timeout=10.0))
+        assert len(listen_results) == 10
+
+        assert all(listen_result and listen_result == listen_results[0] for listen_result in listen_results)
 
 
 if __name__ == "__main__":
