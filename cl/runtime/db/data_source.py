@@ -550,7 +550,7 @@ class DataSource(DataSourceKey, RecordMixin):
             record: Record to be inserted
             commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
         """
-        self.save_many([record], commit=commit, save_policy=SavePolicy.INSERT)
+        self._save_many([record], commit=commit, save_policy=SavePolicy.INSERT)
 
     def insert_many(
         self,
@@ -569,7 +569,7 @@ class DataSource(DataSourceKey, RecordMixin):
             records: A sequence of records which may have different key types
             commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
         """
-        self.save_many(records, commit=commit, save_policy=SavePolicy.INSERT)
+        self._save_many(records, commit=commit, save_policy=SavePolicy.INSERT)
 
     def replace_one(
         self,
@@ -588,7 +588,7 @@ class DataSource(DataSourceKey, RecordMixin):
             record: Record to be saved
             commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
         """
-        self.save_many([record], commit=commit, save_policy=SavePolicy.REPLACE)
+        self._save_many([record], commit=commit, save_policy=SavePolicy.REPLACE)
 
     def replace_many(
         self,
@@ -607,70 +607,7 @@ class DataSource(DataSourceKey, RecordMixin):
             records: A sequence of records which may have different key types
             commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
         """
-        self.save_many(records, commit=commit, save_policy=SavePolicy.REPLACE)
-
-    def save_one(
-        self,
-        record: RecordProtocol,
-        *,
-        commit: bool,
-        save_policy: SavePolicy,
-    ) -> None:
-        """
-        Save the specified record to DB, insert vs. replace behavior is governed by save_policy.
-
-        Notes:
-            - Records are saved when commit() is called, or on data source context exit if exception is not raised
-            - Pending saves are cancelled when rollback() is called, or on data source context exit under exception
-
-        Args:
-            record: Record to be saved
-            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
-            save_policy: Insert vs. replace policy, partial update is not included due to design considerations
-        """
-        self.save_many([record], commit=commit, save_policy=save_policy)
-
-    def save_many(
-        self,
-        records: Sequence[RecordProtocol],
-        *,
-        commit: bool,
-        save_policy: SavePolicy,
-    ) -> None:
-        """
-        Save the specified record or record sequence, insert vs. replace behavior is governed by save_policy.
-
-        Notes:
-            - Records are saved when commit() is called, or on data source context exit if exception is not raised
-            - Pending saves are cancelled when rollback() is called, or on data source context exit under exception
-
-        Args:
-            records: A sequence of records which may have different key types
-            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
-            save_policy: Insert vs. replace policy, partial update is not included due to design considerations
-        """
-        assert TypeCheck.guard_record_sequence(records)
-        assert TypeCheck.guard_not_none(save_policy)
-
-        # Do nothing if empty but error on None
-        if len(records) == 0:
-            return
-
-        if save_policy == SavePolicy.INSERT:
-            pass
-        elif save_policy == SavePolicy.REPLACE:
-            # Add to the list of pending deletes, which will execute before the inserts
-            replace_keys = [record.get_key() for record in records]
-            self._pending_deletes.extend(replace_keys)
-        else:
-            ErrorUtil.enum_value_error(save_policy, SavePolicy)
-
-        # Add to the list of pending inserts
-        self._pending_inserts.extend(records)
-
-        # Commit immediately if commit parameter is True
-        if commit:
-            self.commit()
+        self._save_many(records, commit=commit, save_policy=SavePolicy.REPLACE)
 
     def delete_one(
         self,
@@ -820,3 +757,45 @@ class DataSource(DataSourceKey, RecordMixin):
         result = defaultdict(list)
         consume(result[x.get_key_type()].append(x) for x in inputs if x is not None)
         return result
+
+    def _save_many(
+        self,
+        records: Sequence[RecordProtocol],
+        *,
+        commit: bool,
+        save_policy: SavePolicy,
+    ) -> None:
+        """
+        Save the specified record or record sequence, insert vs. replace behavior is governed by save_policy.
+
+        Notes:
+            - Records are saved when commit() is called, or on data source context exit if exception is not raised
+            - Pending saves are cancelled when rollback() is called, or on data source context exit under exception
+
+        Args:
+            records: A sequence of records which may have different key types
+            commit: If True, commit() is called immediately after which will also commit other pending saves and deletes
+            save_policy: Insert vs. replace policy, partial update is not included due to design considerations
+        """
+        assert TypeCheck.guard_record_sequence(records)
+        assert TypeCheck.guard_not_none(save_policy)
+
+        # Do nothing if empty but error on None
+        if len(records) == 0:
+            return
+
+        if save_policy == SavePolicy.INSERT:
+            pass
+        elif save_policy == SavePolicy.REPLACE:
+            # Add to the list of pending deletes, which will execute before the inserts
+            replace_keys = [record.get_key() for record in records]
+            self._pending_deletes.extend(replace_keys)
+        else:
+            ErrorUtil.enum_value_error(save_policy, SavePolicy)
+
+        # Add to the list of pending inserts
+        self._pending_inserts.extend(records)
+
+        # Commit immediately if commit parameter is True
+        if commit:
+            self.commit()
