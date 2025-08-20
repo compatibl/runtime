@@ -45,6 +45,7 @@ def _handle_async_task_exception(task: asyncio.Task):
     except Exception:
         _LOGGER.error("DB SSE pull events task failed.", exc_info=True)
 
+
 async def _pull_events():
     """
     An async task to check events in the DB and distribute them to subscribed queues.
@@ -58,7 +59,9 @@ async def _pull_events():
 
         # Get unprocessed events from the DB, sorted by ascending timestamp
         # TODO (Roman): Replace with DataSource.query() when supported
-        new_events = list(reversed([x for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_key_type(), limit=100)]))
+        new_events = list(
+            reversed([x for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_key_type(), limit=100)])
+        )
 
         if new_events:
             _LOGGER.debug(f"SSE: Found {len(new_events)} events in DB.")
@@ -84,6 +87,7 @@ def _subscribe_queue(queue: asyncio.Queue):
     if _pull_events_task is None or _pull_events_task.done() or _pull_events_task.cancelled():
         _pull_events_task = asyncio.create_task(_pull_events())
         _pull_events_task.add_done_callback(_handle_async_task_exception)
+
 
 def _unsubscribe_queue(queue: asyncio.Queue):
     """Unsubscribe queue from receiving events."""

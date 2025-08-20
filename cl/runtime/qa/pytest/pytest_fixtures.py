@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging.config
 import pytest
+import logging.config
 import os
 import uuid
 from typing import Iterator
