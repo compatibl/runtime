@@ -113,8 +113,6 @@ def _parse_stream_lines(stream_lines: list[str]) -> list[dict]:
 
 
 def test_events(default_db_fixture):
-    # Set up logging config
-    logging.config.dictConfig(logging_config)
 
     with patch("cl.runtime.routers.sse.sse_router._event_generator", mock_event_generator_limited):
         # Run coroutines to publish and listen events in parallel asynchronously
@@ -130,8 +128,6 @@ def test_events(default_db_fixture):
 
 
 def test_events_multi_listener(default_db_fixture):
-    # Set up logging config
-    logging.config.dictConfig(logging_config)
 
     with patch("cl.runtime.routers.sse.sse_router._event_generator", mock_event_generator_limited):
         # Run coroutines to publish and listen events in parallel asynchronously

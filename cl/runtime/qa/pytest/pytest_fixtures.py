@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging.config
 import pytest
 import os
 import uuid
@@ -26,6 +27,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
 from cl.runtime.db.sql.sqlite_db import SqliteDb
+from cl.runtime.log.log_config import logging_config
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
@@ -126,3 +128,9 @@ def work_dir_fixture(request: FixtureRequest) -> Iterator[str]:
 def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
     """Convert a UUID to BSON Binary object."""
     return Binary(uuid_.bytes, UUID_SUBTYPE)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def configure_logging_fixture(request: FixtureRequest):
+    """Configure logging with basic config."""
+    logging.config.dictConfig(logging_config)

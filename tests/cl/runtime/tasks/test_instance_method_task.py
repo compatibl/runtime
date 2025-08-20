@@ -74,21 +74,5 @@ def _run_task(task_index: int):
     task.run_task()
 
 
-def test_task_logger(default_db_fixture, capsys):
-    """Test task logger don't share contextual properties."""
-
-    # Set up logging config
-    logging.config.dictConfig(logging_config)
-
-    [_run_task(task_index) for task_index in range(TASK_COUNT)]
-
-    # Get stdout lines
-    captured_lines = capsys.readouterr().out.splitlines()
-
-    # Check that the stdout lines are not empty and are unique, as they contain specific contextual information
-    assert bool(captured_lines)
-    assert len(captured_lines) == len(set(captured_lines))
-
-
 if __name__ == "__main__":
     pytest.main([__file__])

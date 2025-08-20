@@ -26,10 +26,10 @@ class TaskEvent(Event):
     task_run_id: str = required()
     """Unique task run identifier."""
 
-    record_type_name: str = required()
+    record_type_name: str | None = None
     """Record Type on which handler is run."""
 
-    handler_name: str = required()
+    handler_name: str | None = None
     """Handler name."""
 
     record_key: str | None = None
@@ -44,12 +44,6 @@ class TaskEvent(Event):
 
             if log_context.task_run_id is None:
                 raise RuntimeError("TaskLog.task_run_id is required to create TaskEvent.")
-
-            if log_context.record_type_name is None:
-                raise RuntimeError("TaskLog.type is required to create TaskEvent.")
-
-            if log_context.handler is None:
-                raise RuntimeError("TaskLog.handler is required to create TaskEvent.")
 
             # Fill in Event fields from Context
             self.task_run_id = log_context.task_run_id
