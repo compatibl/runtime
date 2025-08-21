@@ -135,7 +135,7 @@ class DbEventBroker(EventBroker):
 
             # Filter old or already sent events
             if event.timestamp > self._from_timestamp and event.timestamp not in self._sent_event_buffer:
-                self._sent_event_buffer.append(event)
+                self._sent_event_buffer.append(event.timestamp)
                 return event
 
     async def publish(self, topic: str, event: Event) -> None:
