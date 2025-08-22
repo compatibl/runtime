@@ -15,6 +15,8 @@
 from abc import ABC
 from typing import Self
 from memoization import cached
+
+from cl.runtime.records.bootstrap_util import BootstrapUtil
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.serializers.slots_util import SlotsUtil
 
@@ -37,17 +39,4 @@ class BootstrapMixin(BuilderMixin, ABC):
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Calls its 'mark_frozen' method without performing validation against the schema
         """
-        # Invoke '__init' in the order from base to derived
-        # Keep track of which init methods in class hierarchy were already called
-        invoked = set()
-        # Reverse the MRO to start from base to derived
-        for class_ in reversed(self.__class__.__mro__):
-            # Remove leading underscores from the class name when generating mangling for __init
-            # to support classes that start from _ to mark them as protected
-            class_init = getattr(class_, f"_{class_.__name__.lstrip('_')}__init", None)
-            if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
-                # Add qualname to invoked to prevent executing the same method twice
-                invoked.add(qualname)
-                # Invoke '__init' method if it exists, otherwise do nothing
-                class_init(self)
-        return self
+        return BootstrapUtil.build(self)
