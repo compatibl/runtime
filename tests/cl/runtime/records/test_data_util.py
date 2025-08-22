@@ -14,8 +14,13 @@
 
 import pytest
 
+from cl.runtime.parsers.locale import Locale
+from cl.runtime.parsers.locale_key import LocaleKey
 from cl.runtime.records.data_util import DataUtil
-from stubs.cl.runtime import StubDataclass
+from cl.runtime.serializers.data_serializers import DataSerializers
+from cl.runtime.settings.labels.class_label import ClassLabel
+from cl.runtime.settings.labels.class_label_key import ClassLabelKey
+from stubs.cl.runtime import StubDataclass, StubDataclassKey
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
@@ -52,6 +57,35 @@ def test_data_build():
 
     for sample in samples:
         DataUtil.full_build(sample)
+
+
+def test_required():
+    """Test validation of the field type during build."""
+
+    samples = [
+        ClassLabelKey(),  # noqa - missing a required field in key
+        ClassLabel(class_name="en-US"),  # noqa - missing a required field in record
+    ]
+
+    for sample in samples:
+        DataUtil.full_build(sample)
+        DataSerializers.DEFAULT.serialize(sample)
+
+
+def test_field_type():
+    """Test validation of the field type during build."""
+
+    samples = [
+        StubDataclass(id=123),  # noqa - wrong primitive type in key
+        StubDataclassDerived(id=123),   # noqa - wrong primitive type in record
+        StubDataclass(id=StubDataclassKey()),   # noqa - complex instead of primitive type
+        StubDataclass(id=StubDataclassKey()),  # noqa - unrelated type
+    ]
+
+    for sample in samples:
+        DataUtil.full_build(sample)
+        with pytest.raises(Exception):
+            DataSerializers.DEFAULT.serialize(sample)
 
 
 if __name__ == "__main__":
