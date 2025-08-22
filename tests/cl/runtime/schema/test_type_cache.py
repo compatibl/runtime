@@ -41,15 +41,11 @@ def test_is_known_type():
 
     # Valid cases
     assert TypeCache.is_known_type(StubDataclass)
-    assert TypeCache.is_known_type(StubDataclass, type_kind=TypeKind.RECORD)
     assert TypeCache.is_known_type(StubDataclassKey)
-    assert TypeCache.is_known_type(StubDataclassKey, type_kind=TypeKind.KEY)
     assert TypeCache.is_known_type(StubDataclassData)
-    assert TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.DATA)
 
     # Invalid cases
-    assert not TypeCache.is_known_type(123)
-    assert not TypeCache.is_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
+    assert not TypeCache.is_known_type(123)  # noqa
 
 
 def test_guard_known_type():
