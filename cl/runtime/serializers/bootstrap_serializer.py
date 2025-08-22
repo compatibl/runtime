@@ -236,12 +236,12 @@ class BootstrapSerializer(Serializer):
         elif data_class_name == "bytes":
             if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
                 return data
+            elif value_format == BytesFormat.DEFAULT:
+                # Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL
+                return base64.encodebytes(data).decode("utf-8").rstrip("\n")  # TODO: Create BytesUtil
             elif value_format == BytesFormat.COMPACT:
                 # Base64 encoding for bytes on a single line
                 return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
-            elif value_format == BytesFormat.MIME:
-                # Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL
-                return base64.encodebytes(data).decode("utf-8").rstrip("\n")  # TODO: Create BytesUtil
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         elif data_class_name in SEQUENCE_CLASS_NAMES:

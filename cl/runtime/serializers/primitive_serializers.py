@@ -60,7 +60,7 @@ class PrimitiveSerializers:
         datetime_format=DatetimeFormat.DEFAULT,
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.DEFAULT,
-        bytes_format=BytesFormat.MIME,
+        bytes_format=BytesFormat.DEFAULT,
         type_format=TypeFormat.DEFAULT,
     ).build()
     """Pass through None and string, serialize all other primitive types to string using default format."""
