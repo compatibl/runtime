@@ -24,6 +24,7 @@ from cl.runtime.serializers.primitive_serializer import PrimitiveSerializer
 from cl.runtime.serializers.string_format import StringFormat
 from cl.runtime.serializers.time_format import TimeFormat
 from cl.runtime.serializers.timestamp_format import TimestampFormat
+from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.uuid_format import UuidFormat
 
 
@@ -43,6 +44,7 @@ class PrimitiveSerializers:
         uuid_format=UuidFormat.PASSTHROUGH,
         timestamp_format=TimestampFormat.PASSTHROUGH,
         bytes_format=BytesFormat.PASSTHROUGH,
+        type_format=TypeFormat.PASSTHROUGH,
     ).build()
     """Do not perform any conversion but validate against type information if provided."""
 
@@ -59,6 +61,7 @@ class PrimitiveSerializers:
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.DEFAULT,
         bytes_format=BytesFormat.MIME,
+        type_format=TypeFormat.DEFAULT,
     ).build()
     """Pass through None and string, serialize all other primitive types to string using default format."""
 
@@ -75,6 +78,7 @@ class PrimitiveSerializers:
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.DEFAULT,
         bytes_format=BytesFormat.DEFAULT,
+        type_format=TypeFormat.DEFAULT,
     ).build()
     """Default primitive serializer settings for JSON."""
 
@@ -91,6 +95,7 @@ class PrimitiveSerializers:
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
         bytes_format=BytesFormat.DEFAULT,
+        type_format=TypeFormat.DEFAULT,
     ).build()
     """Default primitive serializer settings for UI."""
 
@@ -107,8 +112,9 @@ class PrimitiveSerializers:
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
         bytes_format=BytesFormat.DEFAULT,
+        type_format=TypeFormat.DEFAULT,
     ).build()
-    """Default primitive serializer settings for UI."""
+    """Default primitive serializer settings for CSV."""
 
     FOR_SQLITE = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
@@ -123,8 +129,9 @@ class PrimitiveSerializers:
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
         bytes_format=BytesFormat.DEFAULT,
+        type_format=TypeFormat.DEFAULT,
     ).build()
-    """Default primitive serializer settings for UI."""
+    """Default primitive serializer settings for SQLite."""
 
     FOR_MONGO = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
@@ -139,6 +146,7 @@ class PrimitiveSerializers:
         uuid_format=UuidFormat.PASSTHROUGH,
         timestamp_format=TimestampFormat.PASSTHROUGH,
         bytes_format=BytesFormat.PASSTHROUGH,
+        type_format=TypeFormat.DEFAULT,
     ).build()
     """
     Default primitive serializer settings for MongoDB.

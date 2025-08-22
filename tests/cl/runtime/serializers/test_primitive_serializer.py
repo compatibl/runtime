@@ -21,6 +21,7 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
+from stubs.cl.runtime import StubDataclass
 
 
 def test_roundtrip():
@@ -70,7 +71,7 @@ def test_roundtrip():
         (UUID, "UUID", UUID("1A" * 16), "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a"),
         # Timestamp
         (UUID, "timestamp", None, None),
-        # ("timestamp", UUID("1A" * 16), "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a"),
+        # ("timestamp", UUID("1A" * 16), "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a"),  # TODO: Restore test
         # TODO: Add datetime-hex format for timestamp
         # Bytes
         (bytes, "bytes", bytes([100, 110, 120]), "ZG54"),
@@ -82,6 +83,7 @@ def test_roundtrip():
             "ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\n"
             "ZG54ZG54",
         ),
+        (type, "type", StubDataclass, "StubDataclass"),
     ]
 
     for test_case in test_cases:
@@ -158,6 +160,7 @@ def test_serialization_exceptions():
         (bool, "bool", "Null"),
         (int, "int", 2147483648),  # Out of range for int32
         (int, "long", 9007199254740992),  # Out of range for int54
+        (type, "type", str),  # Not a data, key or record class
     ]
 
     # Check exception cases with type name (without type name, the call will succeed for most values)

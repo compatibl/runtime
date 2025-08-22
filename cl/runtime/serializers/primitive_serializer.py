@@ -20,6 +20,7 @@ from typing import Any
 from uuid import UUID
 from bson import Int64
 
+from cl.runtime import TypeCache
 from cl.runtime.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil
@@ -109,8 +110,8 @@ class PrimitiveSerializer(Serializer):
                        the same class with another type (e.g. long and int types share the int class)
         """
 
-        # Get the class of data
-        data_class_name = typename(data)
+        # Get type name of data, which may be a type
+        data_class_name = "type" if isinstance(data, type) else typename(data)
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
@@ -257,9 +258,12 @@ class PrimitiveSerializer(Serializer):
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         elif data_class_name == "type":
             if (type_format := self.type_format) == TypeFormat.PASSTHROUGH:
+                # Return data after checking it is a known type
+                assert TypeCache.guard_known_type(data)
                 return data
             elif type_format == TypeFormat.DEFAULT:
-                return typename(data)
+                # Return type name after checking it is a known type
+                return TypeCache.get_type_name(data)
             else:
                 raise ErrorUtil.enum_value_error(type_format, TypeFormat)
         else:
@@ -574,8 +578,12 @@ class PrimitiveSerializer(Serializer):
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         elif schema_type_name == "type":
             if (value_format := self.type_format) == TypeFormat.PASSTHROUGH:
-                if data is None or isinstance(data, type):
-                    # Pass through None and type
+                if data is None:
+                    # Pass through None
+                    return None
+                elif isinstance(data, type):
+                    # Return data after checking it is a known type
+                    assert TypeCache.guard_known_type(data)
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
@@ -584,9 +592,8 @@ class PrimitiveSerializer(Serializer):
                     # Treat an empty string and "null" as None
                     return None
                 elif isinstance(data, str):
-                    # Get type from string typename
-                    # TODO: Use TypeInfo after resolving the cyclic reference
-                    raise NotImplementedError()
+                    # Get type from string typename, must be a known type
+                    return TypeCache.from_type_name(data)
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:

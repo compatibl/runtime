@@ -70,7 +70,7 @@ class TypeCache:
         cls._ensure_loaded()
 
         # Convert to type name if provided as type
-        type_name = typename(type_or_name) if isinstance(type_or_name, type) else type_or_name
+        type_name = type_or_name if isinstance(type_or_name, str) else typename(type_or_name)
 
         # Return True if present in dict
         result = type_name in cls._type_info_by_type_name_dict
@@ -98,7 +98,7 @@ class TypeCache:
         cls._ensure_loaded()
 
         # Convert to type name if provided as type
-        type_name = typename(type_or_name) if isinstance(type_or_name, type) else type_or_name
+        type_name = type_or_name if isinstance(type_or_name, str) else typename(type_or_name)
 
         if type_kind is None:
             # If type_kind is None, only check if present in dict
@@ -155,7 +155,7 @@ class TypeCache:
         cls._ensure_loaded()
 
         # Convert to type name if provided as type
-        type_name = typename(type_or_name) if isinstance(type_or_name, type) else type_or_name
+        type_name = type_or_name if isinstance(type_or_name, str) else typename(type_or_name)
         result = cls._type_info_by_type_name_dict.get(type_name)
         if not result:
             packages_str = "\n".join(f"  - {package}" for package in cls._get_packages())
@@ -651,7 +651,7 @@ class TypeCache:
     @classmethod
     def _get_type_name(cls, type_or_name: type | str) -> str:
         """Convert to string if type is provided and validate."""
-        result = typename(type_or_name) if isinstance(type_or_name, type) else type_or_name
+        result = type_or_name if isinstance(type_or_name, str) else typename(type_or_name)
         if not isinstance(result, str):
             raise RuntimeError("Parameter must be a type or a string type name.")
         CaseUtil.check_pascal_case(result)
