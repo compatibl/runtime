@@ -20,9 +20,10 @@ from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
+from cl.runtime.records.condition_util import ConditionUtil
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.key_util import KeyUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_key
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_key, is_condition
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -148,6 +149,8 @@ class DataUtil:
                        in _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE
                     else EnumUtil.normalize(field_value, field_spec.type_hint)
                     if is_enum(field_value)
+                    else ConditionUtil.normalize(field_value, field_spec.type_hint)
+                    if is_condition(field_value)
                     else cls.full_build(field_value, field_spec.type_hint)
                 ))
                 for field_key, field_spec in data_field_dict.items()

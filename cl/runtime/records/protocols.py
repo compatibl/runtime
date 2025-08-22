@@ -49,6 +49,22 @@ The list of primitive type names, includes those primitive types that do not hav
 Pyton classes such as long (uses Python type int) and timestamp (uses Python type UUID).
 """
 
+CONDITION_CLASS_NAMES = (
+    "And",
+    "Exists",
+    "Gt",
+    "Gte",
+    "In",
+    "Lt",
+    "Lte",
+    "Not",
+    "NotIn",
+    "Or",
+    "Range",
+)
+"""
+The list of condition class names."""
+
 SEQUENCE_CLASSES = (list, tuple)
 """Classes that may be used to represent sequences, excluding abstract base classes."""
 
@@ -198,6 +214,13 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
     """Returns true if the argument is one of the supported primitive classes."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in PRIMITIVE_CLASS_NAMES
+    return result
+
+
+def is_condition(instance_or_type: Any) -> TypeGuard[Any]:  # TODO: Add protocol
+    """Returns true if the argument is one of the supported condition classes."""
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    result = type_.__name__ in CONDITION_CLASS_NAMES
     return result
 
 

@@ -19,9 +19,12 @@ from types import ModuleType
 from typing import Mapping
 from typing import cast
 from uuid import UUID
+
+from cl.runtime.records.conditions import Condition
 from cl.runtime.records.protocols import DataProtocol
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.typename import typename
+from cl.runtime.schema.condition_spec import ConditionSpec
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.no_slots_spec import NoSlotsSpec
@@ -93,6 +96,9 @@ class TypeSchema:
             elif is_data_key_or_record(class_) and not cast(DataProtocol, class_).get_field_names():
                 # Base class of data, key or record with no slots
                 spec_class = NoSlotsSpec
+            elif issubclass(class_, Condition):
+                # Condition class
+                spec_class = ConditionSpec
             else:
                 raise RuntimeError(
                     f"Class {typename(class_)} implements build method but does not\n"
