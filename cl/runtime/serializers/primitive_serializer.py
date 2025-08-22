@@ -19,6 +19,7 @@ from enum import IntEnum
 from typing import Any
 from uuid import UUID
 from bson import Int64
+
 from cl.runtime.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil
@@ -34,7 +35,7 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import TPrimitive
-from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typename, qualname
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format import BoolFormat
 from cl.runtime.serializers.bytes_format import BytesFormat
@@ -48,6 +49,7 @@ from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.string_format import StringFormat
 from cl.runtime.serializers.time_format import TimeFormat
 from cl.runtime.serializers.timestamp_format import TimestampFormat
+from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.uuid_format import UuidFormat
 
 
@@ -56,40 +58,43 @@ class PrimitiveSerializer(Serializer):
     """Helper class for serialization and deserialization of primitive types."""
 
     none_format: NoneFormat = required()
-    """Serialization format for None (pass through without conversion if not set)."""
+    """Serialization format for None."""
 
     string_format: StringFormat = required()
-    """Serialization format for str (pass through without conversion if not set)."""
+    """Serialization format for str."""
 
     float_format: FloatFormat = required()
-    """Serialization format for float (pass through without conversion if not set)."""
+    """Serialization format for float."""
 
     bool_format: BoolFormat = required()
-    """Serialization format for bool (pass through without conversion if not set)."""
+    """Serialization format for bool."""
 
     int_format: IntFormat = required()
-    """Serialization format for int (pass through without conversion if not set)."""
+    """Serialization format for int."""
 
     long_format: LongFormat = required()
-    """Serialization format for long (pass through without conversion if not set)."""
+    """Serialization format for long."""
 
     date_format: DateFormat = required()
-    """Serialization format for dt.date (pass through without conversion if not set)."""
+    """Serialization format for dt.date."""
 
     datetime_format: DatetimeFormat = required()
-    """Serialization format for dt.datetime (pass through without conversion if not set)."""
+    """Serialization format for dt.datetime."""
 
     time_format: TimeFormat = required()
-    """Serialization format for dt.time (pass through without conversion if not set)."""
+    """Serialization format for dt.time."""
 
     uuid_format: UuidFormat = required()
-    """Serialization format for UUID other than UUIDv7 (pass through without conversion if not set)."""
+    """Serialization format for UUID other than UUIDv7."""
 
     timestamp_format: TimestampFormat = required()
-    """Serialization format for UUIDv7 unique timestamp (pass through without conversion if not set)."""
+    """Serialization format for UUIDv7 unique timestamp."""
 
     bytes_format: BytesFormat = required()
-    """Serialization format for bytes (pass through without conversion if not set)."""
+    """Serialization format for bytes."""
+    
+    type_format: TypeFormat = required()
+    """Format of the type information in serialized data."""
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """
@@ -250,6 +255,13 @@ class PrimitiveSerializer(Serializer):
                 return base64.encodebytes(data).decode("utf-8").rstrip("\n")  # TODO: Create BytesUtil
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
+        elif data_class_name == "type":
+            if (type_format := self.type_format) == TypeFormat.PASSTHROUGH:
+                return data
+            elif type_format == TypeFormat.DEFAULT:
+                return typename(data)
+            else:
+                raise ErrorUtil.enum_value_error(type_format, TypeFormat)
         else:
             raise RuntimeError(f"Class {data_class_name} cannot be serialized using {type(self).__name__}.")
 
@@ -560,6 +572,25 @@ class PrimitiveSerializer(Serializer):
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
+        elif schema_type_name == "type":
+            if (value_format := self.type_format) == TypeFormat.PASSTHROUGH:
+                if data is None or isinstance(data, type):
+                    # Pass through None and type
+                    return data
+                else:
+                    raise self._deserialization_error(data, schema_type_name, value_format)
+            elif value_format == TypeFormat.DEFAULT:
+                if is_data_empty:
+                    # Treat an empty string and "null" as None
+                    return None
+                elif isinstance(data, str):
+                    # Get type from string typename
+                    # TODO: Use TypeInfo after resolving the cyclic reference
+                    raise NotImplementedError()
+                else:
+                    raise self._deserialization_error(data, schema_type_name, value_format)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, TypeFormat)
         else:
             value_class_name = typename(data)
             serializer_type_name = typename(self)
