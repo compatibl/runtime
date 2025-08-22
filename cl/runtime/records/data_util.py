@@ -15,9 +15,14 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
+from more_itertools import consume
+
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.primitive.enum_util import EnumUtil
+from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.conditions import Condition
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.key_util import KeyUtil
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_key
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -27,8 +32,10 @@ from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.data_spec_util import DataSpecUtil
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
+_PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE = PRIMITIVE_TYPE_NAMES + ("NoneType",)
 
 class DataUtil:
     """Helper methods for build functionality in DataMixin."""
@@ -41,10 +48,10 @@ class DataUtil:
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Validates root level object against the schema and calls its 'mark_frozen' method
         """
-        # Get the class of data, which may be NoneType
+        # Get the class of data, which may be None
         data_class_name = typename(data)
 
-        # Get parameters from the type chain, considering the possibility that it may be None
+        # Get parameters from type_hint if specified, otherwise set to None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
@@ -58,32 +65,39 @@ class DataUtil:
         elif data_class_name in PRIMITIVE_CLASS_NAMES:
             if remaining_chain:
                 raise RuntimeError(
-                    f"Data is an instance of a primitive class {data_class_name} that is incompatible with\n"
-                    f"a composite type hint: {type_hint.to_str()}."
+                    f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
+                    f"{type_hint.to_str()}."
                 )
-            if type_hint is None:
-                raise RuntimeError(
-                    f"An instance of a primitive class {data_class_name} is passed to\n"
-                    f"the DataUtil.full_build method without specifying the type chain."
-                )
-
-            if schema_type_name in PRIMITIVE_TYPE_NAMES:
-                # Convert data to the type name specified in schema, error message if conversion is not possible
-                return PrimitiveSerializers.PASSTHROUGH.deserialize(data, type_hint)
-            else:
-                raise RuntimeError(
-                    f"The data has primitive type {data_class_name} which is not compatible "
-                    f"with type hint '{type_hint.to_str()}'.\n{ErrorUtil.wrap(data)}."
-                )
+            return PrimitiveUtil.normalize(data, type_hint)
         elif data_class_name in SEQUENCE_TYPE_NAMES:
-            type_hint.validate_for_sequence()
-            return tuple(cls.full_build(v, remaining_chain) for v in data)
+            # Serialize sequence into list, allowing remaining_chain to be None
+            # If remaining_chain is None, it will be provided for each slotted data
+            # item in the sequence, and will cause an error for a primitive item
+            if type_hint is not None:
+                type_hint.validate_for_sequence()  # TODO: Rename to avoid validate_for...
+            if len(data) == 0:
+                # Consider an empty sequence equivalent to None
+                return None
+            else:
+                return tuple(cls.full_build(v, remaining_chain) for v in data)
         elif data_class_name in MAPPING_TYPE_NAMES:
-            type_hint.validate_for_mapping()
-            return frozendict((k, cls.full_build(v, remaining_chain)) for k, v in data.items())
+            # Deserialize mapping into dict, allowing remaining_chain to be None
+            # If remaining_chain is None, it will be provided for each slotted data
+            # item in the mapping, and will cause an error for a primitive item
+            if type_hint is not None:
+                type_hint.validate_for_mapping()
+            return frozendict({
+                dict_key: cls.full_build(dict_value, remaining_chain)
+                for dict_key, dict_value in data.items()
+                if dict_value is not None
+            })
         elif is_enum(data):
-            type_hint.validate_for_enum()
-            return data
+            if remaining_chain:
+                raise RuntimeError(
+                    f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
+                    f"{type_hint.to_str()}."
+                )
+            return EnumUtil.normalize(data, type_hint)
         elif is_data_key_or_record(data):
 
             # Has slots, process as data, key or record
@@ -107,37 +121,37 @@ class DataUtil:
                     class_init(data)
 
             # Type spec for the data
-            data_type_spec = DataSpecUtil.from_class(data)
+            data_type_spec = TypeSchema.for_class(data)
             data_type_name = data_type_spec.type_name
 
-            if not isinstance(data_type_spec, DataSpec):
-                raise RuntimeError(f"Type of data '{schema_type_name}' is not a slotted class in the schema.")
-
-            if (
-                False and schema_type_name is not None and schema_type_name != data_type_name
-            ):  # TODO: Check when possible
-                # If schema type is specified, error if the data is not an instance of the specified type
-                raise RuntimeError(
-                    f"Type {data_type_name} is not the same or a subclass of "
-                    f"the type {schema_type_name} specified in the schema."
-                )
+            # Perform check against the schema if provided irrespective of the type inclusion setting
+            if schema_type_name is not None and schema_type_name != data_type_name:
+                # If schema type is specified, ensure that data is an instance of the specified type
+                schema_type_spec = TypeSchema.for_type_name(schema_type_name)
+                schema_type_name = schema_type_spec.type_name
+                if not is_data_key_or_record(schema_class := schema_type_spec.get_class()):
+                    raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
+                if not isinstance(data, schema_class):
+                    raise RuntimeError(
+                        f"Type {data_type_name} is not the same or a subclass of "
+                        f"the type {schema_type_name} specified in schema."
+                    )
 
             # Get class and field dictionary for schema_type_name
             data_field_dict = data_type_spec.get_field_dict()
 
-            # Apply updates to the data object
-            tuple(
-                setattr(data, k, cls.full_build(v, field_spec.type_hint))
-                for k, field_spec in data_field_dict.items()
-                if (
-                    (v := getattr(data, k)) is not None
-                    and type(v).__name__ not in PRIMITIVE_CLASS_NAMES
-                    and not isinstance(v, Enum)
-                    and not isinstance(v, Condition)
-                    and not k.startswith("_")
-                )
+            # Serialize slot values in the order of declaration except those that are None
+            consume(
+                setattr(data, field_key, (
+                    PrimitiveUtil.normalize(field_value, field_spec.type_hint)
+                    if (field_value := getattr(data, field_key)).__class__.__name__
+                       in _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE
+                    else EnumUtil.normalize(field_value, field_spec.type_hint)
+                    if is_enum(field_value)
+                    else cls.full_build(field_value, field_spec.type_hint)
+                ))
+                for field_key, field_spec in data_field_dict.items()
             )
-
             # Mark as frozen to prevent further modifications
             return data.mark_frozen()
         else:

@@ -17,6 +17,7 @@ import pytest
 from cl.runtime.parsers.locale import Locale
 from cl.runtime.parsers.locale_key import LocaleKey
 from cl.runtime.records.data_util import DataUtil
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.settings.labels.class_label import ClassLabel
 from cl.runtime.settings.labels.class_label_key import ClassLabelKey
@@ -56,7 +57,7 @@ def test_data_build():
     ]
 
     for sample in samples:
-        DataUtil.full_build(sample)
+        DataUtil.full_build(sample, TypeHint.for_class(type(sample)))
 
 
 def test_required():
@@ -68,8 +69,8 @@ def test_required():
     ]
 
     for sample in samples:
-        DataUtil.full_build(sample)
-        DataSerializers.DEFAULT.serialize(sample)
+        with pytest.raises(Exception):
+            DataUtil.full_build(sample, TypeHint.for_class(type(sample)))
 
 
 def test_field_type():
@@ -83,9 +84,8 @@ def test_field_type():
     ]
 
     for sample in samples:
-        DataUtil.full_build(sample)
         with pytest.raises(Exception):
-            DataSerializers.DEFAULT.serialize(sample)
+            DataUtil.full_build(sample, TypeHint.for_class(type(sample)))
 
 
 if __name__ == "__main__":

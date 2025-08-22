@@ -18,6 +18,7 @@ from memoization import cached
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.protocols import TObj
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
@@ -39,7 +40,7 @@ class DataMixin(BuilderMixin, ABC):
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Validates root level object against the schema and calls its 'mark_frozen' method
         """
-        return DataUtil.full_build(self)
+        return DataUtil.full_build(self, TypeHint.for_class(type(self)))
 
     def clone(self) -> Self:
         """Return an unfrozen object of the same type populated by shallow copies of public fields."""
