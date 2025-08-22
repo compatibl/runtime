@@ -113,7 +113,7 @@ class BootstrapSerializer(Serializer):
     type_inclusion: TypeInclusion = TypeInclusion.OMIT
     """When to include type information in serialized data."""
 
-    type_format: TypeFormat = TypeFormat.NAME_ONLY
+    type_format: TypeFormat = TypeFormat.DEFAULT
     """Format of the type information in serialized data (optional, not used if type_inclusion=OMIT)."""
 
     type_placement: TypePlacement = TypePlacement.FIRST
@@ -304,7 +304,7 @@ class BootstrapSerializer(Serializer):
             if self.type_inclusion not in (None, TypeInclusion.OMIT):
                 if self.type_format == TypeFormat.PASSTHROUGH:
                     type_field = type(data)
-                elif self.type_format == TypeFormat.NAME_ONLY:
+                elif self.type_format == TypeFormat.DEFAULT:
                     type_field = data_type_name
                 else:
                     raise ErrorUtil.enum_value_error(self.type_format, TypeFormat)

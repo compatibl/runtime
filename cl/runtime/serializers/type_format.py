@@ -22,5 +22,5 @@ class TypeFormat(IntEnum):
     PASSTHROUGH = auto()
     """Do not apply any transformation during serialization or deserialization."""
 
-    NAME_ONLY = auto()
+    DEFAULT = auto()
     """ClassName or its alias without the module in PascalCase."""
