@@ -77,7 +77,7 @@ class PrimitiveSerializers:
         datetime_format=DatetimeFormat.DEFAULT,
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.DEFAULT,
-        bytes_format=BytesFormat.DEFAULT,
+        bytes_format=BytesFormat.COMPACT,
         type_format=TypeFormat.DEFAULT,
     ).build()
     """Default primitive serializer settings for JSON."""
@@ -94,7 +94,7 @@ class PrimitiveSerializers:
         datetime_format=DatetimeFormat.DEFAULT,
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
-        bytes_format=BytesFormat.DEFAULT,
+        bytes_format=BytesFormat.COMPACT,
         type_format=TypeFormat.DEFAULT,
     ).build()
     """Default primitive serializer settings for UI."""
@@ -111,7 +111,7 @@ class PrimitiveSerializers:
         datetime_format=DatetimeFormat.DEFAULT,  # TODO: Support float for Excel?
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
-        bytes_format=BytesFormat.DEFAULT,
+        bytes_format=BytesFormat.COMPACT,
         type_format=TypeFormat.DEFAULT,
     ).build()
     """Default primitive serializer settings for CSV."""
@@ -128,7 +128,7 @@ class PrimitiveSerializers:
         datetime_format=DatetimeFormat.DEFAULT,
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
-        bytes_format=BytesFormat.DEFAULT,
+        bytes_format=BytesFormat.COMPACT,
         type_format=TypeFormat.DEFAULT,
     ).build()
     """Default primitive serializer settings for SQLite."""

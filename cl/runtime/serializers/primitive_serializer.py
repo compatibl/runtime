@@ -248,12 +248,12 @@ class PrimitiveSerializer(Serializer):
         elif data_class_name == "bytes":
             if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
                 return data
-            elif value_format == BytesFormat.DEFAULT:
-                # Base64 encoding for bytes on a single line
-                return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
             elif value_format == BytesFormat.MIME:
                 # Base64 encoding for bytes with MIME line wrap convention at 76 characters, remove trailing EOL
                 return base64.encodebytes(data).decode("utf-8").rstrip("\n")  # TODO: Create BytesUtil
+            elif value_format == BytesFormat.COMPACT:
+                # Base64 encoding for bytes on a single line
+                return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         elif data_class_name == "type":
@@ -556,7 +556,7 @@ class PrimitiveSerializer(Serializer):
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == BytesFormat.DEFAULT:
+            elif value_format == BytesFormat.MIME:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None
@@ -565,7 +565,7 @@ class PrimitiveSerializer(Serializer):
                     return base64.b64decode(data)  # TODO: Create BytesUtil
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == BytesFormat.MIME:
+            elif value_format == BytesFormat.COMPACT:
                 if is_data_empty:
                     # Treat an empty string and "null" as None
                     return None

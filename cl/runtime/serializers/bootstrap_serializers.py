@@ -46,7 +46,7 @@ class BootstrapSerializers:
         datetime_format=DatetimeFormat.DEFAULT,
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.DEFAULT,
-        bytes_format=BytesFormat.DEFAULT,
+        bytes_format=BytesFormat.COMPACT,
         enum_format=EnumFormat.DEFAULT,
         key_format=KeyFormat.DEFAULT,
     ).build()
@@ -102,7 +102,7 @@ class BootstrapSerializers:
         datetime_format=DatetimeFormat.DEFAULT,
         uuid_format=UuidFormat.DEFAULT,
         timestamp_format=TimestampFormat.UUID,  # TODO: Review, should accept DEFAULT
-        bytes_format=BytesFormat.DEFAULT,
+        bytes_format=BytesFormat.COMPACT,
         enum_format=EnumFormat.DEFAULT,
         key_format=KeyFormat.DEFAULT,
         pascalize_keys=True,

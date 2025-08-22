@@ -22,7 +22,7 @@ class BytesFormat(IntEnum):
     PASSTHROUGH = auto()
     """Do not apply any transformation during serialization or deserialization."""
 
-    DEFAULT = auto()
+    COMPACT = auto()
     """Base64 encoding for bytes on a single line."""
 
     MIME = auto()

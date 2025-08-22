@@ -236,7 +236,7 @@ class BootstrapSerializer(Serializer):
         elif data_class_name == "bytes":
             if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
                 return data
-            elif value_format == BytesFormat.DEFAULT:
+            elif value_format == BytesFormat.COMPACT:
                 # Base64 encoding for bytes on a single line
                 return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
             elif value_format == BytesFormat.MIME:
