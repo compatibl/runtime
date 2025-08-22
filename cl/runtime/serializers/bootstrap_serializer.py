@@ -114,10 +114,10 @@ class BootstrapSerializer(Serializer):
     """When to include type information in serialized data."""
 
     type_format: TypeFormat = TypeFormat.NAME_ONLY
-    """Format of the type information in serialized data (optional, do not provide if type_inclusion=OMIT)."""
+    """Format of the type information in serialized data (optional, not used if type_inclusion=OMIT)."""
 
     type_placement: TypePlacement = TypePlacement.FIRST
-    """Placement of type information in the output dictionary (optional, do not provide if type_inclusion=OMIT)."""
+    """Placement of type information in the output dictionary (optional, not used if type_inclusion=OMIT)."""
 
     type_field: str = "_type"
     """Dictionary key under which type information is stored (optional, defaults to '_type')."""
@@ -302,10 +302,10 @@ class BootstrapSerializer(Serializer):
 
             # Parse type_format field
             if self.type_inclusion not in (None, TypeInclusion.OMIT):
-                if self.type_format == TypeFormat.NAME_ONLY:
+                if self.type_format == TypeFormat.PASSTHROUGH:
+                    type_field = type(data)
+                elif self.type_format == TypeFormat.NAME_ONLY:
                     type_field = data_type_name
-                elif self.type_format == TypeFormat.FULL_PATH:
-                    raise RuntimeError("TypeFormat.FULL_PATH is not supported.")
                 else:
                     raise ErrorUtil.enum_value_error(self.type_format, TypeFormat)
             else:
