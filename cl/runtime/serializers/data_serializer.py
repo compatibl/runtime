@@ -19,7 +19,7 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -136,7 +136,7 @@ class DataSerializer(Serializer):
             return dict(
                 (self._serialize_key(dict_key), self.serialize(dict_value, remaining_chain))
                 for dict_key, dict_value in data.items()
-                if not DataUtil.is_empty(dict_value)
+                if not is_empty(dict_value)
             )  # TODO: Replace by frozendict
         elif is_data_key_or_record(data):
             # Use key serializer for key types if specified
@@ -220,7 +220,7 @@ class DataSerializer(Serializer):
                         )
                     )
                     for field_key, field_spec in data_field_dict.items()
-                    if not DataUtil.is_empty(field_value := getattr(data, field_key))
+                    if not is_empty(field_value := getattr(data, field_key))
                 }
             )
 
@@ -306,7 +306,7 @@ class DataSerializer(Serializer):
                     dict_value, remaining_chain
                 )  # TODO: Should data_serializer be used here?
                 for dict_key, dict_value in data.items()
-                if not DataUtil.is_empty(dict_value)
+                if not is_empty(dict_value)
             }
         elif isinstance(data, str):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
@@ -388,7 +388,7 @@ class DataSerializer(Serializer):
                     else self.deserialize(field_value, field_hint)
                 )
                 for field_key, field_value in data.items()
-                if not field_key.startswith("_") and not DataUtil.is_empty(field_value)
+                if not field_key.startswith("_") and not is_empty(field_value)
             }
 
             # Construct an instance of the target type

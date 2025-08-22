@@ -23,11 +23,6 @@ class DataUtil:
     """Helper methods for working with slotted classes."""
 
     @classmethod
-    def is_empty(cls, data: Any) -> bool:
-        """Check if the data is None, an empty string, or an empty container."""
-        return data in (None, "") or (data.__class__.__name__ in SEQUENCE_AND_MAPPING_CLASS_NAMES and len(data) == 0)
-
-    @classmethod
     def remove_none(cls, data: Any) -> Any:
         """Recursively remove dict (mapping) keys with None values, leave all other instances of None as is."""
         if is_data_key_or_record(data):

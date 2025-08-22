@@ -176,9 +176,6 @@ TKeyField = dict[str, "TKeyField"] | TPrimitive | Enum
 TKeyDict = dict[str, TKeyField]
 """Serialized key in dictionary format."""
 
-TObj = TypeVar("TObj")
-"""Generic type parameter for any object."""
-
 TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
 
@@ -190,6 +187,11 @@ TKey = TypeVar("TKey", bound=KeyProtocol)
 
 TRecord = TypeVar("TRecord", bound=RecordProtocol)
 """Generic type parameter for a record."""
+
+
+def is_empty(data: Any) -> bool:
+    """Returns true if the argument is None or an empty string, sequence or mapping."""
+    return data in (None, "") or (data.__class__.__name__ in SEQUENCE_AND_MAPPING_CLASS_NAMES and len(data) == 0)
 
 
 def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:

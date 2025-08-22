@@ -33,7 +33,7 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_key
@@ -257,7 +257,7 @@ class BootstrapSerializer(Serializer):
             result = {
                 k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._serialize(v)
                 for k, v in data.items()
-                if not DataUtil.is_empty(v)
+                if not is_empty(v)
             }
             return result
         elif isinstance(data, Enum):
@@ -337,7 +337,7 @@ class BootstrapSerializer(Serializer):
                 {
                     k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._serialize(v)
                     for k in slots
-                    if not DataUtil.is_empty(v := getattr(data, k)) and not k.startswith("_")
+                    if not is_empty(v := getattr(data, k)) and not k.startswith("_")
                 }
             )
 
