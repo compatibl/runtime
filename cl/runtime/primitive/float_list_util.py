@@ -14,10 +14,9 @@
 
 import numpy as np
 from cl.runtime.primitive.float_util import FloatUtil
-from cl.runtime.primitive.list_util import ListUtil
 
 
-class FloatListUtil(ListUtil):
+class FloatListUtil:
     """Extends ListUtil to provide helper methods for float lists."""
 
     @classmethod

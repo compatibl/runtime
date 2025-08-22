@@ -14,7 +14,7 @@
 
 import pytest
 
-from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.bootstrap_util import BootstrapUtil
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -30,8 +30,8 @@ from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassSingleton
 
 
-def test_data_build():
-    """Test DataUtil.full_build method."""
+def test_bootstrap_build():
+    """Test BootstrapUtil.bootstrap_build method."""
 
     samples = [
         StubDataclassOptionalFields(id="abc7"),
@@ -51,7 +51,7 @@ def test_data_build():
     ]
 
     for sample in samples:
-        DataUtil.full_build(sample)
+        BootstrapUtil.bootstrap_build(sample)
 
 
 if __name__ == "__main__":

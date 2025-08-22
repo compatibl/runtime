@@ -38,4 +38,4 @@ class BootstrapMixin(BuilderMixin, ABC):
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Calls its 'mark_frozen' method without performing validation against the schema
         """
-        return BootstrapUtil.build(self)
+        return BootstrapUtil.bootstrap_build(self)

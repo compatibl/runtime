@@ -34,9 +34,9 @@ class DataUtil:
     """Helper methods for build functionality in DataMixin."""
 
     @classmethod
-    def typed_build(cls, data: Any, type_hint: TypeHint | None = None) -> Any:  # TODO: Rename to build?
+    def full_build(cls, data: Any, type_hint: TypeHint | None = None) -> Any:
         """
-        The implementation of the build method in DataUtil performs the following steps:
+        The full implementation of the build method in DataUtil performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Validates root level object against the schema and calls its 'mark_frozen' method
@@ -64,7 +64,7 @@ class DataUtil:
             if type_hint is None:
                 raise RuntimeError(
                     f"An instance of a primitive class {data_class_name} is passed to\n"
-                    f"the DataUtil.typed_build method without specifying the type chain."
+                    f"the DataUtil.full_build method without specifying the type chain."
                 )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
@@ -77,10 +77,10 @@ class DataUtil:
                 )
         elif data_class_name in SEQUENCE_TYPE_NAMES:
             type_hint.validate_for_sequence()
-            return tuple(cls.typed_build(v, remaining_chain) for v in data)
+            return tuple(cls.full_build(v, remaining_chain) for v in data)
         elif data_class_name in MAPPING_TYPE_NAMES:
             type_hint.validate_for_mapping()
-            return frozendict((k, cls.typed_build(v, remaining_chain)) for k, v in data.items())
+            return frozendict((k, cls.full_build(v, remaining_chain)) for k, v in data.items())
         elif is_enum(data):
             type_hint.validate_for_enum()
             return data
@@ -127,7 +127,7 @@ class DataUtil:
 
             # Apply updates to the data object
             tuple(
-                setattr(data, k, cls.typed_build(v, field_spec.type_hint))
+                setattr(data, k, cls.full_build(v, field_spec.type_hint))
                 for k, field_spec in data_field_dict.items()
                 if (
                     (v := getattr(data, k)) is not None

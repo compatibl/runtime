@@ -27,9 +27,9 @@ class BootstrapUtil:
     """Helper methods for build functionality in BootstrapMixin."""
 
     @classmethod
-    def build(cls, data: Any) -> Any:
+    def bootstrap_build(cls, data: Any) -> Any:
         """
-        The implementation of the build method in BootstrapUtil performs the following steps:
+        The simplified implementation of the build method in BootstrapUtil performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Calls its 'mark_frozen' method without performing validation against the schema
@@ -45,10 +45,10 @@ class BootstrapUtil:
             return data
         elif data_class_name in SEQUENCE_TYPE_NAMES:
             # Convert a sequence types to tuple after applying build to each item
-            return tuple(cls.build(v) for v in data)
+            return tuple(cls.bootstrap_build(v) for v in data)
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Convert a mapping type to frozendict after applying build to each item
-            return frozendict((k, cls.build(v)) for k, v in data.items())
+            return frozendict((k, cls.bootstrap_build(v)) for k, v in data.items())
         elif is_data_key_or_record(data):
             # Has slots, process as data, key or record
             if data.is_frozen():
@@ -71,7 +71,7 @@ class BootstrapUtil:
 
             # Apply updates to the data object
             tuple(
-                setattr(data, k, cls.build(v))
+                setattr(data, k, cls.bootstrap_build(v))
                 for k in data.get_field_names()
                 if (
                     # Exclude those types that are passed through
