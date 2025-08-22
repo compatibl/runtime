@@ -25,7 +25,7 @@ from dynaconf import Dynaconf
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil
-from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -77,7 +77,7 @@ _dynaconf_loaded_files = _all_settings._loaded_files  # noqa
 
 
 @dataclass(slots=True, kw_only=True)
-class Settings(DataMixin, ABC):
+class Settings(BootstrapMixin, ABC):
     """
     Abstract base of settings classes.
 

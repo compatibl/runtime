@@ -21,7 +21,7 @@ from unittest import mock
 from _pytest.fixtures import FixtureRequest
 from bson import UUID_SUBTYPE
 from bson import Binary
-from cl.runtime import Db
+from cl.runtime.db.db import Db
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
