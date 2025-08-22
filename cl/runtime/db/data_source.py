@@ -19,11 +19,10 @@ from typing import Self
 from typing import Sequence
 from typing import cast
 from more_itertools import consume
-from cl.runtime.db.db import Db
-from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
+from cl.runtime.db.db import Db
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_by_query import FilterByQuery
@@ -46,6 +45,7 @@ from cl.runtime.records.record_type_binding import RecordTypeBinding
 from cl.runtime.records.record_type_binding_query import RecordTypeBindingQuery
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.key_serializers import KeySerializers
 

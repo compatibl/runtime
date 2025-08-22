@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.view.dag.dag import Dag
 from cl.runtime.views.dag.successor_dag_key import SuccessorDagKey
 from cl.runtime.views.dag.successor_dag_node import SuccessorDagNode

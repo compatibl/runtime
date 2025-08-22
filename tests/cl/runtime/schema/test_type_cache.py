@@ -15,9 +15,9 @@
 import pytest
 from enum import Enum
 from enum import IntEnum
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
@@ -68,6 +68,7 @@ def test_guard_known_type():
     assert not TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD, raise_on_fail=False)
     with pytest.raises(Exception):
         TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
+
 
 def test_get_type_info():
     """Test get_type_name method."""

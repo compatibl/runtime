@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.views.view import View
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.views.view import View
 
 
 @dataclass(slots=True, kw_only=True)

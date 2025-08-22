@@ -23,6 +23,7 @@ def typename(instance_or_type: Any) -> str:
     result = type_.__name__
     return result
 
+
 def qualname(instance_or_type: Any) -> str:
     """Return fully qualified type name with module in module.PascalCase format without applying any aliases."""
     # Accept instance or type

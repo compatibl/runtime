@@ -14,9 +14,9 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
+from cl.runtime.schema.type_cache import TypeCache
 
 
 class TypeTablesResponseItem(BaseModel):

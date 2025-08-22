@@ -14,8 +14,8 @@
 
 from dataclasses import dataclass
 from typing import Any
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import optional
+from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_any_fields_key import StubDataclassAnyFieldsKey

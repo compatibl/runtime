@@ -27,4 +27,3 @@ class BytesFormat(IntEnum):
 
     COMPACT = auto()
     """Base64 encoding for bytes on a single line."""
-

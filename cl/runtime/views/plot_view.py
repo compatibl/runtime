@@ -14,12 +14,12 @@
 
 from dataclasses import dataclass
 from typing import Self
-from cl.runtime.views.view import View
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.plot_key import PlotKey
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_key
+from cl.runtime.views.view import View
 
 
 @dataclass(slots=True, kw_only=True)

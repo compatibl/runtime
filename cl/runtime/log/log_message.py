@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.log.log_message_key import LogMessageKey
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)

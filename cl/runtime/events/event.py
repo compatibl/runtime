@@ -13,10 +13,10 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.events.event_key import EventKey
 from cl.runtime.events.event_kind import EventKind
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)

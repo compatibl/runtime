@@ -19,9 +19,9 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-from cl.runtime.db.db import Db
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.db.db import Db
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.log.log_config import uvicorn_empty_logging_config

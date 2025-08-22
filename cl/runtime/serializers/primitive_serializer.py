@@ -19,8 +19,6 @@ from enum import IntEnum
 from typing import Any
 from uuid import UUID
 from bson import Int64
-
-from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil
@@ -36,7 +34,8 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import TPrimitive
-from cl.runtime.records.typename import typename, qualname
+from cl.runtime.records.typename import typename
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format import BoolFormat
 from cl.runtime.serializers.bytes_format import BytesFormat
@@ -93,7 +92,7 @@ class PrimitiveSerializer(Serializer):
 
     bytes_format: BytesFormat = required()
     """Serialization format for bytes."""
-    
+
     type_format: TypeFormat = required()
     """Format of the type information in serialized data."""
 

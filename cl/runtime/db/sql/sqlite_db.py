@@ -20,8 +20,6 @@ from typing import Sequence
 from typing import cast
 from memoization import cached
 from cl.runtime.db.db import Db
-from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
@@ -32,9 +30,11 @@ from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import TDataDict
 from cl.runtime.records.protocols import TKey
 from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers

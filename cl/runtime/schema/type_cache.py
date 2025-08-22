@@ -30,7 +30,8 @@ from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
-from cl.runtime.records.typename import typename, qualname
+from cl.runtime.records.typename import qualname
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.env_settings import EnvSettings
