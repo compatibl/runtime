@@ -14,7 +14,6 @@
 
 import asyncio
 import logging
-import weakref
 from collections import deque
 from typing import AsyncGenerator
 from starlette.requests import Request
@@ -30,68 +29,33 @@ _LOGGER = logging.getLogger(__name__)
 _PULL_EVENTS_DELAY = 3.0
 """Delay in seconds to check new events in DB."""
 
-# Set of subscribed queues for which events will be distributed.
-_subscribed_queues: weakref.WeakSet[asyncio.Queue] = weakref.WeakSet()
-
-# Async Task for pulling Events from DB.
-_pull_events_task: asyncio.Task | None = None
-
 
 def _handle_async_task_exception(task: asyncio.Task):
     """Log error if pull events task failed."""
 
     try:
         task.result()
+    except asyncio.CancelledError:
+        # Ignore task canceled error
+        pass
     except Exception:
         _LOGGER.error("DB SSE pull events task failed.", exc_info=True)
 
 
-async def _pull_events():
-    """
-    An async task to check events in the DB and distribute them to subscribed queues.
-    Automatically ends if there are no subscribed queues.
-    """
-
+async def _pull_events(queue: asyncio.Queue):
     while True:
-
-        if not _subscribed_queues:
-            break
-
         # Get unprocessed events from the DB, sorted by ascending timestamp
         # TODO (Roman): Replace with DataSource.query() when supported
         new_events = list(
             reversed([x for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_key_type(), limit=100)])
         )
 
-        if new_events:
-            _LOGGER.debug(f"SSE: Found {len(new_events)} events in DB.")
-
         # Put events to subscribed queues
         for event in new_events:
-            for queue in _subscribed_queues:
-                await queue.put(event)
+            await queue.put(event)
 
         # Wait for delay
         await asyncio.sleep(_PULL_EVENTS_DELAY)
-
-
-def _subscribe_queue(queue: asyncio.Queue):
-    """Subscribe queue to receive events from DB."""
-
-    global _pull_events_task
-
-    # Add queue to subscribed set
-    _subscribed_queues.add(queue)
-
-    # Start the background task if it is not already running
-    if _pull_events_task is None or _pull_events_task.done() or _pull_events_task.cancelled():
-        _pull_events_task = asyncio.create_task(_pull_events())
-        _pull_events_task.add_done_callback(_handle_async_task_exception)
-
-
-def _unsubscribe_queue(queue: asyncio.Queue):
-    """Unsubscribe queue from receiving events."""
-    _subscribed_queues.discard(queue)
 
 
 class DbEventBroker(EventBroker):
@@ -116,13 +80,19 @@ class DbEventBroker(EventBroker):
         # Buffer queue for event
         self._event_queue: asyncio.Queue[Event] = asyncio.Queue()
 
+        # Async Task for pulling Events from DB.
+        self._pull_events_task: asyncio.Task | None = None
+
     async def connect(self) -> None:
         return None
 
     async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[Event, None]:
 
-        # Add self queue to subscribed
-        _subscribe_queue(self._event_queue)
+        # Start pulling events from db in parallel async task
+        if self._pull_events_task is None:
+            pull_events_task = asyncio.create_task(_pull_events(self._event_queue))
+            pull_events_task.add_done_callback(_handle_async_task_exception)
+            self._pull_events_task = pull_events_task
 
         # Yield events from base subscribe() implementation
         async for event in super(DbEventBroker, self).subscribe(topic=topic, request=request):
@@ -146,4 +116,6 @@ class DbEventBroker(EventBroker):
         active(DataSource).replace_one(event, commit=True)
 
     async def close(self) -> None:
-        _unsubscribe_queue(self._event_queue)
+        # Cancel pull events task
+        if self._pull_events_task is not None:
+            self._pull_events_task.cancel()
