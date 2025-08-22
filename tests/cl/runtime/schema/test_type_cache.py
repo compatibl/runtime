@@ -69,6 +69,25 @@ def test_guard_known_type():
     with pytest.raises(Exception):
         TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
 
+def test_get_type_info():
+    """Test get_type_name method."""
+
+    # Valid cases
+    assert TypeCache.get_type_info(StubDataclass).type_kind == TypeKind.RECORD
+    assert TypeCache.get_type_info("StubDataclass").type_kind == TypeKind.RECORD
+    assert TypeCache.get_type_info(StubDataclassKey).type_kind == TypeKind.KEY
+    assert TypeCache.get_type_info("StubDataclassKey").type_kind == TypeKind.KEY
+    assert TypeCache.get_type_info(StubDataclassData).type_kind == TypeKind.DATA
+    assert TypeCache.get_type_info("StubDataclassData").type_kind == TypeKind.DATA
+
+    # Invalid cases
+    with pytest.raises(Exception):
+        # Not a known type
+        TypeCache.get_type_info(123)  # noqa
+    with pytest.raises(Exception):
+        # Not a known type name
+        TypeCache.get_type_info("123")  # noqa
+
 
 def test_get_type_name():
     """Test get_type_name method."""
@@ -103,6 +122,8 @@ def test_from_type_name():
 
     assert TypeCache.from_type_name("TypeDecl") is TypeDecl
     assert TypeCache.from_type_name("StubDataclass") is StubDataclass
+    assert TypeCache.from_type_name("StubDataclassKey") is StubDataclassKey
+    assert TypeCache.from_type_name("StubDataclassData") is StubDataclassData
 
 
 def test_from_qual_name():

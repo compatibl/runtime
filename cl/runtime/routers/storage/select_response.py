@@ -52,14 +52,14 @@ class SelectResponse(RecordsWithSchemaResponse):
         ds = active(DataSource)
 
         # TODO(Roman): !!! Implement separate methods for table and type
-        if TypeCache.is_known_type(type_or_name=request.type_, type_kind=TypeKind.RECORD):
+        if (type_kind := TypeCache.get_type_info(type_or_name=request.type_).type_kind) == TypeKind.RECORD:
             # Get records for a type
             record_type_name = request.type_
             record_type = TypeCache.from_type_name(record_type_name)
             # Load records for the type
             records = ds.load_by_type(record_type)
             common_base_record_type = record_type
-        else:
+        elif type_kind == TypeKind.KEY:
             # Get records for a table
             key_type_name = request.type_
             key_type = TypeCache.from_type_name(key_type_name)
@@ -67,6 +67,8 @@ class SelectResponse(RecordsWithSchemaResponse):
             # Get lowest common type to the records stored in the table
             common_base_record_type_name = ds.get_common_base_record_type_name(key_type_name=key_type_name)
             common_base_record_type = TypeCache.from_type_name(common_base_record_type_name)
+        else:
+            raise RuntimeError(f"Type {request.type_} is neither a record nor a key.")
 
         # Serialize records for table.
         serialized_records = [cls._serialize_record_for_table(record) for record in records]
