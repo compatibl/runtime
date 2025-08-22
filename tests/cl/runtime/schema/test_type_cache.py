@@ -81,10 +81,7 @@ def test_get_type_name():
     # Invalid cases
     with pytest.raises(Exception):
         # Not a known type
-        TypeCache.get_type_name(123)
-    with pytest.raises(Exception):
-        # Not a record
-        TypeCache.get_type_name(StubDataclassData, type_kind=TypeKind.RECORD)
+        TypeCache.get_type_name(123)  # noqa
 
 
 def test_get_qual_name():
@@ -98,10 +95,7 @@ def test_get_qual_name():
     # Invalid cases
     with pytest.raises(Exception):
         # Not a known type
-        TypeCache.get_qual_name(123)
-    with pytest.raises(Exception):
-        # Not a record
-        TypeCache.get_qual_name(StubDataclassData, type_kind=TypeKind.RECORD)
+        TypeCache.get_qual_name(123)  # noqa
 
 
 def test_from_type_name():

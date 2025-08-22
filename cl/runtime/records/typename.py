@@ -16,9 +16,16 @@ from typing import Any
 
 
 def typename(instance_or_type: Any) -> str:
-    """Returns type name in PascalCase, or an alias if provided."""
+    """Return type name without module in PascalCase, or an alias if provided."""
     # TODO: Add support for aliases
     # Accept instance or type
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__
+    return result
+
+def qualname(instance_or_type: Any) -> str:
+    """Return fully qualified type name with module in module.PascalCase format without applying any aliases."""
+    # Accept instance or type
+    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
+    result = f"{type_.__module__}.{type_.__name__}"
     return result
