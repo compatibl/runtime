@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
@@ -65,7 +65,7 @@ def test_passthrough():
         obj_2 = serializer.deserialize(serialized_1).build()
         serialized_2 = serializer.serialize(obj_2)
 
-        assert obj_2 == DataUtil.remove_none(obj_1)
+        assert obj_2 == MappingUtil.remove_none(obj_1)
         assert serialized_1 == serialized_2
 
 

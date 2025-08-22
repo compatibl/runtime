@@ -19,7 +19,7 @@ from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
 
 
-class DataUtil:
+class MappingUtil:
     """Helper methods for working with slotted classes."""
 
     @classmethod

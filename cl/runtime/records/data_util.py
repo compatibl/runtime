@@ -30,13 +30,13 @@ from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 
-class BuildUtil:
+class DataUtil:
     """Helper methods for build functionality in DataMixin."""
 
     @classmethod
     def typed_build(cls, data: Any, type_hint: TypeHint | None = None) -> Any:  # TODO: Rename to build?
         """
-        The implementation of the build method in BuildUtil performs the following steps:
+        The implementation of the build method in DataUtil performs the following steps:
         (1) Invokes 'build' recursively for all non-primitive public fields and container elements
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Validates root level object against the schema and calls its 'mark_frozen' method
@@ -64,7 +64,7 @@ class BuildUtil:
             if type_hint is None:
                 raise RuntimeError(
                     f"An instance of a primitive class {data_class_name} is passed to\n"
-                    f"the BuildUtil.typed_build method without specifying the type chain."
+                    f"the DataUtil.typed_build method without specifying the type chain."
                 )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:

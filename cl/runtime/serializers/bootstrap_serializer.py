@@ -31,7 +31,7 @@ from cl.runtime.primitive.long_util import LongUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
-from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES

@@ -19,7 +19,7 @@ import pandas as pd
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_file_reader import CsvFileReader
-from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.typename import typename
@@ -93,7 +93,7 @@ def test_roundtrip(default_db_fixture):
 
             read_records_from_csv(file_path, entry_type)
             actual_records = tuple(active(DataSource).load_by_type(entry_type))
-            assert actual_records == FreezeUtil.freeze(DataUtil.remove_none(expected_entries))
+            assert actual_records == FreezeUtil.freeze(MappingUtil.remove_none(expected_entries))
         finally:
             if file_path is not None:
                 file_path.unlink(missing_ok=True)

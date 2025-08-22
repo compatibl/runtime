@@ -17,7 +17,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.conditions import In
-from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.mapping_util import MappingUtil
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -91,7 +91,7 @@ def test_insert_many(multi_db_fixture):
     sample_keys = [sample.get_key() for sample in _SAMPLES]
     loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
 
-    assert loaded_records == DataUtil.remove_none(_SAMPLES)
+    assert loaded_records == MappingUtil.remove_none(_SAMPLES)
 
 
 def test_replace_many(multi_db_fixture):
@@ -100,11 +100,11 @@ def test_replace_many(multi_db_fixture):
 
     sample_keys = [sample.get_key() for sample in _SAMPLES]
     loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
-    assert loaded_records == DataUtil.remove_none(_SAMPLES)
+    assert loaded_records == MappingUtil.remove_none(_SAMPLES)
 
     active(DataSource).replace_many(_SAMPLES, commit=True)
     loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
-    assert loaded_records == DataUtil.remove_none(_SAMPLES)
+    assert loaded_records == MappingUtil.remove_none(_SAMPLES)
 
 
 def test_basic_operations(multi_db_fixture):
@@ -121,12 +121,12 @@ def test_basic_operations(multi_db_fixture):
 
     # Load one by one for all keys because each type is different
     loaded_records = [active(DataSource).load_one(key) for key in sample_keys]
-    assert loaded_records == DataUtil.remove_none(_SAMPLES)
+    assert loaded_records == MappingUtil.remove_none(_SAMPLES)
 
     # Delete first and last record
     active(DataSource).delete_many([sample_keys[0], sample_keys[-1]], commit=True)
     loaded_records = [active(DataSource).load_one_or_none(key) for key in sample_keys]
-    assert loaded_records == DataUtil.remove_none([None, *_SAMPLES[1:-1], None])
+    assert loaded_records == MappingUtil.remove_none([None, *_SAMPLES[1:-1], None])
 
     # Delete all records
     active(DataSource).delete_many(sample_keys, commit=True)

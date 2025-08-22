@@ -17,7 +17,7 @@ from enum import Enum
 from typing import Any
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.data_util import DataUtil
+from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
