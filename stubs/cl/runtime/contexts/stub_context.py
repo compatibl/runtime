@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Self
-from cl.runtime import RecordMixin
+from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime.contexts.stub_context_key import StubContextKey
 
 

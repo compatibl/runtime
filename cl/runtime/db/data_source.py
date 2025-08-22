@@ -19,8 +19,8 @@ from typing import Self
 from typing import Sequence
 from typing import cast
 from more_itertools import consume
-from cl.runtime import Db
-from cl.runtime import TypeCache
+from cl.runtime.db.db import Db
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey

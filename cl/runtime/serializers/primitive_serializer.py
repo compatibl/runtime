@@ -20,7 +20,7 @@ from typing import Any
 from uuid import UUID
 from bson import Int64
 
-from cl.runtime import TypeCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil

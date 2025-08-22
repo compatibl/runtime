@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import logging
-from cl.runtime import RecordListView
-from cl.runtime import RecordView
-from cl.runtime import View
+from cl.runtime.views.record_list_view import RecordListView
+from cl.runtime.views.record_view import RecordView
+from cl.runtime.views.view import View
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.protocols import is_data_key_or_record

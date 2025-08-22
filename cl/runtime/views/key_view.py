@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime import RecordView
-from cl.runtime import View
+from cl.runtime.views.record_view import RecordView
+from cl.runtime.views.view import View
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.for_dataclasses.extensions import required

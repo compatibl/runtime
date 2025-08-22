@@ -14,8 +14,8 @@
 
 from dataclasses import dataclass
 from typing import Sequence
-from cl.runtime import Db
-from cl.runtime import RecordMixin
+from cl.runtime.db.db import Db
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime import RecordMixin
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_abstract

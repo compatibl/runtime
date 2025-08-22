@@ -21,7 +21,7 @@ from typing import cast
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.synchronous.collection import Collection
-from cl.runtime import RecordMixin
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.db.db import Db
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy

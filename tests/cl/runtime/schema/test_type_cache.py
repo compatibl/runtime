@@ -15,7 +15,7 @@
 import pytest
 from enum import Enum
 from enum import IntEnum
-from cl.runtime import RecordMixin
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.type_cache import TypeCache

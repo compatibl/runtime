@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime import TypeCache
+from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.db.filter import Filter
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_check import TypeCheck

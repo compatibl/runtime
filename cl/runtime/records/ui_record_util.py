@@ -15,10 +15,10 @@
 import logging
 from dataclasses import dataclass
 from typing_extensions import Any
-from cl.runtime import RecordListView
-from cl.runtime import RecordView
-from cl.runtime import TypeCache
-from cl.runtime import View
+from cl.runtime.views.record_list_view import RecordListView
+from cl.runtime.views.record_view import RecordView
+from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.views.view import View
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.data_mixin import DataMixin

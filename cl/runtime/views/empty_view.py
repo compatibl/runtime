@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime import View
+from cl.runtime.views.view import View
 
 
 @dataclass(slots=True, kw_only=True)

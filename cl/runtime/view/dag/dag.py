@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 import networkx as nx
-from cl.runtime import RecordMixin
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.view.dag.dag_edge import DagEdge
 from cl.runtime.view.dag.dag_key import DagKey

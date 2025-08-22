@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime import RecordMixin
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.log.log_message_key import LogMessageKey
 from cl.runtime.primitive.timestamp import Timestamp
 
