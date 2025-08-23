@@ -16,8 +16,12 @@ from dataclasses import dataclass
 from getpass import getuser
 from typing_extensions import final
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.typename import typename
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.settings import Settings
 from cl.runtime.settings.settings_util import SettingsUtil
@@ -31,7 +35,7 @@ class EnvSettings(Settings):
     env_id: str = required()
     """Unique environment identifier."""
 
-    env_kind: EnvKind | None = None  # TODO: Make required
+    env_kind: EnvKind = required()
     """Determines the default settings for multiuser access and data retention."""
 
     env_tenant: str = required()
@@ -53,22 +57,20 @@ class EnvSettings(Settings):
         self.env_packages = SettingsUtil.to_str_tuple(self.env_packages)
 
         if self.env_kind is not None:
-            # Convert from string to EnvKind enum if necessary
             if isinstance(self.env_kind, str):
-                if self.env_kind.islower():
-                    # Create enum after converting to uppercase if the string is in lowercase
-                    if (item := self.env_kind.upper()) in EnvKind:
-                        self.env_kind = EnvKind[item]  # noqa
-                    else:
-                        valid_items = "\n".join(item.name.lower() for item in EnvKind)
-                        raise RuntimeError(
-                            f"Enum EnvKind does not include the item {str(self.env_kind)}.\n"
-                            f"Valid items are:\n{valid_items}\n"
-                        )
-                else:
-                    raise RuntimeError(f"Invalid environment name {self.env_kind}, it should be lowercase.")
-            elif not isinstance(self.env_kind, EnvKind):
-                raise RuntimeError(f"The value of env should be a string or an instance of EnvKind.")
+                # First, convert from snake_case to PascalCase (default for enums)
+                env_kind_pascal_case = CaseUtil.snake_to_pascal_case(self.env_kind)
+                self.env_kind = EnumUtil.from_str(
+                    EnvKind,
+                    env_kind_pascal_case,
+                    field_name="env_kind",
+                    class_name="EnvSettings",
+                )
+            elif not is_enum(self.env_kind):
+                raise RuntimeError(f"The value of env_kind={self.env_kind} in {typename(self)}\n"
+                                   f"is not an EnvKind enum or a string.")
+        else:
+            raise RuntimeError(f"Required field 'env_kind' is None for env_id={self.env_id}")
 
         if self.env_user is None:
             # Set default username if not specified in settings.yaml
