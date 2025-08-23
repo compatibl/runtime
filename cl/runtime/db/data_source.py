@@ -33,6 +33,7 @@ from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
@@ -91,6 +92,10 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        # Use timestamp as data_source_id if not specified
+        if self.data_source_id is None:
+            self.data_source_id = Timestamp.create()
 
         # Load the database object, use default DB if not specified
         if self.db is None:
