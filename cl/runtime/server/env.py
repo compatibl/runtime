@@ -27,20 +27,17 @@ from cl.runtime.settings.env_settings import EnvSettings
 class Env(EnvKey, RecordMixin):
     """Application environment parameters."""
 
-    testing: bool | None = None
-    """True for the root process or worker processes of a test, False when not a test."""
+    name: str = required()
+    """Identifies the application or test."""
 
     env: EnvKind = required()
     """Determines the default settings for multiuser access and data retention."""
 
-    name: str = required()
-    """Identifies the application or test."""
-
     user: str = required()
     """Identifies the application or test user."""
 
-    user_scoped: bool = required()  # TODO: Refactor and make the names more clear
-    """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
+    testing: bool | None = None
+    """True for the root process or worker processes of a test, False when not a test."""
 
     def get_key(self) -> EnvKey:
         return EnvKey(env_id=self.env_id).build()
@@ -59,7 +56,6 @@ class Env(EnvKey, RecordMixin):
         self.env = self.env if self.env is not None else env_settings.env_kind
         self.name = self.name if self.name is not None else env_settings.env_id
         self.user = self.user if self.user is not None else env_settings.env_user
-        self.user_scoped = self.user_scoped if self.user_scoped is not None else env_settings.env_shared
 
     @classmethod
     def get_env(cls) -> EnvKind:
@@ -90,25 +86,6 @@ class Env(EnvKey, RecordMixin):
         else:
             # Default to OS user if not specified
             return getuser()
-
-    @classmethod
-    def is_user_scoped(cls) -> bool:
-        """Deployment data is fully isolated for each user if true and shared if false (user must be set either way)."""
-        user_scoped = (
-            context.user_scoped if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_shared
-        )
-        if user_scoped is not None:
-            return user_scoped
-        else:
-            # Default user-scoped setting is based on env
-            if (env := cls.get_env()) in (EnvKind.PROD, EnvKind.STAGING):
-                # Data is shared between users by default for PROD and STAGING environments
-                return True
-            elif env in (EnvKind.DEV, EnvKind.TEMP):
-                # Data is specific to each user by default for DEV and TEMP environments
-                return False
-            else:
-                raise ErrorUtil.enum_value_error(env, EnvKind)
 
     @classmethod
     def is_cleanup_before(cls) -> bool:
