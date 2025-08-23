@@ -17,7 +17,7 @@ from typing import Mapping
 from typing import Sequence
 from typing import TypeGuard
 from typing import cast
-from cl.runtime.records.protocols import BuilderProtocol
+from cl.runtime.records.protocols import BuilderProtocol, TObj
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
 from cl.runtime.records.protocols import is_builder
@@ -43,7 +43,7 @@ class TypeCheck:
             return False
 
     @classmethod
-    def guard_not_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[object]:
+    def guard_not_none(cls, obj: TObj | None, *, raise_on_fail: bool = True) -> TypeGuard[TObj]:
         """Confirm that the argument is not None."""
         if obj is not None:
             return True
