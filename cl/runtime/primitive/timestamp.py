@@ -14,13 +14,17 @@
 
 import datetime as dt
 import re
+from typing import Any, TypeGuard
 from uuid import UUID
 import uuid_utils
+from pandas.core.arrays.period import raise_on_incompatible
+
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 
 _ISO_DELIMITED_FORMAT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z-[a-f0-9]{20}$")
-"""Regex for the legacy UUIDv7-based timestamp format where the datetime component uses ISO-8601 delimiters."""
+"""Regex for the invalid UUIDv7-based timestamp format with ISO-8601 delimiters instead of dash delimiters."""
 
 
 def _get_uuid7() -> UUID:
@@ -95,9 +99,37 @@ class Timestamp:
         return result
 
     @classmethod
+    def guard_valid(
+            cls,
+            value: Any,
+            *,
+            fast: bool = False,
+            value_name: str | None = None,
+            method_name: str | None = None,
+            data_type: type | str | None = None,
+            raise_on_fail: bool = True,
+    ) -> TypeGuard[str]:
+        """Confirm argument is UUIDv7-based timestamp in readable ordered string format with dash delimiters."""
+
+        # If fast parameter is true, check for length and the value of Z delimiter between datetime and hex components
+        # and stop further processing if the check succeeds
+        if fast and isinstance(value, str) and len(value) == 45 and value[25] == "Z":
+            return True
+
+        # Otherwise rely on conversion to datetime for full validation
+        result = cls.to_datetime_or_none(
+            value,
+            value_name=value_name,
+            method_name=method_name,
+            data_type=data_type,
+            raise_on_fail=raise_on_fail,
+        )
+        return result is not None
+
+    @classmethod
     def to_datetime(
         cls,
-        timestamp: str,
+        value: str,
         *,
         value_name: str | None = None,
         method_name: str | None = None,
@@ -107,39 +139,78 @@ class Timestamp:
         Return the UTC datetime component of a UUIDv7 based timestamp time-ordered dash-delimited string format.
 
         Args:
-            timestamp: UUIDv7 based timestamp in time-ordered format yyyy-MM-dd-hh-mm-ss-fff-hex(20)
+            value: UUIDv7 based timestamp in time-ordered format yyyy-MM-dd-hh-mm-ss-fff-hex(20)
             value_name: Variable, field or parameter name for formatting the error message (optional)
             method_name: Method or function name for formatting the error message (optional)
             data_type: Class type or name for formatting the error message (optional)
         """
+        # Confirm the value is not None
+        assert TypeCheck.guard_not_none(value)
 
-        # Provide a specific error message for the ISO-delimited legacy format
-        if len(timestamp) == 45 and re.match(_ISO_DELIMITED_FORMAT_RE, timestamp):
-            raise ErrorUtil.value_error(
-                timestamp,
-                details=f"""
+        # Delegate to the method that can also handle None, always raise on fail for this overload
+        return cls.to_datetime_or_none(
+            value,
+            value_name=value_name,
+            method_name=method_name,
+            data_type=data_type,
+        )
+
+    @classmethod
+    def to_datetime_or_none(
+        cls,
+        timestamp: str | None,
+        *,
+        value_name: str | None = None,
+        method_name: str | None = None,
+        data_type: type | str | None = None,
+        raise_on_fail: bool = True,
+    ) -> dt.datetime | None:
+        """
+        Return the UTC datetime component of a UUIDv7 based timestamp time-ordered dash-delimited string format,
+        or None if the argument is None.
+
+        Args:
+            timestamp: UUIDv7 based timestamp in time-ordered format yyyy-MM-dd-hh-mm-ss-fff-hex(20)
+            value_name: Variable, field or parameter name for formatting the error message (optional)
+            method_name: Method or function name for formatting the error message (optional)
+            data_type: Class type or name for formatting the error message (optional)
+            raise_on_fail: If the validation fails, return None or raise an error depending on raise_on_fail
+        """
+
+        # Handle None first
+        if timestamp is None:
+            return None
+
+        tokens = timestamp.split("-")
+        if (length := len(timestamp)) != 44 or len(tokens) != 8:
+            if not raise_on_fail:
+                return None
+            elif re.match(_ISO_DELIMITED_FORMAT_RE, timestamp):
+                # Provide a specific error message for the ISO-delimited format (a frequent error)
+                raise ErrorUtil.value_error(
+                    timestamp,
+                    details=f"""
 - It uses legacy format with ISO-8601 delimiters for the datetime component: yyyy-MM-ddThh:mm:ss.fffZ-hex(20)
 - Convert to the new format by replacing all delimiters by dash so that the timestamp can be used in filenames
 - New format example: yyyy-MM-dd-hh-mm-ss-fff-hex(20)
-""",
-                value_name=value_name if value_name is not None else "Timestamp",
-                method_name=method_name,
-                data_type=data_type,
-            )
-
-        # Validate
-        tokens = timestamp.split("-")
-        if len(timestamp) != 44 or len(tokens) != 8:
-            raise ErrorUtil.value_error(
-                timestamp,
-                details=f"""
-- The value does not conform to the expected format yyyy-MM-dd-hh-mm-ss-fff-hex(20)
-- It has {len(tokens)} dash-delimited tokens instead of 8
-""",
-                value_name=value_name if value_name is not None else "Timestamp",
-                method_name=method_name,
-                data_type=data_type,
-            )
+    """,
+                    value_name=value_name if value_name is not None else "Timestamp",
+                    method_name=method_name,
+                    data_type=data_type,
+                )
+            else:
+                # Provide a generic message for other format errors
+                length_str = f"- It has the length of {length} instead of 44\n" if length != 44 else ""
+                tokens_str = f"- It has {len(tokens)} dash-delimited tokens instead of 8\n" if len(tokens) != 8 else ""
+                raise ErrorUtil.value_error(
+                    timestamp,
+                    details=f"- Timestamp '{timestamp}' does not conform "
+                            f"to the expected format yyyy-MM-dd-hh-mm-ss-fff-hex(20)\n"
+                            f"{length_str}{tokens_str}",
+                    value_name=value_name if value_name is not None else "Timestamp",
+                    method_name=method_name,
+                    data_type=data_type,
+                )
 
         year, month, day, hour, minute, second, millisecond, suffix = tuple(tokens)
 
@@ -162,17 +233,20 @@ class Timestamp:
             if not suffix.startswith("7"):
                 raise ValueError(f"Hex component of UUIDv7 timestamp '{timestamp}' does not start from 7.")
         except ValueError as e:
-            raise ErrorUtil.value_error(
-                timestamp,
-                details=f"""
-- The value does not conform to the expected format yyyy-MM-dd-hh-mm-ss-fff-hex(20)
-- It causes the following parsing error:
-{e}
-""",
-                value_name=value_name if value_name is not None else "Timestamp",
-                method_name=method_name,
-                data_type=data_type,
-            )
+            if raise_on_fail:
+                raise ErrorUtil.value_error(
+                    timestamp,
+                    details=f"""
+    - The value does not conform to the expected format yyyy-MM-dd-hh-mm-ss-fff-hex(20)
+    - It causes the following parsing error:
+    {e}
+    """,
+                    value_name=value_name if value_name is not None else "Timestamp",
+                    method_name=method_name,
+                    data_type=data_type,
+                )
+            else:
+                return None
         return result
 
     @classmethod
@@ -216,6 +290,5 @@ class Timestamp:
     @classmethod
     def validate_uuid7(cls, value: UUID) -> None:
         """Validate that the argument is a valid UUIDv7."""
-
         if not cls.is_uuid7(value):
             raise RuntimeError(f"UUID v{value.version} was provided while v7 was expected.")

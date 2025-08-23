@@ -5,7 +5,8 @@ The following value of Timestamp caused an error:
 
 Further details:
 
-- The value does not conform to the expected format yyyy-MM-dd-hh-mm-ss-fff-hex(20)
+- Timestamp '123' does not conform to the expected format yyyy-MM-dd-hh-mm-ss-fff-hex(20)
+- It has the length of 3 instead of 44
 - It has 1 dash-delimited tokens instead of 8
 
 Raises UserError with the message:
