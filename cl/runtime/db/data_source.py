@@ -93,7 +93,7 @@ class DataSource(DataSourceKey, RecordMixin):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-        # Use timestamp as data_source_id if not specified
+        # Use globally unique UUIDv7-based timestamp if not specified
         if self.data_source_id is None:
             self.data_source_id = Timestamp.create()
 
