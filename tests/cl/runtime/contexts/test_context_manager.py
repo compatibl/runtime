@@ -62,13 +62,13 @@ def _perform_testing(
         # Ensure that current context is not leaked outside the 'with clause' before the test
         active(StubContext)
 
-    stub_context_1 = StubContext(id="stub_context_1").build()
+    stub_context_1 = StubContext(id="1").build()
     with activate(stub_context_1):
 
         _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
         assert active(StubContext) is stub_context_1
 
-        stub_context_2 = StubDerivedContext(derived_field="stub_context_2").build()
+        stub_context_2 = StubDerivedContext(id="2", derived_field="2").build()
         with activate(stub_context_2):
             _sleep(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
             assert active(StubContext) is stub_context_2
@@ -106,13 +106,13 @@ async def _perform_testing_async(
         # Ensure that current context is not leaked outside the 'with clause' before the test
         active(StubContext)
 
-    stub_context_1 = StubContext(id="stub_context_1").build()
+    stub_context_1 = StubContext(id="1").build()
     with activate(stub_context_1):
 
         await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
         assert active(StubContext) is stub_context_1
 
-        stub_context_2 = StubDerivedContext(derived_field="stub_context_2").build()
+        stub_context_2 = StubDerivedContext(id="2", derived_field="2").build()
         with activate(stub_context_2):
             await _sleep_async(task_index=task_index, rnd=rnd, max_sleep_duration=max_sleep_duration)
             assert active(StubContext) is stub_context_2
@@ -209,7 +209,7 @@ def test_make_active():
     assert active_or_none(StubContext, context_id="1") is None
 
     # Test nested activation with different context types
-    stub_context_2 = StubDerivedContext(derived_field="stub_context_2").build()
+    stub_context_2 = StubDerivedContext(id="2", derived_field="2").build()
 
     # Activate base context
     make_active(stub_context_0)
@@ -244,8 +244,8 @@ def test_make_active():
 def test_error_handling():
     """Test error handling in specifying extensions."""
 
-    stub_context_1 = StubContext(id="stub_context_1").build()
-    stub_context_2 = StubDerivedContext(id="stub_context_2").build()
+    stub_context_1 = StubContext(id="1").build()
+    stub_context_2 = StubDerivedContext(id="2").build()
 
     # Outer context all of the fields of the inner context, ok
     assert active_or_none(StubContext) is None
@@ -256,7 +256,7 @@ def test_error_handling():
 
     # Outer context raises on __post__init__
     with pytest.raises(RuntimeError):
-        with activate(StubContext(error_on_post_init=True).build()):
+        with activate(StubContext(id="3", error_on_post_init=True).build()):
             with activate(stub_context_1):
                 pass
     assert active_or_none(StubContext) is None
@@ -264,13 +264,13 @@ def test_error_handling():
     # Inner context raises on __post__init__
     with pytest.raises(RuntimeError):
         with activate(stub_context_1):
-            with activate(StubContext(error_on_post_init=True).build()):
+            with activate(StubContext(id="4", error_on_post_init=True).build()):
                 pass
     assert active_or_none(StubContext) is None
 
     # Outer context raises on init
     with pytest.raises(RuntimeError):
-        with activate(StubContext(error_on_init=True).build()):
+        with activate(StubContext(id="5", error_on_init=True).build()):
             with activate(stub_context_1):
                 pass
     assert active_or_none(StubContext) is None
@@ -278,13 +278,13 @@ def test_error_handling():
     # Inner context raises on init
     with pytest.raises(RuntimeError):
         with activate(stub_context_1):
-            with activate(StubContext(error_on_init=True).build()):
+            with activate(StubContext(id="6", error_on_init=True).build()):
                 pass
     assert active_or_none(StubContext) is None
 
     # Outer context raises on enter
     with pytest.raises(RuntimeError):
-        with activate(StubContext(error_on_enter=True).build()):
+        with activate(StubContext(id="7", error_on_enter=True).build()):
             with activate(stub_context_1):
                 pass
     assert active_or_none(StubContext) is None
@@ -292,13 +292,13 @@ def test_error_handling():
     # Inner context raises on enter
     with pytest.raises(RuntimeError):
         with activate(stub_context_1):
-            with activate(StubContext(error_on_enter=True).build()):
+            with activate(StubContext(id="8", error_on_enter=True).build()):
                 pass
     assert active_or_none(StubContext) is None
 
     # Outer context raises on exit
     with pytest.raises(RuntimeError):
-        with activate(StubContext(error_on_exit=True).build()):
+        with activate(StubContext(id="9", error_on_exit=True).build()):
             with activate(stub_context_1):
                 pass
     assert active_or_none(StubContext) is None
@@ -306,7 +306,7 @@ def test_error_handling():
     # Inner context raises on exit
     with pytest.raises(RuntimeError):
         with activate(stub_context_1):
-            with activate(StubContext(error_on_exit=True).build()):
+            with activate(StubContext(id="10", error_on_exit=True).build()):
                 pass
     assert active_or_none(StubContext) is None
 

@@ -73,26 +73,26 @@ def test_context_snapshot():
     _perform_serialization_test([])
     _perform_manager_test([])
 
-    # Create StubContext() but do not use 'with' clause
-    context_external = StubContext().build()
+    # Create StubContext(...) but do not use 'with' clause
+    context_external = StubContext(id="0").build()
     _perform_manager_test([context_external])
 
-    # Inside a single 'with StubContext()' clause
-    with activate(StubContext().build()) as context_1:
+    # Inside a single 'with StubContext(...)' clause
+    with activate(StubContext(id="initial_id").build()) as context_1:
         _perform_serialization_test([context_1])
     # Recreate using ContextSnapshot
     _perform_manager_test([context_1])
 
     # Inside two nested 'with' clauses for the same key type StubContext
-    with activate(StubContext().build()):
-        with activate(StubContext(id="modified_id").build()) as context_2:
+    with activate(StubContext(id="outer_modified_id").build()):
+        with activate(StubContext(id="inner_modified_id").build()) as context_2:
             _perform_serialization_test([context_2])
     # Recreate using ContextSnapshot
     _perform_manager_test([context_2])
 
     # Inside two nested 'with' clauses for different same key types
-    with activate(StubContext().build()) as context_1:
-        with activate(StubDataclass().build()) as context_2:
+    with activate(StubContext(id="outer_id").build()) as context_1:
+        with activate(StubDataclass(id="inner_id").build()) as context_2:
             _perform_serialization_test([context_1, context_2])
     # Recreate using ContextSnapshot
     _perform_manager_test([context_1, context_2])
