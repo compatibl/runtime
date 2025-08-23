@@ -27,11 +27,20 @@ from cl.runtime.views.dag.successor_dag_node_key import SuccessorDagNodeKey
 class SuccessorDag(SuccessorDagKey, RecordMixin):
     """Directed acyclic graph (DAG) where each node defines its successors."""
 
+    title: str = required()
+    """Title is set to dag_id if not specified."""
+
     root_node: SuccessorDagNodeKey = required()
     """Root node of the DAG."""
 
     def get_key(self) -> SuccessorDagKey:
         return SuccessorDagKey(dag_id=self.dag_id).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.title is None:
+            # Title is set to dag_id if not specified
+            self.title = self.dag_id
 
     def view_dag(self) -> Dag | None:
         """DAG view."""
