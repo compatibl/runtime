@@ -24,9 +24,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class BarPlot(MatplotlibPlot, ABC):
     """Base class for the 2D bar plot."""
 
-    title: str = required()
-    """Plot title."""
-
     bar_labels: list[str] = required()
     """List of bar labels."""
 

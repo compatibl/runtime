@@ -69,5 +69,5 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
 
             plots.append(heatmap)
 
-        result = MultiPlot(plot_id=plot_id, plots=plots).build()
+        result = MultiPlot(plot_id=plot_id, title=plot_id, plots=plots).build()
         return result

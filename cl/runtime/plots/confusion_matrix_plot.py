@@ -27,9 +27,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class ConfusionMatrixPlot(MatplotlibPlot):
     """Confusion matrix visualization for a categorical experiment."""
 
-    title: str = required()
-    """Plot title."""
-
     received_categories: list[str] = required()
     """List of received (predicted) categories for each trial."""
 

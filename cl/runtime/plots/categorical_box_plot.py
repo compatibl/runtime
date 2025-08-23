@@ -25,9 +25,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class CategoricalBoxPlot(MatplotlibPlot):
     """A box plot comparing distributions across different categories"""
 
-    title: str = required()
-    """Plot title."""
-
     data: pd.DataFrame = required()  # TODO: Refactor to avoid using DataFrame as a field
     """DataFrame containing the data to plot. Must include columns specified by `x_col` and `y_col`."""
 

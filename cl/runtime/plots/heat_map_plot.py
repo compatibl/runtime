@@ -27,9 +27,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class HeatMapPlot(MatplotlibPlot):
     """Heat map visualization."""
 
-    title: str = required()
-    """Plot title."""
-
     row_labels: list[str] = required()
     """Row label for each cell in the same order of cells as other fields."""
 

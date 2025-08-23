@@ -23,9 +23,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class LinePlot(MatplotlibPlot):
     """Class for creating a 2D line plot using Matplotlib."""
 
-    title: str = required()
-    """Plot title."""
-
     x_values: list[float] = required()
     """List of X-coordinates, common for all lines."""
 

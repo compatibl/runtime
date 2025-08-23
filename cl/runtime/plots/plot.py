@@ -16,6 +16,7 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.plots.plot_key import PlotKey
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
 
@@ -23,8 +24,17 @@ from cl.runtime.records.record_mixin import RecordMixin
 class Plot(PlotKey, RecordMixin, ABC):
     """Base class for plot objects."""
 
+    title: str = required()
+    """Plot title."""
+
     def get_key(self) -> PlotKey:
         return PlotKey(plot_id=self.plot_id).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.title is None:
+            # Use plot_id as title if not specified
+            self.title = self.plot_id
 
     def view_plot(self):
         """Default plot viewer."""

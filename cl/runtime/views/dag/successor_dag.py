@@ -27,9 +27,6 @@ from cl.runtime.views.dag.successor_dag_node_key import SuccessorDagNodeKey
 class SuccessorDag(SuccessorDagKey, RecordMixin):
     """Directed acyclic graph (DAG) where each node defines its successors."""
 
-    title: str = required()
-    """Title of the DAG."""
-
     root_node: SuccessorDagNodeKey = required()
     """Root node of the DAG."""
 

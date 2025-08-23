@@ -25,9 +25,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class MultiPlot(MatplotlibPlot):
     """Visualization of multiple plots as a single one."""
 
-    title: str = required()
-    """Plot title."""
-
     plots: list[Plot] = required()
     """
     Plots to combine.
