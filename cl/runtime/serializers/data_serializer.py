@@ -376,7 +376,9 @@ class DataSerializer(Serializer):
             # Deserialize into a dict
             result_dict = {
                 (snake_case_k := self._deserialize_key(field_key)): (
-                    self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
+                    self._key_error(type_name=type_name, field_key=field_key)
+                    if (field_hint := field_dict.get(snake_case_k)) is None
+                    else self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
                     if (
                         (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != "str"
                         and self.inner_encoder is not None
@@ -436,3 +438,7 @@ class DataSerializer(Serializer):
         else:
             # If inner serializer is not specified, use the current serializer
             return self.deserialize(data, type_hint)
+
+    def _key_error(self, *, type_name: str, field_key: str) -> None:
+        """Report an error."""
+        raise RuntimeError(f"Type {type_name} does not have a field '{field_key}'.")
