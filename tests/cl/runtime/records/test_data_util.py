@@ -57,7 +57,7 @@ def test_data_build():
     ]
 
     for sample in samples:
-        DataUtil.full_build(sample, TypeHint.for_class(type(sample)))
+        DataUtil.build_(sample, TypeHint.for_class(type(sample)))
 
 
 def test_required():
@@ -70,7 +70,7 @@ def test_required():
 
     for sample in samples:
         with pytest.raises(Exception):
-            DataUtil.full_build(sample, TypeHint.for_class(type(sample)))
+            DataUtil.build_(sample, TypeHint.for_class(type(sample)))
 
 
 def test_field_type():
@@ -85,7 +85,7 @@ def test_field_type():
 
     for sample in samples:
         with pytest.raises(Exception):
-            DataUtil.full_build(sample, TypeHint.for_class(type(sample)))
+            DataUtil.build_(sample, TypeHint.for_class(type(sample)))
 
 
 if __name__ == "__main__":

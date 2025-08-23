@@ -40,7 +40,7 @@ class DataMixin(BuilderMixin, ABC):
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Validates root level object against the schema and calls its 'mark_frozen' method
         """
-        return DataUtil.full_build(self, TypeHint.for_class(type(self)))
+        return DataUtil.build_(self, TypeHint.for_class(type(self)))
 
     def clone(self) -> Self:
         """Return an unfrozen object of the same type populated by shallow copies of public fields."""

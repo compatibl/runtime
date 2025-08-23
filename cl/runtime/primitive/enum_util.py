@@ -18,12 +18,13 @@ from typing import Any
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.string_util import StringUtil
+from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.protocols import TEnum
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 
 
-class EnumUtil:
+class EnumUtil(BuilderUtil):
     """Helper methods for enums."""
 
     @classmethod
@@ -77,8 +78,14 @@ class EnumUtil:
         return description
 
     @classmethod
-    def normalize(cls, data: Any, type_hint: TypeHint | None = None) -> Any:
-        """Normalize an enum based on type hint (return None if value is None)."""
+    def build_(
+            cls,
+            data: Any,
+            type_hint: TypeHint | None = None,
+            *,
+            outer_type_name: str | None = None,
+            field_name: str | None = None,
+    ) -> Any:
         if data is None:
             if type_hint is not None and not type_hint.optional:
                 raise RuntimeError(f"Enum {type_hint.schema_type_name} value is None but marked as required.")

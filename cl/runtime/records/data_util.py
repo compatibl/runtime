@@ -20,6 +20,7 @@ from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
+from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.key_util import KeyUtil
@@ -38,17 +39,18 @@ from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE = PRIMITIVE_TYPE_NAMES + ("NoneType",)
 
-class DataUtil:
+class DataUtil(BuilderUtil):
     """Helper methods for build functionality in DataMixin."""
 
     @classmethod
-    def full_build(cls, data: Any, type_hint: TypeHint | None = None) -> Any:
-        """
-        The full implementation of the build method in DataUtil performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (3) Validates root level object against the schema and calls its 'mark_frozen' method
-        """
+    def build_(
+            cls,
+            data: Any,
+            type_hint: TypeHint | None = None,
+            *,
+            outer_type_name: str | None = None,
+            field_name: str | None = None,
+    ) -> Any:
         # Get the class of data, which may be None
         data_class_name = typename(data)
 
@@ -69,7 +71,7 @@ class DataUtil:
                     f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
                     f"{type_hint.to_str()}."
                 )
-            return PrimitiveUtil.normalize(data, type_hint)
+            return PrimitiveUtil.build_(data, type_hint)
         elif data_class_name in SEQUENCE_TYPE_NAMES:
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
@@ -80,7 +82,7 @@ class DataUtil:
                 # Consider an empty sequence equivalent to None
                 return None
             else:
-                return tuple(cls.full_build(v, remaining_chain) for v in data)
+                return tuple(cls.build_(v, remaining_chain) for v in data)
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
@@ -88,7 +90,7 @@ class DataUtil:
             if type_hint is not None:
                 type_hint.validate_for_mapping()
             return frozendict({
-                dict_key: cls.full_build(dict_value, remaining_chain)
+                dict_key: cls.build_(dict_value, remaining_chain)
                 for dict_key, dict_value in data.items()
                 if dict_value is not None
             })
@@ -98,7 +100,7 @@ class DataUtil:
                     f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
                     f"{type_hint.to_str()}."
                 )
-            return EnumUtil.normalize(data, type_hint)
+            return EnumUtil.build_(data, type_hint)
         elif is_data_key_or_record(data):
 
             # Has slots, process as data, key or record
@@ -143,17 +145,17 @@ class DataUtil:
 
             # Serialize slot values in the order of declaration except those that are None
             consume(
-                setattr(data, field_key, (
-                    PrimitiveUtil.normalize(field_value, field_spec.type_hint)
-                    if (field_value := getattr(data, field_key)).__class__.__name__
+                setattr(data, field_name, (
+                    PrimitiveUtil.build_(field_value, field_spec.type_hint, field_name=field_name)
+                    if (field_value := getattr(data, field_name)).__class__.__name__
                        in _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE
-                    else EnumUtil.normalize(field_value, field_spec.type_hint)
+                    else EnumUtil.build_(field_value, field_spec.type_hint, field_name=field_name)
                     if is_enum(field_value)
-                    else ConditionUtil.normalize(field_value, field_spec.type_hint)
+                    else ConditionUtil.build_(field_value, field_spec.type_hint, field_name=field_name)
                     if is_condition(field_value)
-                    else cls.full_build(field_value, field_spec.type_hint)
+                    else cls.build_(field_value, field_spec.type_hint, field_name=field_name)
                 ))
-                for field_key, field_spec in data_field_dict.items()
+                for field_name, field_spec in data_field_dict.items()
             )
             # Mark as frozen to prevent further modifications
             return data.mark_frozen()
