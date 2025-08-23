@@ -23,7 +23,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclas
 def test_smoke():
     """Smoke test."""
 
-    with activate(DataSource(db=LocalCache()).build()):
+    with activate(DataSource(db=LocalCache(db_id="sample")).build()):
 
         # Create test record and populate with sample data
         record = StubDataclass().build()

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from abc import abstractmethod, ABC
 from typing import Any
 
@@ -47,7 +48,7 @@ class BuilderUtil(ABC):
     @classmethod
     def _get_location_str(
             cls,
-            data: Any,
+            data_type_name: str,
             type_hint: TypeHint | None = None,
             *,
             outer_type_name: str | None = None,
@@ -56,8 +57,8 @@ class BuilderUtil(ABC):
         """Describes the location where the error occurred."""
         outer_type_name_str = f"Field located in: {outer_type_name}\n" if outer_type_name else ""
         field_name_str = f"Field name: {field_name}\n" if field_name else ""
-        actual_type_str = f"Actual field type: {typename(data)}\n" if data else ""
-        expected_type_str = f"Expected field type: {type_hint}\n" if type_hint else ""
+        actual_type_str = f"Actual field type: {data_type_name}\n"
+        expected_type_str = f"Expected field type: {type_hint}\n"
         location_str = f"{outer_type_name_str}{field_name_str}{actual_type_str}{expected_type_str}"
         if location_str:
             return f"\nError location:\n{location_str}"

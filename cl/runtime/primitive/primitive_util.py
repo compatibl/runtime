@@ -14,16 +14,20 @@
 
 from typing import Any
 
+from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.primitive.limits import check_int_32, check_int_54
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.builder_util import BuilderUtil
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, PRIMITIVE_CLASSES, PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
 
-_PASSTHROUGH_CLASS_NAMES = {"str", "float", "bool", "date","time", "datetime", "UUID", "bytes"}
+_PASSTHROUGH_CLASS_NAMES = {"bool", "date", "time", "datetime", "UUID", "bytes"}
 """Class names for which the argument is returned as is after checking that a required value is not None."""
+
+_SUBTYPED_CLASS_NAMES = {"str", "int", "float"}
+"""Class names that have subtypes."""
 
 class PrimitiveUtil(BuilderUtil):
     """Helper methods for implementing the builder pattern with primitive fields."""
@@ -46,7 +50,7 @@ class PrimitiveUtil(BuilderUtil):
             else:
                 # Required and has the value of None, raise an error
                 location_str = cls._get_location_str(
-                    data,
+                    typename(data),
                     type_hint,
                     outer_type_name=outer_type_name,
                     field_name=field_name)
@@ -61,67 +65,26 @@ class PrimitiveUtil(BuilderUtil):
         # Ensure there is no remaining chain (type hint is not a sequence or mapping)
         if type_hint.remaining:
             raise RuntimeError(
-                f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
+                f"Data is an instance of a primitive class {data_class_name} which is\n"
+                f"incompatible with a composite type hint:\n"
                 f"{type_hint.to_str()}."
             )
 
         # Validate that the actual data type matches the expected type (which may have subtypes)
-        if data_class_name != schema_type_name:
-            if schema_type_name == "long":
-                if data_class_name != "int":
-                    location_str = cls._get_location_str(
-                        data,
-                        type_hint,
-                        outer_type_name=outer_type_name,
-                        field_name=field_name)
-                    raise RuntimeError(
-                        f"Type '{schema_type_name}' can only be stored as 'int' class, not {data_class_name} class."
-                        f"{location_str}"
-                    )
-            elif schema_type_name == "timestamp":
-                if data_class_name != "UUID":
-                    location_str = cls._get_location_str(
-                        data,
-                        type_hint,
-                        outer_type_name=outer_type_name,
-                        field_name=field_name)
-                    raise RuntimeError(
-                        f"Type '{schema_type_name}' can only be stored as 'str' class, not {data_class_name} class."
-                        f"{location_str}"
-                    )
-            else:
-                location_str = cls._get_location_str(
-                    data,
-                    type_hint,
-                    outer_type_name=outer_type_name,
-                    field_name=field_name)
-                raise RuntimeError(
-                    f"Type {schema_type_name} cannot be stored as {data_class_name} class.{location_str}"
-                    )
+        if data_class_name != schema_type_name and data_class_name not in _SUBTYPED_CLASS_NAMES:
+            location_str = cls._get_location_str(
+                typename(data),
+                type_hint,
+                outer_type_name=outer_type_name,
+                field_name=field_name)
+            raise RuntimeError(
+                f"Actual field type is {data_class_name} while {schema_type_name} was expected.{location_str}"
+            )
 
         # Use schema_type_name to distinguish between types that share the same class
         if data_class_name in _PASSTHROUGH_CLASS_NAMES:
             # We already checked that the type matches the schema and handled None
             return data
-        elif data_class_name == "int":
-            if schema_type_name == "int":
-                # Check that the value is in 32-bit signed integer range
-                # if schema_type_name is specified and is int rather than long
-                check_int_32(data)
-                return data
-            elif schema_type_name == "long":
-                # Check that the value is in 54-bit signed integer range
-                # if schema_type_name is specified and is long
-                check_int_54(data)
-                return data
-            else:
-                location_str = cls._get_location_str(
-                    data,
-                    type_hint,
-                    outer_type_name=outer_type_name,
-                    field_name=field_name)
-                raise RuntimeError(
-                    f"Type {schema_type_name} is stored as '{data_class_name}', use 'int' instead.{location_str}")
         elif data_class_name == "str":
             if schema_type_name == "str":
                 # No further checks are required
@@ -137,16 +100,66 @@ class PrimitiveUtil(BuilderUtil):
                 return data
             else:
                 location_str = cls._get_location_str(
-                    data,
+                    typename(data),
                     type_hint,
                     outer_type_name=outer_type_name,
                     field_name=field_name)
                 raise RuntimeError(
-                    f"Type {schema_type_name} is stored as '{data_class_name}', use 'int' instead.{location_str}")
+                    f"Data type '{data_class_name}' can only be used for fields declared as str or timestamp.\n"
+                    f"It is not a valid type for a field declared as {schema_type_name}.{location_str}"
+                )
+        elif data_class_name == "int":
+            if schema_type_name == "int":
+                # Check that the value is in 32-bit signed integer range
+                # if schema_type_name is specified and is int rather than long
+                check_int_32(data)
+                return data
+            elif schema_type_name == "long":
+                # Check that the value is in 54-bit signed integer range
+                # if schema_type_name is specified and is long
+                check_int_54(data)
+                return data
+            elif schema_type_name == "float":
+                # Check that the value is in 54-bit signed integer range
+                # which can be stored as float without losing precision
+                check_int_54(data)
+                # If yes, convert to float
+                return float(data)
+            else:
+                location_str = cls._get_location_str(
+                    typename(data),
+                    type_hint,
+                    outer_type_name=outer_type_name,
+                    field_name=field_name)
+                raise RuntimeError(
+                    f"Data type '{data_class_name}' can only be used for fields declared as int, long, or float.\n"
+                    f"It is not a valid type for a field declared as {schema_type_name}.{location_str}"
+                )
+        elif data_class_name == "float":
+            if schema_type_name == "float":
+                # No further checks are required
+                return data
+            elif schema_type_name == "int":
+                # This method also performs the check that the value is in 32-bit signed integer range
+                return FloatUtil.to_int(data)
+            elif schema_type_name == "long":
+                # This method also performs the check that the value is in 54-bit signed integer range
+                return FloatUtil.to_long(data)
+            else:
+                location_str = cls._get_location_str(
+                    typename(data),
+                    type_hint,
+                    outer_type_name=outer_type_name,
+                    field_name=field_name)
+                raise RuntimeError(
+                    f"Data type '{data_class_name}' can only be used for fields declared as float, int or long.\n"
+                    f"It is not a valid type for a field declared as {schema_type_name}.{location_str}"
+                )
         elif data_class_name == "type":
             assert TypeCache.guard_known_type(data)
             return data
         else:
-            primitive_types_str = "\n".join(PRIMITIVE_TYPE_NAMES)
+            primitive_class_names_str = "\n".join(PRIMITIVE_CLASS_NAMES)
             raise RuntimeError(
-                f"Type {data_class_name} is not one of the supported primitive types:\n{primitive_types_str}\n")
+                f"Type {data_class_name} is not a valid value type for a primitive field:\n"
+                f"{primitive_class_names_str}\n")

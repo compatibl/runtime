@@ -144,16 +144,37 @@ class DataUtil(BuilderUtil):
             data_field_dict = data_type_spec.get_field_dict()
 
             # Serialize slot values in the order of declaration except those that are None
+            # TODO: Construct a new instance instead of setting fields in an existing instance
             consume(
                 setattr(data, field_name, (
-                    PrimitiveUtil.build_(field_value, field_spec.type_hint, field_name=field_name)
+                    PrimitiveUtil.build_(
+                        field_value,
+                        field_spec.type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
                     if (field_value := getattr(data, field_name)).__class__.__name__
                        in _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE
-                    else EnumUtil.build_(field_value, field_spec.type_hint, field_name=field_name)
+                    else EnumUtil.build_(
+                        field_value,
+                        field_spec.type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
                     if is_enum(field_value)
-                    else ConditionUtil.build_(field_value, field_spec.type_hint, field_name=field_name)
+                    else ConditionUtil.build_(
+                        field_value,
+                        field_spec.type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
                     if is_condition(field_value)
-                    else cls.build_(field_value, field_spec.type_hint, field_name=field_name)
+                    else cls.build_(
+                        field_value,
+                        field_spec.type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
                 ))
                 for field_name, field_spec in data_field_dict.items()
             )
