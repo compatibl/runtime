@@ -14,9 +14,9 @@
 
 import random
 from dataclasses import dataclass
-from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
-from cl.runtime.experiments.classifier_trial import ClassifierTrial
-from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
+from cl.runtime.stats.classifier_experiment import ClassifierExperiment
+from cl.runtime.stats.classifier_trial import ClassifierTrial
+from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
 
 
 @dataclass(slots=True, kw_only=True)

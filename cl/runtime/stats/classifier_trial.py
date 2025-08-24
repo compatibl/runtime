@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.experiments.trial import Trial
+from cl.runtime.stats.trial import Trial
 from cl.runtime.records.for_dataclasses.extensions import required
 
 

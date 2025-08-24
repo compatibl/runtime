@@ -14,9 +14,9 @@
 
 import random
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
-from cl.runtime.experiments.supervised_binary_experiment import SupervisedBinaryExperiment
-from cl.runtime.experiments.supervised_binary_trial import SupervisedBinaryTrial
+from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
+from cl.runtime.stats.supervised_binary_experiment import SupervisedBinaryExperiment
+from cl.runtime.stats.supervised_binary_trial import SupervisedBinaryTrial
 
 
 @dataclass(slots=True, kw_only=True)

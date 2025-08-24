@@ -14,8 +14,8 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment_scenario_key import ExperimentScenarioKey
-from cl.runtime.experiments.trial_key import TrialKey
+from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
+from cl.runtime.stats.trial_key import TrialKey
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.record_mixin import RecordMixin
 

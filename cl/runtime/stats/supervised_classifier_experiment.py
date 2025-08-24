@@ -17,9 +17,9 @@ from dataclasses import dataclass
 import numpy as np
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.experiments.classifier_experiment import ClassifierExperiment
-from cl.runtime.experiments.supervised_classifier_trial import SupervisedClassifierTrial
-from cl.runtime.experiments.trial_key_query import TrialKeyQuery
+from cl.runtime.stats.classifier_experiment import ClassifierExperiment
+from cl.runtime.stats.supervised_classifier_trial import SupervisedClassifierTrial
+from cl.runtime.stats.trial_key_query import TrialKeyQuery
 from cl.runtime.plots.heat_map_plot import HeatMapPlot
 from cl.runtime.plots.multi_plot import MultiPlot
 

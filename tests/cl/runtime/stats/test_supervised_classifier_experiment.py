@@ -16,10 +16,10 @@ import pytest
 import random
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.experiments.experiment_kind import ExperimentKind
-from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
-from cl.runtime.experiments.experiment_scenario import ExperimentScenario
-from stubs.cl.runtime.experiments.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
+from cl.runtime.stats.experiment_kind import ExperimentKind
+from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
+from cl.runtime.stats.experiment_scenario import ExperimentScenario
+from stubs.cl.runtime.stats.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
 
 
 def test_smoke(multi_db_fixture):

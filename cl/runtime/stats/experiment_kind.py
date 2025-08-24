@@ -14,7 +14,7 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.experiments.experiment_kind_key import ExperimentKindKey
+from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 from cl.runtime.records.record_mixin import RecordMixin
 
 
