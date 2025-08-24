@@ -22,7 +22,7 @@ class StubLinePlots:
     @classmethod
     def get_one_line_plot(cls, plot_id: str) -> Plot:
         """Get basic plot."""
-        result = LinePlot(plot_id=plot_id)
+        result = LinePlot(plot_id=plot_id, title="LinePlot")
         result.x_values = [1.0, 2.0, 3.0]
         result.lines = {
             "line_1": [4.0, 3.0, 7.0],
@@ -32,7 +32,7 @@ class StubLinePlots:
     @classmethod
     def get_two_line_plot(cls, plot_id: str) -> Plot:
         """Get basic plot."""
-        result = LinePlot(plot_id=plot_id)
+        result = LinePlot(plot_id=plot_id, title="LinePlot")
         result.x_values = [1.0, 2.0, 3.0]
         result.lines = {"line_1": [4.0, 3.0, 7.0], "line_2": [5.0, 6.0, 1.0]}
         return result.build()

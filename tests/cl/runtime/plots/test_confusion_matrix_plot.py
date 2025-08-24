@@ -25,10 +25,11 @@ def test_smoke(work_dir_fixture):
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
 def test_dark_theme(work_dir_fixture):
     raw_data = pd.read_csv(Path(__file__).resolve().parent / "./test_confusion_matrix_plot.csv")
-    plot = ConfusionMatrixPlot(plot_id="matrix_plot")
-    plot.title = "Confusion Matrix"
-    plot.expected_categories = raw_data["True Category"].values.tolist()
-    plot.received_categories = raw_data["Predicted"].values.tolist()
+    plot = ConfusionMatrixPlot(
+        title="ConfusionMatrixPlot",
+        expected_categories=raw_data["True Category"].values.tolist(),
+        received_categories=raw_data["Predicted"].values.tolist(),
+    ).build()
     plot.save()
 
 

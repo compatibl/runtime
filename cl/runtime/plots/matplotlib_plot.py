@@ -41,6 +41,7 @@ class MatplotlibPlot(Plot, ABC):
 
     def get_view(self) -> PngView:
         """Return a view object for the plot, implement using 'create_figure' method."""
+        self.check_frozen()
 
         # Create figure
         fig = self._create_figure()
@@ -60,6 +61,8 @@ class MatplotlibPlot(Plot, ABC):
 
     def save(self, format_: str = "png") -> None:
         """Save in given format to 'base_dir/plot_id.format_', implement using 'create_figure' method."""
+        self.check_frozen()
+
         if format_ not in ("png", "svg"):
             raise RuntimeError(f"Unsupported figure save format: {format_}.")
         # Create figure

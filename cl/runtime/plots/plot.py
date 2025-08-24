@@ -16,6 +16,7 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.plots.plot_key import PlotKey
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
@@ -32,6 +33,9 @@ class Plot(PlotKey, RecordMixin, ABC):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.plot_id is None:
+            # Use globally unique UUIDv7-based timestamp if not specified
+            self.plot_id = Timestamp.create()
         if self.title is None:
             # Use plot_id as title if not specified
             self.title = self.plot_id

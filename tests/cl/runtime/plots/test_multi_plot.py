@@ -21,14 +21,14 @@ def test_multi_heatmap(work_dir_fixture):
     """Test a multi heat map plot"""
     plot = MultiPlot(
         plot_id="test_multi_heat_map_plot.test_multi_heatmap",
-        title="Test",
+        title="MultiPlot",
         plots=[
             StubHeatMapPlots.get_basic_plot("test"),
             StubHeatMapPlots.get_basic_plot("test"),
             StubHeatMapPlots.get_basic_plot("test"),
             StubHeatMapPlots.get_basic_plot("test"),
         ],
-    )
+    ).build()
     plot.save()
 
 
