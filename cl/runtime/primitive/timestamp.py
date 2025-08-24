@@ -14,11 +14,10 @@
 
 import datetime as dt
 import re
-from typing import Any, TypeGuard
+from typing import Any
+from typing import TypeGuard
 from uuid import UUID
 import uuid_utils
-from pandas.core.arrays.period import raise_on_incompatible
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
@@ -100,14 +99,14 @@ class Timestamp:
 
     @classmethod
     def guard_valid(
-            cls,
-            value: Any,
-            *,
-            fast: bool = False,
-            value_name: str | None = None,
-            method_name: str | None = None,
-            data_type: type | str | None = None,
-            raise_on_fail: bool = True,
+        cls,
+        value: Any,
+        *,
+        fast: bool = False,
+        value_name: str | None = None,
+        method_name: str | None = None,
+        data_type: type | str | None = None,
+        raise_on_fail: bool = True,
     ) -> TypeGuard[str]:
         """Confirm argument is UUIDv7-based timestamp in readable ordered string format with dash delimiters."""
 
@@ -205,8 +204,8 @@ class Timestamp:
                 raise ErrorUtil.value_error(
                     timestamp,
                     details=f"- Timestamp '{timestamp}' does not conform "
-                            f"to the expected format yyyy-MM-dd-hh-mm-ss-fff-hex(20)\n"
-                            f"{length_str}{tokens_str}",
+                    f"to the expected format yyyy-MM-dd-hh-mm-ss-fff-hex(20)\n"
+                    f"{length_str}{tokens_str}",
                     value_name=value_name if value_name is not None else "Timestamp",
                     method_name=method_name,
                     data_type=data_type,

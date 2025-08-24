@@ -205,7 +205,9 @@ TRecord = TypeVar("TRecord", bound=RecordProtocol)
 """Generic type parameter for a record."""
 
 
-def is_empty(data: Any) -> bool:  # TODO: Review if we should consider empty sequences as None during build or serialization
+def is_empty(
+    data: Any,
+) -> bool:  # TODO: Review if we should consider empty sequences as None during build or serialization
     """Returns true if the argument is None or an empty string, sequence or mapping."""
     return data in (None, "") or (data.__class__.__name__ in SEQUENCE_AND_MAPPING_CLASS_NAMES and len(data) == 0)
 

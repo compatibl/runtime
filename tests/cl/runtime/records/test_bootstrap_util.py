@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.records.bootstrap_util import BootstrapUtil
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite

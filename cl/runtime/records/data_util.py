@@ -12,44 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import Enum
 from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
-
-from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
-from cl.runtime.records.conditions import Condition
-from cl.runtime.records.key_util import KeyUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_key, is_condition
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
+from cl.runtime.records.protocols import is_condition
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.data_spec import DataSpec
-from cl.runtime.schema.data_spec_util import DataSpecUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
-from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 
 _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE = PRIMITIVE_TYPE_NAMES + ("NoneType",)
+
 
 class DataUtil(BuilderUtil):
     """Helper methods for build functionality in DataMixin."""
 
     @classmethod
     def build_(
-            cls,
-            data: Any,
-            type_hint: TypeHint | None = None,
-            *,
-            outer_type_name: str | None = None,
-            field_name: str | None = None,
+        cls,
+        data: Any,
+        type_hint: TypeHint | None = None,
+        *,
+        outer_type_name: str | None = None,
+        field_name: str | None = None,
     ) -> Any:
         # Get the class of data, which may be None
         data_class_name = typename(data)
@@ -89,11 +83,13 @@ class DataUtil(BuilderUtil):
             # item in the mapping, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_mapping()
-            return frozendict({
-                dict_key: cls.build_(dict_value, remaining_chain)
-                for dict_key, dict_value in data.items()
-                if dict_value is not None
-            })
+            return frozendict(
+                {
+                    dict_key: cls.build_(dict_value, remaining_chain)
+                    for dict_key, dict_value in data.items()
+                    if dict_value is not None
+                }
+            )
         elif is_enum(data):
             if remaining_chain:
                 raise RuntimeError(
@@ -146,36 +142,44 @@ class DataUtil(BuilderUtil):
             # Serialize slot values in the order of declaration except those that are None
             # TODO: Construct a new instance instead of setting fields in an existing instance
             consume(
-                setattr(data, field_name, (
-                    PrimitiveUtil.build_(
-                        field_value,
-                        field_spec.type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                    if (field_value := getattr(data, field_name)).__class__.__name__
-                       in _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE
-                    else EnumUtil.build_(
-                        field_value,
-                        field_spec.type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                    if is_enum(field_value)
-                    else ConditionUtil.build_(
-                        field_value,
-                        field_spec.type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                    if is_condition(field_value)
-                    else cls.build_(
-                        field_value,
-                        field_spec.type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                ))
+                setattr(
+                    data,
+                    field_name,
+                    (
+                        PrimitiveUtil.build_(
+                            field_value,
+                            field_spec.type_hint,
+                            outer_type_name=typename(data),
+                            field_name=field_name,
+                        )
+                        if (field_value := getattr(data, field_name)).__class__.__name__
+                        in _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE
+                        else (
+                            EnumUtil.build_(
+                                field_value,
+                                field_spec.type_hint,
+                                outer_type_name=typename(data),
+                                field_name=field_name,
+                            )
+                            if is_enum(field_value)
+                            else (
+                                ConditionUtil.build_(
+                                    field_value,
+                                    field_spec.type_hint,
+                                    outer_type_name=typename(data),
+                                    field_name=field_name,
+                                )
+                                if is_condition(field_value)
+                                else cls.build_(
+                                    field_value,
+                                    field_spec.type_hint,
+                                    outer_type_name=typename(data),
+                                    field_name=field_name,
+                                )
+                            )
+                        )
+                    ),
+                )
                 for field_name, field_spec in data_field_dict.items()
             )
             # Mark as frozen to prevent further modifications

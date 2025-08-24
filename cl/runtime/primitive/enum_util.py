@@ -14,7 +14,6 @@
 
 from enum import Enum
 from typing import Any
-
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.string_util import StringUtil
@@ -79,12 +78,12 @@ class EnumUtil(BuilderUtil):
 
     @classmethod
     def build_(
-            cls,
-            data: Any,
-            type_hint: TypeHint | None = None,
-            *,
-            outer_type_name: str | None = None,
-            field_name: str | None = None,
+        cls,
+        data: Any,
+        type_hint: TypeHint | None = None,
+        *,
+        outer_type_name: str | None = None,
+        field_name: str | None = None,
     ) -> Any:
         if data is None:
             if type_hint is not None and not type_hint.optional:

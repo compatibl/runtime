@@ -19,7 +19,6 @@ from types import ModuleType
 from typing import Mapping
 from typing import cast
 from uuid import UUID
-
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.protocols import DataProtocol
 from cl.runtime.records.protocols import is_data_key_or_record

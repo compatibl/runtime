@@ -15,7 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.protocols import TData
 from cl.runtime.records.record_mixin import RecordMixin

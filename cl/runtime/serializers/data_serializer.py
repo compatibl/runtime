@@ -17,9 +17,8 @@ from enum import Enum
 from typing import Any
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -27,6 +26,7 @@ from cl.runtime.records.protocols import SEQUENCE_AND_MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.typename import typename
@@ -378,16 +378,18 @@ class DataSerializer(Serializer):
                 (snake_case_k := self._deserialize_key(field_key)): (
                     self._key_error(type_name=type_name, field_key=field_key)
                     if (field_hint := field_dict.get(snake_case_k)) is None
-                    else self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
-                    if (
-                        (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != "str"
-                        and self.inner_encoder is not None
-                        and isinstance(field_value, str)
-                        and len(field_value) > 0
-                        # TODO: Improve detection of embedded JSON
-                        and (field_value.startswith('{"') or field_value.startswith("["))
+                    else (
+                        self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
+                        if (
+                            (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != "str"
+                            and self.inner_encoder is not None
+                            and isinstance(field_value, str)
+                            and len(field_value) > 0
+                            # TODO: Improve detection of embedded JSON
+                            and (field_value.startswith('{"') or field_value.startswith("["))
+                        )
+                        else self.deserialize(field_value, field_hint)
                     )
-                    else self.deserialize(field_value, field_hint)
                 )
                 for field_key, field_value in data.items()
                 if not field_key.startswith("_") and not is_empty(field_value)

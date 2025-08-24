@@ -15,8 +15,8 @@
 import pytest
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.records.freeze_util import FreezeUtil
+from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubDataclass

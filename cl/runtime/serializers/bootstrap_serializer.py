@@ -31,11 +31,11 @@ from cl.runtime.primitive.long_util import LongUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
-from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint

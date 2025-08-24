@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod, ABC
+from abc import ABC
+from abc import abstractmethod
 from typing import Any
-
-from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 
 
@@ -25,12 +24,12 @@ class BuilderUtil(ABC):
     @classmethod
     @abstractmethod
     def build_(
-            cls,
-            data: Any,
-            type_hint: TypeHint | None = None,
-            *,
-            outer_type_name: str | None = None,
-            field_name: str | None = None,
+        cls,
+        data: Any,
+        type_hint: TypeHint | None = None,
+        *,
+        outer_type_name: str | None = None,
+        field_name: str | None = None,
     ) -> Any:
         """
         Validate data against the type hint, init or normalize, and return an immutable copy.
@@ -47,12 +46,12 @@ class BuilderUtil(ABC):
 
     @classmethod
     def _get_location_str(
-            cls,
-            data_type_name: str,
-            type_hint: TypeHint | None = None,
-            *,
-            outer_type_name: str | None = None,
-            field_name: str | None = None,
+        cls,
+        data_type_name: str,
+        type_hint: TypeHint | None = None,
+        *,
+        outer_type_name: str | None = None,
+        field_name: str | None = None,
     ) -> str:
         """Describes the location where the error occurred."""
         outer_type_name_str = f"Field located in: {outer_type_name}\n" if outer_type_name else ""

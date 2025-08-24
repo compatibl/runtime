@@ -45,4 +45,3 @@ class EnvKind(IntEnum):
     Temporary environment for testing or development, initialized and deleted automatically on each run.
     Activates Dynaconf setting 'development' when outside pytest, or 'testing' when inside pytest.
     """
-

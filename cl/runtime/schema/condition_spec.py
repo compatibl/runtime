@@ -14,9 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Self
-
 from cl.runtime.records.conditions import Condition
-from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 
@@ -32,9 +30,7 @@ class ConditionSpec(DataSpec):
         # This class (ConditionSpec) is only appropriate for a data base or mixin class that does not define its own slots
         type_name = typename(class_)
         if not issubclass(class_, Condition):
-            raise RuntimeError(
-                f"Cannot create {cls.__name__} for class {type_name} because it is not a condition."
-            )
+            raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it is not a condition.")
         elif class_.get_field_names():
             pass  # TODO: Define schema
 

@@ -13,20 +13,17 @@
 # limitations under the License.
 
 import pytest
-
-from cl.runtime.parsers.locale import Locale
-from cl.runtime.parsers.locale_key import LocaleKey
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.settings.labels.class_label import ClassLabel
 from cl.runtime.settings.labels.class_label_key import ClassLabelKey
-from stubs.cl.runtime import StubDataclass, StubDataclassKey
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
@@ -78,8 +75,8 @@ def test_field_type():
 
     samples = [
         StubDataclass(id=123),  # noqa - wrong primitive type in key
-        StubDataclassDerived(id=123),   # noqa - wrong primitive type in record
-        StubDataclass(id=StubDataclassKey()),   # noqa - complex instead of primitive type
+        StubDataclassDerived(id=123),  # noqa - wrong primitive type in record
+        StubDataclass(id=StubDataclassKey()),  # noqa - complex instead of primitive type
         StubDataclass(id=StubDataclassKey()),  # noqa - unrelated type
     ]
 

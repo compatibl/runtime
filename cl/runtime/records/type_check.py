@@ -17,9 +17,10 @@ from typing import Mapping
 from typing import Sequence
 from typing import TypeGuard
 from typing import cast
-from cl.runtime.records.protocols import BuilderProtocol, TObj
+from cl.runtime.records.protocols import BuilderProtocol
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_builder
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record

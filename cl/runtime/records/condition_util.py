@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import Any
-
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.schema.type_hint import TypeHint
 
@@ -23,11 +22,11 @@ class ConditionUtil(BuilderUtil):
 
     @classmethod
     def build_(
-            cls,
-            data: Any,
-            type_hint: TypeHint | None = None,
-            *,
-            outer_type_name: str | None = None,
-            field_name: str | None = None,
+        cls,
+        data: Any,
+        type_hint: TypeHint | None = None,
+        *,
+        outer_type_name: str | None = None,
+        field_name: str | None = None,
     ) -> Any:
         return data  # TODO: !!! Add validation
