@@ -1,0 +1,12 @@
+{
+  "id": "abc",
+  "base_key_field": {
+    "id": "abc"
+  }
+}
+{
+  "id": "abc",
+  "base_key_field": {
+    "id": "abc"
+  }
+}

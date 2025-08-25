@@ -1,0 +1,16 @@
+{
+  "_type": "StubDataclassPolymorphic",
+  "id": "abc",
+  "base_key_field": {
+    "_type": "StubDataclassPolymorphicKey",
+    "id": "abc"
+  }
+}
+{
+  "_type": "StubDataclassPolymorphic",
+  "id": "abc",
+  "base_key_field": {
+    "_type": "StubDataclassPolymorphic",
+    "id": "abc"
+  }
+}
