@@ -39,7 +39,7 @@ from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
-_TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildNames")
+_TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName",)
 """Headers of TypeInfo preload file."""
 
 
@@ -541,14 +541,14 @@ class TypeCache:
                 # Parse a type info row
                 if len(row_tokens) == len(_TYPE_INFO_HEADERS):
                     # Extract the type name and qual name from the tokens
-                    type_name, type_kind, qual_name, parent_record_type_names, child_record_type_names = row_tokens
+                    type_name, type_kind, qual_name = row_tokens
                 else:
                     expected_num_tokens = len(_TYPE_INFO_HEADERS)
                     actual_num_tokens = len(row_tokens)
                     raise RuntimeError(
                         f"Invalid number of comma-delimited tokens {actual_num_tokens} in TypeCache, "
                         f"should be {expected_num_tokens}.\n"
-                        f"Sample row: TypeName,TypeKind,module.ClassName,Superclass1;Superclass2,Subclass1;Subclass2,\n"
+                        f"Sample row: TypeName,TypeKind,module.ClassName\n"
                         f"Invalid row: {row.strip()}\n"
                     )
 
@@ -590,17 +590,9 @@ class TypeCache:
                 type_kind_str = EnumUtil.to_str(type_info.type_kind)
                 qual_name = type_info.qual_name
 
-                # Sort parent and child names (they should already be sorted, just to be sure)
-                parent_record_type_names_str = (
-                    ";".join(sorted(type_info.parent_record_type_names)) if type_info.parent_record_type_names else ""
-                )
-                child_record_type_names_str = (
-                    ";".join(sorted(type_info.child_record_type_names)) if type_info.child_record_type_names else ""
-                )
-
                 # Write comma-separated values for each token, with semicolons-separated lists
                 file.write(
-                    f"{type_name},{type_kind_str},{qual_name},{parent_record_type_names_str},{child_record_type_names_str}\n"
+                    f"{type_name},{type_kind_str},{qual_name}\n"
                 )
 
     @classmethod
