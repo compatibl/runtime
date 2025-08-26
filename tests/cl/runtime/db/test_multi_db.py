@@ -63,8 +63,20 @@ _SAMPLES = [
         StubDataclass(id="abc14"),
         StubDataclassVersioned(id="abc15"),
         StubDataclassPolymorphic(id="abc16"),
-        StubDataclassPolymorphic(id="abc17", base_key_field=StubDataclassPolymorphicKey()),
-        StubDataclassPolymorphic(id="abc18", base_key_field=StubDataclassPolymorphic()),
+        StubDataclassPolymorphic(
+            id="abc17",
+            base_key_field=StubDataclassPolymorphicKey(),
+            root_key_field=StubDataclassPolymorphicKey(),
+            record_as_base_key_field=StubDataclassPolymorphic(),
+            record_as_root_key_field=StubDataclassPolymorphic(),
+            ),
+        StubDataclassPolymorphic(
+            id="abc18",
+            base_key_field=StubDataclassPolymorphicKey(),
+            root_key_field=StubDataclassPolymorphicKey(),
+            record_as_base_key_field=StubDataclassPolymorphic(),
+            record_as_root_key_field=StubDataclassPolymorphic(),
+            ),
     ]
 ]
 

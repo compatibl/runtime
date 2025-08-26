@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_base_key import StubDataclassPolymorphicBaseKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
@@ -24,8 +25,20 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key imp
 class StubDataclassPolymorphic(StubDataclassPolymorphicKey, RecordMixin):
     """Stub record class derived from StubDataclassPolymorphicKey."""
 
+    record_field: str = "record_field"
+    """The presence of this field indicates a record rather than key is stored."""
+
     base_key_field: StubDataclassPolymorphicBaseKey | None = None
     """The type of this field is not the key itself but its base."""
+
+    root_key_field: KeyMixin | None = None
+    """The type of this field is not the key itself but KeyMixin."""
+
+    record_as_base_key_field: StubDataclassPolymorphicBaseKey | None = None
+    """The type of this field is not the key itself but its base, the value is a record."""
+
+    record_as_root_key_field: KeyMixin | None = None
+    """The type of this field is not the key itself but KeyMixin, the value is a record."""
 
     def get_key(self) -> StubDataclassPolymorphicKey:
         return StubDataclassPolymorphicKey(id=self.id).build()

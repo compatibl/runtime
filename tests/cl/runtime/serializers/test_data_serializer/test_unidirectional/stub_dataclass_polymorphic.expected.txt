@@ -1,12 +1,36 @@
 {
   "id": "abc",
+  "record_field": "record_field",
   "base_key_field": {
     "id": "abc"
+  },
+  "root_key_field": {
+    "id": "abc"
+  },
+  "record_as_base_key_field": {
+    "id": "abc",
+    "record_field": "record_field"
+  },
+  "record_as_root_key_field": {
+    "id": "abc",
+    "record_field": "record_field"
   }
 }
 {
   "id": "abc",
+  "record_field": "record_field",
   "base_key_field": {
     "id": "abc"
+  },
+  "root_key_field": {
+    "id": "abc"
+  },
+  "record_as_base_key_field": {
+    "id": "abc",
+    "record_field": "record_field"
+  },
+  "record_as_root_key_field": {
+    "id": "abc",
+    "record_field": "record_field"
   }
 }

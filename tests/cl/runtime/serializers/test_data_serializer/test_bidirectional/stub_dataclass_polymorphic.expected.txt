@@ -1,16 +1,46 @@
 {
   "_type": "StubDataclassPolymorphic",
   "id": "abc",
+  "record_field": "record_field",
   "base_key_field": {
     "_type": "StubDataclassPolymorphicKey",
     "id": "abc"
+  },
+  "root_key_field": {
+    "_type": "StubDataclassPolymorphicKey",
+    "id": "abc"
+  },
+  "record_as_base_key_field": {
+    "_type": "StubDataclassPolymorphic",
+    "id": "abc",
+    "record_field": "record_field"
+  },
+  "record_as_root_key_field": {
+    "_type": "StubDataclassPolymorphic",
+    "id": "abc",
+    "record_field": "record_field"
   }
 }
 {
   "_type": "StubDataclassPolymorphic",
   "id": "abc",
+  "record_field": "record_field",
   "base_key_field": {
-    "_type": "StubDataclassPolymorphic",
+    "_type": "StubDataclassPolymorphicKey",
     "id": "abc"
+  },
+  "root_key_field": {
+    "_type": "StubDataclassPolymorphicKey",
+    "id": "abc"
+  },
+  "record_as_base_key_field": {
+    "_type": "StubDataclassPolymorphic",
+    "id": "abc",
+    "record_field": "record_field"
+  },
+  "record_as_root_key_field": {
+    "_type": "StubDataclassPolymorphic",
+    "id": "abc",
+    "record_field": "record_field"
   }
 }

@@ -53,8 +53,18 @@ _SAMPLES = [
     StubDataclassListDictFields().build(),
     StubDataclassPrimitiveFields().build(),
     StubDataclassSingleton().build(),
-    StubDataclassPolymorphic(base_key_field=StubDataclassPolymorphicKey()),
-    StubDataclassPolymorphic(base_key_field=StubDataclassPolymorphic()),
+    StubDataclassPolymorphic(
+        base_key_field=StubDataclassPolymorphicKey(),
+        root_key_field=StubDataclassPolymorphicKey(),
+        record_as_base_key_field=StubDataclassPolymorphic(),
+        record_as_root_key_field=StubDataclassPolymorphic(),
+    ),
+    StubDataclassPolymorphic(
+        base_key_field=StubDataclassPolymorphicKey(),
+        root_key_field=StubDataclassPolymorphicKey(),
+        record_as_base_key_field=StubDataclassPolymorphic(),
+        record_as_root_key_field=StubDataclassPolymorphic(),
+    ),
     # TODO: StubDataclassTupleFields().build(),  # TODO: Implement support for this class
 ]
 
