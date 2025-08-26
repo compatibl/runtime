@@ -23,11 +23,11 @@ from types import ModuleType
 from typing import Sequence
 from memoization import cached
 from more_itertools import consume
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data_key_or_record, is_key_or_record, is_data
+from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -39,7 +39,11 @@ from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
-_TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName",)
+_TYPE_INFO_HEADERS = (
+    "TypeName",
+    "TypeKind",
+    "QualName",
+)
 """Headers of TypeInfo preload file."""
 
 
@@ -591,9 +595,7 @@ class TypeCache:
                 qual_name = type_info.qual_name
 
                 # Write comma-separated values for each token, with semicolons-separated lists
-                file.write(
-                    f"{type_name},{type_kind_str},{qual_name}\n"
-                )
+                file.write(f"{type_name},{type_kind_str},{qual_name}\n")
 
     @classmethod
     def _clear(cls) -> None:

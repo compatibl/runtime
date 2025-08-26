@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 
 
 @dataclass(slots=True)

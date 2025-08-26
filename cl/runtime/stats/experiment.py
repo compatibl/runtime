@@ -19,15 +19,15 @@ from typing import Sequence
 from typing import TypeVar
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.log.exceptions.user_error import UserError
+from cl.runtime.plots.plot import Plot
+from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.records.typename import typename
 from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.stats.trial import Trial
 from cl.runtime.stats.trial_key import TrialKey
 from cl.runtime.stats.trial_key_query import TrialKeyQuery
-from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.plots.plot import Plot
-from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.typename import typename
 from cl.runtime.views.png_view import PngView
 
 TTrial = TypeVar("TTrial", bound=Trial)

@@ -14,8 +14,8 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
 
 
 @dataclass(slots=True, kw_only=True)

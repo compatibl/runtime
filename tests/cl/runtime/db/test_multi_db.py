@@ -34,12 +34,12 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased import StubDataclassAliased
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
     StubDataclassPrimitiveFieldsQuery,
 )
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_versioned import StubDataclassVersioned
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 
 _SAMPLES = [
     sample.build()
@@ -69,14 +69,14 @@ _SAMPLES = [
             root_key_field=StubDataclassPolymorphicKey(),
             record_as_base_key_field=StubDataclassPolymorphic(),
             record_as_root_key_field=StubDataclassPolymorphic(),
-            ),
+        ),
         StubDataclassPolymorphic(
             id="abc18",
             base_key_field=StubDataclassPolymorphicKey(),
             root_key_field=StubDataclassPolymorphicKey(),
             record_as_base_key_field=StubDataclassPolymorphic(),
             record_as_root_key_field=StubDataclassPolymorphic(),
-            ),
+        ),
     ]
 ]
 
@@ -224,6 +224,7 @@ def test_singleton(multi_db_fixture):
     assert len(all_records) == 1
     assert all_records[0] == other_singleton_sample
 
+
 def test_derived_key(multi_db_fixture):
     """Test singleton type saving."""
     sample = StubDataclassPolymorphic().build()
@@ -233,6 +234,7 @@ def test_derived_key(multi_db_fixture):
         cast_to=StubDataclassPolymorphic,
     )
     assert loaded_sample == sample
+
 
 @pytest.mark.skip(
     "Temporarily skip a test for repeated record save."

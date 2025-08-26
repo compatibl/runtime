@@ -17,11 +17,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 from typing import Deque
-from typing import Tuple
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.records.protocols import DataProtocol
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import TPrimitive
@@ -34,7 +32,6 @@ from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_cache import TypeCache
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_schema import TypeSchema
@@ -228,13 +225,14 @@ class KeySerializer(Serializer):
                         self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_hint)
                     ]
                     if (v := getattr(data, k)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else
-                    [
-                        # Use enum serializer, specify enum class
-                        self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
-                    ]
-                    if isinstance(v, Enum)
-                    else self._to_tuple(v, field_spec.type_hint, is_outer=False)
+                    else (
+                        [
+                            # Use enum serializer, specify enum class
+                            self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
+                        ]
+                        if isinstance(v, Enum)
+                        else self._to_tuple(v, field_spec.type_hint, is_outer=False)
+                    )
                 )
                 for k, field_spec in field_dict.items()
             )

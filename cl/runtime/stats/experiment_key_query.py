@@ -14,11 +14,11 @@
 
 from dataclasses import dataclass
 from cl.runtime.db.query_mixin import QueryMixin
-from cl.runtime.stats.experiment_key import ExperimentKey
-from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.stats.experiment_key import ExperimentKey
+from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 
 
 @dataclass(slots=True, kw_only=True)

@@ -16,7 +16,9 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.protocols import is_key, is_key_or_record, is_data_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers

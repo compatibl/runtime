@@ -16,10 +16,10 @@ from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.stats.binary_experiment import BinaryExperiment
 from cl.runtime.stats.supervised_binary_trial import SupervisedBinaryTrial
 from cl.runtime.stats.trial_key_query import TrialKeyQuery
-from cl.runtime.plots.stack_bar_plot import StackBarPlot
 
 
 @dataclass(slots=True, kw_only=True)

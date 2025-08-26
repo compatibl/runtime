@@ -17,11 +17,11 @@ from collections import Counter
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.plots.stack_bar_plot import StackBarPlot
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.stats.classifier_trial import ClassifierTrial
 from cl.runtime.stats.experiment import Experiment
 from cl.runtime.stats.trial_key_query import TrialKeyQuery
-from cl.runtime.plots.stack_bar_plot import StackBarPlot
-from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)

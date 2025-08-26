@@ -27,4 +27,3 @@ class StubDataclassPolymorphicKey(StubDataclassPolymorphicBaseKey):
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
         return StubDataclassPolymorphicKey
-
