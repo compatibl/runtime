@@ -16,17 +16,21 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.protocols import is_key, is_key_or_record, is_data_key_or_record
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 from stubs.cl.runtime import StubDataclassCompositeKey
 from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_base_key import StubDataclassPolymorphicBaseKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
 _SERIALIZATION_SAMPLES = [
     StubDataclassKey().build(),
     StubDataclassCompositeKey().build(),
     StubDataclassPrimitiveFieldsKey().build(),
+    StubDataclassPolymorphicKey().build(),
 ]
 
 _SERIALIZATION_EXCEPTION_SAMPLES = [
@@ -52,6 +56,31 @@ def test_serialization():  # TODO: Rename to test_delimited
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(serialized)
     RegressionGuard().verify_all()
+
+
+def test_polymorphic():
+    """Test KeySerializer.serialize method with polymorphic key."""
+
+    # Ensure base key is treated as key
+    assert is_key(StubDataclassPolymorphicBaseKey)
+    assert is_key_or_record(StubDataclassPolymorphicBaseKey)
+    assert is_data_key_or_record(StubDataclassPolymorphicBaseKey)
+
+    # Ensure derived key is treated as key
+    assert is_key(StubDataclassPolymorphicKey)
+    assert is_key_or_record(StubDataclassPolymorphicKey)
+    assert is_data_key_or_record(StubDataclassPolymorphicKey)
+
+    # Sample for derived and type hint for base
+    sample = StubDataclassPolymorphicKey().build()
+    base_type = StubDataclassPolymorphicBaseKey
+    base_type_hint = TypeHint.for_class(base_type)
+
+    # Roundtrip serialization
+    serialized = KeySerializers.DELIMITED.serialize(sample, base_type_hint)
+    assert serialized == f"{typename(sample)};{sample.id}"
+    deserialized = KeySerializers.DELIMITED.deserialize(serialized, base_type_hint)
+    assert sample == PytestUtil.approx(deserialized)
 
 
 def test_for_sqlite():

@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.schema.type_kind import TypeKind
 
 
 @dataclass(slots=True, kw_only=True)
-class TypeInfo(BootstrapMixin, ABC):
+class TypeInfo(BootstrapMixin):
     """Information about a type stored in the type cache."""
 
     type_name: str
@@ -30,9 +29,3 @@ class TypeInfo(BootstrapMixin, ABC):
 
     qual_name: str
     """Fully qualified name in module.ClassName format."""
-
-    parent_record_type_names: tuple[str, ...] | None
-    """Tuple of parent (superclass) type names or None if none exist."""
-
-    child_record_type_names: tuple[str, ...] | None
-    """Tuple of child (subclass) type names or None if none exist or not yet populated."""

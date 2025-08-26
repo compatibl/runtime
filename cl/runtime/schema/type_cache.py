@@ -23,9 +23,11 @@ from types import ModuleType
 from typing import Sequence
 from memoization import cached
 from more_itertools import consume
+
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record, is_key_or_record, is_data
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -238,21 +240,35 @@ class TypeCache:
             type_or_name: Type or type name in PascalCase format
             type_kind: Restrict to the specified type kind if provided (optional)
         """
-
-        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
-        cls._ensure_loaded()
-
-        # Convert type to type name if not already a string
-        record_type = cls._get_type_name(type_or_name)
-
-        # Get from cached TypeInfo
-        if (type_info := cls._type_info_by_type_name_dict.get(record_type, None)) is not None:
-            result = type_info.parent_record_type_names
-            if type_kind is not None:
-                result = tuple(x for x in result if cls.get_type_info(x).type_kind == type_kind)
-            return result
+        if isinstance(type_or_name, str):
+            # Get type from name
+            type_ = cls.from_type_name(type_or_name)
+        elif isinstance(type_or_name, type):
+            # Argument is type
+            type_ = type_or_name
         else:
-            raise cls._type_name_not_found_error(record_type)
+            raise RuntimeError(
+                f"Param {type_or_name} has type {typename(type_or_name)} but must be a type or type name."
+            )
+
+        # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
+        if typename(type_) == "StubDataclassPolymorphicKey":
+            pass  # TODO: !!! Remove debug code
+
+        # Filter based on type_kind, use set to eliminate duplicates
+        if type_kind is None:
+            predicate = is_data_key_or_record
+        elif type_kind == TypeKind.DATA:
+            predicate = is_data
+        elif type_kind == TypeKind.KEY:
+            predicate = is_key
+        elif type_kind == TypeKind.RECORD:
+            predicate = is_record
+        else:
+            raise ErrorUtil.enum_value_error(type_kind, TypeKind)
+
+        result = tuple(sorted(set(typename(x) for x in type_.mro() if predicate(x))))
+        return result
 
     @classmethod
     @cached
@@ -266,31 +282,28 @@ class TypeCache:
             type_kind: Restrict to the specified type kind if provided (optional)
         """
 
-        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
-        cls._ensure_loaded()
-
-        # Convert type to type name if not already a string
-        type_name = cls._get_type_name(type_or_name)
-
-        # Get from cached TypeInfo
-        if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
-            child_record_type_names = type_info.child_record_type_names
-            if type_kind is not None:
-                child_record_type_names = tuple(
-                    x for x in child_record_type_names if cls.get_type_info(x).type_kind == type_kind
-                )
-
-            # Sort child types by depth in hierarchy
-            depth_dict = {
-                x: len(TypeCache.get_parent_type_names(x, type_kind=type_kind)) for x in child_record_type_names
-            }
-            sorted_child_record_type_names = tuple(
-                child_record_type_name
-                for child_record_type_name, depth in sorted(depth_dict.items(), key=lambda item: item[1])
-            )
-            return sorted_child_record_type_names
+        if isinstance(type_or_name, str):
+            # Get type from name
+            type_ = cls.from_type_name(type_or_name)
+        elif isinstance(type_or_name, type):
+            # Argument is type
+            type_ = type_or_name
         else:
-            raise cls._type_name_not_found_error(type_name)
+            raise RuntimeError(
+                f"Param {type_or_name} has type {typename(type_or_name)} but must be a type or type name."
+            )
+
+        # This must run after all types are loaded
+        subtypes = [typename(type_)] if is_data_key_or_record(type_) else []  # Include self in subtypes
+        for subclass in type_.__subclasses__():
+            # Exclude self from subtypes
+            if subclass is not type_:
+                # Check that the subclass is in the package list
+                cls._check_type(subclass)
+                # Recurse into the subclass hierarchy, avoid adding duplicates
+                subtypes.extend(x for x in cls.get_child_type_names(subclass) if x not in subtypes)
+        # Eliminate duplicates (they should not be present but just to be sure) and sort the names
+        return tuple(sorted(set(subtypes)))
 
     @classmethod
     @cached
@@ -436,27 +449,6 @@ class TypeCache:
             )
 
     @classmethod
-    def _build_child_type_names(cls, class_: type) -> tuple[str, ...]:
-        """Return a tuple subtypes (inclusive of self) that match the predicate, sorted by type name."""
-        # This must run after all types are loaded
-        subtypes = [typename(class_)] if is_data_key_or_record(class_) else []  # Include self in subtypes
-        for subclass in class_.__subclasses__():
-            # Exclude self from subtypes
-            if subclass is not class_:
-                # Check that the subclass is in the package list
-                cls._check_type(subclass)
-                # Recurse into the subclass hierarchy, avoid adding duplicates
-                subtypes.extend(x for x in cls._build_child_type_names(subclass) if x not in subtypes)
-        # Eliminate duplicates (they should not be present but just to be sure) and sort the names
-        return tuple(sorted(set(subtypes)))
-
-    @classmethod
-    def _build_parent_type_names(cls, class_: type) -> tuple[str, ...]:
-        """Return a tuple superclasses (inclusive of self) that match the predicate, not cached."""
-        # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
-        return tuple(sorted(set(typename(x) for x in class_.mro() if is_record(x))))
-
-    @classmethod
     def _add_class(cls, class_: type, *, subtype: str | None = None) -> None:
         """Add the specified class to the qual_name and type_name dicts without overwriting the existing values."""
 
@@ -486,27 +478,11 @@ class TypeCache:
         # Get fully qualified name
         qual_name = qualname(class_)
 
-        # Get parent and child class names for data, keys or records
-        if is_data_key_or_record(class_):
-            # Build parent and child name lists
-            parent_record_type_names = cls._build_parent_type_names(class_)
-            child_record_type_names = cls._build_child_type_names(class_)
-
-            # Use None if empty
-            parent_record_type_names = parent_record_type_names if parent_record_type_names else None
-            child_record_type_names = child_record_type_names if child_record_type_names else None
-        else:
-            # Do not generate if not data
-            parent_record_type_names = None
-            child_record_type_names = None
-
         # Get type info without subclass names (which will be done on second pass after all types are loaded)
         type_info = TypeInfo(
             type_name=type_name,
             type_kind=type_kind,
             qual_name=qual_name,
-            parent_record_type_names=parent_record_type_names,
-            child_record_type_names=child_record_type_names,
         )
 
         # Populate the dictionary
@@ -581,12 +557,6 @@ class TypeCache:
                     type_name=type_name,
                     type_kind=EnumUtil.from_str(TypeKind, type_kind),
                     qual_name=qual_name,
-                    parent_record_type_names=(
-                        tuple(parent_record_type_names.split(";")) if parent_record_type_names else None
-                    ),
-                    child_record_type_names=(
-                        tuple(child_record_type_names.split(";")) if child_record_type_names else None
-                    ),
                 )
 
                 # Add to the type info dictionary

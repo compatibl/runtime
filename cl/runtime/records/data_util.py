@@ -120,7 +120,7 @@ class DataUtil(BuilderUtil):
                     class_init(data)
 
             # Type spec for the data
-            data_type_spec = TypeSchema.for_class(data)
+            data_type_spec = TypeSchema.for_class(type(data))
             data_type_name = data_type_spec.type_name
 
             # Perform check against the schema if provided irrespective of the type inclusion setting

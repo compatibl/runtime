@@ -81,8 +81,6 @@ class TypeSchema:
             # Already created, return from spec dictionary
             return result
         else:
-            # Get class for the specified type name
-            class_ = TypeCache.from_type_name(type_name)
 
             # TODO: Use mapping records to avoid hardcoding the list of data frameworks
             # Get class for the type spec

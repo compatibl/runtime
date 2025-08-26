@@ -30,10 +30,13 @@ from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.serializer import Serializer
@@ -55,47 +58,8 @@ class KeySerializer(Serializer):
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize key into a delimited string or a flattened sequence of primitive types."""
 
-        # Get the class of data, which may be NoneType
-        data_class_name = typename(data)
-
-        # Get parameters from the type chain, considering the possibility that it may be None
-        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
-        is_optional = type_hint.optional if type_hint is not None else None
-        remaining_chain = type_hint.remaining if type_hint is not None else None
-
-        # Ensure data type is the same as schema type if type chain is specified
-        if schema_type_name is not None and data_class_name != schema_type_name:
-            # Confirm that schema type is parent of data type
-            if schema_type_name not in TypeCache.get_parent_type_names(data_class_name):
-                raise RuntimeError(
-                    f"Key type {data_class_name} is not a subclass of the field type {schema_type_name}.\n"
-                )
-            # Field type is parent of the key type rather than the key type itself
-            is_parent = True
-        else:
-            # Key type and field type are the same
-            is_parent = False
-
-        # Ensure that type hint is not a container
-        if remaining_chain:
-            raise RuntimeError(
-                f"Cannot serialize type {data_class_name} because it is\n"
-                f"incompatible with container type hint {type_hint.to_str()}."
-            )
-
-        if data is None:
-            if is_optional:
-                return None
-            else:
-                raise RuntimeError(f"Key is None while its type hint {type_hint.to_str()} is not optional.")
-        elif is_key(data):
-            # Perform checks and flatten into a linear sequence
-            sequence = self._to_tuple(data)
-        else:
-            raise RuntimeError(
-                f"{typename(self)} cannot serialize {type(data)}.\n"
-                f"The input must be a key object, key tuple or None."
-            )
+        # Perform checks and flatten serialized embedded keys into a linear sequence
+        sequence = self._to_tuple(data, type_hint, is_outer=True)
 
         # Check that all tokens are primitive types
         invalid_tokens = [x for x in sequence if not is_primitive(x) and not is_enum(x)]
@@ -119,12 +83,15 @@ class KeySerializer(Serializer):
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize key from a delimited string or a flattened sequence of primitive types."""
 
+        # For keys, type hint is required
+        TypeCheck.guard_not_none(type_hint)
+
         # Get schema class from the type hint
         schema_class = type_hint._schema_class
 
         # Convert to key if a record
         if is_record(schema_class):
-            key_type = schema_class.get_key_type()
+            key_type = schema_class.get_key_type()  # TODO: Why should we accept a record type here?
         elif is_key(schema_class):
             key_type = schema_class
         else:
@@ -159,6 +126,33 @@ class KeySerializer(Serializer):
 
         # Perform deserialization
         key_type_hint = TypeHint.for_class(key_type)
+
+        # Check if this is a genric type that requires prefix
+        num_data_tokens = len(tokens)
+        num_type_tokens = len(key_type.get_field_names())
+        if num_data_tokens > num_type_tokens:
+            # Schema type is base of key type, first token is type in KeyTypeName;KeyField1;KeyField2 format
+            key_type_name = tokens.popleft()
+            key_type = TypeCache.from_type_name(key_type_name)
+            num_data_tokens = len(tokens)
+            num_type_tokens = len(key_type.get_field_names())
+            if num_data_tokens != num_type_tokens:
+                tokens_str = ";".join(tokens)
+                key_str = f"{key_type_name};{tokens_str}"
+                raise RuntimeError(
+                    f"Key type {key_type_name} requires {num_type_tokens} after the type token\n"
+                    f"in KeyTypeName;KeyField1;KeyField2 format but only {num_data_tokens} were provided.\n"
+                    f"Key: {key_str}"
+                )
+        elif num_data_tokens < num_type_tokens:
+            # Not enough tokens, error message
+            key_str = ";".join(tokens)
+            raise RuntimeError(
+                f"Key type {typename(key_type)} requires {num_type_tokens} tokens\n"
+                f"in KeyField1;KeyField2;... format but {num_data_tokens} were provided.\n"
+                f"Key: {key_str}"
+            )
+
         result = self._from_sequence(tokens, key_type, key_type_hint, key_type)
 
         # Check if any tokens are remaining
@@ -168,23 +162,64 @@ class KeySerializer(Serializer):
             )
         return result
 
-    def _to_tuple(self, data: KeyProtocol) -> tuple[TPrimitive, ...]:
+    def _to_tuple(self, data: KeyProtocol, type_hint: TypeHint, *, is_outer: bool) -> tuple[TPrimitive, ...] | None:
         """Serialize key into a flattened sequence of primitive types."""
 
-        # Check that the argument is a key
+        if not is_outer:
+            # For inner key fields which also have key type, type hint is required
+            TypeCheck.guard_not_none(type_hint)
+
+        # Get the class of data, which may be NoneType
+        data_type_name = typename(data)
+
+        # Get parameters from the type chain, considering the possibility that it may be None
+        schema_type_name = type_hint.schema_type_name if type_hint is not None else data_type_name
+        is_optional = type_hint.optional if type_hint is not None else None
+        remaining_chain = type_hint.remaining if type_hint is not None else None
+
+        # Ensure data type is the same as schema type if type chain is specified
+        if schema_type_name is not None and data_type_name != schema_type_name:
+            # Confirm that schema type is parent of data type
+            parent_type_names = TypeCache.get_parent_type_names(data_type_name, type_kind=TypeKind.KEY)
+            if not parent_type_names or schema_type_name not in parent_type_names:
+                raise RuntimeError(
+                    f"Key type {data_type_name} is not a subclass of the field type {schema_type_name}.\n"
+                )
+            # Field type is parent of the key type rather than the key type itself, include type prefix in key
+            key_type_prefix = data_type_name
+        else:
+            # Key type and field type are the same, do not include type prefix in key
+            key_type_prefix = None
+
+        # Ensure that type hint is not a container
+        if remaining_chain:
+            raise RuntimeError(
+                f"Cannot serialize type {data_type_name} because it is\n"
+                f"incompatible with container type hint {type_hint.to_str()}."
+            )
+
         if data is None:
-            # This message will not be displayed for outer key because is_key is checked first
-            raise RuntimeError("An inner key field inside a composite key cannot be None.")
+            if is_optional:
+                if is_outer:
+                    return None
+                else:
+                    # This message will not be displayed for the entire key if type hint allows optional
+                    raise RuntimeError("An inner key field inside a composite key cannot be None.")
+            else:
+                raise RuntimeError(f"Key is None while its type hint {type_hint.to_str()} is not optional.")
         elif is_key(data):
+
             # Check that the argument is frozen
             data.check_frozen()
+
             # Get type spec
             type_spec = TypeSchema.for_class(type(data))
             if not isinstance(type_spec, DataSpec):
                 raise RuntimeError(
-                    f"Key serializer cannot serialize '{typename(data)}'\nbecause it is not a slotted class."
+                    f"Key serializer cannot serialize '{typename(data)}' because it is not a data, key or record class."
                 )
             field_dict = type_spec.get_field_dict()
+
             # Serialize slot values in the order of declaration packing primitive types into size-one lists
             packed_result = tuple(
                 (
@@ -199,20 +234,28 @@ class KeySerializer(Serializer):
                         self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
                     ]
                     if isinstance(v, Enum)
-                    else self._to_tuple(v)
+                    else self._to_tuple(v, field_spec.type_hint, is_outer=False)
                 )
                 for k, field_spec in field_dict.items()
             )
-        else:
-            # This message will not be displayed for outer key because is_key is checked first
-            raise RuntimeError(
-                f"A field inside a composite key has type {typename(data)}\n"
-                f"which is not a primitive type, enum, or another key."
-            )
 
-        # Flatten by unpacking the inner tuples
-        result = tuple(token for item in packed_result for token in item)
-        return result
+            # Flatten by unpacking the inner tuples
+            result = tuple(token for item in packed_result for token in item)
+
+            # Add key type prefix if schema type is not the same as data type
+            if key_type_prefix:
+                result = (key_type_prefix,) + result
+
+            return result
+        else:
+            if is_outer:
+                raise RuntimeError(f"{typename(self)} cannot serialize {type(data)} because it is not a key.")
+            else:
+                # This message will not be displayed for outer key
+                raise RuntimeError(
+                    f"A field inside a composite key has type {typename(data)}\n"
+                    f"which is not a primitive type, enum, or another key."
+                )
 
     @classmethod
     def _checked_value(cls, value: TObj) -> TObj:
@@ -242,15 +285,13 @@ class KeySerializer(Serializer):
             token = tokens.popleft()
             return self.enum_serializer.deserialize(token, field_type_hint)
         elif is_key(field_class):
-            # Key type, extract as many tokens as slots
             type_spec = TypeSchema.for_class(field_class)
             field_dict = type_spec.get_field_dict()
             key_tokens = tuple(
                 self._from_sequence(tokens, field_spec.get_class(), field_spec.type_hint, root_class)
                 for field_spec in field_dict.values()
             )
-            result_type = type_spec.get_class()
-            result = result_type(*key_tokens)
+            result = field_class(*key_tokens)
             return result.build()
         else:
             raise RuntimeError(
