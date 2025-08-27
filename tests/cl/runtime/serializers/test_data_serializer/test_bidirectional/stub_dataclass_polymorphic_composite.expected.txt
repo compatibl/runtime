@@ -1,0 +1,12 @@
+{
+  "_type": "StubDataclassPolymorphicComposite",
+  "base_key_field": {
+    "_type": "StubDataclassPolymorphicKey",
+    "id": "abc"
+  },
+  "root_key_field": {
+    "_type": "StubDataclassPolymorphicKey",
+    "id": "abc"
+  },
+  "record_field": "record_field"
+}

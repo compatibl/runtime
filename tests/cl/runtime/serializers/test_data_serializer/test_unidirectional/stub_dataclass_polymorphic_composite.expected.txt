@@ -1,0 +1,9 @@
+{
+  "base_key_field": {
+    "id": "abc"
+  },
+  "root_key_field": {
+    "id": "abc"
+  },
+  "record_field": "record_field"
+}
