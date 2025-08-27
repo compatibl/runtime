@@ -19,7 +19,7 @@ from typing import Any
 from typing import Deque
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, is_abstract
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import TPrimitive
@@ -181,6 +181,12 @@ class KeySerializer(Serializer):
             if not parent_type_names or schema_type_name not in parent_type_names:
                 raise RuntimeError(
                     f"Key type {data_type_name} is not a subclass of the field type {schema_type_name}.\n"
+                )
+            # Confirm that schema type is abstract
+            schema_type = TypeCache.from_type_name(schema_type_name)
+            if not is_abstract(schema_type):
+                raise RuntimeError(
+                    f"Key field is declared as {schema_type_name} which neither a key type nor abstract.\n"
                 )
             # Field type is parent of the key type rather than the key type itself, include type prefix in key
             key_type_prefix = data_type_name
