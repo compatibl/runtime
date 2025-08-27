@@ -19,14 +19,14 @@ from typing import Any
 from typing import Deque
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, is_abstract
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
@@ -91,8 +91,7 @@ class KeySerializer(Serializer):
             key_type = schema_type
         else:
             raise RuntimeError(
-                f"Type {typename(schema_type)} passed to {typename(self)}\n"
-                f"is not a key type, cannot serialize."
+                f"Type {typename(schema_type)} passed to {typename(self)}\n" f"is not a key type, cannot serialize."
             )
 
         # Convert argument to a sequence based on the key_format field
@@ -262,9 +261,7 @@ class KeySerializer(Serializer):
                         f"Key type {data_type_name} is not a subclass of the field type {typename(schema_type)}.\n"
                     )
                 elif not is_key(data_type):
-                    raise RuntimeError(
-                        f"Key value type {data_type} is not a key type.\n"
-                    )
+                    raise RuntimeError(f"Key value type {data_type} is not a key type.\n")
             else:
                 # Field type and data type are the same, no prefix in key
                 data_type = schema_type

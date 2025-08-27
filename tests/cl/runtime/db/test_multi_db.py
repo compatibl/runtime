@@ -35,8 +35,9 @@ from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased import StubDataclassAliased
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composite import \
-    StubDataclassPolymorphicComposite
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composite import (
+    StubDataclassPolymorphicComposite,
+)
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
     StubDataclassPrimitiveFieldsQuery,
