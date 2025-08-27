@@ -86,7 +86,7 @@ def test_polymorphic():
     deserialized = KeySerializers.DELIMITED.deserialize(serialized, base_type_hint)
     assert sample == PytestUtil.approx(deserialized)
 
-    return  # TODO: Restore after composite key is supported
+    # return  # TODO: Restore after composite key is supported
     
     # Sample for derived and type hint for base
     composite_key = StubDataclassPolymorphicCompositeKey(
@@ -100,7 +100,7 @@ def test_polymorphic():
     inner_type = typename(StubDataclassPolymorphicKey)
     assert serialized == (f"{inner_type};{composite_key.base_key_field.id};"
                           f"{inner_type};{composite_key.root_key_field.id}")  # noqa
-    deserialized = KeySerializers.DELIMITED.deserialize(serialized, base_type_hint)
+    deserialized = KeySerializers.DELIMITED.deserialize(serialized, composite_key_hint)
     assert composite_key == PytestUtil.approx(deserialized)
 
 

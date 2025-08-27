@@ -121,39 +121,12 @@ class KeySerializer(Serializer):
 
         # Perform deserialization
         key_type_hint = TypeHint.for_class(key_type)
-
-        # Check if this is a genric type that requires prefix
-        num_data_tokens = len(tokens)
-        num_type_tokens = len(key_type.get_field_names())
-        if num_data_tokens > num_type_tokens:
-            # Schema type is base of key type, first token is type in KeyTypeName;KeyField1;KeyField2 format
-            key_type_name = tokens.popleft()
-            key_type = TypeCache.from_type_name(key_type_name)
-            num_data_tokens = len(tokens)
-            num_type_tokens = len(key_type.get_field_names())
-            if num_data_tokens != num_type_tokens:
-                tokens_str = ";".join(tokens)
-                key_str = f"{key_type_name};{tokens_str}"
-                raise RuntimeError(
-                    f"Key type {key_type_name} requires {num_type_tokens} after the type token\n"
-                    f"in KeyTypeName;KeyField1;KeyField2 format but only {num_data_tokens} were provided.\n"
-                    f"Key: {key_str}"
-                )
-        elif num_data_tokens < num_type_tokens:
-            # Not enough tokens, error message
-            key_str = ";".join(tokens)
-            raise RuntimeError(
-                f"Key type {typename(key_type)} requires {num_type_tokens} tokens\n"
-                f"in KeyField1;KeyField2;... format but {num_data_tokens} were provided.\n"
-                f"Key: {key_str}"
-            )
-
         result = self._from_sequence(tokens, key_type, key_type_hint, key_type)
 
         # Check if any tokens are remaining
         if (remaining_length := len(tokens)) > 0:
             raise RuntimeError(
-                f"Serialized sequence size for key {key_type.__name__} is long by {remaining_length} tokens."
+                f"Serialized key {data} for key type {typename(key_type)} has two {remaining_length} extra tokens."
             )
         return result
 
@@ -259,6 +232,57 @@ class KeySerializer(Serializer):
                     f"which is not a primitive type, enum, or another key."
                 )
 
+    def _from_sequence(
+        self,
+        tokens: Deque[TPrimitive],
+        schema_type: type,
+        schema_type_hint: TypeHint,
+        root_class: type,
+    ) -> Any:
+        """Deserialize key from a flattened sequence of primitive types."""
+        if len(tokens) == 0:
+            raise RuntimeError(f"Insufficient number of key tokens for key {root_class.__name__}.")
+        elif is_primitive(schema_type):
+            # Primitive type, extract one token
+            token = tokens.popleft()
+            return self.primitive_serializer.deserialize(token, schema_type_hint)
+        elif is_enum(schema_type):
+            # Enum type, extract one token
+            token = tokens.popleft()
+            return self.enum_serializer.deserialize(token, schema_type_hint)
+        elif is_key(schema_type):
+
+            # Get data type if key field is abstract
+            if is_abstract(schema_type):
+                # Abstract key class, the first token is data type
+                data_type_name = tokens.popleft()
+                data_type = TypeCache.from_type_name(data_type_name)
+                if not issubclass(data_type, schema_type):
+                    raise RuntimeError(
+                        f"Key type {data_type_name} is not a subclass of the field type {typename(schema_type)}.\n"
+                    )
+                elif not is_key(data_type):
+                    raise RuntimeError(
+                        f"Key value type {data_type} is not a key type.\n"
+                    )
+            else:
+                # Field type and data type are the same, no prefix in key
+                data_type = schema_type
+
+            type_spec = TypeSchema.for_class(data_type)
+            field_dict = type_spec.get_field_dict()
+            key_tokens = tuple(
+                self._from_sequence(tokens, field_spec.get_class(), field_spec.type_hint, root_class)
+                for field_spec in field_dict.values()
+            )
+            result = data_type(*key_tokens)
+            return result.build()
+        else:
+            raise RuntimeError(
+                f"Field type {typename(schema_type)} inside key type {typename(root_class)} \n"
+                f"is not a primitive type, enum, or another key."
+            )
+
     @classmethod
     def _checked_value(cls, value: TObj) -> TObj:
         """Return checked primitive value or enum."""
@@ -267,36 +291,3 @@ class KeySerializer(Serializer):
         if (class_name := value.__class__.__name__) not in PRIMITIVE_CLASS_NAMES and not isinstance(value, Enum):
             raise RuntimeError(f"Type {class_name} inside key is not a primitive type, enum, or another key.")
         return value
-
-    def _from_sequence(
-        self,
-        tokens: Deque[TPrimitive],
-        field_class: type,
-        field_type_hint: TypeHint,
-        root_class: type,
-    ) -> Any:
-        """Deserialize key from a flattened sequence of primitive types."""
-        if len(tokens) == 0:
-            raise RuntimeError(f"Insufficient number of key tokens for key {root_class.__name__}.")
-        elif is_primitive(field_class):
-            # Primitive type, extract one token
-            token = tokens.popleft()
-            return self.primitive_serializer.deserialize(token, field_type_hint)
-        elif is_enum(field_class):
-            # Enum type, extract one token
-            token = tokens.popleft()
-            return self.enum_serializer.deserialize(token, field_type_hint)
-        elif is_key(field_class):
-            type_spec = TypeSchema.for_class(field_class)
-            field_dict = type_spec.get_field_dict()
-            key_tokens = tuple(
-                self._from_sequence(tokens, field_spec.get_class(), field_spec.type_hint, root_class)
-                for field_spec in field_dict.values()
-            )
-            result = field_class(*key_tokens)
-            return result.build()
-        else:
-            raise RuntimeError(
-                f"Field type {field_class.__name__} inside key type {root_class.__name__} \n"
-                f"is not a primitive type, enum, or another key."
-            )
