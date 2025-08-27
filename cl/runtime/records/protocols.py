@@ -266,7 +266,7 @@ def is_mixin(instance_or_type: Any) -> bool:
     return type_.__name__.endswith("Mixin")
 
 
-def is_builder(instance_or_type: Any) -> TypeGuard[TData]:
+def is_builder(instance_or_type: Any) -> TypeGuard[type[BuilderProtocol]]:
     """
     True if the argument has 'build' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -275,7 +275,7 @@ def is_builder(instance_or_type: Any) -> TypeGuard[TData]:
     return hasattr(type_, "build") and not type_.__name__.startswith("_")
 
 
-def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[TData]:
+def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[type[DataProtocol]]:
     """
     True if the argument has 'get_field_names' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -284,7 +284,7 @@ def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[TData]:
     return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
 
 
-def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
+def is_key_or_record(instance_or_type: Any) -> TypeGuard[type[KeyProtocol]]:
     """
     True if the argument has 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -293,7 +293,7 @@ def is_key_or_record(instance_or_type: Any) -> TypeGuard[TKey]:
     return hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
 
 
-def is_data(instance_or_type: Any) -> TypeGuard[TKey]:
+def is_data(instance_or_type: Any) -> TypeGuard[type[DataProtocol]]:
     """
     True if the argument has 'get_field_names' method but not 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -304,7 +304,7 @@ def is_data(instance_or_type: Any) -> TypeGuard[TKey]:
     )
 
 
-def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
+def is_key(instance_or_type: Any) -> TypeGuard[type[KeyProtocol]]:
     """
     True if the argument has 'get_key_type' method but not 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -313,7 +313,7 @@ def is_key(instance_or_type: Any) -> TypeGuard[TKey]:
     return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not type_.__name__.startswith("_")
 
 
-def is_record(instance_or_type: Any) -> TypeGuard[TRecord]:
+def is_record(instance_or_type: Any) -> TypeGuard[type[RecordProtocol]]:
     """
     Return True if the argument has 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
