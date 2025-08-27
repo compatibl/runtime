@@ -84,17 +84,15 @@ class KeySerializer(Serializer):
         TypeCheck.guard_not_none(type_hint)
 
         # Get schema class from the type hint
-        schema_class = type_hint._schema_class
+        schema_type = type_hint._schema_class
 
         # Convert to key if a record
-        if is_record(schema_class):
-            key_type = schema_class.get_key_type()  # TODO: Why should we accept a record type here?
-        elif is_key(schema_class):
-            key_type = schema_class
+        if is_key(schema_type):
+            key_type = schema_type
         else:
             raise RuntimeError(
-                f"Type {typename(schema_class)} passed to {typename(self)}\n"
-                f"is not a key or record type, cannot serialize."
+                f"Type {typename(schema_type)} passed to {typename(self)}\n"
+                f"is not a key type, cannot serialize."
             )
 
         # Convert argument to a sequence based on the key_format field
