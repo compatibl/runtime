@@ -56,7 +56,7 @@ class KeySerializer(Serializer):
         """Serialize key into a delimited string or a flattened sequence of primitive types."""
 
         # Perform checks and flatten serialized embedded keys into a linear sequence
-        sequence = self._to_tuple(data, type_hint, is_outer=True)
+        sequence = self._to_sequence(data, type_hint, is_outer=True)
 
         # Check that all tokens are primitive types
         invalid_tokens = [x for x in sequence if not is_primitive(x) and not is_enum(x)]
@@ -159,7 +159,7 @@ class KeySerializer(Serializer):
             )
         return result
 
-    def _to_tuple(self, data: KeyProtocol, type_hint: TypeHint, *, is_outer: bool) -> tuple[TPrimitive, ...] | None:
+    def _to_sequence(self, data: KeyProtocol, type_hint: TypeHint, *, is_outer: bool) -> tuple[TPrimitive, ...] | None:
         """Serialize key into a flattened sequence of primitive types."""
 
         if not is_outer:
@@ -237,7 +237,7 @@ class KeySerializer(Serializer):
                             self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
                         ]
                         if isinstance(v, Enum)
-                        else self._to_tuple(v, field_spec.type_hint, is_outer=False)
+                        else self._to_sequence(v, field_spec.type_hint, is_outer=False)
                     )
                 )
                 for k, field_spec in field_dict.items()
