@@ -32,10 +32,7 @@ class Env(EnvKey, RecordMixin):
     env_kind: EnvKind = required()
     """Determines the default settings for multiuser access and data retention."""
 
-    name: str | None = None
-    """Identifies the application or test."""
-
-    user: str = required()
+    env_user: str = required()
     """Identifies the application or test user."""
 
     def get_key(self) -> EnvKey:
@@ -48,8 +45,7 @@ class Env(EnvKey, RecordMixin):
             # Default to the active environment if present, allow to override
             self.env_id = self.env_id if self.env_id is not None else active.env_id
             self.env_kind = self.env_kind if self.env_kind is not None else active.env_kind
-            self.name = self.name if self.name is not None else active.name
-            self.user = self.user if self.user is not None else active.user
+            self.env_user = self.env_user if self.env_user is not None else active.env_user
         else:
             # Use test root process detection only if env_kind is None to prevent override in worker processes
             if QaUtil.is_test_root_process():
@@ -63,15 +59,13 @@ class Env(EnvKey, RecordMixin):
                 self.env_id = self.env_id if self.env_id is not None else QaUtil.get_test_name_from_call_stack()
                 # Use settings for other fields if not yet set
                 settings = EnvSettings.instance()
-                # self.name = self.name if self.name is not None else settings.name
-                self.user = self.user if self.user is not None else settings.env_user
+                self.env_user = self.env_user if self.env_user is not None else settings.env_user
             else:
                 # Otherwise use settings for all fields that are not yet set
                 settings = EnvSettings.instance()
                 self.env_id = self.env_id if self.env_id is not None else settings.env_id
                 self.env_kind = self.env_kind if self.env_kind is not None else settings.env_kind
-                # self.name = self.name if self.name is not None else settings.name
-                self.user = self.user if self.user is not None else settings.env_user
+                self.env_user = self.env_user if self.env_user is not None else settings.env_user
 
         # Error if env_kind is not TEST but we are inside a root test process
         if self.env_kind != EnvKind.TEST and QaUtil.is_test_root_process():
@@ -105,7 +99,7 @@ class Env(EnvKey, RecordMixin):
     @classmethod
     def get_user(cls) -> str:
         """Identifies the application or test user."""
-        user = context.user if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_user
+        user = context.env_user if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_user
         if user is not None:
             return user
         else:
