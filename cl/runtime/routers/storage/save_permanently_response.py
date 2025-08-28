@@ -94,7 +94,7 @@ class SavePermanentlyResponse(BaseModel):
 
         for record_type, records in get_type_to_records_map(request).items():
             filename = f"{typename(record_type)}.{cls._get_extension()}"
-            FileUtil.check_valid_filename(filename)
+            FileUtil.guard_valid_filename(filename)
             file_path = cls._get_path_to_save_permanently_folder() / filename
             file_path.parent.mkdir(parents=True, exist_ok=True)
 

@@ -14,17 +14,18 @@
 
 import os
 import re
+from typing import TypeGuard
 
-invalid_filename_symbols = r'/\\<>:"|?*'
+_INVALID_FILENAME_SYMBOLS = r'/\\<>:"|?*\x00\n'
 """Invalid filename symbols."""
 
-invalid_filename_regex = re.compile(f"[{invalid_filename_symbols}]")
+_INVALID_FILENAME_RE = re.compile(f"[{_INVALID_FILENAME_SYMBOLS}]")
 """Precompiled regex to check for invalid filename symbols."""
 
-invalid_path_symbols = r'<>:"|?*'
+_INVALID_PATH_SYMBOLS = r'<>:"|?*\x00\n'
 """Precompiled regex to check for invalid filename symbols."""
 
-invalid_path_regex = re.compile(f"[{invalid_path_symbols}]")
+_INVALID_PATH_RE = re.compile(f"[{_INVALID_PATH_SYMBOLS}]")
 """Precompiled regex to check for invalid filename symbols."""
 
 
@@ -32,22 +33,35 @@ class FileUtil:
     """Utilities for working with files."""
 
     @classmethod
-    def check_valid_filename(cls, filename: str) -> None:
-        """Error if invalid symbols are present in filename (do not use for path with directory separators)."""
-        if invalid_filename_regex.search(filename):
+    def guard_valid_filename(cls, filename: str, *, raise_on_fail: bool = True) -> TypeGuard[str]:
+        """Check if invalid symbols are present in filename (do not use for path with directory separators)."""
+        if not _INVALID_FILENAME_RE.search(filename):
+            return True
+        elif raise_on_fail:
+            # Raise on fail
             raise RuntimeError(
                 f"Filename '{filename}' is not valid because it contains special characters "
-                f"from this list: '{invalid_filename_symbols}'"
+                f"from this list: '{_INVALID_FILENAME_SYMBOLS}'"
             )
+        else:
+            # Return False on fail
+            return False
 
     @classmethod
-    def check_valid_path(cls, path: str) -> None:
-        """Error if invalid symbols are present in directory or file path (directory separators are allowed)."""
-        if invalid_path_regex.search(path):
+    def guard_valid_path(cls, path: str, *, raise_on_fail: bool = True) -> TypeGuard[str]:
+        """Check if invalid symbols are present in directory or file path (directory separators are allowed)."""
+        if not _INVALID_PATH_RE.search(path):
+            return True
+        elif raise_on_fail:
+            # Raise on fail
             raise RuntimeError(
                 f"Directory or file path '{path}' is not valid because it contains special characters "
-                f"from this list: '{invalid_path_symbols}'"
+                f"from this list: '{_INVALID_PATH_SYMBOLS}'"
             )
+
+        else:
+            # Return False on fail
+            return False
 
     @classmethod
     def has_extension(cls, path: str, ext: str | None) -> bool:

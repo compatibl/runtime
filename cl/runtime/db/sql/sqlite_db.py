@@ -430,7 +430,7 @@ class SqliteDb(Db):
         """Get database file path from db_id, applying the appropriate formatting conventions."""
 
         # Check that db_id is a valid filename
-        FileUtil.check_valid_filename(self.db_id)
+        FileUtil.guard_valid_filename(self.db_id)
 
         # Get dir for database
         db_dir = DbSettings.get_db_dir()

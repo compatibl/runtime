@@ -18,26 +18,26 @@ from cl.runtime.file.file_util import FileUtil
 
 def test_check_valid_filename():
     """Test for 'check_valid_filename' method."""
-    FileUtil.check_valid_filename("abc")  # Allow filenames without extension
-    FileUtil.check_valid_filename("abc.xyz")
+    FileUtil.guard_valid_filename("abc")  # Allow filenames without extension
+    FileUtil.guard_valid_filename("abc.xyz")
     with pytest.raises(RuntimeError):
-        FileUtil.check_valid_filename("abc|xyz")
+        FileUtil.guard_valid_filename("abc|xyz")
     with pytest.raises(RuntimeError):
-        FileUtil.check_valid_filename("abc\\xyz")
+        FileUtil.guard_valid_filename("abc\\xyz")
     with pytest.raises(RuntimeError):
-        FileUtil.check_valid_filename("abc/xyz")
+        FileUtil.guard_valid_filename("abc/xyz")
 
 
 def test_check_valid_path():
     """Test for 'check_valid_path' method."""
-    FileUtil.check_valid_path("abc")  # Allow filenames without extension
-    FileUtil.check_valid_path("abc.xyz")  # Allow filenames with no path
-    FileUtil.check_valid_path("mydir\\mydir\\abc.xyz")
-    FileUtil.check_valid_path("mydir/mydir/abc.xyz")
+    FileUtil.guard_valid_path("abc")  # Allow filenames without extension
+    FileUtil.guard_valid_path("abc.xyz")  # Allow filenames with no path
+    FileUtil.guard_valid_path("mydir\\mydir\\abc.xyz")
+    FileUtil.guard_valid_path("mydir/mydir/abc.xyz")
     with pytest.raises(RuntimeError):
-        FileUtil.check_valid_filename("abc|xyz")
+        FileUtil.guard_valid_filename("abc|xyz")
     with pytest.raises(RuntimeError):
-        FileUtil.check_valid_filename("mydir\\mydir\\abc[xyz")
+        FileUtil.guard_valid_filename("mydir\\mydir\\abc[xyz")
 
 
 def test_has_extension():
