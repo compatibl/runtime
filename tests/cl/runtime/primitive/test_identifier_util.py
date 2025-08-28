@@ -69,6 +69,7 @@ def test_guard_valid_directory():
     # Test with raise_on_fail = False
     assert not IdentifierUtil.guard_valid_identifier("abc|xyz", allow_directory_separators=True, raise_on_fail=False)
 
+
 def test_guard_valid_format():
     """Test for 'guard_valid_identifier' method."""
 

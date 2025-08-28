@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from dataclasses import dataclass
 from getpass import getuser
 from typing_extensions import final
@@ -20,7 +19,6 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.identifier_util import IdentifierUtil
-from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.typename import typename
@@ -108,7 +106,8 @@ class EnvSettings(Settings):
             else:
                 raise RuntimeError(
                     f"Required field 'env_kind' is not set and cannot be determined from\n"
-                    f"env_id prefix for env_id={self.env_id}")
+                    f"env_id prefix for env_id={self.env_id}"
+                )
 
         if self.env_user is None:
             # Set to the username reported by OS if not specified via Dynaconf
@@ -142,7 +141,7 @@ class EnvSettings(Settings):
             # Perform variable substitution
             env_dir_vars = {
                 "project_root": ProjectSettings.instance().get_project_root(),
-                "project_resources": ProjectSettings.instance().get_resources_root(), # TODO: Update after ProjectSettings changes
+                "project_resources": ProjectSettings.instance().get_resources_root(),  # TODO: Update after ProjectSettings changes
                 "env_id": self.env_id,
                 "env_kind": CaseUtil.upper_to_snake_case(self.env_kind.name),
                 "env_user": self.env_user,

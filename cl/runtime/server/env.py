@@ -12,12 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from dataclasses import dataclass
-from getpass import getuser
-
 from cl.runtime.contexts.context_manager import active_or_none
-from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
