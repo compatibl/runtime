@@ -33,10 +33,10 @@ class EnvSettings(Settings):
     """Settings for the naming and location of the app data."""
 
     env_id: str = required()
-    """Unique environment identifier."""
+    """Unique environment identifier (does not apply inside pytest)."""
 
     env_kind: EnvKind = required()
-    """Determines the default settings for multiuser access and data retention."""
+    """Determines the default settings for multiuser access and data retention  (does not apply inside pytest)."""
 
     env_tenant: str = required()
     """Unique tenant identifier, tenants are isolated when sharing the same DB."""
@@ -53,10 +53,8 @@ class EnvSettings(Settings):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-        # Convert to tuple
-        self.env_packages = SettingsUtil.to_str_tuple(self.env_packages)
-
         if self.env_kind is not None:
+            # Field env_kind is specified in settings.yaml
             if isinstance(self.env_kind, str):
                 # First, convert from snake_case to PascalCase (default for enums)
                 env_kind_pascal_case = CaseUtil.snake_to_pascal_case(self.env_kind)
@@ -72,17 +70,29 @@ class EnvSettings(Settings):
                     f"is not an EnvKind enum or a string."
                 )
         else:
-            raise RuntimeError(f"Required field 'env_kind' is None for env_id={self.env_id}")
+            # Field env_kind is not specified, use env_id prefix
+            if self.env_id.startswith("prod_"):
+                self.env_kind = EnvKind.PROD
+            elif self.env_id.startswith("staging_"):
+                self.env_kind = EnvKind.STAGING
+            elif self.env_id.startswith("dev_"):
+                self.env_kind = EnvKind.DEV
+            elif self.env_id.startswith("temp_"):
+                self.env_kind = EnvKind.TEMP
+            elif self.env_id.startswith("test_"):
+                self.env_kind = EnvKind.TEST
+            else:
+                raise RuntimeError(
+                    f"Required field 'env_kind' is not set and cannot be determined from\n"
+                    f"env_id prefix for env_id={self.env_id}")
 
         if self.env_user is None:
-            # Set default username if not specified in settings.yaml
-            if (test_name_from_call_stack := QaUtil.get_test_name_from_call_stack_or_none()) is not None:
-                # App user is test name from call stack if inside a test
-                self.env_user = test_name_from_call_stack
-            else:
-                # Use the username reported by OS if not testing
-                os_user_id = getuser()
-                self.env_user = os_user_id
+            # Use the username reported by OS if not specified via Dynaconf
+            os_user_id = getuser()
+            self.env_user = os_user_id
+
+        # Convert the list of packages to tuple
+        self.env_packages = SettingsUtil.to_str_tuple(self.env_packages)
 
     def cleanup_before(self) -> bool:
         """Cleanup deployment data (except logs) before each run if true."""

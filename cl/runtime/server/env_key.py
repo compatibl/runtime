@@ -22,7 +22,7 @@ class EnvKey(KeyMixin):
     """Application environment parameters."""
 
     env_id: str = required()
-    """Unique environment identifier."""
+    """Unique environment identifier (inside pytest, test identifier)."""
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:

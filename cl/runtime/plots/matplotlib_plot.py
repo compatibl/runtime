@@ -97,7 +97,7 @@ class MatplotlibPlot(Plot, ABC):
     @classmethod
     def is_dark_theme(cls) -> bool:
         """True if dark UI theme when invoked from a process, and False inside tests."""
-        if active_or_default(Env).testing:
+        if active_or_default(Env).is_test():
             result = False
         else:
             result = UiAppState.get_current_user_app_theme() == "Dark"  # TODO: Move to PlotSettings

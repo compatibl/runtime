@@ -29,6 +29,8 @@ from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
 from cl.runtime.db.sql.sqlite_db import SqliteDb
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
+from cl.runtime.server.env import Env
+from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 
@@ -39,21 +41,24 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
     # Set test DB name to test name in dot-delimited snake_case format, prefixed by 'temp_'
     test_name = PytestUtil.get_test_path_from_request(request, name_only=True)
 
-    # Replace dots by semicolons
-    db_id = test_name.replace(".", ";")
+    # Activate test environment
+    with activate(Env(env_id=test_name, env_kind=EnvKind.TEST).build()):
 
-    # Create a new DB instance of the specified type (use the type from settings if None)
-    db = Db.create(db_type=db_type, db_id=db_id)
+        # Replace dots by semicolons
+        db_id = test_name.replace(".", ";")
 
-    # Delete all existing records in unit test DB before the test in case it was not performed by the preceding run
-    db.drop_test_db()
+        # Create a new DB instance of the specified type (use the type from settings if None)
+        db = Db.create(db_type=db_type, db_id=db_id)
 
-    # Run with the created DB, return db from the fixture
-    with activate(DataSource(db=db).build()):
-        yield db
+        # Delete all existing records in unit test DB before the test in case it was not performed by the preceding run
+        db.drop_test_db()
 
-    # Delete all existing records in unit test DB after the test
-    db.drop_test_db()
+        # Run with the created DB, return db from the fixture
+        with activate(DataSource(db=db).build()):
+            yield db
+
+        # Delete all existing records in unit test DB after the test
+        db.drop_test_db()
 
 
 @pytest.fixture(scope="function")

@@ -204,7 +204,7 @@ class Db(DbKey, RecordMixin, ABC):
     @classmethod
     def _get_test_db_name(cls) -> str:  # TODO: Use fixture instead
         """Get SQLite database with name based on test namespace."""
-        if active_or_default(Env).testing:
+        if active_or_default(Env).is_test():
             result = f"temp;{QaUtil.get_test_name_from_call_stack().replace('.', ';')}"
             return result
         else:
@@ -223,7 +223,7 @@ class Db(DbKey, RecordMixin, ABC):
 
         # Get DB identifier if not specified
         if db_id is None:
-            if not active_or_default(Env).testing:
+            if not active_or_default(Env).is_test():
                 db_id = db_settings.db_id
             else:
                 raise RuntimeError("Use pytest fixtures to create temporary DBs inside tests.")
@@ -234,7 +234,7 @@ class Db(DbKey, RecordMixin, ABC):
 
     def check_drop_test_db_preconditions(self) -> None:
         """Error if db_id does not start from db_test_prefix specified in settings.yaml (defaults to 'test_')."""
-        if not active_or_default(Env).testing:
+        if not active_or_default(Env).is_test():
             raise RuntimeError(f"Cannot drop a unit test DB when not invoked from a running unit test.")
 
         db_settings = DbSettings.instance()

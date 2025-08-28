@@ -23,25 +23,16 @@ class EnvKind(IntEnum):
     """
 
     PROD = auto()
-    """
-    Persistent production environment, destructive actions require explicit authorization.
-    Activates Dynaconf setting 'production'.
-    """
+    """Persistent production environment, destructive actions require explicit authorization."""
 
     STAGING = auto()
-    """
-    Persistent staging environment, destructive actions require explicit authorization.
-    Activates Dynaconf setting 'staging'.
-    """
+    """Persistent staging environment, destructive actions require explicit authorization."""
 
     DEV = auto()
-    """
-    Persistent development environment, destructive actions do not require explicit authorization.
-    Activates Dynaconf setting 'development'.
-    """
+    """Persistent development environment, destructive actions do not require explicit authorization."""
 
     TEMP = auto()
-    """
-    Temporary environment for testing or development, initialized and deleted automatically on each run.
-    Activates Dynaconf setting 'development' when outside pytest, or 'testing' when inside pytest.
-    """
+    """Temporary development environment, automatically cleared (deleted) before each application start."""
+
+    TEST = auto()
+    """Test environment, automatically cleared (deleted) before each test run."""
