@@ -36,16 +36,13 @@ class EnvSettings(Settings):
     """Unique environment identifier (does not apply inside pytest)."""
 
     env_kind: EnvKind = required()
-    """Determines the default settings for multiuser access and data retention  (does not apply inside pytest)."""
+    """Determines the default settings for multiuser access and data retention (does not apply inside pytest)."""
+
+    env_user: str = required()
+    """Identifies the application or test user (defaults to the OS user)."""
 
     env_tenant: str = required()
-    """Unique tenant identifier, tenants are isolated when sharing the same DB."""
-
-    env_user: str | None = None  # TODO: Determine if this should be here or in UserContext, keep one
-    """Identifies the user."""
-
-    env_shared: bool | None = None  # TODO: Determine if this should be here or in UserContext, keep one
-    """Data is shared by users if True and fully isolated by user if False (the user must be specified either way)."""
+    """Unique tenant identifier, tenants are isolated when sharing the same DB (defaults to env_user)."""
 
     env_packages: tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
@@ -87,9 +84,12 @@ class EnvSettings(Settings):
                     f"env_id prefix for env_id={self.env_id}")
 
         if self.env_user is None:
-            # Use the username reported by OS if not specified via Dynaconf
-            os_user_id = getuser()
-            self.env_user = os_user_id
+            # Set to the username reported by OS if not specified via Dynaconf
+            self.env_user = getuser()
+
+        if self.env_tenant is None:
+            # Set to env_user if not specified via Dynaconf
+            self.env_tenant = self.env_user
 
         # Convert the list of packages to tuple
         self.env_packages = SettingsUtil.to_str_tuple(self.env_packages)

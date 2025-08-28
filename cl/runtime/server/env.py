@@ -33,7 +33,10 @@ class Env(EnvKey, RecordMixin):
     """Determines the default settings for multiuser access and data retention."""
 
     env_user: str = required()
-    """Identifies the application or test user."""
+    """Identifies the application or test user (defaults to the OS user)."""
+
+    env_tenant: str = required()
+    """Unique tenant identifier, tenants are isolated when sharing the same DB (defaults to env_user)."""
 
     def get_key(self) -> EnvKey:
         return EnvKey(env_id=self.env_id).build()
@@ -46,6 +49,7 @@ class Env(EnvKey, RecordMixin):
             self.env_id = self.env_id if self.env_id is not None else active.env_id
             self.env_kind = self.env_kind if self.env_kind is not None else active.env_kind
             self.env_user = self.env_user if self.env_user is not None else active.env_user
+            self.env_tenant = self.env_tenant if self.env_tenant is not None else active.env_tenant
         else:
             # Use test root process detection only if env_kind is None to prevent override in worker processes
             if QaUtil.is_test_root_process():
@@ -60,12 +64,14 @@ class Env(EnvKey, RecordMixin):
                 # Use settings for other fields if not yet set
                 settings = EnvSettings.instance()
                 self.env_user = self.env_user if self.env_user is not None else settings.env_user
+                self.env_tenant = self.env_tenant if self.env_tenant is not None else settings.env_tenant
             else:
                 # Otherwise use settings for all fields that are not yet set
                 settings = EnvSettings.instance()
                 self.env_id = self.env_id if self.env_id is not None else settings.env_id
                 self.env_kind = self.env_kind if self.env_kind is not None else settings.env_kind
                 self.env_user = self.env_user if self.env_user is not None else settings.env_user
+                self.env_tenant = self.env_tenant if self.env_tenant is not None else settings.env_tenant
 
         # Error if env_kind is not TEST but we are inside a root test process
         if self.env_kind != EnvKind.TEST and QaUtil.is_test_root_process():
@@ -75,53 +81,3 @@ class Env(EnvKey, RecordMixin):
     def is_test(self) -> bool:  # TODO: DEPRECATED, USE ENV TO SET PARAMS INSTEAD
         """True for the root process or worker processes of a test, False when not a test."""
         return self.env_kind == EnvKind.TEST
-
-    @classmethod
-    def get_env(cls) -> EnvKind:
-        """Determines the default settings for multiuser access and data retention."""
-        env = context.env_kind if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_kind
-        if env is not None:
-            return env
-        else:
-            # Default to DEV if not specified
-            return EnvKind.DEV
-
-    @classmethod
-    def get_name(cls) -> str:
-        """Identifies the application or test."""
-        name = context.name if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_id
-        if name is not None:
-            return name
-        else:
-            # Default to Runtime if not specified
-            return "Runtime"
-
-    @classmethod
-    def get_user(cls) -> str:
-        """Identifies the application or test user."""
-        user = context.env_user if (context := cls.current_or_none()) is not None else EnvSettings.instance().env_user
-        if user is not None:
-            return user
-        else:
-            # Default to OS user if not specified
-            return getuser()
-
-    @classmethod
-    def is_cleanup_before(cls) -> bool:
-        """Cleanup deployment data (except logs) before each run if true."""
-        if (env := cls.get_env()) in (EnvKind.PROD, EnvKind.STAGING):
-            return False
-        elif env in (EnvKind.DEV, EnvKind.TEMP):
-            return True
-        else:
-            raise ErrorUtil.enum_value_error(env, EnvKind)
-
-    @classmethod
-    def is_cleanup_after(cls) -> bool:
-        """Cleanup deployment data (except logs) after each run if true."""
-        if (env := cls.get_env()) in (EnvKind.PROD, EnvKind.STAGING, EnvKind.DEV):
-            return False
-        elif env == EnvKind.TEMP:
-            return True
-        else:
-            raise ErrorUtil.enum_value_error(env, EnvKind)
