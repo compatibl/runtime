@@ -19,7 +19,7 @@ from typing import Any
 from typing import Optional
 from typing import Type
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.typename import typename
 
 _STACK_DICT_VAR: ContextVar[Optional[defaultdict[tuple[type, str | None], list[RecordProtocol]]]] = ContextVar(

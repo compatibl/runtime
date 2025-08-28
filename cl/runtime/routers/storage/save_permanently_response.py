@@ -20,7 +20,7 @@ from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.file_util import FileUtil
-from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
 from cl.runtime.schema.type_cache import TypeCache

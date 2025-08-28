@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from box import Box
-from cl.runtime.records.protocols import TData
+from cl.runtime.records.data_mixin import TData
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.templates.template_engine import TemplateEngine
 

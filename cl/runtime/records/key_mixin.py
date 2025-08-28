@@ -14,7 +14,7 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing import Self
+from typing import Self, TypeVar
 from cl.runtime.records.data_mixin import DataMixin
 
 
@@ -27,3 +27,7 @@ class KeyMixin(DataMixin, ABC):
     @abstractmethod
     def get_key_type(cls) -> type[Self]:
         """Return key type even when called from a record."""
+
+
+TKey = TypeVar("TKey", bound=KeyMixin)
+"""Generic type parameter for a key."""

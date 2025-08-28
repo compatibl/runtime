@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from abc import ABC
-from typing import Self
+from enum import Enum
+from typing import Self, TypeVar
 from memoization import cached
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.data_util import DataUtil
-from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import TObj, TPrimitive
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.slots_util import SlotsUtil
 
@@ -49,3 +50,13 @@ class DataMixin(BuilderMixin, ABC):
     def clone_as(self, result_type: type[TObj]) -> TObj:
         """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
         return result_type(**{k: getattr(self, k) for k in self.get_field_names()})
+
+
+TDataField = dict[str, "TDataField"] | list["TDataField"] | TPrimitive | Enum
+"""Field types for serialized data in dictionary format."""
+
+TDataDict = dict[str, TDataField]
+"""Serialized data in dictionary format."""
+
+TData = TypeVar("TData", bound=DataMixin)
+"""Generic type parameter for a class that has slots and implements the builder pattern."""

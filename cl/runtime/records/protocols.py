@@ -180,29 +180,8 @@ TSequence = list | tuple | Sequence
 TMapping = dict | frozendict | Mapping
 """Type alias for a supported mapping type."""
 
-TDataField = dict[str, "TDataField"] | list["TDataField"] | TPrimitive | Enum
-"""Field types for serialized data in dictionary format."""
-
-TDataDict = dict[str, TDataField]
-"""Serialized data in dictionary format."""
-
-TKeyField = dict[str, "TKeyField"] | TPrimitive | Enum
-"""Field types for serialized key in dictionary format."""
-
-TKeyDict = dict[str, TKeyField]
-"""Serialized key in dictionary format."""
-
 TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
-
-TData = TypeVar("TData", bound=DataProtocol)
-"""Generic type parameter for a class that has slots and implements the builder pattern."""
-
-TKey = TypeVar("TKey", bound=KeyProtocol)
-"""Generic type parameter for a key."""
-
-TRecord = TypeVar("TRecord", bound=RecordProtocol)
-"""Generic type parameter for a record."""
 
 
 def is_empty(

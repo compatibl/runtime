@@ -38,7 +38,7 @@ from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin

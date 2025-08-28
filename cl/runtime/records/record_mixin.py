@@ -14,6 +14,8 @@
 
 from abc import ABC
 from abc import abstractmethod
+from typing import TypeVar
+
 from cl.runtime.records.key_mixin import KeyMixin
 
 
@@ -26,3 +28,7 @@ class RecordMixin(KeyMixin, ABC):
     @abstractmethod
     def get_key(self) -> KeyMixin:
         """Return a new key object whose fields populated from self, do not return self."""
+
+
+TRecord = TypeVar("TRecord", bound=RecordMixin)
+"""Generic type parameter for a record."""

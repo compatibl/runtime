@@ -24,7 +24,7 @@ from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import KeyProtocol
 from cl.runtime.records.protocols import RecordProtocol
-from cl.runtime.records.protocols import TRecord
+from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_type_binding import RecordTypeBinding
 from cl.runtime.records.record_type_binding_key import RecordTypeBindingKey
