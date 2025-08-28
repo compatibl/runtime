@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from dataclasses import dataclass
 from getpass import getuser
 
@@ -38,6 +39,16 @@ class Env(EnvKey, RecordMixin):
     env_tenant: str = required()
     """Unique tenant identifier, tenants are isolated when sharing the same DB (defaults to env_user)."""
 
+    env_dir: str = required()
+    """
+    Defaults to the value in settings if not specified. The following variables can be used inside braces:
+
+    - env_id
+    - env_kind
+    - env_user
+    - env_tenant
+    """
+
     def get_key(self) -> EnvKey:
         return EnvKey(env_id=self.env_id).build()
 
@@ -50,6 +61,7 @@ class Env(EnvKey, RecordMixin):
             self.env_kind = self.env_kind if self.env_kind is not None else active.env_kind
             self.env_user = self.env_user if self.env_user is not None else active.env_user
             self.env_tenant = self.env_tenant if self.env_tenant is not None else active.env_tenant
+            self.env_dir = self.env_dir if self.env_dir is not None else active.env_dir
         else:
             # Use test root process detection only if env_kind is None to prevent override in worker processes
             if QaUtil.is_test_root_process():
@@ -61,6 +73,7 @@ class Env(EnvKey, RecordMixin):
             if self.env_kind == EnvKind.TEST:
                 # Inside a test, override settings for these fields if not yet set and configure them for a test
                 self.env_id = self.env_id if self.env_id is not None else QaUtil.get_test_name_from_call_stack()
+                self.env_dir = self.env_dir if self.env_dir is not None else QaUtil.get_test_dir_from_call_stack()
                 # Use settings for other fields if not yet set
                 settings = EnvSettings.instance()
                 self.env_user = self.env_user if self.env_user is not None else settings.env_user
@@ -72,11 +85,7 @@ class Env(EnvKey, RecordMixin):
                 self.env_kind = self.env_kind if self.env_kind is not None else settings.env_kind
                 self.env_user = self.env_user if self.env_user is not None else settings.env_user
                 self.env_tenant = self.env_tenant if self.env_tenant is not None else settings.env_tenant
-
-        # Error if env_kind is not TEST but we are inside a root test process
-        if self.env_kind != EnvKind.TEST and QaUtil.is_test_root_process():
-            test_name = QaUtil.get_test_name_from_call_stack()
-            raise RuntimeError(f"Env.is_test must not be True inside a test root process.\nTest name: {test_name}.")
+                self.env_dir = self.env_dir if self.env_dir is not None else settings.env_dir
 
     def is_test(self) -> bool:  # TODO: DEPRECATED, USE ENV TO SET PARAMS INSTEAD
         """True for the root process or worker processes of a test, False when not a test."""

@@ -42,7 +42,11 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
     test_name = PytestUtil.get_test_path_from_request(request, name_only=True)
 
     # Activate test environment
-    with activate(Env(env_id=test_name, env_kind=EnvKind.TEST).build()):
+    with activate(Env(
+            env_id=test_name,
+            env_kind=EnvKind.TEST,
+            env_dir=PytestUtil.get_test_path_from_request(request, name_only=False),
+    ).build()):
 
         # Replace dots by semicolons
         db_id = test_name.replace(".", ";")

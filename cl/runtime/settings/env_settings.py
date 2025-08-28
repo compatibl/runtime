@@ -12,17 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from dataclasses import dataclass
 from getpass import getuser
 from typing_extensions import final
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
+from cl.runtime.primitive.identifier_util import IdentifierUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.typename import typename
 from cl.runtime.settings.env_kind import EnvKind
+from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
 from cl.runtime.settings.settings_util import SettingsUtil
 
@@ -42,13 +45,37 @@ class EnvSettings(Settings):
     """Identifies the application or test user (defaults to the OS user)."""
 
     env_tenant: str = required()
-    """Unique tenant identifier, tenants are isolated when sharing the same DB (defaults to env_user)."""
+    """
+    Unique tenant identifier, tenants are isolated when sharing the same DB.
+    Defaults to env_user if not specified. The following variables can be used inside braces:
+    
+    - env_id
+    - env_kind (converted to snake_case)
+    - env_user
+    """
+
+    env_dir: str = required()
+    """
+    Defaults to project_resources if not specified. The following variables can be used inside braces:
+    
+    - project_root
+    - project_resources
+    - env_id
+    - env_kind (converted to snake_case)
+    - env_user
+    - env_tenant
+    """
 
     env_packages: tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        if self.env_id is None:
+            raise RuntimeError("Field env_id is missing in settings.yaml and env var is not set.")
+        # Check the end result for safety
+        IdentifierUtil.guard_valid_identifier(self.env_id)
 
         if self.env_kind is not None:
             # Field env_kind is specified in settings.yaml
@@ -86,10 +113,45 @@ class EnvSettings(Settings):
         if self.env_user is None:
             # Set to the username reported by OS if not specified via Dynaconf
             self.env_user = getuser()
+        # Check the end result for safety
+        IdentifierUtil.guard_valid_identifier(self.env_user)
 
         if self.env_tenant is None:
-            # Set to env_user if not specified via Dynaconf
+            # Set env_tenant to env_user if not specified via Dynaconf
             self.env_tenant = self.env_user
+        else:
+            # Check for safety before substitution
+            IdentifierUtil.guard_valid_identifier(self.env_tenant, allow_braces=True)
+            # Perform variable substitution
+            env_tenant_vars = {
+                "env_id": self.env_id,
+                "env_kind": CaseUtil.upper_to_snake_case(self.env_kind.name),
+                "env_user": self.env_user,
+            }
+            self.env_tenant = self.env_tenant.format(**env_tenant_vars)
+
+        # Check the end result for safety
+        IdentifierUtil.guard_valid_identifier(self.env_tenant)
+
+        if self.env_dir is None:
+            # Default if not specified via Dynaconf
+            self.env_dir = ProjectSettings.instance().get_resources_root()
+        else:
+            # Check for safety before substitution
+            IdentifierUtil.guard_valid_identifier(self.env_dir, allow_braces=True, allow_directory_separators=True)
+            # Perform variable substitution
+            env_dir_vars = {
+                "project_root": ProjectSettings.instance().get_project_root(),
+                "project_resources": ProjectSettings.instance().get_resources_root(), # TODO: Update after ProjectSettings changes
+                "env_id": self.env_id,
+                "env_kind": CaseUtil.upper_to_snake_case(self.env_kind.name),
+                "env_user": self.env_user,
+                "env_tenant": self.env_tenant,
+            }
+            self.env_dir = self.env_dir.format(**env_dir_vars)
+
+        # Check the end result for safety
+        IdentifierUtil.guard_valid_identifier(self.env_dir, allow_directory_separators=True)
 
         # Convert the list of packages to tuple
         self.env_packages = SettingsUtil.to_str_tuple(self.env_packages)
