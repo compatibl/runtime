@@ -20,7 +20,7 @@ from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_check import TypeCheck
@@ -37,7 +37,7 @@ _local_cache_instance = None
 class LocalCache(Db):
     """In-memory cache for objects without serialization."""
 
-    __cache: dict[type[KeyProtocol], dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
+    __cache: dict[type[KeyProtocol], dict[tuple, RecordMixin]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
     def load_many(
@@ -107,7 +107,7 @@ class LocalCache(Db):
     def save_many(
         self,
         key_type: type[KeyProtocol],
-        records: Sequence[RecordProtocol],
+        records: Sequence[RecordMixin],
         *,
         dataset: str,
         save_policy: SavePolicy,

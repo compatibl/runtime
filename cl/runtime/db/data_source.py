@@ -37,7 +37,7 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
@@ -81,7 +81,7 @@ class DataSource(DataSourceKey, RecordMixin):
     as part of the same commit.
     """
 
-    _pending_inserts: list[RecordProtocol] | None = None
+    _pending_inserts: list[RecordMixin] | None = None
     """
     Records that will be inserted on commit, including replacement records for which are being deleted
     as part of the same commit.
@@ -540,7 +540,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def insert_one(
         self,
-        record: RecordProtocol,
+        record: RecordMixin,
         *,
         commit: bool,
     ) -> None:
@@ -559,7 +559,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def insert_many(
         self,
-        records: RecordProtocol | Sequence[RecordProtocol],
+        records: RecordMixin | Sequence[RecordMixin],
         *,
         commit: bool,
     ) -> None:
@@ -578,7 +578,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def replace_one(
         self,
-        record: RecordProtocol,
+        record: RecordMixin,
         *,
         commit: bool,
     ) -> None:
@@ -597,7 +597,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def replace_many(
         self,
-        records: RecordProtocol | Sequence[RecordProtocol],
+        records: RecordMixin | Sequence[RecordMixin],
         *,
         commit: bool,
     ) -> None:
@@ -756,8 +756,8 @@ class DataSource(DataSourceKey, RecordMixin):
 
     @classmethod
     def _group_inputs_by_key_type(
-        cls, inputs: Sequence[RecordProtocol | KeyProtocol | None]
-    ) -> dict[type[KeyProtocol], Sequence[RecordProtocol | KeyProtocol | None]]:
+        cls, inputs: Sequence[RecordMixin | KeyProtocol | None]
+    ) -> dict[type[KeyProtocol], Sequence[RecordMixin | KeyProtocol | None]]:
         """Group inputs by key type, skipping sequence elements that are None."""
         result = defaultdict(list)
         consume(result[x.get_key_type()].append(x) for x in inputs if x is not None)
@@ -765,7 +765,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def _save_many(
         self,
-        records: Sequence[RecordProtocol],
+        records: Sequence[RecordMixin],
         *,
         commit: bool,
         save_policy: SavePolicy,

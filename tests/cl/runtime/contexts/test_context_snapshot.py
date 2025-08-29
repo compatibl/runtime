@@ -17,12 +17,12 @@ from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_manager import get_active_contexts_and_ids
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime.contexts.stub_context import StubContext
 
 
-def _perform_serialization_test(contexts: list[RecordProtocol]):
+def _perform_serialization_test(contexts: list[RecordMixin]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Serialize current contexts into data and then deserialize data into a ContextSnapshot instance
@@ -39,7 +39,7 @@ def _perform_serialization_test(contexts: list[RecordProtocol]):
         assert not deserialized.contexts
 
 
-def _perform_manager_test(contexts: list[RecordProtocol]):
+def _perform_manager_test(contexts: list[RecordMixin]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Capture active contexts before

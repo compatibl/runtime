@@ -21,7 +21,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.reader import Reader
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.char_util import CharUtil
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -65,7 +65,7 @@ class CsvFileReader(Reader):
             if records:
                 active(DataSource).replace_many(records, commit=True)
 
-    def _deserialize_row(self, row_dict: dict[str, Any]) -> RecordProtocol:
+    def _deserialize_row(self, row_dict: dict[str, Any]) -> RecordMixin:
         """Deserialize row into a record."""
 
         # Record type is ClassName without extension in PascalCase

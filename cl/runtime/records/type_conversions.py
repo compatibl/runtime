@@ -14,7 +14,7 @@
 
 from typing import Sequence
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 
@@ -38,7 +38,7 @@ class TypeConversions:
             )
 
     @classmethod
-    def to_record_sequence(cls, records: RecordProtocol | Sequence[RecordProtocol]) -> Sequence[RecordProtocol]:
+    def to_record_sequence(cls, records: RecordMixin | Sequence[RecordMixin]) -> Sequence[RecordMixin]:
         """Convert input record to record sequence and pass through if already a record sequence, with validation."""
         if TypeCheck.guard_record_instance(records, raise_on_fail=False):
             # Single record, convert to tuple

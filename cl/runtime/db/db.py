@@ -23,7 +23,7 @@ from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_type_binding import RecordTypeBinding
@@ -145,7 +145,7 @@ class Db(DbKey, RecordMixin, ABC):
     def save_many(
         self,
         key_type: type[KeyProtocol],
-        records: Sequence[RecordProtocol],
+        records: Sequence[RecordMixin],
         *,
         dataset: str,
         save_policy: SavePolicy,
@@ -271,7 +271,7 @@ class Db(DbKey, RecordMixin, ABC):
             self._record_type_name_cache[dataset] = result
         return result
 
-    def _add_record_type(self, *, record_type: type[RecordProtocol], dataset: str) -> None:
+    def _add_record_type(self, *, record_type: type[RecordMixin], dataset: str) -> None:
         """Add record type to cache for the specified dataset."""
 
         if record_type == RecordTypeBinding:

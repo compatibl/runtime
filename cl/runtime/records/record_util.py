@@ -14,7 +14,7 @@
 
 from typing import Any
 from typing import Iterable
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.protocols import is_record
 
 
@@ -22,7 +22,7 @@ class RecordUtil:
     """Utilities for working with records."""
 
     @classmethod
-    def sort_records_by_key(cls, records: Iterable[RecordProtocol]) -> tuple[RecordProtocol]:
+    def sort_records_by_key(cls, records: Iterable[RecordMixin]) -> tuple[RecordMixin]:
         """Sort records by string key fields."""
 
         # TODO (Roman): Check string key fields in nested keys

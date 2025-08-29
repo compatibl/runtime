@@ -18,11 +18,11 @@ from contextvars import ContextVar
 from typing import Any
 from typing import Optional
 from typing import Type
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.typename import typename
 
-_STACK_DICT_VAR: ContextVar[Optional[defaultdict[tuple[type, str | None], list[RecordProtocol]]]] = ContextVar(
+_STACK_DICT_VAR: ContextVar[Optional[defaultdict[tuple[type, str | None], list[RecordMixin]]]] = ContextVar(
     "_STACK_DICT_VAR",
     default=None,
 )
@@ -32,7 +32,7 @@ Each asynchronous environment has its own stack dictionary.
 """
 
 
-def _get_or_create_stack_dict() -> defaultdict[tuple[type, str | None], list[RecordProtocol]]:
+def _get_or_create_stack_dict() -> defaultdict[tuple[type, str | None], list[RecordMixin]]:
     """Get or create stack dictionary for the current asynchronous environment indexed by context key."""
     stack_dict = _STACK_DICT_VAR.get()
     if stack_dict is None:
@@ -41,7 +41,7 @@ def _get_or_create_stack_dict() -> defaultdict[tuple[type, str | None], list[Rec
     return stack_dict
 
 
-def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | None = None) -> list[RecordProtocol]:
+def _get_or_create_stack(context_type: Type[RecordMixin], context_id: str | None = None) -> list[RecordMixin]:
     """
     Get or create stack for the (context_key_type, context_id) pair in the current asynchronous environment.
 
@@ -56,7 +56,7 @@ def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | N
     return _get_or_create_stack_dict()[(key_type_name, context_id)]
 
 
-def make_active_and_return_stack(context: TRecord, context_id: str | None = None) -> list[RecordProtocol]:
+def make_active_and_return_stack(context: TRecord, context_id: str | None = None) -> list[RecordMixin]:
     """
     Similar to make_active(...) but returns context stack rather than the context.
 
@@ -113,7 +113,7 @@ def make_inactive(
     exc_type: Any = None,
     exc_val: Any = None,
     exc_tb: Any = None,
-    expected_stack: list[RecordProtocol] | None = None,
+    expected_stack: list[RecordMixin] | None = None,
 ) -> None:
     """
     Make context inactive and revert to the previous active context (if any).
@@ -283,7 +283,7 @@ def active_or_default(context_type: type[TRecord]) -> TRecord:
     return result
 
 
-def get_active_contexts_and_ids() -> tuple[tuple[RecordProtocol, ...], tuple[str | None, ...]]:
+def get_active_contexts_and_ids() -> tuple[tuple[RecordMixin, ...], tuple[str | None, ...]]:
     """
     Return a tuple of (contexts, context_ids) for all active contexts, with empty tuples if no contexts are active.
     This method is used by the ContextSnapshot to restore the active contexts for out-of-process task execution.

@@ -21,7 +21,7 @@ from cl.runtime.contexts.context_manager import make_active_and_return_stack
 from cl.runtime.contexts.context_manager import make_inactive
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 _CONTEXT_SERIALIZER = DataSerializers.FOR_JSON
@@ -44,13 +44,13 @@ class ContextSnapshot(DataMixin):
     context_ids: tuple[str | None, ...] = required()
     """The value of context identifier for the corresponding context."""
 
-    _processed_contexts: list[RecordProtocol] | None = None
+    _processed_contexts: list[RecordMixin] | None = None
     """
     Contexts for which __enter__ method has been called inside ContextSnapshot.__enter__ so far.
     For each of these contexts, __exit__ will be invoked in case of an exception.
     """
 
-    _processed_context_stacks: list[list[RecordProtocol]] | None = None
+    _processed_context_stacks: list[list[RecordMixin]] | None = None
     """Context stacks for which __enter__ method has been called inside ContextSnapshot.__enter__ so far."""
 
     _token: Token | None = None

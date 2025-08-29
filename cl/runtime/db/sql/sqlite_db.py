@@ -26,7 +26,7 @@ from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.data_mixin import TDataDict
 from cl.runtime.records.key_mixin import TKey
 from cl.runtime.records.record_mixin import TRecord
@@ -315,7 +315,7 @@ class SqliteDb(Db):
     def save_many(
         self,
         key_type: type[KeyProtocol],
-        records: Sequence[RecordProtocol],
+        records: Sequence[RecordMixin],
         *,
         dataset: str,
         save_policy: SavePolicy,

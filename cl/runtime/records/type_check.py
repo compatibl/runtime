@@ -19,7 +19,7 @@ from typing import TypeGuard
 from typing import cast
 from cl.runtime.records.protocols import BuilderProtocol
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_builder
 from cl.runtime.records.protocols import is_key
@@ -211,7 +211,7 @@ class TypeCheck:
                 return False
 
     @classmethod
-    def guard_record_type(cls, record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
+    def guard_record_type(cls, record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordMixin]:
         """Check if the argument is a record type."""
         if isinstance(record_type, type) and is_record(record_type):
             if not (type_name := typename(record_type)).endswith("Key"):
@@ -229,13 +229,13 @@ class TypeCheck:
             return False
 
     @classmethod
-    def guard_record_instance(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordProtocol]:
+    def guard_record_instance(cls, record: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordMixin]:
         """Check if the argument is a record."""
         if record is None:
             raise RuntimeError("Expected a record instance but received None.")
         elif not isinstance(record, type) and is_record(record):
             if not (type_name := typename(record)).endswith("Key"):
-                return cast(TypeGuard[RecordProtocol], cls.guard_frozen(record, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[RecordMixin], cls.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
@@ -255,7 +255,7 @@ class TypeCheck:
             return True
         elif not isinstance(record, type) and is_record(record):
             if not (type_name := typename(record)).endswith("Key"):
-                return cast(TypeGuard[RecordProtocol], cls.guard_frozen(record, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[RecordMixin], cls.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
@@ -269,7 +269,7 @@ class TypeCheck:
             return False
 
     @classmethod
-    def guard_record_sequence(cls, records: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[RecordProtocol]]:
+    def guard_record_sequence(cls, records: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[RecordMixin]]:
         """Check if the argument is a record sequence (iterable generator is not accepted)."""
         if is_sequence(records):
             return all(cls.guard_record_instance(x, raise_on_fail=raise_on_fail) for x in records)
@@ -287,7 +287,7 @@ class TypeCheck:
         records: Any,
         *,
         raise_on_fail: bool = True,
-    ) -> TypeGuard[Sequence[RecordProtocol] | None] | None:
+    ) -> TypeGuard[Sequence[RecordMixin] | None] | None:
         """
         Check if the argument is a sequence of records (iterable generator is not accepted)
         where each element can be None, and the entire sequence can also be None.
@@ -371,7 +371,7 @@ class TypeCheck:
         keys_or_records: Any,
         *,
         raise_on_fail: bool = True,
-    ) -> TypeGuard[Sequence[RecordProtocol | None] | None]:
+    ) -> TypeGuard[Sequence[RecordMixin | None] | None]:
         """
         Check if the argument is a sequence of keys or records (iterable generator is not accepted)
         where each element can be None, and the entire sequence can also be None.

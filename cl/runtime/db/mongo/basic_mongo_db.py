@@ -26,7 +26,7 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
@@ -258,7 +258,7 @@ class BasicMongoDb(Db):
     def save_many(
         self,
         key_type: type[KeyProtocol],
-        records: Sequence[RecordProtocol],
+        records: Sequence[RecordMixin],
         *,
         dataset: str,
         save_policy: SavePolicy,

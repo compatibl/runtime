@@ -163,13 +163,6 @@ class KeyProtocol(DataProtocol):
         ...
 
 
-class RecordProtocol(KeyProtocol):
-    """Protocol implemented by records."""
-
-    def get_key(self) -> KeyProtocol:
-        """Return a new key object whose fields populated from self, do not return self."""
-        ...
-
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Type alias for Python classes used to store primitive values."""
@@ -292,7 +285,7 @@ def is_key(instance_or_type: Any) -> TypeGuard[type[KeyProtocol]]:
     return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not type_.__name__.startswith("_")
 
 
-def is_record(instance_or_type: Any) -> TypeGuard[type[RecordProtocol]]:
+def is_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[RecordMixin]]:
     """
     Return True if the argument has 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.

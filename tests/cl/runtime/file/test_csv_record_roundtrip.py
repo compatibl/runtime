@@ -21,7 +21,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.records.mapping_util import MappingUtil
-from cl.runtime.records.protocols import RecordProtocol
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubDataclass
@@ -41,7 +41,7 @@ _CSV_SERIALIZER = DataSerializers.FOR_CSV
 """Serializer for CSV serialization."""
 
 
-stub_entries: list[list[RecordProtocol]] = [  # noqa
+stub_entries: list[list[RecordMixin]] = [  # noqa
     [StubDataclass(id=f"abc1_n{i}").build() for i in range(5)],
     [StubDataclassNestedFields(id=f"abc2_n{i}").build() for i in range(5)],
     [StubDataclassComposite(primitive=f"abc{i}").build() for i in range(5)],
@@ -73,13 +73,13 @@ def save_records_to_csv(records: Iterable, file_path: str) -> None:
     df.to_csv(file_path, index=False)
 
 
-def save_test_records(entries: list[RecordProtocol]) -> tuple[list[RecordProtocol], Path]:
+def save_test_records(entries: list[RecordMixin]) -> tuple[list[RecordMixin], Path]:
     file_path = Path(__file__).parent.joinpath(f"{typename(entries[0])}.csv")
     save_records_to_csv(entries, str(file_path.absolute()))
     return entries, file_path
 
 
-def read_records_from_csv(file_path: Path, entry_type: type[RecordProtocol]):
+def read_records_from_csv(file_path: Path, entry_type: type[RecordMixin]):
     loader = CsvFileReader(file_path=str(file_path.absolute()))
     loader.csv_to_db()
 
