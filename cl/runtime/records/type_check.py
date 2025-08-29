@@ -17,10 +17,10 @@ from typing import Mapping
 from typing import Sequence
 from typing import TypeGuard
 from typing import cast
-from cl.runtime.records.protocols import BuilderProtocol
+
+from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.protocols import is_builder
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_mapping
@@ -63,38 +63,6 @@ class TypeCheck:
             return False
 
     @classmethod
-    def guard_frozen(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol]:
-        """Check if the argument is frozen."""
-        if is_builder(obj):
-            if obj.is_frozen():
-                return True
-            elif raise_on_fail:
-                raise RuntimeError(f"Parameter of type {typename(obj)} is not frozen.")
-            else:
-                return False
-        elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} does not implement BuilderProtocol.")
-        else:
-            return False
-
-    @classmethod
-    def guard_frozen_or_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderProtocol | None]:
-        """Check if the argument is frozen or None."""
-        if obj is None:
-            return True
-        elif is_builder(obj):
-            if obj.is_frozen():
-                return True
-            elif raise_on_fail:
-                raise RuntimeError(f"Parameter of type {typename(obj)} is not frozen or None.")
-            else:
-                return False
-        elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} does not implement BuilderProtocol and is not None.")
-        else:
-            return False
-
-    @classmethod
     def guard_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyMixin]:
         """Check if the argument is a key type."""
         if isinstance(key_type, type) and is_key(key_type):
@@ -122,7 +90,7 @@ class TypeCheck:
                 return False
         if not isinstance(key, type) and is_key(key):
             if (type_name := typename(key)).endswith("Key"):
-                return cast(TypeGuard[KeyMixin], cls.guard_frozen(key, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a key, but its name does not end\n"
@@ -142,7 +110,7 @@ class TypeCheck:
             return True
         elif not isinstance(key, type) and is_key(key):
             if (type_name := typename(key)).endswith("Key"):
-                return cast(TypeGuard[KeyMixin], cls.guard_frozen(key, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a key, but its name does not end\n"
@@ -214,7 +182,7 @@ class TypeCheck:
             raise RuntimeError("Expected a record instance but received None.")
         elif not isinstance(record, type) and is_record(record):
             if not (type_name := typename(record)).endswith("Key"):
-                return cast(TypeGuard[RecordMixin], cls.guard_frozen(record, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[RecordMixin], BuilderChecks.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
@@ -234,7 +202,7 @@ class TypeCheck:
             return True
         elif not isinstance(record, type) and is_record(record):
             if not (type_name := typename(record)).endswith("Key"):
-                return cast(TypeGuard[RecordMixin], cls.guard_frozen(record, raise_on_fail=raise_on_fail))
+                return cast(TypeGuard[RecordMixin], BuilderChecks.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
                     f"Type {type_name} implements the required methods for a record, but its name ends\n"
@@ -303,7 +271,7 @@ class TypeCheck:
             else:
                 return False
         elif not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
-            return cast(TypeGuard[KeyMixin], cls.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
+            return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance.")
         else:
@@ -320,7 +288,7 @@ class TypeCheck:
         if key_or_record is None:
             return True
         elif not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
-            return cast(TypeGuard[KeyMixin], cls.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
+            return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance or None.")
         else:

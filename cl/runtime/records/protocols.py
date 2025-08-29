@@ -95,47 +95,6 @@ SEQUENCE_AND_MAPPING_TYPE_NAMES = tuple(x for x in (*SEQUENCE_TYPE_NAMES, *MAPPI
 TObj = TypeVar("TObj")
 """Generic type parameter for any object."""
 
-
-class BuilderProtocol(Protocol):
-    """Protocol for freezable fields and builder pattern support."""
-
-    @classmethod
-    def default(cls) -> Self:
-        """Create a default instance of this type, derived types may override."""
-        ...
-
-    def is_frozen(self) -> bool:
-        """Return True if the instance has been frozen. Once frozen, the instance cannot be unfrozen."""
-        ...
-
-    def mark_frozen(self) -> Self:
-        """
-        Mark the instance as frozen without actually freezing it, which is the responsibility of build method.
-        The action of marking the instance frozen cannot be reversed. Can be called more than once.
-        """
-        ...
-
-    def check_frozen(self) -> None:
-        """Raise an error if the instance is not frozen."""
-        ...
-
-    def build(self) -> Self:
-        """
-        This method performs the following steps:
-        (1) Invokes 'build' recursively for all non-primitive public fields and container elements
-        (1) Invokes '__init' method of this class and its ancestors in the order from base to derived
-        (2) Invokes 'freeze' method of this class
-        Returns self to enable method chaining.
-        """
-        ...
-
-    def cast(self, cast_to: type[TObj]) -> TObj:
-        """
-        Cast self to type cast_to after checking it is an instance of cast_to, error message otherwise.
-        This provides a runtime-checked alternative to typing.cast which does not check anything at runtime.
-        """
-        ...
-
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Type alias for Python classes used to store primitive values."""
 
@@ -210,7 +169,7 @@ def is_mixin(instance_or_type: Any) -> bool:
     return type_.__name__.endswith("Mixin")
 
 
-def is_builder(instance_or_type: Any) -> TypeGuard[type[BuilderProtocol]]:
+def is_builder(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[BuilderMixin]]:
     """
     True if the argument has 'build' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
