@@ -15,7 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from typing import TypeVar
-
 from cl.runtime.records.key_mixin import KeyMixin
 
 

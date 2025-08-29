@@ -17,15 +17,14 @@ from typing import Mapping
 from typing import Sequence
 from typing import TypeGuard
 from typing import cast
-
 from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
 from cl.runtime.records.protocols import is_mapping
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 
 

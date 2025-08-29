@@ -18,9 +18,10 @@ from enum import Enum
 from typing import Any
 from typing import Deque
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.records.protocols import is_abstract
@@ -28,7 +29,6 @@ from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
-from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_cache import TypeCache

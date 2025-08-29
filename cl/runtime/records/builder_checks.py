@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, TypeGuard
+from typing import Any
+from typing import TypeGuard
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.protocols import is_builder
 from cl.runtime.records.typename import typename

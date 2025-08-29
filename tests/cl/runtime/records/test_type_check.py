@@ -15,7 +15,6 @@
 import pytest
 from frozendict import frozendict
 from cl.runtime.records.type_check import TypeCheck
-from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived

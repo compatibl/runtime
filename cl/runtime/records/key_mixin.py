@@ -14,7 +14,8 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing import Self, TypeVar
+from typing import Self
+from typing import TypeVar
 from cl.runtime.records.data_mixin import DataMixin
 
 

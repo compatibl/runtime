@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.records.builder_checks import BuilderChecks
 from stubs.cl.runtime import StubDataclass
 
@@ -41,6 +40,7 @@ def test_guard_frozen():
     frozen = not_frozen.build()
     assert BuilderChecks.guard_frozen(frozen, raise_on_fail=False)
     assert BuilderChecks.guard_frozen(frozen)
+
 
 def test_guard_frozen_or_none():
     """Test BuilderChecks.guard_frozen_or_none method."""

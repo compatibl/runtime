@@ -14,8 +14,8 @@
 
 from typing import Any
 from typing import Iterable
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.protocols import is_record
+from cl.runtime.records.record_mixin import RecordMixin
 
 
 class RecordUtil:

@@ -14,11 +14,13 @@
 
 from abc import ABC
 from enum import Enum
-from typing import Self, TypeVar
+from typing import Self
+from typing import TypeVar
 from memoization import cached
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.data_util import DataUtil
-from cl.runtime.records.protocols import TObj, TPrimitive
+from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import TPrimitive
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.slots_util import SlotsUtil
 

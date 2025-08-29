@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, TypeGuard
-
+from typing import Any
+from typing import TypeGuard
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.typename import typename
 
@@ -40,4 +40,3 @@ class PrimitiveChecks:
             raise RuntimeError(f"Parameter of type {typename(obj)} is None.")
         else:
             return False
-

@@ -16,8 +16,6 @@ import datetime as dt
 from enum import Enum
 from typing import Any
 from typing import Mapping
-from typing import Protocol
-from typing import Self
 from typing import Sequence
 from typing import TypeGuard
 from typing import TypeVar
