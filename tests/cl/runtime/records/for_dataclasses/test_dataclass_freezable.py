@@ -20,7 +20,6 @@ from stubs.cl.runtime import StubDataclassNestedFields
 
 FROZEN_MESSAGE_SUBSTR = "because the instance is frozen"
 TUPLE_MESSAGE_SUBSTR = "'tuple' object does not support item assignment"
-NON_FREEZABLE_MESSAGE_SUBSTR = "does not support DataProtocol"
 
 
 def test_simple_fields():

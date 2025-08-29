@@ -136,25 +136,6 @@ class BuilderProtocol(Protocol):
         """
         ...
 
-
-class DataProtocol(BuilderProtocol):
-    """Protocol for a class that has slots and implements the builder pattern."""
-
-    @classmethod
-    def get_field_names(cls) -> tuple[str, ...]:
-        """Return slots the order of declaration from base to derived."""
-        ...
-
-    def clone(self) -> Self:
-        """Return an unfrozen object of the same type populated by shallow copies of public fields."""
-        ...
-
-    def clone_as(self, result_type: type[TObj]) -> TObj:
-        """Return an unfrozen object of the specified type populated by shallow copies of public fields."""
-        ...
-
-
-
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Type alias for Python classes used to store primitive values."""
 
@@ -238,7 +219,7 @@ def is_builder(instance_or_type: Any) -> TypeGuard[type[BuilderProtocol]]:
     return hasattr(type_, "build") and not type_.__name__.startswith("_")
 
 
-def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[type[DataProtocol]]:
+def is_data_key_or_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[DataMixin]]:
     """
     True if the argument has 'get_field_names' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -256,7 +237,7 @@ def is_key_or_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type
     return hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
 
 
-def is_data(instance_or_type: Any) -> TypeGuard[type[DataProtocol]]:
+def is_data(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[DataMixin]]:
     """
     True if the argument has 'get_field_names' method but not 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
