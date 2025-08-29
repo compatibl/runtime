@@ -20,7 +20,6 @@ from typing import Mapping
 from typing import cast
 from uuid import UUID
 from cl.runtime.records.conditions import Condition
-from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.condition_spec import ConditionSpec
@@ -90,7 +89,7 @@ class TypeSchema:
             elif dataclasses.is_dataclass(class_):
                 # Uses dataclasses
                 spec_class = DataclassSpec
-            elif is_data_key_or_record(class_) and not cast(DataMixin, class_).get_field_names():
+            elif is_data_key_or_record(class_) and not class_.get_field_names():  # noqa
                 # Base class of data, key or record with no slots
                 spec_class = NoSlotsSpec
             elif issubclass(class_, Condition):

@@ -20,7 +20,6 @@ from typing import cast
 from cl.runtime.records.protocols import BuilderProtocol
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_builder
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
