@@ -17,7 +17,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.sql.sqlite_db import SqliteDb
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.serializers.data_serializers import DataSerializers
 
@@ -26,7 +26,7 @@ class SseQueryUtil:
     """Temporary util to perform query with simple conditions."""
 
     @classmethod
-    def query_sorted_desc_and_limited(cls, key_type: type[KeyProtocol], *, limit: int | None = None):
+    def query_sorted_desc_and_limited(cls, key_type: type[KeyMixin], *, limit: int | None = None):
         """Query 'table' with sort by 'timestamp' in descending order and limit."""
 
         # TODO (Roman): Refactor to use active(DataSource). Needed features:
@@ -55,7 +55,7 @@ class SseQueryUtil:
     def _query_sorted_desc_and_limited_sqlite(
         cls,
         db: SqliteDb,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         *,
         sort_by_desc: str,
         limit: int | None,
@@ -95,7 +95,7 @@ class SseQueryUtil:
     def _query_sorted_mongo(
         cls,
         db: BasicMongoDb,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         *,
         sort_by_desc: str,
         limit: int | None,

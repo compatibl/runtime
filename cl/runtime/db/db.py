@@ -22,7 +22,7 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.qa.qa_util import QaUtil
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.record_mixin import RecordMixin
@@ -52,8 +52,8 @@ class Db(DbKey, RecordMixin, ABC):
     @abstractmethod
     def load_many(
         self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyProtocol],
+        key_type: type[KeyMixin],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str,
         project_to: type[TRecord] | None = None,
@@ -73,7 +73,7 @@ class Db(DbKey, RecordMixin, ABC):
     @abstractmethod
     def load_all(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         *,
         dataset: str,
         cast_to: type[TRecord] | None = None,
@@ -144,7 +144,7 @@ class Db(DbKey, RecordMixin, ABC):
     @abstractmethod
     def save_many(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         records: Sequence[RecordMixin],
         *,
         dataset: str,
@@ -163,8 +163,8 @@ class Db(DbKey, RecordMixin, ABC):
     @abstractmethod
     def delete_many(
         self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyProtocol],
+        key_type: type[KeyMixin],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str,
     ) -> None:

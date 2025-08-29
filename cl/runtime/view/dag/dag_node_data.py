@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True, kw_only=True)
@@ -28,5 +28,5 @@ class DagNodeData(DataMixin):
     node_data: dict[str, str] | None = None
     """Optional node data."""
 
-    node_data_reference: KeyProtocol | None = None
+    node_data_reference: KeyMixin | None = None
     """Optional node data reference."""

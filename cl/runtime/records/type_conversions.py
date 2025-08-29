@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from typing import Sequence
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
@@ -23,7 +23,7 @@ class TypeConversions:
     """Perform type conversions."""
 
     @classmethod
-    def to_key_sequence(cls, keys: KeyProtocol | Sequence[KeyProtocol]) -> Sequence[KeyProtocol]:
+    def to_key_sequence(cls, keys: KeyMixin | Sequence[KeyMixin]) -> Sequence[KeyMixin]:
         """Convert input key to key sequence and pass through if already a key sequence, with validation."""
         if TypeCheck.guard_key_instance(keys, raise_on_fail=False):
             # Single key, convert to tuple

@@ -19,7 +19,7 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_check import TypeCheck
@@ -36,13 +36,13 @@ _local_cache_instance = None
 class LocalCache(Db):
     """In-memory cache for objects without serialization."""
 
-    __cache: dict[type[KeyProtocol], dict[tuple, RecordMixin]] = required(default_factory=lambda: {})
+    __cache: dict[type[KeyMixin], dict[tuple, RecordMixin]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
     def load_many(
         self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyProtocol],
+        key_type: type[KeyMixin],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str,
         project_to: type[TRecord] | None = None,
@@ -68,7 +68,7 @@ class LocalCache(Db):
 
     def load_all(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         *,
         dataset: str,
         cast_to: type[TRecord] | None = None,
@@ -105,7 +105,7 @@ class LocalCache(Db):
 
     def save_many(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         records: Sequence[RecordMixin],
         *,
         dataset: str,
@@ -139,8 +139,8 @@ class LocalCache(Db):
 
     def delete_many(
         self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyProtocol],
+        key_type: type[KeyMixin],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str,
     ) -> None:

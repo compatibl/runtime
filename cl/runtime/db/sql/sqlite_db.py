@@ -25,7 +25,7 @@ from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.data_mixin import TDataDict
 from cl.runtime.records.key_mixin import TKey
@@ -60,8 +60,8 @@ class SqliteDb(Db):
 
     def load_many(
         self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyProtocol],
+        key_type: type[KeyMixin],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str,
         project_to: type[TRecord] | None = None,
@@ -100,7 +100,7 @@ class SqliteDb(Db):
 
     def load_all(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         *,
         dataset: str,
         cast_to: type[TRecord] | None = None,
@@ -314,7 +314,7 @@ class SqliteDb(Db):
 
     def save_many(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         records: Sequence[RecordMixin],
         *,
         dataset: str,
@@ -372,8 +372,8 @@ class SqliteDb(Db):
 
     def delete_many(
         self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyProtocol],
+        key_type: type[KeyMixin],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str,
     ) -> None:
@@ -467,7 +467,7 @@ class SqliteDb(Db):
 
         return conn
 
-    def _create_table(self, *, key_type: type[KeyProtocol]) -> None:
+    def _create_table(self, *, key_type: type[KeyMixin]) -> None:
         """Create a table if not exists with a structure corresponding to the key_type hierarchy."""
 
         # Get table name from key type and check it has an acceptable format
@@ -565,7 +565,7 @@ class SqliteDb(Db):
 
     @classmethod
     @cached
-    def _get_validated_table_name(cls, *, key_type: type[KeyProtocol]):
+    def _get_validated_table_name(cls, *, key_type: type[KeyMixin]):
         """Get table name from key type and check that it has an acceptable format or length, error otherwise."""
         table_name = typename(key_type).removesuffix("Key")
         if _TABLE_NAME_RE.fullmatch(table_name) is None:

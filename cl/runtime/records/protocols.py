@@ -154,15 +154,6 @@ class DataProtocol(BuilderProtocol):
         ...
 
 
-class KeyProtocol(DataProtocol):
-    """Protocol implemented by both keys and records."""
-
-    @classmethod
-    def get_key_type(cls) -> type["KeyProtocol"]:
-        """Return key type even when called from a record."""
-        ...
-
-
 
 TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Type alias for Python classes used to store primitive values."""
@@ -256,7 +247,7 @@ def is_data_key_or_record(instance_or_type: Any) -> TypeGuard[type[DataProtocol]
     return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
 
 
-def is_key_or_record(instance_or_type: Any) -> TypeGuard[type[KeyProtocol]]:
+def is_key_or_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[KeyMixin]]:
     """
     True if the argument has 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -276,7 +267,7 @@ def is_data(instance_or_type: Any) -> TypeGuard[type[DataProtocol]]:
     )
 
 
-def is_key(instance_or_type: Any) -> TypeGuard[type[KeyProtocol]]:
+def is_key(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[KeyMixin]]:
     """
     True if the argument has 'get_key_type' method but not 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.

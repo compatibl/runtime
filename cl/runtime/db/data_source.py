@@ -36,7 +36,7 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.protocols import is_key
@@ -76,7 +76,7 @@ class DataSource(DataSourceKey, RecordMixin):
     designated: list[ResourceKey] | None = None
     """Lookup these resources only here, not in any child or parent (optional)."""
 
-    _pending_deletes: list[KeyProtocol] | None = None
+    _pending_deletes: list[KeyMixin] | None = None
     """
     Keys that will be deleted on commit, including keys for which replacement records will be inserted
     as part of the same commit.
@@ -149,7 +149,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_one(
         self,
-        key_or_record: KeyProtocol,
+        key_or_record: KeyMixin,
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -191,7 +191,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_one_or_none(
         self,
-        key_or_record: KeyProtocol | None,
+        key_or_record: KeyMixin | None,
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -217,7 +217,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_many(
         self,
-        records_or_keys: Sequence[TRecord | KeyProtocol],
+        records_or_keys: Sequence[TRecord | KeyMixin],
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -253,7 +253,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_many_or_none(
         self,
-        records_or_keys: Sequence[TRecord | KeyProtocol | None] | None,
+        records_or_keys: Sequence[TRecord | KeyMixin | None] | None,
         *,
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -377,7 +377,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def load_all(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         *,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
@@ -617,7 +617,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def delete_one(
         self,
-        key: KeyProtocol,
+        key: KeyMixin,
         *,
         commit: bool,
     ) -> None:
@@ -626,7 +626,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
     def delete_many(
         self,
-        keys: Sequence[KeyProtocol],
+        keys: Sequence[KeyMixin],
         *,
         commit: bool,
     ) -> None:
@@ -757,8 +757,8 @@ class DataSource(DataSourceKey, RecordMixin):
 
     @classmethod
     def _group_inputs_by_key_type(
-        cls, inputs: Sequence[RecordMixin | KeyProtocol | None]
-    ) -> dict[type[KeyProtocol], Sequence[RecordMixin | KeyProtocol | None]]:
+        cls, inputs: Sequence[RecordMixin | KeyMixin | None]
+    ) -> dict[type[KeyMixin], Sequence[RecordMixin | KeyMixin | None]]:
         """Group inputs by key type, skipping sequence elements that are None."""
         result = defaultdict(list)
         consume(result[x.get_key_type()].append(x) for x in inputs if x is not None)

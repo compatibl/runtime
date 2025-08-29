@@ -25,7 +25,7 @@ from cl.runtime.db.db import Db
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
-from cl.runtime.records.protocols import KeyProtocol
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.protocols import is_key
@@ -76,8 +76,8 @@ class BasicMongoDb(Db):
 
     def load_many(
         self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyProtocol],
+        key_type: type[KeyMixin],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str,
         project_to: type[TRecord] | None = None,
@@ -104,7 +104,7 @@ class BasicMongoDb(Db):
 
     def load_all(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         *,
         dataset: str,
         cast_to: type[TRecord] | None = None,
@@ -257,7 +257,7 @@ class BasicMongoDb(Db):
 
     def save_many(
         self,
-        key_type: type[KeyProtocol],
+        key_type: type[KeyMixin],
         records: Sequence[RecordMixin],
         *,
         dataset: str,
@@ -301,8 +301,8 @@ class BasicMongoDb(Db):
 
     def delete_many(
         self,
-        key_type: type[KeyProtocol],
-        keys: Sequence[KeyProtocol],
+        key_type: type[KeyMixin],
+        keys: Sequence[KeyMixin],
         *,
         dataset: str,
     ) -> None:
@@ -368,7 +368,7 @@ class BasicMongoDb(Db):
 
         return result
 
-    def _get_mongo_collection(self, key_type: type[KeyProtocol]) -> Collection:
+    def _get_mongo_collection(self, key_type: type[KeyMixin]) -> Collection:
         """Get pymongo collection for the specified key type."""
         if self._mongo_collection_dict is None:
             self._mongo_collection_dict = {}
@@ -514,7 +514,7 @@ class BasicMongoDb(Db):
 
         return record_dict
 
-    def _get_mongo_keys_filter(self, keys: Sequence[KeyProtocol], *, dataset: str) -> dict[str, Any]:
+    def _get_mongo_keys_filter(self, keys: Sequence[KeyMixin], *, dataset: str) -> dict[str, Any]:
         """Get filter for loading records that match one of the specified keys."""
         serialized_keys = tuple(_KEY_SERIALIZER.serialize(key) for key in keys)
         return {
