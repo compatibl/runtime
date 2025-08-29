@@ -28,7 +28,7 @@ from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
-from cl.runtime.records.type_check import TypeCheck
+from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_cache import TypeCache
@@ -81,7 +81,7 @@ class KeySerializer(Serializer):
         """Deserialize key from a delimited string or a flattened sequence of primitive types."""
 
         # For keys, type hint is required
-        TypeCheck.guard_not_none(type_hint)
+        PrimitiveChecks.guard_not_none(type_hint)
 
         # Get schema class from the type hint
         schema_type = type_hint._schema_class
@@ -134,7 +134,7 @@ class KeySerializer(Serializer):
 
         if not is_outer:
             # For inner key fields which also have key type, type hint is required
-            TypeCheck.guard_not_none(type_hint)
+            PrimitiveChecks.guard_not_none(type_hint)
 
         # Get the class of data, which may be NoneType
         data_type_name = typename(data)

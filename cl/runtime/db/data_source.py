@@ -45,6 +45,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_type_binding import RecordTypeBinding
 from cl.runtime.records.record_type_binding_query import RecordTypeBindingQuery
 from cl.runtime.records.type_check import TypeCheck
+from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
@@ -783,7 +784,7 @@ class DataSource(DataSourceKey, RecordMixin):
             save_policy: Insert vs. replace policy, partial update is not included due to design considerations
         """
         assert TypeCheck.guard_record_sequence(records)
-        assert TypeCheck.guard_not_none(save_policy)
+        assert PrimitiveChecks.guard_not_none(save_policy)
 
         # Do nothing if empty but error on None
         if len(records) == 0:

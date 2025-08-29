@@ -20,7 +20,6 @@ from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import KeyProtocol
-from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.type_check import TypeCheck

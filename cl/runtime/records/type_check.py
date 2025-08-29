@@ -34,26 +34,6 @@ class TypeCheck:
     """Performs runtime type checks and returns TypeGuard instance."""
 
     @classmethod
-    def guard_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[None]:
-        """Confirm that the argument is None."""
-        if obj is None:
-            return True
-        elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} is not None.")
-        else:
-            return False
-
-    @classmethod
-    def guard_not_none(cls, obj: TObj | None, *, raise_on_fail: bool = True) -> TypeGuard[TObj]:
-        """Confirm that the argument is not None."""
-        if obj is not None:
-            return True
-        elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} is None.")
-        else:
-            return False
-
-    @classmethod
     def guard_sequence(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence]:
         """Confirm that the argument is an immutable sequence."""
         if obj is not None:

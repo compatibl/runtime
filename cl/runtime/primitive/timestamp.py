@@ -19,7 +19,7 @@ from typing import TypeGuard
 from uuid import UUID
 import uuid_utils
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.records.type_check import TypeCheck
+from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.records.typename import typename
 
 _ISO_DELIMITED_FORMAT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z-[a-f0-9]{20}$")
@@ -144,7 +144,7 @@ class Timestamp:
             data_type: Class type or name for formatting the error message (optional)
         """
         # Confirm the value is not None
-        assert TypeCheck.guard_not_none(value)
+        assert PrimitiveChecks.guard_not_none(value)
 
         # Delegate to the method that can also handle None, always raise on fail for this overload
         return cls.to_datetime_or_none(
