@@ -167,7 +167,7 @@ def is_mixin(instance_or_type: Any) -> bool:
     return type_.__name__.endswith("Mixin")
 
 
-def is_builder(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[BuilderMixin]]:
+def is_builder(instance_or_type: Any) -> bool:
     """
     True if the argument has 'build' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -176,7 +176,7 @@ def is_builder(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[Build
     return hasattr(type_, "build") and not type_.__name__.startswith("_")
 
 
-def is_data_key_or_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[DataMixin]]:
+def is_data_key_or_record(instance_or_type: Any) -> bool:
     """
     True if the argument has 'get_field_names' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -185,7 +185,7 @@ def is_data_key_or_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard
     return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
 
 
-def is_key_or_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[KeyMixin]]:
+def is_key_or_record(instance_or_type: Any) -> bool:
     """
     True if the argument has 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -194,7 +194,7 @@ def is_key_or_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type
     return hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
 
 
-def is_data(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[DataMixin]]:
+def is_data(instance_or_type: Any) -> bool:
     """
     True if the argument has 'get_field_names' method but not 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -205,7 +205,7 @@ def is_data(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[DataMixi
     )
 
 
-def is_key(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[KeyMixin]]:
+def is_key(instance_or_type: Any) -> bool:
     """
     True if the argument has 'get_key_type' method but not 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -214,19 +214,10 @@ def is_key(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[KeyMixin]
     return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not type_.__name__.startswith("_")
 
 
-def is_record(instance_or_type: Any) -> bool:  # TODO: !!! TypeGuard[type[RecordMixin]]:
+def is_record(instance_or_type: Any) -> bool:
     """
     Return True if the argument has 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return hasattr(type_, "get_key") and not type_.__name__.startswith("_")
-
-
-def is_singleton_key(instance_or_type: Any):  # TODO: Move elsewhere and review logic
-    """Return True if the argument is a singleton key (has no key fields), error if not a key or has no slots."""
-    if not is_key(instance_or_type):
-        raise RuntimeError("Function 'is_singleton_key' is called on an object that is not a key.")
-    if not hasattr(instance_or_type, "__slots__"):
-        raise RuntimeError("Function 'is_singleton' is called on an object that has no __slots__ attribute.")
-    return all(name.startswith("_") for name in instance_or_type.get_field_names())
