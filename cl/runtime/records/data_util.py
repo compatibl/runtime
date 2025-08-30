@@ -19,7 +19,7 @@ from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_primitive
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -29,8 +29,6 @@ from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
-
-_PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE = PRIMITIVE_TYPE_NAMES + ("NoneType",)
 
 
 class DataUtil(BuilderUtil):
@@ -53,7 +51,7 @@ class DataUtil(BuilderUtil):
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
 
-        if data_class_name == "NoneType":
+        if is_empty(data):
             if type_hint is None or is_optional:
                 # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
                 return None
@@ -72,11 +70,7 @@ class DataUtil(BuilderUtil):
             # item in the sequence, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_sequence()  # TODO: Rename to avoid validate_for...
-            if len(data) == 0:
-                # Consider an empty sequence equivalent to None
-                return None
-            else:
-                return tuple(cls.build_(v, remaining_chain) for v in data)
+            return tuple(cls.build_(v, remaining_chain) if not is_empty(v) else None for v in data)
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
@@ -84,11 +78,9 @@ class DataUtil(BuilderUtil):
             if type_hint is not None:
                 type_hint.validate_for_mapping()
             return frozendict(
-                {
-                    dict_key: cls.build_(dict_value, remaining_chain)
-                    for dict_key, dict_value in data.items()
-                    if dict_value is not None
-                }
+                (dict_key, cls.build_(dict_value, remaining_chain))
+                for dict_key, dict_value in data.items()
+                if not is_empty(dict_value)
             )
         elif is_enum(data):
             if remaining_chain:
@@ -152,35 +144,31 @@ class DataUtil(BuilderUtil):
                             outer_type_name=typename(data),
                             field_name=field_name,
                         )
-                        if (field_value := getattr(data, field_name)).__class__.__name__
-                        in _PRIMITIVE_TYPE_NAMES_AND_NONE_TYPE
-                        else (
-                            EnumUtil.build_(
-                                field_value,
-                                field_spec.type_hint,
-                                outer_type_name=typename(data),
-                                field_name=field_name,
-                            )
-                            if is_enum(field_value)
-                            else (
-                                ConditionUtil.build_(
-                                    field_value,
-                                    field_spec.type_hint,
-                                    outer_type_name=typename(data),
-                                    field_name=field_name,
-                                )
-                                if is_condition(field_value)
-                                else cls.build_(
-                                    field_value,
-                                    field_spec.type_hint,
-                                    outer_type_name=typename(data),
-                                    field_name=field_name,
-                                )
-                            )
+                        if is_primitive(field_value)
+                        else EnumUtil.build_(
+                            field_value,
+                            field_spec.type_hint,
+                            outer_type_name=typename(data),
+                            field_name=field_name,
+                        )
+                        if is_enum(field_value)
+                        else ConditionUtil.build_(
+                            field_value,
+                            field_spec.type_hint,
+                            outer_type_name=typename(data),
+                            field_name=field_name,
+                        )
+                        if is_condition(field_value)
+                        else cls.build_(
+                            field_value,
+                            field_spec.type_hint,
+                            outer_type_name=typename(data),
+                            field_name=field_name,
                         )
                     ),
                 )
                 for field_name, field_spec in data_field_dict.items()
+                if not is_empty(field_value := getattr(data, field_name))
             )
             # Mark as frozen to prevent further modifications
             return data.mark_frozen()

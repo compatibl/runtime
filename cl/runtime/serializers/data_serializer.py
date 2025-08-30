@@ -15,10 +15,13 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
+
+from frozendict import frozendict
+
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -26,7 +29,6 @@ from cl.runtime.records.protocols import SEQUENCE_AND_MAPPING_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.typename import typename
@@ -95,12 +97,15 @@ class DataSerializer(Serializer):
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
 
-        if data_class_name == "NoneType":
+        if is_empty(data):
             if type_hint is None or is_optional:
                 # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
                 return None
             else:
-                raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
+                raise RuntimeError(
+                	f"Data is None or an empty primitive type but type hint\n"
+                	f"{type_hint.to_str()} indicates it is required."
+                )
         elif data_class_name in PRIMITIVE_CLASS_NAMES:
             if remaining_chain:
                 raise RuntimeError(
@@ -122,22 +127,18 @@ class DataSerializer(Serializer):
             # item in the sequence, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_sequence()
-            if len(data) == 0:
-                # Consider an empty sequence equivalent to None
-                return None
-            else:
-                return list(self.serialize(v, remaining_chain) for v in data)  # TODO: Replace by tuple
+            return tuple(self.serialize(v, remaining_chain) if not is_empty(v) else None for v in data)
         elif data_class_name in MAPPING_TYPE_NAMES:
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_mapping()
-            return dict(
+            return frozendict(
                 (self._serialize_key(dict_key), self.serialize(dict_value, remaining_chain))
                 for dict_key, dict_value in data.items()
                 if not is_empty(dict_value)
-            )  # TODO: Replace by frozendict
+            )
         elif is_data_key_or_record(data):
             # Use key serializer for key types if specified
             if self.key_serializer is not None and is_key(data):
@@ -270,7 +271,7 @@ class DataSerializer(Serializer):
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
 
-        if data_class_name == "NoneType":
+        if is_empty(data):
             if type_hint is None or is_optional:
                 # Return None if type hint is not specified or is_optional flag is set, otherwise raise an error
                 return None
@@ -283,31 +284,30 @@ class DataSerializer(Serializer):
             type_hint.validate_for_sequence()
             if data_class_name not in SEQUENCE_CLASS_NAMES:
                 raise RuntimeError(
-                    f"Data type {data_class_name} is a sequence but schema type\n" f"{schema_type_name} is not."
+                    f"Data type {data_class_name} is a sequence but schema type {schema_type_name} is not."
                 )
             # Decode if necessary
             # TODO: Eliminate check for the fist character
-            if len(data) == 0:
-                # Consider an empty sequence equivalent to None
-                return None
             elif self.inner_encoder is not None and isinstance(data, str) and data.startswith("["):
                 # Decode and deserialize sequence using data_serializer
                 data = self.inner_encoder.decode(data)
-                return list(self.inner_serializer.deserialize(v, remaining_chain) for v in data)
+                return tuple(self.inner_serializer.deserialize(v, remaining_chain) if not is_empty(v) else None for v in data)
             else:
                 # Deserialize sequence using self
-                return list(self.deserialize(v, remaining_chain) for v in data)
+                return tuple(self.deserialize(v, remaining_chain) if not is_empty(v) else None for v in data)
         elif schema_type_name in MAPPING_TYPE_NAMES:
             type_hint.validate_for_mapping()
+            if data_class_name not in MAPPING_TYPE_NAMES:
+                raise RuntimeError(
+                    f"Data type {data_class_name} is a mapping but schema type {schema_type_name} is not."
+                )
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
-            return {
-                self._deserialize_key(dict_key): self.deserialize(
-                    dict_value, remaining_chain
-                )  # TODO: Should data_serializer be used here?
+            return frozendict(
+                (self._deserialize_key(dict_key), self.deserialize(dict_value, remaining_chain))
                 for dict_key, dict_value in data.items()
                 if not is_empty(dict_value)
-            }
+            )
         elif isinstance(data, str):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
             type_spec = TypeSchema.for_type_name(schema_type_name)
@@ -377,7 +377,7 @@ class DataSerializer(Serializer):
             result_dict = {
                 (snake_case_k := self._deserialize_key(field_key)): (
                     self._key_error(type_name=type_name, field_key=field_key)
-                    if (field_hint := field_dict.get(snake_case_k)) is None
+                    if field_dict.get(snake_case_k) is None
                     else (
                         self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
                         if (
@@ -392,7 +392,7 @@ class DataSerializer(Serializer):
                     )
                 )
                 for field_key, field_value in data.items()
-                if not field_key.startswith("_") and not is_empty(field_value)
+                if not is_empty(field_value) and not field_key.startswith("_")
             }
 
             # Construct an instance of the target type
@@ -405,11 +405,6 @@ class DataSerializer(Serializer):
                 f"Cannot deserialize the following data using type hint '{type_hint.to_str()}':\n"
                 f"{ErrorUtil.wrap(data)}"
             )
-
-    @classmethod
-    def _is_empty(cls, data: Any) -> bool:
-        """Check if the data is None, an empty string, or an empty container."""
-        return data in (None, "") or (data.__class__.__name__ in SEQUENCE_AND_MAPPING_CLASS_NAMES and len(data) == 0)
 
     def _serialize_key(self, field_key: str) -> str:
         """Transform the field key for use in serialization"""

@@ -15,7 +15,7 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
@@ -34,14 +34,14 @@ class BootstrapUtil:
         (2) Invokes '__init' method of this class and its ancestors in the order from base to derived
         (3) Calls its 'mark_frozen' method without performing validation against the schema
         """
-        if data is None:
-            # Pass through None
-            return data
+        if is_empty(data):
+            # Pass through None and empty primitive types
+            return None
         elif (data_class_name := typename(data)) in PRIMITIVE_CLASS_NAMES:
             # Pass through primitive types
             return data
         elif is_enum(data):
-            # Pass through enum types
+            # Pass through enums
             return data
         elif data_class_name in SEQUENCE_TYPE_NAMES:
             # Convert a sequence types to tuple after applying build to each item

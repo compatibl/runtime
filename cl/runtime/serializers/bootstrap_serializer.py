@@ -32,10 +32,9 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
@@ -245,21 +244,16 @@ class BootstrapSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         elif data_class_name in SEQUENCE_CLASS_NAMES:
-            if len(data) == 0:
-                # Consider an empty sequence equivalent to None
-                return None
-            else:
-                # Include items that are None in output to preserve item positions
-                return [self._serialize(v) if v is not None else None for v in data]
+            # Include items that are None in output to preserve item positions
+            return [self._serialize(v) if not is_empty(v) else None for v in data]
         elif data_class_name in MAPPING_CLASS_NAMES:
-            # Mapping container, do not include values that are null or empty
+            # Mapping container, do not include values that are None or an empty primitive type
             # Allow keys that begin from _ in mapping classes, but not slotted classes
-            result = {
+            return {
                 k if not self.pascalize_keys else CaseUtil.snake_to_pascal_case(k): self._serialize(v)
                 for k, v in data.items()
                 if not is_empty(v)
             }
-            return result
         elif isinstance(data, Enum):
             if (value_format := self.enum_format) == EnumFormat.PASSTHROUGH:
                 # Pass through the enum instance without changes
@@ -269,9 +263,7 @@ class BootstrapSerializer(Serializer):
                 return CaseUtil.upper_to_pascal_case(data.name)
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormat)
-
         elif is_data_key_or_record(data):
-
             # Use key serializer for key types
             if is_key(data):
                 if self.key_format == KeyFormat.DELIMITED:

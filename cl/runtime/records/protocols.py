@@ -108,10 +108,11 @@ TEnum = TypeVar("TEnum", bound=Enum)
 
 def is_empty(
     data: Any,
-) -> bool:  # TODO: Review if we should consider empty sequences as None during build or serialization
-    """Returns true if the argument is None or an empty string, sequence or mapping."""
-    return data in (None, "") or (data.__class__.__name__ in SEQUENCE_AND_MAPPING_CLASS_NAMES and len(data) == 0)
+) -> bool:
+    """True if the argument is None or an empty primitive type, False for an empty sequence or mapping."""
+    return data in (None, "")
 
+# TODO: !!! Avoid instance_or_type, create two methods instead
 
 def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveTypes]:
     """Returns true if the argument is one of the supported primitive classes."""
@@ -148,7 +149,7 @@ def is_sequence(instance_or_type: Any) -> TypeGuard[SequenceTypes]:
     return result
 
 
-def is_mapping(instance_or_type: Any) -> TypeGuard[SequenceTypes]:
+def is_mapping(instance_or_type: Any) -> TypeGuard[MappingTypes]:
     """Returns true if the argument is one of the supported mapping types."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in MAPPING_TYPE_NAMES

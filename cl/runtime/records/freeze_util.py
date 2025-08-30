@@ -15,7 +15,7 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
-from cl.runtime.records.protocols import MAPPING_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES, is_builder, is_empty, is_primitive
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
@@ -29,26 +29,43 @@ class FreezeUtil:
     def freeze(cls, data: Any) -> Any:
         """
         Recursively convert sequence classes to tuples and mapping classes to frozendicts inside nested data
-        and invoke freeze method for buildable classes without checking the type hint.
+        and invoke freeze method for buildable classes without checking the type hint for public fields,
+        pass through private and protected fields.
         """
-        if data is None or isinstance(data, PRIMITIVE_CLASSES) or isinstance(data, Enum):
-            # Pass through None, primitive types, and enums
+        if is_empty(data):
+            # Return None if data is None or an empty primitive type
+            return None
+        elif is_primitive(data):
+            # Pass through primitive types
+            return data
+        elif isinstance(data, Enum):
+            # Pass through enums
             return data
         elif isinstance(data, SEQUENCE_CLASSES):
             # Convert all sequence types to tuple
-            return tuple(cls.freeze(item) for item in data)
+            return tuple(cls.freeze(item) if not is_empty(item) else None for item in data)
         elif isinstance(data, MAPPING_CLASSES):
             # Convert all mapping types to frozendict
-            return frozendict((k, cls.freeze(v)) for k, v in data.items())
-        elif hasattr(data, "mark_frozen"):
-            if is_data_key_or_record(data):
-                # Recreate with frozen fields and freeze the result
-                return type(data)(**{k: cls.freeze(getattr(data, k)) for k in data.get_field_names()}).mark_frozen()
-            else:
-                # Mark frozen and return
-                return data.mark_frozen()
+            return frozendict(
+                (k, cls.freeze(v))
+                if not k.startswith("_")
+                else v  # Do not freeze private or protected fields
+                for k, v in data.items()
+                if not is_empty(v)
+            )
+        elif is_data_key_or_record(data):
+            # Recreate with frozen fields and freeze the result
+            frozen_data = {
+                k: cls.freeze(v)
+                if not k.startswith("_")
+                else v  # Do not freeze private or protected fields
+                for k in data.get_field_names()
+                if not is_empty(v := getattr(data, k))
+            }
+            return type(data)(**frozen_data).mark_frozen()
         else:
             raise RuntimeError(
-                f"Cannot freeze data of type {typename(data)} because it is not a\n"
-                f"primitive type, enum, sequence, mapping or a freezable class."
+                f"Cannot freeze data of type {typename(data)} because it is not\n"
+                f"a primitive type, enum, data, key or record class,\n"
+                f"or a supported container of these types."
             )

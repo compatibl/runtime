@@ -240,18 +240,19 @@ class TypeHint(BootstrapMixin):
                             condition=type_alias_condition,
                         )
                     )
-                elif type_alias_origin is dict:
+                elif type_alias_origin in (dict, frozendict):
                     if len(type_alias_args) != 2 or type_alias_args[0] is not str:
                         raise RuntimeError(
-                            f"Dict type hint '{cls._serialize_type_alias(type_alias)}'\n"
+                            f"Type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"for field {field_name} in {typename(containing_type)} is not supported\n"
-                            f"because it is not a dictionary with string keys using the syntax 'dict[str, type]'\n"
+                            f"because it is not a mapping with string keys using the syntax\n"
+                            f"dict[str, element_type] or frozendict[str, element_type].\n"
                         )
                     type_alias = type_alias_args[1]
                     type_hint_tokens.append(
                         TypeHint(
-                            schema_type_name="dict",
-                            _schema_class=dict,
+                            schema_type_name=type_alias_origin.__name__,
+                            _schema_class=type_alias_origin,
                             optional=type_alias_optional,
                             condition=type_alias_condition,
                         )
