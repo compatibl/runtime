@@ -1,0 +1,47 @@
+{
+  "id": "abc"
+}
+{
+  "id": "abc",
+  "empty_list": [],
+  "empty_tuple": [],
+  "empty_dict": {},
+  "empty_frozendict": {}
+}
+{
+  "id": "abc",
+  "empty_list": [],
+  "empty_tuple": [],
+  "empty_dict": {},
+  "empty_frozendict": {}
+}
+{
+  "id": "abc",
+  "empty_list": [
+    "abc"
+  ],
+  "empty_tuple": [
+    "abc"
+  ],
+  "empty_dict": {
+    "1": "abc"
+  },
+  "empty_frozendict": {
+    "1": "abc"
+  }
+}
+{
+  "id": "abc",
+  "empty_list": [
+    "abc"
+  ],
+  "empty_tuple": [
+    "abc"
+  ],
+  "empty_dict": {
+    "1": "abc"
+  },
+  "empty_frozendict": {
+    "1": "abc"
+  }
+}

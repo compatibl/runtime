@@ -14,15 +14,18 @@
 
 import pytest
 import orjson
+from frozendict import frozendict
+
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.mapping_util import MappingUtil
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_inclusion import TypeInclusion
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclass, StubDataclassTupleFields
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
@@ -35,6 +38,8 @@ from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_empty_fields import StubDataclassEmptyFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_frozendict_fields import StubDataclassFrozendictFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composite import (
     StubDataclassPolymorphicComposite,
@@ -42,19 +47,21 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composi
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
 
 _SAMPLES = [
-    StubDataclass().build(),
-    StubDataclassNestedFields().build(),
-    StubDataclassComposite().build(),
-    StubDataclassDerived().build(),
-    StubDataclassDoubleDerived().build(),
-    StubDataclassOtherDerived().build(),
-    StubDataclassListFields().build(),
-    StubDataclassOptionalFields().build(),
-    StubDataclassDictFields().build(),
-    StubDataclassDictListFields().build(),
-    StubDataclassListDictFields().build(),
-    StubDataclassPrimitiveFields().build(),
-    StubDataclassSingleton().build(),
+    StubDataclass(),
+    StubDataclassNestedFields(),
+    StubDataclassComposite(),
+    StubDataclassDerived(),
+    StubDataclassDoubleDerived(),
+    StubDataclassOtherDerived(),
+    StubDataclassTupleFields(),
+    StubDataclassListFields(),
+    StubDataclassOptionalFields(),
+    StubDataclassFrozendictFields(),
+    StubDataclassDictFields(),
+    StubDataclassDictListFields(),
+    StubDataclassListDictFields(),
+    StubDataclassPrimitiveFields(),
+    StubDataclassSingleton(),
     StubDataclassPolymorphic(
         base_key_field=StubDataclassPolymorphicKey(),
         root_key_field=StubDataclassPolymorphicKey(),
@@ -65,7 +72,35 @@ _SAMPLES = [
         base_key_field=StubDataclassPolymorphicKey(),
         root_key_field=StubDataclassPolymorphicKey(),
     ),
-    # TODO: StubDataclassTupleFields().build(),  # TODO: Implement support for this class
+    StubDataclassEmptyFields(),  # Fields set to None
+    StubDataclassEmptyFields(  # Fields set to empty mutable containers
+        empty_str="",
+        empty_list=[],
+        empty_tuple=[],  # noqa
+        empty_dict={},
+        empty_frozendict={}, # noqa
+    ),
+    StubDataclassEmptyFields(  # Fields set to empty immutable containers
+        empty_str="",
+        empty_list=(), # noqa
+        empty_tuple=(),
+        empty_dict=frozendict(),
+        empty_frozendict=frozendict(),
+    ),
+    StubDataclassEmptyFields(  # Fields set to non-empty mutable containers
+        empty_str="",
+        empty_list=["abc"],
+        empty_tuple=["abc"],  # noqa
+        empty_dict={"1": "abc"},
+        empty_frozendict={"1": "abc"},  # noqa
+    ),
+    StubDataclassEmptyFields(  # Fields set to non-empty immutable containers
+        empty_str="",
+        empty_list=("abc",), # noqa
+        empty_tuple=("abc",),
+        empty_dict=frozendict({"1": "abc"}),
+        empty_frozendict=frozendict({"1": "abc"}),
+    ),
 ]
 
 
@@ -79,13 +114,14 @@ def test_bidirectional():
     ).build()
 
     for sample in _SAMPLES:
+        sample = sample.build()
 
         # Serialize to dict
         serialized = serializer.serialize(sample)
 
         # Deserialize and compare
         deserialized = serializer.deserialize(serialized)
-        assert deserialized == MappingUtil.remove_none(sample)
+        assert BuilderChecks.is_equal(deserialized, sample)
 
         # Convert serialized data to JSON using orjson to avoid relying on the functionality being tested
         result_str = orjson.dumps(
@@ -113,6 +149,7 @@ def test_unidirectional():
     ).build()
 
     for sample in _SAMPLES:
+        sample = sample.build()
 
         # Serialize to dict
         serialized = serializer.serialize(sample)

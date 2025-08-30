@@ -1,0 +1,52 @@
+{
+  "_type": "StubDataclassEmptyFields",
+  "id": "abc"
+}
+{
+  "_type": "StubDataclassEmptyFields",
+  "id": "abc",
+  "empty_list": [],
+  "empty_tuple": [],
+  "empty_dict": {},
+  "empty_frozendict": {}
+}
+{
+  "_type": "StubDataclassEmptyFields",
+  "id": "abc",
+  "empty_list": [],
+  "empty_tuple": [],
+  "empty_dict": {},
+  "empty_frozendict": {}
+}
+{
+  "_type": "StubDataclassEmptyFields",
+  "id": "abc",
+  "empty_list": [
+    "abc"
+  ],
+  "empty_tuple": [
+    "abc"
+  ],
+  "empty_dict": {
+    "1": "abc"
+  },
+  "empty_frozendict": {
+    "1": "abc"
+  }
+}
+{
+  "_type": "StubDataclassEmptyFields",
+  "id": "abc",
+  "empty_list": [
+    "abc"
+  ],
+  "empty_tuple": [
+    "abc"
+  ],
+  "empty_dict": {
+    "1": "abc"
+  },
+  "empty_frozendict": {
+    "1": "abc"
+  }
+}
