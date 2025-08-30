@@ -16,6 +16,7 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_key_or_record
@@ -54,7 +55,7 @@ def test_serialization():  # TODO: Rename to test_delimited
         serialized = KeySerializers.DELIMITED.serialize(sample)
         type_hint = TypeHint.for_class(sample.__class__)
         deserialized = KeySerializers.DELIMITED.deserialize(serialized, type_hint)
-        assert sample == PytestUtil.approx(deserialized)
+        assert BuilderChecks.is_equal(sample, deserialized)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(sample))
@@ -85,7 +86,7 @@ def test_polymorphic():
     serialized = KeySerializers.DELIMITED.serialize(sample, base_type_hint)
     assert serialized == f"{typename(sample)};{sample.id}"
     deserialized = KeySerializers.DELIMITED.deserialize(serialized, base_type_hint)
-    assert sample == PytestUtil.approx(deserialized)
+    assert BuilderChecks.is_equal(sample, deserialized)
 
     # return  # TODO: Restore after composite key is supported
 
@@ -103,7 +104,7 @@ def test_polymorphic():
         f"{inner_type};{composite_key.base_key_field.id};" f"{inner_type};{composite_key.root_key_field.id}"
     )  # noqa
     deserialized = KeySerializers.DELIMITED.deserialize(serialized, composite_key_hint)
-    assert composite_key == PytestUtil.approx(deserialized)
+    assert BuilderChecks.is_equal(composite_key, deserialized)
 
 
 def test_for_sqlite():
@@ -114,7 +115,7 @@ def test_for_sqlite():
         serialized = KeySerializers.FOR_SQLITE.serialize(sample)
         type_hint = TypeHint.for_class(sample.__class__)
         deserialized = KeySerializers.FOR_SQLITE.deserialize(serialized, type_hint)
-        assert sample == PytestUtil.approx(deserialized)
+        assert BuilderChecks.is_equal(sample, deserialized)
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(sample))

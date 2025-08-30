@@ -16,6 +16,7 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
@@ -95,7 +96,7 @@ def test_from_yaml():
         deserialized_dict = _PASSTHROUGH_SERIALIZER.serialize(deserialized)
 
         # Compare with floating point tolerance
-        assert deserialized_dict == PytestUtil.approx(obj_dict)
+        assert BuilderChecks.is_equal(deserialized_dict, obj_dict)
 
 
 if __name__ == "__main__":
