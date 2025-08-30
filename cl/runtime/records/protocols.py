@@ -90,17 +90,17 @@ SEQUENCE_AND_MAPPING_CLASS_NAMES = tuple(x for x in (*SEQUENCE_CLASS_NAMES, *MAP
 SEQUENCE_AND_MAPPING_TYPE_NAMES = tuple(x for x in (*SEQUENCE_TYPE_NAMES, *MAPPING_TYPE_NAMES))
 """Names of classes that may be used to represent mappings, excluding abstract base classes."""
 
-TObj = TypeVar("TObj")
-"""Generic type parameter for any object."""
-
-TPrimitive = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
+PrimitiveTypes = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Type alias for Python classes used to store primitive values."""
 
-TSequence = list | tuple | Sequence
+SequenceTypes = list | tuple | Sequence
 """Type alias for a supported sequence type."""
 
-TMapping = dict | frozendict | Mapping
+MappingTypes = dict | frozendict | Mapping
 """Type alias for a supported mapping type."""
+
+TObj = TypeVar("TObj")
+"""Generic type parameter for any object."""
 
 TEnum = TypeVar("TEnum", bound=Enum)
 """Generic type parameter for an enum."""
@@ -113,7 +113,7 @@ def is_empty(
     return data in (None, "") or (data.__class__.__name__ in SEQUENCE_AND_MAPPING_CLASS_NAMES and len(data) == 0)
 
 
-def is_primitive(instance_or_type: Any) -> TypeGuard[TPrimitive]:
+def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveTypes]:
     """Returns true if the argument is one of the supported primitive classes."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in PRIMITIVE_CLASS_NAMES
@@ -127,7 +127,7 @@ def is_condition(instance_or_type: Any) -> TypeGuard[Any]:  # TODO: Add protocol
     return result
 
 
-def is_enum(instance_or_type: Any) -> TypeGuard[TEnum]:
+def is_enum(instance_or_type: Any) -> TypeGuard[Enum]:
     """
     Returns true if the argument is an enum.
     Excludes classes whose name starts from underscore.
@@ -141,14 +141,14 @@ def is_enum(instance_or_type: Any) -> TypeGuard[TEnum]:
     return issubclass(type_, Enum) and not type_.__name__.startswith("_") and not_base_enum
 
 
-def is_sequence(instance_or_type: Any) -> TypeGuard[TSequence]:
+def is_sequence(instance_or_type: Any) -> TypeGuard[SequenceTypes]:
     """Returns true if the argument is one of the supported sequence types."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in SEQUENCE_TYPE_NAMES
     return result
 
 
-def is_mapping(instance_or_type: Any) -> TypeGuard[TSequence]:
+def is_mapping(instance_or_type: Any) -> TypeGuard[SequenceTypes]:
     """Returns true if the argument is one of the supported mapping types."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in MAPPING_TYPE_NAMES

@@ -23,7 +23,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import TObj
-from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
@@ -129,7 +129,7 @@ class KeySerializer(Serializer):
             )
         return result
 
-    def _to_sequence(self, data: KeyMixin, type_hint: TypeHint, *, is_outer: bool) -> tuple[TPrimitive, ...] | None:
+    def _to_sequence(self, data: KeyMixin, type_hint: TypeHint, *, is_outer: bool) -> tuple[PrimitiveTypes, ...] | None:
         """Serialize key into a flattened sequence of primitive types."""
 
         if not is_outer:
@@ -233,7 +233,7 @@ class KeySerializer(Serializer):
 
     def _from_sequence(
         self,
-        tokens: Deque[TPrimitive],
+        tokens: Deque[PrimitiveTypes],
         schema_type: type,
         schema_type_hint: TypeHint,
         root_class: type,

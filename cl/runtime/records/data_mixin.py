@@ -20,7 +20,7 @@ from memoization import cached
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.protocols import TObj
-from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.slots_util import SlotsUtil
 
@@ -54,7 +54,7 @@ class DataMixin(BuilderMixin, ABC):
         return result_type(**{k: getattr(self, k) for k in self.get_field_names()})
 
 
-TDataField = dict[str, "TDataField"] | list["TDataField"] | TPrimitive | Enum
+TDataField = dict[str, "TDataField"] | list["TDataField"] | PrimitiveTypes | Enum
 """Field types for serialized data in dictionary format."""
 
 TDataDict = dict[str, TDataField]

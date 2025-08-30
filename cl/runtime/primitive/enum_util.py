@@ -59,7 +59,7 @@ class EnumUtil(BuilderUtil):
     @classmethod
     def get_description(
         cls,
-        enum_type: type[TEnum],
+        enum_type: type[Enum],
         value: str | None,
         *,
         field_name: str | None = None,

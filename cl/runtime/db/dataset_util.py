@@ -17,7 +17,7 @@ from typing import Iterable
 from urllib.parse import unquote
 from cl.runtime.primitive.date_util import DateUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
-from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import PrimitiveTypes
 
 
 class DatasetUtil:
@@ -80,7 +80,7 @@ class DatasetUtil:
         return result
 
     @classmethod
-    def combine(cls, *datasets: TPrimitive | Iterable[TPrimitive] | None) -> str:
+    def combine(cls, *datasets: PrimitiveTypes | Iterable[PrimitiveTypes] | None) -> str:
         """
         Combine one or more datasets with validation, where each argument may contain more than one level.
 
@@ -130,7 +130,7 @@ class DatasetUtil:
         return dataset
 
     @classmethod
-    def _normalize_level(cls, dataset_level: TPrimitive | None) -> str:
+    def _normalize_level(cls, dataset_level: PrimitiveTypes | None) -> str:
         """Validate and convert input to a single dataset level."""
 
         if isinstance(dataset_level, str):

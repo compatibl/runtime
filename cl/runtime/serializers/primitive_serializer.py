@@ -33,7 +33,7 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import TPrimitive
+from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
@@ -603,7 +603,7 @@ class PrimitiveSerializer(Serializer):
             raise RuntimeError(f"Class {value_class_name} cannot be serialized using {serializer_type_name}.")
 
     @classmethod
-    def _deserialization_error(cls, value: TPrimitive | None, type_name: str, type_format: IntEnum) -> Exception:
+    def _deserialization_error(cls, value: PrimitiveTypes | None, type_name: str, type_format: IntEnum) -> Exception:
         """Error message on deserialization failure."""
         value_type_name = typename(type(value))
         value_format_str = f"{type_format.__class__} set to {type_format.name}"
