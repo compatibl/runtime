@@ -26,7 +26,7 @@ from cl.runtime.schema.type_hint import TypeHint
 _PASSTHROUGH_CLASS_NAMES = {"bool", "date", "time", "datetime", "UUID", "bytes"}
 """Class names for which the argument is returned as is after checking that a required value is not None."""
 
-_SUBTYPED_CLASS_NAMES = {"str", "int", "float"}
+_SUBTYPED_CLASS_NAMES = {"str", "int", "float"}  # TODO: !!! Refactor to avoid creating additional lists
 """Class names that have subtypes."""
 
 

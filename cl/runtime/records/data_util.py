@@ -14,7 +14,6 @@
 
 from typing import Any
 from frozendict import frozendict
-from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
@@ -22,7 +21,6 @@ from cl.runtime.records.condition_util import ConditionUtil
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_primitive, is_sequence, is_mapping, \
     is_primitive_instance
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_condition
 from cl.runtime.records.protocols import is_data_key_or_record
@@ -129,47 +127,47 @@ class DataUtil(BuilderUtil):
             # Get class and field dictionary for schema_type_name
             data_field_dict = data_type_spec.get_field_dict()
 
-            # Serialize slot values in the order of declaration except those that are None
-            # TODO: Construct a new instance instead of setting fields in an existing instance
-            consume(
-                setattr(
-                    data,
-                    field_name,
-                    (
-                        PrimitiveUtil.build_(
-                            field_value,
-                            field_spec.type_hint,
-                            outer_type_name=typename(data),
-                            field_name=field_name,
-                        )
-                        if is_primitive_instance(field_value)
-                        else EnumUtil.build_(
-                            field_value,
-                            field_spec.type_hint,
-                            outer_type_name=typename(data),
-                            field_name=field_name,
-                        )
-                        if is_enum(field_value)
-                        else ConditionUtil.build_(
-                            field_value,
-                            field_spec.type_hint,
-                            outer_type_name=typename(data),
-                            field_name=field_name,
-                        )
-                        if is_condition(field_value)
-                        else cls.build_(
-                            field_value,
-                            field_spec.type_hint,
-                            outer_type_name=typename(data),
-                            field_name=field_name,
-                        )
-                    ),
+            # Construct a new instance with frozen or immutable fields, checking against the schema
+            data_dict = {
+                field_name: (
+                    PrimitiveUtil.build_(
+                        field_value,
+                        field_spec.type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
+                    if is_primitive_instance(field_value)
+                    else EnumUtil.build_(
+                        field_value,
+                        field_spec.type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
+                    if is_enum(field_value)
+                    else ConditionUtil.build_(
+                        field_value,
+                        field_spec.type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
+                    if is_condition(field_value)
+                    else cls.build_(
+                        field_value,
+                        field_spec.type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
                 )
                 for field_name, field_spec in data_field_dict.items()
-                if not is_empty(field_value := getattr(data, field_name))
-            )
-            # Mark as frozen to prevent further modifications
-            return data.mark_frozen()
+                if not is_empty(data) and not PrimitiveUtil.build_(  # PrimitiveUtil.build_ validates vs. the type hint
+                    field_value := getattr(data, field_name),
+                    field_spec.type_hint,
+                    outer_type_name=typename(data),
+                    field_name=field_name,
+                )
+            }
+            # Create a new instance with frozen and immutable fields and mark it as frozen
+            return type(data)(**data_dict).mark_frozen()
         else:
             raise cls._unsupported_object_error(data)
 

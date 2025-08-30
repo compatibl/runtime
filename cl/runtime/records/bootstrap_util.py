@@ -15,8 +15,9 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_sequence, is_mapping, is_primitive, \
-    is_primitive_instance
+
+from cl.runtime.records.freeze_util import FreezeUtil
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_primitive_instance, is_sequence, is_mapping
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
@@ -73,22 +74,8 @@ class BootstrapUtil:
                     # Invoke '__init' method if it exists, otherwise do nothing
                     class_init(data)
 
-            # Apply updates to the data object
-            tuple(
-                setattr(data, k, cls.bootstrap_build(v))
-                for k in data.get_field_names()
-                if (
-                    # Exclude those types that are passed through
-                    (v := getattr(data, k)) is not None
-                    and type(v).__name__ not in PRIMITIVE_CLASS_NAMES
-                    and not isinstance(v, Enum)
-                    # Exclude protected and private fields
-                    and not k.startswith("_")
-                )
-            )
-
-            # Mark as frozen to prevent further modifications
-            return data.mark_frozen()
+            # Return a new data object with frozen or immutable fields without checking the type against the schema
+            return FreezeUtil.freeze(data)
         else:
             raise cls._unsupported_object_error(data)
 
