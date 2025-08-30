@@ -19,8 +19,8 @@ from typing import TypeVar
 from memoization import cached
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.data_util import DataUtil
-from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import PrimitiveTypes
+from cl.runtime.records.protocols import TObj
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.slots_util import SlotsUtil
 

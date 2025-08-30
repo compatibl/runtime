@@ -22,8 +22,8 @@ from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import PrimitiveTypes
+from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
