@@ -255,10 +255,6 @@ class TypeCache:
                 f"Param {type_or_name} has type {typename(type_or_name)} but must be a type or type name."
             )
 
-        # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
-        if typename(type_) == "StubDataclassPolymorphicKey":
-            pass  # TODO: !!! Remove debug code
-
         # Filter based on type_kind, use set to eliminate duplicates
         if type_kind is None:
             predicate = is_data_key_or_record
