@@ -269,7 +269,7 @@ class KeySerializer(Serializer):
             type_spec = TypeSchema.for_class(data_type)
             field_dict = type_spec.get_field_dict()
             key_tokens = tuple(
-                self._from_sequence(tokens, field_spec.get_class(), field_spec.type_hint, root_class)
+                self._from_sequence(tokens, field_spec.field_type, field_spec.field_type_hint, root_class)
                 for field_spec in field_dict.values()
             )
             result = data_type(*key_tokens)

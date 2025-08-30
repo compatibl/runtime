@@ -33,19 +33,15 @@ class FieldSpec(BootstrapMixin):
     where type_name may refer to a container, slotted type, or primitive type.
     """
 
-    _class: type
+    field_type: type
     """The inner data class or primitive class inside the nested containers."""
-
-    def get_class(self) -> type:
-        """The inner data class or primitive class inside the nested containers."""
-        return self._class
 
     @classmethod
     def create(
         cls,
         *,
         field_name: str,
-        type_alias: typing.TypeAlias,
+        field_type_alias: typing.TypeAlias,
         field_optional: bool | None = None,
         field_subtype: str | None = None,
         field_alias: str | None = None,
@@ -58,7 +54,7 @@ class FieldSpec(BootstrapMixin):
 
         Args:
             field_name: Name of the field, used for error messages only and recorded into the output
-            type_alias: Type of the field obtained from get_type_hints where ForwardRefs are resolved
+            field_type_alias: Type of the field obtained from get_type_hints where ForwardRefs are resolved
             field_subtype: Optional subtype from field metadata such as long or timestamp
             field_optional: Optional flag from field metadata, cross check against type hint if not None
             field_alias: Optional name alias from field metadata, field name is used when not specified
@@ -68,8 +64,8 @@ class FieldSpec(BootstrapMixin):
         """
 
         # Create type hint object from type alias
-        type_hint = TypeHint.for_type_alias(
-            type_alias=type_alias,
+        field_type_hint = TypeHint.for_type_alias(
+            type_alias=field_type_alias,
             field_subtype=field_subtype,
             field_name=field_name,
             containing_type=containing_type,
@@ -83,21 +79,21 @@ class FieldSpec(BootstrapMixin):
             raise RuntimeError(f"Specifying 'field_formatter' in schema is not yet supported.")
 
         # Validate optional flag if provided
-        if field_optional is not None and field_optional != bool(type_hint.optional):
+        if field_optional is not None and field_optional != bool(field_type_hint.optional):
             if field_optional:
                 raise RuntimeError(
                     f"Field {typename(containing_type)}.{field_name} uses '= optional()'\n"
-                    f"but type hint is not a union with None: {type_hint.to_str()}"
+                    f"but type hint is not a union with None: {field_type_hint.to_str()}"
                 )
             if not field_optional:
                 raise RuntimeError(
                     f"Field {typename(containing_type)}.{field_name} uses '= required()'\n"
-                    f"but type hint is a union with None: {type_hint.to_str()}"
+                    f"but type hint is a union with None: {field_type_hint.to_str()}"
                 )
 
         result = cls(
             field_name=field_name,
-            type_hint=type_hint,
-            _class=type_alias,
+            type_hint=field_type_hint,
+            field_type=field_type_alias,
         )
         return result
