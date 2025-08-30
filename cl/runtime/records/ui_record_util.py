@@ -45,7 +45,7 @@ _UI_SERIALIZER = DataSerializers.FOR_UI
 
 
 @dataclass(slots=True, kw_only=True)
-class UiRecordUtil(DataMixin):
+class UiRecordUtil(DataMixin):  # TODO: Move to the appropriate directory
     """
     Utility type to provide additional functionality for working with records.
     """
