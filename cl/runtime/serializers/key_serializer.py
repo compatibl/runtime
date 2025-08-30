@@ -21,7 +21,7 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, is_primitive_instance, is_primitive_type
 from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_abstract
@@ -59,7 +59,7 @@ class KeySerializer(Serializer):
         sequence = self._to_sequence(data, type_hint, is_outer=True)
 
         # Check that all tokens are primitive types
-        invalid_tokens = [x for x in sequence if not is_primitive(x) and not is_enum(x)]
+        invalid_tokens = [x for x in sequence if not is_primitive_instance(x) and not is_enum(x)]
         if len(invalid_tokens) > 0:
             invalid_tokens_str = "\n".join(str(x) for x in invalid_tokens)
             raise RuntimeError(
@@ -241,7 +241,7 @@ class KeySerializer(Serializer):
         """Deserialize key from a flattened sequence of primitive types."""
         if len(tokens) == 0:
             raise RuntimeError(f"Insufficient number of key tokens for key {root_class.__name__}.")
-        elif is_primitive(schema_type):
+        elif is_primitive_type(schema_type):
             # Primitive type, extract one token
             token = tokens.popleft()
             return self.primitive_serializer.deserialize(token, schema_type_hint)

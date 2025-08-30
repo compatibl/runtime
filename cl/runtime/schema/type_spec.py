@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from typing import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record, is_primitive_type
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_primitive
@@ -51,7 +51,7 @@ class TypeSpec(BootstrapMixin, ABC):
             self.type_name = typename(self._class)
 
         # Set type kind
-        if is_primitive(self._class):
+        if is_primitive_type(self._class):
             self.type_kind = TypeKind.PRIMITIVE
         elif is_enum(self._class):
             self.type_kind = TypeKind.ENUM

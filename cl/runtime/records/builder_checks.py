@@ -18,7 +18,7 @@ from typing import TypeGuard
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.protocols import is_builder, is_empty, PRIMITIVE_CLASSES, SEQUENCE_CLASSES, MAPPING_CLASSES, \
-    is_primitive, is_enum, is_sequence, is_mapping, is_data_key_or_record
+    is_primitive, is_enum, is_sequence, is_mapping, is_data_key_or_record, is_primitive_instance
 from cl.runtime.records.typename import typename
 
 
@@ -69,9 +69,9 @@ class BuilderChecks:
         elif isinstance(data, float):
             # Use FloatUtil.tolerance to compare floats to avoid errors on serialization roundtrip
             return isinstance(other, float) and FloatUtil.equal(data, other)
-        elif is_primitive(data):
+        elif is_primitive_instance(data):
             # Exact match is required for all other types including datetime
-            return is_primitive(other) and data == other
+            return is_primitive_instance(other) and data == other
         elif is_enum(data):
             return is_enum(other) and data == other
         elif is_sequence(data):

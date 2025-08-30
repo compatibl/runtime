@@ -15,7 +15,7 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
-from cl.runtime.records.protocols import MAPPING_CLASSES, is_builder, is_empty, is_primitive
+from cl.runtime.records.protocols import MAPPING_CLASSES, is_builder, is_empty, is_primitive, is_primitive_instance
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
@@ -35,7 +35,7 @@ class FreezeUtil:
         if is_empty(data):
             # Return None if data is None or an empty primitive type
             return None
-        elif is_primitive(data):
+        elif is_primitive_instance(data):
             # Pass through primitive types
             return data
         elif isinstance(data, Enum):

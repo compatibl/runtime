@@ -19,7 +19,8 @@ from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_primitive
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_primitive, is_sequence, is_mapping, \
+    is_primitive_instance
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -43,9 +44,6 @@ class DataUtil(BuilderUtil):
         outer_type_name: str | None = None,
         field_name: str | None = None,
     ) -> Any:
-        # Get the class of data, which may be None
-        data_class_name = typename(data)
-
         # Get parameters from type_hint if specified, otherwise set to None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
         is_optional = type_hint.optional if type_hint is not None else None
@@ -57,21 +55,21 @@ class DataUtil(BuilderUtil):
                 return None
             else:
                 raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
-        elif data_class_name in PRIMITIVE_CLASS_NAMES:
+        elif is_primitive_instance(data):
             if remaining_chain:
                 raise RuntimeError(
-                    f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
+                    f"Data is an instance of a primitive class {type(data).__name__} which is incompatible with type hint\n"
                     f"{type_hint.to_str()}."
                 )
             return PrimitiveUtil.build_(data, type_hint)
-        elif data_class_name in SEQUENCE_TYPE_NAMES:
+        elif is_sequence(data):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the sequence, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_sequence()  # TODO: Rename to avoid validate_for...
             return tuple(cls.build_(v, remaining_chain) if not is_empty(v) else None for v in data)
-        elif data_class_name in MAPPING_TYPE_NAMES:
+        elif is_mapping(data):
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
@@ -85,8 +83,8 @@ class DataUtil(BuilderUtil):
         elif is_enum(data):
             if remaining_chain:
                 raise RuntimeError(
-                    f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
-                    f"{type_hint.to_str()}."
+                    f"Data is an instance of a primitive class {type(data).__name__} which is incompatible\n"
+                    f"with type hint {type_hint.to_str()}."
                 )
             return EnumUtil.build_(data, type_hint)
         elif is_data_key_or_record(data):
@@ -144,7 +142,7 @@ class DataUtil(BuilderUtil):
                             outer_type_name=typename(data),
                             field_name=field_name,
                         )
-                        if is_primitive(field_value)
+                        if is_primitive_instance(field_value)
                         else EnumUtil.build_(
                             field_value,
                             field_spec.type_hint,

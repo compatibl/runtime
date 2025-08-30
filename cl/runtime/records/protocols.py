@@ -23,7 +23,7 @@ from uuid import UUID
 from bson import Int64
 from frozendict import frozendict
 
-PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes)
+PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes, type)
 """The list of Python classes used to store primitive types, not the same as type names."""
 
 PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)
@@ -41,6 +41,7 @@ PRIMITIVE_TYPE_NAMES = (
     "UUID",
     "timestamp",  # Stored in UUID class
     "bytes",
+    "type",
 )
 """
 The list of primitive type names, includes those primitive types that do not have their own
@@ -118,6 +119,16 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveTypes]:
     """Returns true if the argument is one of the supported primitive classes."""
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     result = type_.__name__ in PRIMITIVE_CLASS_NAMES
+    return result
+
+def is_primitive_instance(instance: Any) -> TypeGuard[PrimitiveTypes]:
+    """Returns true if the argument is an instance of one of the supported primitive types."""
+    result = type(instance).__name__ in PRIMITIVE_CLASS_NAMES or isinstance(instance, type)
+    return result
+
+def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
+    """Returns true if the argument is one of the supported primitive types."""
+    result = type_.__name__ in PRIMITIVE_CLASS_NAMES or issubclass(type_, type)
     return result
 
 

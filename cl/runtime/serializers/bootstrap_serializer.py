@@ -32,7 +32,7 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty, is_sequence, is_mapping
 from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_key
@@ -139,7 +139,7 @@ class BootstrapSerializer(Serializer):
     def _serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize data to a dictionary without encoding."""
 
-        data_class_name = data.__class__.__name__
+        data_class_name = type(data).__name__
         if data is None:
             if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
                 # Pass through None for untyped serialization
@@ -243,10 +243,10 @@ class BootstrapSerializer(Serializer):
                 return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
-        elif data_class_name in SEQUENCE_CLASS_NAMES:
+        elif is_sequence(data):
             # Include items that are None in output to preserve item positions
             return [self._serialize(v) if not is_empty(v) else None for v in data]
-        elif data_class_name in MAPPING_CLASS_NAMES:
+        elif is_mapping(data):
             # Mapping container, do not include values that are None or an empty primitive type
             # Allow keys that begin from _ in mapping classes, but not slotted classes
             return {

@@ -26,7 +26,7 @@ from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data
+from cl.runtime.records.protocols import is_data, is_primitive_type
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
@@ -419,7 +419,7 @@ class TypeCache:
     @classmethod
     def _get_type_kind(cls, class_: type) -> TypeKind | None:
         """Get type kind of the class, return None if not a framework class."""
-        if is_primitive(class_):
+        if is_primitive_type(class_):
             return TypeKind.PRIMITIVE
         elif is_enum(class_):
             return TypeKind.ENUM

@@ -21,7 +21,8 @@ from frozendict import frozendict
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty
+from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty, is_primitive, is_sequence, is_mapping, \
+    is_primitive_instance
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
@@ -89,9 +90,6 @@ class DataSerializer(Serializer):
         if self.type_inclusion not in [TypeInclusion.AS_NEEDED, TypeInclusion.ALWAYS, TypeInclusion.OMIT]:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
-        # Get the class of data, which may be NoneType
-        data_class_name = typename(data)
-
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
         is_optional = type_hint.optional if type_hint is not None else None
@@ -106,11 +104,11 @@ class DataSerializer(Serializer):
                 	f"Data is None or an empty primitive type but type hint\n"
                 	f"{type_hint.to_str()} indicates it is required."
                 )
-        elif data_class_name in PRIMITIVE_CLASS_NAMES:
+        elif is_primitive_instance(data):
             if remaining_chain:
                 raise RuntimeError(
-                    f"Data is an instance of a primitive class {data_class_name} which is incompatible with type hint\n"
-                    f"{type_hint.to_str()}."
+                    f"Data is an instance of a primitive class {type(data).__name__} which is incompatible\n"
+                    f"with type hint {type_hint.to_str()}."
                 )
 
             if schema_type_name in PRIMITIVE_TYPE_NAMES:
@@ -121,14 +119,14 @@ class DataSerializer(Serializer):
                 # TODO: Check for type_kind in TypeHint instead
                 result = self.enum_serializer.serialize(data, type_hint)
                 return result
-        elif data_class_name in SEQUENCE_TYPE_NAMES:
+        elif is_sequence(data):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the sequence, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_sequence()
             return tuple(self.serialize(v, remaining_chain) if not is_empty(v) else None for v in data)
-        elif data_class_name in MAPPING_TYPE_NAMES:
+        elif is_mapping(data):
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
@@ -240,11 +238,8 @@ class DataSerializer(Serializer):
         elif self.type_inclusion not in [TypeInclusion.AS_NEEDED, TypeInclusion.ALWAYS]:
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
-        # Get the class of data, which may be NoneType
-        data_class_name = typename(data)
-
         if type_hint is None:
-            if data_class_name in MAPPING_CLASS_NAMES:
+            if is_mapping(data):
                 # Attempt to extract type information from the mapping data
                 if (type_name := data.get(self.type_field, None) if data else None) is not None:
                     # Type name is specified, look up the class
@@ -257,7 +252,7 @@ class DataSerializer(Serializer):
                         f"Key '_type' is missing in the serialized data and type hint is not specified, "
                         f"cannot deserialize."
                     )
-            elif data_class_name in SEQUENCE_CLASS_NAMES:
+            elif is_sequence(data):
                 # Recursive call is needed because type information may be contained inside items
                 return [self.deserialize(v) for v in data]
             else:
@@ -282,9 +277,9 @@ class DataSerializer(Serializer):
             return self.primitive_serializer.deserialize(data, type_hint)
         elif schema_type_name in SEQUENCE_TYPE_NAMES:
             type_hint.validate_for_sequence()
-            if data_class_name not in SEQUENCE_CLASS_NAMES:
+            if not is_sequence(data):
                 raise RuntimeError(
-                    f"Data type {data_class_name} is a sequence but schema type {schema_type_name} is not."
+                    f"Data type {type(data).__name__} is a sequence but schema type {schema_type_name} is not."
                 )
             # Decode if necessary
             # TODO: Eliminate check for the fist character
@@ -297,9 +292,9 @@ class DataSerializer(Serializer):
                 return tuple(self.deserialize(v, remaining_chain) if not is_empty(v) else None for v in data)
         elif schema_type_name in MAPPING_TYPE_NAMES:
             type_hint.validate_for_mapping()
-            if data_class_name not in MAPPING_TYPE_NAMES:
+            if not is_mapping(data):
                 raise RuntimeError(
-                    f"Data type {data_class_name} is a mapping but schema type {schema_type_name} is not."
+                    f"Data type {type(data).__name__} is a mapping but schema type {schema_type_name} is not."
                 )
             # Deserialize mapping into frozendict
             # TODO: Replace by frozendict
@@ -345,7 +340,7 @@ class DataSerializer(Serializer):
         elif isinstance(data, Enum):
             # Process as enum
             return self.enum_serializer.deserialize(data, type_hint)
-        elif data_class_name in MAPPING_TYPE_NAMES:
+        elif is_mapping(data):
             # Process as slotted class if data is a mapping but schema type is not
             # Get _type if provided, otherwise use schema_type_name
             data_type_name = data.get(self.type_field, None)

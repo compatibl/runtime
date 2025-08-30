@@ -16,7 +16,7 @@ from abc import ABC
 from typing import Generic
 from typing import Sequence
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import TObj, is_primitive_instance
 from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
@@ -73,7 +73,7 @@ class Gt(Generic[TObj], Condition[TObj]):
 
     def __init__(self, value: TObj):
         """Create from the value to use with the greater-than operator."""
-        if is_primitive(value):
+        if is_primitive_instance(value):
             self.op_gt = value
         else:
             raise RuntimeError(f"Argument of Gt operator has type {typename(value)} which is not a primitive.")
@@ -89,7 +89,7 @@ class Gte(Generic[TObj], Condition[TObj]):
 
     def __init__(self, value: TObj):
         """Create from the value to use with the greater-than-or-equal operator."""
-        if is_primitive(value):
+        if is_primitive_instance(value):
             self.op_gte = value
         else:
             raise RuntimeError(f"Argument of Gte operator has type {typename(value)} which is not a primitive.")
@@ -105,7 +105,7 @@ class Lt(Generic[TObj], Condition[TObj]):
 
     def __init__(self, value: TObj):
         """Create from the value to use with the less-than operator."""
-        if is_primitive(value):
+        if is_primitive_instance(value):
             self.op_lt = value
         else:
             raise RuntimeError(f"Argument of Lt operator has type {typename(value)} which is not a primitive.")
@@ -121,7 +121,7 @@ class Lte(Generic[TObj], Condition[TObj]):
 
     def __init__(self, value: TObj):
         """Create from the value to use with the less-than-or-equal operator."""
-        if is_primitive(value):
+        if is_primitive_instance(value):
             self.op_lte = value
         else:
             raise RuntimeError(f"Argument of Lte operator has type {typename(value)} which is not a primitive.")

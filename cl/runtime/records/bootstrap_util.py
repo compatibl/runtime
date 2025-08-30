@@ -15,7 +15,8 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_sequence, is_mapping, is_primitive, \
+    is_primitive_instance
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
@@ -37,23 +38,26 @@ class BootstrapUtil:
         if is_empty(data):
             # Pass through None and empty primitive types
             return None
-        elif (data_class_name := typename(data)) in PRIMITIVE_CLASS_NAMES:
+        elif is_primitive_instance(data):
             # Pass through primitive types
             return data
         elif is_enum(data):
             # Pass through enums
             return data
-        elif data_class_name in SEQUENCE_TYPE_NAMES:
+        elif is_sequence(data):
             # Convert a sequence types to tuple after applying build to each item
             return tuple(cls.bootstrap_build(v) for v in data)
-        elif data_class_name in MAPPING_TYPE_NAMES:
+        elif is_mapping(data):
             # Convert a mapping type to frozendict after applying build to each item
             return frozendict((k, cls.bootstrap_build(v)) for k, v in data.items())
         elif is_data_key_or_record(data):
             # Has slots, process as data, key or record
-            if data.is_frozen():
-                # Pass through if already frozen to prevent repeat initialization of shared instances
-                return data
+            try:
+                if data.is_frozen():
+                    # Pass through if already frozen to prevent repeat initialization of shared instances
+                    return data
+            except:
+                raise RuntimeError("Debug hook")  # TODO: !!!
 
             # Invoke '__init' in the order from base to derived
             # Keep track of which init methods in class hierarchy were already called
