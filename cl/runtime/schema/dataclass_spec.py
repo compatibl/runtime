@@ -47,7 +47,7 @@ class DataclassSpec(DataSpec):
 
         result = DataclassSpec(
             type_name=type_name,
-            _class=class_,
+            type_=class_,
             fields=fields,
         ).build()
         return result

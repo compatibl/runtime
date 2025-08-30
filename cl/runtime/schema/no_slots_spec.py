@@ -45,7 +45,7 @@ class NoSlotsSpec(DataSpec):
 
         result = NoSlotsSpec(
             type_name=type_name,
-            _class=class_,
+            type_=class_,
             fields=[],
         ).build()
         return result

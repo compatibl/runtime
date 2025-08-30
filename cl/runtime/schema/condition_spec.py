@@ -43,7 +43,7 @@ class ConditionSpec(DataSpec):
 
         result = ConditionSpec(
             type_name=type_name,
-            _class=class_,
+            type_=class_,
             fields=[],
         ).build()
         return result

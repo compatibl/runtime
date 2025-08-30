@@ -118,7 +118,7 @@ class DataUtil(BuilderUtil):
                 # If schema type is specified, ensure that data is an instance of the specified type
                 schema_type_spec = TypeSchema.for_type_name(schema_type_name)
                 schema_type_name = schema_type_spec.type_name
-                if not is_data_key_or_record(schema_class := schema_type_spec.get_class()):
+                if not is_data_key_or_record(schema_class := schema_type_spec.type_):
                     raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
                 if not isinstance(data, schema_class):
                     raise RuntimeError(

@@ -34,7 +34,7 @@ class TypeSpec(BootstrapMixin, ABC):
     enums and primitive types.
     """
 
-    _class: type
+    type_: type
     """Class where the type is stored (this is not the type hint as it excludes container and optional info)."""
 
     type_name: str = required()
@@ -48,26 +48,22 @@ class TypeSpec(BootstrapMixin, ABC):
 
         # Set type name unless already set
         if self.type_name is None:
-            self.type_name = typename(self._class)
+            self.type_name = typename(self.type_)
 
         # Set type kind
-        if is_primitive_type(self._class):
+        if is_primitive_type(self.type_):
             self.type_kind = TypeKind.PRIMITIVE
-        elif is_enum(self._class):
+        elif is_enum(self.type_):
             self.type_kind = TypeKind.ENUM
-        elif is_key(self._class):
+        elif is_key(self.type_):
             self.type_kind = TypeKind.KEY
-        elif is_record(self._class):
+        elif is_record(self.type_):
             self.type_kind = TypeKind.RECORD
-        elif is_data_key_or_record(self._class):
+        elif is_data_key_or_record(self.type_):
             self.type_kind = TypeKind.DATA
         else:
             # This should not happen because this method is only invoked for data types, but just in case
             raise RuntimeError(f"Dataclass {self.type_name} is neither a primitive type, enum, key, record or data.")
-
-    def get_class(self) -> type:
-        """Class where the type is stored."""
-        return self._class
 
     @classmethod
     @abstractmethod

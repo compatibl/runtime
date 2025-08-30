@@ -151,7 +151,7 @@ class DataSerializer(Serializer):
                 # If schema type is specified, ensure that data is an instance of the specified type
                 schema_type_spec = TypeSchema.for_type_name(schema_type_name)
                 schema_type_name = schema_type_spec.type_name
-                if not is_data_key_or_record(schema_class := schema_type_spec.get_class()):
+                if not is_data_key_or_record(schema_class := schema_type_spec.type_):
                     raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
                 if not isinstance(data, schema_class):
                     raise RuntimeError(
@@ -244,7 +244,7 @@ class DataSerializer(Serializer):
                 if (type_name := data.get(self.type_field, None) if data else None) is not None:
                     # Type name is specified, look up the class
                     type_spec = TypeSchema.for_type_name(type_name)
-                    type_hint = TypeHint.for_class(type_spec.get_class())
+                    type_hint = TypeHint.for_class(type_spec.type_)
                     # Recursive call is needed because of nested containers
                     return self.deserialize(data, type_hint)
                 else:
@@ -306,7 +306,7 @@ class DataSerializer(Serializer):
         elif isinstance(data, str):
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
             type_spec = TypeSchema.for_type_name(schema_type_name)
-            schema_class = type_spec.get_class()
+            schema_class = type_spec.type_
             if self.key_serializer is not None and is_key(schema_class):
                 if (
                     # TODO: Eliminate check for the fist character
@@ -365,7 +365,7 @@ class DataSerializer(Serializer):
                 )
 
             # Get class and field dictionary for type_name
-            schema_class = type_spec.get_class()
+            schema_class = type_spec.type_
             field_dict = type_spec.get_field_dict()
 
             # Deserialize into a dict
