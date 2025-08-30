@@ -67,7 +67,7 @@ class EnumSerializer(Serializer):
         """Deserialize a string or another primitive type to the specified enum type (return None if value is None)."""
         if type_hint is None:
             raise RuntimeError(f"Type hint is required for enum deserialization.")
-        elif type_hint._schema_class is None:
+        elif type_hint.schema_type is None:
             raise RuntimeError(f"Type hint must specify the class for enum deserialization.")
         elif data in [None, "", "null"]:
             if not type_hint.optional:
@@ -76,7 +76,7 @@ class EnumSerializer(Serializer):
                 return data
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
-        elif issubclass(enum_type := type_hint._schema_class, Enum):
+        elif issubclass(enum_type := type_hint.schema_type, Enum):
             if (value_format := self.enum_format) == EnumFormat.PASSTHROUGH:
                 # Pass through the enum instance without changes
                 return data

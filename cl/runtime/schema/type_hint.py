@@ -34,7 +34,7 @@ class TypeHint(BootstrapMixin):
     schema_type_name: str
     """Type name in the schema."""
 
-    _schema_class: type
+    schema_type: type
     """Class if available, if not provided it will be looked up using the type name."""
 
     optional: bool | None = None
@@ -45,10 +45,6 @@ class TypeHint(BootstrapMixin):
 
     remaining: Self | None = None
     """Remaining chain if present, None otherwise."""
-
-    def get_schema_class(self) -> type:
-        """Return schema class."""
-        return self._schema_class
 
     def to_str(self):
         """Serialize as string in type alias format."""
@@ -75,7 +71,7 @@ class TypeHint(BootstrapMixin):
 
     def validate_for_enum(self) -> None:
         """Raise an error if the type hint is not an enum."""
-        if not issubclass(self._schema_class, Enum):
+        if not issubclass(self.schema_type, Enum):
             raise RuntimeError(f"{self.to_str()} is not compatible with enum value.")
         elif self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is not valid for an enum.")
@@ -119,7 +115,7 @@ class TypeHint(BootstrapMixin):
 
         return cls(
             schema_type_name=schema_type_name,
-            _schema_class=class_,
+            schema_type=class_,
             optional=optional,
             condition=condition,
         )
@@ -219,7 +215,7 @@ class TypeHint(BootstrapMixin):
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name="list",
-                            _schema_class=list,
+                            schema_type=list,
                             optional=type_alias_optional,
                             condition=type_alias_condition,
                         )
@@ -235,7 +231,7 @@ class TypeHint(BootstrapMixin):
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name="tuple",
-                            _schema_class=tuple,
+                            schema_type=tuple,
                             optional=type_alias_optional,
                             condition=type_alias_condition,
                         )
@@ -252,7 +248,7 @@ class TypeHint(BootstrapMixin):
                     type_hint_tokens.append(
                         TypeHint(
                             schema_type_name=type_alias_origin.__name__,
-                            _schema_class=type_alias_origin,
+                            schema_type=type_alias_origin,
                             optional=type_alias_optional,
                             condition=type_alias_condition,
                         )
@@ -276,7 +272,7 @@ class TypeHint(BootstrapMixin):
                             type_hint_tokens.append(
                                 TypeHint(
                                     schema_type_name=schema_type_name,
-                                    _schema_class=type_alias,
+                                    schema_type=type_alias,
                                     optional=type_alias_optional,
                                     condition=type_alias_condition,
                                 )
@@ -286,7 +282,7 @@ class TypeHint(BootstrapMixin):
                                 type_hint_tokens.append(
                                     TypeHint(
                                         schema_type_name="long",
-                                        _schema_class=int,
+                                        schema_type=int,
                                         optional=type_alias_optional,
                                         condition=type_alias_condition,
                                     )
@@ -298,7 +294,7 @@ class TypeHint(BootstrapMixin):
                                 type_hint_tokens.append(
                                     TypeHint(
                                         schema_type_name="timestamp",
-                                        _schema_class=UUID,
+                                        schema_type=UUID,
                                         optional=type_alias_optional,
                                         condition=type_alias_condition,
                                     )
@@ -344,7 +340,7 @@ class TypeHint(BootstrapMixin):
             head, *tail = type_hints
             return TypeHint(
                 schema_type_name=head.schema_type_name,
-                _schema_class=head._schema_class,
+                schema_type=head.schema_type,
                 optional=head.optional,
                 condition=head.condition,
                 remaining=cls._link_type_hint_tokens(tail),

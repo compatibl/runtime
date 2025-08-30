@@ -90,7 +90,7 @@ def test_roundtrip():
 
         # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
         class_, type_name, value, serialized, *alternative_serialized_list = test_case
-        type_hint = TypeHint(schema_type_name=type_name, _schema_class=class_, optional=(value is None))
+        type_hint = TypeHint(schema_type_name=type_name, schema_type=class_, optional=(value is None))
 
         # Test passthrough with and without type_name
         assert PrimitiveSerializers.PASSTHROUGH.serialize(value) == value
@@ -131,7 +131,7 @@ def test_mongo():
 
         # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
         class_, type_name, value, serialized, *alternative_serialized_list = test_case
-        type_hint = TypeHint(schema_type_name=type_name, _schema_class=class_, optional=(value is None))
+        type_hint = TypeHint(schema_type_name=type_name, schema_type=class_, optional=(value is None))
 
         # Serialize without type_name, deserialization always requires type_name
         assert PrimitiveSerializers.FOR_MONGO.serialize(value) == serialized
@@ -166,7 +166,7 @@ def test_serialization_exceptions():
     # Check exception cases with type name (without type name, the call will succeed for most values)
     for test_case in test_cases:
         class_, type_name, value = test_case
-        type_hint = TypeHint(schema_type_name=type_name, _schema_class=class_, optional=(value is None))
+        type_hint = TypeHint(schema_type_name=type_name, schema_type=class_, optional=(value is None))
 
         # Test passthrough with type_name
         with pytest.raises(Exception):
@@ -201,7 +201,7 @@ def test_deserialization_exceptions():
     # Check exception cases
     for test_case in test_cases:
         class_, type_name, serialized = test_case
-        type_hint = TypeHint(schema_type_name=type_name, _schema_class=class_, optional=(serialized is None))
+        type_hint = TypeHint(schema_type_name=type_name, schema_type=class_, optional=(serialized is None))
         with pytest.raises(Exception):
             PrimitiveSerializers.PASSTHROUGH.deserialize(serialized, type_hint)
         with pytest.raises(Exception):

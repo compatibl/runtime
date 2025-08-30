@@ -84,7 +84,7 @@ class KeySerializer(Serializer):
         PrimitiveChecks.guard_not_none(type_hint)
 
         # Get schema class from the type hint
-        schema_type = type_hint._schema_class
+        schema_type = type_hint.schema_type
 
         # Convert to key if a record
         if is_key(schema_type):
