@@ -265,7 +265,7 @@ class BootstrapSerializer(Serializer):
         elif is_sequence(type(data)):
             # Include items that are None in output to preserve item positions
             return [self._serialize(v) if not is_empty(v) else None for v in data]
-        elif is_mapping(data):
+        elif is_mapping(type(data)):
             # Mapping container, do not include values that are None or an empty primitive type
             # Allow keys that begin from _ in mapping classes, but not slotted classes
             return {

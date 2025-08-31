@@ -48,7 +48,7 @@ class BootstrapUtil:
         elif is_sequence(type(data)):
             # Convert a sequence types to tuple after applying build to each item
             return tuple(cls.bootstrap_build(v) if not is_empty(v) else None for v in data)
-        elif is_mapping(data):
+        elif is_mapping(type(data)):
             # Convert a mapping type to frozendict after applying build to each item
             return frozendict((k, cls.bootstrap_build(v)) for k, v in data.items() if not is_empty(v))
         elif is_data_key_or_record(data):

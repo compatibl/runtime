@@ -123,7 +123,7 @@ class DataSerializer(Serializer):
             if type_hint is not None:
                 type_hint.validate_for_sequence()
             return tuple(self.serialize(v, remaining_chain) if not is_empty(v) else None for v in data)
-        elif is_mapping(data):
+        elif is_mapping(type(data)):
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
@@ -233,7 +233,7 @@ class DataSerializer(Serializer):
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
         if type_hint is None:
-            if is_mapping(data):
+            if is_mapping(type(data)):
                 # Attempt to extract type information from the mapping data
                 if (type_name := data.get(self.type_field, None) if data else None) is not None:
                     # Type name is specified, look up the class
@@ -288,7 +288,7 @@ class DataSerializer(Serializer):
                 return tuple(self.deserialize(v, remaining_chain) if not is_empty(v) else None for v in data)
         elif schema_type_name in MAPPING_TYPE_NAMES:
             type_hint.validate_for_mapping()
-            if not is_mapping(data):
+            if not is_mapping(type(data)):
                 raise RuntimeError(
                     f"Data type {type(data).__name__} is a mapping but schema type {schema_type_name} is not."
                 )
@@ -336,7 +336,7 @@ class DataSerializer(Serializer):
         elif isinstance(data, Enum):
             # Process as enum
             return self.enum_serializer.deserialize(data, type_hint)
-        elif is_mapping(data):
+        elif is_mapping(type(data)):
             # Process as slotted class if data is a mapping but schema type is not
             # Get _type if provided, otherwise use schema_type_name
             data_type_name = data.get(self.type_field, None)

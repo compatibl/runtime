@@ -84,9 +84,9 @@ class BuilderChecks:
                 and len(data) == len(other)
                 and all(cls.is_equal(data_item, other_item) for data_item, other_item in zip(data, other))
             )
-        elif is_mapping(data):
+        elif is_mapping(type(data)):
             return (
-                is_mapping(other)
+                is_mapping(type(other))
                 and len(data) == len(other)
                 and all(cls.is_equal(v, other.get(k)) for k, v in data.items() if not k.startswith("_"))
             )

@@ -50,7 +50,7 @@ class TypeCheck:
     def guard_mapping(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[Mapping]:
         """Confirm that the argument is an immutable mapping."""
         if obj is not None:
-            if is_mapping(obj):  # TODO: Exclude mutable mapping
+            if is_mapping(type(obj)):  # TODO: Exclude mutable mapping
                 return True
             elif raise_on_fail:
                 raise RuntimeError(f"Parameter of type {typename(type(obj))} is not a mapping.")

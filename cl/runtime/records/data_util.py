@@ -78,7 +78,7 @@ class DataUtil(BuilderUtil):
             if type_hint is not None:
                 type_hint.validate_for_sequence()  # TODO: Rename to avoid validate_for...
             return tuple(cls.build_(v, remaining_chain) if not is_empty(v) else None for v in data)
-        elif is_mapping(data):
+        elif is_mapping(type(data)):
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
