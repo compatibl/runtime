@@ -116,7 +116,7 @@ class DataSerializer(Serializer):
                 # TODO: Check for type_kind in TypeHint instead
                 result = self.enum_serializer.serialize(data, type_hint)
                 return result
-        elif is_sequence(data):
+        elif is_sequence(type(data)):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the sequence, and will cause an error for a primitive item
@@ -246,7 +246,7 @@ class DataSerializer(Serializer):
                         f"Key '_type' is missing in the serialized data and type hint is not specified, "
                         f"cannot deserialize."
                     )
-            elif is_sequence(data):
+            elif is_sequence(type(data)):
                 # Recursive call is needed because type information may be contained inside items
                 return [self.deserialize(v) for v in data]
             else:
@@ -271,7 +271,7 @@ class DataSerializer(Serializer):
             return self.primitive_serializer.deserialize(data, type_hint)
         elif schema_type_name in SEQUENCE_TYPE_NAMES:
             type_hint.validate_for_sequence()
-            if not is_sequence(data):
+            if not is_sequence(type(data)):
                 raise RuntimeError(
                     f"Data type {type(data).__name__} is a sequence but schema type {schema_type_name} is not."
                 )

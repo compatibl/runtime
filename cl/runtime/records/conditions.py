@@ -194,7 +194,7 @@ class In(Generic[TObj], Condition[TObj]):
         """Create from the sequence of values to use with the In operator."""
         if isinstance(values, tuple):
             self.op_in = values
-        elif is_sequence(values):
+        elif is_sequence(type(values)):
             self.op_in = tuple(values)
         else:
             raise RuntimeError(f"Argument of In operator has type {typename(type(values))} which is not a sequence.")
@@ -212,7 +212,7 @@ class NotIn(Generic[TObj], Condition[TObj]):
         """Create from the sequence of values to use with the NotIn operator."""
         if isinstance(values, tuple):
             self.op_nin = values
-        elif is_sequence(values):
+        elif is_sequence(type(values)):
             self.op_nin = tuple(values)
         else:
             raise RuntimeError(f"Argument of NotIn operator has type {typename(type(values))} which is not a sequence.")

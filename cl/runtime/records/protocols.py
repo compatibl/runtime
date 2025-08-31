@@ -123,7 +123,7 @@ def is_primitive(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
         # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type
         return type_.__name__ in PRIMITIVE_CLASS_NAMES or issubclass(type_, type)
     else:
-        raise RuntimeError(f"The argument of is_primitive is an instance of {type(type_).__name__} rather type.")
+        raise RuntimeError(f"The argument of is_primitive is an instance of {type(type_).__name__} rather than type.")
 
 
 def is_enum(type_: type) -> TypeGuard[type[Enum]]:
@@ -131,13 +131,14 @@ def is_enum(type_: type) -> TypeGuard[type[Enum]]:
     if isinstance(type_, type):
         return issubclass(type_, Enum) and type_.__module__ != "enum" and not type_.__name__.startswith("_")
     else:
-        raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather type.")
+        raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather than type.")
 
-def is_sequence(instance_or_type: Any) -> TypeGuard[SequenceTypes]:
+def is_sequence(type_: type) -> TypeGuard[SequenceTypes]:
     """Returns true if the argument is one of the supported sequence types."""
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    result = type_.__name__ in SEQUENCE_TYPE_NAMES
-    return result
+    if isinstance(type_, type):
+        return type_.__name__ in SEQUENCE_TYPE_NAMES
+    else:
+        raise RuntimeError(f"The argument of is_sequence is an instance of {type(type_).__name__} rather than type.")
 
 
 def is_mapping(instance_or_type: Any) -> TypeGuard[MappingTypes]:
@@ -221,5 +222,5 @@ def is_condition(type_: type) -> bool:
         # Use class names to avoid a cyclic reference
         return type_.__name__ in CONDITION_CLASS_NAMES
     else:
-        raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather type.")
+        raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather than type.")
 

@@ -78,9 +78,9 @@ class BuilderChecks:
             return is_primitive(type(other)) and data == other
         elif is_enum(type(data)):
             return is_enum(type(other)) and data == other
-        elif is_sequence(data):
+        elif is_sequence(type(data)):
             return (
-                is_sequence(other)
+                is_sequence(type(other))
                 and len(data) == len(other)
                 and all(cls.is_equal(data_item, other_item) for data_item, other_item in zip(data, other))
             )

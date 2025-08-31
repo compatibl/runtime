@@ -108,7 +108,7 @@ class KeySerializer(Serializer):
             sequence = data.split(";")
         elif key_format == KeyFormat.TUPLE:
             # Check the argument is a sequence
-            if not is_sequence(data):
+            if not is_sequence(type(data)):
                 raise RuntimeError(
                     f"KeyFormat.SEQUENCE is specified but data passed to\n"
                     f"KeySerializer.deserialize method has type {typename(type(data))}"

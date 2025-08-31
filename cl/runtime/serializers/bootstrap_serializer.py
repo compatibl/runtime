@@ -262,7 +262,7 @@ class BootstrapSerializer(Serializer):
                 return CaseUtil.upper_to_pascal_case(data.name)
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormat)
-        elif is_sequence(data):
+        elif is_sequence(type(data)):
             # Include items that are None in output to preserve item positions
             return [self._serialize(v) if not is_empty(v) else None for v in data]
         elif is_mapping(data):

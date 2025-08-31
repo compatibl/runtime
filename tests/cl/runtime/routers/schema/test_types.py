@@ -35,7 +35,7 @@ def test_method(default_db_fixture):
     result = TypesResponseItem.get_types()
 
     # Check if the result is a sequence
-    assert is_sequence(result)
+    assert is_sequence(type(result))
 
     # Check if each item in the result is a TypesResponseItem instance
     assert all(isinstance(x, TypesResponseItem) for x in result)
@@ -58,7 +58,7 @@ def test_api(default_db_fixture):
         result = response.json()
 
         # Check if the result is a sequence
-        assert is_sequence(result)
+        assert is_sequence(type(result))
 
         # Check if each item in the result has valid data to construct TypesResponseItem
         for item in result:

@@ -45,7 +45,7 @@ class BootstrapUtil:
         elif is_enum(type(data)):
             # Pass through enums
             return data
-        elif is_sequence(data):
+        elif is_sequence(type(data)):
             # Convert a sequence types to tuple after applying build to each item
             return tuple(cls.bootstrap_build(v) if not is_empty(v) else None for v in data)
         elif is_mapping(data):

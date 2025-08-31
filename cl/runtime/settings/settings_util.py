@@ -118,7 +118,7 @@ class SettingsUtil:
         """Convert Dynaconf setting or env var to a string tuple, None if not specified."""
         if not value:
             return None
-        elif is_sequence(value):
+        elif is_sequence(type(value)):
             # Already a sequence, convert to string and strip whitespace for each element
             return tuple(str(token).strip() for token in value)
         elif is_primitive(type(value)):

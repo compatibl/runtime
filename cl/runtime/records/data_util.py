@@ -71,7 +71,7 @@ class DataUtil(BuilderUtil):
                     f"with type hint {type_hint.to_str()}."
                 )
             return EnumUtil.build_(data, type_hint)
-        elif is_sequence(data):
+        elif is_sequence(type(data)):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the sequence, and will cause an error for a primitive item
