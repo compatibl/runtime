@@ -34,11 +34,11 @@ _FROM_CLASS_VALID_CASES = [
     UUID,
     (UUID, "timestamp"),
     bytes,
+    type,
 ]
 
 _FROM_CLASS_EXCEPTION_CASES = [
     NoneType,
-    type,
     StubDataclass,
     StubIntEnum,
     (int, "int64"),
