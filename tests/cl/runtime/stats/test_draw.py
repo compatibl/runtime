@@ -42,17 +42,21 @@ def test_context():
 def test_exceptions():
     """Test Draw exceptions."""
 
-    not_a_str_msg = "not a valid type for a field declared as int"
-    required_msg = "Required field is not specified"
-    with pytest.raises(RuntimeError, match=not_a_str_msg):
+    not_int_msg = "is not an int"
+    required_msg = "Required field is None or an empty primitive type"
+    negative_msg = "Draw index is negative"
+    with pytest.raises(RuntimeError, match=not_int_msg):
         # Not an int
         Draw(draw_index="1").build()  # noqa
-    with pytest.raises(RuntimeError, match=not_a_str_msg):
+    with pytest.raises(RuntimeError, match=required_msg):
         # Empty string
         Draw(draw_index="").build()  # noqa
     with pytest.raises(RuntimeError, match=required_msg):
         # None
         Draw(draw_index=None).build()  # noqa
+    with pytest.raises(RuntimeError, match=negative_msg):
+        # Negative
+        Draw(draw_index=-1).build()
 
 
 if __name__ == "__main__":

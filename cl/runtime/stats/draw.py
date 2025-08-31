@@ -15,7 +15,9 @@
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.records.typename import typename
 from cl.runtime.stats.draw_key import DrawKey
 
 
@@ -31,6 +33,15 @@ class Draw(DrawKey, RecordMixin):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        # Verify that draw index is a non-negative int
+        if is_empty(self.draw_index):
+            RuntimeError(f"Draw index is None or an empty primitive type.")
+        elif not isinstance(self.draw_index, int):
+            raise RuntimeError(f"Draw index '{self.draw_index}' is not an int.")
+        elif self.draw_index < 0:
+            raise RuntimeError(f"Draw index is negative.")
+
         # Unique draw identifier consists of dot-delimited draw indices for each nested draw context
         if current_draw := active_or_none(type(self)):
             # Combine the active draw_id with self.draw_index
