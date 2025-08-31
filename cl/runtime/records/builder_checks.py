@@ -32,7 +32,7 @@ class BuilderChecks:
     @classmethod
     def guard_frozen(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderMixin]:
         """Check if the argument is frozen."""
-        if is_builder(obj):
+        if is_builder(type(obj)):
             if obj.is_frozen():
                 return True
             elif raise_on_fail:
@@ -49,7 +49,7 @@ class BuilderChecks:
         """Check if the argument is frozen or None."""
         if obj is None:
             return True
-        elif is_builder(obj):
+        elif is_builder(type(obj)):
             if obj.is_frozen():
                 return True
             elif raise_on_fail:

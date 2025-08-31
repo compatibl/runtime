@@ -149,25 +149,23 @@ def is_mapping(type_: type) -> TypeGuard[MappingTypes]:
         raise RuntimeError(f"The argument of is_mapping is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_abstract(instance_or_type: Any) -> bool:
+def is_abstract(type_: type) -> bool:
     """True if the argument is an abstract class."""
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return bool(getattr(type_, "__abstractmethods__", None))
+    if isinstance(type_, type):
+        return bool(getattr(type_, "__abstractmethods__", None))
+    else:
+        raise RuntimeError(f"The argument of is_abstract is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_mixin(instance_or_type: Any) -> bool:
-    """True if the argument is a mixin class, detect base on Mixin name suffix only."""
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return type_.__name__.endswith("Mixin")
-
-
-def is_builder(instance_or_type: Any) -> bool:
+def is_builder(type_: type) -> bool:
     """
     True if the argument has 'build' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "build") and not type_.__name__.startswith("_")
+    if isinstance(type_, type):
+        return hasattr(type_, "build") and not type_.__name__.startswith("_")
+    else:
+        raise RuntimeError(f"The argument of is_builder is an instance of {type(type_).__name__} rather than type.")
 
 
 def is_data_key_or_record(instance_or_type: Any) -> bool:
