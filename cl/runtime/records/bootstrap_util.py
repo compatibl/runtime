@@ -42,7 +42,7 @@ class BootstrapUtil:
         elif is_primitive(type(data)):
             # Pass through primitive types
             return data
-        elif is_enum(data):
+        elif is_enum(type(data)):
             # Pass through enums
             return data
         elif is_sequence(data):

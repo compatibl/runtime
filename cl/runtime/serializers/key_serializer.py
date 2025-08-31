@@ -61,7 +61,7 @@ class KeySerializer(Serializer):
         sequence = self._to_sequence(data, type_hint, is_outer=True)
 
         # Check that all tokens are primitive types
-        invalid_tokens = [x for x in sequence if not is_primitive(type(x)) and not is_enum(x)]
+        invalid_tokens = [x for x in sequence if not is_primitive(type(x)) and not is_enum(type(x))]
         if len(invalid_tokens) > 0:
             invalid_tokens_str = "\n".join(str(x) for x in invalid_tokens)
             raise RuntimeError(

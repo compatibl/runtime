@@ -64,7 +64,7 @@ class DataUtil(BuilderUtil):
                     f"{type_hint.to_str()}."
                 )
             return PrimitiveUtil.build_(data, type_hint)
-        elif is_enum(data):
+        elif is_enum(type(data)):
             if remaining_chain:
                 raise RuntimeError(
                     f"Data is an instance of a primitive class {type(data).__name__} which is incompatible\n"
@@ -150,7 +150,7 @@ class DataUtil(BuilderUtil):
                                     outer_type_name=typename(type(data)),
                                     field_name=field_name,
                                 )
-                                if is_enum(field_value)
+                                if is_enum(type(field_value))
                                 else (
                                     ConditionUtil.build_(
                                         field_value,
@@ -158,7 +158,7 @@ class DataUtil(BuilderUtil):
                                         outer_type_name=typename(type(data)),
                                         field_name=field_name,
                                     )
-                                    if is_condition(field_value)
+                                    if is_condition(type(field_value))
                                     else cls.build_(
                                         field_value,
                                         field_spec.field_type_hint,

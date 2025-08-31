@@ -26,7 +26,7 @@ from frozendict import frozendict
 PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes, type)
 """The list of Python classes used to store primitive types, not the same as type names."""
 
-PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)
+PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)  # TODO: Resolve the issue with ABCMeta
 """The list of Python class names used to store primitive types, not the same as type names."""
 
 PRIMITIVE_TYPE_NAMES = (
@@ -118,30 +118,20 @@ def is_empty(
 
 def is_primitive(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     """Returns true if the argument is one of the supported primitive types."""
-    result = type_.__name__ in PRIMITIVE_CLASS_NAMES or issubclass(type_, type)
-    return result
+    if isinstance(type_, type):
+        # Use class names to avoid import discrepancies for UUID
+        # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type
+        return type_.__name__ in PRIMITIVE_CLASS_NAMES or issubclass(type_, type)
+    else:
+        raise RuntimeError(f"The argument of is_primitive is an instance of {type(type_).__name__} rather type.")
 
 
-def is_condition(instance_or_type: Any) -> TypeGuard[Any]:  # TODO: Add protocol
-    """Returns true if the argument is one of the supported condition classes."""
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    result = type_.__name__ in CONDITION_CLASS_NAMES
-    return result
-
-
-def is_enum(instance_or_type: Any) -> TypeGuard[Enum]:
-    """
-    Returns true if the argument is an enum.
-    Excludes classes whose name starts from underscore.
-    """
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-
-    # Ensure the argument is not one of the base enum classes such as Enum, IntEnum, etc.
-    not_base_enum = type_.__module__ != "enum"
-
-    # Derived from Enum but not one of the base enum classes
-    return issubclass(type_, Enum) and not type_.__name__.startswith("_") and not_base_enum
-
+def is_enum(type_: type) -> TypeGuard[type[Enum]]:
+    """Derived from Enum but not one of the base enum classes and the name does not start from underscore."""
+    if isinstance(type_, type):
+        return issubclass(type_, Enum) and type_.__module__ != "enum" and not type_.__name__.startswith("_")
+    else:
+        raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather type.")
 
 def is_sequence(instance_or_type: Any) -> TypeGuard[SequenceTypes]:
     """Returns true if the argument is one of the supported sequence types."""
@@ -223,3 +213,13 @@ def is_record(instance_or_type: Any) -> bool:
     """
     type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
     return hasattr(type_, "get_key") and not type_.__name__.startswith("_")
+
+
+def is_condition(type_: type) -> bool:
+    """Returns true if the argument is one of the supported condition types."""
+    if isinstance(type_, type):
+        # Use class names to avoid a cyclic reference
+        return type_.__name__ in CONDITION_CLASS_NAMES
+    else:
+        raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather type.")
+

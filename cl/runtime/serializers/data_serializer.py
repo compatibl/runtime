@@ -204,7 +204,7 @@ class DataSerializer(Serializer):
                         if field_value.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                         else (
                             self.enum_serializer.serialize(field_value, field_spec.field_type_hint)
-                            if is_enum(field_value)
+                            if is_enum(type(field_value))
                             else (
                                 key_serializer.serialize(field_value, field_spec.field_type_hint)
                                 if is_key(field_value)

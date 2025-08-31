@@ -76,8 +76,8 @@ class BuilderChecks:
         elif is_primitive(type(data)):
             # Exact match is required for all other types including datetime
             return is_primitive(type(other)) and data == other
-        elif is_enum(data):
-            return is_enum(other) and data == other
+        elif is_enum(type(data)):
+            return is_enum(type(other)) and data == other
         elif is_sequence(data):
             return (
                 is_sequence(other)
