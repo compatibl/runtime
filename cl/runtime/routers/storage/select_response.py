@@ -95,9 +95,9 @@ class SelectResponse(RecordsWithSchemaResponse):
             and (
                 # TODO (Roman): Consider adding other types to table format.
                 # Check if field is primitive, key or enum.
-                       slot_v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                       or is_key_type(type(slot_v))
-                       or isinstance(slot_v, Enum)
+                slot_v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                or is_key_type(type(slot_v))
+                or isinstance(slot_v, Enum)
             )
         }
 

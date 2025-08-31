@@ -25,8 +25,8 @@ from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data_type
 from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_data_type
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_primitive_type

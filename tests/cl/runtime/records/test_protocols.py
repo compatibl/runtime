@@ -17,8 +17,8 @@ from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_abstract_type
 from cl.runtime.records.protocols import is_data_key_or_record_type
-from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_key_or_record_type
+from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_util import RecordUtil
@@ -78,11 +78,15 @@ def test_functions():
 
     # Test is_data
     for class_ in all_classes:
-        assert is_data_key_or_record_type(class_) == (class_ in data_classes), f"{class_} is not a data, key or record class"
+        assert is_data_key_or_record_type(class_) == (
+            class_ in data_classes
+        ), f"{class_} is not a data, key or record class"
 
     # Test is_key_or_record
     for class_ in all_classes:
-        assert is_key_or_record_type(class_) == (class_ in key_or_record_classes), f"{class_} is not a key or record class"
+        assert is_key_or_record_type(class_) == (
+            class_ in key_or_record_classes
+        ), f"{class_} is not a key or record class"
 
     # Test is_key
     for class_ in all_classes:

@@ -80,21 +80,21 @@ class BuilderChecks:
             return is_enum_type(type(other)) and data == other
         elif is_sequence_type(type(data)):
             return (
-                    is_sequence_type(type(other))
-                    and len(data) == len(other)
-                    and all(cls.is_equal(data_item, other_item) for data_item, other_item in zip(data, other))
+                is_sequence_type(type(other))
+                and len(data) == len(other)
+                and all(cls.is_equal(data_item, other_item) for data_item, other_item in zip(data, other))
             )
         elif is_mapping_type(type(data)):
             return (
-                    is_mapping_type(type(other))
-                    and len(data) == len(other)
-                    and all(cls.is_equal(v, other.get(k)) for k, v in data.items() if not k.startswith("_"))
+                is_mapping_type(type(other))
+                and len(data) == len(other)
+                and all(cls.is_equal(v, other.get(k)) for k, v in data.items() if not k.startswith("_"))
             )
         elif is_data_key_or_record_type(type(data)):
             return (
-                    is_data_key_or_record_type(type(other))
-                    and typename(type(data)) == typename(type(other))
-                    and all(cls.is_equal(getattr(data, k), getattr(other, k)) for k in data.get_field_names())
+                is_data_key_or_record_type(type(other))
+                and typename(type(data)) == typename(type(other))
+                and all(cls.is_equal(getattr(data, k), getattr(other, k)) for k in data.get_field_names())
             )
         else:
             raise RuntimeError(

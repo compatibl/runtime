@@ -19,8 +19,8 @@ from typing import TypeGuard
 from typing import cast
 from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_key_or_record_type
+from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.protocols import is_sequence_type
