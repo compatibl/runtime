@@ -56,7 +56,7 @@ class PrimitiveUtil(BuilderUtil):
                 raise RuntimeError(f"Required field is not specified.{location_str}")
 
         # Get the actual type name of data, which may be a type
-        data_class_name = "type" if isinstance(data, type) else typename(type(data))
+        data_class_name = typename(type(data))
 
         # Get the expected type name, which may include subtypes such as long or timestamp
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None

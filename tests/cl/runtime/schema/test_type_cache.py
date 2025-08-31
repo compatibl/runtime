@@ -43,14 +43,33 @@ def test_is_known_type():
     assert TypeCache.is_known_type(StubDataclass)
     assert TypeCache.is_known_type(StubDataclassKey)
     assert TypeCache.is_known_type(StubDataclassData)
+    assert TypeCache.is_known_type(TypeKind)
 
     # Invalid cases
-    with pytest.raises(RuntimeError, match="is passed where only str or type are accepted"):
+    assert not TypeCache.is_known_type(int)
+    with pytest.raises(RuntimeError):
+        # Not a type
         assert not TypeCache.is_known_type(123)  # noqa
+
+def test_is_known_type_name():
+    """Test is_known_type_name method."""
+
+    # Valid cases
+    assert TypeCache.is_known_type_name("StubDataclass")
+    assert TypeCache.is_known_type_name("StubDataclassKey")
+    assert TypeCache.is_known_type_name("StubDataclassData")
+    assert TypeCache.is_known_type_name("TypeKind")
+
+    # Invalid cases
+    assert not TypeCache.is_known_type_name("123")
+    assert not TypeCache.is_known_type_name("int")
+    with pytest.raises(RuntimeError):
+        # Not a string
+        assert not TypeCache.is_known_type_name(StubDataclass)  # noqa
 
 
 def test_guard_known_type():
-    """Test guard_known_type method."""
+    """Test guard_known_type method, will invoke and test guard_known_type_name as well."""
 
     # Valid cases
     assert TypeCache.guard_known_type(StubDataclass)
@@ -61,10 +80,10 @@ def test_guard_known_type():
     assert TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.DATA)
 
     # Invalid cases
-    with pytest.raises(Exception, match="is passed where only str or type are accepted"):
+    with pytest.raises(Exception, match="Function typename accepts only type"):
         # Raise an error even when raise_on_fail is False when the parameter is not a str or type
         TypeCache.guard_known_type(123, raise_on_fail=False)
-    with pytest.raises(Exception, match="is passed where only str or type are accepted"):
+    with pytest.raises(Exception, match="Function typename accepts only type"):
         TypeCache.guard_known_type(123)
 
     # Not a record
@@ -73,52 +92,21 @@ def test_guard_known_type():
         TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
 
 
-def test_get_type_info():
-    """Test get_type_name method."""
+def test_get_type_name_info():
+    """Test get_type_name_info method."""
 
     # Valid cases
-    assert TypeCache.get_type_info(StubDataclass).type_kind == TypeKind.RECORD
-    assert TypeCache.get_type_info("StubDataclass").type_kind == TypeKind.RECORD
-    assert TypeCache.get_type_info(StubDataclassKey).type_kind == TypeKind.KEY
-    assert TypeCache.get_type_info("StubDataclassKey").type_kind == TypeKind.KEY
-    assert TypeCache.get_type_info(StubDataclassData).type_kind == TypeKind.DATA
-    assert TypeCache.get_type_info("StubDataclassData").type_kind == TypeKind.DATA
+    assert TypeCache.get_type_name_info("StubDataclass").type_kind == TypeKind.RECORD
+    assert TypeCache.get_type_name_info("StubDataclassKey").type_kind == TypeKind.KEY
+    assert TypeCache.get_type_name_info("StubDataclassData").type_kind == TypeKind.DATA
 
     # Invalid cases
     with pytest.raises(Exception):
-        # Not a known type
-        TypeCache.get_type_info(123)  # noqa
+        # Not a string name
+        TypeCache.get_type_name_info(123)  # noqa
     with pytest.raises(Exception):
         # Not a known type name
-        TypeCache.get_type_info("123")  # noqa
-
-
-def test_get_type_name():
-    """Test get_type_name method."""
-
-    # Valid cases
-    assert TypeCache.get_type_name(StubDataclass) == "StubDataclass"
-    assert TypeCache.get_type_name(StubDataclassKey) == "StubDataclassKey"
-    assert TypeCache.get_type_name(StubDataclassData) == "StubDataclassData"
-
-    # Invalid cases
-    with pytest.raises(Exception):
-        # Not a known type
-        TypeCache.get_type_name(123)  # noqa
-
-
-def test_get_qual_name():
-    """Test get_qual_name method."""
-
-    # Valid cases
-    assert TypeCache.get_qual_name(StubDataclass) == f"{StubDataclass.__module__}.{StubDataclass.__name__}"
-    assert TypeCache.get_qual_name(StubDataclassKey) == f"{StubDataclassKey.__module__}.{StubDataclassKey.__name__}"
-    assert TypeCache.get_qual_name(StubDataclassData) == f"{StubDataclassData.__module__}.{StubDataclassData.__name__}"
-
-    # Invalid cases
-    with pytest.raises(Exception):
-        # Not a known type
-        TypeCache.get_qual_name(123)  # noqa
+        TypeCache.get_type_name_info("123")  # noqa
 
 
 def test_from_type_name():

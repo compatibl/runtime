@@ -281,7 +281,7 @@ class Db(DbKey, RecordMixin, ABC):
         if record_type_name not in (record_type_name_set := self._get_record_type_set(dataset=dataset)):
 
             # If the record type is not yet in cache, add parent types to DB and cache
-            parent_type_names = TypeCache.get_parent_type_names(record_type, type_kind=TypeKind.RECORD)
+            parent_type_names = TypeCache.get_parent_type_names(record_type_name, type_kind=TypeKind.RECORD)
             bindings = tuple(
                 RecordTypeBinding(
                     record_type_name=parent_type_name,

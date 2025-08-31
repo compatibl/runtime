@@ -19,6 +19,8 @@ from enum import IntEnum
 from typing import Any
 from uuid import UUID
 from bson import Int64
+from cffi.model import PrimitiveType
+
 from cl.runtime.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil
@@ -110,7 +112,7 @@ class PrimitiveSerializer(Serializer):
         """
 
         # Get type name of data, which may be a type
-        data_class_name = "type" if isinstance(data, type) else typename(type(data))
+        data_class_name = typename(type(data))
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
@@ -118,19 +120,17 @@ class PrimitiveSerializer(Serializer):
 
         # Validate that schema_type_name is compatible with value_class_name if specified
         # Because the value of None is passed through, value_class_name NoneType is compatible with any schema_type_name
-        if schema_type_name is not None and data_class_name != "NoneType" and schema_type_name != data_class_name:
-            if schema_type_name == "long":
-                if data_class_name != "int":
-                    raise RuntimeError(
-                        f"Type {schema_type_name} can only be stored using int class, not {data_class_name} class."
-                    )
-            elif schema_type_name == "timestamp":
-                if data_class_name != "UUID":
-                    raise RuntimeError(
-                        f"Type {schema_type_name} can only be stored using UUID class, not {data_class_name} class."
-                    )
-            elif data is not None and data_class_name != schema_type_name:
-                raise RuntimeError(f"Type {schema_type_name} cannot be stored as {data_class_name} class.")
+        if not (
+                data is None or
+                schema_type_name is None or
+                data_class_name == schema_type_name or
+                (schema_type_name == "long" and data_class_name == "int") or
+                (schema_type_name == "timestamp" and data_class_name == "UUID") or
+                (schema_type_name == "type" and isinstance(data, type))
+            ):
+            raise RuntimeError(
+                f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
+            )
 
         # Serialize based on value_class_name, using schema_type_name to distinguish between types that share the same class
         if data is None:
@@ -262,7 +262,8 @@ class PrimitiveSerializer(Serializer):
                 return data
             elif type_format == TypeFormat.DEFAULT:
                 # Return type name after checking it is a known type
-                return TypeCache.get_type_name(data)
+                assert TypeCache.guard_known_type(data)
+                return typename(data)
             else:
                 raise ErrorUtil.enum_value_error(type_format, TypeFormat)
         else:

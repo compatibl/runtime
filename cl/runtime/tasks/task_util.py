@@ -51,7 +51,7 @@ class TaskUtil:
             if serialized_key is not None:
                 # Key is not None, this is an instance method
 
-                if TypeCache.is_known_type(request.type):
+                if TypeCache.is_known_type_name(request.type):
                     # Get key type based on table in request
                     key_type = TypeCache.from_type_name(request.type).get_key_type()  # noqa
                 else:

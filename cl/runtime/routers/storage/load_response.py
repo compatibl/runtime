@@ -45,7 +45,7 @@ class LoadResponse(RecordsWithSchemaResponse):
             return LoadResponse(schema_=cls._get_schema_dict(None), data=[])  # noqa
 
         # TODO: !!! Do not rely on first element to detect type
-        if TypeCache.is_known_type(request.load_keys[0].type):
+        if TypeCache.is_known_type_name(request.load_keys[0].type):
             record_type_name = request.load_keys[0].type
         else:
             bound_type_names = active(DataSource).get_bound_record_type_names(table=request.load_keys[0].type)
@@ -72,7 +72,7 @@ class LoadResponse(RecordsWithSchemaResponse):
 
             # Find a common base
             common_base_name = TypeCache.get_common_base_type_name(
-                types_or_names=loaded_record_type_names,
+                type_names=loaded_record_type_names,
                 type_kind=TypeKind.RECORD,
             )
             common_base = TypeCache.from_type_name(common_base_name)

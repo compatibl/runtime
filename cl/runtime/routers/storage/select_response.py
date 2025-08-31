@@ -52,7 +52,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         ds = active(DataSource)
 
         # TODO(Roman): !!! Implement separate methods for table and type
-        if (type_kind := TypeCache.get_type_info(type_or_name=request.type_).type_kind) == TypeKind.RECORD:
+        if (type_kind := TypeCache.get_type_name_info(type_name=request.type_).type_kind) == TypeKind.RECORD:
             # Get records for a type
             record_type_name = request.type_
             record_type = TypeCache.from_type_name(record_type_name)
