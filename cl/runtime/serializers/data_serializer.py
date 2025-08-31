@@ -134,7 +134,7 @@ class DataSerializer(Serializer):
                 for dict_key, dict_value in data.items()
                 if not is_empty(dict_value)
             )
-        elif is_data_key_or_record(data):
+        elif is_data_key_or_record(type(data)):
             # Use key serializer for key types if specified
             if self.key_serializer is not None and is_key(data):
                 return self.key_serializer.serialize(data, type_hint)

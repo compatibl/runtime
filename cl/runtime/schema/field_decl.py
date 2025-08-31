@@ -226,7 +226,7 @@ class FieldDecl(DataMixin):
             elif is_record(field_type):
                 # Field is a record (excludes keys)
                 result.field_kind = TypeKind.RECORD
-            elif is_data_key_or_record(field_type):
+            elif is_data_key_or_record(type(field_type)):
                 # Field is a slotted data type (excludes keys and records)
                 result.field_kind = TypeKind.DATA
             else:

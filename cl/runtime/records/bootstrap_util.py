@@ -51,7 +51,7 @@ class BootstrapUtil:
         elif is_mapping(type(data)):
             # Convert a mapping type to frozendict after applying build to each item
             return frozendict((k, cls.bootstrap_build(v)) for k, v in data.items() if not is_empty(v))
-        elif is_data_key_or_record(data):
+        elif is_data_key_or_record(type(data)):
             if data.is_frozen():
                 # Stop further processing and return if the object has already been frozen to
                 # prevent repeat initialization of shared instances

@@ -85,7 +85,7 @@ class DataUtil(BuilderUtil):
             if type_hint is not None:
                 type_hint.validate_for_mapping()
             return frozendict((k, cls.build_(v, remaining_chain)) for k, v in data.items() if not is_empty(v))
-        elif is_data_key_or_record(data):
+        elif is_data_key_or_record(type(data)):
             if data.is_frozen():
                 # Stop further processing and return if the object has already been frozen to
                 # prevent repeat initialization of shared instances

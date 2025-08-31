@@ -143,7 +143,7 @@ class PanelResponseUtil:
             return KeyView(view_for=view_for, view_name=view_name, key=viewer_result)
 
         # If the result is a Record, convert it to a RecordView.
-        elif is_data_key_or_record(viewer_result):
+        elif is_data_key_or_record(type(viewer_result)):
             return RecordView(view_for=view_for, view_name=view_name, record=viewer_result)
 
         # If the result is a list of keys or list of records, convert it to an appropriate View.

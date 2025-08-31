@@ -273,7 +273,7 @@ class BootstrapSerializer(Serializer):
                 for k, v in data.items()
                 if not is_empty(v)
             }
-        elif is_data_key_or_record(data):
+        elif is_data_key_or_record(type(data)):
             # Use key serializer for key types
             if is_key(data):
                 if self.key_format == KeyFormat.DELIMITED:

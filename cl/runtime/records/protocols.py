@@ -168,13 +168,16 @@ def is_builder(type_: type) -> bool:
         raise RuntimeError(f"The argument of is_builder is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_data_key_or_record(instance_or_type: Any) -> bool:
+def is_data_key_or_record(type_: type) -> bool:
     """
     True if the argument has 'get_field_names' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
+    if isinstance(type_, type):
+        return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
+    else:
+        raise RuntimeError(
+            f"The argument of is_data_key_or_record is an instance of {type(type_).__name__} rather than type.")
 
 
 def is_key_or_record(instance_or_type: Any) -> bool:

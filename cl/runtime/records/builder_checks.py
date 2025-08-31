@@ -90,9 +90,9 @@ class BuilderChecks:
                 and len(data) == len(other)
                 and all(cls.is_equal(v, other.get(k)) for k, v in data.items() if not k.startswith("_"))
             )
-        elif is_data_key_or_record(data):
+        elif is_data_key_or_record(type(data)):
             return (
-                is_data_key_or_record(other)
+                is_data_key_or_record(type(other))
                 and typename(type(data)) == typename(type(other))
                 and all(cls.is_equal(getattr(data, k), getattr(other, k)) for k in data.get_field_names())
             )
