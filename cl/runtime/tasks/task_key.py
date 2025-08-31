@@ -42,5 +42,5 @@ class TaskKey(KeyMixin):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         # Check only if inside a key, will be set automatically if inside a record
-        if is_key(self):
+        if is_key(type(self)):
             Timestamp.validate(self.task_id, value_name="task_id", data_type="TaskKey")

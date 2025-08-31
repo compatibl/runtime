@@ -190,7 +190,7 @@ class UiRecordUtil(DataMixin):  # TODO: Move to the appropriate directory
             return viewer_result
 
         # If the result is a Key, convert it to a KeyView.
-        elif is_key(viewer_result):
+        elif is_key(type(viewer_result)):
             return KeyView(view_for=view_for, view_name=view_name, key=viewer_result)
 
         # If the result is a Record, convert it to a RecordView.
@@ -201,7 +201,7 @@ class UiRecordUtil(DataMixin):  # TODO: Move to the appropriate directory
         elif isinstance(viewer_result, (list, tuple)):
 
             # Check iterable value type by first item.
-            if is_key(viewer_result[0]):
+            if is_key(type(viewer_result[0])):
                 return KeyListView(view_for=view_for, view_name=view_name, keys=viewer_result)
             elif is_record(viewer_result[0]):
                 return RecordListView(view_for=view_for, view_name=view_name, records=viewer_result)

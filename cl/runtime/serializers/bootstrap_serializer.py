@@ -275,7 +275,7 @@ class BootstrapSerializer(Serializer):
             }
         elif is_data_key_or_record(type(data)):
             # Use key serializer for key types
-            if is_key(data):
+            if is_key(type(data)):
                 if self.key_format == KeyFormat.DELIMITED:
                     key_serializer = KeySerializers.DELIMITED
                     return key_serializer.serialize(data, type_hint)

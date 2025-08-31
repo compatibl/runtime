@@ -183,7 +183,7 @@ class KeySerializer(Serializer):
                     raise RuntimeError("An inner key field inside a composite key cannot be None.")
             else:
                 raise RuntimeError(f"Key is None while its type hint {type_hint.to_str()} is not optional.")
-        elif is_key(data):
+        elif is_key(type(data)):
 
             # Check that the argument is frozen
             data.check_frozen()

@@ -32,7 +32,7 @@ class PlotView(View):
     def materialize(self) -> Self:
         """Return Self with loaded plot if self.plot is a key."""
 
-        if is_key(self.plot):
+        if is_key(type(self.plot)):
             plot = active(DataSource).load_one(self.plot)
             self.plot = plot
 

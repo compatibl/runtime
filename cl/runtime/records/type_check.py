@@ -87,7 +87,7 @@ class TypeCheck:
                 raise RuntimeError("Expected a key instance but received None.")
             else:
                 return False
-        if not isinstance(key, type) and is_key(key):
+        if is_key(type(key)):
             if (type_name := typename(type(key))).endswith("Key"):
                 return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
@@ -107,7 +107,7 @@ class TypeCheck:
         """Check if the argument is a key instance or None."""
         if key is None:
             return True
-        elif not isinstance(key, type) and is_key(key):
+        elif is_key(type(key)):
             if (type_name := typename(type(key))).endswith("Key"):
                 return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:

@@ -79,30 +79,18 @@ def test_functions():
     # Test is_data
     for class_ in all_classes:
         assert is_data_key_or_record(class_) == (class_ in data_classes), f"{class_} is not a data, key or record class"
-        if class_ not in abstract_classes:
-            assert is_data_key_or_record(class_()) == (
-                class_ in data_classes
-            ), f"{class_} is not a data, key or record class instance"
 
     # Test is_key_or_record
     for class_ in all_classes:
         assert is_key_or_record(class_) == (class_ in key_or_record_classes), f"{class_} is not a key or record class"
-        if class_ not in abstract_classes:
-            assert is_key_or_record(class_()) == (
-                class_ in key_or_record_classes
-            ), f"{class_} is not a key or record instance"
 
     # Test is_key
     for class_ in all_classes:
         assert is_key(class_) == (class_ in key_classes), f"{class_} is not a key class"
-        if class_ not in abstract_classes:
-            assert is_key(class_()) == (class_ in key_classes), f"{class_} is not a key instance"
 
     # Test is_record
     for class_ in all_classes:
         assert is_record(class_) == (class_ in record_classes), f"{class_} is not a record class"
-        if class_ not in abstract_classes:
-            assert is_record(class_()) == (class_ in record_classes), f"{class_} is not a record instance"
 
 
 if __name__ == "__main__":

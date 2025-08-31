@@ -100,7 +100,7 @@ class DataSource(DataSourceKey, RecordMixin):
         # Load the database object, use default DB if not specified
         if self.db is None:
             self.db = Db.create()  # TODO: Move initialization code here?
-        elif is_key(self.db):
+        elif is_key(type(self.db)):
             self.db = self.load_one(self.db)
 
         _LOGGER.info(f"Connected to DB type '{typename(type(self.db))}', db_id = '{self.db.db_id}'.")
@@ -281,7 +281,7 @@ class DataSource(DataSourceKey, RecordMixin):
         if cast_to is not None:
             # Check that the keys in the input list have the same type as cast_to.get_key_type()
             key_type = cast_to.get_key_type()
-            invalid_keys = [x for x in records_or_keys if is_key(x) and not isinstance(x, key_type)]
+            invalid_keys = [x for x in records_or_keys if is_key(type(x)) and not isinstance(x, key_type)]
             if len(invalid_keys) > 0:
                 invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
                 raise RuntimeError(
@@ -299,7 +299,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 )
 
         # The list of keys to load, skip None and records
-        keys_to_load = [x for x in records_or_keys if is_key(x)]
+        keys_to_load = [x for x in records_or_keys if is_key(type(x))]
 
         # Group keys by table
         keys_to_load_grouped_by_key_type = self._group_inputs_by_key_type(keys_to_load)
@@ -333,7 +333,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Populate the result with records loaded using input keys, pass through None and input records
         result = tuple(
-            loaded_records_dict.get(KeySerializers.TUPLE.serialize(x), None) if is_key(x) else x
+            loaded_records_dict.get(KeySerializers.TUPLE.serialize(x), None) if is_key(type(x)) else x
             for x in records_or_keys
         )
 

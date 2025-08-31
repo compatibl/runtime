@@ -42,7 +42,7 @@ class KeyRequestItem(BaseModel):
 
         if is_record(key_or_record):
             key = key_or_record.get_key()
-        elif is_key(key_or_record):
+        elif is_key(type(key_or_record)):
             key = key_or_record
         else:
             raise RuntimeError(f"The object {str(key_or_record)}) is neither a record nor a key.")

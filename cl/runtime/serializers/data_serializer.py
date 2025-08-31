@@ -136,7 +136,7 @@ class DataSerializer(Serializer):
             )
         elif is_data_key_or_record(type(data)):
             # Use key serializer for key types if specified
-            if self.key_serializer is not None and is_key(data):
+            if self.key_serializer is not None and is_key(type(data)):
                 return self.key_serializer.serialize(data, type_hint)
 
             # Type spec for the data
@@ -207,7 +207,7 @@ class DataSerializer(Serializer):
                             if is_enum(type(field_value))
                             else (
                                 key_serializer.serialize(field_value, field_spec.field_type_hint)
-                                if is_key(field_value)
+                                if is_key(type(field_value))
                                 else self._serialize_inner(field_value, field_spec.field_type_hint)
                             )
                         )
