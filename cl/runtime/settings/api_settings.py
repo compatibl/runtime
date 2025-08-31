@@ -61,7 +61,7 @@ class ApiSettings(Settings):
 
         # Validate hostname
         if self.api_hostname is not None and not isinstance(self.api_hostname, str):
-            raise RuntimeError(f"{typename(self)} field 'hostname' must be a string or None.")
+            raise RuntimeError(f"{typename(type(self))} field 'hostname' must be a string or None.")
 
         # Convert and validate port
         if self.api_port is None or isinstance(self.api_port, int):
@@ -70,9 +70,9 @@ class ApiSettings(Settings):
             if self.api_port.isdigit():
                 self.api_port = int(self.api_port)
             else:
-                raise RuntimeError(f"{typename(self)} field 'port' includes non-digit characters.")
+                raise RuntimeError(f"{typename(type(self))} field 'port' includes non-digit characters.")
         else:
-            raise RuntimeError(f"{typename(self)} field 'port' must be an int or a string.")
+            raise RuntimeError(f"{typename(type(self))} field 'port' must be an int or a string.")
 
         # Apply the defaults to the remaining fields when hostname is one of None, localhost or loopback IP address
         if self.api_hostname in [None, "localhost", "127.0.0.1"]:
@@ -92,32 +92,32 @@ class ApiSettings(Settings):
 
         # Validate the remaining settings,
         if self.api_allow_origins is None:
-            raise RuntimeError(f"{typename(self)} field 'allow_origins' is required except for localhost.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_origins' is required except for localhost.")
         elif isinstance(self.api_allow_origins, str) or not hasattr(self.api_allow_origins, "__iter__"):
-            raise RuntimeError(f"{typename(self)} field 'allow_origins' must be a list or None.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_origins' must be a list or None.")
 
         if self.api_allow_origin_regex is not None and not isinstance(self.api_allow_origin_regex, str):
-            raise RuntimeError(f"{typename(self)} field 'allow_origin_regex' must be a string or None.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_origin_regex' must be a string or None.")
 
         if self.api_allow_credentials is None:
-            raise RuntimeError(f"{typename(self)} field 'allow_credentials' is required except for localhost.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_credentials' is required except for localhost.")
         elif not isinstance(self.api_allow_credentials, bool):
-            raise RuntimeError(f"{typename(self)} field 'allow_credentials' must be a bool or None.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_credentials' must be a bool or None.")
 
         if self.api_allow_methods is None:
-            raise RuntimeError(f"{typename(self)} field 'allow_methods' is required except for localhost.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_methods' is required except for localhost.")
         elif isinstance(self.api_allow_methods, str) or not hasattr(self.api_allow_methods, "__iter__"):
-            raise RuntimeError(f"{typename(self)} field 'allow_methods' must be a list or None.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_methods' must be a list or None.")
 
         if self.api_allow_headers is None:
-            raise RuntimeError(f"{typename(self)} field 'allow_headers' is required except for localhost.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_headers' is required except for localhost.")
         elif isinstance(self.api_allow_headers, str) or not hasattr(self.api_allow_headers, "__iter__"):
-            raise RuntimeError(f"{typename(self)} field 'allow_headers' must be a list or None.")
+            raise RuntimeError(f"{typename(type(self))} field 'allow_headers' must be a list or None.")
 
         if self.api_expose_headers is not None and (
             isinstance(self.api_expose_headers, str) or not hasattr(self.api_expose_headers, "__iter__")
         ):
-            raise RuntimeError(f"{typename(self)} field 'expose_headers' must be a list or None.")
+            raise RuntimeError(f"{typename(type(self))} field 'expose_headers' must be a list or None.")
 
         if self.api_max_age is not None and not isinstance(self.api_max_age, int):
-            raise RuntimeError(f"{typename(self)} field 'max_age' must be an int or None.")
+            raise RuntimeError(f"{typename(type(self))} field 'max_age' must be an int or None.")

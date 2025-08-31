@@ -103,7 +103,7 @@ class DataSource(DataSourceKey, RecordMixin):
         elif is_key(self.db):
             self.db = self.load_one(self.db)
 
-        _LOGGER.info(f"Connected to DB type '{typename(self.db)}', db_id = '{self.db.db_id}'.")
+        _LOGGER.info(f"Connected to DB type '{typename(type(self.db))}', db_id = '{self.db.db_id}'.")
 
         # Load dataset, use root dataset if not specified
         if self.dataset is None:
@@ -483,7 +483,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 sort_order=sort_order,
             )
         else:
-            raise RuntimeError(f"Filter type {typename(filter_)} not supported by the data source.")
+            raise RuntimeError(f"Filter type {typename(type(filter_))} not supported by the data source.")
 
     def load_by_query(
         self,

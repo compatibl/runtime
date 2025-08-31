@@ -110,7 +110,7 @@ class PrimitiveSerializer(Serializer):
         """
 
         # Get type name of data, which may be a type
-        data_class_name = "type" if isinstance(data, type) else typename(data)
+        data_class_name = "type" if isinstance(data, type) else typename(type(data))
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
@@ -598,8 +598,8 @@ class PrimitiveSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, TypeFormat)
         else:
-            value_class_name = typename(data)
-            serializer_type_name = typename(self)
+            value_class_name = typename(type(data))
+            serializer_type_name = typename(type(self))
             raise RuntimeError(f"Class {value_class_name} cannot be serialized using {serializer_type_name}.")
 
     @classmethod

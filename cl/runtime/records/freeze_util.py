@@ -65,7 +65,7 @@ class FreezeUtil:
             return data.mark_frozen()
         else:
             raise RuntimeError(
-                f"Cannot freeze data of type {typename(data)} because it is not\n"
+                f"Cannot freeze data of type {typename(type(data))} because it is not\n"
                 f"a primitive type, enum, data, key or record class,\n"
                 f"or a supported container of these types."
             )

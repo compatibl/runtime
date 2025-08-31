@@ -65,7 +65,7 @@ class KeySerializer(Serializer):
         if len(invalid_tokens) > 0:
             invalid_tokens_str = "\n".join(str(x) for x in invalid_tokens)
             raise RuntimeError(
-                f"Tuple argument of {typename(self)}.serialize includes non-primitive/non-enum tokens:\n"
+                f"Tuple argument of {typename(type(self))}.serialize includes non-primitive/non-enum tokens:\n"
                 f"{invalid_tokens_str}"
             )
 
@@ -93,7 +93,8 @@ class KeySerializer(Serializer):
             key_type = schema_type
         else:
             raise RuntimeError(
-                f"Type {typename(schema_type)} passed to {typename(self)}\n" f"is not a key type, cannot serialize."
+                f"Type {typename(schema_type)} passed to {typename(type(self))}\n"
+                f"is not a key type, cannot serialize."
             )
 
         # Convert argument to a sequence based on the key_format field
@@ -102,7 +103,7 @@ class KeySerializer(Serializer):
             if not isinstance(data, str):
                 raise RuntimeError(
                     f"KeyFormat.DELIMITED is specified but data passed to\n"
-                    f"KeySerializer.deserialize method has type {typename(data)}"
+                    f"KeySerializer.deserialize method has type {typename(type(data))}"
                 )
             sequence = data.split(";")
         elif key_format == KeyFormat.TUPLE:
@@ -110,7 +111,7 @@ class KeySerializer(Serializer):
             if not is_sequence(data):
                 raise RuntimeError(
                     f"KeyFormat.SEQUENCE is specified but data passed to\n"
-                    f"KeySerializer.deserialize method has type {typename(data)}"
+                    f"KeySerializer.deserialize method has type {typename(type(data))}"
                 )
             # Check each token and create a deque so popleft is available
             sequence = [self._checked_value(x) for x in data]
@@ -139,7 +140,7 @@ class KeySerializer(Serializer):
             PrimitiveChecks.guard_not_none(type_hint)
 
         # Get the class of data, which may be NoneType
-        data_type_name = typename(data)
+        data_type_name = typename(type(data))
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = type_hint.schema_type_name if type_hint is not None else data_type_name
@@ -191,7 +192,7 @@ class KeySerializer(Serializer):
             type_spec = TypeSchema.for_class(type(data))
             if not isinstance(type_spec, DataSpec):
                 raise RuntimeError(
-                    f"Key serializer cannot serialize '{typename(data)}' because it is not a data, key or record class."
+                    f"Key serializer cannot serialize '{typename(type(data))}' because it is not a data, key or record class."
                 )
 
             # Serialize slot values in the order of declaration packing primitive types into size-one lists
@@ -224,11 +225,11 @@ class KeySerializer(Serializer):
             return result
         else:
             if is_outer:
-                raise RuntimeError(f"{typename(self)} cannot serialize {type(data)} because it is not a key.")
+                raise RuntimeError(f"{typename(type(self))} cannot serialize {type(data)} because it is not a key.")
             else:
                 # This message will not be displayed for outer key
                 raise RuntimeError(
-                    f"A field inside a composite key has type {typename(data)}\n"
+                    f"A field inside a composite key has type {typename(type(data))}\n"
                     f"which is not a primitive type, enum, or another key."
                 )
 

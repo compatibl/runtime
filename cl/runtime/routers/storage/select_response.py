@@ -105,7 +105,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         table_dict = {k: v for k, v in DataSerializers.FOR_UI.serialize(record).items() if k in table_fields}
 
         # Add "_t" and "_key" attributes
-        table_dict["_t"] = typename(record)
+        table_dict["_t"] = typename(type(record))
         table_dict["_key"] = KeySerializers.DELIMITED.serialize(record.get_key())
 
         return table_dict

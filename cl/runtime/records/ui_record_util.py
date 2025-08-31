@@ -147,7 +147,7 @@ class UiRecordUtil(DataMixin):  # TODO: Move to the appropriate directory
         if not handlers or not (
             viewer_name := next((h.name for h in handlers if h.label == panel_id and h.type_ == "Viewer"), None)
         ):
-            raise RuntimeError(f"Type {typename(record)} has no view named '{panel_id}'.")
+            raise RuntimeError(f"Type {typename(type(record))} has no view named '{panel_id}'.")
 
         # Call viewer method and get the result.
         viewer = getattr(record, f"view_{viewer_name}")

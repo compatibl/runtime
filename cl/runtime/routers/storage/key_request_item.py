@@ -48,6 +48,6 @@ class KeyRequestItem(BaseModel):
             raise RuntimeError(f"The object {str(key_or_record)}) is neither a record nor a key.")
 
         key_ = _KEY_SERIALIZER.serialize(key)
-        type_ = typename(key)
+        type_ = typename(type(key))
 
         return cls(key=key_, type=type_)

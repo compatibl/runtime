@@ -114,7 +114,7 @@ class SqliteDb(Db):
         self._check_dataset(dataset)
 
         if project_to is not None:
-            raise RuntimeError(f"{typename(self)} does not currently support 'project_to' option.")
+            raise RuntimeError(f"{typename(type(self))} does not currently support 'project_to' option.")
 
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=key_type)
@@ -177,7 +177,7 @@ class SqliteDb(Db):
         self._check_dataset(dataset)
 
         if project_to is not None:
-            raise RuntimeError(f"{typename(self)} does not currently support 'project_to' option.")
+            raise RuntimeError(f"{typename(type(self))} does not currently support 'project_to' option.")
 
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
@@ -195,7 +195,7 @@ class SqliteDb(Db):
         elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {typename(self)}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"In {typename(type(self))}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
                 f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 
@@ -280,7 +280,7 @@ class SqliteDb(Db):
         elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {typename(self)}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"In {typename(type(self))}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
                 f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 

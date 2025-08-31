@@ -52,10 +52,12 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.max_trials is not None and self.max_trials <= 0:
-            raise RuntimeError(f"{typename(self)}.max_trials={self.max_trials}. It must be None or a positive number.")
+            raise RuntimeError(
+                f"{typename(type(self))}.max_trials={self.max_trials}. It must be None or a positive number."
+            )
         if self.max_parallel is not None and self.max_parallel <= 0:
             raise RuntimeError(
-                f"{typename(self)}.max_parallel={self.max_parallel}. It must be None or a positive number."
+                f"{typename(type(self))}.max_parallel={self.max_parallel}. It must be None or a positive number."
             )
 
     @abstractmethod
@@ -175,7 +177,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         if result == 0:
             raise RuntimeError(
                 f"The maximum number of trials ({self.max_trials}) has already been reached\n"
-                f"for {typename(self)} with experiment_id={self.experiment_id}."
+                f"for {typename(type(self))} with experiment_id={self.experiment_id}."
             )
         return result
 

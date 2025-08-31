@@ -65,7 +65,7 @@ class DbSettings(Settings):
             raise RuntimeError(f"Field 'db_name' in settings.yaml must be None or a string.")
 
         if not isinstance(self.db_type, str):
-            raise RuntimeError(f"{typename(self)} field 'db_type' must be Db class name in PascalCase format.")
+            raise RuntimeError(f"{typename(type(self))} field 'db_type' must be Db class name in PascalCase format.")
 
     @classmethod
     def get_db_dir(cls) -> str:

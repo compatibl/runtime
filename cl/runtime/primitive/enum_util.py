@@ -91,7 +91,7 @@ class EnumUtil(BuilderUtil):
             return data
         elif isinstance(data, Enum):
             # Check that schema type matches if specified
-            if type_hint is not None and type_hint.schema_type_name != (data_type_name := typename(data)):
+            if type_hint is not None and type_hint.schema_type_name != (data_type_name := typename(type(data))):
                 raise RuntimeError(
                     f"Enum value type {data_type_name} does not match the schema type {type_hint.schema_type_name}."
                 )

@@ -180,7 +180,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
             raise RuntimeError(f"Cannot create TypeDecl for class {typename(record_type)} because it is a tuple.")
         else:
             raise RuntimeError(
-                f"Cannot create TypeDecl for class {typename(record_type)} " f"because it is not a record, key or data."
+                f"Cannot create TypeDecl for class {typename(record_type)} because it is not a record, key or data."
             )
 
         result.module = ModuleDeclKey().build()

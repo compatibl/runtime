@@ -34,7 +34,7 @@ class FilterMany(Filter):
         assert TypeCheck.guard_key_sequence(self.keys)
         if self.keys:
             key_type = type(self.keys[0])
-            mismatched_types = [typename(key) for key in self.keys if type(key) != key_type]
+            mismatched_types = [typename(type(key)) for key in self.keys if type(key) != key_type]
             if mismatched_types:
                 mismatched_types_str = ", ".join(mismatched_types)
                 raise RuntimeError(f"Keys in FilterMany have more than one type: {mismatched_types_str}")

@@ -88,7 +88,7 @@ class EnvSettings(Settings):
                 )
             elif not is_enum(self.env_kind):
                 raise RuntimeError(
-                    f"The value of env_kind={self.env_kind} in {typename(self)}\n"
+                    f"The value of env_kind={self.env_kind} in {typename(type(self))}\n"
                     f"is not an EnvKind enum or a string."
                 )
         else:

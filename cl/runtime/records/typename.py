@@ -12,21 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from memoization import cached
 
 
-def typename(instance_or_type: Any) -> str:
+@cached
+def typename(type_: type) -> str:
     """Return type name without module in PascalCase, or an alias if provided."""
-    # TODO: Add support for aliases
-    # Accept instance or type
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    result = type_.__name__
-    return result
+    # Accept type only, error if an instance is passed
+    if isinstance(type_, type):
+        # TODO: Add support for aliases
+        return type_.__name__
+    else:
+        raise RuntimeError(
+            f"Function typename accepts only type but an instance of {typename(type(type_))} was provided instead."
+        )
 
 
-def qualname(instance_or_type: Any) -> str:
+def qualname(type_: type) -> str:
     """Return fully qualified type name with module in module.PascalCase format without applying any aliases."""
-    # Accept instance or type
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    result = f"{type_.__module__}.{type_.__name__}"
-    return result
+    # Accept type only, error if an instance is passed
+    if isinstance(type_, type):
+        return f"{type_.__module__}.{type_.__name__}"
+    else:
+        raise RuntimeError(
+            f"Function qualname accepts only type but an instance of {qualname(type(type_))} was provided instead."
+        )

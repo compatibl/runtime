@@ -40,4 +40,4 @@ class CastUtil:
         if obj is None or isinstance(obj, cast_to):
             return obj
         else:
-            raise RuntimeError(f"Cannot cast an object of type {typename(obj)} to type {typename(cast_to)}.")
+            raise RuntimeError(f"Cannot cast an object of type {typename(type(obj))} to type {typename(cast_to)}.")

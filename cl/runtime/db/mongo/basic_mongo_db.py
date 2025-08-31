@@ -184,8 +184,8 @@ class BasicMongoDb(Db):
         elif not issubclass(restrict_to, query_target_type):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {typename(self)}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
-                f"of the query target type {typename(query_target_type)} for {typename(query)}."
+                f"In {typename(type(self))}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"of the query target type {typename(query_target_type)} for {typename(type(query))}."
             )
 
         # Filter by restrict_to if specified
@@ -243,7 +243,7 @@ class BasicMongoDb(Db):
         elif not issubclass(restrict_to, query_target_type):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {typename(self)}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"In {typename(type(self))}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
                 f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 

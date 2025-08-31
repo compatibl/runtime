@@ -47,7 +47,7 @@ class LocalStorage(Storage):
         if not os.path.isabs(self.rel_dir):
             self._abs_dir = os.path.join(ProjectSettings.get_project_root(), self.rel_dir)
         else:
-            raise RuntimeError(f"{typename(self)}.rel_dir is not a relative path:\n{self.rel_dir}")
+            raise RuntimeError(f"{typename(type(self))}.rel_dir is not a relative path:\n{self.rel_dir}")
 
         # Create storage root directory if does not exist
         if not os.path.exists(self._abs_dir):

@@ -36,11 +36,11 @@ class BuilderChecks:
             if obj.is_frozen():
                 return True
             elif raise_on_fail:
-                raise RuntimeError(f"Parameter of type {typename(obj)} is not frozen.")
+                raise RuntimeError(f"Parameter of type {typename(type(obj))} is not frozen.")
             else:
                 return False
         elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} does not have build() method.")
+            raise RuntimeError(f"Parameter of type {typename(type(obj))} does not have build() method.")
         else:
             return False
 
@@ -53,11 +53,11 @@ class BuilderChecks:
             if obj.is_frozen():
                 return True
             elif raise_on_fail:
-                raise RuntimeError(f"Parameter of type {typename(obj)} is not frozen or None.")
+                raise RuntimeError(f"Parameter of type {typename(type(obj))} is not frozen or None.")
             else:
                 return False
         elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} does not have build() method and is not None.")
+            raise RuntimeError(f"Parameter of type {typename(type(obj))} does not have build() method and is not None.")
         else:
             return False
 
@@ -93,12 +93,12 @@ class BuilderChecks:
         elif is_data_key_or_record(data):
             return (
                 is_data_key_or_record(other)
-                and typename(data) == typename(other)
+                and typename(type(data)) == typename(type(other))
                 and all(cls.is_equal(getattr(data, k), getattr(other, k)) for k in data.get_field_names())
             )
         else:
             raise RuntimeError(
-                f"{typename(cls)} cannot compare data of type {typename(data)} because it is not\n"
+                f"{typename(cls)} cannot compare data of type {typename(type(data))} because it is not\n"
                 f"a primitive type, enum, data, key or record class or a supported container of these types."
             )
 

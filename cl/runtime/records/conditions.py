@@ -76,7 +76,7 @@ class Gt(Generic[TObj], Condition[TObj]):
         if is_primitive_instance(value):
             self.op_gt = value
         else:
-            raise RuntimeError(f"Argument of Gt operator has type {typename(value)} which is not a primitive.")
+            raise RuntimeError(f"Argument of Gt operator has type {typename(type(value))} which is not a primitive.")
 
 
 class Gte(Generic[TObj], Condition[TObj]):
@@ -92,7 +92,7 @@ class Gte(Generic[TObj], Condition[TObj]):
         if is_primitive_instance(value):
             self.op_gte = value
         else:
-            raise RuntimeError(f"Argument of Gte operator has type {typename(value)} which is not a primitive.")
+            raise RuntimeError(f"Argument of Gte operator has type {typename(type(value))} which is not a primitive.")
 
 
 class Lt(Generic[TObj], Condition[TObj]):
@@ -108,7 +108,7 @@ class Lt(Generic[TObj], Condition[TObj]):
         if is_primitive_instance(value):
             self.op_lt = value
         else:
-            raise RuntimeError(f"Argument of Lt operator has type {typename(value)} which is not a primitive.")
+            raise RuntimeError(f"Argument of Lt operator has type {typename(type(value))} which is not a primitive.")
 
 
 class Lte(Generic[TObj], Condition[TObj]):
@@ -124,7 +124,7 @@ class Lte(Generic[TObj], Condition[TObj]):
         if is_primitive_instance(value):
             self.op_lte = value
         else:
-            raise RuntimeError(f"Argument of Lte operator has type {typename(value)} which is not a primitive.")
+            raise RuntimeError(f"Argument of Lte operator has type {typename(type(value))} which is not a primitive.")
 
 
 class And(Generic[TObj], Condition[TObj]):
@@ -179,7 +179,7 @@ class Exists(Generic[TObj], Condition[TObj]):
         if type(value) is bool:
             self.op_exists = value
         else:
-            raise RuntimeError(f"Argument of Exists operator has type {typename(value)} which is not a bool.")
+            raise RuntimeError(f"Argument of Exists operator has type {typename(type(value))} which is not a bool.")
 
 
 class In(Generic[TObj], Condition[TObj]):
@@ -197,7 +197,7 @@ class In(Generic[TObj], Condition[TObj]):
         elif is_sequence(values):
             self.op_in = tuple(values)
         else:
-            raise RuntimeError(f"Argument of In operator has type {typename(values)} which is not a sequence.")
+            raise RuntimeError(f"Argument of In operator has type {typename(type(values))} which is not a sequence.")
 
 
 class NotIn(Generic[TObj], Condition[TObj]):
@@ -215,4 +215,4 @@ class NotIn(Generic[TObj], Condition[TObj]):
         elif is_sequence(values):
             self.op_nin = tuple(values)
         else:
-            raise RuntimeError(f"Argument of NotIn operator has type {typename(values)} which is not a sequence.")
+            raise RuntimeError(f"Argument of NotIn operator has type {typename(type(values))} which is not a sequence.")

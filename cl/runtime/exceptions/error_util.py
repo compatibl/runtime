@@ -70,7 +70,7 @@ class ErrorUtil:
             callable_name: Function name in snake_case format or method name in ClassName.method_name format (optional)
             param_name: Snake case parameter name (optional)
         """
-        type_str = typename(value)
+        type_str = typename(type(value))
         details_str = cls.wrap(details) if details else ""
         callable_str = f"Method {callable_name}" if "." in callable_name else f"Function {callable_name}"
         param_str = f"type {type_str} for parameter '{param_name}'" if param_name else f"parameter type {type_str}"
@@ -117,7 +117,7 @@ class ErrorUtil:
                     f"Type {value_type_name} of enum value does not match the type in schema {schema_type}"
                 )
             else:
-                enum_type_name = typename(value)
+                enum_type_name = typename(type(value))
                 enum_value_str = value.name if isinstance(value, Enum) else str(value)
                 valid_items = "\n".join(item.name for item in value.__class__)
                 return RuntimeError(

@@ -135,7 +135,7 @@ class SettingsUtil:
                 return (value,)
         else:
             raise RuntimeError(
-                f"Cannot convert {cls._what(field_name, settings_type)} of type {typename(value)}\n"
+                f"Cannot convert {cls._what(field_name, settings_type)} of type {typename(type(value))}\n"
                 f"with value {value} to a string or a sequence of comma-delimited strings."
             )
 

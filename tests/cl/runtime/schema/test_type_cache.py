@@ -45,7 +45,8 @@ def test_is_known_type():
     assert TypeCache.is_known_type(StubDataclassData)
 
     # Invalid cases
-    assert not TypeCache.is_known_type(123)  # noqa
+    with pytest.raises(RuntimeError, match="is passed where only str or type are accepted"):
+        assert not TypeCache.is_known_type(123)  # noqa
 
 
 def test_guard_known_type():
@@ -60,8 +61,10 @@ def test_guard_known_type():
     assert TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.DATA)
 
     # Invalid cases
-    assert not TypeCache.guard_known_type(123, raise_on_fail=False)
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match="is passed where only str or type are accepted"):
+        # Raise an error even when raise_on_fail is False when the parameter is not a str or type
+        TypeCache.guard_known_type(123, raise_on_fail=False)
+    with pytest.raises(Exception, match="is passed where only str or type are accepted"):
         TypeCache.guard_known_type(123)
 
     # Not a record

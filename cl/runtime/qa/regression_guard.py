@@ -147,7 +147,7 @@ class RegressionGuard:
 
         # Perform type conversion
         if isinstance(value, Exception):
-            value = f"Raises {typename(value)} with the message:\n{str(value)}"
+            value = f"Raises {typename(type(value))} with the message:\n{str(value)}"
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
         if self.__delegate_to is not None:

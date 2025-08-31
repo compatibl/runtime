@@ -139,13 +139,13 @@ def make_inactive(
     # Validate stack integrity and restore previous current
     if not context_stack:
         raise RuntimeError(
-            f"Context stack for context type {typename(context)} and context_id={context_id}\n"
+            f"Context stack for context type {typename(type(context))} and context_id={context_id}\n"
             f"has been cleared inside 'with activate(...)' clause."
         )
     elif expected_stack and context_stack is not expected_stack:
         # Perform this check only if expected_stack is not None
         raise RuntimeError(
-            f"Context stack for context type {typename(context)} and context_id={context_id}\n"
+            f"Context stack for context type {typename(type(context))} and context_id={context_id}\n"
             f"has been changed inside 'with activate(...)' clause."
         )
 
@@ -155,7 +155,7 @@ def make_inactive(
         context_stack.pop()
     else:
         raise RuntimeError(
-            f"Active context for context type {typename(context)} and context_id={context_id}\n"
+            f"Active context for context type {typename(type(context))} and context_id={context_id}\n"
             f"has been changed bypassing the context manager."
         )
 

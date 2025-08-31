@@ -51,12 +51,12 @@ class PrimitiveUtil(BuilderUtil):
             else:
                 # Required and has the value of None, raise an error
                 location_str = cls._get_location_str(
-                    typename(data), type_hint, outer_type_name=outer_type_name, field_name=field_name
+                    typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
                 raise RuntimeError(f"Required field is not specified.{location_str}")
 
         # Get the actual type name of data, which may be a type
-        data_class_name = "type" if isinstance(data, type) else typename(data)
+        data_class_name = "type" if isinstance(data, type) else typename(type(data))
 
         # Get the expected type name, which may include subtypes such as long or timestamp
         schema_type_name = type_hint.schema_type_name if type_hint is not None else None
@@ -72,7 +72,7 @@ class PrimitiveUtil(BuilderUtil):
         # Validate that the actual data type matches the expected type (which may have subtypes)
         if data_class_name != schema_type_name and data_class_name not in _SUBTYPED_CLASS_NAMES:
             location_str = cls._get_location_str(
-                typename(data), type_hint, outer_type_name=outer_type_name, field_name=field_name
+                typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
             )
             raise RuntimeError(
                 f"Actual field type is {data_class_name} while {schema_type_name} was expected.{location_str}"
@@ -92,7 +92,7 @@ class PrimitiveUtil(BuilderUtil):
                 return data
             else:
                 location_str = cls._get_location_str(
-                    typename(data), type_hint, outer_type_name=outer_type_name, field_name=field_name
+                    typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
                 raise RuntimeError(
                     f"Data type '{data_class_name}' can only be used for fields declared as str or timestamp.\n"
@@ -117,7 +117,7 @@ class PrimitiveUtil(BuilderUtil):
                 return float(data)
             else:
                 location_str = cls._get_location_str(
-                    typename(data), type_hint, outer_type_name=outer_type_name, field_name=field_name
+                    typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
                 raise RuntimeError(
                     f"Data type '{data_class_name}' can only be used for fields declared as int, long, or float.\n"
@@ -135,7 +135,7 @@ class PrimitiveUtil(BuilderUtil):
                 return FloatUtil.to_long(data)
             else:
                 location_str = cls._get_location_str(
-                    typename(data), type_hint, outer_type_name=outer_type_name, field_name=field_name
+                    typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
                 raise RuntimeError(
                     f"Data type '{data_class_name}' can only be used for fields declared as float, int or long.\n"

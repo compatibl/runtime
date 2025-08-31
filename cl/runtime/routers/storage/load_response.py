@@ -63,7 +63,7 @@ class LoadResponse(RecordsWithSchemaResponse):
         loaded_records = active(DataSource).load_many_or_none(keys)
 
         # Find the lowest common base of the loaded types except None
-        loaded_record_type_names = tuple(typename(x) for x in loaded_records if x is not None)
+        loaded_record_type_names = tuple(typename(type(x)) for x in loaded_records if x is not None)
 
         # TODO: Decide if this is the right logic to return empty response if records not found
         if loaded_record_type_names:

@@ -73,7 +73,7 @@ def save_records_to_csv(records: Iterable, file_path: str) -> None:
 
 
 def save_test_records(entries: list[RecordMixin]) -> tuple[list[RecordMixin], Path]:
-    file_path = Path(__file__).parent.joinpath(f"{typename(entries[0])}.csv")
+    file_path = Path(__file__).parent.joinpath(f"{typename(type(entries[0]))}.csv")
     save_records_to_csv(entries, str(file_path.absolute()))
     return entries, file_path
 

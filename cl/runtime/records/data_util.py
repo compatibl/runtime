@@ -131,7 +131,7 @@ class DataUtil(BuilderUtil):
                         cls._checked_empty(  # Validates vs. the type hint while is_empty does not
                             field_value,
                             field_spec.field_type_hint,
-                            outer_type_name=typename(data),
+                            outer_type_name=typename(type(data)),
                             field_name=field_name,
                         )
                         if is_empty(field_value := getattr(data, field_name))
@@ -139,7 +139,7 @@ class DataUtil(BuilderUtil):
                             PrimitiveUtil.build_(
                                 field_value,
                                 field_spec.field_type_hint,
-                                outer_type_name=typename(data),
+                                outer_type_name=typename(type(data)),
                                 field_name=field_name,
                             )
                             if is_primitive_instance(field_value)
@@ -147,7 +147,7 @@ class DataUtil(BuilderUtil):
                                 EnumUtil.build_(
                                     field_value,
                                     field_spec.field_type_hint,
-                                    outer_type_name=typename(data),
+                                    outer_type_name=typename(type(data)),
                                     field_name=field_name,
                                 )
                                 if is_enum(field_value)
@@ -155,14 +155,14 @@ class DataUtil(BuilderUtil):
                                     ConditionUtil.build_(
                                         field_value,
                                         field_spec.field_type_hint,
-                                        outer_type_name=typename(data),
+                                        outer_type_name=typename(type(data)),
                                         field_name=field_name,
                                     )
                                     if is_condition(field_value)
                                     else cls.build_(
                                         field_value,
                                         field_spec.field_type_hint,
-                                        outer_type_name=typename(data),
+                                        outer_type_name=typename(type(data)),
                                         field_name=field_name,
                                     )
                                 )
@@ -195,7 +195,7 @@ class DataUtil(BuilderUtil):
             # Optional, perform full type hint validation if not None
             if data is not None:
                 # Get the actual type name of data, which may be a type
-                data_class_name = "type" if isinstance(data, type) else typename(data)
+                data_class_name = "type" if isinstance(data, type) else typename(type(data))
                 # Get the expected type name, which may include subtypes such as long or timestamp
                 schema_type_name = type_hint.schema_type_name if type_hint is not None else None
                 if data_class_name != schema_type_name:
@@ -207,7 +207,7 @@ class DataUtil(BuilderUtil):
         else:
             # Required and has empty value, raise an error
             location_str = cls._get_location_str(
-                typename(data), type_hint, outer_type_name=outer_type_name, field_name=field_name
+                typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
             )
             raise RuntimeError(f"Required field is None or an empty primitive type.{location_str}")
 

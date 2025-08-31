@@ -77,7 +77,7 @@ class TypeCache:
         cls._ensure_loaded()
 
         # Convert to type name if provided as type
-        type_name = type_or_name if isinstance(type_or_name, str) else typename(type_or_name)
+        type_name = cls._get_type_name(type_or_name)
 
         # Return True if present in dict
         result = type_name in cls._type_info_by_type_name_dict
@@ -105,7 +105,7 @@ class TypeCache:
         cls._ensure_loaded()
 
         # Convert to type name if provided as type
-        type_name = type_or_name if isinstance(type_or_name, str) else typename(type_or_name)
+        type_name = cls._get_type_name(type_or_name)
 
         if type_kind is None:
             # If type_kind is None, only check if present in dict
@@ -162,7 +162,8 @@ class TypeCache:
         cls._ensure_loaded()
 
         # Convert to type name if provided as type
-        type_name = type_or_name if isinstance(type_or_name, str) else typename(type_or_name)
+        type_name = cls._get_type_name(type_or_name)
+
         result = cls._type_info_by_type_name_dict.get(type_name)
         if not result:
             packages_str = "\n".join(f"  - {package}" for package in cls._get_packages())
@@ -244,16 +245,9 @@ class TypeCache:
             type_or_name: Type or type name in PascalCase format
             type_kind: Restrict to the specified type kind if provided (optional)
         """
-        if isinstance(type_or_name, str):
-            # Get type from name
-            type_ = cls.from_type_name(type_or_name)
-        elif isinstance(type_or_name, type):
-            # Argument is type
-            type_ = type_or_name
-        else:
-            raise RuntimeError(
-                f"Param {type_or_name} has type {typename(type_or_name)} but must be a type or type name."
-            )
+
+        # Convert to type if provided as name
+        type_ = cls._get_type(type_or_name)
 
         # Filter based on type_kind, use set to eliminate duplicates
         if type_kind is None:
@@ -282,16 +276,8 @@ class TypeCache:
             type_kind: Restrict to the specified type kind if provided (optional)
         """
 
-        if isinstance(type_or_name, str):
-            # Get type from name
-            type_ = cls.from_type_name(type_or_name)
-        elif isinstance(type_or_name, type):
-            # Argument is type
-            type_ = type_or_name
-        else:
-            raise RuntimeError(
-                f"Param {type_or_name} has type {typename(type_or_name)} but must be a type or type name."
-            )
+        # Convert to type if provided as name
+        type_ = cls._get_type(type_or_name)
 
         # This must run after all types are loaded
         subtypes = [typename(type_)] if is_data_key_or_record(type_) else []  # Include self in subtypes
@@ -611,11 +597,34 @@ class TypeCache:
 
     @classmethod
     def _get_type_name(cls, type_or_name: type | str) -> str:
-        """Convert to string if type is provided and validate."""
-        result = type_or_name if isinstance(type_or_name, str) else typename(type_or_name)
-        if not isinstance(result, str):
-            raise RuntimeError("Parameter must be a type or a string type name.")
-        CaseUtil.check_pascal_case(result)
+        """Convert to name if provided as type, passthrough if already a name."""
+        if isinstance(type_or_name, str):
+            # Already a name
+            result = type_or_name
+        elif isinstance(type_or_name, type):
+            # Convert to type name if provided as type
+            result = typename(type_or_name)
+        else:
+            raise RuntimeError(
+                f"An instance of {typename(type(type_or_name))} is passed where only str or type are accepted."
+            )
+        if not CaseUtil.is_pascal_case(result):
+            raise RuntimeError(f"Type name {result} is not PascalCase.")
+        return result
+
+    @classmethod
+    def _get_type(cls, type_or_name: type | str) -> type:
+        """Convert to type if provided as nas, passthrough if already a type."""
+        if isinstance(type_or_name, str):
+            # Convert to type if provided as name
+            result = cls.from_type_name(type_or_name)
+        elif isinstance(type_or_name, type):
+            # Already a type
+            result = type_or_name
+        else:
+            raise RuntimeError(
+                f"An instance of {typename(type(type_or_name))} is passed where only str or type are accepted."
+            )
         return result
 
     @classmethod

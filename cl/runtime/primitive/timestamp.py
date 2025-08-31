@@ -279,7 +279,7 @@ class Timestamp:
         """Return true if the argument is a valid UUIDv7."""
 
         # Check type using name as UUID class may come from different packages
-        if (value_type_name := typename(value)) != "UUID":
+        if (value_type_name := typename(type(value))) != "UUID":
             raise RuntimeError(f"An object of type '{value_type_name}' was provided while UUIDv7 was expected.")
 
         # Check that version is UUIDv7

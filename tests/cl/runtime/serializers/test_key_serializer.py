@@ -57,7 +57,7 @@ def test_serialization():  # TODO: Rename to test_delimited
         assert BuilderChecks.is_equal(sample, deserialized)
 
         # Write to regression guard
-        snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(sample))
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(type(sample)))
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(serialized)
     RegressionGuard().verify_all()
@@ -83,7 +83,7 @@ def test_polymorphic():
 
     # Roundtrip serialization
     serialized = KeySerializers.DELIMITED.serialize(sample, base_type_hint)
-    assert serialized == f"{typename(sample)};{sample.id}"
+    assert serialized == f"{typename(type(sample))};{sample.id}"
     deserialized = KeySerializers.DELIMITED.deserialize(serialized, base_type_hint)
     assert BuilderChecks.is_equal(sample, deserialized)
 
@@ -117,7 +117,7 @@ def test_for_sqlite():
         assert BuilderChecks.is_equal(sample, deserialized)
 
         # Write to regression guard
-        snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(sample))
+        snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(type(sample)))
         guard = RegressionGuard(channel=snake_case_type_name)
         guard.write(serialized)
     RegressionGuard().verify_all()

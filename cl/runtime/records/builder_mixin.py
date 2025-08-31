@@ -61,12 +61,12 @@ class BuilderMixin(ABC):
     def check_frozen(self) -> None:
         """Raise an error if the instance is not frozen."""
         if not self.is_frozen():
-            raise RuntimeError(f"{typename(self)} not frozen, invoke build method before first use.")
+            raise RuntimeError(f"{typename(type(self))} not frozen, invoke build method before first use.")
 
     def __setattr__(self, key, value):
         """Raise an error on attempt to modify a public field for a frozen instance."""
         if self.is_frozen() and not key.startswith("_"):
-            type_name = typename(self)
+            type_name = typename(type(self))
             raise RuntimeError(f"Cannot modify public field {type_name}.{key} because the instance is frozen.")
         object.__setattr__(self, key, value)
 

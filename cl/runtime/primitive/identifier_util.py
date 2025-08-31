@@ -56,7 +56,7 @@ class IdentifierUtil:
         """
         if not isinstance(value, str):
             if raise_on_fail:
-                raise RuntimeError(f"Identifier '{typename(value)}' type is not string.")
+                raise RuntimeError(f"Identifier '{typename(type(value))}' type is not string.")
             else:
                 return False
 

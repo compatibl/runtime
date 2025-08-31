@@ -287,7 +287,7 @@ class BootstrapSerializer(Serializer):
                     pass
 
             # Data type name taking into account aliases
-            data_type_name = typename(data)
+            data_type_name = typename(type(data))
 
             # Include type in output according to the type_inclusion setting
             if self.type_inclusion == TypeInclusion.ALWAYS:
@@ -349,8 +349,8 @@ class BootstrapSerializer(Serializer):
             return result
         else:
             # Did not match a supported data type
-            raise RuntimeError(f"Cannot serialize data of type '{typename(data)}'.")
+            raise RuntimeError(f"Cannot serialize data of type '{typename(type(data))}'.")
 
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Deserialize a dictionary into object using type information extracted from the _type field."""
-        raise RuntimeError(f"{typename(self)} does not support deserialization.")
+        raise RuntimeError(f"{typename(type(self))} does not support deserialization.")

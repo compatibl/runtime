@@ -88,7 +88,7 @@ class TypeCheck:
             else:
                 return False
         if not isinstance(key, type) and is_key(key):
-            if (type_name := typename(key)).endswith("Key"):
+            if (type_name := typename(type(key))).endswith("Key"):
                 return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
@@ -98,7 +98,7 @@ class TypeCheck:
             else:
                 return False
         elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(key)} is not a key instance.")
+            raise RuntimeError(f"Parameter of type {typename(type(key))} is not a key instance.")
         else:
             return False
 
@@ -108,7 +108,7 @@ class TypeCheck:
         if key is None:
             return True
         elif not isinstance(key, type) and is_key(key):
-            if (type_name := typename(key)).endswith("Key"):
+            if (type_name := typename(type(key))).endswith("Key"):
                 return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
@@ -118,7 +118,7 @@ class TypeCheck:
             else:
                 return False
         elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(key)} is not a key instance or None.")
+            raise RuntimeError(f"Parameter of type {typename(type(key))} is not a key instance or None.")
         else:
             return False
 
@@ -180,7 +180,7 @@ class TypeCheck:
         if record is None:
             raise RuntimeError("Expected a record instance but received None.")
         elif not isinstance(record, type) and is_record(record):
-            if not (type_name := typename(record)).endswith("Key"):
+            if not (type_name := typename(type(record))).endswith("Key"):
                 return cast(TypeGuard[RecordMixin], BuilderChecks.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
@@ -190,7 +190,7 @@ class TypeCheck:
             else:
                 return False
         elif raise_on_fail:
-            raise RuntimeError(f"Parameter {typename(record)} is not a record instance.")
+            raise RuntimeError(f"Parameter {typename(type(record))} is not a record instance.")
         else:
             return False
 
@@ -200,7 +200,7 @@ class TypeCheck:
         if record is None:
             return True
         elif not isinstance(record, type) and is_record(record):
-            if not (type_name := typename(record)).endswith("Key"):
+            if not (type_name := typename(type(record))).endswith("Key"):
                 return cast(TypeGuard[RecordMixin], BuilderChecks.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
                 raise RuntimeError(
@@ -210,7 +210,7 @@ class TypeCheck:
             else:
                 return False
         elif raise_on_fail:
-            raise RuntimeError(f"Parameter {typename(record)} is not a record instance or None.")
+            raise RuntimeError(f"Parameter {typename(type(record))} is not a record instance or None.")
         else:
             return False
 
