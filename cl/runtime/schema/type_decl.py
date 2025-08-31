@@ -171,7 +171,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
         if is_record(record_type):
             result.type_kind = TypeKind.RECORD
         elif is_key(record_type):
-            result.type_kind = TypeKind.DATA  # TODO: Review, should be KEY
+            result.type_kind = TypeKind.DATA  # TODO: !!! Review, should be KEY
         elif is_data(record_type):
             result.type_kind = TypeKind.DATA
         elif is_enum(record_type):

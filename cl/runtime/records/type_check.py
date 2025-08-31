@@ -254,7 +254,7 @@ class TypeCheck:
     @classmethod
     def guard_key_or_record_type(cls, key_or_record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyMixin]:
         """Check if the argument is a key or record type."""
-        if isinstance(key_or_record_type, type) and is_key_or_record(key_or_record_type):
+        if is_key_or_record(key_or_record_type):
             return True
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record_type)} is not a key or record type.")
@@ -269,7 +269,7 @@ class TypeCheck:
                 raise RuntimeError("Expected a key or record instance but received None.")
             else:
                 return False
-        elif not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
+        elif is_key_or_record(type(key_or_record)):
             return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance.")
@@ -286,7 +286,7 @@ class TypeCheck:
         """Check if the argument is a key or record or None."""
         if key_or_record is None:
             return True
-        elif not isinstance(key_or_record, type) and is_key_or_record(key_or_record):
+        elif is_key_or_record(type(key_or_record)):
             return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance or None.")
