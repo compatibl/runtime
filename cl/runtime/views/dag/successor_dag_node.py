@@ -65,7 +65,7 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin):
             if disallowed_list and any(disallowed_list):
                 disallowed_list_str = "  - ".join(f"  - Node: {x.node_id}\n" for x in disallowed_list)
                 raise UserError(
-                    f"One or more successors do not belong to DAG {self.dag.dag_id}:\n" f"{disallowed_list_str}"
+                    f"One or more successors do not belong to DAG {self.dag.dag_id}:\n{disallowed_list_str}"
                 )
         # Verify that edges is None or has the same size
         edge_count = len(self.successor_edges) if self.successor_edges is not None else 0

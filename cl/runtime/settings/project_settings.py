@@ -118,7 +118,7 @@ class ProjectSettings:
         else:
             search_paths_str = "\n".join(search_paths)
             raise RuntimeError(
-                f"Did not find  __init__.py for package '{package}'. Location searched:\n" f"{search_paths_str}\n"
+                f"Did not find  __init__.py for package '{package}'. Location searched:\n{search_paths_str}\n"
             )
 
     @classmethod
