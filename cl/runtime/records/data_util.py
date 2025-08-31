@@ -17,7 +17,7 @@ from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.primitive.primitive_checks import PrimitiveChecks
+from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
@@ -190,7 +190,7 @@ class DataUtil(BuilderUtil):
         """Returns the same result as is_empty but also validates against the type hint."""
 
         # Handle None or empty
-        PrimitiveChecks.guard_not_none(type_hint)
+        NoneChecks.guard_not_none(type_hint)
         if type_hint.optional:
             # Optional, perform full type hint validation if not None
             if data is not None:

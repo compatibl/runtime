@@ -13,33 +13,33 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.primitive.primitive_checks import PrimitiveChecks
+from cl.runtime.records.none_checks import NoneChecks
 
 
 def test_guard_none():
     """Test for guard_none method."""
 
     # Valid cases
-    assert PrimitiveChecks.guard_none(None)
-    assert PrimitiveChecks.guard_none(None, raise_on_fail=False)
+    assert NoneChecks.guard_none(None)
+    assert NoneChecks.guard_none(None, raise_on_fail=False)
 
     # Invalid cases
-    assert not PrimitiveChecks.guard_none(123, raise_on_fail=False)
+    assert not NoneChecks.guard_none(123, raise_on_fail=False)
     with pytest.raises(Exception):
-        assert not PrimitiveChecks.guard_none(123)
+        assert not NoneChecks.guard_none(123)
 
 
 def test_guard_not_none():
     """Test for guard_not_none method."""
 
     # Valid cases
-    assert PrimitiveChecks.guard_not_none(123)
-    assert PrimitiveChecks.guard_not_none(123, raise_on_fail=False)
+    assert NoneChecks.guard_not_none(123)
+    assert NoneChecks.guard_not_none(123, raise_on_fail=False)
 
     # Invalid cases
-    assert not PrimitiveChecks.guard_not_none(None, raise_on_fail=False)
+    assert not NoneChecks.guard_not_none(None, raise_on_fail=False)
     with pytest.raises(Exception):
-        assert not PrimitiveChecks.guard_not_none(None)
+        assert not NoneChecks.guard_not_none(None)
 
 
 if __name__ == "__main__":

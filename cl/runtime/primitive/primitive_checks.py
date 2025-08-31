@@ -14,30 +14,7 @@
 
 from typing import Any
 from typing import TypeGuard
-from cl.runtime.records.protocols import TObj
-from cl.runtime.records.typename import typename
 
 
-# TODO: !!! Rename to NoneChecks
-class PrimitiveChecks:
-    """Runtime checks for None."""
-
-    @classmethod
-    def guard_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[None]:
-        """Confirm that the argument is None."""
-        if obj is None:
-            return True
-        elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} is not None.")
-        else:
-            return False
-
-    @classmethod
-    def guard_not_none(cls, obj: TObj | None, *, raise_on_fail: bool = True) -> TypeGuard[TObj]:
-        """Confirm that the argument is not None."""
-        if obj is not None:
-            return True
-        elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} is None.")
-        else:
-            return False
+class PrimitiveChecks:  # TODO: Add methods or remove class
+    """Runtime checks for primitive types."""

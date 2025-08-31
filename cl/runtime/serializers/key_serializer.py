@@ -18,7 +18,7 @@ from enum import Enum
 from typing import Any
 from typing import Deque
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.primitive.primitive_checks import PrimitiveChecks
+from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
@@ -83,7 +83,7 @@ class KeySerializer(Serializer):
         """Deserialize key from a delimited string or a flattened sequence of primitive types."""
 
         # For keys, type hint is required
-        PrimitiveChecks.guard_not_none(type_hint)
+        NoneChecks.guard_not_none(type_hint)
 
         # Get schema class from the type hint
         schema_type = type_hint.schema_type
@@ -137,7 +137,7 @@ class KeySerializer(Serializer):
 
         if not is_outer:
             # For inner key fields which also have key type, type hint is required
-            PrimitiveChecks.guard_not_none(type_hint)
+            NoneChecks.guard_not_none(type_hint)
 
         # Get the class of data, which may be NoneType
         data_type_name = typename(type(data))

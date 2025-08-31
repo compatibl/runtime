@@ -33,7 +33,7 @@ from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.primitive.primitive_checks import PrimitiveChecks
+from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -783,7 +783,7 @@ class DataSource(DataSourceKey, RecordMixin):
             save_policy: Insert vs. replace policy, partial update is not included due to design considerations
         """
         assert TypeCheck.guard_record_sequence(records)
-        assert PrimitiveChecks.guard_not_none(save_policy)
+        assert NoneChecks.guard_not_none(save_policy)
 
         # Do nothing if empty but error on None
         if len(records) == 0:
