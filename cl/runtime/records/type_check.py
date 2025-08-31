@@ -179,7 +179,7 @@ class TypeCheck:
         """Check if the argument is a record."""
         if record is None:
             raise RuntimeError("Expected a record instance but received None.")
-        elif not isinstance(record, type) and is_record(record):
+        elif not isinstance(record, type) and is_record(type(record)):
             if not (type_name := typename(type(record))).endswith("Key"):
                 return cast(TypeGuard[RecordMixin], BuilderChecks.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
@@ -199,7 +199,7 @@ class TypeCheck:
         """Check if the argument is a record or None."""
         if record is None:
             return True
-        elif not isinstance(record, type) and is_record(record):
+        elif not isinstance(record, type) and is_record(type(record)):
             if not (type_name := typename(type(record))).endswith("Key"):
                 return cast(TypeGuard[RecordMixin], BuilderChecks.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:

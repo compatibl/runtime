@@ -114,8 +114,6 @@ def is_empty(
     return data in (None, "")
 
 
-# TODO: !!! Avoid instance_or_type, convert argument to type
-
 def is_primitive(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     """Returns true if the argument is one of the supported primitive types."""
     if isinstance(type_, type):
@@ -218,13 +216,15 @@ def is_key(type_: type) -> bool:
         raise RuntimeError(f"The argument of is_key is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_record(instance_or_type: Any) -> bool:
+def is_record(type_: type) -> bool:
     """
     Return True if the argument has 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    return hasattr(type_, "get_key") and not type_.__name__.startswith("_")
+    if isinstance(type_, type):
+        return hasattr(type_, "get_key") and not type_.__name__.startswith("_")
+    else:
+        raise RuntimeError(f"The argument of is_record is an instance of {type(type_).__name__} rather than type.")
 
 
 def is_condition(type_: type) -> bool:

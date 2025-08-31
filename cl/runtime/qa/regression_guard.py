@@ -349,7 +349,7 @@ class RegressionGuard:
         """Format text for regression testing."""
 
         # Convert to one of the supported output types
-        if is_record(value) or value.__class__ in SEQUENCE_CLASSES or value.__class__ in MAPPING_CLASSES:
+        if is_record(type(value)) or value.__class__ in SEQUENCE_CLASSES or value.__class__ in MAPPING_CLASSES:
             value = _YAML_SERIALIZER.serialize(value)
         elif is_key(type(value)):
             value = _KEY_SERIALIZER.serialize(value)

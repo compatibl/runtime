@@ -96,7 +96,7 @@ class InstanceMethodTask(MethodTask):
         # Get key type and key
         key_type = key_or_record.get_key_type()
         result.key_type_str = f"{key_type.__module__}.{typename(key_type)}"
-        key = key_or_record.get_key() if is_record(key_or_record) else key_or_record
+        key = key_or_record.get_key() if is_record(type(key_or_record)) else key_or_record
         result.key_str = _KEY_SERIALIZER.serialize(key)
 
         # Two tokens because the callable is bound to a class or its instance

@@ -170,7 +170,7 @@ class DataSource(DataSourceKey, RecordMixin):
             )
             if result is None:
                 assert TypeCheck.guard_key_or_record_type(type(key_or_record))
-                if is_record(key_or_record):
+                if is_record(type(key_or_record)):
                     key = key_or_record.get_key()
                 else:
                     key = key_or_record
@@ -290,7 +290,7 @@ class DataSource(DataSourceKey, RecordMixin):
                     f"of the cast_to parameter {typename(cast_to)}:\n{invalid_keys_str}"
                 )
             # Check that the records in the input list are derived from cast_to
-            invalid_records = [x for x in records_or_keys if is_record(x) and not isinstance(x, cast_to)]
+            invalid_records = [x for x in records_or_keys if is_record(type(x)) and not isinstance(x, cast_to)]
             if len(invalid_records) > 0:
                 invalid_records_str = "\n".join(str(x) for x in invalid_records)
                 raise RuntimeError(

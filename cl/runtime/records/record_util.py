@@ -29,7 +29,7 @@ class RecordUtil:
         sort_records: Any = []
         for record in records:
             # TODO: Refactor to use a key serializer
-            key_slots = record.get_key().get_field_names() if is_record(record) else tuple()  # noqa
+            key_slots = record.get_key().get_field_names() if is_record(type(record)) else tuple()  # noqa
             str_key_values = [v for slot in key_slots if isinstance((v := getattr(record, slot)), str)]
             sort_key = ";".join(str_key_values)
             sort_records.append((sort_key, record))

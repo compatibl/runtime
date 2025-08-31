@@ -152,7 +152,7 @@ class PanelResponseUtil:
             # Check iterable value type by first item.
             if is_key(type(viewer_result[0])):
                 return KeyListView(view_for=view_for, view_name=view_name, keys=viewer_result)
-            elif is_record(viewer_result[0]):
+            elif is_record(type(viewer_result[0])):
                 return RecordListView(view_for=view_for, view_name=view_name, records=viewer_result)
             else:
                 raise RuntimeError(

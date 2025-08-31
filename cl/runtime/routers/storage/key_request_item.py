@@ -40,7 +40,7 @@ class KeyRequestItem(BaseModel):
     def from_key_or_record(cls, key_or_record) -> KeyRequestItem:
         """Create KeyRequestItem from record or key."""
 
-        if is_record(key_or_record):
+        if is_record(type(key_or_record)):
             key = key_or_record.get_key()
         elif is_key(type(key_or_record)):
             key = key_or_record
