@@ -608,8 +608,6 @@ class TypeCache:
             raise RuntimeError(
                 f"An instance of {typename(type(type_or_name))} is passed where only str or type are accepted."
             )
-        if not CaseUtil.is_pascal_case(result):
-            raise RuntimeError(f"Type name {result} is not PascalCase.")
         return result
 
     @classmethod
