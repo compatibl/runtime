@@ -737,11 +737,9 @@ class DataSource(DataSourceKey, RecordMixin):
 
         if bound_type_names:
             # Find the common base name
-            result = TypeCache.get_common_base_type_name(
-                type_names=bound_type_names,
-                type_kind=TypeKind.RECORD,
-            )
-            return result
+            bound_types = [TypeCache.from_type_name(x) for x in bound_type_names]
+            result = TypeCache.get_common_base_type(types=bound_types)
+            return typename(result)
         else:
             # Empty bound_type_names can only occur if key_type_name is not stored, raise an error
             raise RuntimeError(f"Table {key_type_name} is empty.")

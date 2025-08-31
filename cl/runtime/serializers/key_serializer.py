@@ -150,7 +150,7 @@ class KeySerializer(Serializer):
         # Ensure data type is the same as schema type if type chain is specified
         if schema_type_name is not None and data_type_name != schema_type_name:
             # Confirm that schema type is parent of data type
-            parent_type_names = TypeCache.get_parent_type_names(data_type_name, type_kind=TypeKind.KEY)
+            parent_type_names = TypeCache.get_parent_type_names(type(data), type_kind=TypeKind.KEY)
             if not parent_type_names or schema_type_name not in parent_type_names:
                 raise RuntimeError(
                     f"Key type {data_type_name} is not a subclass of the field type {schema_type_name}.\n"

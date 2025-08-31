@@ -15,6 +15,7 @@
 from __future__ import annotations
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.records.protocols import is_record
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
@@ -63,19 +64,15 @@ class LoadResponse(RecordsWithSchemaResponse):
         loaded_records = active(DataSource).load_many_or_none(keys)
 
         # Find the lowest common base of the loaded types except None
-        loaded_record_type_names = tuple(typename(type(x)) for x in loaded_records if x is not None)
+        loaded_record_types = tuple(type(x) for x in loaded_records if x is not None)
 
         # TODO: Decide if this is the right logic to return empty response if records not found
-        if loaded_record_type_names:
+        if loaded_record_types:
             # At least one of the records is not None
             serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
             # Find a common base
-            common_base_name = TypeCache.get_common_base_type_name(
-                type_names=loaded_record_type_names,
-                type_kind=TypeKind.RECORD,
-            )
-            common_base = TypeCache.from_type_name(common_base_name)
+            common_base = TypeCache.get_common_base_type(types=loaded_record_types)
 
             # Create schema dict for the common base
             schema_dict = cls._get_schema_dict(common_base)
