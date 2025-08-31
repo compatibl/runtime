@@ -102,7 +102,7 @@ class QaUtil:
                 test_file = frame_globals["__file__"]
                 test_name = frame_info.function
                 cls_instance = frame_info.frame.f_locals.get("self", None)
-                class_name = typename(type(cls_instance)) if cls_instance else None
+                class_name = typename(type(cls_instance)) if cls_instance else None  # TODO: Rename cls_instance to avoid "cls"
 
                 # Convert to test path or name
                 return cls.format_test_path(

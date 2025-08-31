@@ -38,11 +38,11 @@ class TypeCheck:
             if is_sequence(obj):  # TODO: Exclude mutable sequence
                 return True
             elif raise_on_fail:
-                raise RuntimeError(f"Parameter of type {typename(obj)} is not a sequence.")
+                raise RuntimeError(f"Parameter of type {typename(type(obj))} is not a sequence.")
             else:
                 return False
         elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} is None.")
+            raise RuntimeError(f"Parameter of type {typename(type(obj))} is None.")
         else:
             return False
 
@@ -53,11 +53,11 @@ class TypeCheck:
             if is_mapping(obj):  # TODO: Exclude mutable mapping
                 return True
             elif raise_on_fail:
-                raise RuntimeError(f"Parameter of type {typename(obj)} is not a mapping.")
+                raise RuntimeError(f"Parameter of type {typename(type(obj))} is not a mapping.")
             else:
                 return False
         elif raise_on_fail:
-            raise RuntimeError(f"Parameter of type {typename(obj)} is None.")
+            raise RuntimeError(f"Parameter of type {typename(type(obj))} is None.")
         else:
             return False
 

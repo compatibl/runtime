@@ -213,7 +213,7 @@ class DataUtil(BuilderUtil):
 
     @classmethod
     def _unsupported_object_error(cls, obj: Any) -> Exception:
-        obj_type_name = typename(obj)
+        obj_type_name = typename(type(obj))
         return RuntimeError(
             f"Class {obj_type_name} cannot be a record or its field. Supported types include:\n"
             f"  1. Classes that implement 'build' method;\n"
