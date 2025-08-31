@@ -250,43 +250,6 @@ class TypeCache:
 
     @classmethod
     @cached
-    def get_parent_type_names(cls, type_name: str, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
-        """
-        Return a tuple of type names for parent types (inclusive of self) that match the predicate.
-
-        Args:
-            type_name: Type name in PascalCase format
-            type_kind: Restrict to the specified type kind if provided (optional)
-        """
-
-        # Convert to type if provided as name
-        type_ = cls._get_type(type_name)
-
-        # Get filtered list of MRO type names
-        result = cls._get_data_key_or_record_names(type_.mro(), type_kind=type_kind)
-        return result
-
-    @classmethod
-    @cached
-    def get_child_type_names(cls, type_name: str, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
-        """
-        Return a tuple of type names for child types (inclusive of self) that match the predicate.
-        Result is sorted by depth in hierarchy.
-
-        Args:
-            type_name: Type or type name in PascalCase format
-            type_kind: Restrict to the specified type kind if provided (optional)
-        """
-        # Convert to type if provided as name
-        type_ = cls._get_type(type_name)
-        # Recursively load subtypes
-        subtypes = cls._get_child_types_set(type_)
-        # Filter, eliminate duplicates and sort
-        result = cls._get_data_key_or_record_names(subtypes, type_kind=type_kind)
-        return result
-
-    @classmethod
-    @cached
     def get_types(cls, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
         """
         Return already cached types, filter by TypeKind if specified.
@@ -307,43 +270,100 @@ class TypeCache:
 
     @classmethod
     @cached
-    def get_common_base_type_name(
-        cls,
-        type_names: Sequence[str],
-        *,
-        type_kind: TypeKind | None = None,
-    ) -> str:
+    def get_parent_type_names(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
         """
-        Return PascalCase record type name of the closest common base to the argument types.
+        Return a tuple of type names for parent types (inclusive of self) that match the predicate.
 
         Args:
-            type_names: Type names in PascalCase format
+            type_: Type for which the result is returned
             type_kind: Restrict to the specified type kind if provided (optional)
         """
+        # Get types
+        result_types = cls.get_parent_types(type_, type_kind=type_kind)
+        # Convert to names and sort
+        return tuple(sorted(typename(x) for x in result_types))
+
+    @classmethod
+    @cached
+    def get_parent_types(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
+        """
+        Return a tuple of parent types (inclusive of self) that match the predicate.
+
+        Args:
+            type_: Type for which the result is returned
+            type_kind: Restrict to the specified type kind if provided (optional)
+        """
+        # Get filtered list of MRO types
+        result = cls._get_data_key_or_record_types(type_.mro(), type_kind=type_kind)
+        return result
+
+    @classmethod
+    @cached
+    def get_child_type_names(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
+        """
+        Return a tuple of type names for child types (inclusive of self) that match the predicate.
+        Result is sorted by depth in hierarchy.
+
+        Args:
+            type_: Type for which the result is returned
+            type_kind: Restrict to the specified type kind if provided (optional)
+        """
+        # Get types
+        result_types = cls.get_child_types(type_, type_kind=type_kind)
+        # Convert to names and sort
+        return tuple(sorted(typename(x) for x in result_types))
+
+    @classmethod
+    @cached
+    def get_child_types(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
+        """
+        Return a tuple of type names for child types (inclusive of self) that match the predicate.
+        Result is sorted by depth in hierarchy.
+
+        Args:
+            type_: Type for which the result is returned
+            type_kind: Restrict to the specified type kind if provided (optional)
+        """
+        # Recursively load subtypes without filtering, because filter may apply to child but not parent
+        subtypes = tuple(cls._get_unfiltered_child_types_set(type_))
+        # Filter, eliminate duplicates and sort
+        result = cls._get_data_key_or_record_types(subtypes, type_kind=type_kind)
+        return result
+
+    @classmethod
+    @cached
+    def get_common_base_type(cls, types: Sequence[type]) -> type:
+        """Return PascalCase record type name of the closest common base to the argument types."""
 
         # Ensure the argument is not empty
-        if not type_names:
-            raise RuntimeError("The argument of get_common_base_type_name is None or empty.")
+        if not types:
+            raise RuntimeError("The argument of get_common_base_type is None or empty.")
 
-        parent_dict = {x: TypeCache.get_parent_type_names(x, type_kind=type_kind) for x in type_names}
-        depth_dict = {x: len(parent_dict[x]) for x in parent_dict}
-        sorted_depth_dict = dict(sorted(depth_dict.items(), key=lambda item: item[1]))
+        # Dict where type is key and value is a set of its parents
+        parent_dict = {x: set(TypeCache.get_parent_types(x)) for x in types}
+        # Set of all argument types and their parents, parents of parents are already included
+        all_types = set(item for values in parent_dict.values() for item in values)
+        # Dict where key is the number of parents and value is type
+        all_types_depth_dict = {x: len(TypeCache.get_parent_types(x)) for x in all_types}
+        # Sort by the number of parents in descending order using negative length as sorting key
+        sorted_all_types_depth_dict = dict(sorted(all_types_depth_dict.items(), key=lambda item: -item[1]))
         result = None
-        for candidate_type in sorted_depth_dict.keys():
-            candidate_parents = parent_dict[candidate_type]
+        for candidate_type in sorted_all_types_depth_dict.keys():
             is_common = all(
                 candidate_type in parent_dict[other_type]
                 for other_type in parent_dict
-                if other_type not in candidate_parents  # Exclude parents of the candidate and the candidate itself
             )
             if is_common:
+                # The dict is sorted in the reverse order of the number of parents,
+                # break on the first common type which will have the most fields
                 result = candidate_type
+                break
 
         if result is not None:
             return result
         else:
             # Handle the case when common base is not found
-            record_type_names_str = "\n".join(type_names)
+            record_type_names_str = "\n".join(typename(x) for x in types)
             raise RuntimeError(f"No common base is found for the following records:\n{record_type_names_str}")
 
     @classmethod
@@ -603,12 +623,12 @@ class TypeCache:
         return result
 
     @classmethod
-    def _get_data_key_or_record_names(
+    def _get_data_key_or_record_types(
             cls,
             types_: Sequence[type],
             *,
             type_kind: TypeKind | None
-    ) -> tuple[str, ...]:
+    ) -> tuple[type, ...]:
         """
         Sort by type name and filter by type kind, or return data, key or record types if type kind is None,
         eliminate duplicates.
@@ -631,14 +651,12 @@ class TypeCache:
             raise ErrorUtil.enum_value_error(type_kind, TypeKind)
 
         # Eliminate the duplicates and filter by predicate
-        filtered_types = tuple(x for x in set(types_) if predicate(x))
-
-        # Convert to names and sort
-        return tuple(sorted(typename(x) for x in filtered_types))
+        result = tuple(x for x in set(types_) if predicate(x))
+        return result
 
     @classmethod
     @cached
-    def _get_child_types_set(cls, type_: type) -> set[type]:  # TODO: Consider if self should be included
+    def _get_unfiltered_child_types_set(cls, type_: type) -> set[type]:  # TODO: Consider if self should be included
         """Return a tuple of child types (inclusive of self), may include duplicates."""
 
         # TODO: !! This must run after all types are loaded, refactor to ensure complete load,
@@ -651,7 +669,7 @@ class TypeCache:
                 cls._check_type(subtype)
                 # Recurse into the subclass hierarchy, avoid adding duplicates
                 subtypes.update(
-                    x for x in cls._get_child_types_set(subtype)
+                    x for x in cls._get_unfiltered_child_types_set(subtype)
                     if x not in subtypes and is_data_key_or_record(x)
                 )
         return subtypes

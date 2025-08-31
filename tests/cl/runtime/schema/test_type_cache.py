@@ -21,7 +21,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclass, StubDataclassDerived, StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubIntEnum
@@ -144,8 +144,8 @@ def test_from_qual_name():
         TypeCache.from_qual_name(path_with_unknown_class)
 
 
-def test_get_classes():
-    """Test TypeCache.get_classes method."""
+def test_get_types():
+    """Test TypeCache.get_types method."""
 
     # Included in data types
     data_types = TypeCache.get_types(type_kind=TypeKind.DATA)
@@ -187,6 +187,15 @@ def test_get_classes():
     assert KeyMixin not in enum_types
     assert RecordMixin not in enum_types
 
+
+def test_get_common_base_type():
+    """Test TypeCache.get_common_base_type method."""
+    assert TypeCache.get_common_base_type([StubDataclass]) is StubDataclass
+    assert TypeCache.get_common_base_type([StubDataclassKey]) is StubDataclassKey
+    assert TypeCache.get_common_base_type([StubDataclass, StubDataclassKey]) is StubDataclassKey
+    assert TypeCache.get_common_base_type([StubDataclass, StubDataclassKey, StubDataclassDerived]) is StubDataclassKey
+    assert TypeCache.get_common_base_type([StubDataclass, StubDataclassDerived]) is StubDataclass
+    assert TypeCache.get_common_base_type([StubDataclassOtherDerived, StubDataclassDerived]) is StubDataclass
 
 if __name__ == "__main__":
     pytest.main([__file__])
