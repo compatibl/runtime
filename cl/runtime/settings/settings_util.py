@@ -16,7 +16,7 @@ from typing import Any
 from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import TEnum
-from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 
@@ -121,7 +121,7 @@ class SettingsUtil:
         elif is_sequence(value):
             # Already a sequence, convert to string and strip whitespace for each element
             return tuple(str(token).strip() for token in value)
-        elif is_primitive_instance(value):
+        elif is_primitive(type(value)):
             # Convert to string
             value = str(value)
             if value.startswith("[") and value.endswith("]"):

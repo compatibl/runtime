@@ -28,8 +28,8 @@ from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive_instance
-from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
@@ -61,7 +61,7 @@ class KeySerializer(Serializer):
         sequence = self._to_sequence(data, type_hint, is_outer=True)
 
         # Check that all tokens are primitive types
-        invalid_tokens = [x for x in sequence if not is_primitive_instance(x) and not is_enum(x)]
+        invalid_tokens = [x for x in sequence if not is_primitive(type(x)) and not is_enum(x)]
         if len(invalid_tokens) > 0:
             invalid_tokens_str = "\n".join(str(x) for x in invalid_tokens)
             raise RuntimeError(
@@ -243,7 +243,7 @@ class KeySerializer(Serializer):
         schema_type = schema_type_hint.schema_type
         if len(tokens) == 0:
             raise RuntimeError(f"Insufficient number of key tokens for key {root_class.__name__}.")
-        elif is_primitive_type(schema_type):
+        elif is_primitive(schema_type):
             schema_type_hint.validate_for_primitive()
             # Primitive type, extract one token
             token = tokens.popleft()

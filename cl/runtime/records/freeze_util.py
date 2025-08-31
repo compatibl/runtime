@@ -20,7 +20,7 @@ from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_empty
-from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.typename import typename
 
 
@@ -37,7 +37,7 @@ class FreezeUtil:
         if is_empty(data):
             # Return None if data is None or an empty primitive type
             return None
-        elif is_primitive_instance(data):
+        elif is_primitive(type(data)):
             # Pass through primitive types
             return data
         elif isinstance(data, Enum):

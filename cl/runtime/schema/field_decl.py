@@ -24,7 +24,7 @@ from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.container_decl import ContainerDecl
@@ -210,7 +210,7 @@ class FieldDecl(DataMixin):
             result.field_type_decl = TypeDeclKey.from_type(field_type)
 
             # Add field type to dependencies, do not use if dependencies to prevent from skipping on first item added
-            if dependencies is not None and not is_primitive_type(field_type):
+            if dependencies is not None and not is_primitive(field_type):
                 dependencies.add(field_type)
 
             # Assign field kind

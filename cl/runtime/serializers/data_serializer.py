@@ -28,7 +28,7 @@ from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
@@ -101,7 +101,7 @@ class DataSerializer(Serializer):
                     f"Data is None or an empty primitive type but type hint\n"
                     f"{type_hint.to_str()} indicates it is required."
                 )
-        elif is_primitive_instance(data):
+        elif is_primitive(type(data)):
             if remaining_chain:
                 raise RuntimeError(
                     f"Data is an instance of a primitive class {type(data).__name__} which is incompatible\n"

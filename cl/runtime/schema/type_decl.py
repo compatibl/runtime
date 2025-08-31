@@ -31,7 +31,7 @@ from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
@@ -229,7 +229,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
             type_aliases = get_type_hints(record_type)
 
             # Dictionary of member comments (docstrings), currently requires source parsing due Python limitations
-            if not is_primitive_type(record_type):
+            if not is_primitive(record_type):
                 member_comments = cls.get_member_comments(record_type)
             else:
                 member_comments = f"Primitive type {record_type.__name__}"
@@ -261,7 +261,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
                     for dep in added_dependencies:
                         # Call recursively on all added dependencies unless already in dependencies or primitive
                         # TODO(Sasha): Review if enum declarations should be in dependencies
-                        if not is_primitive_type(dep) and not is_enum(dep) and dep not in dependencies:
+                        if not is_primitive(dep) and not is_enum(dep) and dep not in dependencies:
                             cls.for_type(
                                 dep, dependencies=dependencies, skip_fields=skip_fields, skip_handlers=skip_handlers
                             )

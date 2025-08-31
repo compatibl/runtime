@@ -27,7 +27,7 @@ from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
@@ -57,7 +57,7 @@ class DataUtil(BuilderUtil):
                 return None
             else:
                 raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
-        elif is_primitive_instance(data):
+        elif is_primitive(type(data)):
             if remaining_chain:
                 raise RuntimeError(
                     f"Data is an instance of a primitive class {type(data).__name__} which is incompatible with type hint\n"
@@ -142,7 +142,7 @@ class DataUtil(BuilderUtil):
                                 outer_type_name=typename(type(data)),
                                 field_name=field_name,
                             )
-                            if is_primitive_instance(field_value)
+                            if is_primitive(type(field_value))
                             else (
                                 EnumUtil.build_(
                                     field_value,

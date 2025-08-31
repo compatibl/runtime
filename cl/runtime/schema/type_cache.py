@@ -30,7 +30,7 @@ from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.typename import qualname
 from cl.runtime.records.typename import typename
@@ -405,7 +405,7 @@ class TypeCache:
     @classmethod
     def _get_type_kind(cls, class_: type) -> TypeKind | None:
         """Get type kind of the class, return None if not a framework class."""
-        if is_primitive_type(class_):
+        if is_primitive(class_):
             return TypeKind.PRIMITIVE
         elif is_enum(class_):
             return TypeKind.ENUM

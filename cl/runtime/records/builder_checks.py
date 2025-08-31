@@ -21,7 +21,7 @@ from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 
@@ -73,9 +73,9 @@ class BuilderChecks:
         elif isinstance(data, float):
             # Use FloatUtil.tolerance to compare floats to avoid errors on serialization roundtrip
             return isinstance(other, float) and FloatUtil.equal(data, other)
-        elif is_primitive_instance(data):
+        elif is_primitive(type(data)):
             # Exact match is required for all other types including datetime
-            return is_primitive_instance(other) and data == other
+            return is_primitive(type(other)) and data == other
         elif is_enum(data):
             return is_enum(other) and data == other
         elif is_sequence(data):

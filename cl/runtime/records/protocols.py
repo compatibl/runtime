@@ -114,23 +114,9 @@ def is_empty(
     return data in (None, "")
 
 
-# TODO: !!! Avoid instance_or_type, create two methods instead
+# TODO: !!! Avoid instance_or_type, convert argument to type
 
-
-def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveTypes]:
-    """Returns true if the argument is one of the supported primitive classes."""
-    type_ = instance_or_type if isinstance(instance_or_type, type) else type(instance_or_type)
-    result = type_.__name__ in PRIMITIVE_CLASS_NAMES
-    return result
-
-
-def is_primitive_instance(instance: Any) -> TypeGuard[PrimitiveTypes]:
-    """Returns true if the argument is an instance of one of the supported primitive types."""
-    result = type(instance).__name__ in PRIMITIVE_CLASS_NAMES or isinstance(instance, type)
-    return result
-
-
-def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
+def is_primitive(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     """Returns true if the argument is one of the supported primitive types."""
     result = type_.__name__ in PRIMITIVE_CLASS_NAMES or issubclass(type_, type)
     return result

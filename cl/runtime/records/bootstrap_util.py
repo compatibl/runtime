@@ -20,7 +20,7 @@ from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_primitive
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 
@@ -39,7 +39,7 @@ class BootstrapUtil:
         if is_empty(data):
             # Pass through None and empty primitive types
             return None
-        elif is_primitive_instance(data):
+        elif is_primitive(type(data)):
             # Pass through primitive types
             return data
         elif is_enum(data):
