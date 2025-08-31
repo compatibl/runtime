@@ -243,6 +243,24 @@ class BootstrapSerializer(Serializer):
                 return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
+        elif isinstance(data, type):
+            if (value_format := self.type_format) == TypeFormat.PASSTHROUGH:
+                # Pass through the type instance without changes
+                return data
+            elif value_format == TypeFormat.DEFAULT:
+                # Serialize as name without type in PascalCase
+                return data.__name__   # TODO: Replace by typename(...)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, TypeFormat)
+        elif isinstance(data, Enum):
+            if (value_format := self.enum_format) == EnumFormat.PASSTHROUGH:
+                # Pass through the enum instance without changes
+                return data
+            elif value_format == EnumFormat.DEFAULT:
+                # Serialize as name without type in PascalCase
+                return CaseUtil.upper_to_pascal_case(data.name)
+            else:
+                raise ErrorUtil.enum_value_error(value_format, EnumFormat)
         elif is_sequence(data):
             # Include items that are None in output to preserve item positions
             return [self._serialize(v) if not is_empty(v) else None for v in data]
@@ -254,15 +272,6 @@ class BootstrapSerializer(Serializer):
                 for k, v in data.items()
                 if not is_empty(v)
             }
-        elif isinstance(data, Enum):
-            if (value_format := self.enum_format) == EnumFormat.PASSTHROUGH:
-                # Pass through the enum instance without changes
-                return data
-            elif value_format == EnumFormat.DEFAULT:
-                # Serialize as name without type in PascalCase
-                return CaseUtil.upper_to_pascal_case(data.name)
-            else:
-                raise ErrorUtil.enum_value_error(value_format, EnumFormat)
         elif is_data_key_or_record(data):
             # Use key serializer for key types
             if is_key(data):

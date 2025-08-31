@@ -1,13 +1,17 @@
+type_: StubDataclassComposite
 type_name: StubDataclassComposite
 type_kind: Record
 fields:
 - field_name: primitive
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
 - field_name: embedded_1
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassKey
+    schema_type: StubDataclassKey
 - field_name: embedded_2
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassKey
+    schema_type: StubDataclassKey
 

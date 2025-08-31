@@ -1,49 +1,63 @@
+type_: UiAppState
 type_name: UiAppState
 type_kind: Record
 fields:
 - field_name: user
-  type_hint:
+  field_type_hint:
     schema_type_name: UserKey
+    schema_type: UserKey
 - field_name: opened_tabs
-  type_hint:
+  field_type_hint:
     schema_type_name: list
+    schema_type: list
     optional: true
     remaining:
       schema_type_name: TabInfo
+      schema_type: TabInfo
 - field_name: active_tab_index
-  type_hint:
+  field_type_hint:
     schema_type_name: int
+    schema_type: int
     optional: true
 - field_name: backend_version
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
     optional: true
 - field_name: versions
-  type_hint:
+  field_type_hint:
     schema_type_name: dict
+    schema_type: dict
     optional: true
     remaining:
       schema_type_name: str
+      schema_type: str
 - field_name: application_name
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
     optional: true
 - field_name: read_only
-  type_hint:
+  field_type_hint:
     schema_type_name: bool
+    schema_type: bool
     optional: true
 - field_name: application_theme
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
     optional: true
 - field_name: user_secret_identifiers
-  type_hint:
+  field_type_hint:
     schema_type_name: list
+    schema_type: list
     optional: true
     remaining:
       schema_type_name: str
+      schema_type: str
 - field_name: full_screen_mode
-  type_hint:
+  field_type_hint:
     schema_type_name: bool
+    schema_type: bool
     optional: true
 

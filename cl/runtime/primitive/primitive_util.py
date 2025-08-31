@@ -43,7 +43,7 @@ class PrimitiveUtil(BuilderUtil):
         field_name: str | None = None,
     ) -> Any:
 
-        # Handle None first
+        # Handle None or empty first
         if data is None:
             if type_hint.optional:
                 # Optional and has the value of None, return None

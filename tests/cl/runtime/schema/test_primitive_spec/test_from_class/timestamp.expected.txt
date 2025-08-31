@@ -1,3 +1,4 @@
+type_: UUID
 type_name: timestamp
 type_kind: Primitive
 

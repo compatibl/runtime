@@ -255,7 +255,7 @@ class PrimitiveSerializer(Serializer):
                 return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
-        elif data_class_name == "type":
+        elif isinstance(data, type):
             if (type_format := self.type_format) == TypeFormat.PASSTHROUGH:
                 # Return data after checking it is a known type
                 assert TypeCache.guard_known_type(data)

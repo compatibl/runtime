@@ -1,42 +1,58 @@
+type_: StubDataclassTupleFields
 type_name: StubDataclassTupleFields
 type_kind: Record
 fields:
 - field_name: id
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
 - field_name: str_tuple
-  type_hint:
+  field_type_hint:
     schema_type_name: tuple
+    schema_type: tuple
     remaining:
       schema_type_name: str
+      schema_type: str
 - field_name: float_tuple
-  type_hint:
+  field_type_hint:
     schema_type_name: tuple
+    schema_type: tuple
     remaining:
       schema_type_name: float
+      schema_type: float
 - field_name: date_tuple
-  type_hint:
+  field_type_hint:
     schema_type_name: tuple
+    schema_type: tuple
     remaining:
       schema_type_name: date
+      schema_type: date
 - field_name: data_tuple
-  type_hint:
+  field_type_hint:
     schema_type_name: tuple
+    schema_type: tuple
     remaining:
       schema_type_name: StubDataclassData
+      schema_type: StubDataclassData
 - field_name: key_tuple
-  type_hint:
+  field_type_hint:
     schema_type_name: tuple
+    schema_type: tuple
     remaining:
       schema_type_name: StubDataclassKey
+      schema_type: StubDataclassKey
 - field_name: record_tuple
-  type_hint:
+  field_type_hint:
     schema_type_name: tuple
+    schema_type: tuple
     remaining:
       schema_type_name: StubDataclass
+      schema_type: StubDataclass
 - field_name: derived_tuple
-  type_hint:
+  field_type_hint:
     schema_type_name: tuple
+    schema_type: tuple
     remaining:
       schema_type_name: StubDataclassDerived
+      schema_type: StubDataclassDerived
 

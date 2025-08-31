@@ -19,6 +19,7 @@ from typing import Any
 from typing import Deque
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.primitive_checks import PrimitiveChecks
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, is_primitive_instance, is_primitive_type
@@ -120,7 +121,7 @@ class KeySerializer(Serializer):
 
         # Perform deserialization
         key_type_hint = TypeHint.for_class(key_type)
-        result = self._from_sequence(tokens, key_type, key_type_hint, key_type)
+        result = self._from_sequence(tokens, key_type_hint, key_type)
 
         # Check if any tokens are remaining
         if (remaining_length := len(tokens)) > 0:
@@ -191,26 +192,23 @@ class KeySerializer(Serializer):
                 raise RuntimeError(
                     f"Key serializer cannot serialize '{typename(data)}' because it is not a data, key or record class."
                 )
-            field_dict = type_spec.get_field_dict()
 
             # Serialize slot values in the order of declaration packing primitive types into size-one lists
             packed_result = tuple(
                 (
                     [
                         # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
-                        self.primitive_serializer.serialize(self._checked_value(v), field_spec.type_hint)
+                        self.primitive_serializer.serialize(self._checked_value(v), field_spec.field_type_hint)
                     ]
-                    if (v := getattr(data, k)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
-                    else (
-                        [
-                            # Use enum serializer, specify enum class
-                            self.enum_serializer.serialize(self._checked_value(v), field_spec.type_hint)
-                        ]
-                        if isinstance(v, Enum)
-                        else self._to_sequence(v, field_spec.type_hint, is_outer=False)
-                    )
+                    if (v := getattr(data, field_spec.field_name)).__class__.__name__ in PRIMITIVE_CLASS_NAMES else
+                    [
+                        # Use enum serializer, specify enum class
+                        self.enum_serializer.serialize(self._checked_value(v), field_spec.field_type_hint)
+                    ]
+                    if isinstance(v, Enum) else
+                    self._to_sequence(v, field_spec.field_type_hint, is_outer=False)
                 )
-                for k, field_spec in field_dict.items()
+                for field_spec in type_spec.fields
             )
 
             # Flatten by unpacking the inner tuples
@@ -234,23 +232,25 @@ class KeySerializer(Serializer):
     def _from_sequence(
         self,
         tokens: Deque[PrimitiveTypes],
-        schema_type: type,
         schema_type_hint: TypeHint,
         root_class: type,
     ) -> Any:
         """Deserialize key from a flattened sequence of primitive types."""
+        schema_type = schema_type_hint.schema_type
         if len(tokens) == 0:
             raise RuntimeError(f"Insufficient number of key tokens for key {root_class.__name__}.")
         elif is_primitive_type(schema_type):
+            schema_type_hint.validate_for_primitive()
             # Primitive type, extract one token
             token = tokens.popleft()
             return self.primitive_serializer.deserialize(token, schema_type_hint)
         elif is_enum(schema_type):
+            schema_type_hint.validate_for_enum()
             # Enum type, extract one token
             token = tokens.popleft()
             return self.enum_serializer.deserialize(token, schema_type_hint)
         elif is_key(schema_type):
-
+            schema_type_hint.validate_for_key()
             # Get data type if key field is abstract
             if is_abstract(schema_type):
                 # Abstract key class, the first token is data type
@@ -266,11 +266,10 @@ class KeySerializer(Serializer):
                 # Field type and data type are the same, no prefix in key
                 data_type = schema_type
 
-            type_spec = TypeSchema.for_class(data_type)
-            field_dict = type_spec.get_field_dict()
+            data_spec = CastUtil.cast(DataSpec, TypeSchema.for_class(data_type))
             key_tokens = tuple(
-                self._from_sequence(tokens, field_spec.field_type, field_spec.field_type_hint, root_class)
-                for field_spec in field_dict.values()
+                self._from_sequence(tokens, field_spec.field_type_hint, root_class)
+                for field_spec in data_spec.fields
             )
             result = data_type(*key_tokens)
             return result.build()

@@ -20,7 +20,7 @@ from typing import Self
 from uuid import UUID
 from frozendict import frozendict
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_key
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
@@ -62,6 +62,7 @@ class TypeHint(BootstrapMixin):
         else:
             return base
 
+    # TODO: Move to TypeHintChecks and rename to guard_
     def validate_for_primitive(self) -> None:
         """Raise an error if the type hint is not a primitive type."""
         if not self.schema_type_name in PRIMITIVE_TYPE_NAMES:
@@ -72,23 +73,32 @@ class TypeHint(BootstrapMixin):
     def validate_for_enum(self) -> None:
         """Raise an error if the type hint is not an enum."""
         if not issubclass(self.schema_type, Enum):
-            raise RuntimeError(f"{self.to_str()} is not compatible with enum value.")
+            raise RuntimeError(f"{self.to_str()} is not an enum type.")
         elif self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is not valid for an enum.")
 
     def validate_for_sequence(self) -> None:
         """Raise an error if the type hint is not a sequence."""
         if not self.schema_type_name in SEQUENCE_TYPE_NAMES:
-            raise RuntimeError(f"The data is a sequence but type hint {self.to_str()} is not.")
+            raise RuntimeError(f"{self.to_str()} is not a supported sequence type.")
         elif not self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is a sequence type but does not specify item type.")
 
     def validate_for_mapping(self) -> None:
         """Raise an error if the type hint is not a mapping."""
         if not self.schema_type_name in MAPPING_TYPE_NAMES:
-            raise RuntimeError(f"The data is a mapping but the type hint {self.to_str()} is not.")
+            raise RuntimeError(f"{self.to_str()} is not a supported mapping type.")
         elif not self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is a mapping but does not specify item type.")
+
+    def validate_for_key(self) -> None:
+        """Raise an error if the type hint is not a key."""
+        if not is_key(self.schema_type):
+            raise RuntimeError(f"{self.to_str()} is not a key type.")
+        elif self.remaining:
+            raise RuntimeError(f"The type hint {self.to_str()} is a key but has additional unsupported components.")
+
+    # TODO: Add validate_for_record, data, etc.
 
     @classmethod
     def for_class(

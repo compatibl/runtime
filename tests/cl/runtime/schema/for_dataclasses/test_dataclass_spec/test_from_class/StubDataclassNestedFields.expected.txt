@@ -1,28 +1,37 @@
+type_: StubDataclassNestedFields
 type_name: StubDataclassNestedFields
 type_kind: Record
 fields:
 - field_name: id
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
 - field_name: base_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassData
+    schema_type: StubDataclassData
 - field_name: derived_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassDerivedData
+    schema_type: StubDataclassDerivedData
 - field_name: double_derived_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassDoubleDerivedData
+    schema_type: StubDataclassDoubleDerivedData
 - field_name: polymorphic_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassData
+    schema_type: StubDataclassData
 - field_name: polymorphic_derived_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassDerivedData
+    schema_type: StubDataclassDerivedData
 - field_name: key_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassKey
+    schema_type: StubDataclassKey
 - field_name: record_as_key_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubDataclassKey
+    schema_type: StubDataclassKey
 

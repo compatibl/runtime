@@ -1,3 +1,4 @@
+type_: StubIntEnum
 type_name: StubIntEnum
 type_kind: Enum
 members:

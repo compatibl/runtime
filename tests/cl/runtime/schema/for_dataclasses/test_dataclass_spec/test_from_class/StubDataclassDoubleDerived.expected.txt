@@ -1,13 +1,17 @@
+type_: StubDataclassDoubleDerived
 type_name: StubDataclassDoubleDerived
 type_kind: Record
 fields:
 - field_name: id
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
 - field_name: derived_str_field
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
 - field_name: double_derived_str_field
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
 

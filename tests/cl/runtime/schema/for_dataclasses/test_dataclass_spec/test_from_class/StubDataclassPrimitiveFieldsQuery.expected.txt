@@ -1,134 +1,161 @@
+type_: StubDataclassPrimitiveFieldsQuery
 type_name: StubDataclassPrimitiveFieldsQuery
 type_kind: Data
 fields:
 - field_name: key_str_field
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
     optional: true
     condition: true
 - field_name: key_float_field
-  type_hint:
+  field_type_hint:
     schema_type_name: float
+    schema_type: float
     optional: true
     condition: true
 - field_name: key_bool_field
-  type_hint:
+  field_type_hint:
     schema_type_name: bool
+    schema_type: bool
     optional: true
     condition: true
 - field_name: key_int_field
-  type_hint:
+  field_type_hint:
     schema_type_name: int
+    schema_type: int
     optional: true
     condition: true
 - field_name: key_long_field
-  type_hint:
+  field_type_hint:
     schema_type_name: int
+    schema_type: int
     optional: true
     condition: true
 - field_name: key_date_field
-  type_hint:
+  field_type_hint:
     schema_type_name: date
+    schema_type: date
     optional: true
     condition: true
 - field_name: key_time_field
-  type_hint:
+  field_type_hint:
     schema_type_name: time
+    schema_type: time
     optional: true
     condition: true
 - field_name: key_date_time_field
-  type_hint:
+  field_type_hint:
     schema_type_name: datetime
+    schema_type: datetime
     optional: true
     condition: true
 - field_name: key_uuid_field
-  type_hint:
+  field_type_hint:
     schema_type_name: UUID
+    schema_type: UUID
     optional: true
     condition: true
 - field_name: key_bytes_field
-  type_hint:
+  field_type_hint:
     schema_type_name: bytes
+    schema_type: bytes
     optional: true
     condition: true
 - field_name: key_int_enum_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubIntEnum
+    schema_type: StubIntEnum
     optional: true
     condition: true
 - field_name: obj_str_field
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
     optional: true
     condition: true
 - field_name: obj_str_with_eol_field
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
     optional: true
     condition: true
 - field_name: obj_str_with_trailing_eol_field
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
     optional: true
     condition: true
 - field_name: obj_str_timestamp_field
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
     optional: true
     condition: true
 - field_name: obj_float_field
-  type_hint:
+  field_type_hint:
     schema_type_name: float
+    schema_type: float
     optional: true
     condition: true
 - field_name: obj_bool_field
-  type_hint:
+  field_type_hint:
     schema_type_name: bool
+    schema_type: bool
     optional: true
     condition: true
 - field_name: obj_int_field
-  type_hint:
+  field_type_hint:
     schema_type_name: int
+    schema_type: int
     optional: true
     condition: true
 - field_name: obj_long_field
-  type_hint:
+  field_type_hint:
     schema_type_name: int
+    schema_type: int
     optional: true
     condition: true
 - field_name: obj_date_field
-  type_hint:
+  field_type_hint:
     schema_type_name: date
+    schema_type: date
     optional: true
     condition: true
 - field_name: obj_time_field
-  type_hint:
+  field_type_hint:
     schema_type_name: time
+    schema_type: time
     optional: true
     condition: true
 - field_name: obj_date_time_field
-  type_hint:
+  field_type_hint:
     schema_type_name: datetime
+    schema_type: datetime
     optional: true
     condition: true
 - field_name: obj_uuid_field
-  type_hint:
+  field_type_hint:
     schema_type_name: UUID
+    schema_type: UUID
     optional: true
     condition: true
 - field_name: obj_bytes_field
-  type_hint:
+  field_type_hint:
     schema_type_name: bytes
+    schema_type: bytes
     optional: true
     condition: true
 - field_name: obj_bytes_large_field
-  type_hint:
+  field_type_hint:
     schema_type_name: bytes
+    schema_type: bytes
     optional: true
     condition: true
 - field_name: obj_int_enum_field
-  type_hint:
+  field_type_hint:
     schema_type_name: StubIntEnum
+    schema_type: StubIntEnum
     optional: true
     condition: true
 

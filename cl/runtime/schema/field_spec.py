@@ -27,14 +27,11 @@ class FieldSpec(BootstrapMixin):
     field_name: str
     """Field name (must be unique within the class)."""
 
-    type_hint: TypeHint
+    field_type_hint: TypeHint
     """
     Chain of nested type hints, each item has format 'type_name' or 'type_name | None'
     where type_name may refer to a container, slotted type, or primitive type.
     """
-
-    field_type: type
-    """The inner data class or primitive class inside the nested containers."""
 
     @classmethod
     def create(
@@ -93,7 +90,6 @@ class FieldSpec(BootstrapMixin):
 
         result = cls(
             field_name=field_name,
-            type_hint=field_type_hint,
-            field_type=field_type_alias,
+            field_type_hint=field_type_hint,
         )
         return result

@@ -15,6 +15,8 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
+from more_itertools import consume
+
 from cl.runtime.records.protocols import MAPPING_CLASSES, is_builder, is_empty, is_primitive, is_primitive_instance
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
@@ -54,15 +56,17 @@ class FreezeUtil:
                 if not is_empty(v)
             )
         elif is_data_key_or_record(data):
-            # Recreate with frozen fields and freeze the result
-            frozen_data = {
-                k: cls.freeze(v)
-                if not k.startswith("_")
-                else v  # Do not freeze private or protected fields
+            if data.is_frozen():
+                # Stop further processing and return if the object has already been frozen to
+                # prevent repeat initialization of shared instances
+                return data
+            # Freeze public fields
+            consume(
+                setattr(data, k, cls.freeze(getattr(data, k)))
                 for k in data.get_field_names()
-                if not is_empty(v := getattr(data, k))
-            }
-            return type(data)(**frozen_data).mark_frozen()
+                if not k.startswith("_")
+            )
+            return data.mark_frozen()
         else:
             raise RuntimeError(
                 f"Cannot freeze data of type {typename(data)} because it is not\n"

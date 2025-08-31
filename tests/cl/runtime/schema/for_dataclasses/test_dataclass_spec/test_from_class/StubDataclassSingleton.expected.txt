@@ -1,7 +1,9 @@
+type_: StubDataclassSingleton
 type_name: StubDataclassSingleton
 type_kind: Record
 fields:
 - field_name: str_field
-  type_hint:
+  field_type_hint:
     schema_type_name: str
+    schema_type: str
 

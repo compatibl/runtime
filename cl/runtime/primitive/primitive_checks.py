@@ -17,9 +17,9 @@ from typing import TypeGuard
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.typename import typename
 
-
+# TODO: !!! Rename to NoneChecks
 class PrimitiveChecks:
-    """Runtime checks for primitive fields."""
+    """Runtime checks for None."""
 
     @classmethod
     def guard_none(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[None]:

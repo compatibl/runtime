@@ -15,6 +15,7 @@
 from enum import Enum
 from typing import Any
 from frozendict import frozendict
+from more_itertools import consume
 
 from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_primitive_instance, is_sequence, is_mapping
@@ -47,18 +48,19 @@ class BootstrapUtil:
             return data
         elif is_sequence(data):
             # Convert a sequence types to tuple after applying build to each item
-            return tuple(cls.bootstrap_build(v) for v in data)
+            return tuple(cls.bootstrap_build(v) if not is_empty(v) else None for v in data)
         elif is_mapping(data):
             # Convert a mapping type to frozendict after applying build to each item
-            return frozendict((k, cls.bootstrap_build(v)) for k, v in data.items())
+            return frozendict(
+                (k, cls.bootstrap_build(v))
+                for k, v in data.items()
+                if not is_empty(v)
+            )
         elif is_data_key_or_record(data):
-            # Has slots, process as data, key or record
-            try:
-                if data.is_frozen():
-                    # Pass through if already frozen to prevent repeat initialization of shared instances
-                    return data
-            except:
-                raise RuntimeError("Debug hook")  # TODO: !!!
+            if data.is_frozen():
+                # Stop further processing and return if the object has already been frozen to
+                # prevent repeat initialization of shared instances
+                return data
 
             # Invoke '__init' in the order from base to derived
             # Keep track of which init methods in class hierarchy were already called
@@ -74,8 +76,15 @@ class BootstrapUtil:
                     # Invoke '__init' method if it exists, otherwise do nothing
                     class_init(data)
 
-            # Return a new data object with frozen or immutable fields without checking the type against the schema
-            return FreezeUtil.freeze(data)
+            # Build and freeze public fields
+            consume(
+                setattr(data, k, cls.bootstrap_build(getattr(data, k)))
+                for k in data.get_field_names()
+                if not k.startswith("_")
+            )
+
+            # Mark as frozen and return
+            return data.mark_frozen()
         else:
             raise cls._unsupported_object_error(data)
 

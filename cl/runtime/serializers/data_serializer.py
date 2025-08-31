@@ -198,28 +198,25 @@ class DataSerializer(Serializer):
             # Include type information first based on include_type_first flag
             result = {self.type_field: type_field} if include_type_first else {}
 
-            # Get class and field dictionary for schema_type_name
-            data_field_dict = data_type_spec.get_field_dict()
-
             # Serialize slot values in the order of declaration except those that are None
             key_serializer = self.key_serializer if self.key_serializer is not None else self
             result.update(
                 {
-                    self._serialize_key(field_key): (
-                        self.primitive_serializer.serialize(field_value, field_spec.type_hint)
+                    self._serialize_key(field_name): (
+                        self.primitive_serializer.serialize(field_value, field_spec.field_type_hint)
                         if field_value.__class__.__name__ in PRIMITIVE_CLASS_NAMES
                         else (
-                            self.enum_serializer.serialize(field_value, field_spec.type_hint)
+                            self.enum_serializer.serialize(field_value, field_spec.field_type_hint)
                             if is_enum(field_value)
                             else (
-                                key_serializer.serialize(field_value, field_spec.type_hint)
+                                key_serializer.serialize(field_value, field_spec.field_type_hint)
                                 if is_key(field_value)
-                                else self._serialize_inner(field_value, field_spec.type_hint)
+                                else self._serialize_inner(field_value, field_spec.field_type_hint)
                             )
                         )
                     )
-                    for field_key, field_spec in data_field_dict.items()
-                    if not is_empty(field_value := getattr(data, field_key))
+                    for field_spec in data_type_spec.fields
+                    if not is_empty(field_value := getattr(data, field_name := field_spec.field_name))
                 }
             )
 
@@ -366,7 +363,7 @@ class DataSerializer(Serializer):
 
             # Get class and field dictionary for type_name
             schema_class = type_spec.type_
-            field_dict = type_spec.get_field_dict()
+            field_dict = {x.field_name: x for x in type_spec.fields} if type_spec.fields is not None else {}
 
             # Deserialize into a dict
             result_dict = {
@@ -376,12 +373,12 @@ class DataSerializer(Serializer):
                     else (
                         self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
                         if (
-                            (field_hint := field_dict[snake_case_k].type_hint).schema_type_name != "str"
-                            and self.inner_encoder is not None
-                            and isinstance(field_value, str)
-                            and len(field_value) > 0
-                            # TODO: Improve detection of embedded JSON
-                            and (field_value.startswith('{"') or field_value.startswith("["))
+                                (field_hint := field_dict[snake_case_k].field_type_hint).schema_type_name != "str"
+                                and self.inner_encoder is not None
+                                and isinstance(field_value, str)
+                                and len(field_value) > 0
+                                # TODO: Improve detection of embedded JSON
+                                and (field_value.startswith('{"') or field_value.startswith("["))
                         )
                         else self.deserialize(field_value, field_hint)
                     )

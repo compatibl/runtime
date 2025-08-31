@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from types import NoneType
 from typing import Any
 from frozendict import frozendict
+from more_itertools import consume
+
 from cl.runtime.primitive.enum_util import EnumUtil
+from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
@@ -60,6 +64,13 @@ class DataUtil(BuilderUtil):
                     f"{type_hint.to_str()}."
                 )
             return PrimitiveUtil.build_(data, type_hint)
+        elif is_enum(data):
+            if remaining_chain:
+                raise RuntimeError(
+                    f"Data is an instance of a primitive class {type(data).__name__} which is incompatible\n"
+                    f"with type hint {type_hint.to_str()}."
+                )
+            return EnumUtil.build_(data, type_hint)
         elif is_sequence(data):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
@@ -74,22 +85,13 @@ class DataUtil(BuilderUtil):
             if type_hint is not None:
                 type_hint.validate_for_mapping()
             return frozendict(
-                (dict_key, cls.build_(dict_value, remaining_chain))
-                for dict_key, dict_value in data.items()
-                if not is_empty(dict_value)
+                (k, cls.build_(v, remaining_chain))
+                for k, v in data.items()
+                if not is_empty(v)
             )
-        elif is_enum(data):
-            if remaining_chain:
-                raise RuntimeError(
-                    f"Data is an instance of a primitive class {type(data).__name__} which is incompatible\n"
-                    f"with type hint {type_hint.to_str()}."
-                )
-            return EnumUtil.build_(data, type_hint)
         elif is_data_key_or_record(data):
-
-            # Has slots, process as data, key or record
             if data.is_frozen():
-                # Stop further processing and return if the object has been frozen to
+                # Stop further processing and return if the object has already been frozen to
                 # prevent repeat initialization of shared instances
                 return data
 
@@ -124,52 +126,83 @@ class DataUtil(BuilderUtil):
                         f"the type {schema_type_name} specified in schema."
                     )
 
-            # Get class and field dictionary for schema_type_name
-            data_field_dict = data_type_spec.get_field_dict()
-
-            # Construct a new instance with frozen or immutable fields, checking against the schema
-            data_dict = {
-                field_name: (
+            # Freeze or make immutable all public fields, checking against the schema
+            consume(
+                setattr(data, field_name := field_spec.field_name, (
+                    cls._checked_empty(  # Validates vs. the type hint while is_empty does not
+                        field_value,
+                        field_spec.field_type_hint,
+                        outer_type_name=typename(data),
+                        field_name=field_name,
+                    )
+                    if is_empty(field_value := getattr(data, field_name)) else
                     PrimitiveUtil.build_(
                         field_value,
-                        field_spec.type_hint,
+                        field_spec.field_type_hint,
                         outer_type_name=typename(data),
                         field_name=field_name,
                     )
-                    if is_primitive_instance(field_value)
-                    else EnumUtil.build_(
+                    if is_primitive_instance(field_value) else
+                    EnumUtil.build_(
                         field_value,
-                        field_spec.type_hint,
+                        field_spec.field_type_hint,
                         outer_type_name=typename(data),
                         field_name=field_name,
                     )
-                    if is_enum(field_value)
-                    else ConditionUtil.build_(
+                    if is_enum(field_value) else
+                    ConditionUtil.build_(
                         field_value,
-                        field_spec.type_hint,
+                        field_spec.field_type_hint,
                         outer_type_name=typename(data),
                         field_name=field_name,
                     )
-                    if is_condition(field_value)
-                    else cls.build_(
+                    if is_condition(field_value) else
+                    cls.build_(
                         field_value,
-                        field_spec.type_hint,
+                        field_spec.field_type_hint,
                         outer_type_name=typename(data),
                         field_name=field_name,
                     )
-                )
-                for field_name, field_spec in data_field_dict.items()
-                if not is_empty(data) and not PrimitiveUtil.build_(  # PrimitiveUtil.build_ validates vs. the type hint
-                    field_value := getattr(data, field_name),
-                    field_spec.type_hint,
-                    outer_type_name=typename(data),
-                    field_name=field_name,
-                )
-            }
-            # Create a new instance with frozen and immutable fields and mark it as frozen
-            return type(data)(**data_dict).mark_frozen()
+                ))
+                for field_spec in data_type_spec.fields
+            )
+
+            # Mark as frozen and return
+            return data.mark_frozen()
         else:
             raise cls._unsupported_object_error(data)
+
+    @classmethod
+    def _checked_empty(  # Move to NoneUtils
+        cls,
+        data: Any,
+        type_hint: TypeHint | None = None,
+        *,
+        outer_type_name: str | None = None,
+        field_name: str | None = None,
+    ) -> NoneType:
+        """Returns the same result as is_empty but also validates against the type hint."""
+
+        # Handle None or empty
+        PrimitiveChecks.guard_not_none(type_hint)
+        if type_hint.optional:
+            # Optional, perform full type hint validation if not None
+            if data is not None:
+                # Get the actual type name of data, which may be a type
+                data_class_name = "type" if isinstance(data, type) else typename(data)
+                # Get the expected type name, which may include subtypes such as long or timestamp
+                schema_type_name = type_hint.schema_type_name if type_hint is not None else None
+                if data_class_name != schema_type_name:
+                    raise RuntimeError(
+                        f"An empty instance of primitive type has type {data_class_name}\n"
+                        f"while {schema_type_name} was expected.")
+            return None
+        else:
+            # Required and has empty value, raise an error
+            location_str = cls._get_location_str(
+                typename(data), type_hint, outer_type_name=outer_type_name, field_name=field_name
+            )
+            raise RuntimeError(f"Required field is None or an empty primitive type.{location_str}")
 
     @classmethod
     def _unsupported_object_error(cls, obj: Any) -> Exception:

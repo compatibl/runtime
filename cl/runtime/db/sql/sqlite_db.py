@@ -25,7 +25,7 @@ from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
-from cl.runtime.records.data_mixin import TDataDict
+from cl.runtime.records.data_mixin import TDataDict, DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.key_mixin import TKey
 from cl.runtime.records.record_mixin import RecordMixin
@@ -539,15 +539,9 @@ class SqliteDb(Db):
         # Iterate through child types and add unique columns.
         # Since child types are sorted by depth in the hierarchy, the base fields will be at the beginning.
         for child in child_record_type_names:
-            # Get child type spec
-            child_type_spec = TypeSchema.for_type_name(child)
-            child_type_spec = cast(DataSpec, child_type_spec)
-
-            # Get field dictionary for child type
-            field_dict = child_type_spec.get_field_dict()
-
             # Add unique columns from child fields
-            add_columns = set(field_dict.keys()) - set(result_columns)
+            child_type = cast(type[DataMixin], TypeCache.from_type_name(child))
+            add_columns = set(child_type.get_field_names()) - set(result_columns)
             result_columns.extend(add_columns)
 
         return result_columns
