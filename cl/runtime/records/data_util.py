@@ -22,13 +22,13 @@ from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
 from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.records.protocols import is_condition
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_condition_type
+from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
@@ -57,35 +57,35 @@ class DataUtil(BuilderUtil):
                 return None
             else:
                 raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
-        elif is_primitive(type(data)):
+        elif is_primitive_type(type(data)):
             if remaining_chain:
                 raise RuntimeError(
                     f"Data is an instance of a primitive class {type(data).__name__} which is incompatible with type hint\n"
                     f"{type_hint.to_str()}."
                 )
             return PrimitiveUtil.build_(data, type_hint)
-        elif is_enum(type(data)):
+        elif is_enum_type(type(data)):
             if remaining_chain:
                 raise RuntimeError(
                     f"Data is an instance of a primitive class {type(data).__name__} which is incompatible\n"
                     f"with type hint {type_hint.to_str()}."
                 )
             return EnumUtil.build_(data, type_hint)
-        elif is_sequence(type(data)):
+        elif is_sequence_type(type(data)):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the sequence, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_sequence()  # TODO: Rename to avoid validate_for...
             return tuple(cls.build_(v, remaining_chain) if not is_empty(v) else None for v in data)
-        elif is_mapping(type(data)):
+        elif is_mapping_type(type(data)):
             # Deserialize mapping into dict, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data
             # item in the mapping, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_mapping()
             return frozendict((k, cls.build_(v, remaining_chain)) for k, v in data.items() if not is_empty(v))
-        elif is_data_key_or_record(type(data)):
+        elif is_data_key_or_record_type(type(data)):
             if data.is_frozen():
                 # Stop further processing and return if the object has already been frozen to
                 # prevent repeat initialization of shared instances
@@ -114,7 +114,7 @@ class DataUtil(BuilderUtil):
                 # If schema type is specified, ensure that data is an instance of the specified type
                 schema_type_spec = TypeSchema.for_type_name(schema_type_name)
                 schema_type_name = schema_type_spec.type_name
-                if not is_data_key_or_record(schema_class := schema_type_spec.type_):
+                if not is_data_key_or_record_type(schema_class := schema_type_spec.type_):
                     raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
                 if not isinstance(data, schema_class):
                     raise RuntimeError(
@@ -142,7 +142,7 @@ class DataUtil(BuilderUtil):
                                 outer_type_name=typename(type(data)),
                                 field_name=field_name,
                             )
-                            if is_primitive(type(field_value))
+                            if is_primitive_type(type(field_value))
                             else (
                                 EnumUtil.build_(
                                     field_value,
@@ -150,7 +150,7 @@ class DataUtil(BuilderUtil):
                                     outer_type_name=typename(type(data)),
                                     field_name=field_name,
                                 )
-                                if is_enum(type(field_value))
+                                if is_enum_type(type(field_value))
                                 else (
                                     ConditionUtil.build_(
                                         field_value,
@@ -158,7 +158,7 @@ class DataUtil(BuilderUtil):
                                         outer_type_name=typename(type(data)),
                                         field_name=field_name,
                                     )
-                                    if is_condition(type(field_value))
+                                    if is_condition_type(type(field_value))
                                     else cls.build_(
                                         field_value,
                                         field_spec.field_type_hint,

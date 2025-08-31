@@ -19,11 +19,11 @@ from typing import TypeGuard
 from typing import cast
 from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_key_or_record
-from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_record
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_key_or_record_type
+from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_record_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 
@@ -35,7 +35,7 @@ class TypeCheck:
     def guard_sequence(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence]:
         """Confirm that the argument is an immutable sequence."""
         if obj is not None:
-            if is_sequence(type(obj)):  # TODO: Exclude mutable sequence
+            if is_sequence_type(type(obj)):  # TODO: Exclude mutable sequence
                 return True
             elif raise_on_fail:
                 raise RuntimeError(f"Parameter of type {typename(type(obj))} is not a sequence.")
@@ -50,7 +50,7 @@ class TypeCheck:
     def guard_mapping(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[Mapping]:
         """Confirm that the argument is an immutable mapping."""
         if obj is not None:
-            if is_mapping(type(obj)):  # TODO: Exclude mutable mapping
+            if is_mapping_type(type(obj)):  # TODO: Exclude mutable mapping
                 return True
             elif raise_on_fail:
                 raise RuntimeError(f"Parameter of type {typename(type(obj))} is not a mapping.")
@@ -64,7 +64,7 @@ class TypeCheck:
     @classmethod
     def guard_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyMixin]:
         """Check if the argument is a key type."""
-        if isinstance(key_type, type) and is_key(key_type):
+        if isinstance(key_type, type) and is_key_type(key_type):
             if (type_name := typename(key_type)).endswith("Key"):
                 return True
             elif raise_on_fail:
@@ -87,7 +87,7 @@ class TypeCheck:
                 raise RuntimeError("Expected a key instance but received None.")
             else:
                 return False
-        if is_key(type(key)):
+        if is_key_type(type(key)):
             if (type_name := typename(type(key))).endswith("Key"):
                 return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
@@ -107,7 +107,7 @@ class TypeCheck:
         """Check if the argument is a key instance or None."""
         if key is None:
             return True
-        elif is_key(type(key)):
+        elif is_key_type(type(key)):
             if (type_name := typename(type(key))).endswith("Key"):
                 return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
@@ -125,7 +125,7 @@ class TypeCheck:
     @classmethod
     def guard_key_sequence(cls, keys: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[KeyMixin]]:
         """Check if the argument is a key sequence (iterable generator is not accepted)."""
-        if is_sequence(type(keys)):
+        if is_sequence_type(type(keys)):
             return all(cls.guard_key_instance(x, raise_on_fail=raise_on_fail) for x in keys)
         else:
             if raise_on_fail:
@@ -145,7 +145,7 @@ class TypeCheck:
         """
         if keys is None:
             return True
-        elif is_sequence(type(keys)):
+        elif is_sequence_type(type(keys)):
             return all(cls.guard_key_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys)
         else:
             if raise_on_fail:
@@ -159,7 +159,7 @@ class TypeCheck:
     @classmethod
     def guard_record_type(cls, record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[RecordMixin]:
         """Check if the argument is a record type."""
-        if isinstance(record_type, type) and is_record(record_type):
+        if isinstance(record_type, type) and is_record_type(record_type):
             if not (type_name := typename(record_type)).endswith("Key"):
                 return True
             elif raise_on_fail:
@@ -179,7 +179,7 @@ class TypeCheck:
         """Check if the argument is a record."""
         if record is None:
             raise RuntimeError("Expected a record instance but received None.")
-        elif not isinstance(record, type) and is_record(type(record)):
+        elif not isinstance(record, type) and is_record_type(type(record)):
             if not (type_name := typename(type(record))).endswith("Key"):
                 return cast(TypeGuard[RecordMixin], BuilderChecks.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
@@ -199,7 +199,7 @@ class TypeCheck:
         """Check if the argument is a record or None."""
         if record is None:
             return True
-        elif not isinstance(record, type) and is_record(type(record)):
+        elif not isinstance(record, type) and is_record_type(type(record)):
             if not (type_name := typename(type(record))).endswith("Key"):
                 return cast(TypeGuard[RecordMixin], BuilderChecks.guard_frozen(record, raise_on_fail=raise_on_fail))
             elif raise_on_fail:
@@ -217,7 +217,7 @@ class TypeCheck:
     @classmethod
     def guard_record_sequence(cls, records: Any, *, raise_on_fail: bool = True) -> TypeGuard[Sequence[RecordMixin]]:
         """Check if the argument is a record sequence (iterable generator is not accepted)."""
-        if is_sequence(type(records)):
+        if is_sequence_type(type(records)):
             return all(cls.guard_record_instance(x, raise_on_fail=raise_on_fail) for x in records)
         else:
             if raise_on_fail:
@@ -240,7 +240,7 @@ class TypeCheck:
         """
         if records is None:
             return True
-        elif is_sequence(type(records)):
+        elif is_sequence_type(type(records)):
             return all(cls.guard_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in records)
         else:
             if raise_on_fail:
@@ -254,7 +254,7 @@ class TypeCheck:
     @classmethod
     def guard_key_or_record_type(cls, key_or_record_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyMixin]:
         """Check if the argument is a key or record type."""
-        if is_key_or_record(key_or_record_type):
+        if is_key_or_record_type(key_or_record_type):
             return True
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record_type)} is not a key or record type.")
@@ -269,7 +269,7 @@ class TypeCheck:
                 raise RuntimeError("Expected a key or record instance but received None.")
             else:
                 return False
-        elif is_key_or_record(type(key_or_record)):
+        elif is_key_or_record_type(type(key_or_record)):
             return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance.")
@@ -286,7 +286,7 @@ class TypeCheck:
         """Check if the argument is a key or record or None."""
         if key_or_record is None:
             return True
-        elif is_key_or_record(type(key_or_record)):
+        elif is_key_or_record_type(type(key_or_record)):
             return cast(TypeGuard[KeyMixin], BuilderChecks.guard_frozen(key_or_record, raise_on_fail=raise_on_fail))
         elif raise_on_fail:
             raise RuntimeError(f"Parameter {typename(key_or_record)} is not a key or record instance or None.")
@@ -301,7 +301,7 @@ class TypeCheck:
         raise_on_fail: bool = True,
     ) -> TypeGuard[Sequence[KeyMixin]]:
         """Check if the argument is a key or record sequence (iterable generator is not accepted)."""
-        if is_sequence(type(keys_or_records)):
+        if is_sequence_type(type(keys_or_records)):
             return all(cls.guard_key_or_record_instance(x, raise_on_fail=raise_on_fail) for x in keys_or_records)
         else:
             if raise_on_fail:
@@ -324,7 +324,7 @@ class TypeCheck:
         """
         if keys_or_records is None:
             return True
-        elif is_sequence(type(keys_or_records)):
+        elif is_sequence_type(type(keys_or_records)):
             return all(
                 cls.guard_key_or_record_instance_or_none(x, raise_on_fail=raise_on_fail) for x in keys_or_records
             )

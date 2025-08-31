@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_type
 
 
 @dataclass(slots=True)
@@ -42,5 +42,5 @@ class TaskKey(KeyMixin):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         # Check only if inside a key, will be set automatically if inside a record
-        if is_key(type(self)):
+        if is_key_type(type(self)):
             Timestamp.validate(self.task_id, value_name="task_id", data_type="TaskKey")

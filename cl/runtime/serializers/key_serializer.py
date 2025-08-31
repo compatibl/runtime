@@ -25,11 +25,11 @@ from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import TObj
-from cl.runtime.records.protocols import is_abstract
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_abstract_type
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_cache import TypeCache
@@ -60,7 +60,7 @@ class KeySerializer(Serializer):
         sequence = self._to_sequence(data, type_hint, is_outer=True)
 
         # Check that all tokens are primitive types
-        invalid_tokens = [x for x in sequence if not is_primitive(type(x)) and not is_enum(type(x))]
+        invalid_tokens = [x for x in sequence if not is_primitive_type(type(x)) and not is_enum_type(type(x))]
         if len(invalid_tokens) > 0:
             invalid_tokens_str = "\n".join(str(x) for x in invalid_tokens)
             raise RuntimeError(
@@ -88,7 +88,7 @@ class KeySerializer(Serializer):
         schema_type = type_hint.schema_type
 
         # Convert to key if a record
-        if is_key(schema_type):
+        if is_key_type(schema_type):
             key_type = schema_type
         else:
             raise RuntimeError(
@@ -107,7 +107,7 @@ class KeySerializer(Serializer):
             sequence = data.split(";")
         elif key_format == KeyFormat.TUPLE:
             # Check the argument is a sequence
-            if not is_sequence(type(data)):
+            if not is_sequence_type(type(data)):
                 raise RuntimeError(
                     f"KeyFormat.SEQUENCE is specified but data passed to\n"
                     f"KeySerializer.deserialize method has type {typename(type(data))}"
@@ -156,7 +156,7 @@ class KeySerializer(Serializer):
                 )
             # Confirm that schema type is abstract
             schema_type = TypeCache.from_type_name(schema_type_name)
-            if not is_abstract(schema_type):
+            if not is_abstract_type(schema_type):
                 raise RuntimeError(
                     f"Key field is declared as {schema_type_name} which neither a key type nor abstract.\n"
                 )
@@ -182,7 +182,7 @@ class KeySerializer(Serializer):
                     raise RuntimeError("An inner key field inside a composite key cannot be None.")
             else:
                 raise RuntimeError(f"Key is None while its type hint {type_hint.to_str()} is not optional.")
-        elif is_key(type(data)):
+        elif is_key_type(type(data)):
 
             # Check that the argument is frozen
             data.check_frozen()
@@ -242,20 +242,20 @@ class KeySerializer(Serializer):
         schema_type = schema_type_hint.schema_type
         if len(tokens) == 0:
             raise RuntimeError(f"Insufficient number of key tokens for key {root_class.__name__}.")
-        elif is_primitive(schema_type):
+        elif is_primitive_type(schema_type):
             schema_type_hint.validate_for_primitive()
             # Primitive type, extract one token
             token = tokens.popleft()
             return self.primitive_serializer.deserialize(token, schema_type_hint)
-        elif is_enum(schema_type):
+        elif is_enum_type(schema_type):
             schema_type_hint.validate_for_enum()
             # Enum type, extract one token
             token = tokens.popleft()
             return self.enum_serializer.deserialize(token, schema_type_hint)
-        elif is_key(schema_type):
+        elif is_key_type(schema_type):
             schema_type_hint.validate_for_key()
             # Get data type if key field is abstract
-            if is_abstract(schema_type):
+            if is_abstract_type(schema_type):
                 # Abstract key class, the first token is data type
                 data_type_name = tokens.popleft()
                 data_type = TypeCache.from_type_name(data_type_name)
@@ -263,7 +263,7 @@ class KeySerializer(Serializer):
                     raise RuntimeError(
                         f"Key type {data_type_name} is not a subclass of the field type {typename(schema_type)}.\n"
                     )
-                elif not is_key(data_type):
+                elif not is_key_type(data_type):
                     raise RuntimeError(f"Key value type {data_type} is not a key type.\n")
             else:
                 # Field type and data type are the same, no prefix in key

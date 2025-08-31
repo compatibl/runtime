@@ -20,7 +20,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.identifier_util import IdentifierUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.typename import typename
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -86,7 +86,7 @@ class EnvSettings(Settings):
                     field_name="env_kind",
                     class_name="EnvSettings",
                 )
-            elif not is_enum(type(self.env_kind)):
+            elif not is_enum_type(type(self.env_kind)):
                 raise RuntimeError(
                     f"The value of env_kind={self.env_kind} in {typename(type(self))}\n"
                     f"is not an EnvKind enum or a string."

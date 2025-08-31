@@ -17,7 +17,7 @@ from fastapi import FastAPI
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.qa_client import QaClient
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
 from stubs.cl.runtime import StubDataclass
@@ -35,7 +35,7 @@ def test_method(default_db_fixture):
     result = TypesResponseItem.get_types()
 
     # Check if the result is a sequence
-    assert is_sequence(type(result))
+    assert is_sequence_type(type(result))
 
     # Check if each item in the result is a TypesResponseItem instance
     assert all(isinstance(x, TypesResponseItem) for x in result)
@@ -58,7 +58,7 @@ def test_api(default_db_fixture):
         result = response.json()
 
         # Check if the result is a sequence
-        assert is_sequence(type(result))
+        assert is_sequence_type(type(result))
 
         # Check if each item in the result has valid data to construct TypesResponseItem
         for item in result:

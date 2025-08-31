@@ -27,12 +27,12 @@ from inflection import titleize
 from memoization import cached
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_abstract
-from cl.runtime.records.protocols import is_data
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_abstract_type
+from cl.runtime.records.protocols import is_data_type
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.element_decl import ElementDecl
@@ -168,13 +168,13 @@ class TypeDecl(TypeDeclKey, RecordMixin):
         result = cls()
 
         # Set type kind
-        if is_record(record_type):
+        if is_record_type(record_type):
             result.type_kind = TypeKind.RECORD
-        elif is_key(record_type):
+        elif is_key_type(record_type):
             result.type_kind = TypeKind.DATA  # TODO: !!! Review, should be KEY
-        elif is_data(record_type):
+        elif is_data_type(record_type):
             result.type_kind = TypeKind.DATA
-        elif is_enum(record_type):
+        elif is_enum_type(record_type):
             raise RuntimeError(f"Cannot create TypeDecl for class {typename(record_type)} because it is an enum.")
         elif issubclass(record_type, tuple):
             raise RuntimeError(f"Cannot create TypeDecl for class {typename(record_type)} because it is a tuple.")
@@ -189,7 +189,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
         result.comment = record_type.__doc__
 
         # Set abstract flag, use None instead of False
-        result.abstract = True if is_abstract(record_type) else None
+        result.abstract = True if is_abstract_type(record_type) else None
 
         # Set display kind
         result.display_kind = "Basic"  # TODO: Remove Basic after display_kind is made optional
@@ -229,7 +229,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
             type_aliases = get_type_hints(record_type)
 
             # Dictionary of member comments (docstrings), currently requires source parsing due Python limitations
-            if not is_primitive(record_type):
+            if not is_primitive_type(record_type):
                 member_comments = cls.get_member_comments(record_type)
             else:
                 member_comments = f"Primitive type {record_type.__name__}"
@@ -261,7 +261,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
                     for dep in added_dependencies:
                         # Call recursively on all added dependencies unless already in dependencies or primitive
                         # TODO(Sasha): Review if enum declarations should be in dependencies
-                        if not is_primitive(dep) and not is_enum(dep) and dep not in dependencies:
+                        if not is_primitive_type(dep) and not is_enum_type(dep) and dep not in dependencies:
                             cls.for_type(
                                 dep, dependencies=dependencies, skip_fields=skip_fields, skip_handlers=skip_handlers
                             )

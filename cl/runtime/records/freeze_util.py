@@ -18,9 +18,9 @@ from frozendict import frozendict
 from more_itertools import consume
 from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
-from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.typename import typename
 
 
@@ -37,7 +37,7 @@ class FreezeUtil:
         if is_empty(data):
             # Return None if data is None or an empty primitive type
             return None
-        elif is_primitive(type(data)):
+        elif is_primitive_type(type(data)):
             # Pass through primitive types
             return data
         elif isinstance(data, Enum):
@@ -53,7 +53,7 @@ class FreezeUtil:
                 for k, v in data.items()
                 if not is_empty(v)
             )
-        elif is_data_key_or_record(type(data)):
+        elif is_data_key_or_record_type(type(data)):
             if data.is_frozen():
                 # Stop further processing and return if the object has already been frozen to
                 # prevent repeat initialization of shared instances

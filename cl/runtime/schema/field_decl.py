@@ -21,11 +21,11 @@ from uuid import UUID
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_CLASSES
-from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.container_decl import ContainerDecl
 from cl.runtime.schema.container_kind import ContainerKind
@@ -210,23 +210,23 @@ class FieldDecl(DataMixin):
             result.field_type_decl = TypeDeclKey.from_type(field_type)
 
             # Add field type to dependencies, do not use if dependencies to prevent from skipping on first item added
-            if dependencies is not None and not is_primitive(field_type):
+            if dependencies is not None and not is_primitive_type(field_type):
                 dependencies.add(field_type)
 
             # Assign field kind
             if field_type in PRIMITIVE_CLASSES:
                 # Field is one of the supported primitive types
                 result.field_kind = TypeKind.PRIMITIVE
-            elif is_enum(field_type):
+            elif is_enum_type(field_type):
                 # Field is an enum
                 result.field_kind = TypeKind.ENUM
-            elif is_key(field_type):
+            elif is_key_type(field_type):
                 # Field is a key (excludes records)
                 result.field_kind = TypeKind.KEY
-            elif is_record(field_type):
+            elif is_record_type(field_type):
                 # Field is a record (excludes keys)
                 result.field_kind = TypeKind.RECORD
-            elif is_data_key_or_record(field_type):
+            elif is_data_key_or_record_type(field_type):
                 # Field is a slotted data type (excludes keys and records)
                 result.field_kind = TypeKind.DATA
             else:

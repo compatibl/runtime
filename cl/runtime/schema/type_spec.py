@@ -18,11 +18,11 @@ from dataclasses import dataclass
 from typing import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
 
@@ -51,15 +51,15 @@ class TypeSpec(BootstrapMixin, ABC):
             self.type_name = typename(self.type_)
 
         # Set type kind
-        if is_primitive(self.type_):
+        if is_primitive_type(self.type_):
             self.type_kind = TypeKind.PRIMITIVE
-        elif is_enum(self.type_):
+        elif is_enum_type(self.type_):
             self.type_kind = TypeKind.ENUM
-        elif is_key(self.type_):
+        elif is_key_type(self.type_):
             self.type_kind = TypeKind.KEY
-        elif is_record(self.type_):
+        elif is_record_type(self.type_):
             self.type_kind = TypeKind.RECORD
-        elif is_data_key_or_record(self.type_):
+        elif is_data_key_or_record_type(self.type_):
             self.type_kind = TypeKind.DATA
         else:
             # This should not happen because this method is only invoked for data types, but just in case

@@ -16,9 +16,9 @@ import pytest
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.builder_checks import BuilderChecks
-from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_key_or_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -67,14 +67,14 @@ def test_polymorphic():
     """Test KeySerializer.serialize method with polymorphic key."""
 
     # Ensure base key is treated as key
-    assert is_key(StubDataclassPolymorphicBaseKey)
-    assert is_key_or_record(StubDataclassPolymorphicBaseKey)
-    assert is_data_key_or_record(StubDataclassPolymorphicBaseKey)
+    assert is_key_type(StubDataclassPolymorphicBaseKey)
+    assert is_key_or_record_type(StubDataclassPolymorphicBaseKey)
+    assert is_data_key_or_record_type(StubDataclassPolymorphicBaseKey)
 
     # Ensure derived key is treated as key
-    assert is_key(StubDataclassPolymorphicKey)
-    assert is_key_or_record(StubDataclassPolymorphicKey)
-    assert is_data_key_or_record(StubDataclassPolymorphicKey)
+    assert is_key_type(StubDataclassPolymorphicKey)
+    assert is_key_or_record_type(StubDataclassPolymorphicKey)
+    assert is_data_key_or_record_type(StubDataclassPolymorphicKey)
 
     # Sample for derived and type hint for base
     sample = StubDataclassPolymorphicKey().build()

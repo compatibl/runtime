@@ -15,9 +15,9 @@
 import logging
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.schema.type_cache import TypeCache
@@ -139,20 +139,20 @@ class PanelResponseUtil:
             return viewer_result
 
         # If the result is a Key, convert it to a KeyView.
-        elif is_key(type(viewer_result)):
+        elif is_key_type(type(viewer_result)):
             return KeyView(view_for=view_for, view_name=view_name, key=viewer_result)
 
         # If the result is a Record, convert it to a RecordView.
-        elif is_data_key_or_record(type(viewer_result)):
+        elif is_data_key_or_record_type(type(viewer_result)):
             return RecordView(view_for=view_for, view_name=view_name, record=viewer_result)
 
         # If the result is a list of keys or list of records, convert it to an appropriate View.
         elif isinstance(viewer_result, (list, tuple)):
 
             # Check iterable value type by first item.
-            if is_key(type(viewer_result[0])):
+            if is_key_type(type(viewer_result[0])):
                 return KeyListView(view_for=view_for, view_name=view_name, keys=viewer_result)
-            elif is_record(type(viewer_result[0])):
+            elif is_record_type(type(viewer_result[0])):
                 return RecordListView(view_for=view_for, view_name=view_name, records=viewer_result)
             else:
                 raise RuntimeError(

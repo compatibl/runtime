@@ -26,8 +26,8 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.type_check import TypeCheck
@@ -451,11 +451,11 @@ class BasicMongoDb(Db):
         if restrict_to is None:
             # Do nothing if restrict_to is not specified
             return
-        if is_record(restrict_to):
+        if is_record_type(restrict_to):
             # Add filter condition on type if it is a record type
             child_record_type_names = TypeCache.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
             query_dict["_type"] = {"$in": child_record_type_names}
-        elif is_key(restrict_to):
+        elif is_key_type(restrict_to):
             # Check that it matches the key type obtained from the query
             if restrict_to != key_type:
                 raise RuntimeError(

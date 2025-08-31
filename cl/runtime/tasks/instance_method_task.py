@@ -22,7 +22,7 @@ from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
@@ -96,7 +96,7 @@ class InstanceMethodTask(MethodTask):
         # Get key type and key
         key_type = key_or_record.get_key_type()
         result.key_type_str = f"{key_type.__module__}.{typename(key_type)}"
-        key = key_or_record.get_key() if is_record(type(key_or_record)) else key_or_record
+        key = key_or_record.get_key() if is_record_type(type(key_or_record)) else key_or_record
         result.key_str = _KEY_SERIALIZER.serialize(key)
 
         # Two tokens because the callable is bound to a class or its instance

@@ -17,8 +17,8 @@ from typing import Generic
 from typing import Sequence
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import TObj
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 
 
@@ -73,7 +73,7 @@ class Gt(Generic[TObj], Condition[TObj]):
 
     def __init__(self, value: TObj):
         """Create from the value to use with the greater-than operator."""
-        if is_primitive(type(value)):
+        if is_primitive_type(type(value)):
             self.op_gt = value
         else:
             raise RuntimeError(f"Argument of Gt operator has type {typename(type(value))} which is not a primitive.")
@@ -89,7 +89,7 @@ class Gte(Generic[TObj], Condition[TObj]):
 
     def __init__(self, value: TObj):
         """Create from the value to use with the greater-than-or-equal operator."""
-        if is_primitive(type(value)):
+        if is_primitive_type(type(value)):
             self.op_gte = value
         else:
             raise RuntimeError(f"Argument of Gte operator has type {typename(type(value))} which is not a primitive.")
@@ -105,7 +105,7 @@ class Lt(Generic[TObj], Condition[TObj]):
 
     def __init__(self, value: TObj):
         """Create from the value to use with the less-than operator."""
-        if is_primitive(type(value)):
+        if is_primitive_type(type(value)):
             self.op_lt = value
         else:
             raise RuntimeError(f"Argument of Lt operator has type {typename(type(value))} which is not a primitive.")
@@ -121,7 +121,7 @@ class Lte(Generic[TObj], Condition[TObj]):
 
     def __init__(self, value: TObj):
         """Create from the value to use with the less-than-or-equal operator."""
-        if is_primitive(type(value)):
+        if is_primitive_type(type(value)):
             self.op_lte = value
         else:
             raise RuntimeError(f"Argument of Lte operator has type {typename(type(value))} which is not a primitive.")
@@ -194,7 +194,7 @@ class In(Generic[TObj], Condition[TObj]):
         """Create from the sequence of values to use with the In operator."""
         if isinstance(values, tuple):
             self.op_in = values
-        elif is_sequence(type(values)):
+        elif is_sequence_type(type(values)):
             self.op_in = tuple(values)
         else:
             raise RuntimeError(f"Argument of In operator has type {typename(type(values))} which is not a sequence.")
@@ -212,7 +212,7 @@ class NotIn(Generic[TObj], Condition[TObj]):
         """Create from the sequence of values to use with the NotIn operator."""
         if isinstance(values, tuple):
             self.op_nin = values
-        elif is_sequence(type(values)):
+        elif is_sequence_type(type(values)):
             self.op_nin = tuple(values)
         else:
             raise RuntimeError(f"Argument of NotIn operator has type {typename(type(values))} which is not a sequence.")

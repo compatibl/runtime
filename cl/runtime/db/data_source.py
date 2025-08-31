@@ -38,8 +38,8 @@ from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.none_checks import NoneChecks
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.record_type_binding import RecordTypeBinding
@@ -99,7 +99,7 @@ class DataSource(DataSourceKey, RecordMixin):
         # Load the database object, use default DB if not specified
         if self.db is None:
             self.db = Db.create()  # TODO: Move initialization code here?
-        elif is_key(type(self.db)):
+        elif is_key_type(type(self.db)):
             self.db = self.load_one(self.db)
 
         _LOGGER.info(f"Connected to DB type '{typename(type(self.db))}', db_id = '{self.db.db_id}'.")
@@ -169,7 +169,7 @@ class DataSource(DataSourceKey, RecordMixin):
             )
             if result is None:
                 assert TypeCheck.guard_key_or_record_type(type(key_or_record))
-                if is_record(type(key_or_record)):
+                if is_record_type(type(key_or_record)):
                     key = key_or_record.get_key()
                 else:
                     key = key_or_record
@@ -280,7 +280,7 @@ class DataSource(DataSourceKey, RecordMixin):
         if cast_to is not None:
             # Check that the keys in the input list have the same type as cast_to.get_key_type()
             key_type = cast_to.get_key_type()
-            invalid_keys = [x for x in records_or_keys if is_key(type(x)) and not isinstance(x, key_type)]
+            invalid_keys = [x for x in records_or_keys if is_key_type(type(x)) and not isinstance(x, key_type)]
             if len(invalid_keys) > 0:
                 invalid_keys_str = "\n".join(str(x) for x in invalid_keys)
                 raise RuntimeError(
@@ -289,7 +289,7 @@ class DataSource(DataSourceKey, RecordMixin):
                     f"of the cast_to parameter {typename(cast_to)}:\n{invalid_keys_str}"
                 )
             # Check that the records in the input list are derived from cast_to
-            invalid_records = [x for x in records_or_keys if is_record(type(x)) and not isinstance(x, cast_to)]
+            invalid_records = [x for x in records_or_keys if is_record_type(type(x)) and not isinstance(x, cast_to)]
             if len(invalid_records) > 0:
                 invalid_records_str = "\n".join(str(x) for x in invalid_records)
                 raise RuntimeError(
@@ -298,7 +298,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 )
 
         # The list of keys to load, skip None and records
-        keys_to_load = [x for x in records_or_keys if is_key(type(x))]
+        keys_to_load = [x for x in records_or_keys if is_key_type(type(x))]
 
         # Group keys by table
         keys_to_load_grouped_by_key_type = self._group_inputs_by_key_type(keys_to_load)
@@ -332,7 +332,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # Populate the result with records loaded using input keys, pass through None and input records
         result = tuple(
-            loaded_records_dict.get(KeySerializers.TUPLE.serialize(x), None) if is_key(type(x)) else x
+            loaded_records_dict.get(KeySerializers.TUPLE.serialize(x), None) if is_key_type(type(x)) else x
             for x in records_or_keys
         )
 

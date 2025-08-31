@@ -15,8 +15,8 @@
 from __future__ import annotations
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -40,9 +40,9 @@ class KeyRequestItem(BaseModel):
     def from_key_or_record(cls, key_or_record) -> KeyRequestItem:
         """Create KeyRequestItem from record or key."""
 
-        if is_record(type(key_or_record)):
+        if is_record_type(type(key_or_record)):
             key = key_or_record.get_key()
-        elif is_key(type(key_or_record)):
+        elif is_key_type(type(key_or_record)):
             key = key_or_record
         else:
             raise RuntimeError(f"The object {str(key_or_record)}) is neither a record nor a key.")

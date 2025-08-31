@@ -16,12 +16,12 @@ from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 
 
@@ -39,19 +39,19 @@ class BootstrapUtil:
         if is_empty(data):
             # Pass through None and empty primitive types
             return None
-        elif is_primitive(type(data)):
+        elif is_primitive_type(type(data)):
             # Pass through primitive types
             return data
-        elif is_enum(type(data)):
+        elif is_enum_type(type(data)):
             # Pass through enums
             return data
-        elif is_sequence(type(data)):
+        elif is_sequence_type(type(data)):
             # Convert a sequence types to tuple after applying build to each item
             return tuple(cls.bootstrap_build(v) if not is_empty(v) else None for v in data)
-        elif is_mapping(type(data)):
+        elif is_mapping_type(type(data)):
             # Convert a mapping type to frozendict after applying build to each item
             return frozendict((k, cls.bootstrap_build(v)) for k, v in data.items() if not is_empty(v))
-        elif is_data_key_or_record(type(data)):
+        elif is_data_key_or_record_type(type(data)):
             if data.is_frozen():
                 # Stop further processing and return if the object has already been frozen to
                 # prevent repeat initialization of shared instances

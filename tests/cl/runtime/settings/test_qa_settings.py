@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.settings.qa_settings import QaSettings
 
 
@@ -21,7 +21,7 @@ def test_qa_settings():
     """Test DbSettings class."""
 
     qa_settings = QaSettings.instance()
-    assert qa_settings.qa_db_types is not None and is_sequence(type(qa_settings.qa_db_types))
+    assert qa_settings.qa_db_types is not None and is_sequence_type(type(qa_settings.qa_db_types))
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
-from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.typename import typename
 
 
@@ -94,7 +94,7 @@ class TypeHint(BootstrapMixin):
 
     def validate_for_key(self) -> None:
         """Raise an error if the type hint is not a key."""
-        if not is_key(self.schema_type):
+        if not is_key_type(self.schema_type):
             raise RuntimeError(f"{self.to_str()} is not a key type.")
         elif self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is a key but has additional unsupported components.")

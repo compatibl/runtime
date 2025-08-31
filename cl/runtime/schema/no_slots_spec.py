@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing import Self
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 
@@ -29,7 +29,7 @@ class NoSlotsSpec(DataSpec):
 
         # This class (NoSlotsSpec) is only appropriate for a data base or mixin class that does not define its own slots
         type_name = typename(class_)
-        if not is_data_key_or_record(class_):
+        if not is_data_key_or_record_type(class_):
             raise RuntimeError(
                 f"Cannot create {cls.__name__} for class {type_name} because it is not data, key or record."
             )

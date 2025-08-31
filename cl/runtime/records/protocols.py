@@ -114,7 +114,7 @@ def is_empty(
     return data in (None, "")
 
 
-def is_primitive(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
+def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     """Returns true if the argument is one of the supported primitive types."""
     if isinstance(type_, type):
         # Use class names to avoid import discrepancies for UUID
@@ -124,7 +124,7 @@ def is_primitive(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
         raise RuntimeError(f"The argument of is_primitive is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_enum(type_: type) -> TypeGuard[type[Enum]]:
+def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
     """Derived from Enum but not one of the base enum classes and the name does not start from underscore."""
     if isinstance(type_, type):
         return issubclass(type_, Enum) and type_.__module__ != "enum" and not type_.__name__.startswith("_")
@@ -132,7 +132,7 @@ def is_enum(type_: type) -> TypeGuard[type[Enum]]:
         raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_sequence(type_: type) -> TypeGuard[SequenceTypes]:
+def is_sequence_type(type_: type) -> TypeGuard[SequenceTypes]:
     """Returns true if the argument is one of the supported sequence types."""
     if isinstance(type_, type):
         return type_.__name__ in SEQUENCE_TYPE_NAMES
@@ -140,7 +140,7 @@ def is_sequence(type_: type) -> TypeGuard[SequenceTypes]:
         raise RuntimeError(f"The argument of is_sequence is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_mapping(type_: type) -> TypeGuard[MappingTypes]:
+def is_mapping_type(type_: type) -> TypeGuard[MappingTypes]:
     """Returns true if the argument is one of the supported mapping types."""
     if isinstance(type_, type):
         return type_.__name__ in MAPPING_TYPE_NAMES
@@ -148,7 +148,7 @@ def is_mapping(type_: type) -> TypeGuard[MappingTypes]:
         raise RuntimeError(f"The argument of is_mapping is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_abstract(type_: type) -> bool:
+def is_abstract_type(type_: type) -> bool:
     """True if the argument is an abstract class."""
     if isinstance(type_, type):
         return bool(getattr(type_, "__abstractmethods__", None))
@@ -156,7 +156,7 @@ def is_abstract(type_: type) -> bool:
         raise RuntimeError(f"The argument of is_abstract is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_builder(type_: type) -> bool:
+def is_builder_type(type_: type) -> bool:
     """
     True if the argument has 'build' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -167,7 +167,7 @@ def is_builder(type_: type) -> bool:
         raise RuntimeError(f"The argument of is_builder is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_data_key_or_record(type_: type) -> bool:
+def is_data_key_or_record_type(type_: type) -> bool:
     """
     True if the argument has 'get_field_names' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -180,7 +180,7 @@ def is_data_key_or_record(type_: type) -> bool:
         )
 
 
-def is_key_or_record(type_: type) -> bool:
+def is_key_or_record_type(type_: type) -> bool:
     """
     True if the argument has 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -193,7 +193,7 @@ def is_key_or_record(type_: type) -> bool:
         )
 
 
-def is_data(type_: type) -> bool:
+def is_data_type(type_: type) -> bool:
     """
     True if the argument has 'get_field_names' method but not 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -208,7 +208,7 @@ def is_data(type_: type) -> bool:
         raise RuntimeError(f"The argument of is_data is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_key(type_: type) -> bool:
+def is_key_type(type_: type) -> bool:
     """
     True if the argument has 'get_key_type' method but not 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -219,7 +219,7 @@ def is_key(type_: type) -> bool:
         raise RuntimeError(f"The argument of is_key is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_record(type_: type) -> bool:
+def is_record_type(type_: type) -> bool:
     """
     Return True if the argument has 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
@@ -230,7 +230,7 @@ def is_record(type_: type) -> bool:
         raise RuntimeError(f"The argument of is_record is an instance of {type(type_).__name__} rather than type.")
 
 
-def is_condition(type_: type) -> bool:
+def is_condition_type(type_: type) -> bool:
     """Returns true if the argument is one of the supported condition types."""
     if isinstance(type_, type):
         # Use class names to avoid a cyclic reference

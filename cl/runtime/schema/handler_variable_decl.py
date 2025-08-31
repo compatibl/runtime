@@ -20,9 +20,9 @@ from typing import Union
 from typing import get_args
 from typing import get_origin
 from memoization import cached
-from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.schema.member_decl import MemberDecl
 from cl.runtime.schema.value_decl import ValueDecl
 
@@ -77,11 +77,11 @@ class HandlerVariableDecl(MemberDecl):
 
         # Check for one of the supported container types
         if type_origin is not None:
-            if is_sequence(type_origin):
+            if is_sequence_type(type_origin):
                 # Get the type of value inside the container
                 result.vector = True
                 value_type_ = type_args[0]
-            elif is_mapping(type_origin):
+            elif is_mapping_type(type_origin):
                 raise RuntimeError("Mapping types are not supported in legacy type declarations.")
 
         # Check if value_type is Self
@@ -90,7 +90,7 @@ class HandlerVariableDecl(MemberDecl):
 
         # Handle primitive types
         # TODO (Ina): Add Enum and Dict supporting, handle unexpected types
-        if is_primitive(value_type_):
+        if is_primitive_type(value_type_):
             result.value = ValueDecl.from_type(value_type_)
         elif value_type_.__name__.endswith("Key"):
             result.key_ = TypeDecl.for_type(value_type_, skip_handlers=True)

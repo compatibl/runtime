@@ -18,7 +18,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.plot_key import PlotKey
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_key_type
 from cl.runtime.views.view import View
 
 
@@ -32,7 +32,7 @@ class PlotView(View):
     def materialize(self) -> Self:
         """Return Self with loaded plot if self.plot is a key."""
 
-        if is_key(type(self.plot)):
+        if is_key_type(type(self.plot)):
             plot = active(DataSource).load_one(self.plot)
             self.plot = plot
 

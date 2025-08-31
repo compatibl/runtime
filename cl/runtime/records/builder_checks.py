@@ -16,13 +16,13 @@ from typing import Any
 from typing import TypeGuard
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.records.builder_mixin import BuilderMixin
-from cl.runtime.records.protocols import is_builder
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_builder_type
+from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 
 
@@ -32,7 +32,7 @@ class BuilderChecks:
     @classmethod
     def guard_frozen(cls, obj: Any, *, raise_on_fail: bool = True) -> TypeGuard[BuilderMixin]:
         """Check if the argument is frozen."""
-        if is_builder(type(obj)):
+        if is_builder_type(type(obj)):
             if obj.is_frozen():
                 return True
             elif raise_on_fail:
@@ -49,7 +49,7 @@ class BuilderChecks:
         """Check if the argument is frozen or None."""
         if obj is None:
             return True
-        elif is_builder(type(obj)):
+        elif is_builder_type(type(obj)):
             if obj.is_frozen():
                 return True
             elif raise_on_fail:
@@ -73,28 +73,28 @@ class BuilderChecks:
         elif isinstance(data, float):
             # Use FloatUtil.tolerance to compare floats to avoid errors on serialization roundtrip
             return isinstance(other, float) and FloatUtil.equal(data, other)
-        elif is_primitive(type(data)):
+        elif is_primitive_type(type(data)):
             # Exact match is required for all other types including datetime
-            return is_primitive(type(other)) and data == other
-        elif is_enum(type(data)):
-            return is_enum(type(other)) and data == other
-        elif is_sequence(type(data)):
+            return is_primitive_type(type(other)) and data == other
+        elif is_enum_type(type(data)):
+            return is_enum_type(type(other)) and data == other
+        elif is_sequence_type(type(data)):
             return (
-                is_sequence(type(other))
-                and len(data) == len(other)
-                and all(cls.is_equal(data_item, other_item) for data_item, other_item in zip(data, other))
+                    is_sequence_type(type(other))
+                    and len(data) == len(other)
+                    and all(cls.is_equal(data_item, other_item) for data_item, other_item in zip(data, other))
             )
-        elif is_mapping(type(data)):
+        elif is_mapping_type(type(data)):
             return (
-                is_mapping(type(other))
-                and len(data) == len(other)
-                and all(cls.is_equal(v, other.get(k)) for k, v in data.items() if not k.startswith("_"))
+                    is_mapping_type(type(other))
+                    and len(data) == len(other)
+                    and all(cls.is_equal(v, other.get(k)) for k, v in data.items() if not k.startswith("_"))
             )
-        elif is_data_key_or_record(type(data)):
+        elif is_data_key_or_record_type(type(data)):
             return (
-                is_data_key_or_record(type(other))
-                and typename(type(data)) == typename(type(other))
-                and all(cls.is_equal(getattr(data, k), getattr(other, k)) for k in data.get_field_names())
+                    is_data_key_or_record_type(type(other))
+                    and typename(type(data)) == typename(type(other))
+                    and all(cls.is_equal(getattr(data, k), getattr(other, k)) for k in data.get_field_names())
             )
         else:
             raise RuntimeError(

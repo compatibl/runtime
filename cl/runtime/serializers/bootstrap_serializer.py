@@ -32,11 +32,11 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_mapping
-from cl.runtime.records.protocols import is_sequence
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format import BoolFormat
@@ -262,10 +262,10 @@ class BootstrapSerializer(Serializer):
                 return CaseUtil.upper_to_pascal_case(data.name)
             else:
                 raise ErrorUtil.enum_value_error(value_format, EnumFormat)
-        elif is_sequence(type(data)):
+        elif is_sequence_type(type(data)):
             # Include items that are None in output to preserve item positions
             return [self._serialize(v) if not is_empty(v) else None for v in data]
-        elif is_mapping(type(data)):
+        elif is_mapping_type(type(data)):
             # Mapping container, do not include values that are None or an empty primitive type
             # Allow keys that begin from _ in mapping classes, but not slotted classes
             return {
@@ -273,9 +273,9 @@ class BootstrapSerializer(Serializer):
                 for k, v in data.items()
                 if not is_empty(v)
             }
-        elif is_data_key_or_record(type(data)):
+        elif is_data_key_or_record_type(type(data)):
             # Use key serializer for key types
-            if is_key(type(data)):
+            if is_key_type(type(data)):
                 if self.key_format == KeyFormat.DELIMITED:
                     key_serializer = KeySerializers.DELIMITED
                     return key_serializer.serialize(data, type_hint)

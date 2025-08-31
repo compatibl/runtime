@@ -25,12 +25,12 @@ from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data
-from cl.runtime.records.protocols import is_data_key_or_record
-from cl.runtime.records.protocols import is_enum
-from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
-from cl.runtime.records.protocols import is_record
+from cl.runtime.records.protocols import is_data_type
+from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import qualname
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_info import TypeInfo
@@ -48,7 +48,7 @@ _TYPE_INFO_HEADERS = (
 
 def is_schema_type(type_: type) -> bool:
     """Return true if the type should be included in schema, includes data types (except mixin types) and enums."""
-    return isclass(type_) and (is_data_key_or_record(type_) or is_enum(type_))
+    return isclass(type_) and (is_data_key_or_record_type(type_) or is_enum_type(type_))
 
 
 class TypeCache:
@@ -413,15 +413,15 @@ class TypeCache:
     @classmethod
     def _get_type_kind(cls, class_: type) -> TypeKind | None:
         """Get type kind of the class, return None if not a framework class."""
-        if is_primitive(class_):
+        if is_primitive_type(class_):
             return TypeKind.PRIMITIVE
-        elif is_enum(class_):
+        elif is_enum_type(class_):
             return TypeKind.ENUM
-        elif is_key(class_):
+        elif is_key_type(class_):
             return TypeKind.KEY
-        elif is_record(class_):
+        elif is_record_type(class_):
             return TypeKind.RECORD
-        elif is_data_key_or_record(class_):
+        elif is_data_key_or_record_type(class_):
             return TypeKind.DATA
         else:
             # Return None if not a framework class
@@ -631,13 +631,13 @@ class TypeCache:
 
         # Filter based on type_kind, use set to eliminate duplicates
         if type_kind is None:
-            predicate = is_data_key_or_record
+            predicate = is_data_key_or_record_type
         elif type_kind == TypeKind.DATA:
-            predicate = is_data
+            predicate = is_data_type
         elif type_kind == TypeKind.KEY:
-            predicate = is_key
+            predicate = is_key_type
         elif type_kind == TypeKind.RECORD:
-            predicate = is_record
+            predicate = is_record_type
         else:
             raise ErrorUtil.enum_value_error(type_kind, TypeKind)
 
@@ -652,7 +652,7 @@ class TypeCache:
 
         # TODO: !! This must run after all types are loaded, refactor to ensure complete load,
         # TODO: consider filtering by parent instead of using subclasses
-        subtypes = {type_} if is_data_key_or_record(type_) else set()  # Include self in subtypes
+        subtypes = {type_} if is_data_key_or_record_type(type_) else set()  # Include self in subtypes
         for subtype in type_.__subclasses__():
             # Exclude self from subtypes
             if subtype is not type_:
@@ -662,7 +662,7 @@ class TypeCache:
                 subtypes.update(
                     x
                     for x in cls._get_unfiltered_child_types_set(subtype)
-                    if x not in subtypes and is_data_key_or_record(x)
+                    if x not in subtypes and is_data_key_or_record_type(x)
                 )
         return subtypes
 
