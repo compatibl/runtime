@@ -21,9 +21,11 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
-from stubs.cl.runtime import StubDataclass, StubDataclassDerived, StubDataclassOtherDerived
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_underscore import (  # noqa
     __StubDataclassDoubleUnderscore,
@@ -50,6 +52,7 @@ def test_is_known_type():
     with pytest.raises(RuntimeError):
         # Not a type
         assert not TypeCache.is_known_type(123)  # noqa
+
 
 def test_is_known_type_name():
     """Test is_known_type_name method."""
@@ -196,6 +199,7 @@ def test_get_common_base_type():
     assert TypeCache.get_common_base_type([StubDataclass, StubDataclassKey, StubDataclassDerived]) is StubDataclassKey
     assert TypeCache.get_common_base_type([StubDataclass, StubDataclassDerived]) is StubDataclass
     assert TypeCache.get_common_base_type([StubDataclassOtherDerived, StubDataclassDerived]) is StubDataclass
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

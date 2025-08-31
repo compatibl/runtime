@@ -24,7 +24,6 @@ from typing import Sequence
 from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_data_key_or_record
@@ -78,8 +77,8 @@ class TypeCache:
             return cls.is_known_type_name(typename(type_))
         else:
             raise RuntimeError(
-                f"The argument of is_known_type is an instance of {type(type_).__name__} rather than type.")
-
+                f"The argument of is_known_type is an instance of {type(type_).__name__} rather than type."
+            )
 
     @classmethod
     @cached
@@ -93,7 +92,8 @@ class TypeCache:
             return result
         else:
             raise RuntimeError(
-                f"The argument of is_known_type_name is an instance of {type(type_name).__name__} rather than str.")
+                f"The argument of is_known_type_name is an instance of {type(type_name).__name__} rather than str."
+            )
 
     @classmethod
     @cached
@@ -349,10 +349,7 @@ class TypeCache:
         sorted_all_types_depth_dict = dict(sorted(all_types_depth_dict.items(), key=lambda item: -item[1]))
         result = None
         for candidate_type in sorted_all_types_depth_dict.keys():
-            is_common = all(
-                candidate_type in parent_dict[other_type]
-                for other_type in parent_dict
-            )
+            is_common = all(candidate_type in parent_dict[other_type] for other_type in parent_dict)
             if is_common:
                 # The dict is sorted in the reverse order of the number of parents,
                 # break on the first common type which will have the most fields
@@ -606,7 +603,6 @@ class TypeCache:
         result = os.path.join(resources_root, "bootstrap/TypeInfo.csv")
         return result
 
-
     @classmethod
     def _get_type(cls, type_or_name: type | str) -> type:
         """Convert to type if provided as nas, passthrough if already a type."""
@@ -623,12 +619,7 @@ class TypeCache:
         return result
 
     @classmethod
-    def _get_data_key_or_record_types(
-            cls,
-            types_: Sequence[type],
-            *,
-            type_kind: TypeKind | None
-    ) -> tuple[type, ...]:
+    def _get_data_key_or_record_types(cls, types_: Sequence[type], *, type_kind: TypeKind | None) -> tuple[type, ...]:
         """
         Sort by type name and filter by type kind, or return data, key or record types if type kind is None,
         eliminate duplicates.
@@ -669,7 +660,8 @@ class TypeCache:
                 cls._check_type(subtype)
                 # Recurse into the subclass hierarchy, avoid adding duplicates
                 subtypes.update(
-                    x for x in cls._get_unfiltered_child_types_set(subtype)
+                    x
+                    for x in cls._get_unfiltered_child_types_set(subtype)
                     if x not in subtypes and is_data_key_or_record(x)
                 )
         return subtypes

@@ -17,10 +17,10 @@ from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
+from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import is_condition
 from cl.runtime.records.protocols import is_data_key_or_record

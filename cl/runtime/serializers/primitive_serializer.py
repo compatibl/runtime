@@ -19,8 +19,6 @@ from enum import IntEnum
 from typing import Any
 from uuid import UUID
 from bson import Int64
-from cffi.model import PrimitiveType
-
 from cl.runtime.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil
@@ -121,13 +119,13 @@ class PrimitiveSerializer(Serializer):
         # Validate that schema_type_name is compatible with value_class_name if specified
         # Because the value of None is passed through, value_class_name NoneType is compatible with any schema_type_name
         if not (
-                data is None or
-                schema_type_name is None or
-                data_class_name == schema_type_name or
-                (schema_type_name == "long" and data_class_name == "int") or
-                (schema_type_name == "timestamp" and data_class_name == "UUID") or
-                (schema_type_name == "type" and isinstance(data, type))
-            ):
+            data is None
+            or schema_type_name is None
+            or data_class_name == schema_type_name
+            or (schema_type_name == "long" and data_class_name == "int")
+            or (schema_type_name == "timestamp" and data_class_name == "UUID")
+            or (schema_type_name == "type" and isinstance(data, type))
+        ):
             raise RuntimeError(
                 f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
             )

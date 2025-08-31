@@ -131,6 +131,7 @@ def is_enum(type_: type) -> TypeGuard[type[Enum]]:
     else:
         raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather than type.")
 
+
 def is_sequence(type_: type) -> TypeGuard[SequenceTypes]:
     """Returns true if the argument is one of the supported sequence types."""
     if isinstance(type_, type):
@@ -175,7 +176,8 @@ def is_data_key_or_record(type_: type) -> bool:
         return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_data_key_or_record is an instance of {type(type_).__name__} rather than type.")
+            f"The argument of is_data_key_or_record is an instance of {type(type_).__name__} rather than type."
+        )
 
 
 def is_key_or_record(type_: type) -> bool:
@@ -187,7 +189,8 @@ def is_key_or_record(type_: type) -> bool:
         return hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_key_or_record is an instance of {type(type_).__name__} rather than type.")
+            f"The argument of is_key_or_record is an instance of {type(type_).__name__} rather than type."
+        )
 
 
 def is_data(type_: type) -> bool:
@@ -197,9 +200,9 @@ def is_data(type_: type) -> bool:
     """
     if isinstance(type_, type):
         return (
-            hasattr(type_, "get_field_names") and
-            not hasattr(type_, "get_key_type") and
-            not type_.__name__.startswith("_")
+            hasattr(type_, "get_field_names")
+            and not hasattr(type_, "get_key_type")
+            and not type_.__name__.startswith("_")
         )
     else:
         raise RuntimeError(f"The argument of is_data is an instance of {type(type_).__name__} rather than type.")
@@ -234,4 +237,3 @@ def is_condition(type_: type) -> bool:
         return type_.__name__ in CONDITION_CLASS_NAMES
     else:
         raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather than type.")
-

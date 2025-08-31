@@ -33,11 +33,11 @@ from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import is_key
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
@@ -47,7 +47,6 @@ from cl.runtime.records.record_type_binding_query import RecordTypeBindingQuery
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
-from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _LOGGER = logging.getLogger(__name__)
