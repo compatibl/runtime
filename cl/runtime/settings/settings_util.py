@@ -15,8 +15,8 @@
 from typing import Any
 from typing import cast
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.protocols import TEnum, is_primitive_instance
-from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import TEnum
+from cl.runtime.records.protocols import is_primitive_instance
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 

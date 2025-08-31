@@ -32,10 +32,11 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty, is_sequence, is_mapping
-from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_key
+from cl.runtime.records.protocols import is_mapping
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format import BoolFormat
@@ -249,7 +250,7 @@ class BootstrapSerializer(Serializer):
                 return data
             elif value_format == TypeFormat.DEFAULT:
                 # Serialize as name without type in PascalCase
-                return data.__name__   # TODO: Replace by typename(...)
+                return data.__name__  # TODO: Replace by typename(...)
             else:
                 raise ErrorUtil.enum_value_error(value_format, TypeFormat)
         elif isinstance(data, Enum):

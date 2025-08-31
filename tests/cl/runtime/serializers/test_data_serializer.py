@@ -15,7 +15,6 @@
 import pytest
 import orjson
 from frozendict import frozendict
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.builder_checks import BuilderChecks
@@ -24,7 +23,7 @@ from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_inclusion import TypeInclusion
-from stubs.cl.runtime import StubDataclass, StubDataclassTupleFields
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
@@ -37,6 +36,7 @@ from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_empty_fields import StubDataclassEmptyFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_frozendict_fields import StubDataclassFrozendictFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
@@ -77,11 +77,11 @@ _SAMPLES = [
         empty_list=[],
         empty_tuple=[],  # noqa
         empty_dict={},
-        empty_frozendict={}, # noqa
+        empty_frozendict={},  # noqa
     ),
     StubDataclassEmptyFields(  # Fields set to empty immutable containers
         empty_str="",
-        empty_list=(), # noqa
+        empty_list=(),  # noqa
         empty_tuple=(),
         empty_dict=frozendict(),
         empty_frozendict=frozendict(),
@@ -95,7 +95,7 @@ _SAMPLES = [
     ),
     StubDataclassEmptyFields(  # Fields set to non-empty immutable containers
         empty_str="",
-        empty_list=("abc",), # noqa
+        empty_list=("abc",),  # noqa
         empty_tuple=("abc",),
         empty_dict=frozendict({"1": "abc"}),
         empty_frozendict=frozendict({"1": "abc"}),

@@ -17,7 +17,6 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.builder_checks import BuilderChecks
-from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.conditions import In
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite

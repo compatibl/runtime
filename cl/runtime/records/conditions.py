@@ -16,8 +16,8 @@ from abc import ABC
 from typing import Generic
 from typing import Sequence
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import TObj, is_primitive_instance
-from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import is_primitive_instance
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 

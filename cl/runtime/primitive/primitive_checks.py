@@ -17,6 +17,7 @@ from typing import TypeGuard
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.typename import typename
 
+
 # TODO: !!! Rename to NoneChecks
 class PrimitiveChecks:
     """Runtime checks for None."""

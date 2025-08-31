@@ -13,10 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.builder_checks import BuilderChecks
-from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubDataclass

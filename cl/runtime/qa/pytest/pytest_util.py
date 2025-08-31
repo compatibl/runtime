@@ -12,13 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 from typing import Any
 from typing import Iterable
 from _pytest.fixtures import FixtureRequest
 from cl.runtime.qa.qa_util import QaUtil
-from cl.runtime.records.protocols import MAPPING_CLASSES
-from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.typename import typename
 
 

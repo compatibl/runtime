@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import Enum
 from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
-
-from cl.runtime.records.freeze_util import FreezeUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_primitive_instance, is_sequence, is_mapping
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.protocols import is_mapping
+from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 
 
@@ -51,11 +50,7 @@ class BootstrapUtil:
             return tuple(cls.bootstrap_build(v) if not is_empty(v) else None for v in data)
         elif is_mapping(data):
             # Convert a mapping type to frozendict after applying build to each item
-            return frozendict(
-                (k, cls.bootstrap_build(v))
-                for k, v in data.items()
-                if not is_empty(v)
-            )
+            return frozendict((k, cls.bootstrap_build(v)) for k, v in data.items() if not is_empty(v))
         elif is_data_key_or_record(data):
             if data.is_frozen():
                 # Stop further processing and return if the object has already been frozen to

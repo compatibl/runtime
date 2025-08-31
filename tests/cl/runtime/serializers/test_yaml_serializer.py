@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.serializers.data_serializer import DataSerializer

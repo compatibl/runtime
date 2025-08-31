@@ -26,11 +26,11 @@ from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data, is_primitive_type
+from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_data_key_or_record
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.typename import qualname
 from cl.runtime.records.typename import typename

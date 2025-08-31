@@ -16,19 +16,19 @@ from types import NoneType
 from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
-
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_empty, is_primitive, is_sequence, is_mapping, \
-    is_primitive_instance
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_condition
 from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
+from cl.runtime.records.protocols import is_mapping
+from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
@@ -84,11 +84,7 @@ class DataUtil(BuilderUtil):
             # item in the mapping, and will cause an error for a primitive item
             if type_hint is not None:
                 type_hint.validate_for_mapping()
-            return frozendict(
-                (k, cls.build_(v, remaining_chain))
-                for k, v in data.items()
-                if not is_empty(v)
-            )
+            return frozendict((k, cls.build_(v, remaining_chain)) for k, v in data.items() if not is_empty(v))
         elif is_data_key_or_record(data):
             if data.is_frozen():
                 # Stop further processing and return if the object has already been frozen to
@@ -128,42 +124,52 @@ class DataUtil(BuilderUtil):
 
             # Freeze or make immutable all public fields, checking against the schema
             consume(
-                setattr(data, field_name := field_spec.field_name, (
-                    cls._checked_empty(  # Validates vs. the type hint while is_empty does not
-                        field_value,
-                        field_spec.field_type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                    if is_empty(field_value := getattr(data, field_name)) else
-                    PrimitiveUtil.build_(
-                        field_value,
-                        field_spec.field_type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                    if is_primitive_instance(field_value) else
-                    EnumUtil.build_(
-                        field_value,
-                        field_spec.field_type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                    if is_enum(field_value) else
-                    ConditionUtil.build_(
-                        field_value,
-                        field_spec.field_type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                    if is_condition(field_value) else
-                    cls.build_(
-                        field_value,
-                        field_spec.field_type_hint,
-                        outer_type_name=typename(data),
-                        field_name=field_name,
-                    )
-                ))
+                setattr(
+                    data,
+                    field_name := field_spec.field_name,
+                    (
+                        cls._checked_empty(  # Validates vs. the type hint while is_empty does not
+                            field_value,
+                            field_spec.field_type_hint,
+                            outer_type_name=typename(data),
+                            field_name=field_name,
+                        )
+                        if is_empty(field_value := getattr(data, field_name))
+                        else (
+                            PrimitiveUtil.build_(
+                                field_value,
+                                field_spec.field_type_hint,
+                                outer_type_name=typename(data),
+                                field_name=field_name,
+                            )
+                            if is_primitive_instance(field_value)
+                            else (
+                                EnumUtil.build_(
+                                    field_value,
+                                    field_spec.field_type_hint,
+                                    outer_type_name=typename(data),
+                                    field_name=field_name,
+                                )
+                                if is_enum(field_value)
+                                else (
+                                    ConditionUtil.build_(
+                                        field_value,
+                                        field_spec.field_type_hint,
+                                        outer_type_name=typename(data),
+                                        field_name=field_name,
+                                    )
+                                    if is_condition(field_value)
+                                    else cls.build_(
+                                        field_value,
+                                        field_spec.field_type_hint,
+                                        outer_type_name=typename(data),
+                                        field_name=field_name,
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                )
                 for field_spec in data_type_spec.fields
             )
 
@@ -195,7 +201,8 @@ class DataUtil(BuilderUtil):
                 if data_class_name != schema_type_name:
                     raise RuntimeError(
                         f"An empty instance of primitive type has type {data_class_name}\n"
-                        f"while {schema_type_name} was expected.")
+                        f"while {schema_type_name} was expected."
+                    )
             return None
         else:
             # Required and has empty value, raise an error

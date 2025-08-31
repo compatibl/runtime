@@ -15,24 +15,21 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
-
 from frozendict import frozendict
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_CLASS_NAMES, is_empty, is_primitive, is_sequence, is_mapping, \
-    is_primitive_instance
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
-from cl.runtime.records.protocols import SEQUENCE_AND_MAPPING_CLASS_NAMES
-from cl.runtime.records.protocols import SEQUENCE_CLASS_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.typename import typename
+from cl.runtime.records.protocols import is_mapping
+from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_sequence
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
@@ -101,8 +98,8 @@ class DataSerializer(Serializer):
                 return None
             else:
                 raise RuntimeError(
-                	f"Data is None or an empty primitive type but type hint\n"
-                	f"{type_hint.to_str()} indicates it is required."
+                    f"Data is None or an empty primitive type but type hint\n"
+                    f"{type_hint.to_str()} indicates it is required."
                 )
         elif is_primitive_instance(data):
             if remaining_chain:
@@ -283,7 +280,9 @@ class DataSerializer(Serializer):
             elif self.inner_encoder is not None and isinstance(data, str) and data.startswith("["):
                 # Decode and deserialize sequence using data_serializer
                 data = self.inner_encoder.decode(data)
-                return tuple(self.inner_serializer.deserialize(v, remaining_chain) if not is_empty(v) else None for v in data)
+                return tuple(
+                    self.inner_serializer.deserialize(v, remaining_chain) if not is_empty(v) else None for v in data
+                )
             else:
                 # Deserialize sequence using self
                 return tuple(self.deserialize(v, remaining_chain) if not is_empty(v) else None for v in data)
@@ -373,12 +372,12 @@ class DataSerializer(Serializer):
                     else (
                         self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
                         if (
-                                (field_hint := field_dict[snake_case_k].field_type_hint).schema_type_name != "str"
-                                and self.inner_encoder is not None
-                                and isinstance(field_value, str)
-                                and len(field_value) > 0
-                                # TODO: Improve detection of embedded JSON
-                                and (field_value.startswith('{"') or field_value.startswith("["))
+                            (field_hint := field_dict[snake_case_k].field_type_hint).schema_type_name != "str"
+                            and self.inner_encoder is not None
+                            and isinstance(field_value, str)
+                            and len(field_value) > 0
+                            # TODO: Improve detection of embedded JSON
+                            and (field_value.startswith('{"') or field_value.startswith("["))
                         )
                         else self.deserialize(field_value, field_hint)
                     )

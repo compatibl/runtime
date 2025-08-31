@@ -20,7 +20,6 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_file_reader import CsvFileReader
 from cl.runtime.records.builder_checks import BuilderChecks
-from cl.runtime.records.freeze_util import FreezeUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.serializers.data_serializers import DataSerializers

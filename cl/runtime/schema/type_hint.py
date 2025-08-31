@@ -20,10 +20,11 @@ from typing import Self
 from uuid import UUID
 from frozendict import frozendict
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES, is_key
+from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
+from cl.runtime.records.protocols import is_key
 from cl.runtime.records.typename import typename
 
 

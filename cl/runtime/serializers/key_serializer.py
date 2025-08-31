@@ -22,13 +22,14 @@ from cl.runtime.primitive.primitive_checks import PrimitiveChecks
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, is_primitive_instance, is_primitive_type
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
 from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_primitive_instance
+from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
@@ -200,13 +201,15 @@ class KeySerializer(Serializer):
                         # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
                         self.primitive_serializer.serialize(self._checked_value(v), field_spec.field_type_hint)
                     ]
-                    if (v := getattr(data, field_spec.field_name)).__class__.__name__ in PRIMITIVE_CLASS_NAMES else
-                    [
-                        # Use enum serializer, specify enum class
-                        self.enum_serializer.serialize(self._checked_value(v), field_spec.field_type_hint)
-                    ]
-                    if isinstance(v, Enum) else
-                    self._to_sequence(v, field_spec.field_type_hint, is_outer=False)
+                    if (v := getattr(data, field_spec.field_name)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                    else (
+                        [
+                            # Use enum serializer, specify enum class
+                            self.enum_serializer.serialize(self._checked_value(v), field_spec.field_type_hint)
+                        ]
+                        if isinstance(v, Enum)
+                        else self._to_sequence(v, field_spec.field_type_hint, is_outer=False)
+                    )
                 )
                 for field_spec in type_spec.fields
             )
@@ -268,8 +271,7 @@ class KeySerializer(Serializer):
 
             data_spec = CastUtil.cast(DataSpec, TypeSchema.for_class(data_type))
             key_tokens = tuple(
-                self._from_sequence(tokens, field_spec.field_type_hint, root_class)
-                for field_spec in data_spec.fields
+                self._from_sequence(tokens, field_spec.field_type_hint, root_class) for field_spec in data_spec.fields
             )
             result = data_type(*key_tokens)
             return result.build()

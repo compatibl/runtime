@@ -13,9 +13,7 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.records.builder_checks import BuilderChecks
-from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers

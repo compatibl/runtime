@@ -17,7 +17,6 @@ from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.typename import typename
 from cl.runtime.stats.draw_key import DrawKey
 
 

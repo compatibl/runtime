@@ -113,7 +113,9 @@ def is_empty(
     """True if the argument is None or an empty primitive type, False for an empty sequence or mapping."""
     return data in (None, "")
 
+
 # TODO: !!! Avoid instance_or_type, create two methods instead
+
 
 def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveTypes]:
     """Returns true if the argument is one of the supported primitive classes."""
@@ -121,10 +123,12 @@ def is_primitive(instance_or_type: Any) -> TypeGuard[PrimitiveTypes]:
     result = type_.__name__ in PRIMITIVE_CLASS_NAMES
     return result
 
+
 def is_primitive_instance(instance: Any) -> TypeGuard[PrimitiveTypes]:
     """Returns true if the argument is an instance of one of the supported primitive types."""
     result = type(instance).__name__ in PRIMITIVE_CLASS_NAMES or isinstance(instance, type)
     return result
+
 
 def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     """Returns true if the argument is one of the supported primitive types."""

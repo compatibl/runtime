@@ -17,7 +17,6 @@ from dataclasses import dataclass
 from io import StringIO
 from typing import Any
 from uuid import UUID
-
 from frozendict import frozendict
 from ruamel.yaml import YAML
 from ruamel.yaml import StringIO
@@ -87,7 +86,7 @@ def bytes_representer(dumper, data):
 
 def frozendict_representer(dumper, data):
     """Configure YAML class for serializing a frozendict field."""
-    data_dict = {k:v for k, v in data.items()}
+    data_dict = {k: v for k, v in data.items()}
     return dumper.represent_mapping("tag:yaml.org,2002:map", data_dict)
 
 

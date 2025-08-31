@@ -16,11 +16,11 @@ from enum import Enum
 from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
-
-from cl.runtime.records.protocols import MAPPING_CLASSES, is_builder, is_empty, is_primitive, is_primitive_instance
-from cl.runtime.records.protocols import PRIMITIVE_CLASSES
+from cl.runtime.records.protocols import MAPPING_CLASSES
 from cl.runtime.records.protocols import SEQUENCE_CLASSES
 from cl.runtime.records.protocols import is_data_key_or_record
+from cl.runtime.records.protocols import is_empty
+from cl.runtime.records.protocols import is_primitive_instance
 from cl.runtime.records.typename import typename
 
 
@@ -49,9 +49,7 @@ class FreezeUtil:
         elif isinstance(data, MAPPING_CLASSES):
             # Convert all mapping types to frozendict
             return frozendict(
-                (k, cls.freeze(v))
-                if not k.startswith("_")
-                else v  # Do not freeze private or protected fields
+                (k, cls.freeze(v)) if not k.startswith("_") else v  # Do not freeze private or protected fields
                 for k, v in data.items()
                 if not is_empty(v)
             )
@@ -62,9 +60,7 @@ class FreezeUtil:
                 return data
             # Freeze public fields
             consume(
-                setattr(data, k, cls.freeze(getattr(data, k)))
-                for k in data.get_field_names()
-                if not k.startswith("_")
+                setattr(data, k, cls.freeze(getattr(data, k))) for k in data.get_field_names() if not k.startswith("_")
             )
             return data.mark_frozen()
         else:

@@ -13,9 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from frozendict import frozendict
-
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 

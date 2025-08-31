@@ -27,11 +27,11 @@ from inflection import titleize
 from memoization import cached
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_abstract, is_primitive_type
+from cl.runtime.records.protocols import is_abstract
 from cl.runtime.records.protocols import is_data
 from cl.runtime.records.protocols import is_enum
 from cl.runtime.records.protocols import is_key
-from cl.runtime.records.protocols import is_primitive
+from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
