@@ -24,14 +24,14 @@ class ConditionSpec(DataSpec):
     """Provides information about a condition class."""
 
     @classmethod
-    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
+    def for_type(cls, type_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # This class (ConditionSpec) is only appropriate for a data base or mixin class that does not define its own slots
-        type_name = typename(class_)
-        if not issubclass(class_, Condition):
+        type_name = typename(type_)
+        if not issubclass(type_, Condition):
             raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it is not a condition.")
-        elif class_.get_field_names():
+        elif type_.get_field_names():
             pass  # TODO: Define schema
 
         # Subtypes are only for primitive types
@@ -43,7 +43,7 @@ class ConditionSpec(DataSpec):
 
         result = ConditionSpec(
             type_name=type_name,
-            type_=class_,
+            type_=type_,
             fields=[],
         ).build()
         return result

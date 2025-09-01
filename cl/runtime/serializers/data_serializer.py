@@ -140,7 +140,7 @@ class DataSerializer(Serializer):
                 return self.key_serializer.serialize(data, type_hint)
 
             # Type spec for the data
-            data_type_spec = TypeSchema.for_class(type(data))  # TODO: !!! Use TypeCache
+            data_type_spec = TypeSchema.for_type(type(data))  # TODO: !!! Use TypeCache
             data_type_name = data_type_spec.type_name
 
             # Perform check against the schema if provided irrespective of the type inclusion setting
@@ -238,7 +238,7 @@ class DataSerializer(Serializer):
                 if (type_name := data.get(self.type_field, None) if data else None) is not None:
                     # Type name is specified, look up the class
                     type_spec = TypeSchema.for_type_name(type_name)
-                    type_hint = TypeHint.for_class(type_spec.type_)
+                    type_hint = TypeHint.for_type(type_spec.type_)
                     # Recursive call is needed because of nested containers
                     return self.deserialize(data, type_hint)
                 else:

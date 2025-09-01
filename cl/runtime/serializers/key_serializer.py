@@ -121,7 +121,7 @@ class KeySerializer(Serializer):
         tokens = deque(self._checked_value(x) for x in sequence)
 
         # Perform deserialization
-        key_type_hint = TypeHint.for_class(key_type)
+        key_type_hint = TypeHint.for_type(key_type)
         result = self._from_sequence(tokens, key_type_hint, key_type)
 
         # Check if any tokens are remaining
@@ -188,7 +188,7 @@ class KeySerializer(Serializer):
             data.check_frozen()
 
             # Get type spec
-            type_spec = TypeSchema.for_class(type(data))
+            type_spec = TypeSchema.for_type(type(data))
             if not isinstance(type_spec, DataSpec):
                 raise RuntimeError(
                     f"Key serializer cannot serialize '{typename(type(data))}' because it is not a data, key or record class."
@@ -269,7 +269,7 @@ class KeySerializer(Serializer):
                 # Field type and data type are the same, no prefix in key
                 data_type = schema_type
 
-            data_spec = CastUtil.cast(DataSpec, TypeSchema.for_class(data_type))
+            data_spec = CastUtil.cast(DataSpec, TypeSchema.for_type(data_type))
             key_tokens = tuple(
                 self._from_sequence(tokens, field_spec.field_type_hint, root_class) for field_spec in data_spec.fields
             )

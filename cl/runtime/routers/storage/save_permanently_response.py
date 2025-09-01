@@ -35,7 +35,7 @@ def get_type_to_records_map(request: SavePermanentlyRequest) -> defaultdict[type
     """Fetch records from the database and return them."""
 
     request_type = TypeCache.from_type_name(request.type)
-    type_hint = TypeHint.for_class(request_type, optional=True)
+    type_hint = TypeHint.for_type(request_type, optional=True)
 
     key_objs = [_KEY_SERIALIZER.deserialize(key, type_hint) for key in request.keys]
     records = active(DataSource).load_many(key_objs)

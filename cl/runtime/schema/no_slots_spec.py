@@ -24,16 +24,16 @@ class NoSlotsSpec(DataSpec):
     """Provides information about a class with no slots."""
 
     @classmethod
-    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
+    def for_type(cls, type_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # This class (NoSlotsSpec) is only appropriate for a data base or mixin class that does not define its own slots
-        type_name = typename(class_)
-        if not is_data_key_or_record_type(class_):
+        type_name = typename(type_)
+        if not is_data_key_or_record_type(type_):
             raise RuntimeError(
                 f"Cannot create {cls.__name__} for class {type_name} because it is not data, key or record."
             )
-        elif class_.get_field_names():
+        elif type_.get_field_names():
             raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it has slots.")
 
         # Subtypes are only for primitive types
@@ -45,7 +45,7 @@ class NoSlotsSpec(DataSpec):
 
         result = NoSlotsSpec(
             type_name=type_name,
-            type_=class_,
+            type_=type_,
             fields=[],
         ).build()
         return result

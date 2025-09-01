@@ -21,8 +21,8 @@ from stubs.cl.runtime import StubIntEnum
 def test_serialize():
     """Test serialize method."""
     serializer = EnumSerializers.DEFAULT
-    type_hint_required = TypeHint.for_class(StubIntEnum)
-    type_hint_optional = TypeHint.for_class(StubIntEnum, optional=True)
+    type_hint_required = TypeHint.for_type(StubIntEnum)
+    type_hint_optional = TypeHint.for_type(StubIntEnum, optional=True)
 
     # Valid values without type
     assert serializer.serialize(None) is None
@@ -43,8 +43,8 @@ def test_serialize():
 def test_deserialize():
     """Test deserialize method."""
     serializer = EnumSerializers.DEFAULT
-    type_hint_required = TypeHint.for_class(StubIntEnum)
-    type_hint_optional = TypeHint.for_class(StubIntEnum, optional=True)
+    type_hint_required = TypeHint.for_type(StubIntEnum)
+    type_hint_optional = TypeHint.for_type(StubIntEnum, optional=True)
 
     # Valid values
     assert serializer.deserialize(None, type_hint_optional) is None

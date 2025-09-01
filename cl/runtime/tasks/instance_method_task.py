@@ -57,7 +57,7 @@ class InstanceMethodTask(MethodTask):
         """Invoke the specified instance method."""
 
         key_type = TypeCache.from_qual_name(self.key_type_str)
-        type_hint = TypeHint.for_class(key_type)
+        type_hint = TypeHint.for_type(key_type)
         key = _KEY_SERIALIZER.deserialize(self.key_str, type_hint)
 
         # Load record from storage

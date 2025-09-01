@@ -25,12 +25,12 @@ class DataclassSpec(DataSpec):
     """Provides information about a dataclass."""
 
     @classmethod
-    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
+    def for_type(cls, type_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # Perform checks
-        type_name = typename(class_)
-        if not dataclasses.is_dataclass(class_):
+        type_name = typename(type_)
+        if not dataclasses.is_dataclass(type_):
             raise RuntimeError(f"Cannot create {cls.__name__} for class {type_name} because it is not a dataclass.")
         if subtype is not None:
             raise RuntimeError(
@@ -40,14 +40,14 @@ class DataclassSpec(DataSpec):
 
         # Create the list of enum members
         fields = [
-            cls._create_field_spec(field, containing_type=class_)
-            for field in dataclasses.fields(class_)  # noqa: type=ignore, verified it is a dataclass above
+            cls._create_field_spec(field, containing_type=type_)
+            for field in dataclasses.fields(type_)  # noqa: type=ignore, verified it is a dataclass above
             if not field.name.startswith("_")
         ]
 
         result = DataclassSpec(
             type_name=type_name,
-            type_=class_,
+            type_=type_,
             fields=fields,
         ).build()
         return result

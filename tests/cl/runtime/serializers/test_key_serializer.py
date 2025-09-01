@@ -52,7 +52,7 @@ def test_serialization():  # TODO: Rename to test_delimited
     for sample in _SERIALIZATION_SAMPLES:
         # Roundtrip serialization
         serialized = KeySerializers.DELIMITED.serialize(sample)
-        type_hint = TypeHint.for_class(sample.__class__)
+        type_hint = TypeHint.for_type(sample.__class__)
         deserialized = KeySerializers.DELIMITED.deserialize(serialized, type_hint)
         assert BuilderChecks.is_equal(sample, deserialized)
 
@@ -79,7 +79,7 @@ def test_polymorphic():
     # Sample for derived and type hint for base
     sample = StubDataclassPolymorphicKey().build()
     base_type = StubDataclassPolymorphicBaseKey
-    base_type_hint = TypeHint.for_class(base_type)
+    base_type_hint = TypeHint.for_type(base_type)
 
     # Roundtrip serialization
     serialized = KeySerializers.DELIMITED.serialize(sample, base_type_hint)
@@ -94,7 +94,7 @@ def test_polymorphic():
         base_key_field=StubDataclassPolymorphicKey(id="abc"),
         root_key_field=StubDataclassPolymorphicKey(id="def"),
     ).build()
-    composite_key_hint = TypeHint.for_class(StubDataclassPolymorphicCompositeKey)
+    composite_key_hint = TypeHint.for_type(StubDataclassPolymorphicCompositeKey)
 
     # Roundtrip serialization
     serialized = KeySerializers.DELIMITED.serialize(composite_key, composite_key_hint)
@@ -112,7 +112,7 @@ def test_for_sqlite():
     for sample in _SERIALIZATION_SAMPLES:
         # Roundtrip serialization
         serialized = KeySerializers.FOR_SQLITE.serialize(sample)
-        type_hint = TypeHint.for_class(sample.__class__)
+        type_hint = TypeHint.for_type(sample.__class__)
         deserialized = KeySerializers.FOR_SQLITE.deserialize(serialized, type_hint)
         assert BuilderChecks.is_equal(sample, deserialized)
 

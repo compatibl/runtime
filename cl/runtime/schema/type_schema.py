@@ -45,34 +45,33 @@ class TypeSchema:
         """Get or create type spec for the specified type name."""
         # Get class for the specified type name and use it to get type spec
         class_ = TypeCache.from_type_name(type_name)
-        return cls.for_class(class_)
+        return cls.for_type(class_)
 
     @classmethod
     @cached
-    def for_class(cls, class_: type) -> TypeSpec:
+    def for_type(cls, type_: type) -> TypeSpec:
         """Get or create type spec for the specified class."""
-        type_name = typename(class_)
         # TODO: ! Use mapping records to avoid hardcoding the list of data frameworks
         # Get class for the type spec
-        if issubclass(class_, Enum):
+        if issubclass(type_, Enum):
             # Enum class
             spec_class = EnumSpec
-        elif dataclasses.is_dataclass(class_):
+        elif dataclasses.is_dataclass(type_):
             # Uses dataclasses
             spec_class = DataclassSpec
-        elif is_data_key_or_record_type(class_) and not class_.get_field_names():  # noqa
+        elif is_data_key_or_record_type(type_) and not type_.get_field_names():  # noqa
             # Base class of data, key or record with no slots
             spec_class = NoSlotsSpec
-        elif issubclass(class_, Condition):
+        elif issubclass(type_, Condition):
             # Condition class
             spec_class = ConditionSpec
         else:
             raise RuntimeError(
-                f"Class {typename(class_)} implements build method but does not\n"
+                f"Class {typename(type_)} implements build method but does not\n"
                 f"use one of the supported dataclass frameworks and does not\n"
                 f"have a method to generate type spec."
             )
 
         # Create from class, add to spec dictionary and return
-        result = spec_class.for_class(class_)
+        result = spec_class.for_type(type_)
         return result

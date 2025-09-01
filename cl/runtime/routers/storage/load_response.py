@@ -53,7 +53,7 @@ class LoadResponse(RecordsWithSchemaResponse):
 
         # Deserialize keys in request
         keys = tuple(
-            _KEY_SERIALIZER.deserialize(x.key, TypeHint.for_class(key_type)).build()
+            _KEY_SERIALIZER.deserialize(x.key, TypeHint.for_type(key_type)).build()
             for x in request.load_keys or tuple()
         )
 

@@ -42,7 +42,7 @@ def test_key_serialization():
         obj_1_key = obj_1.get_key()
         serialized = _KEY_SERIALIZER.serialize(obj_1_key)
 
-        type_hint = TypeHint.for_class(sample_type.get_key_type())
+        type_hint = TypeHint.for_type(sample_type.get_key_type())
         deserialized_key = _KEY_SERIALIZER.deserialize(serialized, type_hint).build()
         assert obj_1_key == deserialized_key
 

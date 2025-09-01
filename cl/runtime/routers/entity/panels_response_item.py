@@ -56,7 +56,7 @@ class PanelsResponseItem(BaseModel):
         # Get actual type from record if request.key is not None
         if request.key is not None:
             # Deserialize ui key
-            key = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(key_type))
+            key = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_type(key_type))
 
             # If the record is not found, display panel tabs for the base type
             record = active(DataSource).load_one_or_none(key)

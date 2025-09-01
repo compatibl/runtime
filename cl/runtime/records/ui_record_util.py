@@ -60,7 +60,7 @@ class UiRecordUtil(DataMixin):  # TODO: Move to the appropriate directory
         # Get actual type from record if request.key is not None
         if key is not None:
             # Deserialize ui key
-            key = _KEY_SERIALIZER.deserialize(key, TypeHint.for_class(request_type.get_key_type()))
+            key = _KEY_SERIALIZER.deserialize(key, TypeHint.for_type(request_type.get_key_type()))
 
             # If the record is not found, display panel tabs for the base type
             record = active(DataSource).load_one_or_none(key)
@@ -133,7 +133,7 @@ class UiRecordUtil(DataMixin):  # TODO: Move to the appropriate directory
         type_ = TypeCache.from_type_name(type_name)
 
         # Deserialize key from string to object.
-        key_obj = _KEY_SERIALIZER.deserialize(key, TypeHint.for_class(type_.get_key_type()))
+        key_obj = _KEY_SERIALIZER.deserialize(key, TypeHint.for_type(type_.get_key_type()))
 
         # Load record from the database.
         record = active(DataSource).load_one(key_obj)

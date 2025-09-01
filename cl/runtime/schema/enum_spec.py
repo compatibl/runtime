@@ -29,12 +29,12 @@ class EnumSpec(TypeSpec):
     """List of enum members (use None for a placeholder enum with no members)."""
 
     @classmethod
-    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
+    def for_type(cls, type_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # Perform checks
-        class_name = class_.__name__
-        if not issubclass(class_, Enum):
+        class_name = type_.__name__
+        if not issubclass(type_, Enum):
             raise RuntimeError(f"Cannot create EnumSpec for {class_name} because it is not an enum.")
         if subtype is not None:
             raise RuntimeError(
@@ -47,9 +47,9 @@ class EnumSpec(TypeSpec):
             EnumMemberSpec(
                 member_name=CaseUtil.upper_to_pascal_case(member.name),
             )
-            for member in class_
+            for member in type_
         ]
 
         # Create the enum spec
-        result = EnumSpec(type_name=class_name, type_kind=TypeKind.ENUM, type_=class_, members=members)
+        result = EnumSpec(type_name=class_name, type_kind=TypeKind.ENUM, type_=type_, members=members)
         return result

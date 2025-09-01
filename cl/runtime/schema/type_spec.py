@@ -67,5 +67,5 @@ class TypeSpec(BootstrapMixin, ABC):
 
     @classmethod
     @abstractmethod
-    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
-        """Create spec from class, specify subtype only when different from class name (e.g., long or timestamp)."""
+    def for_type(cls, type_: type, subtype: str | None = None) -> Self:
+        """Create spec from type, specify subtype only when different from class name (e.g., long or timestamp)."""

@@ -58,7 +58,7 @@ class PanelResponseUtil:
             key_type = active(DataSource).get_bound_key_type(table=request.type_name)
 
         # Deserialize key from string to object.
-        key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_class(key_type))
+        key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_type(key_type))
 
         # Load record from the database.
         record = active(DataSource).load_one(key_obj)

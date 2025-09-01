@@ -100,7 +100,7 @@ class TypeHint(BootstrapMixin):
     # TODO: Add validate_for_record, data, etc.
 
     @classmethod
-    def for_class(
+    def for_type(
         cls,
         class_: type,
         *,
