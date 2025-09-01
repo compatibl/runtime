@@ -18,7 +18,7 @@ from typing import Any
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
@@ -95,7 +95,7 @@ class SelectResponse(RecordsWithSchemaResponse):
             and (
                 # TODO (Roman): Consider adding other types to table format.
                 # Check if field is primitive, key or enum.
-                slot_v.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                slot_v.__class__.__name__ in PRIMITIVE_TYPE_NAMES
                 or is_key_type(type(slot_v))
                 or isinstance(slot_v, Enum)
             )

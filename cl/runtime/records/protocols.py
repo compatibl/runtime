@@ -14,7 +14,7 @@
 
 import datetime as dt
 from enum import Enum
-from typing import Any
+from typing import Any, MutableSequence, MutableMapping
 from typing import Mapping
 from typing import Sequence
 from typing import TypeGuard
@@ -23,14 +23,15 @@ from uuid import UUID
 from bson import Int64
 from frozendict import frozendict
 
-PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes, type)
+PRIMITIVE_TYPES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes, type)
 """The list of Python classes used to store primitive types, not the same as type names."""
 
-PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)  # TODO: Resolve the issue with ABCMeta
+PRIMITIVE_TYPE_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_TYPES)
 """The list of Python class names used to store primitive types, not the same as type names."""
 
-CONDITION_CLASS_NAMES = (
+CONDITION_TYPE_NAMES = (
     "And",
+    "Condition",  # Abstract base
     "Exists",
     "Gt",
     "Gte",
@@ -42,43 +43,27 @@ CONDITION_CLASS_NAMES = (
     "Or",
     "Range",
 )
-"""
-The list of condition class names."""
+"""Names of types that may be used to represent conditions, including abstract base classes."""
 
-SEQUENCE_CLASSES = (list, tuple)
-"""Classes that may be used to represent sequences, excluding abstract base classes."""
-
-SEQUENCE_CLASS_NAMES = tuple(type_.__name__ for type_ in SEQUENCE_CLASSES)
-"""Names of classes that may be used to represent sequences, excluding abstract base classes."""
+SEQUENCE_TYPES = (list, tuple)
+"""Types that may be used to represent sequences, excluding abstract base classes."""
 
 SEQUENCE_TYPE_NAMES = ("MutableSequence", "Sequence", "list", "tuple")
-"""Names of classes that may be used to represent sequences, including abstract base classes."""
+"""Names of types that may be used to represent sequences, including abstract base classes."""
 
-MAPPING_CLASSES = (dict, frozendict)
-"""Classes that may be used to represent mappings, excluding abstract base classes."""
-
-MAPPING_CLASS_NAMES = tuple(type_.__name__ for type_ in MAPPING_CLASSES)
-"""Names of classes that may be used to represent mappings, excluding abstract base classes."""
+MAPPING_TYPES = (dict, frozendict)
+"""Types that may be used to represent mappings, excluding abstract base classes."""
 
 MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
-"""Names of classes that may be used to represent mappings, including abstract base classes."""
-
-SEQUENCE_AND_MAPPING_CLASSES = tuple(x for x in (*SEQUENCE_CLASSES, *MAPPING_CLASSES))
-"""Names of classes that may be used to represent mappings, excluding abstract base classes."""
-
-SEQUENCE_AND_MAPPING_CLASS_NAMES = tuple(x for x in (*SEQUENCE_CLASS_NAMES, *MAPPING_CLASS_NAMES))
-"""Names of classes that may be used to represent mappings, excluding abstract base classes."""
-
-SEQUENCE_AND_MAPPING_TYPE_NAMES = tuple(x for x in (*SEQUENCE_TYPE_NAMES, *MAPPING_TYPE_NAMES))
-"""Names of classes that may be used to represent mappings, excluding abstract base classes."""
+"""Names of types that may be used to represent mappings, including abstract base classes."""
 
 PrimitiveTypes = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
 """Type alias for Python classes used to store primitive values."""
 
-SequenceTypes = list | tuple | Sequence
+SequenceTypes = list | tuple | Sequence | MutableSequence
 """Type alias for a supported sequence type."""
 
-MappingTypes = dict | frozendict | Mapping
+MappingTypes = dict | frozendict | Mapping | MutableMapping
 """Type alias for a supported mapping type."""
 
 TObj = TypeVar("TObj")
@@ -100,7 +85,7 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     if isinstance(type_, type):
         # Use class names to avoid import discrepancies for UUID
         # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type
-        return type_.__name__ in PRIMITIVE_CLASS_NAMES or issubclass(type_, type)
+        return type_.__name__ in PRIMITIVE_TYPE_NAMES or issubclass(type_, type)
     else:
         raise RuntimeError(f"The argument of is_primitive is an instance of {type(type_).__name__} rather than type.")
 
@@ -215,6 +200,6 @@ def is_condition_type(type_: type) -> bool:
     """Returns true if the argument is one of the supported condition types."""
     if isinstance(type_, type):
         # Use class names to avoid a cyclic reference
-        return type_.__name__ in CONDITION_CLASS_NAMES
+        return type_.__name__ in CONDITION_TYPE_NAMES
     else:
         raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather than type.")

@@ -15,7 +15,7 @@
 from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum_type
@@ -91,5 +91,5 @@ class BootstrapUtil:
             f"  1. Classes that implement 'build' method;\n"
             f"  2. Sequence types (list, tuple, etc.) where all values are supported types;\n"
             f"  3. Mapping types (dict, frozendict, etc.) with string keys where all values are supported types;\n"
-            f"  4. Enums; and\n5. Primitive types from the following list:\n{', '.join(PRIMITIVE_CLASS_NAMES)}"
+            f"  4. Enums; and\n5. Primitive types from the following list:\n{', '.join(PRIMITIVE_TYPE_NAMES)}"
         )

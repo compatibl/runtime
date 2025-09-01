@@ -23,7 +23,7 @@ from ruamel.yaml.constructor import SafeConstructor
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_hints import TypeHints
@@ -125,7 +125,7 @@ class YamlEncoder(Encoder):
 
         if data is None:
             return ""
-        elif data.__class__.__name__ in PRIMITIVE_CLASS_NAMES:
+        elif data.__class__.__name__ in PRIMITIVE_TYPE_NAMES:
             # Use default primitive serializer for a primitive type
             result = PrimitiveSerializers.DEFAULT.serialize(data)
             # Add trailing newline

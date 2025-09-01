@@ -20,7 +20,7 @@ from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
@@ -108,7 +108,7 @@ class DataSerializer(Serializer):
                     f"with type hint {type_hint.to_str()}."
                 )
 
-            if schema_type_name in PRIMITIVE_CLASS_NAMES:
+            if schema_type_name in PRIMITIVE_TYPE_NAMES:
                 # Deserialize using primitive serializer if a primitive type
                 return self.primitive_serializer.serialize(data, type_hint)
             else:
@@ -201,7 +201,7 @@ class DataSerializer(Serializer):
                 {
                     self._serialize_key(field_name): (
                         self.primitive_serializer.serialize(field_value, field_spec.field_type_hint)
-                        if field_value.__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                        if field_value.__class__.__name__ in PRIMITIVE_TYPE_NAMES
                         else (
                             self.enum_serializer.serialize(field_value, field_spec.field_type_hint)
                             if is_enum_type(type(field_value))
@@ -266,7 +266,7 @@ class DataSerializer(Serializer):
                 return None
             else:
                 raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
-        elif schema_type_name in PRIMITIVE_CLASS_NAMES:
+        elif schema_type_name in PRIMITIVE_TYPE_NAMES:
             type_hint.validate_for_primitive()
             return self.primitive_serializer.deserialize(data, type_hint)
         elif schema_type_name in SEQUENCE_TYPE_NAMES:

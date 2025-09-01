@@ -22,7 +22,7 @@ from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.none_checks import NoneChecks
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_abstract_type
@@ -201,7 +201,7 @@ class KeySerializer(Serializer):
                         # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
                         self.primitive_serializer.serialize(self._checked_value(v), field_spec.field_type_hint)
                     ]
-                    if (v := getattr(data, field_spec.field_name)).__class__.__name__ in PRIMITIVE_CLASS_NAMES
+                    if (v := getattr(data, field_spec.field_name)).__class__.__name__ in PRIMITIVE_TYPE_NAMES
                     else (
                         [
                             # Use enum serializer, specify enum class
@@ -286,6 +286,6 @@ class KeySerializer(Serializer):
         """Return checked primitive value or enum."""
         if value is None:
             raise RuntimeError("A primitive field or enum inside a key cannot be None.")
-        if (class_name := value.__class__.__name__) not in PRIMITIVE_CLASS_NAMES and not isinstance(value, Enum):
+        if (class_name := value.__class__.__name__) not in PRIMITIVE_TYPE_NAMES and not isinstance(value, Enum):
             raise RuntimeError(f"Type {class_name} inside key is not a primitive type, enum, or another key.")
         return value

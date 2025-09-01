@@ -105,7 +105,7 @@ class PrimitiveSerializer(Serializer):
             A string or another serialization output such as int or None
 
         Args:
-            data: An instance of primitive class from PRIMITIVE_CLASS_NAMES
+            data: An instance of primitive class from PRIMITIVE_TYPE_NAMES
             type_hint: Optional type chain to use for validation and to identify a type that shares
                        the same class with another type (e.g. long and int types share the int class)
         """
@@ -267,7 +267,7 @@ class PrimitiveSerializer(Serializer):
         Deserialize a string or another primitive value such as int or None to an instance of type_name.
 
         Returns:
-            An instance of type_name, which must be one of PRIMITIVE_CLASS_NAMES, including None
+            An instance of type_name, which must be one of PRIMITIVE_TYPE_NAMES, including None
 
         Args:
             data: A string or another serialization output such as int or None

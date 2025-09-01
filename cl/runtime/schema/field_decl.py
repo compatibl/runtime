@@ -20,7 +20,7 @@ from typing import Self
 from uuid import UUID
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_CLASSES
+from cl.runtime.records.protocols import PRIMITIVE_TYPES
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
@@ -214,7 +214,7 @@ class FieldDecl(DataMixin):
                 dependencies.add(field_type)
 
             # Assign field kind
-            if field_type in PRIMITIVE_CLASSES:
+            if field_type in PRIMITIVE_TYPES:
                 # Field is one of the supported primitive types
                 result.field_kind = TypeKind.PRIMITIVE
             elif is_enum_type(field_type):

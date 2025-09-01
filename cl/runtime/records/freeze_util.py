@@ -16,8 +16,8 @@ from enum import Enum
 from typing import Any
 from frozendict import frozendict
 from more_itertools import consume
-from cl.runtime.records.protocols import MAPPING_CLASSES
-from cl.runtime.records.protocols import SEQUENCE_CLASSES
+from cl.runtime.records.protocols import MAPPING_TYPES
+from cl.runtime.records.protocols import SEQUENCE_TYPES
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_primitive_type
@@ -43,10 +43,10 @@ class FreezeUtil:
         elif isinstance(data, Enum):
             # Pass through enums
             return data
-        elif isinstance(data, SEQUENCE_CLASSES):
+        elif isinstance(data, SEQUENCE_TYPES):
             # Convert all sequence types to tuple
             return tuple(cls.freeze(item) if not is_empty(item) else None for item in data)
-        elif isinstance(data, MAPPING_CLASSES):
+        elif isinstance(data, MAPPING_TYPES):
             # Convert all mapping types to frozendict
             return frozendict(
                 (k, cls.freeze(v)) if not k.startswith("_") else v  # Do not freeze private or protected fields

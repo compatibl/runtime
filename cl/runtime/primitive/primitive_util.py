@@ -18,7 +18,7 @@ from cl.runtime.primitive.limits import check_int_32
 from cl.runtime.primitive.limits import check_int_54
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.builder_util import BuilderUtil
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, is_primitive_type
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
@@ -124,12 +124,12 @@ class PrimitiveUtil(BuilderUtil):
             # Validate the type is known
             assert TypeCache.guard_known_type(data)
             return data
-        elif schema_type_name in PRIMITIVE_CLASS_NAMES:
+        elif schema_type_name in PRIMITIVE_TYPE_NAMES:
             # Pass through other types
             # TODO: !!! Add validation of datetime and other types, including for whole milliseconds
             return data
         else:
-            primitive_class_names_str = "\n".join(PRIMITIVE_CLASS_NAMES)
+            primitive_class_names_str = "\n".join(PRIMITIVE_TYPE_NAMES)
             raise RuntimeError(
                 f"Type {data_class_name} is not a valid value type for a primitive field:\n"
                 f"{primitive_class_names_str}\n"

@@ -21,7 +21,7 @@ from uuid import UUID
 from frozendict import frozendict
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import is_sequence_type, is_mapping_type, is_primitive_type
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.typename import typename
 
@@ -300,7 +300,7 @@ class TypeHint(BootstrapMixin):
                             f"- a union with None (optional) with one of the supported types inside\n"
                             f"- list, tuple, dict, frozendict with one of the supported types inside\n"
                             f"- a type with build method\n"
-                            f"- {', '.join(PRIMITIVE_CLASS_NAMES)}\n"
+                            f"- {', '.join(PRIMITIVE_TYPE_NAMES)}\n"
                         )
 
                     # Link tokens into the complete type hint

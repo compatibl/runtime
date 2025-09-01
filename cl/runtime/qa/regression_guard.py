@@ -20,8 +20,8 @@ from typing import Any
 from typing import ClassVar
 from typing import Self
 from cl.runtime.qa.qa_util import QaUtil
-from cl.runtime.records.protocols import MAPPING_CLASSES
-from cl.runtime.records.protocols import SEQUENCE_CLASSES
+from cl.runtime.records.protocols import MAPPING_TYPES
+from cl.runtime.records.protocols import SEQUENCE_TYPES
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
@@ -349,7 +349,7 @@ class RegressionGuard:
         """Format text for regression testing."""
 
         # Convert to one of the supported output types
-        if is_record_type(type(value)) or value.__class__ in SEQUENCE_CLASSES or value.__class__ in MAPPING_CLASSES:
+        if is_record_type(type(value)) or value.__class__ in SEQUENCE_TYPES or value.__class__ in MAPPING_TYPES:
             value = _YAML_SERIALIZER.serialize(value)
         elif is_key_type(type(value)):
             value = _KEY_SERIALIZER.serialize(value)
