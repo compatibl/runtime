@@ -24,7 +24,7 @@ class NoSlotsSpec(DataSpec):
     """Provides information about a class with no slots."""
 
     @classmethod
-    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
+    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # This class (NoSlotsSpec) is only appropriate for a data base or mixin class that does not define its own slots

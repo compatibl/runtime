@@ -78,7 +78,7 @@ class ElementDecl(MemberDecl):  # TODO: Consider renaming to TypeFieldDecl or Fi
         match field_decl.field_kind:
             case TypeKind.PRIMITIVE:
                 # Primitive type, create declaration from name
-                result.value = ValueDecl.from_name(field_decl.field_type_decl.name)
+                result.value = ValueDecl.for_type_name(field_decl.field_type_decl.name)
             case TypeKind.ENUM:
                 result.enum = field_decl.field_type_decl
             case TypeKind.KEY:

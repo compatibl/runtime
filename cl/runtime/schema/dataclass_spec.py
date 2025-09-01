@@ -25,7 +25,7 @@ class DataclassSpec(DataSpec):
     """Provides information about a dataclass."""
 
     @classmethod
-    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
+    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # Perform checks

@@ -29,7 +29,7 @@ class EnumSpec(TypeSpec):
     """List of enum members (use None for a placeholder enum with no members)."""
 
     @classmethod
-    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
+    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
         """Create spec from class, subtype is not permitted."""
 
         # Perform checks

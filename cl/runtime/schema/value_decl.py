@@ -40,12 +40,12 @@ class ValueDecl(DataMixin):
     """Primitive type name."""
 
     @classmethod
-    def from_type(cls, record_type: type | str) -> Self:
+    def for_type(cls, type_: type | str) -> Self:
         """Create an instance from the specified type."""
-        return cls.from_name(record_type.__name__)
+        return cls.for_type_name(type_.__name__)
 
     @classmethod
-    def from_name(cls, type_name: str) -> Self:
+    def for_type_name(cls, type_name: str) -> Self:
         """Create an instance from the specified type name."""
 
         runtime_name = _VALUE_DECL_NAME_MAP.get(type_name, None)

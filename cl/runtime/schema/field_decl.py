@@ -207,7 +207,7 @@ class FieldDecl(DataMixin):
         elif field_origin is None:
 
             # Assign type declaration key
-            result.field_type_decl = TypeDeclKey.from_type(field_type)
+            result.field_type_decl = TypeDeclKey.for_type(field_type)
 
             # Add field type to dependencies, do not use if dependencies to prevent from skipping on first item added
             if dependencies is not None and not is_primitive_type(field_type):

@@ -34,6 +34,6 @@ class TypeDeclKey(KeyMixin):
         return TypeDeclKey
 
     @classmethod
-    def from_type(cls, type_: type) -> Self:
+    def for_type(cls, type_: type) -> Self:
         """Create primitive type declaration from Python type."""
         return TypeDeclKey(module=ModuleDeclKey(), name=type_.__name__).build()

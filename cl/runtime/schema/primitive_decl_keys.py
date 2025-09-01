@@ -21,32 +21,32 @@ from cl.runtime.schema.type_decl_key import TypeDeclKey
 class PrimitiveDeclKeys:
     """RatesSwapLegSideKey constants."""
 
-    STR: TypeDeclKey = TypeDeclKey.from_type(str)
+    STR: TypeDeclKey = TypeDeclKey.for_type(str)
     """String primitive type."""
 
-    FLOAT: TypeDeclKey = TypeDeclKey.from_type(float)
+    FLOAT: TypeDeclKey = TypeDeclKey.for_type(float)
     """Float primitive type."""
 
-    BOOL: TypeDeclKey = TypeDeclKey.from_type(bool)
+    BOOL: TypeDeclKey = TypeDeclKey.for_type(bool)
     """Bool primitive type."""
 
-    INT: TypeDeclKey = TypeDeclKey.from_type(int)
+    INT: TypeDeclKey = TypeDeclKey.for_type(int)
     """Int primitive type."""
 
     LONG: TypeDeclKey = TypeDeclKey(module=ModuleDeclKey(), name="long").build()
     """Long primitive type, use builtins module with name=long"""
 
-    DATE: TypeDeclKey = TypeDeclKey.from_type(dt.date)
+    DATE: TypeDeclKey = TypeDeclKey.for_type(dt.date)
     """Date primitive type."""
 
-    TIME: TypeDeclKey = TypeDeclKey.from_type(dt.time)
+    TIME: TypeDeclKey = TypeDeclKey.for_type(dt.time)
     """Time primitive type."""
 
-    DATETIME: TypeDeclKey = TypeDeclKey.from_type(dt.datetime)
+    DATETIME: TypeDeclKey = TypeDeclKey.for_type(dt.datetime)
     """Datetime primitive type."""
 
-    UUID: TypeDeclKey = TypeDeclKey.from_type(UUID)
+    UUID: TypeDeclKey = TypeDeclKey.for_type(UUID)
     """UUID primitive type."""
 
-    bytes: TypeDeclKey = TypeDeclKey.from_type(bytes)
+    bytes: TypeDeclKey = TypeDeclKey.for_type(bytes)
     """Bytes primitive type."""

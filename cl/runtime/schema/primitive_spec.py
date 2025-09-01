@@ -24,7 +24,7 @@ class PrimitiveSpec(TypeSpec):
     """Provides information about a primitive type."""
 
     @classmethod
-    def from_class(cls, class_: type, subtype: str | None = None) -> Self:
+    def for_class(cls, class_: type, subtype: str | None = None) -> Self:
         """Create spec from class, set name to subtype after checking compatibility."""
         if (class_name := class_.__name__) not in PRIMITIVE_TYPE_NAMES:
             primitive_class_names_str = ", ".join(PRIMITIVE_TYPE_NAMES)

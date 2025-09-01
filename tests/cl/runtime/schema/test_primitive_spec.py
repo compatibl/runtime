@@ -46,8 +46,8 @@ _FROM_CLASS_EXCEPTION_CASES = [
 ]
 
 
-def test_from_class():
-    """Test PrimitiveSpec.from_class method."""
+def test_for_class():
+    """Test PrimitiveSpec.for_class method."""
     for test_case in _FROM_CLASS_VALID_CASES:
 
         # Get sample type and subtype (if specified)
@@ -60,7 +60,7 @@ def test_from_class():
             raise RuntimeError("Invalid test case format.")
 
         # Get enum spec and serialize as YAML
-        type_spec = PrimitiveSpec.from_class(sample_type, subtype)
+        type_spec = PrimitiveSpec.for_class(sample_type, subtype)
         type_spec_str = BootstrapSerializers.YAML.serialize(type_spec)
 
         # Record in RegressionGuard
@@ -69,8 +69,8 @@ def test_from_class():
     RegressionGuard().verify_all()
 
 
-def test_from_class_exceptions():
-    """Test PrimitiveSpec.from_class method exceptions."""
+def test_for_class_exceptions():
+    """Test PrimitiveSpec.for_class method exceptions."""
     for test_case in _FROM_CLASS_EXCEPTION_CASES:
 
         # Get sample type and subtype (if specified)
@@ -84,7 +84,7 @@ def test_from_class_exceptions():
 
         # Check that exception is thrown as expected
         with pytest.raises(Exception):
-            PrimitiveSpec.from_class(sample_type, subtype)
+            PrimitiveSpec.for_class(sample_type, subtype)
 
 
 if __name__ == "__main__":

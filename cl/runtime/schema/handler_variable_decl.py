@@ -91,7 +91,7 @@ class HandlerVariableDecl(MemberDecl):
         # Handle primitive types
         # TODO (Ina): Add Enum and Dict supporting, handle unexpected types
         if is_primitive_type(value_type_):
-            result.value = ValueDecl.from_type(value_type_)
+            result.value = ValueDecl.for_type(value_type_)
         elif value_type_.__name__.endswith("Key"):
             result.key_ = TypeDecl.for_type(value_type_, skip_handlers=True)
         elif inspect.isclass(value_type_):

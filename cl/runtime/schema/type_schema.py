@@ -74,5 +74,5 @@ class TypeSchema:
             )
 
         # Create from class, add to spec dictionary and return
-        result = spec_class.from_class(class_)
+        result = spec_class.for_class(class_)
         return result
