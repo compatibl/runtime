@@ -17,12 +17,13 @@ import typing
 from dataclasses import dataclass
 from enum import Enum
 from typing import Self
-from uuid import UUID
 from frozendict import frozendict
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import is_sequence_type, is_mapping_type, is_primitive_type
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 
 
@@ -110,10 +111,7 @@ class TypeHint(BootstrapMixin):
     ) -> Self:
         """Create type hint for a class with optional parameters."""
         class_name = typename(class_)
-        if (
-            (subtype == "long" and class_ is not int) or
-            (subtype == "timestamp" and class_ is not str)
-        ):
+        if (subtype == "long" and class_ is not int) or (subtype == "timestamp" and class_ is not str):
             raise RuntimeError(f"Subtype {subtype} is not valid for class {class_name}.")
 
         return TypeHint(
@@ -276,9 +274,8 @@ class TypeHint(BootstrapMixin):
                     if type_alias_origin is None and not type_alias_args:
                         # Validate that subtype is compatible with the schema type
                         schema_type_name = typename(type_alias)
-                        if (
-                                (field_subtype == "long" and schema_type_name != "int") or
-                                (field_subtype == "timestamp" and schema_type_name != "str")
+                        if (field_subtype == "long" and schema_type_name != "int") or (
+                            field_subtype == "timestamp" and schema_type_name != "str"
                         ):
                             raise RuntimeError(
                                 f"Subtype '{field_subtype}' is not compatible with type {schema_type_name}"

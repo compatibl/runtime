@@ -34,7 +34,8 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.none_checks import NoneChecks
-from cl.runtime.records.protocols import PrimitiveTypes, is_empty
+from cl.runtime.records.protocols import PrimitiveTypes
+from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
@@ -142,9 +143,9 @@ class PrimitiveSerializer(Serializer):
         # Validate that data type is compatible with schema type, allowing
         # mixing of int and float subject to subsequent validation of data value
         if (
-                data_class_name != schema_type_name and
-                not (data_class_name == "int" and schema_type_name == "float") and
-                not (data_class_name == "float" and schema_type_name == "int")
+            data_class_name != schema_type_name
+            and not (data_class_name == "int" and schema_type_name == "float")
+            and not (data_class_name == "float" and schema_type_name == "int")
         ):
             raise RuntimeError(
                 f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
@@ -152,9 +153,8 @@ class PrimitiveSerializer(Serializer):
 
         # Validate that subtype is compatible with schema_type_name
         subtype = type_hint.subtype if type_hint is not None else None
-        if (
-            (schema_type_name == "int" and subtype not in (None, "long")) or
-            (schema_type_name == "str" and subtype not in (None, "timestamp"))
+        if (schema_type_name == "int" and subtype not in (None, "long")) or (
+            schema_type_name == "str" and subtype not in (None, "timestamp")
         ):
             raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
 
@@ -299,9 +299,8 @@ class PrimitiveSerializer(Serializer):
 
         # Validate that subtype is compatible with schema_type_name
         subtype = type_hint.subtype
-        if (
-            (schema_type_name == "int" and subtype not in (None, "long")) or
-            (schema_type_name == "str" and subtype not in (None, "timestamp"))
+        if (schema_type_name == "int" and subtype not in (None, "long")) or (
+            schema_type_name == "str" and subtype not in (None, "timestamp")
         ):
             raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
 

@@ -14,8 +14,10 @@
 
 import datetime as dt
 from enum import Enum
-from typing import Any, MutableSequence, MutableMapping
+from typing import Any
 from typing import Mapping
+from typing import MutableMapping
+from typing import MutableSequence
 from typing import Sequence
 from typing import TypeGuard
 from typing import TypeVar

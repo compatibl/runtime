@@ -14,14 +14,13 @@
 
 from typing import Any
 from cl.runtime.primitive.float_util import FloatUtil
-from cl.runtime.primitive.limits import check_int_32
-from cl.runtime.primitive.limits import check_int_54
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.builder_util import BuilderUtil
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
+
 
 class PrimitiveUtil(BuilderUtil):
     """Helper methods for implementing the builder pattern with primitive fields."""
@@ -68,9 +67,9 @@ class PrimitiveUtil(BuilderUtil):
         # Validate that data type is compatible with schema type, allowing
         # mixing of int and float subject to subsequent validation of data value
         if (
-                data_class_name != schema_type_name and
-                not (data_class_name == "int" and schema_type_name == "float") and
-                not (data_class_name == "float" and schema_type_name == "int")
+            data_class_name != schema_type_name
+            and not (data_class_name == "int" and schema_type_name == "float")
+            and not (data_class_name == "float" and schema_type_name == "int")
         ):
             location_str = cls._get_location_str(
                 typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
@@ -82,9 +81,8 @@ class PrimitiveUtil(BuilderUtil):
 
         # Validate that subtype is compatible with schema_type_name
         subtype = type_hint.subtype if type_hint is not None else None
-        if (
-            (schema_type_name == "int" and subtype not in (None, "long")) or
-            (schema_type_name == "str" and subtype not in (None, "timestamp"))
+        if (schema_type_name == "int" and subtype not in (None, "long")) or (
+            schema_type_name == "str" and subtype not in (None, "timestamp")
         ):
             raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
 

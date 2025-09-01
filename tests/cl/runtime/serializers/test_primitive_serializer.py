@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
-from typing import Any
-
 import pytest
 import datetime as dt
+from dataclasses import dataclass
 from types import NoneType
+from typing import Any
 from uuid import UUID
 from bson import Int64
 from cl.runtime.primitive.datetime_util import DatetimeUtil
@@ -25,6 +24,7 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from stubs.cl.runtime import StubDataclass
+
 
 @dataclass(slots=True, kw_only=True)
 class _TestCase:
@@ -48,11 +48,8 @@ class _TestCase:
     def get_type_hint(self) -> TypeHint:
         """Get type hint for the test."""
         return TypeHint(
-            schema_type=self.type_,
-            optional=(self.value is None),
-            condition=None,
-            remaining=None,
-            subtype=self.subtype)
+            schema_type=self.type_, optional=(self.value is None), condition=None, remaining=None, subtype=self.subtype
+        )
 
 
 def test_roundtrip():
@@ -148,7 +145,12 @@ def test_mongo():
         _TestCase(type_=dt.date, value=dt.date(2023, 4, 21), serialized=20230421, alternative_serialized=("20230421",)),
         # Time
         _TestCase(type_=dt.time, value=None, serialized=None),
-        _TestCase(type_=dt.time, value=TimeUtil.from_fields(11, 10, 0, millisecond=123), serialized=111000123,  alternative_serialized=("111000123",)),
+        _TestCase(
+            type_=dt.time,
+            value=TimeUtil.from_fields(11, 10, 0, millisecond=123),
+            serialized=111000123,
+            alternative_serialized=("111000123",),
+        ),
     ]
 
     for test_case in test_cases:

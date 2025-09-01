@@ -372,12 +372,12 @@ class DataSerializer(Serializer):
                     else (
                         self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
                         if (
-                                (field_hint := field_dict[snake_case_k].field_type_hint).schema_type != str
-                                and self.inner_encoder is not None
-                                and isinstance(field_value, str)
-                                and len(field_value) > 0
-                                # TODO: Improve detection of embedded JSON
-                                and (field_value.startswith('{"') or field_value.startswith("["))
+                            (field_hint := field_dict[snake_case_k].field_type_hint).schema_type != str
+                            and self.inner_encoder is not None
+                            and isinstance(field_value, str)
+                            and len(field_value) > 0
+                            # TODO: Improve detection of embedded JSON
+                            and (field_value.startswith('{"') or field_value.startswith("["))
                         )
                         else self.deserialize(field_value, field_hint)
                     )

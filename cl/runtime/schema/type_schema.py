@@ -13,14 +13,8 @@
 # limitations under the License.
 
 import dataclasses
-import datetime as dt
 from enum import Enum
-from types import ModuleType
-from typing import Mapping
-from uuid import UUID
-
 from memoization import cached
-
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.typename import typename
@@ -28,7 +22,6 @@ from cl.runtime.schema.condition_spec import ConditionSpec
 from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.no_slots_spec import NoSlotsSpec
-from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_spec import TypeSpec
 
