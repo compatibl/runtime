@@ -4,49 +4,41 @@ type_kind: Data
 fields:
 - field_name: id
   field_type_hint:
-    schema_type_name: str
     schema_type: str
     optional: true
     condition: true
 - field_name: base_field
   field_type_hint:
-    schema_type_name: StubDataclassData
     schema_type: StubDataclassData
     optional: true
     condition: true
 - field_name: derived_field
   field_type_hint:
-    schema_type_name: StubDataclassDerivedData
     schema_type: StubDataclassDerivedData
     optional: true
     condition: true
 - field_name: double_derived_field
   field_type_hint:
-    schema_type_name: StubDataclassDoubleDerivedData
     schema_type: StubDataclassDoubleDerivedData
     optional: true
     condition: true
 - field_name: polymorphic_field
   field_type_hint:
-    schema_type_name: StubDataclassData
     schema_type: StubDataclassData
     optional: true
     condition: true
 - field_name: polymorphic_derived_field
   field_type_hint:
-    schema_type_name: StubDataclassDerivedData
     schema_type: StubDataclassDerivedData
     optional: true
     condition: true
 - field_name: key_field
   field_type_hint:
-    schema_type_name: StubDataclassKey
     schema_type: StubDataclassKey
     optional: true
     condition: true
 - field_name: record_as_key_field
   field_type_hint:
-    schema_type_name: StubDataclassKey
     schema_type: StubDataclassKey
     optional: true
     condition: true

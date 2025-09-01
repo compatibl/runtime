@@ -4,6 +4,5 @@ type_kind: Record
 fields:
 - field_name: stub_id
   field_type_hint:
-    schema_type_name: str
     schema_type: str
 

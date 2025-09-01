@@ -4,7 +4,6 @@ type_kind: Data
 fields:
 - field_name: id
   field_type_hint:
-    schema_type_name: str
     schema_type: str
     optional: true
     condition: true
