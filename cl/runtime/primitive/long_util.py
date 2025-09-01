@@ -46,7 +46,7 @@ class LongUtil:
     @classmethod
     def from_float(cls, value: float) -> int:
         """
-        Check that float value is within roundoff tolerance from an long and return the long, error otherwise.
+        Check that float value is within roundoff tolerance from an long and retFurn the long, error otherwise.
         Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
         """
         NoneChecks.guard_not_none(value)

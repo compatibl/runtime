@@ -21,7 +21,6 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
 from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
@@ -109,12 +108,12 @@ class DataSerializer(Serializer):
                     f"with type hint {type_hint.to_str()}."
                 )
 
-            if schema_type_name in PRIMITIVE_TYPE_NAMES:
+            if schema_type_name in PRIMITIVE_CLASS_NAMES:
                 # Deserialize using primitive serializer if a primitive type
                 return self.primitive_serializer.serialize(data, type_hint)
             else:
                 # Otherwise assume it is an enum
-                # TODO: Check for type_kind in TypeHint instead
+                # TODO: !!! Check for type_kind in TypeHint instead
                 result = self.enum_serializer.serialize(data, type_hint)
                 return result
         elif is_sequence_type(type(data)):
@@ -267,7 +266,7 @@ class DataSerializer(Serializer):
                 return None
             else:
                 raise RuntimeError(f"Data is None but type hint {type_hint.to_str()} indicates it is required.")
-        elif schema_type_name in PRIMITIVE_TYPE_NAMES:
+        elif schema_type_name in PRIMITIVE_CLASS_NAMES:
             type_hint.validate_for_primitive()
             return self.primitive_serializer.deserialize(data, type_hint)
         elif schema_type_name in SEQUENCE_TYPE_NAMES:

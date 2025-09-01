@@ -29,25 +29,6 @@ PRIMITIVE_CLASSES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime
 PRIMITIVE_CLASS_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_CLASSES)  # TODO: Resolve the issue with ABCMeta
 """The list of Python class names used to store primitive types, not the same as type names."""
 
-PRIMITIVE_TYPE_NAMES = (
-    "str",
-    "float",
-    "bool",
-    "int",
-    "long",  # Stored in int or Int64 class
-    "date",
-    "time",
-    "datetime",
-    "UUID",
-    "timestamp",  # TODO: !!!! Stored in str class
-    "bytes",
-    "type",
-)
-"""
-The list of primitive type names, includes those primitive types that do not have their own
-Pyton classes such as long (uses Python type int) and timestamp (uses Python type UUID).
-"""
-
 CONDITION_CLASS_NAMES = (
     "And",
     "Exists",
