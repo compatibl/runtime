@@ -14,7 +14,7 @@
 
 from math import log10
 import numpy as np
-from cl.runtime.primitive.limits import check_int_32
+from cl.runtime.primitive.limits import check_int_32, check_int_54
 
 
 class FloatUtil:
@@ -85,7 +85,7 @@ class FloatUtil:
         return value_1 > value_2 - cls.tolerance
 
     @classmethod
-    def to_int(cls, value: float | None) -> int | None:
+    def to_int(cls, value: int | float | None) -> int | None:  # TODO: !!!! Add _or_none
         """
         Check that float value is within roundoff tolerance from an int and return the int, error otherwise.
         Verifies that the value fits in 32-bit signed integer range.
@@ -93,13 +93,15 @@ class FloatUtil:
         check_int_32(value)
         if value is None:
             return None
+        elif isinstance(value, int):
+            return value
         elif cls.equal(result := int(round(value)), value):
             return result
         else:
             raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
 
     @classmethod
-    def to_int_or_float(cls, value: float | None) -> int | float | None:
+    def to_int_or_float(cls, value: int | float | None) -> int | float | None:  # TODO: !!!! Add _or_none
         """
         Check that float value is within roundoff tolerance from an int, return int if yes and float otherwise.
         Verifies that the value fits in 32-bit signed integer range.
@@ -107,20 +109,41 @@ class FloatUtil:
         check_int_32(value)
         if value is None:
             return None
+        elif isinstance(value, int):
+            return value
         elif cls.equal(result := int(round(value)), value):
             return result
         else:
             return value
 
     @classmethod
-    def to_long(cls, value: float | None) -> int | None:
+    def to_long(cls, value: int | float | None) -> int | None:  # TODO: !!!! Add _or_none
         """
         Check that float value is within roundoff tolerance from an long and return the long, error otherwise.
         Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
         """
+        check_int_54(value)
         if value is None:
             return None
+        elif isinstance(value, int):
+            return value
         elif cls.equal(result := int(round(value)), value):
             return result
         else:
             raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
+
+    @classmethod
+    def to_long_or_float(cls, value: int | float | None) -> int | float | None:  # TODO: !!!! Add _or_none
+        """
+        Check that float value is within roundoff tolerance from an long and return the long if yes and float otherwise.
+        Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
+        """
+        check_int_54(value)
+        if value is None:
+            return None
+        elif isinstance(value, int):
+            return value
+        elif cls.equal(result := int(round(value)), value):
+            return result
+        else:
+            return value

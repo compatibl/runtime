@@ -27,7 +27,7 @@ _INT_54_MAX: Final[int] = 2**53 - 1
 """Maximum value of 54-bit signed integer, numbers in this range can be represented as a float exactly."""
 
 
-def is_int_32(value: int | float | None) -> bool:
+def is_int_32(value: int | float | None) -> bool:  # TODO: ! Rename to add suffix range
     """True if the value is None or fits in 32-bit signed integer range."""
     return value is None or _INT_32_MIN <= value <= _INT_32_MAX
 

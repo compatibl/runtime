@@ -24,6 +24,7 @@ from stubs.cl.runtime import StubIntEnum
 
 _FROM_CLASS_VALID_CASES = [
     str,
+    (str, "timestamp"),
     float,
     bool,
     int,
@@ -32,7 +33,6 @@ _FROM_CLASS_VALID_CASES = [
     dt.time,
     dt.datetime,
     UUID,
-    (UUID, "timestamp"),
     bytes,
     type,
 ]

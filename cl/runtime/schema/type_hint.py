@@ -35,16 +35,16 @@ class TypeHint(BootstrapMixin):
     schema_type: type
     """Class if available, if not provided it will be looked up using the type name."""
 
-    optional: bool | None = None
+    optional: bool | None
     """True if the type hint is a union with None, None otherwise."""
 
-    condition: bool | None = None
+    condition: bool | None
     """True if the type hint includes T | Condition[T], None otherwise."""
 
-    remaining: Self | None = None
+    remaining: Self | None
     """Remaining chain if present, None otherwise."""
 
-    subtype: str | None = None
+    subtype: str | None
     """Subtype (e.g., long) if specified, None otherwise."""
 
     def to_str(self):
@@ -108,26 +108,22 @@ class TypeHint(BootstrapMixin):
         *,
         optional: bool = None,
         condition: bool = None,
-        schema_type_name: str | None = None,
+        subtype: str | None = None,
     ) -> Self:
         """Create type hint for a class with optional parameters."""
-
         class_name = typename(class_)
         if (
-            schema_type_name is None
-            or (schema_type_name == "long" and class_ is int)
-            or (schema_type_name == "timestamp" and class_ is str)
+            (subtype == "long" and class_ is not int) or
+            (subtype == "timestamp" and class_ is not str)
         ):
-            # Validate and use subtype if specified
-            schema_type_name = class_name
-        elif schema_type_name != class_name:
-            # Otherwise use class name
-            raise RuntimeError(f"Subtype {schema_type_name} is not valid for class {class_name}.")
+            raise RuntimeError(f"Subtype {subtype} is not valid for class {class_name}.")
 
-        return cls(
+        return TypeHint(
             schema_type=class_,
             optional=optional,
             condition=condition,
+            remaining=None,
+            subtype=subtype,
         )
 
     @classmethod
@@ -227,6 +223,8 @@ class TypeHint(BootstrapMixin):
                             schema_type=list,
                             optional=type_alias_optional,
                             condition=type_alias_condition,
+                            remaining=None,
+                            subtype=None,
                         )
                     )
                 elif type_alias_origin is tuple:
@@ -242,6 +240,8 @@ class TypeHint(BootstrapMixin):
                             schema_type=tuple,
                             optional=type_alias_optional,
                             condition=type_alias_condition,
+                            remaining=None,
+                            subtype=None,
                         )
                     )
                 elif type_alias_origin in (dict, frozendict):
@@ -258,6 +258,8 @@ class TypeHint(BootstrapMixin):
                             schema_type=type_alias_origin,
                             optional=type_alias_optional,
                             condition=type_alias_condition,
+                            remaining=None,
+                            subtype=None,
                         )
                     )
                 else:
@@ -274,37 +276,26 @@ class TypeHint(BootstrapMixin):
                 # Not a container: must be a genuine type (not TypeAlias)
                 if isinstance(type_alias, type):
                     if type_alias_origin is None and not type_alias_args:
+                        # Validate that subtype is compatible with the schema type
                         schema_type_name = typename(type_alias)
-                        if field_subtype is None or field_subtype == schema_type_name:
-                            type_hint_tokens.append(
-                                TypeHint(
-                                    schema_type=type_alias,
-                                    optional=type_alias_optional,
-                                    condition=type_alias_condition,
-                                )
-                            )
-                        elif field_subtype == "long" and schema_type_name == "int":
-                            type_hint_tokens.append(
-                                TypeHint(
-                                    schema_type=int,
-                                    optional=type_alias_optional,
-                                    condition=type_alias_condition,
-                                    subtype="field_subtype",
-                                )
-                            )
-                        elif field_subtype == "timestamp" and schema_type_name == "str":
-                            type_hint_tokens.append(
-                                TypeHint(
-                                    schema_type=str,
-                                    optional=type_alias_optional,
-                                    condition=type_alias_condition,
-                                    subtype="field_subtype",
-                                )
-                            )
-                        else:
+                        if (
+                                (field_subtype == "long" and schema_type_name != "int") or
+                                (field_subtype == "timestamp" and schema_type_name != "str")
+                        ):
                             raise RuntimeError(
                                 f"Subtype '{field_subtype}' is not compatible with type {schema_type_name}"
                             )
+
+                        # Return type hint for a primitive field
+                        type_hint_tokens.append(
+                            TypeHint(
+                                schema_type=type_alias,
+                                optional=type_alias_optional,
+                                condition=type_alias_condition,
+                                remaining=None,
+                                subtype=field_subtype,
+                            )
+                        )
                     else:
                         raise RuntimeError(
                             f"Type hint {type_alias} is not supported. Supported type hints include:\n"
@@ -345,6 +336,7 @@ class TypeHint(BootstrapMixin):
                 optional=head.optional,
                 condition=head.condition,
                 remaining=cls._link_type_hint_tokens(tail),
+                subtype=head.subtype,
             )
         else:
             return None

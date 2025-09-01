@@ -48,7 +48,7 @@ class PrimitiveUtil(BuilderUtil):
                 )
                 raise RuntimeError(f"Required field is not specified.{location_str}")
 
-        # Get type name of data, which may be a type
+        # To allow ABCMeta and other metaclasses derived from type to pass the check
         data_class_name = "type" if isinstance(data, type) else typename(type(data))
 
         # Ensure there is no remaining component (type hint is not a sequence or mapping)
@@ -63,13 +63,21 @@ class PrimitiveUtil(BuilderUtil):
         if type_hint is not None:
             schema_type_name = typename(type_hint.schema_type)
         else:
-            # To allow ABCMeta and other metaclasses derived from type to pass the check
             schema_type_name = data_class_name
 
-        # Check that schema type matches data type
-        if data_class_name != schema_type_name:
+        # Validate that data type is compatible with schema type, allowing
+        # mixing of int and float subject to subsequent validation of data value
+        if (
+                data_class_name != schema_type_name and
+                not (data_class_name == "int" and schema_type_name == "float") and
+                not (data_class_name == "float" and schema_type_name == "int")
+        ):
+            location_str = cls._get_location_str(
+                typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
+            )
             raise RuntimeError(
                 f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
+                f"{location_str}"
             )
 
         # Validate that subtype is compatible with schema_type_name
@@ -80,17 +88,8 @@ class PrimitiveUtil(BuilderUtil):
         ):
             raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
 
-        # Validate that the actual data type matches the expected type (which may have subtypes)
-        if data_class_name != schema_type_name:
-            location_str = cls._get_location_str(
-                typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
-            )
-            raise RuntimeError(
-                f"Actual field type is {data_class_name} while {schema_type_name} was expected.{location_str}"
-            )
-
-        # Use subtype to distinguish between types that share the same class
-        if data_class_name == "str":
+        # Validate based schema_type_name, taking into account subtype
+        if schema_type_name == "str":
             if subtype is None:
                 # No further checks are required
                 return data
@@ -103,49 +102,30 @@ class PrimitiveUtil(BuilderUtil):
                     typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
                 raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_class_name}.{location_str}")
-        elif data_class_name == "int":
+        elif schema_type_name == "int":
+            # Perform range check based on subtype
             if subtype is None:
                 # Check that the value is in 32-bit signed integer range
-                # if schema_type_name is specified and is int rather than long
-                check_int_54(data)  # TODO: !! Check for 32 after identifying test cases with 54
-                return data
-            elif subtype == "long":
-                # Check that the value is in 54-bit signed integer range
-                # if schema_type_name is specified and is long
-                check_int_54(data)
-                return data
-            elif subtype == "float":  # TODO: !! Add full support for this subtype
-                # Check that the value is in 54-bit signed integer range
-                # which can be stored as float without losing precision
-                check_int_54(data)
-                # If yes, convert to float
-                return float(data)
-            else:
-                location_str = cls._get_location_str(
-                    typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
-                )
-                raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_class_name}.{location_str}")
-        elif data_class_name == "float":
-            if subtype is None:
-                # No further checks are required
-                return data
-            elif subtype == "int":
-                # This method also performs the check that the value is in 32-bit signed integer range
+                # Check that it is within roundoff tolerance of an int if value is float, pass through if int
                 return FloatUtil.to_int(data)
             elif subtype == "long":
-                # This method also performs the check that the value is in 54-bit signed integer range
+                # Check that the value is in 54-bit signed integer range
+                # Check that it is within roundoff tolerance of an int if value is float, pass through if int
                 return FloatUtil.to_long(data)
             else:
                 location_str = cls._get_location_str(
                     typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
                 raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_class_name}.{location_str}")
-        elif data_class_name == "type":
+        elif schema_type_name == "float":
+            # Convert to float in case the argument is int
+            return float(data)
+        elif schema_type_name == "type":
+            # Validate the type is known
             assert TypeCache.guard_known_type(data)
             return data
-        elif is_primitive_type(type(data)):
-            # We already checked that the type matches the schema and handled None,
-            # The rest of the primitive types are passed through as is
+        elif schema_type_name in PRIMITIVE_CLASS_NAMES:
+            # Pass through other types
             # TODO: !!! Add validation of datetime and other types, including for whole milliseconds
             return data
         else:

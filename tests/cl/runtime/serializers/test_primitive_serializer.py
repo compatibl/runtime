@@ -47,7 +47,12 @@ class _TestCase:
 
     def get_type_hint(self) -> TypeHint:
         """Get type hint for the test."""
-        return TypeHint(schema_type=self.type_, optional=(self.value is None), subtype=self.subtype)
+        return TypeHint(
+            schema_type=self.type_,
+            optional=(self.value is None),
+            condition=None,
+            remaining=None,
+            subtype=self.subtype)
 
 
 def test_roundtrip():
@@ -204,7 +209,7 @@ def test_deserialization_exceptions():
 
     test_cases = [
         # NoneType
-        # TODO: !!!!! _TestCase(NoneType, None, "None"),
+        _TestCase(type_=NoneType, value=None, serialized="None"),
         # Bool
         _TestCase(type_=bool, value=None, serialized=0),
         _TestCase(type_=bool, value=None, serialized="None"),

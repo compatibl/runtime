@@ -33,6 +33,7 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import PrimitiveTypes, is_empty
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
@@ -121,7 +122,7 @@ class PrimitiveSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
 
-        # Get type name of data, which may be a type
+        # To allow ABCMeta and other metaclasses derived from type to pass the check
         data_class_name = "type" if isinstance(data, type) else typename(type(data))
 
         # Ensure there is no remaining component (type hint is not a sequence or mapping)
@@ -136,11 +137,15 @@ class PrimitiveSerializer(Serializer):
         if type_hint is not None:
             schema_type_name = typename(type_hint.schema_type)
         else:
-            # To allow ABCMeta and other metaclasses derived from type to pass the check
             schema_type_name = data_class_name
 
-        # Check that schema type matches data type
-        if data_class_name != schema_type_name:
+        # Validate that data type is compatible with schema type, allowing
+        # mixing of int and float subject to subsequent validation of data value
+        if (
+                data_class_name != schema_type_name and
+                not (data_class_name == "int" and schema_type_name == "float") and
+                not (data_class_name == "float" and schema_type_name == "int")
+        ):
             raise RuntimeError(
                 f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
             )
@@ -153,7 +158,7 @@ class PrimitiveSerializer(Serializer):
         ):
             raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
 
-        # Serialize based schema_type_name, taking into account metaclass
+        # Serialize based schema_type_name, taking into account subtype
         if schema_type_name == "str":
             if (value_format := self.string_format) == StringFormat.PASSTHROUGH:
                 # Return None for an empty string
@@ -269,17 +274,13 @@ class PrimitiveSerializer(Serializer):
             type_hint: Type chain of size one to use for validation and to identify a type that shares
                         the same class with another type (e.g. long and int types share the int class)
         """
-
-        # Get parameters from the type chain, considering the possibility that it may be None
-        schema_type_name = typename(type_hint.schema_type) if type_hint is not None else None
-        subtype = type_hint.subtype if type_hint is not None else None
+        # Type hint is required for deserialization of primitive types
+        NoneChecks.guard_not_none(type_hint)
 
         # Handle None and its supported serialized representations first
         if data in [None, "", "null"]:
-            # Set to True if type hint is not specified
-            is_optional = type_hint.optional if type_hint is not None else True
             if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
-                if is_optional:
+                if type_hint.optional:
                     return None
                 else:
                     type_hint_str = f" for type hint '{type_hint.to_str()}'." if type_hint else "."
@@ -287,12 +288,24 @@ class PrimitiveSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
 
+        # Get schema type from the type hint
+        schema_type_name = typename(type_hint.schema_type)
+
         # Ensure there is no remaining component (type hint is not a sequence or mapping)
-        if type_hint is not None and type_hint.remaining:
+        if type_hint.remaining:
             raise RuntimeError(
                 f"Primitive type {schema_type_name} is incompatible with a composite type hint: {type_hint.to_str()}."
             )
 
+        # Validate that subtype is compatible with schema_type_name
+        subtype = type_hint.subtype
+        if (
+            (schema_type_name == "int" and subtype not in (None, "long")) or
+            (schema_type_name == "str" and subtype not in (None, "timestamp"))
+        ):
+            raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
+
+        # Deserialize based schema_type_name, taking into account subtype
         if schema_type_name == "str":
             if subtype is None:
                 if (value_format := self.string_format) == StringFormat.PASSTHROUGH:
