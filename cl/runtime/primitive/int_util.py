@@ -14,6 +14,7 @@
 
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.primitive.limits import check_int_32
+from cl.runtime.records.none_checks import NoneChecks
 
 
 class IntUtil:
@@ -54,5 +55,5 @@ class IntUtil:
         Check that float value is within roundoff tolerance from an int and return the int, error otherwise.
         Verifies that the value fits in 32-bit signed integer range.
         """
-        result = FloatUtil.to_int(value)
-        return result
+        NoneChecks.guard_not_none(value)
+        return FloatUtil.to_int_or_none(value)

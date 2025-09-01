@@ -14,6 +14,7 @@
 
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.primitive.limits import check_int_54
+from cl.runtime.records.none_checks import NoneChecks
 
 
 class LongUtil:
@@ -48,4 +49,5 @@ class LongUtil:
         Check that float value is within roundoff tolerance from an long and return the long, error otherwise.
         Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
         """
-        return FloatUtil.to_long(value)
+        NoneChecks.guard_not_none(value)
+        return FloatUtil.to_long_or_none(value)

@@ -85,7 +85,7 @@ class FloatUtil:
         return value_1 > value_2 - cls.tolerance
 
     @classmethod
-    def to_int(cls, value: int | float | None) -> int | None:  # TODO: !!!! Add _or_none
+    def to_int_or_none(cls, value: int | float | None) -> int | None:
         """
         Check that float value is within roundoff tolerance from an int and return the int, error otherwise.
         Verifies that the value fits in 32-bit signed integer range.
@@ -101,7 +101,7 @@ class FloatUtil:
             raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
 
     @classmethod
-    def to_int_or_float(cls, value: int | float | None) -> int | float | None:  # TODO: !!!! Add _or_none
+    def to_int_or_float_or_none(cls, value: int | float | None) -> int | float | None:
         """
         Check that float value is within roundoff tolerance from an int, return int if yes and float otherwise.
         Verifies that the value fits in 32-bit signed integer range.
@@ -117,7 +117,7 @@ class FloatUtil:
             return value
 
     @classmethod
-    def to_long(cls, value: int | float | None) -> int | None:  # TODO: !!!! Add _or_none
+    def to_long_or_none(cls, value: int | float | None) -> int | None:
         """
         Check that float value is within roundoff tolerance from an long and return the long, error otherwise.
         Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
@@ -133,7 +133,7 @@ class FloatUtil:
             raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
 
     @classmethod
-    def to_long_or_float(cls, value: int | float | None) -> int | float | None:  # TODO: !!!! Add _or_none
+    def to_long_or_float_or_none(cls, value: int | float | None) -> int | float | None:
         """
         Check that float value is within roundoff tolerance from an long and return the long if yes and float otherwise.
         Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.

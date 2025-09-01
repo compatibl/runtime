@@ -40,20 +40,20 @@ def test_format():
 def test_to_int():
     """Test to_int method."""
 
-    assert FloatUtil.to_int(value=None) is None
-    assert FloatUtil.to_int(value=1.0) == 1
-    assert FloatUtil.to_int(value=-1.0) == -1
+    assert FloatUtil.to_int_or_none(value=None) is None
+    assert FloatUtil.to_int_or_none(value=1.0) == 1
+    assert FloatUtil.to_int_or_none(value=-1.0) == -1
     with pytest.raises(RuntimeError):
-        assert FloatUtil.to_int(value=0.5) == 1
+        assert FloatUtil.to_int_or_none(value=0.5) == 1
 
 
 def test_to_int_or_float():
     """Test to_int_or_float method."""
 
-    assert FloatUtil.to_int_or_float(value=None) is None
-    assert FloatUtil.to_int_or_float(value=1.0) == 1
-    assert FloatUtil.to_int_or_float(value=-1.0) == -1
-    assert FloatUtil.to_int_or_float(value=0.5) == 0.5
+    assert FloatUtil.to_int_or_float_or_none(value=None) is None
+    assert FloatUtil.to_int_or_float_or_none(value=1.0) == 1
+    assert FloatUtil.to_int_or_float_or_none(value=-1.0) == -1
+    assert FloatUtil.to_int_or_float_or_none(value=0.5) == 0.5
 
 
 if __name__ == "__main__":

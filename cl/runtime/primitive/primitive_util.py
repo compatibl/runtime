@@ -107,11 +107,11 @@ class PrimitiveUtil(BuilderUtil):
             if subtype is None:
                 # Check that the value is in 32-bit signed integer range
                 # Check that it is within roundoff tolerance of an int if value is float, pass through if int
-                return FloatUtil.to_int(data)
+                return FloatUtil.to_int_or_none(data)
             elif subtype == "long":
                 # Check that the value is in 54-bit signed integer range
                 # Check that it is within roundoff tolerance of an int if value is float, pass through if int
-                return FloatUtil.to_long(data)
+                return FloatUtil.to_long_or_none(data)
             else:
                 location_str = cls._get_location_str(
                     typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
