@@ -34,14 +34,14 @@ class SseQueryUtil:
         #   - limit sorted result
 
         db = active(DataSource)._get_db()  # TODO: !!! Refactor to stop bypassing DataSource logic
-        if isinstance(db, SqliteDb):
+        if isinstance(db, SqliteDb):  # TODO: !!!!! Use standard queries
             return cls._query_sorted_desc_and_limited_sqlite(
                 db,
                 key_type,
                 sort_by_desc="timestamp",
                 limit=limit,
             )
-        elif isinstance(db, BasicMongoDb):
+        elif isinstance(db, BasicMongoDb):  # TODO: !!!!! Use standard queries
             return cls._query_sorted_mongo(
                 db,
                 key_type,

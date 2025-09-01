@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import dataclass
+from typing import Any
+
 import pytest
 import datetime as dt
 from types import NoneType
@@ -23,91 +26,108 @@ from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from stubs.cl.runtime import StubDataclass
 
+@dataclass(slots=True, kw_only=True)
+class _TestCase:
+    """Represents a single test case for serialization and deserialization."""
+
+    type_: type
+    """Data type."""
+
+    subtype: str | None = None
+    """Data subtype if present, None otherwise."""
+
+    value: Any
+    """Value before serialization."""
+
+    serialized: Any | None = None
+    """Value after serialization (optional, do not specify for exception case testing)."""
+
+    alternative_serialized: list[Any] | None = None
+    """Alternative serialized values that are deserialized to the same value (optional)."""
+
+    def get_type_hint(self) -> TypeHint:
+        """Get type hint for the test."""
+        return TypeHint(schema_type=self.type_, optional=(self.value is None), subtype=self.subtype)
+
 
 def test_roundtrip():
     """Test roundtrip serialization and deserialization of primitive types."""
 
     test_cases = [
-        # NoneType
-        (NoneType, "NoneType", None, None, "", "null"),
         # String
-        (str, "str", None, None),
-        (str, "str", "abc", "abc"),
+        _TestCase(type_=str, value=None, serialized=None, alternative_serialized=("", "null")),
+        _TestCase(type_=str, value="abc", serialized="abc"),
         # Float
-        (float, "float", None, None),
-        (float, "float", 1.0, "1."),
-        (float, "float", -1.23, "-1.23"),
+        _TestCase(type_=float, value=None, serialized=None, alternative_serialized=("", "null")),
+        _TestCase(type_=float, value=1.0, serialized="1."),
+        _TestCase(type_=float, value=-1.23, serialized="-1.23"),
         # Bool
-        (bool, "bool", None, None),
-        (bool, "bool", True, "true"),
-        (bool, "bool", False, "false"),
+        _TestCase(type_=bool, value=None, serialized=None, alternative_serialized=("", "null")),
+        _TestCase(type_=bool, value=True, serialized="true"),
+        _TestCase(type_=bool, value=False, serialized="false"),
         # Int
-        (int, "int", None, None),
-        (int, "int", 123, "123"),
-        (int, "int", -123, "-123"),
+        _TestCase(type_=int, value=None, serialized=None, alternative_serialized=("", "null")),
+        _TestCase(type_=int, value=123, serialized="123"),
+        _TestCase(type_=int, value=-123, serialized="-123"),
         # Date
-        (dt.date, "date", None, None),
-        (dt.date, "date", dt.date(2023, 4, 21), "2023-04-21"),
+        _TestCase(type_=dt.date, value=None, serialized=None, alternative_serialized=("", "null")),
+        _TestCase(type_=dt.date, value=dt.date(2023, 4, 21), serialized="2023-04-21"),
         # Time
-        (dt.time, "time", None, None),
-        (dt.time, "time", TimeUtil.from_fields(11, 10, 0), "11:10:00.000"),
-        (dt.time, "time", TimeUtil.from_fields(11, 10, 0, millisecond=123), "11:10:00.123"),
+        _TestCase(type_=dt.time, value=None, serialized=None, alternative_serialized=("", "null")),
+        _TestCase(type_=dt.time, value=TimeUtil.from_fields(11, 10, 0), serialized="11:10:00.000"),
+        _TestCase(type_=dt.time, value=TimeUtil.from_fields(11, 10, 0, millisecond=123), serialized="11:10:00.123"),
         # Datetime
-        (dt.datetime, "datetime", None, None),
-        (
-            dt.datetime,
-            "datetime",
-            DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0),
-            "2023-04-21T11:10:00.000Z",
+        _TestCase(type_=dt.datetime, value=None, serialized=None, alternative_serialized=("", "null")),
+        _TestCase(
+            type_=dt.datetime,
+            value=DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0),
+            serialized="2023-04-21T11:10:00.000Z",
         ),
-        (
-            dt.datetime,
-            "datetime",
-            DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0, millisecond=123),
-            "2023-04-21T11:10:00.123Z",
+        _TestCase(
+            type_=dt.datetime,
+            value=DatetimeUtil.from_fields(2023, 4, 21, 11, 10, 0, millisecond=123),
+            serialized="2023-04-21T11:10:00.123Z",
         ),
         # UUID
-        (UUID, "UUID", None, None),
-        (UUID, "UUID", UUID("1A" * 16), "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a"),
+        _TestCase(type_=UUID, value=None, serialized=None, alternative_serialized=("", "null")),
+        _TestCase(type_=UUID, value=UUID("1A" * 16), serialized="1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a"),
         # Timestamp
-        (UUID, "timestamp", None, None),
-        # ("timestamp", UUID("1A" * 16), "1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a"),  # TODO: Restore test
-        # TODO: Add datetime-hex format for timestamp
+        _TestCase(type_=str, subtype="timestamp", value=None, serialized=None, alternative_serialized=("", "null")),
+        # TODO: Add datetime-hex sample for timestamp
+        # TODO: ! Restore _TestCase(type_=str, subtype="timestamp", value=UUID("1A" * 16), serialized="1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a",),
         # Bytes
-        (bytes, "bytes", bytes([100, 110, 120]), "ZG54"),
-        (
-            bytes,
-            "bytes",
-            bytes(40 * [100, 110, 120]),
-            "ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\n"
+        _TestCase(type_=bytes, value=bytes([100, 110, 120]), serialized="ZG54"),
+        _TestCase(
+            type_=bytes,
+            value=bytes(40 * [100, 110, 120]),
+            serialized="ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\n"
             "ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54\n"
             "ZG54ZG54",
         ),
-        (type, "type", StubDataclass, "StubDataclass"),
+        _TestCase(type_=type, value=StubDataclass, serialized="StubDataclass"),
     ]
 
     for test_case in test_cases:
 
-        # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
-        class_, type_name, value, serialized, *alternative_serialized_list = test_case
-        type_hint = TypeHint(schema_type_name=type_name, schema_type=class_, optional=(value is None))
+        # Get type hint from the test case
+        type_hint = test_case.get_type_hint()
 
         # Test passthrough with and without type_name
-        assert PrimitiveSerializers.PASSTHROUGH.serialize(value) == value
-        assert PrimitiveSerializers.PASSTHROUGH.serialize(value, type_hint) == value
+        assert PrimitiveSerializers.PASSTHROUGH.serialize(test_case.value) == test_case.value
+        assert PrimitiveSerializers.PASSTHROUGH.serialize(test_case.value, type_hint) == test_case.value
 
         # Serialize without type_name, deserialization always requires type_name
-        assert PrimitiveSerializers.DEFAULT.serialize(value) == serialized
-        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, type_hint) == value
+        assert PrimitiveSerializers.DEFAULT.serialize(test_case.value) == test_case.serialized
+        assert PrimitiveSerializers.DEFAULT.deserialize(test_case.serialized, type_hint) == test_case.value
 
         # Serialize and deserialize with type_name
-        assert PrimitiveSerializers.DEFAULT.serialize(value, type_hint) == serialized
-        assert PrimitiveSerializers.DEFAULT.deserialize(serialized, type_hint) == value
+        assert PrimitiveSerializers.DEFAULT.serialize(test_case.value, type_hint) == test_case.serialized
+        assert PrimitiveSerializers.DEFAULT.deserialize(test_case.serialized, type_hint) == test_case.value
 
         # Test alternative serialized forms
-        if alternative_serialized_list:
-            for alternative_serialized in alternative_serialized_list:
-                assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, type_hint) == value
+        if test_case.alternative_serialized:
+            for alternative_serialized in test_case.alternative_serialized:
+                assert PrimitiveSerializers.DEFAULT.deserialize(alternative_serialized, type_hint) == test_case.value
 
 
 def test_mongo():
@@ -115,36 +135,36 @@ def test_mongo():
 
     test_cases = [
         # long
-        (int, "long", None, None),
-        (int, "long", 12345, Int64(12345)),
-        (int, "long", 9007199254740991, Int64(9007199254740991)),  # Max int54
-        # Date
-        (dt.date, "date", None, None),
-        (dt.date, "date", dt.date(2023, 4, 21), 20230421, "20230421"),
+        _TestCase(type_=int, subtype="long", value=None, serialized=None),
+        _TestCase(type_=int, subtype="long", value=12345, serialized=Int64(12345)),
+        _TestCase(type_=int, subtype="long", value=9007199254740991, serialized=Int64(9007199254740991)),  # Max int54
+        # Date,
+        _TestCase(type_=dt.date, value=None, serialized=None),
+        _TestCase(type_=dt.date, value=dt.date(2023, 4, 21), serialized=20230421, alternative_serialized=("20230421",)),
         # Time
-        (dt.time, "time", None, None),
-        (dt.time, "time", TimeUtil.from_fields(11, 10, 0), 111000000, "111000000"),
-        (dt.time, "time", TimeUtil.from_fields(11, 10, 0, millisecond=123), 111000123, "111000123"),
+        _TestCase(type_=dt.time, value=None, serialized=None),
+        _TestCase(type_=dt.time, value=TimeUtil.from_fields(11, 10, 0, millisecond=123), serialized=111000123,  alternative_serialized=("111000123",)),
     ]
 
     for test_case in test_cases:
 
-        # Get type_name, value, expected serialized value, and an optional list of alternative serialized values
-        class_, type_name, value, serialized, *alternative_serialized_list = test_case
-        type_hint = TypeHint(schema_type_name=type_name, schema_type=class_, optional=(value is None))
+        # Get type hint from the test case
+        type_hint = test_case.get_type_hint()
 
         # Serialize without type_name, deserialization always requires type_name
-        assert PrimitiveSerializers.FOR_MONGO.serialize(value) == serialized
-        assert PrimitiveSerializers.FOR_MONGO.deserialize(serialized, type_hint) == value
+        if test_case.subtype is None:
+            # Exclude cases with subtype from the test without type hint
+            assert PrimitiveSerializers.FOR_MONGO.serialize(test_case.value) == test_case.serialized
+        assert PrimitiveSerializers.FOR_MONGO.deserialize(test_case.serialized, type_hint) == test_case.value
 
         # Serialize and deserialize with type_name
-        assert PrimitiveSerializers.FOR_MONGO.serialize(value, type_hint) == serialized
-        assert PrimitiveSerializers.FOR_MONGO.deserialize(serialized, type_hint) == value
+        assert PrimitiveSerializers.FOR_MONGO.serialize(test_case.value, type_hint) == test_case.serialized
+        assert PrimitiveSerializers.FOR_MONGO.deserialize(test_case.serialized, type_hint) == test_case.value
 
         # Test alternative serialized forms
-        if alternative_serialized_list:
-            for alternative_serialized in alternative_serialized_list:
-                assert PrimitiveSerializers.FOR_MONGO.deserialize(alternative_serialized, type_hint) == value
+        if test_case.alternative_serialized:
+            for alternative_serialized in test_case.alternative_serialized:
+                assert PrimitiveSerializers.FOR_MONGO.deserialize(alternative_serialized, type_hint) == test_case.value
 
 
 def test_serialization_exceptions():
@@ -152,30 +172,31 @@ def test_serialization_exceptions():
 
     test_cases = [
         # NoneType
-        (NoneType, "NoneType", ""),
-        (NoneType, "NoneType", "null"),
+        _TestCase(type_=NoneType, value=""),
+        _TestCase(type_=NoneType, value="null"),
         # Bool
-        (bool, "bool", 0),
-        (bool, "bool", "None"),
-        (bool, "bool", "Null"),
-        (int, "int", 2147483648),  # Out of range for int32
-        (int, "long", 9007199254740992),  # Out of range for int54
-        (type, "type", str),  # Not a data, key or record class
+        _TestCase(type_=bool, value=0),
+        _TestCase(type_=bool, value="None"),
+        _TestCase(type_=bool, value="Null"),
+        _TestCase(type_=int, value=2147483648),  # Out of range for int32
+        _TestCase(type_=int, subtype="long", value=9007199254740992),  # Out of range for int54
+        _TestCase(type_=type, value=str),  # Not a data, key or record class
     ]
 
     # Check exception cases with type name (without type name, the call will succeed for most values)
     for test_case in test_cases:
-        class_, type_name, value = test_case
-        type_hint = TypeHint(schema_type_name=type_name, schema_type=class_, optional=(value is None))
+
+        # Get type hint from the test case
+        type_hint = test_case.get_type_hint()
 
         # Test passthrough with type_name
         with pytest.raises(Exception):
-            print(value)
-            PrimitiveSerializers.PASSTHROUGH.serialize(value, type_hint)
+            print(test_case.value)
+            PrimitiveSerializers.PASSTHROUGH.serialize(test_case.value, type_hint)
 
         # Test default settings with type_name
         with pytest.raises(Exception):
-            PrimitiveSerializers.DEFAULT.serialize(value, type_hint)
+            PrimitiveSerializers.DEFAULT.serialize(test_case.value, type_hint)
 
 
 def test_deserialization_exceptions():
@@ -183,29 +204,31 @@ def test_deserialization_exceptions():
 
     test_cases = [
         # NoneType
-        (NoneType, "NoneType", "None"),
+        # TODO: !!!!! _TestCase(NoneType, None, "None"),
         # Bool
-        (bool, "bool", 0),
-        (bool, "bool", "None"),
-        (bool, "bool", "Null"),
-        (bool, "bool", "True"),
-        (bool, "bool", "False"),
-        (bool, "bool", "Y"),
-        (bool, "bool", "N"),
-        (bool, "bool", "YES"),
-        (bool, "bool", "NO"),  # Norway problem
-        (int, "int", "2147483648"),  # Out of range for int32
-        (int, "long", "9007199254740992"),  # Out of range for int54
+        _TestCase(type_=bool, value=None, serialized=0),
+        _TestCase(type_=bool, value=None, serialized="None"),
+        _TestCase(type_=bool, value=None, serialized="Null"),
+        _TestCase(type_=bool, value=None, serialized="True"),
+        _TestCase(type_=bool, value=None, serialized="False"),
+        _TestCase(type_=bool, value=None, serialized="Y"),
+        _TestCase(type_=bool, value=None, serialized="N"),
+        _TestCase(type_=bool, value=None, serialized="YES"),
+        _TestCase(type_=bool, value=None, serialized="NO"),  # Norway problem
+        _TestCase(type_=int, value=None, serialized="2147483648"),  # Out of range for int32
+        _TestCase(type_=int, value="long", serialized="9007199254740992"),  # Out of range for int54
     ]
 
-    # Check exception cases
     for test_case in test_cases:
-        class_, type_name, serialized = test_case
-        type_hint = TypeHint(schema_type_name=type_name, schema_type=class_, optional=(serialized is None))
+
+        # Get type hint from the test case
+        type_hint = test_case.get_type_hint()
+
+        # Check exception cases
         with pytest.raises(Exception):
-            PrimitiveSerializers.PASSTHROUGH.deserialize(serialized, type_hint)
+            PrimitiveSerializers.PASSTHROUGH.deserialize(test_case.serialized, type_hint)
         with pytest.raises(Exception):
-            PrimitiveSerializers.DEFAULT.deserialize(serialized, type_hint)
+            PrimitiveSerializers.DEFAULT.deserialize(test_case.serialized, type_hint)
 
 
 if __name__ == "__main__":

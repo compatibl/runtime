@@ -33,7 +33,7 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.primitive.uuid_util import UuidUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PrimitiveTypes
+from cl.runtime.records.protocols import PrimitiveTypes, is_empty
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
@@ -109,59 +109,74 @@ class PrimitiveSerializer(Serializer):
                        the same class with another type (e.g. long and int types share the int class)
         """
 
-        # Get type name of data, which may be a type
-        data_class_name = typename(type(data))
-
-        # Get parameters from the type chain, considering the possibility that it may be None
-        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
-        is_optional = type_hint.optional if type_hint is not None else None
-
-        # Validate that schema_type_name is compatible with value_class_name if specified
-        # Because the value of None is passed through, value_class_name NoneType is compatible with any schema_type_name
-        if not (
-            data is None
-            or schema_type_name is None
-            or data_class_name == schema_type_name
-            or (schema_type_name == "long" and data_class_name == "int")
-            or (schema_type_name == "timestamp" and data_class_name == "UUID")
-            or (schema_type_name == "type" and isinstance(data, type))
-        ):
-            raise RuntimeError(
-                f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
-            )
-
-        # Serialize based on value_class_name, using schema_type_name to distinguish between types that share the same class
-        if data is None:
+        # Handle None or empty data first
+        if is_empty(data):
+            # Set to True if type hint is not specified
+            is_optional = type_hint.optional if type_hint is not None else True
             if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
-                if type_hint is None or type_hint.schema_type_name == "NoneType" or is_optional:
+                if is_optional:
                     return None
                 else:
                     raise RuntimeError(f"Field value is None but type hint {type_hint.to_str()} does not allow it.")
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
-        elif data_class_name == "str":
+
+        # Get type name of data, which may be a type
+        data_class_name = "type" if isinstance(data, type) else typename(type(data))
+
+        # Ensure there is no remaining component (type hint is not a sequence or mapping)
+        if type_hint is not None and type_hint.remaining:
+            raise RuntimeError(
+                f"Data is an instance of a primitive class {data_class_name} which is\n"
+                f"incompatible with a composite type hint:\n"
+                f"{type_hint.to_str()}."
+            )
+
+        # Set schema_type_name based on type hint or data if not provided
+        if type_hint is not None:
+            schema_type_name = typename(type_hint.schema_type)
+        else:
+            # To allow ABCMeta and other metaclasses derived from type to pass the check
+            schema_type_name = data_class_name
+
+        # Check that schema type matches data type
+        if data_class_name != schema_type_name:
+            raise RuntimeError(
+                f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
+            )
+
+        # Validate that subtype is compatible with schema_type_name
+        subtype = type_hint.subtype if type_hint is not None else None
+        if (
+            (schema_type_name == "int" and subtype not in (None, "long")) or
+            (schema_type_name == "str" and subtype not in (None, "timestamp"))
+        ):
+            raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
+
+        # Serialize based schema_type_name, taking into account metaclass
+        if schema_type_name == "str":
             if (value_format := self.string_format) == StringFormat.PASSTHROUGH:
                 # Return None for an empty string
                 return data if data else None
             else:
                 raise ErrorUtil.enum_value_error(value_format, StringFormat)
-        elif data_class_name == "float":
+        elif schema_type_name == "float":
             if (value_format := self.float_format) == FloatFormat.PASSTHROUGH:
                 return data
             elif value_format == FloatFormat.DEFAULT:
                 return FloatUtil.format(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, FloatFormat)
-        elif data_class_name == "bool":
+        elif schema_type_name == "bool":
             if (value_format := self.bool_format) == BoolFormat.PASSTHROUGH:
                 return data
             elif value_format == BoolFormat.DEFAULT:
                 return BoolUtil.to_str_or_none(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, BoolFormat)
-        elif data_class_name == "int":
-            if schema_type_name is not None and schema_type_name == "int":
-                # Use methods that check that the value is in 32-bit signed integer range
+        elif schema_type_name == "int":
+            if subtype is None:
+                # Use methods that check that the value is in 32-bit signed integer range if subtype is not specified
                 # if schema_type_name is specified and is int rather than long
                 if (value_format := self.int_format) == IntFormat.PASSTHROUGH:
                     check_int_32(data)
@@ -170,8 +185,8 @@ class PrimitiveSerializer(Serializer):
                     return IntUtil.to_str(data)
                 else:
                     raise ErrorUtil.enum_value_error(value_format, IntFormat)
-            elif schema_type_name is not None and schema_type_name == "long":
-                # Use methods that check that the value is in 54-bit signed integer range
+            elif subtype == "long":
+                # Use methods that check that the value is in 54-bit signed integer range if subtype == "long"
                 # if schema_type_name is specified and is long
                 if (value_format := self.long_format) == LongFormat.PASSTHROUGH:
                     check_int_54(data)
@@ -183,17 +198,8 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise ErrorUtil.enum_value_error(value_format, LongFormat)
             else:
-                # Otherwise do not perform range checks and use the convention for long
-                # TODO: Use conventions depending on value instead?
-                if (value_format := self.long_format) == LongFormat.PASSTHROUGH:
-                    return data
-                elif value_format == LongFormat.DEFAULT:
-                    return LongUtil.to_str(data)
-                elif value_format == LongFormat.BSON_INT_64:
-                    return Int64(data)
-                else:
-                    raise ErrorUtil.enum_value_error(value_format, LongFormat)
-        elif data_class_name == "date":
+                raise RuntimeError(f"Subtype {subtype} is not valid for type '{schema_type_name}'.")
+        elif schema_type_name == "date":
             if (value_format := self.date_format) == DateFormat.PASSTHROUGH:
                 return data
             elif value_format == DateFormat.DEFAULT:
@@ -202,7 +208,7 @@ class PrimitiveSerializer(Serializer):
                 return DateUtil.to_iso_int(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, DateFormat)
-        elif data_class_name == "time":
+        elif schema_type_name == "time":
             if (value_format := self.time_format) == TimeFormat.PASSTHROUGH:
                 return data
             elif value_format == TimeFormat.DEFAULT:
@@ -211,38 +217,22 @@ class PrimitiveSerializer(Serializer):
                 return TimeUtil.to_iso_int(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, TimeFormat)
-        elif data_class_name == "datetime":
+        elif schema_type_name == "datetime":
             if (value_format := self.datetime_format) == DatetimeFormat.PASSTHROUGH:
                 return data
             elif value_format == DatetimeFormat.DEFAULT:
                 return DatetimeUtil.to_str(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, DatetimeFormat)
-        elif data_class_name == "UUID":
-            if data.version != 7 or (schema_type_name is not None and schema_type_name == "UUID"):
-                if (value_format := self.uuid_format) == UuidFormat.PASSTHROUGH:
-                    return data
-                elif value_format == UuidFormat.DEFAULT:
-                    # Use the standard delimited UUID format
-                    return UuidUtil.to_str(data)
-                else:
-                    raise ErrorUtil.enum_value_error(value_format, UuidFormat)
+        elif schema_type_name == "UUID":
+            if (value_format := self.uuid_format) == UuidFormat.PASSTHROUGH:
+                return data
+            elif value_format == UuidFormat.DEFAULT:
+                # Use the standard delimited UUID format
+                return UuidUtil.to_str(data)
             else:
-                # Under else, value.version == 7 and schema_type_name != "UUID"
-                if schema_type_name is not None and schema_type_name != "timestamp":
-                    raise RuntimeError("For UUID version 7, only UUID or timestamp types are valid.")
-
-                if (value_format := self.timestamp_format) == TimestampFormat.PASSTHROUGH:
-                    return data
-                elif value_format == TimestampFormat.DEFAULT:
-                    # Use timestamp-hex UUIDv7 format
-                    return Timestamp.from_uuid7(data)
-                elif value_format == TimestampFormat.UUID:
-                    # Use the standard delimited UUID format
-                    return UuidUtil.to_str(data)
-                else:
-                    raise ErrorUtil.enum_value_error(value_format, TimestampFormat)
-        elif data_class_name == "bytes":
+                raise ErrorUtil.enum_value_error(value_format, UuidFormat)
+        elif schema_type_name == "bytes":
             if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
                 return data
             elif value_format == BytesFormat.DEFAULT:
@@ -253,19 +243,19 @@ class PrimitiveSerializer(Serializer):
                 return base64.b64encode(data).decode("utf-8")  # TODO: Create BytesUtil
             else:
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
-        elif isinstance(data, type):
+        elif schema_type_name == "type":
+            # Check this is a known type
+            TypeCache.guard_known_type(data)
             if (type_format := self.type_format) == TypeFormat.PASSTHROUGH:
-                # Return data after checking it is a known type
-                assert TypeCache.guard_known_type(data)
+                # Return type
                 return data
             elif type_format == TypeFormat.DEFAULT:
-                # Return type name after checking it is a known type
-                assert TypeCache.guard_known_type(data)
+                # Return type name
                 return typename(data)
             else:
                 raise ErrorUtil.enum_value_error(type_format, TypeFormat)
         else:
-            raise RuntimeError(f"Class {data_class_name} cannot be serialized using {type(self).__name__}.")
+            raise RuntimeError(f"Class {schema_type_name} is not supported by {type(self).__name__}.")
 
     def deserialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """
@@ -281,43 +271,57 @@ class PrimitiveSerializer(Serializer):
         """
 
         # Get parameters from the type chain, considering the possibility that it may be None
-        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
-        is_optional = (
-            type_hint.optional if type_hint is not None else None
-        )  # TODO: Add a check for optional if value is not provided
+        schema_type_name = typename(type_hint.schema_type) if type_hint is not None else None
+        subtype = type_hint.subtype if type_hint is not None else None
 
-        # Check if data is empty and validate is_optional flag
-        is_data_empty = data in [None, "", "null"]
-        if is_data_empty and not is_optional:
-            raise RuntimeError("Serialized data is empty but marked as required.")
-
-        if schema_type_name == "NoneType":  # TODO: Review the logic for None
-            if is_data_empty:
-                # Treat an empty string and "null" as None
-                return None
-            else:
-                raise self._deserialization_error(data, schema_type_name, self.none_format)
-        elif schema_type_name == "str":
-            if (value_format := self.string_format) == StringFormat.PASSTHROUGH:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
+        # Handle None and its supported serialized representations first
+        if data in [None, "", "null"]:
+            # Set to True if type hint is not specified
+            is_optional = type_hint.optional if type_hint is not None else True
+            if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
+                if is_optional:
                     return None
                 else:
+                    type_hint_str = f" for type hint '{type_hint.to_str()}'." if type_hint else "."
+                    raise RuntimeError(f"Serialized data is None or empty but marked as required{type_hint_str}")
+            else:
+                raise ErrorUtil.enum_value_error(value_format, NoneFormat)
+
+        # Ensure there is no remaining component (type hint is not a sequence or mapping)
+        if type_hint is not None and type_hint.remaining:
+            raise RuntimeError(
+                f"Primitive type {schema_type_name} is incompatible with a composite type hint: {type_hint.to_str()}."
+            )
+
+        if schema_type_name == "str":
+            if subtype is None:
+                if (value_format := self.string_format) == StringFormat.PASSTHROUGH:
                     if isinstance(data, str):
                         # Deserialize from string, strip leading and trailing triple quotes if present
                         data = CsvUtil.strip_quotes(data)
                         return data
                     else:
                         raise self._deserialization_error(data, schema_type_name, self.string_format)
+                else:
+                    raise ErrorUtil.enum_value_error(value_format, StringFormat)
+            elif subtype == "timestamp":
+                if (value_format := self.string_format) == StringFormat.PASSTHROUGH:
+                    if isinstance(data, str):
+                        # Deserialize from string, strip leading and trailing triple quotes if present
+                        data = CsvUtil.strip_quotes(data)
+                        # Fast timestamp format validation without a full date validity check
+                        Timestamp.guard_valid(data, fast=True)
+                        return data
+                    else:
+                        raise self._deserialization_error(data, schema_type_name, self.string_format)
+                else:
+                    raise ErrorUtil.enum_value_error(value_format, StringFormat)
             else:
-                raise ErrorUtil.enum_value_error(value_format, StringFormat)
+                raise RuntimeError(f"Subtype {subtype} is not valid for type '{schema_type_name}'.")
         elif schema_type_name == "float":
             if (value_format := self.float_format) in [FloatFormat.PASSTHROUGH, FloatFormat.DEFAULT]:
                 # Accept additional input types in addition to the one generated by the serializer
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
                     data = CsvUtil.strip_quotes(data)
                     return float(data)  # TODO: !!! Use FloatUtil
@@ -339,10 +343,7 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             elif value_format == BoolFormat.DEFAULT:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Deserialize from string
                     return BoolUtil.from_str(data)
                 else:
@@ -350,66 +351,57 @@ class PrimitiveSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, BoolFormat)
         elif schema_type_name == "int":
-            if (value_format := self.int_format) in [IntFormat.PASSTHROUGH, IntFormat.DEFAULT]:
-                # Accept both passthrough and default formats
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
-                    # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = CsvUtil.strip_quotes(data)
-                    # Checks that value is within 32-bit signed integer range
-                    return IntUtil.from_str(data)
-                elif isinstance(data, int):
-                    # Passthrough int after checking that value is within 32-bit signed integer range
-                    check_int_32(data)
-                    return data
-                elif isinstance(data, float):
-                    # Checks that the value is round and is within 32-bit signed integer range
-                    return IntUtil.from_float(data)
+            if subtype is None:
+                if (value_format := self.int_format) in [IntFormat.PASSTHROUGH, IntFormat.DEFAULT]:
+                    # Accept both passthrough and default formats
+                    if isinstance(data, str):
+                        # Deserialize from string, strip leading and trailing triple quotes if present
+                        data = CsvUtil.strip_quotes(data)
+                        # Checks that value is within 32-bit signed integer range
+                        return IntUtil.from_str(data)
+                    elif isinstance(data, int):
+                        # Passthrough int after checking that value is within 32-bit signed integer range
+                        check_int_32(data)
+                        return data
+                    elif isinstance(data, float):
+                        # Checks that the value is round and is within 32-bit signed integer range
+                        return IntUtil.from_float(data)
+                    else:
+                        raise self._deserialization_error(data, schema_type_name, value_format)
                 else:
-                    raise self._deserialization_error(data, schema_type_name, value_format)
+                    raise ErrorUtil.enum_value_error(value_format, IntFormat)
+            elif subtype == "long":
+                if (value_format := self.long_format) in [LongFormat.PASSTHROUGH, LongFormat.DEFAULT]:
+                    # Accept both passthrough and default formats
+                    if isinstance(data, str):
+                        # Deserialize from string, strip leading and trailing triple quotes if present
+                        data = CsvUtil.strip_quotes(data)
+                        # Checks that value is within 54-bit signed integer range
+                        return LongUtil.from_str(data)
+                    elif isinstance(data, int):
+                        # Passthrough int after checking that value is within 54-bit signed integer range
+                        # that can be represented exactly by a float
+                        check_int_54(data)
+                        return data
+                    elif isinstance(data, float):
+                        # Checks that the value is round and is within 54-bit signed integer range
+                        # that can be represented exactly by a float
+                        return LongUtil.from_float(data)
+                    else:
+                        raise self._deserialization_error(data, schema_type_name, value_format)
+                elif value_format == LongFormat.BSON_INT_64:
+                    if isinstance(data, Int64):
+                        return int(data)
+                    else:
+                        raise self._deserialization_error(data, schema_type_name, value_format)
+                else:
+                    raise ErrorUtil.enum_value_error(value_format, LongFormat)
             else:
-                raise ErrorUtil.enum_value_error(value_format, IntFormat)
-        elif schema_type_name == "long":
-            if (value_format := self.long_format) in [LongFormat.PASSTHROUGH, LongFormat.DEFAULT]:
-                # Accept both passthrough and default formats
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
-                    # Deserialize from string, strip leading and trailing triple quotes if present
-                    data = CsvUtil.strip_quotes(data)
-                    # Checks that value is within 54-bit signed integer range
-                    return LongUtil.from_str(data)
-                elif isinstance(data, int):
-                    # Passthrough int after checking that value is within 54-bit signed integer range
-                    # that can be represented exactly by a float
-                    check_int_54(data)
-                    return data
-                elif isinstance(data, float):
-                    # Checks that the value is round and is within 54-bit signed integer range
-                    # that can be represented exactly by a float
-                    return LongUtil.from_float(data)
-                else:
-                    raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == LongFormat.BSON_INT_64:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, Int64):
-                    return int(data)
-                else:
-                    raise self._deserialization_error(data, schema_type_name, value_format)
-            else:
-                raise ErrorUtil.enum_value_error(value_format, LongFormat)
+                raise RuntimeError(f"Subtype {subtype} is not valid for type '{schema_type_name}'.")
         elif schema_type_name == "date":
             if (value_format := self.date_format) in [DateFormat.PASSTHROUGH, DateFormat.DEFAULT]:
                 # Accept both passthrough and default formats
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
                     data = CsvUtil.strip_quotes(data)
                     # Date as string in ISO-8601 string format ("yyyy-mm-dd")
@@ -420,10 +412,7 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             elif value_format == DateFormat.ISO_INT:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
                     data = CsvUtil.strip_quotes(data)
                     # Date as string in ISO int format without separators ("yyyymmdd")
@@ -438,10 +427,7 @@ class PrimitiveSerializer(Serializer):
         elif schema_type_name == "time":
             if (value_format := self.time_format) in [TimeFormat.PASSTHROUGH, TimeFormat.DEFAULT]:
                 # Accept both passthrough and default formats
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
                     data = CsvUtil.strip_quotes(data)
                     # Convert from string in ISO-8601 format with milliseconds ("hh:mm:ss.fff")
@@ -452,10 +438,7 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             elif value_format == TimeFormat.ISO_INT:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Time as string in ISO int format without separators with milliseconds ("hhmmssfff")
                     return TimeUtil.from_iso_int(int(data))
                 elif isinstance(data, int):
@@ -468,10 +451,7 @@ class PrimitiveSerializer(Serializer):
         elif schema_type_name == "datetime":
             if (value_format := self.datetime_format) in [DatetimeFormat.PASSTHROUGH, DatetimeFormat.DEFAULT]:
                 # Accept both passthrough and default formats
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Deserialize from string, strip leading and trailing triple quotes if present
                     data = CsvUtil.strip_quotes(data)
                     # Convert from string in ISO-8601 format with milliseconds in UTC ("yyyy-mm-ddThh:mm:ss.fffZ")
@@ -491,62 +471,13 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             elif value_format == UuidFormat.DEFAULT:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Accepts both standard format for any UUID version and timestamp-hex format for version 7
                     return UuidUtil.from_str(data)
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:
                 raise ErrorUtil.enum_value_error(value_format, UuidFormat)
-        elif schema_type_name == "timestamp":
-            if (value_format := self.timestamp_format) == TimestampFormat.PASSTHROUGH:
-                if data is None:
-                    # Pass through None
-                    return data
-                elif isinstance(data, UUID):
-                    # Pass through UUID after checking version
-                    if data.version != 7:
-                        raise RuntimeError("For timestamp type, only version 7 of UUID is valid.")
-                    return data
-                else:
-                    raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == TimestampFormat.DEFAULT:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
-                    result = UuidUtil.from_str(data)
-                    # Accepts both standard format for any UUID version and timestamp-hex format for version 7,
-                    # perform an explicit check to ensure UUID version matches the subtype
-                    if result.version != 7:
-                        raise RuntimeError("For timestamp type, only version 7 of UUID is valid.")
-                    return result
-                else:
-                    raise self._deserialization_error(data, schema_type_name, value_format)
-            elif value_format == TimestampFormat.UUID:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
-                    if is_data_empty:
-                        # Treat an empty string and "null" as None
-                        return None
-                    elif isinstance(data, str):
-                        result = UuidUtil.from_str(data)
-                        # Accepts both standard format for any UUID version and timestamp-hex format for version 7,
-                        # perform an explicit check to ensure UUID version matches the subtype
-                        if result.version != 7:
-                            raise RuntimeError("For timestamp type, only version 7 of UUID is valid.")
-                        return result
-                    else:
-                        raise self._deserialization_error(data, schema_type_name, value_format)
-                else:
-                    raise self._deserialization_error(data, schema_type_name, value_format)
-            else:
-                raise ErrorUtil.enum_value_error(value_format, TimestampFormat)
         elif schema_type_name == "bytes":
             if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
                 if data is None or isinstance(data, bytes):
@@ -555,19 +486,13 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             elif value_format == BytesFormat.DEFAULT:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Base64 encoding for bytes, the decoder accepts any line wrap convention
                     return base64.b64decode(data)  # TODO: Create BytesUtil
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             elif value_format == BytesFormat.COMPACT:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Base64 encoding for bytes, the decoder accepts any line wrap convention
                     return base64.b64decode(data)  # TODO: Create BytesUtil
                 else:
@@ -586,10 +511,7 @@ class PrimitiveSerializer(Serializer):
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             elif value_format == TypeFormat.DEFAULT:
-                if is_data_empty:
-                    # Treat an empty string and "null" as None
-                    return None
-                elif isinstance(data, str):
+                if isinstance(data, str):
                     # Get type from string typename, must be a known type
                     return TypeCache.from_type_name(data)
                 else:
@@ -597,9 +519,8 @@ class PrimitiveSerializer(Serializer):
             else:
                 raise ErrorUtil.enum_value_error(value_format, TypeFormat)
         else:
-            value_class_name = typename(type(data))
-            serializer_type_name = typename(type(self))
-            raise RuntimeError(f"Class {value_class_name} cannot be serialized using {serializer_type_name}.")
+            type_hint_str = f" in type hint '{type_hint.to_str()}' " if type_hint else " "
+            raise RuntimeError(f"Type '{schema_type_name}'{type_hint_str}is not supported by {typename(type(self))}.")
 
     @classmethod
     def _deserialization_error(cls, value: PrimitiveTypes | None, type_name: str, type_format: IntEnum) -> Exception:

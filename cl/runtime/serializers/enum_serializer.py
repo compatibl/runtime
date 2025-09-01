@@ -39,16 +39,16 @@ class EnumSerializer(Serializer):
         """Serialize an enum to a string or another primitive type (return None if value is None)."""
         if data is None:
             if type_hint is not None and not type_hint.optional:
-                raise RuntimeError(f"Enum {type_hint.schema_type_name} value is None but marked as required.")
+                raise RuntimeError(f"Enum {typename(type_hint.schema_type)} value is None but marked as required.")
             elif (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
                 return data
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
         elif isinstance(data, Enum):
             # Check that schema type matches if specified
-            if type_hint is not None and type_hint.schema_type_name != (data_type_name := typename(type(data))):
+            if type_hint is not None and typename(type_hint.schema_type) != (data_type_name := typename(type(data))):
                 raise RuntimeError(
-                    f"Enum value type {data_type_name} does not match the schema type {type_hint.schema_type_name}."
+                    f"Enum value type {data_type_name} does not match the schema type {typename(type_hint.schema_type)}."
                 )
             # Serialize according to settings
             if (value_format := self.enum_format) == EnumFormat.PASSTHROUGH:
@@ -71,7 +71,7 @@ class EnumSerializer(Serializer):
             raise RuntimeError(f"Type hint must specify the class for enum deserialization.")
         elif data in [None, "", "null"]:
             if not type_hint.optional:
-                raise RuntimeError(f"Enum {type_hint.schema_type_name} value is None but marked as required.")
+                raise RuntimeError(f"Enum {typename(type_hint.schema_type)} value is None but marked as required.")
             if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
                 return data
             else:

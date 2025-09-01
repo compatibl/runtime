@@ -249,7 +249,7 @@ class Timestamp:
         return result
 
     @classmethod
-    def validate(  # TODO: Rename to validate_str
+    def validate(  # TODO: Rename to validate_str, check if it should be merged with guard_valid
         cls,
         timestamp: str,
         *,

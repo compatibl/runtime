@@ -18,17 +18,10 @@ from cl.runtime.primitive.limits import check_int_32
 from cl.runtime.primitive.limits import check_int_54
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.builder_util import BuilderUtil
-from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_CLASS_NAMES, is_primitive_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
-
-_PASSTHROUGH_CLASS_NAMES = {"bool", "date", "time", "datetime", "UUID", "bytes"}
-"""Class names for which the argument is returned as is after checking that a required value is not None."""
-
-_SUBTYPED_CLASS_NAMES = {"str", "int", "float"}  # TODO: !!! Refactor to avoid creating additional lists
-"""Class names that have subtypes."""
-
 
 class PrimitiveUtil(BuilderUtil):
     """Helper methods for implementing the builder pattern with primitive fields."""
@@ -55,22 +48,40 @@ class PrimitiveUtil(BuilderUtil):
                 )
                 raise RuntimeError(f"Required field is not specified.{location_str}")
 
-        # Get the actual type name of data, which may be a type
-        data_class_name = typename(type(data))
+        # Get type name of data, which may be a type
+        data_class_name = "type" if isinstance(data, type) else typename(type(data))
 
-        # Get the expected type name, which may include subtypes such as long or timestamp
-        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
-
-        # Ensure there is no remaining chain (type hint is not a sequence or mapping)
-        if type_hint.remaining:
+        # Ensure there is no remaining component (type hint is not a sequence or mapping)
+        if type_hint is not None and type_hint.remaining:
             raise RuntimeError(
                 f"Data is an instance of a primitive class {data_class_name} which is\n"
                 f"incompatible with a composite type hint:\n"
                 f"{type_hint.to_str()}."
             )
 
+        # Set schema_type_name based on type hint or data if not provided
+        if type_hint is not None:
+            schema_type_name = typename(type_hint.schema_type)
+        else:
+            # To allow ABCMeta and other metaclasses derived from type to pass the check
+            schema_type_name = data_class_name
+
+        # Check that schema type matches data type
+        if data_class_name != schema_type_name:
+            raise RuntimeError(
+                f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
+            )
+
+        # Validate that subtype is compatible with schema_type_name
+        subtype = type_hint.subtype if type_hint is not None else None
+        if (
+            (schema_type_name == "int" and subtype not in (None, "long")) or
+            (schema_type_name == "str" and subtype not in (None, "timestamp"))
+        ):
+            raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
+
         # Validate that the actual data type matches the expected type (which may have subtypes)
-        if data_class_name != schema_type_name and data_class_name not in _SUBTYPED_CLASS_NAMES:
+        if data_class_name != schema_type_name:
             location_str = cls._get_location_str(
                 typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
             )
@@ -78,15 +89,12 @@ class PrimitiveUtil(BuilderUtil):
                 f"Actual field type is {data_class_name} while {schema_type_name} was expected.{location_str}"
             )
 
-        # Use schema_type_name to distinguish between types that share the same class
-        if data_class_name in _PASSTHROUGH_CLASS_NAMES:
-            # We already checked that the type matches the schema and handled None
-            return data
-        elif data_class_name == "str":
-            if schema_type_name == "str":
+        # Use subtype to distinguish between types that share the same class
+        if data_class_name == "str":
+            if subtype is None:
                 # No further checks are required
                 return data
-            elif schema_type_name == "timestamp":
+            elif subtype == "timestamp":
                 # Perform fast check for valid format
                 assert Timestamp.guard_valid(data, fast=True, value_name=field_name, data_type=outer_type_name)
                 return data
@@ -94,22 +102,19 @@ class PrimitiveUtil(BuilderUtil):
                 location_str = cls._get_location_str(
                     typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
-                raise RuntimeError(
-                    f"Data type '{data_class_name}' can only be used for fields declared as str or timestamp.\n"
-                    f"It is not a valid type for a field declared as {schema_type_name}.{location_str}"
-                )
+                raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_class_name}.{location_str}")
         elif data_class_name == "int":
-            if schema_type_name == "int":
+            if subtype is None:
                 # Check that the value is in 32-bit signed integer range
                 # if schema_type_name is specified and is int rather than long
-                check_int_32(data)
+                check_int_54(data)  # TODO: !! Check for 32 after identifying test cases with 54
                 return data
-            elif schema_type_name == "long":
+            elif subtype == "long":
                 # Check that the value is in 54-bit signed integer range
                 # if schema_type_name is specified and is long
                 check_int_54(data)
                 return data
-            elif schema_type_name == "float":
+            elif subtype == "float":  # TODO: !! Add full support for this subtype
                 # Check that the value is in 54-bit signed integer range
                 # which can be stored as float without losing precision
                 check_int_54(data)
@@ -119,30 +124,29 @@ class PrimitiveUtil(BuilderUtil):
                 location_str = cls._get_location_str(
                     typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
-                raise RuntimeError(
-                    f"Data type '{data_class_name}' can only be used for fields declared as int, long, or float.\n"
-                    f"It is not a valid type for a field declared as {schema_type_name}.{location_str}"
-                )
+                raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_class_name}.{location_str}")
         elif data_class_name == "float":
-            if schema_type_name == "float":
+            if subtype is None:
                 # No further checks are required
                 return data
-            elif schema_type_name == "int":
+            elif subtype == "int":
                 # This method also performs the check that the value is in 32-bit signed integer range
                 return FloatUtil.to_int(data)
-            elif schema_type_name == "long":
+            elif subtype == "long":
                 # This method also performs the check that the value is in 54-bit signed integer range
                 return FloatUtil.to_long(data)
             else:
                 location_str = cls._get_location_str(
                     typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
-                raise RuntimeError(
-                    f"Data type '{data_class_name}' can only be used for fields declared as float, int or long.\n"
-                    f"It is not a valid type for a field declared as {schema_type_name}.{location_str}"
-                )
+                raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_class_name}.{location_str}")
         elif data_class_name == "type":
             assert TypeCache.guard_known_type(data)
+            return data
+        elif is_primitive_type(type(data)):
+            # We already checked that the type matches the schema and handled None,
+            # The rest of the primitive types are passed through as is
+            # TODO: !!! Add validation of datetime and other types, including for whole milliseconds
             return data
         else:
             primitive_class_names_str = "\n".join(PRIMITIVE_CLASS_NAMES)

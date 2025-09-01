@@ -142,7 +142,7 @@ class KeySerializer(Serializer):
         data_type_name = typename(type(data))
 
         # Get parameters from the type chain, considering the possibility that it may be None
-        schema_type_name = type_hint.schema_type_name if type_hint is not None else data_type_name
+        schema_type_name = typename(type_hint.schema_type) if type_hint is not None else data_type_name
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
 

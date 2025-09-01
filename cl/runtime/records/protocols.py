@@ -39,7 +39,7 @@ PRIMITIVE_TYPE_NAMES = (
     "time",
     "datetime",
     "UUID",
-    "timestamp",  # Stored in UUID class
+    "timestamp",  # TODO: !!!! Stored in str class
     "bytes",
     "type",
 )

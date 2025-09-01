@@ -35,7 +35,7 @@ class PrimitiveSpec(TypeSpec):
             if (
                 # Supported combinations only
                 (subtype == "long" and class_name == "int")
-                or (subtype == "timestamp" and class_name == "UUID")
+                or (subtype == "timestamp" and class_name == "str")
             ):
                 return PrimitiveSpec(type_name=subtype, type_kind=TypeKind.PRIMITIVE, type_=class_)
             else:

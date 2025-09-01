@@ -47,7 +47,7 @@ class DataUtil(BuilderUtil):
         field_name: str | None = None,
     ) -> Any:
         # Get parameters from type_hint if specified, otherwise set to None
-        schema_type_name = type_hint.schema_type_name if type_hint is not None else None
+        schema_type_name = typename(type_hint.schema_type) if type_hint is not None else None
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
 
@@ -197,7 +197,7 @@ class DataUtil(BuilderUtil):
                 # Get the actual type name of data, which may be a type
                 data_class_name = typename(type(data))
                 # Get the expected type name, which may include subtypes such as long or timestamp
-                schema_type_name = type_hint.schema_type_name if type_hint is not None else None
+                schema_type_name = typename(type_hint.schema_type) if type_hint is not None else None
                 if data_class_name != schema_type_name:
                     raise RuntimeError(
                         f"An empty instance of primitive type has type {data_class_name}\n"

@@ -38,15 +38,15 @@ class TypeSchema:
 
     _spec_dict: dict[str, TypeSpec] = {
         "str": PrimitiveSpec.from_class(str),
+        "timestamp": PrimitiveSpec.from_class(str, subtype="timestamp"),  # TODO: Do we need these cases when using subtype?
         "float": PrimitiveSpec.from_class(float),
         "bool": PrimitiveSpec.from_class(bool),
         "int": PrimitiveSpec.from_class(int),
-        "long": PrimitiveSpec.from_class(int, subtype="long"),
+        "long": PrimitiveSpec.from_class(int, subtype="long"),  # TODO: Do we need these cases when using subtype?
         "date": PrimitiveSpec.from_class(dt.date),
         "time": PrimitiveSpec.from_class(dt.time),
         "datetime": PrimitiveSpec.from_class(dt.datetime),
         "UUID": PrimitiveSpec.from_class(UUID),
-        "timestamp": PrimitiveSpec.from_class(UUID, subtype="timestamp"),
         "bytes": PrimitiveSpec.from_class(float),
     }
     """Dictionary of type specs indexed by type name and initialized with primitive types."""

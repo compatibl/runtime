@@ -87,13 +87,13 @@ class EnumUtil(BuilderUtil):
     ) -> Any:
         if data is None:
             if type_hint is not None and not type_hint.optional:
-                raise RuntimeError(f"Enum {type_hint.schema_type_name} value is None but marked as required.")
+                raise RuntimeError(f"Enum {typename(type_hint.schema_type)} value is None but marked as required.")
             return data
         elif isinstance(data, Enum):
             # Check that schema type matches if specified
-            if type_hint is not None and type_hint.schema_type_name != (data_type_name := typename(type(data))):
+            if type_hint is not None and typename(type_hint.schema_type) != (data_type_name := typename(type(data))):
                 raise RuntimeError(
-                    f"Enum value type {data_type_name} does not match the schema type {type_hint.schema_type_name}."
+                    f"Enum value type {data_type_name} does not match the schema type {typename(type_hint.schema_type)}."
                 )
             return data
         else:
