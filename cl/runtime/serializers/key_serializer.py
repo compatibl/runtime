@@ -20,6 +20,7 @@ from typing import Deque
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES

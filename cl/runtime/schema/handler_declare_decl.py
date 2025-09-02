@@ -14,13 +14,14 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.handler_param_decl import HandlerParamDecl
 from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 
 
 @dataclass(slots=True, kw_only=True)
-class HandlerDeclareDecl(DataMixin):
+class HandlerDeclareDecl(DataclassMixin):
     """Handler declaration data."""
 
     name: str = required()

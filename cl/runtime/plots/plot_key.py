@@ -13,12 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True)
-class PlotKey(KeyMixin):
+class PlotKey(DataclassMixin, KeyMixin):
     """Base class for plot objects."""
 
     plot_id: str = required()

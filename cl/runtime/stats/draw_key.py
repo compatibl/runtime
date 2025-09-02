@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class DrawKey(KeyMixin):
+class DrawKey(DataclassMixin, KeyMixin):
     """Keep track of a unique draw identifier consisting of dot-delimited draw indices for each nested draw context."""
 
     draw_id: str = required()

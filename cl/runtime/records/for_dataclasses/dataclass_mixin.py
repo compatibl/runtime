@@ -12,18 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
+from abc import ABC
 from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
-from cl.runtime.records.for_dataclasses.extensions import required
 
 
-@dataclass(slots=True, kw_only=True)
-class DagNodePosition(DataclassMixin):
-    """Directed acyclic graph (DAG) node position."""
+class DataclassMixin(DataMixin, ABC):
+    """Implements abstract methods in DataMixin for dataclass-based data, key or record classes."""
 
-    x: float = required()
-    """X coordinate."""
-
-    y: float = required()
-    """Y coordinate."""
+    __slots__ = ()

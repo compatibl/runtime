@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassAliasedKey(KeyMixin):  # TODO: Specify alias and add derived aliased class
+class StubDataclassAliasedKey(DataclassMixin, KeyMixin):  # TODO: Specify alias and add derived aliased class
     """Stub record class with typename alias."""
 
     id: str = required()

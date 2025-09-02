@@ -18,6 +18,7 @@ from typing_extensions import Any
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
@@ -45,7 +46,7 @@ _UI_SERIALIZER = DataSerializers.FOR_UI
 
 
 @dataclass(slots=True, kw_only=True)
-class UiRecordUtil(DataMixin):  # TODO: Move to the appropriate directory
+class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
     """
     Utility type to provide additional functionality for working with records.
     """

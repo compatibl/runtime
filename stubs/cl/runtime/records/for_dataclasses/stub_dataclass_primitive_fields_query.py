@@ -17,13 +17,14 @@ from dataclasses import dataclass
 from uuid import UUID
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.conditions import Condition
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPrimitiveFieldsQuery(QueryMixin):
+class StubDataclassPrimitiveFieldsQuery(DataclassMixin, QueryMixin):
     """Stub record whose elements are primitive types."""
 
     key_str_field: str | Condition[str] | None = None

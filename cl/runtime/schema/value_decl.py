@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from typing import Self
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
 _VALUE_DECL_NAME_MAP: dict[str, str] = {
@@ -33,7 +34,7 @@ _VALUE_DECL_NAME_MAP: dict[str, str] = {
 
 
 @dataclass(slots=True, kw_only=True)
-class ValueDecl(DataMixin):
+class ValueDecl(DataclassMixin):
     """Value or atomic element declaration."""
 
     type_: str = required()

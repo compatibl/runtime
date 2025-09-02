@@ -14,13 +14,14 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_non_freezable import StubDataclassNonFreezable
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassPartialFreezable(DataMixin):
+class StubDataclassPartialFreezable(DataclassMixin):
     """Freezable class must not have a non-freezable class field, should raise."""
 
     value: str = "abc"

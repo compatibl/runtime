@@ -20,6 +20,7 @@ from cl.runtime.contexts.context_manager import get_active_contexts_and_ids
 from cl.runtime.contexts.context_manager import make_active_and_return_stack
 from cl.runtime.contexts.context_manager import make_inactive
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -29,7 +30,7 @@ _CONTEXT_SERIALIZER = DataSerializers.FOR_JSON
 
 
 @dataclass(slots=True, kw_only=True)
-class ContextSnapshot(DataMixin):
+class ContextSnapshot(DataclassMixin):
     """
     When its 'capture_active' method is invoked, an instance of ContextSnapshot stores the active contexts for
     each (context_key_type, context_id) pair. The instance data can be serialized in JSON format for transfer

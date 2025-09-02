@@ -17,10 +17,11 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class Encoder(DataMixin, ABC):
+class Encoder(DataclassMixin, ABC):
     """Abstract base class of encoders that convert data to string and back."""
 
     @abstractmethod

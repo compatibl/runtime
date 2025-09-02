@@ -15,12 +15,13 @@
 from dataclasses import dataclass
 from typing import Self
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 
 
 @dataclass(slots=True)
-class TypeDeclKey(KeyMixin):
+class TypeDeclKey(DataclassMixin, KeyMixin):
     """Provides information about a class, its fields, and its methods."""
 
     module: ModuleDeclKey = required()  # TODO: Merge with name to always use full name

@@ -14,12 +14,13 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.schema.value_decl import ValueDecl
 
 
 @dataclass(slots=True, kw_only=True)
-class MemberDecl(DataMixin):
+class MemberDecl(DataclassMixin):
     """Type member declaration."""
 
     value: ValueDecl | None = None  # TODO: Flatten value and other types to a single field

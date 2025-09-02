@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class PackageAliasKey(KeyMixin):
+class PackageAliasKey(DataclassMixin, KeyMixin):
     """Custom package alias defined using module glob pattern, use to organize types and DB tables by package."""
 
     package_pattern: str = required()

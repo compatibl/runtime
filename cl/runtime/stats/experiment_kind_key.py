@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ExperimentKindKey(KeyMixin):
+class ExperimentKindKey(DataclassMixin, KeyMixin):
     """Experiment and trial records are separated for each experiment kind."""
 
     kind_id: str = required()

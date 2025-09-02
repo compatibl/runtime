@@ -15,12 +15,13 @@
 from dataclasses import dataclass
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.conditions import Condition
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_type_binding_key import RecordTypeBindingKey
 
 
 @dataclass(slots=True, kw_only=True)
-class RecordTypeBindingQuery(QueryMixin):
+class RecordTypeBindingQuery(DataclassMixin, QueryMixin):
     """Query for RecordTypeBinding by the key_type_name field."""
 
     key_type_name: str | Condition[str] | None = None

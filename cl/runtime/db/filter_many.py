@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.db.filter import Filter
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename

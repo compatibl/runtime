@@ -22,6 +22,8 @@ from cl.runtime.events.sse_query_util import SseQueryUtil
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.task_logs import TaskLogs
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.task_query import TaskQuery
 from cl.runtime.tasks.task_status import TaskStatus
@@ -33,7 +35,7 @@ _LOG_HISTORY_LIMIT: Final[int] = 1000
 
 
 @dataclass(slots=True, kw_only=True)
-class UiLogUtil(DataMixin):
+class UiLogUtil(DataclassMixin):
     """UI logs util class."""
 
     @classmethod

@@ -21,6 +21,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename

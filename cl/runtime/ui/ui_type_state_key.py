@@ -14,13 +14,14 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.ui.user_key import UserKey
 
 
 @dataclass(slots=True)
-class UiTypeStateKey(KeyMixin):
+class UiTypeStateKey(DataclassMixin, KeyMixin):
     """Defines some default settings for a type."""
 
     type_: TypeDeclKey = required()

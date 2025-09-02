@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-class StubSlottedKey(KeyMixin):
+class StubSlottedKey(DataclassMixin, KeyMixin):
     """Stub record base class not using any dataclass framework."""
 
     __slots__ = ("key_field",)

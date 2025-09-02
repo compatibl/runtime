@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ConfigKey(KeyMixin):
+class ConfigKey(DataclassMixin, KeyMixin):
     """Performs configuration using parameters specified in this record."""
 
     config_id: str = required()

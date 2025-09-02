@@ -14,11 +14,12 @@
 
 from abc import ABC
 from dataclasses import dataclass
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassPolymorphicBaseKey(KeyMixin, ABC):
+class StubDataclassPolymorphicBaseKey(DataclassMixin, KeyMixin, ABC):
     """Stub base key."""
 
     id: str = "abc"

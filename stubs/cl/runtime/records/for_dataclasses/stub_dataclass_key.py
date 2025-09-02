@@ -13,11 +13,12 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StubDataclassKey(KeyMixin):
+class StubDataclassKey(DataclassMixin, KeyMixin):
     """Stub record base class."""
 
     id: str = "abc"

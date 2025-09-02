@@ -16,13 +16,14 @@ from dataclasses import dataclass
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 
 
 @dataclass(slots=True, kw_only=True)
-class ExperimentKeyQuery(QueryMixin):
+class ExperimentKeyQuery(DataclassMixin, QueryMixin):
     """Query for ExperimentKey by the experiment_kind and experiment_id fields."""
 
     experiment_kind: ExperimentKindKey = required()

@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class RecordTypeBindingKey(KeyMixin):
+class RecordTypeBindingKey(DataclassMixin, KeyMixin):
     """Indicates that the record type is stored in the specified table."""
 
     record_type_name: str = required()

@@ -21,6 +21,7 @@ from inflection import humanize
 from inflection import titleize
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
 from cl.runtime.schema.handler_param_decl import HandlerParamDecl
@@ -28,7 +29,7 @@ from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 
 
 @dataclass(slots=True, kw_only=True)
-class HandlerDeclareBlockDecl(DataMixin):
+class HandlerDeclareBlockDecl(DataclassMixin):
     """Handler declaration block in type declaration."""
 
     handlers: list[HandlerDeclareDecl] = required()

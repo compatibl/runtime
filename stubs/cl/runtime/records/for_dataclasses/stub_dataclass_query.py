@@ -15,12 +15,13 @@
 from dataclasses import dataclass
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.conditions import Condition
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime import StubDataclass
 
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassQuery(QueryMixin):
+class StubDataclassQuery(DataclassMixin, QueryMixin):
     """Query for StubDataclass."""
 
     id: str | Condition[str] | None = None

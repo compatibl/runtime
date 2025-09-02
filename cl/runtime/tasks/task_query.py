@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.conditions import Condition
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
@@ -22,7 +23,7 @@ from cl.runtime.tasks.task_status import TaskStatus
 
 
 @dataclass(slots=True, kw_only=True)
-class TaskQuery(QueryMixin):
+class TaskQuery(DataclassMixin, QueryMixin):
     """Query for Task by the queue and status fields."""
 
     task_id: str | None = None

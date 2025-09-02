@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class DataSourceKey(KeyMixin):
+class DataSourceKey(DataclassMixin, KeyMixin):
     """Rules for hierarchical lookup in multiple databases and datasets with data access control."""
 
     data_source_id: str = required()

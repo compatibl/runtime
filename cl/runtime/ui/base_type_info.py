@@ -14,11 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
 @dataclass(slots=True, kw_only=True)
-class BaseTypeInfo(DataMixin):  # TODO: Rename to avoid confusion with TypeInfo which is not derived from this class
+class BaseTypeInfo(DataclassMixin):  # TODO: Rename to avoid confusion with TypeInfo which is not derived from this class
     """Base type info."""
 
     name: str = required()

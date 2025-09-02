@@ -14,12 +14,13 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.ui.base_type_info import BaseTypeInfo
 
 
 @dataclass(slots=True, kw_only=True)
-class TabInfo(DataMixin):  # TODO: Review usage of TabInfo class
+class TabInfo(DataclassMixin):  # TODO: Review usage of TabInfo class
     """Tab info."""
 
     type: BaseTypeInfo = required()
