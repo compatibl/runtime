@@ -13,10 +13,20 @@
 # limitations under the License.
 
 from abc import ABC
+
+from memoization import cached
+
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class DataclassMixin(DataMixin, ABC):
     """Implements abstract methods in DataMixin for dataclass-based data, key or record classes."""
 
     __slots__ = ()
+
+    @classmethod
+    @cached
+    def get_field_names(cls) -> tuple[str, ...]:
+        """Return slots the order of declaration from base to derived."""
+        return SlotsUtil.get_field_names(cls)

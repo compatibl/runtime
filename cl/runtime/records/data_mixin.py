@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Self
 from typing import TypeVar
@@ -31,10 +31,9 @@ class DataMixin(BuilderMixin, ABC):
     __slots__ = ()
 
     @classmethod
-    @cached
+    @abstractmethod
     def get_field_names(cls) -> tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
-        return SlotsUtil.get_field_names(cls)
 
     def build(self) -> Self:
         """

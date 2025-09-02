@@ -39,6 +39,7 @@ def test_functions():
         DataMixin,
         KeyMixin,
         RecordMixin,
+        DataclassMixin,
         StubDataclassData,
         StubDataclassKey,
         StubDataclass,
@@ -47,11 +48,13 @@ def test_functions():
     abstract_classes = (
         KeyMixin,
         RecordMixin,
+        DataMixin,
     )
     data_classes = (
         DataMixin,
         KeyMixin,
         RecordMixin,
+        DataclassMixin,
         StubDataclassData,
         StubDataclassKey,
         StubDataclass,
