@@ -19,8 +19,8 @@ from cl.runtime.records.conditions import Condition
 from cl.runtime.records.protocols import is_data_key_or_record_type, is_mixin_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.condition_spec import ConditionSpec
+from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
-from cl.runtime.schema.no_slots_spec import NoSlotsSpec
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_spec import TypeSpec
 
@@ -49,8 +49,12 @@ class TypeSchema:
             # Enum class
             return EnumSpec.for_type(type_)
         elif is_mixin_type(type_):
-            # Mixin is a class without instance fields, use NoSlotsSpec
-            return NoSlotsSpec.for_type(type_)
+            # Mixin is a class without instance fields, use DataSpec with empty fields
+            return DataSpec(
+                type_name=typename(type_),
+                type_=type_,
+                fields=[],
+            ).build()
         elif is_data_key_or_record_type(type_):  # TODO: ! Add guard methods
             # Data, key or record type other than mixin which is handled by the preceding elif
             return type_.get_type_spec()
