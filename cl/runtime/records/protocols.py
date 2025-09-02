@@ -25,6 +25,8 @@ from uuid import UUID
 from bson import Int64
 from frozendict import frozendict
 
+from cl.runtime.records.typename import typename
+
 PRIMITIVE_TYPES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes, type)
 """The list of Python classes used to store primitive types, not the same as type names."""
 
@@ -89,7 +91,7 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
         # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type
         return type_.__name__ in PRIMITIVE_TYPE_NAMES or issubclass(type_, type)
     else:
-        raise RuntimeError(f"The argument of is_primitive is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_primitive is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
@@ -97,7 +99,7 @@ def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
     if isinstance(type_, type):
         return issubclass(type_, Enum) and type_.__module__ != "enum" and not type_.__name__.startswith("_")
     else:
-        raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_enum is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_sequence_type(type_: type) -> TypeGuard[SequenceTypes]:
@@ -105,7 +107,7 @@ def is_sequence_type(type_: type) -> TypeGuard[SequenceTypes]:
     if isinstance(type_, type):
         return type_.__name__ in SEQUENCE_TYPE_NAMES
     else:
-        raise RuntimeError(f"The argument of is_sequence is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_sequence is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_mapping_type(type_: type) -> TypeGuard[MappingTypes]:
@@ -113,7 +115,7 @@ def is_mapping_type(type_: type) -> TypeGuard[MappingTypes]:
     if isinstance(type_, type):
         return type_.__name__ in MAPPING_TYPE_NAMES
     else:
-        raise RuntimeError(f"The argument of is_mapping is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_mapping is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_abstract_type(type_: type) -> bool:
@@ -121,7 +123,16 @@ def is_abstract_type(type_: type) -> bool:
     if isinstance(type_, type):
         return bool(getattr(type_, "__abstractmethods__", None))
     else:
-        raise RuntimeError(f"The argument of is_abstract is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_abstract is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
+
+
+def is_mixin_type(type_: type) -> bool:
+    """True if the argument is a mixin class (class without instance fields), detected by classname suffix."""
+    if isinstance(type_, type):
+        return typename(type_).endswith("Mixin")
+    else:
+        raise RuntimeError(
+            f"The argument of is_abstract is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_builder_type(type_: type) -> bool:
@@ -132,7 +143,7 @@ def is_builder_type(type_: type) -> bool:
     if isinstance(type_, type):
         return hasattr(type_, "build") and not type_.__name__.startswith("_")
     else:
-        raise RuntimeError(f"The argument of is_builder is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_builder is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_data_key_or_record_type(type_: type) -> bool:
@@ -144,7 +155,7 @@ def is_data_key_or_record_type(type_: type) -> bool:
         return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_data_key_or_record is an instance of {type(type_).__name__} rather than type."
+            f"The argument of is_data_key_or_record is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -157,7 +168,7 @@ def is_key_or_record_type(type_: type) -> bool:
         return hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_key_or_record is an instance of {type(type_).__name__} rather than type."
+            f"The argument of is_key_or_record is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -173,7 +184,7 @@ def is_data_type(type_: type) -> bool:
             and not type_.__name__.startswith("_")
         )
     else:
-        raise RuntimeError(f"The argument of is_data is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_data is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_key_type(type_: type) -> bool:
@@ -184,7 +195,7 @@ def is_key_type(type_: type) -> bool:
     if isinstance(type_, type):
         return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not type_.__name__.startswith("_")
     else:
-        raise RuntimeError(f"The argument of is_key is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_key is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_record_type(type_: type) -> bool:
@@ -195,7 +206,7 @@ def is_record_type(type_: type) -> bool:
     if isinstance(type_, type):
         return hasattr(type_, "get_key") and not type_.__name__.startswith("_")
     else:
-        raise RuntimeError(f"The argument of is_record is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_record is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")
 
 
 def is_condition_type(type_: type) -> bool:
@@ -204,4 +215,4 @@ def is_condition_type(type_: type) -> bool:
         # Use class names to avoid a cyclic reference
         return type_.__name__ in CONDITION_TYPE_NAMES
     else:
-        raise RuntimeError(f"The argument of is_enum is an instance of {type(type_).__name__} rather than type.")
+        raise RuntimeError(f"The argument of is_enum is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg.")

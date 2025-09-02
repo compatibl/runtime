@@ -20,7 +20,7 @@ from cl.runtime.schema.type_spec import TypeSpec
 
 
 @dataclass(slots=True, kw_only=True)
-class DataSpec(TypeSpec, ABC):
+class DataSpec(TypeSpec):
     """Provides information about a class with fields."""
 
     fields: list[FieldSpec] = required()

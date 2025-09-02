@@ -113,6 +113,9 @@ class DataUtil(BuilderUtil):
             if schema_type_name is not None and schema_type_name != data_type_name:
                 # If schema type is specified, ensure that data is an instance of the specified type
                 schema_type_spec = TypeSchema.for_type_name(schema_type_name)
+                # TODO: !!!!!!!!!!!!!!!!!!!11
+                if schema_type_spec is None:
+                    pass
                 schema_type_name = schema_type_spec.type_name
                 if not is_data_key_or_record_type(schema_class := schema_type_spec.type_):
                     raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")

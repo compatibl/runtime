@@ -22,6 +22,7 @@ from cl.runtime.records.data_util import DataUtil
 from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import TObj
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_spec import TypeSpec
 from cl.runtime.serializers.slots_util import SlotsUtil
 
 
@@ -34,6 +35,13 @@ class DataMixin(BuilderMixin, ABC):
     @abstractmethod
     def get_field_names(cls) -> tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
+
+    @classmethod
+    @abstractmethod
+    def get_type_spec(cls) -> TypeSpec:
+        """Return type specification for this class."""
+        # Python permits abstract class methods to be invoked when there is no override, raise an error in this case
+        raise RuntimeError(f"Abstract method DataMixin.get_type_spec() is invoked, {cls.__name__} must implement.")
 
     def build(self) -> Self:
         """

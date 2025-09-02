@@ -42,7 +42,7 @@ class ConditionSpec(DataSpec):
             )
 
         result = ConditionSpec(
-            type_name=type_name,
+            type_name=type_name,  # TODO: !! Remove type_name as duplicate to type
             type_=type_,
             fields=[],
         ).build()

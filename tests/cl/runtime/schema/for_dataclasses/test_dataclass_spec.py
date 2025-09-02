@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.ui.ui_app_state import UiAppState
 from stubs.cl.runtime import StubDataclass
@@ -80,7 +79,7 @@ def test_for_type():
     for test_case in _FROM_CLASS_VALID_CASES:
 
         # Get enum spec and serialize as YAML
-        type_spec = DataclassSpec.for_type(test_case)
+        type_spec = test_case.get_type_spec()
         type_spec_str = BootstrapSerializers.YAML.serialize(type_spec)
 
         # Record in RegressionGuard
@@ -93,7 +92,7 @@ def test_for_type_exceptions():
     """Test EnumSpec.for_type method exceptions."""
     for test_case in _FROM_CLASS_EXCEPTION_CASES:
         with pytest.raises(Exception):
-            DataclassSpec.for_type(test_case)
+            test_case.get_type_spec()  # noqa
 
 
 if __name__ == "__main__":

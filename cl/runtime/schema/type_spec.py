@@ -66,6 +66,6 @@ class TypeSpec(BootstrapMixin, ABC):
             raise RuntimeError(f"Dataclass {self.type_name} is neither a primitive type, enum, key, record or data.")
 
     @classmethod
-    @abstractmethod
     def for_type(cls, type_: type, subtype: str | None = None) -> Self:
         """Create spec from type, specify subtype only when different from class name (e.g., long or timestamp)."""
+        return NotImplementedError()  # TODO: !!!!!!!!!! Remove

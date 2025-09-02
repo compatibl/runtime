@@ -16,10 +16,9 @@ import dataclasses
 from enum import Enum
 from memoization import cached
 from cl.runtime.records.conditions import Condition
-from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_data_key_or_record_type, is_mixin_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.condition_spec import ConditionSpec
-from cl.runtime.schema.dataclass_spec import DataclassSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.no_slots_spec import NoSlotsSpec
 from cl.runtime.schema.type_cache import TypeCache
@@ -44,27 +43,23 @@ class TypeSchema:
     @cached
     def for_type(cls, type_: type) -> TypeSpec:
         """Get or create type spec for the specified class."""
-        # TODO: ! Use mapping records to avoid hardcoding the list of data frameworks
+        # TODO: ! Use get_type_spec to avoid hardcoding the list of data frameworks
         # Get class for the type spec
         if issubclass(type_, Enum):
             # Enum class
-            spec_class = EnumSpec
-        elif dataclasses.is_dataclass(type_):
-            # Uses dataclasses
-            spec_class = DataclassSpec
-        elif is_data_key_or_record_type(type_) and not type_.get_field_names():  # noqa
-            # Base class of data, key or record with no slots
-            spec_class = NoSlotsSpec
+            return EnumSpec.for_type(type_)
+        elif is_mixin_type(type_):
+            # Mixin is a class without instance fields, use NoSlotsSpec
+            return NoSlotsSpec.for_type(type_)
+        elif is_data_key_or_record_type(type_):  # TODO: ! Add guard methods
+            # Data, key or record type other than mixin which is handled by the preceding elif
+            return type_.get_type_spec()
         elif issubclass(type_, Condition):
-            # Condition class
-            spec_class = ConditionSpec
+            # Query condition type
+            return ConditionSpec.for_type(type_)
         else:
             raise RuntimeError(
                 f"Class {typename(type_)} implements build method but does not\n"
                 f"use one of the supported dataclass frameworks and does not\n"
                 f"have a method to generate type spec."
             )
-
-        # Create from class, add to spec dictionary and return
-        result = spec_class.for_type(type_)
-        return result
