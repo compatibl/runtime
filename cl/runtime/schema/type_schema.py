@@ -18,7 +18,6 @@ from memoization import cached
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.protocols import is_data_key_or_record_type, is_mixin_type
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.condition_spec import ConditionSpec
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.schema.type_cache import TypeCache
@@ -59,8 +58,12 @@ class TypeSchema:
             # Data, key or record type other than mixin which is handled by the preceding elif
             return type_.get_type_spec()
         elif issubclass(type_, Condition):
-            # Query condition type
-            return ConditionSpec.for_type(type_)
+            # Generic condition type
+            return DataSpec(
+                type_name=typename(type_),
+                type_=type_,
+                fields=[],  # TODO: !!! Currently fields are not serialized, implement a custom serializer
+            ).build()
         else:
             raise RuntimeError(
                 f"Class {typename(type_)} implements build method but does not\n"
