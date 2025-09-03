@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from typing import Self
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_spec import TypeSpec
 
@@ -26,20 +27,21 @@ class PrimitiveSpec(TypeSpec):
     subtype: str | None
     """Subtype (e.g., long) if specified, None otherwise."""
 
-    @classmethod
-    def for_type(cls, type_: type, subtype: str | None = None) -> Self:
-        """Create spec from class, set name to subtype after checking compatibility."""
-        if (class_name := type_.__name__) not in PRIMITIVE_TYPE_NAMES:
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
+        # Check that type_ is primitive
+        if (type_name := self.type_.__name__) not in PRIMITIVE_TYPE_NAMES:
             primitive_class_names_str = ", ".join(PRIMITIVE_TYPE_NAMES)
-            raise RuntimeError(f"Class {class_name} is not one of primitive types:\n{primitive_class_names_str}")
-        if subtype is None:
-            return PrimitiveSpec(type_=type_, type_kind=TypeKind.PRIMITIVE, subtype=subtype)
-        else:
-            if (
-                # Supported combinations only
-                (subtype == "long" and class_name == "int")
-                or (subtype == "timestamp" and class_name == "str")
-            ):
-                return PrimitiveSpec(type_=type_, type_kind=TypeKind.PRIMITIVE, subtype=subtype)
-            else:
-                raise RuntimeError(f"Subtype {subtype} cannot be stored in class {class_name}.")
+            raise RuntimeError(
+                f"Cannot create an instance of {typename(type(self))} for type {type_name}\n"
+                f"because it is not one of the supported primitive types:\n{primitive_class_names_str}")
+
+        # Check subtype compatibility
+        if not (
+            # Supported combinations only
+            self.subtype is None
+            or (self.subtype == "long" and type_name == "int")
+            or (self.subtype == "timestamp" and type_name == "str")
+        ):
+            raise RuntimeError(f"Subtype {self.subtype} cannot be stored in class {type_name}.")

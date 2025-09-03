@@ -75,8 +75,8 @@ _FROM_CLASS_EXCEPTION_CASES = [
 ]
 
 
-def test_for_type():
-    """Test EnumSpec.for_type method."""
+def test_get_type_spec():
+    """Test get_type_spec method."""
     for test_case in _FROM_CLASS_VALID_CASES:
 
         # Get enum spec and serialize as YAML
@@ -89,7 +89,7 @@ def test_for_type():
     RegressionGuard().verify_all()
 
 
-def test_for_type_exceptions():
+def test_get_type_spec_exceptions():
     """Test EnumSpec.for_type method exceptions."""
     for test_case in _FROM_CLASS_EXCEPTION_CASES:
         with pytest.raises(Exception):

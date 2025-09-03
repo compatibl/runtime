@@ -23,6 +23,7 @@ from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record_type
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
 
 
@@ -55,9 +56,6 @@ class TypeSpec(BootstrapMixin, ABC):
             self.type_kind = TypeKind.DATA
         else:
             # This should not happen because this method is only invoked for data types, but just in case
-            raise RuntimeError(f"Dataclass {self.type_name} is neither a primitive type, enum, key, record or data.")
+            raise RuntimeError(
+                f"Dataclass {typename(self.type_)} is neither a primitive type, enum, key, record or data.")
 
-    @classmethod
-    def for_type(cls, type_: type, subtype: str | None = None) -> Self:
-        """Create spec from type, specify subtype only when different from class name (e.g., long or timestamp)."""
-        return NotImplementedError()  # TODO: !!!!!!!!!! Remove

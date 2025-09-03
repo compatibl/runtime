@@ -30,7 +30,7 @@ _FROM_CLASS_EXCEPTION_CASES = [
 ]
 
 
-def test_for_type():
+def test_init():
     """Test EnumSpec.for_type method."""
     for test_case in _FROM_CLASS_VALID_CASES:
 
@@ -44,7 +44,7 @@ def test_for_type():
     RegressionGuard().verify_all()
 
 
-def test_for_type_exceptions():
+def test_init_exceptions():
     """Test EnumSpec.for_type method exceptions."""
     for test_case in _FROM_CLASS_EXCEPTION_CASES:
         with pytest.raises(Exception):

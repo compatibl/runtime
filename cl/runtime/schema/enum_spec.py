@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Self
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.enum_member_spec import EnumMemberSpec
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_spec import TypeSpec
@@ -29,18 +30,12 @@ class EnumSpec(TypeSpec):
     """List of enum members (use None for a placeholder enum with no members)."""
 
     @classmethod
-    def for_type(cls, type_: type, subtype: str | None = None) -> Self:
-        """Create spec from class, subtype is not permitted."""
+    def for_type(cls, type_: type) -> Self:
+        """Create from enum class."""
 
-        # Perform checks
-        class_name = type_.__name__
+        # Check the argument is an enum
         if not issubclass(type_, Enum):
-            raise RuntimeError(f"Cannot create EnumSpec for {class_name} because it is not an enum.")
-        if subtype is not None:
-            raise RuntimeError(
-                f"Subtype {subtype} is specified for enum class {class_name}.\n"
-                f"Only primitive types can have subtypes."
-            )
+            raise RuntimeError(f"Cannot create {typename(cls)} from type {typename(type_)} because it is not an enum.")
 
         # Create the list of enum members
         members = [
@@ -51,5 +46,4 @@ class EnumSpec(TypeSpec):
         ]
 
         # Create the enum spec
-        result = EnumSpec(type_=type_, type_kind=TypeKind.ENUM, members=members)
-        return result
+        return EnumSpec(type_=type_, members=members).build()
