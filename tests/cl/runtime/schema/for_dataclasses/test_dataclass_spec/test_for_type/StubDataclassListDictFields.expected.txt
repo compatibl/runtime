@@ -1,5 +1,4 @@
 type_: StubDataclassListDictFields
-type_name: StubDataclassListDictFields
 type_kind: Record
 fields:
 - field_name: id

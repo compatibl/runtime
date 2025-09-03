@@ -1,5 +1,4 @@
 type_: StubDataclassAliased
-type_name: StubDataclassAliased
 type_kind: Record
 fields:
 - field_name: id

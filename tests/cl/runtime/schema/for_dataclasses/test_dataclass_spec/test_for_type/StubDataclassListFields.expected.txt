@@ -1,5 +1,4 @@
 type_: StubDataclassListFields
-type_name: StubDataclassListFields
 type_kind: Record
 fields:
 - field_name: id

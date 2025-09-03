@@ -1,5 +1,4 @@
 type_: UiAppState
-type_name: UiAppState
 type_kind: Record
 fields:
 - field_name: user

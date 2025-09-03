@@ -1,4 +1,7 @@
 type_: int
-type_name: int
 type_kind: Primitive
+
+type_: int
+type_kind: Primitive
+subtype: long
 

@@ -1,4 +1,0 @@
-type_: int
-type_name: long
-type_kind: Primitive
-

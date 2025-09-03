@@ -1,4 +1,3 @@
 type_: UUID
-type_name: UUID
 type_kind: Primitive
 

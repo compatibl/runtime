@@ -1,5 +1,4 @@
 type_: StubDataclassNestedFieldsQuery
-type_name: StubDataclassNestedFieldsQuery
 type_kind: Data
 fields:
 - field_name: id

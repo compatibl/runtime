@@ -1,5 +1,4 @@
 type_: StubDataclassPrimitiveFields
-type_name: StubDataclassPrimitiveFields
 type_kind: Record
 fields:
 - field_name: key_str_field

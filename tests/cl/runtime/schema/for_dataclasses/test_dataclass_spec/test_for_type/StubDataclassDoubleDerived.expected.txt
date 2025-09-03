@@ -1,5 +1,4 @@
 type_: StubDataclassDoubleDerived
-type_name: StubDataclassDoubleDerived
 type_kind: Record
 fields:
 - field_name: id

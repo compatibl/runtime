@@ -1,4 +1,7 @@
 type_: str
-type_name: str
 type_kind: Primitive
+
+type_: str
+type_kind: Primitive
+subtype: timestamp
 

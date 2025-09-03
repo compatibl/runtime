@@ -1,5 +1,4 @@
 type_: StubHandlers
-type_name: StubHandlers
 type_kind: Record
 fields:
 - field_name: stub_id

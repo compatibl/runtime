@@ -1,5 +1,4 @@
 type_: StubDataclassNestedFields
-type_name: StubDataclassNestedFields
 type_kind: Record
 fields:
 - field_name: id

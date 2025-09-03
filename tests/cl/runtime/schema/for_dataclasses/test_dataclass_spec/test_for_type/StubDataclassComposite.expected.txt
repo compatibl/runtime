@@ -1,5 +1,4 @@
 type_: StubDataclassComposite
-type_name: StubDataclassComposite
 type_kind: Record
 fields:
 - field_name: primitive

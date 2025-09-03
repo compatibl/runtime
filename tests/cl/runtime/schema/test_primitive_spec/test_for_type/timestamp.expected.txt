@@ -1,4 +1,0 @@
-type_: str
-type_name: timestamp
-type_kind: Primitive
-
