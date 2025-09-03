@@ -31,11 +31,11 @@ _FROM_CLASS_EXCEPTION_CASES = [
 
 
 def test_init():
-    """Test EnumSpec.for_type method."""
+    """Test EnumSpec construction."""
     for test_case in _FROM_CLASS_VALID_CASES:
 
         # Get enum spec and serialize as YAML
-        type_spec = EnumSpec.for_type(test_case)
+        type_spec = EnumSpec(type_=test_case).build()
         type_spec_str = BootstrapSerializers.YAML.serialize(type_spec)
 
         # Record in RegressionGuard
@@ -45,10 +45,10 @@ def test_init():
 
 
 def test_init_exceptions():
-    """Test EnumSpec.for_type method exceptions."""
+    """Test EnumSpec construction exceptions."""
     for test_case in _FROM_CLASS_EXCEPTION_CASES:
         with pytest.raises(Exception):
-            EnumSpec.for_type(test_case)
+            EnumSpec(type_=test_case).build()
 
 
 if __name__ == "__main__":

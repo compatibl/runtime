@@ -32,7 +32,7 @@ class TypeSchema:
 
     @classmethod
     @cached
-    def for_type_name(cls, type_name: str) -> TypeSpec:
+    def for_type_name(cls, type_name: str) -> TypeSpec:  # TODO: ! Remove this method?
         """Get or create type spec for the specified type name."""
         # Get class for the specified type name and use it to get type spec
         class_ = TypeCache.from_type_name(type_name)
@@ -42,19 +42,11 @@ class TypeSchema:
     @cached
     def for_type(cls, type_: type) -> TypeSpec:
         """Get or create type spec for the specified class."""
-        # TODO: ! Use get_type_spec to avoid hardcoding the list of data frameworks
-        # Get class for the type spec
         if issubclass(type_, Enum):
-            # Enum class
-            return EnumSpec.for_type(type_)
-        elif is_mixin_type(type_):
-            # Mixin is a class without instance fields, use DataSpec with empty fields
-            return DataSpec(
-                type_=type_,
-                fields=[],
-            ).build()
-        elif is_data_key_or_record_type(type_):  # TODO: ! Add guard methods
-            # Data, key or record type other than mixin which is handled by the preceding elif
+            # Enum type
+            return EnumSpec(type_=type_).build()
+        elif is_data_key_or_record_type(type_):  # TODO: ! Use guard methods to prevent static type checker warning
+            # Data, key or record type
             return type_.get_type_spec()
         elif issubclass(type_, Condition):
             # Generic condition type

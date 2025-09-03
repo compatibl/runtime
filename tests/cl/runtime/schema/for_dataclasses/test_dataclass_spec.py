@@ -90,7 +90,7 @@ def test_get_type_spec():
 
 
 def test_get_type_spec_exceptions():
-    """Test EnumSpec.for_type method exceptions."""
+    """Test get_type_spec exceptions."""
     for test_case in _FROM_CLASS_EXCEPTION_CASES:
         with pytest.raises(Exception):
             test_case.get_type_spec()  # noqa

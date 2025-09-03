@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Self
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.enum_member_spec import EnumMemberSpec
 from cl.runtime.schema.type_kind import TypeKind
@@ -26,24 +27,22 @@ from cl.runtime.schema.type_spec import TypeSpec
 class EnumSpec(TypeSpec):
     """Provides information about an enum type."""
 
-    members: list[EnumMemberSpec] | None = None
+    members: list[EnumMemberSpec] = required()
     """List of enum members (use None for a placeholder enum with no members)."""
 
-    @classmethod
-    def for_type(cls, type_: type) -> Self:
-        """Create from enum class."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Check the argument is an enum
-        if not issubclass(type_, Enum):
-            raise RuntimeError(f"Cannot create {typename(cls)} from type {typename(type_)} because it is not an enum.")
+        if not issubclass(self.type_, Enum):
+            raise RuntimeError(
+                f"Cannot create {typename(type(self))} from type {typename(self.type_)} because it is not an enum.")
 
         # Create the list of enum members
-        members = [
+        self.members = [
             EnumMemberSpec(
                 member_name=CaseUtil.upper_to_pascal_case(member.name),
             )
-            for member in type_
+            for member in self.type_
         ]
 
-        # Create the enum spec
-        return EnumSpec(type_=type_, members=members).build()

@@ -88,7 +88,7 @@ def test_init_exceptions():
 
         # Check that exception is thrown as expected
         with pytest.raises(Exception):
-            PrimitiveSpec.for_type(sample_type, subtype)
+            PrimitiveSpec(type_=sample_type, subtype=subtype).build()
 
 
 if __name__ == "__main__":

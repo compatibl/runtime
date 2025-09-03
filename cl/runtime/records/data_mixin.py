@@ -19,8 +19,10 @@ from typing import TypeVar
 from memoization import cached
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.data_util import DataUtil
-from cl.runtime.records.protocols import PrimitiveTypes
+from cl.runtime.records.protocols import PrimitiveTypes, is_mixin_type
 from cl.runtime.records.protocols import TObj
+from cl.runtime.records.typename import typename
+from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_spec import TypeSpec
 from cl.runtime.serializers.slots_util import SlotsUtil
@@ -40,8 +42,18 @@ class DataMixin(BuilderMixin, ABC):
     @abstractmethod
     def get_type_spec(cls) -> TypeSpec:
         """Return type specification for this class."""
-        # Python permits abstract class methods to be invoked when there is no override, raise an error in this case
-        raise RuntimeError(f"Abstract method DataMixin.get_type_spec() is invoked, {cls.__name__} must implement.")
+        if is_mixin_type(cls):
+            # Return data spec with no fields if a mixin class
+            return DataSpec(
+                type_=cls,
+                fields=[],
+            ).build()
+        else:
+            # Otherwise derived type must implement
+            raise RuntimeError(
+                f"{typename(cls)} is not a mixin and must override DataMixin.get_type_spec method\n"
+                f"to provide information about its fields."
+            )
 
     def build(self) -> Self:
         """
