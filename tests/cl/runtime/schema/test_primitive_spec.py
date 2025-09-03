@@ -64,8 +64,11 @@ def test_for_type():
         type_spec = PrimitiveSpec.for_type(sample_type, subtype)
         type_spec_str = BootstrapSerializers.YAML.serialize(type_spec)
 
+        # Include channel in subtype if specified
+        channel = f"{typename(type_spec.type_)}.{subtype}" if subtype else typename(type_spec.type_)
+
         # Record in RegressionGuard
-        guard = RegressionGuard(channel=typename(type_spec.type_))
+        guard = RegressionGuard(channel=channel)
         guard.write(type_spec_str)
     RegressionGuard().verify_all()
 
