@@ -50,7 +50,6 @@ class DataclassMixin(DataMixin, ABC):
         ]
 
         return DataSpec(
-            type_name=typename(cls),
             type_=cls,
             fields=fields,
         ).build()

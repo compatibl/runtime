@@ -51,5 +51,5 @@ class EnumSpec(TypeSpec):
         ]
 
         # Create the enum spec
-        result = EnumSpec(type_name=class_name, type_kind=TypeKind.ENUM, type_=type_, members=members)
+        result = EnumSpec(type_=type_, type_kind=TypeKind.ENUM, members=members)
         return result

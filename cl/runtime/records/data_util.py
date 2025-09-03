@@ -31,7 +31,6 @@ from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.schema.type_schema import TypeSchema
 
 
 class DataUtil(BuilderUtil):
@@ -47,7 +46,7 @@ class DataUtil(BuilderUtil):
         field_name: str | None = None,
     ) -> Any:
         # Get parameters from type_hint if specified, otherwise set to None
-        schema_type_name = typename(type_hint.schema_type) if type_hint is not None else None
+        schema_type = type_hint.schema_type if type_hint is not None else None
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
 
@@ -105,27 +104,19 @@ class DataUtil(BuilderUtil):
                     # Invoke '__init' method if it exists, otherwise do nothing
                     class_init(data)
 
-            # Type spec for the data
-            data_type_spec = TypeSchema.for_type(type(data))
-            data_type_name = data_type_spec.type_name
-
             # Perform check against the schema if provided irrespective of the type inclusion setting
-            if schema_type_name is not None and schema_type_name != data_type_name:
+            if schema_type is not None and schema_type != type(data):
                 # If schema type is specified, ensure that data is an instance of the specified type
-                schema_type_spec = TypeSchema.for_type_name(schema_type_name)
-                # TODO: !!!!!!!!!!!!!!!!!!!11
-                if schema_type_spec is None:
-                    pass
-                schema_type_name = schema_type_spec.type_name
-                if not is_data_key_or_record_type(schema_class := schema_type_spec.type_):
-                    raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
-                if not isinstance(data, schema_class):
+                if not is_data_key_or_record_type(schema_type):
+                    raise RuntimeError(f"Type '{typename(schema_type)}' is not a slotted class.")
+                if not isinstance(data, schema_type):
                     raise RuntimeError(
-                        f"Type {data_type_name} is not the same or a subclass of "
-                        f"the type {schema_type_name} specified in schema."
+                        f"Type {typename(type(data))} is not the same or a subclass of "
+                        f"the type {typename(schema_type)} specified in schema."
                     )
 
             # Freeze or make immutable all public fields, checking against the schema
+            data_type_spec = data.get_type_spec()
             consume(
                 setattr(
                     data,

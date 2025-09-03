@@ -31,7 +31,7 @@ from cl.runtime.records.typename import typename
 class TypeHint(BootstrapMixin):
     """Provides information about a type hint."""
 
-    schema_type: type
+    schema_type: type  # TODO: !! Use TypeSpec and remove subtype field?
     """Class if available, if not provided it will be looked up using the type name."""
 
     optional: bool | None

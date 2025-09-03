@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.enum_spec import EnumSpec
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from stubs.cl.runtime import StubDataclass
@@ -38,7 +39,7 @@ def test_for_type():
         type_spec_str = BootstrapSerializers.YAML.serialize(type_spec)
 
         # Record in RegressionGuard
-        guard = RegressionGuard(channel=type_spec.type_name)
+        guard = RegressionGuard(channel=typename(type_spec.type_))
         guard.write(type_spec_str)
     RegressionGuard().verify_all()
 

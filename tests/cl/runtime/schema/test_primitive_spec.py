@@ -17,6 +17,7 @@ import datetime as dt
 from types import NoneType
 from uuid import UUID
 from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from stubs.cl.runtime import StubDataclass
@@ -47,7 +48,7 @@ _FROM_CLASS_EXCEPTION_CASES = [
 
 
 def test_for_type():
-    """Test PrimitiveSpec.for_type method."""
+    """Test PrimitiveSpec construction."""
     for test_case in _FROM_CLASS_VALID_CASES:
 
         # Get sample type and subtype (if specified)
@@ -64,13 +65,13 @@ def test_for_type():
         type_spec_str = BootstrapSerializers.YAML.serialize(type_spec)
 
         # Record in RegressionGuard
-        guard = RegressionGuard(channel=type_spec.type_name)
+        guard = RegressionGuard(channel=typename(type_spec.type_))
         guard.write(type_spec_str)
     RegressionGuard().verify_all()
 
 
 def test_for_type_exceptions():
-    """Test PrimitiveSpec.for_type method exceptions."""
+    """Test PrimitiveSpec construction exceptions."""
     for test_case in _FROM_CLASS_EXCEPTION_CASES:
 
         # Get sample type and subtype (if specified)

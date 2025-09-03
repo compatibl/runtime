@@ -23,7 +23,6 @@ from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record_type
-from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
 
 
@@ -37,18 +36,11 @@ class TypeSpec(BootstrapMixin, ABC):
     type_: type
     """Class where the type is stored (this is not the type hint as it excludes container and optional info)."""
 
-    type_name: str = required()
-    """Unique type name (the same as class name except when alias is specified), initialized from _class if not set."""
-
     type_kind: TypeKind = required()
     """Type kind (primitive, enum, data, key, record), initialized from _class if not set."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-
-        # Set type name unless already set
-        if self.type_name is None:
-            self.type_name = typename(self.type_)
 
         # Set type kind
         if is_primitive_type(self.type_):

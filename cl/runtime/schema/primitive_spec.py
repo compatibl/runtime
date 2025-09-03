@@ -23,6 +23,9 @@ from cl.runtime.schema.type_spec import TypeSpec
 class PrimitiveSpec(TypeSpec):
     """Provides information about a primitive type."""
 
+    subtype: str | None
+    """Subtype (e.g., long) if specified, None otherwise."""
+
     @classmethod
     def for_type(cls, type_: type, subtype: str | None = None) -> Self:
         """Create spec from class, set name to subtype after checking compatibility."""
@@ -30,13 +33,13 @@ class PrimitiveSpec(TypeSpec):
             primitive_class_names_str = ", ".join(PRIMITIVE_TYPE_NAMES)
             raise RuntimeError(f"Class {class_name} is not one of primitive types:\n{primitive_class_names_str}")
         if subtype is None:
-            return PrimitiveSpec(type_name=class_name, type_kind=TypeKind.PRIMITIVE, type_=type_)
+            return PrimitiveSpec(type_=type_, type_kind=TypeKind.PRIMITIVE, subtype=subtype)
         else:
             if (
                 # Supported combinations only
                 (subtype == "long" and class_name == "int")
                 or (subtype == "timestamp" and class_name == "str")
             ):
-                return PrimitiveSpec(type_name=subtype, type_kind=TypeKind.PRIMITIVE, type_=type_)
+                return PrimitiveSpec(type_=type_, type_kind=TypeKind.PRIMITIVE, subtype=subtype)
             else:
                 raise RuntimeError(f"Subtype {subtype} cannot be stored in class {class_name}.")

@@ -50,7 +50,6 @@ class TypeSchema:
         elif is_mixin_type(type_):
             # Mixin is a class without instance fields, use DataSpec with empty fields
             return DataSpec(
-                type_name=typename(type_),
                 type_=type_,
                 fields=[],
             ).build()
@@ -60,7 +59,6 @@ class TypeSchema:
         elif issubclass(type_, Condition):
             # Generic condition type
             return DataSpec(
-                type_name=typename(type_),
                 type_=type_,
                 fields=[],  # TODO: !!! Currently fields are not serialized, implement a custom serializer
             ).build()

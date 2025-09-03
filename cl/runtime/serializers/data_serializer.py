@@ -88,7 +88,7 @@ class DataSerializer(Serializer):
             raise ErrorUtil.enum_value_error(self.type_inclusion, TypeInclusion)
 
         # Get parameters from the type chain, considering the possibility that it may be None
-        schema_type_name = typename(type_hint.schema_type) if type_hint is not None else None
+        schema_type = type_hint.schema_type if type_hint is not None else None
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
 
@@ -108,7 +108,7 @@ class DataSerializer(Serializer):
                     f"with type hint {type_hint.to_str()}."
                 )
 
-            if schema_type_name in PRIMITIVE_TYPE_NAMES:
+            if schema_type.__name__ in PRIMITIVE_TYPE_NAMES:
                 # Deserialize using primitive serializer if a primitive type
                 return self.primitive_serializer.serialize(data, type_hint)
             else:
@@ -139,21 +139,14 @@ class DataSerializer(Serializer):
             if self.key_serializer is not None and is_key_type(type(data)):
                 return self.key_serializer.serialize(data, type_hint)
 
-            # Type spec for the data
-            data_type_spec = TypeSchema.for_type(type(data))  # TODO: !!! Use TypeCache
-            data_type_name = data_type_spec.type_name
-
-            # Perform check against the schema if provided irrespective of the type inclusion setting
-            if schema_type_name is not None and schema_type_name != data_type_name:
-                # If schema type is specified, ensure that data is an instance of the specified type
-                schema_type_spec = TypeSchema.for_type_name(schema_type_name)
-                schema_type_name = schema_type_spec.type_name
-                if not is_data_key_or_record_type(schema_class := schema_type_spec.type_):
-                    raise RuntimeError(f"Type '{schema_type_name}' is not a slotted class.")
-                if not isinstance(data, schema_class):
+            # Perform check against the schema if provided irrespective of the type_inclusion setting
+            if schema_type is not None:
+                if not is_data_key_or_record_type(schema_type):
+                    raise RuntimeError(f"Type '{typename(schema_type)}' is not a slotted class.")
+                if not isinstance(data, schema_type):
                     raise RuntimeError(
-                        f"Type {data_type_name} is not the same or a subclass of "
-                        f"the type {schema_type_name} specified in schema."
+                        f"Type {typename(type(data))} is not the same or a subclass of "
+                        f"the type {typename(schema_type)} specified in schema."
                     )
 
             # Include type in output according to the type_inclusion setting
@@ -161,7 +154,7 @@ class DataSerializer(Serializer):
                 include_type = True
             elif self.type_inclusion == TypeInclusion.AS_NEEDED:
                 # Include if schema type is not provided or not the same as data type
-                include_type = schema_type_name is None or schema_type_name != data_type_name
+                include_type = schema_type is None or schema_type is not type(data)
             elif self.type_inclusion == TypeInclusion.OMIT:
                 include_type = False
             else:
@@ -172,7 +165,7 @@ class DataSerializer(Serializer):
                 if self.type_format == TypeFormat.PASSTHROUGH:
                     type_field = type(data)
                 elif self.type_format == TypeFormat.DEFAULT:
-                    type_field = data_type_name
+                    type_field = typename(type(data))
                 else:
                     raise ErrorUtil.enum_value_error(self.type_format, TypeFormat)
             else:
@@ -195,8 +188,11 @@ class DataSerializer(Serializer):
             # Include type information first based on include_type_first flag
             result = {self.type_field: type_field} if include_type_first else {}
 
-            # Serialize slot values in the order of declaration except those that are None
+            # Use self to serialize keys unless a key serializer is specified
             key_serializer = self.key_serializer if self.key_serializer is not None else self
+
+            # Serialize slot values in the order of declaration except those that are None
+            data_type_spec = data.get_type_spec()
             result.update(
                 {
                     self._serialize_key(field_name): (
