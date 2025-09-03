@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from cl.runtime.file.file_kind import FileKind
-from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 

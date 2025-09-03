@@ -14,12 +14,10 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Self
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.enum_member_spec import EnumMemberSpec
-from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_spec import TypeSpec
 
 
@@ -36,7 +34,8 @@ class EnumSpec(TypeSpec):
         # Check the argument is an enum
         if not issubclass(self.type_, Enum):
             raise RuntimeError(
-                f"Cannot create {typename(type(self))} from type {typename(self.type_)} because it is not an enum.")
+                f"Cannot create {typename(type(self))} from type {typename(self.type_)} because it is not an enum."
+            )
 
         # Create the list of enum members
         self.members = [
@@ -45,4 +44,3 @@ class EnumSpec(TypeSpec):
             )
             for member in self.type_
         ]
-

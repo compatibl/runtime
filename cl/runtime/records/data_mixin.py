@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from enum import Enum
 from typing import Self
 from typing import TypeVar
-from memoization import cached
 from cl.runtime.records.builder_mixin import BuilderMixin
 from cl.runtime.records.data_util import DataUtil
-from cl.runtime.records.protocols import PrimitiveTypes, is_mixin_type
+from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import TObj
+from cl.runtime.records.protocols import is_mixin_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_spec import TypeSpec
-from cl.runtime.serializers.slots_util import SlotsUtil
 
 
 class DataMixin(BuilderMixin, ABC):

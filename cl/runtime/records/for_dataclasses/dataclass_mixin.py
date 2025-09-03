@@ -15,9 +15,7 @@
 import dataclasses
 from abc import ABC
 from typing import Self
-
 from memoization import cached
-
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec

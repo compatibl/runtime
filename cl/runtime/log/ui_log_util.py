@@ -21,8 +21,6 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.events.sse_query_util import SseQueryUtil
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.task_logs import TaskLogs
-from cl.runtime.records.data_mixin import DataMixin
-from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.task_query import TaskQuery

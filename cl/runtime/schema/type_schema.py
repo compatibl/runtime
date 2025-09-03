@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import dataclasses
 from enum import Enum
 from memoization import cached
 from cl.runtime.records.conditions import Condition
-from cl.runtime.records.protocols import is_data_key_or_record_type, is_mixin_type
+from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec

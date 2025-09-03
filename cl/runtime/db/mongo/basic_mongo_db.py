@@ -25,7 +25,6 @@ from cl.runtime.db.db import Db
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
-from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type

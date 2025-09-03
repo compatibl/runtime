@@ -18,7 +18,6 @@ import typing
 from dataclasses import dataclass
 from typing import Self
 from uuid import UUID
-from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_TYPES

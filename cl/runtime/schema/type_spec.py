@@ -13,9 +13,7 @@
 # limitations under the License.
 
 from abc import ABC
-from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_data_key_or_record_type
@@ -57,5 +55,5 @@ class TypeSpec(BootstrapMixin, ABC):
         else:
             # This should not happen because this method is only invoked for data types, but just in case
             raise RuntimeError(
-                f"Dataclass {typename(self.type_)} is neither a primitive type, enum, key, record or data.")
-
+                f"Dataclass {typename(self.type_)} is neither a primitive type, enum, key, record or data."
+            )

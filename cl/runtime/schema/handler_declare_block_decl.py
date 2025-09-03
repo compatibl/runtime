@@ -20,7 +20,6 @@ from typing import Iterable
 from inflection import humanize
 from inflection import titleize
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl

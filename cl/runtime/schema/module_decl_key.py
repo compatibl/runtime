@@ -14,8 +14,8 @@
 
 from dataclasses import dataclass
 from typing import Final
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 # Temporary global module name, common to all types.

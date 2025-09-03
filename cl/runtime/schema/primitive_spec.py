@@ -13,10 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Self
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_spec import TypeSpec
 
 
@@ -35,7 +33,8 @@ class PrimitiveSpec(TypeSpec):
             primitive_class_names_str = ", ".join(PRIMITIVE_TYPE_NAMES)
             raise RuntimeError(
                 f"Cannot create an instance of {typename(type(self))} for type {type_name}\n"
-                f"because it is not one of the supported primitive types:\n{primitive_class_names_str}")
+                f"because it is not one of the supported primitive types:\n{primitive_class_names_str}"
+            )
 
         # Check subtype compatibility
         if not (
