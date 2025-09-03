@@ -6,6 +6,8 @@ default:
   log_filename_prefix: main
 
   # Documented in EnvSettings class
+  env_id: temp_runtime_main
+  env_tenant: temp_tenant
   env_packages:
     - cl.runtime
     - stubs.cl.runtime
