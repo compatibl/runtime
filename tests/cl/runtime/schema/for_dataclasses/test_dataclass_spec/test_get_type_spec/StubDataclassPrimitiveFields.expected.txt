@@ -32,6 +32,10 @@ fields:
 - field_name: key_bytes_field
   field_type_hint:
     schema_type: bytes
+- field_name: key_type_field
+  field_type_hint:
+    schema_type: type
+    optional: true
 - field_name: key_int_enum_field
   field_type_hint:
     schema_type: StubIntEnum
@@ -89,6 +93,10 @@ fields:
 - field_name: obj_bytes_large_field
   field_type_hint:
     schema_type: bytes
+    optional: true
+- field_name: obj_type_field
+  field_type_hint:
+    schema_type: type
     optional: true
 - field_name: obj_int_enum_field
   field_type_hint:

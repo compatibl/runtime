@@ -8,6 +8,7 @@ key_time_field: 10:15:30.000
 key_date_time_field: '2003-05-01T10:15:00.000Z'
 key_uuid_field: 1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a
 key_bytes_field: ZG54
+key_type_field: StubDataclassKey
 key_int_enum_field: EnumValue2
 obj_str_field: abc
 obj_str_with_eol_field: |-
@@ -28,6 +29,7 @@ obj_uuid_field: 1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a
 obj_bytes_field: ZG54
 obj_bytes_large_field: 
   ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54ZG54
+obj_type_field: StubDataclassKey
 obj_int_enum_field: EnumValue1
 _type: StubDataclassPrimitiveFields
 

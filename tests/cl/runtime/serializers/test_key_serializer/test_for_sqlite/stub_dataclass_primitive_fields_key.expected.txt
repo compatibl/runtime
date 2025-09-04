@@ -8,5 +8,6 @@
 - '2003-05-01T10:15:00.000Z'
 - 1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a1a1a
 - ZG54
+- StubDataclassKey
 - EnumValue2
 

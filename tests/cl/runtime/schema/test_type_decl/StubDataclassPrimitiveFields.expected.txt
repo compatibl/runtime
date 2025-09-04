@@ -50,6 +50,11 @@ elements:
     type_: Binary
   name: KeyBytesField
   comment: Stub field.
+- value:
+    type_: type
+  name: KeyTypeField
+  comment: Stub field.
+  optional: true
 - enum:
     module:
       module_name: cl
@@ -124,6 +129,11 @@ elements:
   name: ObjBytesLargeField
   comment: Stub field.
   optional: true
+- value:
+    type_: type
+  name: ObjTypeField
+  comment: Stub field.
+  optional: true
 - enum:
     module:
       module_name: cl
@@ -142,5 +152,6 @@ keys:
 - KeyDateTimeField
 - KeyUuidField
 - KeyBytesField
+- KeyTypeField
 - KeyIntEnumField
 
