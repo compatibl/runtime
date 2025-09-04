@@ -25,7 +25,7 @@ from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_data_key_or_record_type, is_mixin_type, is_abstract_type
 from cl.runtime.records.protocols import is_data_type
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
@@ -641,8 +641,9 @@ class TypeCache:
         else:
             raise ErrorUtil.enum_value_error(type_kind, TypeKind)
 
-        # Eliminate the duplicates and filter by predicate
-        result = tuple(x for x in set(types_) if predicate(x))
+        # Eliminate the duplicates and filter by predicate, excluding any mixin types
+        # TODO: Refine the inclusion logic
+        result = tuple(x for x in set(types_) if predicate(x) and not is_mixin_type(x) and not is_abstract_type(x))  # TODO: !!!!!!!!! Do not exclude abstract
         return result
 
     @classmethod

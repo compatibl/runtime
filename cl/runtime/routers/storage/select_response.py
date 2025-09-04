@@ -65,8 +65,7 @@ class SelectResponse(RecordsWithSchemaResponse):
             key_type = TypeCache.from_type_name(key_type_name)
             records = ds.load_all(key_type)
             # Get lowest common type to the records stored in the table
-            common_base_record_type_name = ds.get_common_base_record_type_name(key_type_name=key_type_name)
-            common_base_record_type = TypeCache.from_type_name(common_base_record_type_name)
+            common_base_record_type = ds.get_common_base_record_type(key_type=key_type)
         else:
             raise RuntimeError(f"Type {request.type_} is neither a record nor a key.")
 

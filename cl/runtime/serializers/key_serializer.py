@@ -135,30 +135,30 @@ class KeySerializer(Serializer):
         """Serialize key into a flattened sequence of primitive types."""
 
         if not is_outer:
-            # For inner key fields which also have key type, type hint is required
+            # Inner key fields cannot be None and type hint is required
+            NoneChecks.guard_not_none(data)
             NoneChecks.guard_not_none(type_hint)
 
         # Get the class of data, which may be NoneType
-        data_type_name = typenameof(data)
+        data_type = typeof(data)
+        data_type_name = typename(data_type)
 
         # Get parameters from the type chain, considering the possibility that it may be None
-        schema_type_name = typename(type_hint.schema_type) if type_hint is not None else data_type_name
+        schema_type = type_hint.schema_type if type_hint is not None else data_type
         is_optional = type_hint.optional if type_hint is not None else None
         remaining_chain = type_hint.remaining if type_hint is not None else None
 
         # Ensure data type is the same as schema type if type chain is specified
-        if schema_type_name is not None and data_type_name != schema_type_name:
+        if schema_type is not None and data_type is not schema_type:
             # Confirm that schema type is parent of data type
-            parent_type_names = TypeCache.get_parent_type_names(typeof(data), type_kind=TypeKind.KEY)
-            if not parent_type_names or schema_type_name not in parent_type_names:
+            if not issubclass(data_type, schema_type):
                 raise RuntimeError(
-                    f"Key type {data_type_name} is not a subclass of the field type {schema_type_name}.\n"
+                    f"Key type {data_type_name} is not a subclass of the field type {typename(schema_type)}.\n"
                 )
             # Confirm that schema type is abstract
-            schema_type = TypeCache.from_type_name(schema_type_name)
             if not is_abstract_type(schema_type):
                 raise RuntimeError(
-                    f"Key field is declared as {schema_type_name} which neither a key type nor abstract.\n"
+                    f"Key field is declared as {typename(schema_type)} which neither a key type nor abstract.\n"
                 )
             # Field type is parent of the key type rather than the key type itself, include type prefix in key
             key_type_prefix = data_type_name
@@ -182,16 +182,16 @@ class KeySerializer(Serializer):
                     raise RuntimeError("An inner key field inside a composite key cannot be None.")
             else:
                 raise RuntimeError(f"Key is None while its type hint {type_hint.to_str()} is not optional.")
-        elif is_key_type(type(data)):
+        elif is_key_type(data_type):
 
             # Check that the argument is frozen
             data.check_frozen()
 
             # Get type spec
-            type_spec = TypeSchema.for_type(type(data))
+            type_spec = TypeSchema.for_type(data_type)
             if not isinstance(type_spec, DataSpec):
                 raise RuntimeError(
-                    f"Key serializer cannot serialize '{typename(type(data))}' because it is not a data, key or record class."
+                    f"Key serializer cannot serialize '{data_type_name}' because it is not a data, key or record class."
                 )
 
             # Serialize slot values in the order of declaration packing primitive types into size-one lists
@@ -224,11 +224,11 @@ class KeySerializer(Serializer):
             return result
         else:
             if is_outer:
-                raise RuntimeError(f"{typename(type(self))} cannot serialize {type(data)} because it is not a key.")
+                raise RuntimeError(f"{typename(type(self))} cannot serialize {data_type_name} because it is not a key.")
             else:
                 # This message will not be displayed for outer key
                 raise RuntimeError(
-                    f"A field inside a composite key has type {typename(type(data))}\n"
+                    f"A field inside a composite key has type {data_type_name}\n"
                     f"which is not a primitive type, enum, or another key."
                 )
 

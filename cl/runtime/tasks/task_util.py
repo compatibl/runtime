@@ -51,12 +51,8 @@ class TaskUtil:
             if serialized_key is not None:
                 # Key is not None, this is an instance method
 
-                if TypeCache.is_known_type_name(request.type):
-                    # Get key type based on table in request
-                    key_type = TypeCache.from_type_name(request.type).get_key_type()  # noqa
-                else:
-                    # Get key type from table
-                    key_type = active(DataSource).get_bound_key_type(table=request.type)
+                record_type = TypeCache.from_type_name(request.type)
+                key_type = record_type.get_key_type()
 
                 key_type_str = f"{key_type.__module__}.{typename(key_type)}"
                 label = f"{typename(key_type)};{serialized_key};{handler_name}"

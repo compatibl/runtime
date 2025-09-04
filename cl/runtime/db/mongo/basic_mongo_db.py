@@ -273,10 +273,6 @@ class BasicMongoDb(Db):
 
         # TODO: Provide a more performant implementation
         for record in records:
-
-            # Add to the cache of stored types for the specified dataset
-            self._add_record_type(record_type=type(record), dataset=dataset)
-
             # Serialize key
             serialized_key = _KEY_SERIALIZER.serialize(record.get_key())
             key_dict = {

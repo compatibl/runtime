@@ -18,6 +18,7 @@ from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.typename import typename
 
 
 class TypesResponseItem(BaseModel):
@@ -41,27 +42,30 @@ class TypesResponseItem(BaseModel):
         """Implements /schema/types route."""
 
         # Get types stored in DB
-        ds = active(DataSource)
-        record_type_names = ds.get_record_type_names()
+        record_types = (ds := active(DataSource)).get_record_types()
 
         # Add types to result
         types_result = [
             TypesResponseItem(
-                name=record_type_name,
-                label=titleize(record_type_name),  # TODO: Make label different from name or remove
+                name=(record_type_name := typename(record_type)),
+                label=titleize(record_type_name),
             )
-            for record_type_name in record_type_names
+            for record_type in record_types
         ]
 
         # Add tables to result
         tables_result = [
-            TypesResponseItem(name=table, label=table, kind="Table")  # TODO: Make label different from name or remove
-            for table in ds.get_key_type_names()
+            TypesResponseItem(
+                name=(key_type_name := typename(key_type)),
+                # TODO: Remove suffix key when a separate method, currently this would cause a name collision between table and type
+                label=key_type_name,
+                kind="Table",
+            )
+            for key_type in ds.get_key_types()
         ]
 
         # Check name collisions between types and tables
         cls._check_name_collisions(types_result, tables_result)
-
         return tables_result + types_result
 
     @classmethod

@@ -42,12 +42,14 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
-from cl.runtime.records.record_type_binding import RecordTypeBinding
-from cl.runtime.records.record_type_binding_query import RecordTypeBindingQuery
+from cl.runtime.records.stored_record_type_query import StoredRecordTypeQuery
 from cl.runtime.records.type_check import TypeCheck
+from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.records.stored_record_type import StoredRecordType
+from cl.runtime.records.stored_record_type_key import StoredRecordTypeKey
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_cache import TypeCache
-from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.schema.type_kind import TypeKind
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -669,79 +671,61 @@ class DataSource(DataSourceKey, RecordMixin):
             for key_type, records_for_key_type in pending_deletes_grouped_by_key_type.items()
         ]
 
+        # Add record types for each of the inserted records
+        records = [item for sublist in pending_inserts_grouped_by_key_type.values() for item in sublist]
+        record_types_set = set(type(record) for record in records)
+        self._get_db()._add_record_types_set(record_types_set=record_types_set, dataset=self.dataset.dataset_id)
+
         # Insert records for each key type
-        [
+        for key_type, records_for_key_type in pending_inserts_grouped_by_key_type.items():
+            # Only after that save the records
             self._get_db().save_many(
                 key_type,
                 records_for_key_type,
                 dataset=self.dataset.dataset_id,
                 save_policy=SavePolicy.INSERT,
             )
-            for key_type, records_for_key_type in pending_inserts_grouped_by_key_type.items()
-        ]
 
     def rollback(self) -> None:
         """Cancel all pending saves and deletes."""
         self._pending_deletes = []
         self._pending_inserts = []
 
-    def get_bindings(self) -> tuple[RecordTypeBinding, ...]:
-        """Return record type bindings in alphabetical order of key type name followed by record type name."""
+    def get_key_types(self) -> tuple[type, ...]:
+        """Return stored key types in alphabetical order of type name."""
+        # Load from DB as cache may be out of date, eliminate duplicates
+        key_types = set(x.key_type for x in self.load_by_type(StoredRecordType))
+        # Sort in alphabetical order of type name
+        return tuple(sorted(key_types, key=lambda x: typename(x.get_key_type())))
 
-        # Load from DB as cache may be out of date
-        bindings = self.load_by_type(RecordTypeBinding)
-        # Sort bindings by key type name first and then by record type in alphabetical order
-        return tuple(sorted(bindings, key=lambda x: (x.key_type_name, x.record_type_name)))
-
-    def get_key_type_names(self) -> tuple[str, ...]:
-        """Return stored key type names in alphabetical order of PascalCase format."""
-
-        # Load from DB as cache may be out of date
-        bindings = self.load_by_type(RecordTypeBinding)
-        # Convert to set to remove duplicates, sort in alphabetical order, convert back to tuple
-        return tuple(sorted(set(binding.key_type_name for binding in bindings)))
-
-    def get_record_type_names(self, *, key_type_name: str | None = None) -> tuple[str, ...]:
+    def get_record_types(self, *, key_type: type | None = None) -> tuple[type, ...]:
         """
-        Return PascalCase record type names in alphabetical order for records stored in this DB,
-        with optional filtering by key type name.
-
-        Returns:
-            Tuple of PascalCase record type names in alphabetical order or an empty tuple.
+        Return record types in alphabetical order of type name for records stored in this DB,
+        with optional filtering by key type.
 
         Args:
-            key_type_name: Filter the result by key type name in PascalCase format if specified (optional)
+            key_type: Filter the result by key type if specified (optional)
         """
 
-        # Load from DB as cache may be out of date
-        query = RecordTypeBindingQuery(key_type_name=key_type_name).build()
-        bindings = self.load_by_query(query, cast_to=RecordTypeBinding)
+        # Always load from DB as cache may be out of date
+        query = StoredRecordTypeQuery(key_type=key_type).build()
+        stored_record_types = [x.record_type for x in self.load_by_query(query, cast_to=StoredRecordType)]
 
-        # Sort in alphabetical order of record_type (not the same as query sort order) and convert to tuple
-        return tuple(sorted(binding.record_type_name for binding in bindings))
+        # Sort in alphabetical order of record_type (not the same as query sort order)
+        return tuple(sorted(stored_record_types, key=lambda x: typename(x)))
 
-    def get_common_base_record_type_name(self, *, key_type_name: str) -> str:
-        """
-        Return the name of the common type for all records stored for this key type name, error if no such records.
+    def get_common_base_record_type(self, *, key_type: type) -> type:
+        """Return the common type for all records stored for this key type, error if no such records."""
 
-        Args:
-            key_type_name: Key type name in PascalCase format (required).
-        """
+        # Get record types stored for this key type
+        record_types = self.get_record_types(key_type=key_type)
 
-        if not key_type_name:
-            raise RuntimeError("Key type name is required in get_common_base_record_type_name method.")
-
-        # Get record type names stored for this key type name
-        bound_type_names = self.get_record_type_names(key_type_name=key_type_name)
-
-        if bound_type_names:
-            # Find the common base name
-            bound_types = [TypeCache.from_type_name(x) for x in bound_type_names]
-            result = TypeCache.get_common_base_type(types=bound_types)
-            return typename(result)
+        if record_types:
+            # If at least one record type is present, find the common base
+            return TypeCache.get_common_base_type(types=record_types)
         else:
-            # Empty bound_type_names can only occur if key_type_name is not stored, raise an error
-            raise RuntimeError(f"Table {key_type_name} is empty.")
+            # Empty record_types means no records stored, raise an error
+            raise RuntimeError(f"Table {typename(key_type)} is empty.")
 
     def _get_db(self) -> Db:
         """Cast db key type to record type, the record is already loaded by the __init method."""

@@ -335,9 +335,6 @@ class SqliteDb(Db):
 
         serialized_records = []
         for record in records:
-            # Add to the cache of stored types for the specified dataset
-            self._add_record_type(record_type=type(record), dataset=dataset)
-
             serialized_record = _DATA_SERIALIZER.serialize(record)
             serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
             serialized_records.append(serialized_record)

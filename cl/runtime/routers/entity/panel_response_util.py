@@ -49,13 +49,8 @@ class PanelResponseUtil:
         """Implements /entity/panel route."""
 
         # Get the key type
-        if TypeCache.is_known_type_name(request.type_name):
-            # Static type is passed as type_name
-            type_ = TypeCache.from_type_name(request.type_name)
-            key_type = type_.get_key_type()
-        else:
-            # Table is passed as type_name
-            key_type = active(DataSource).get_bound_key_type(table=request.type_name)
+        record_type = TypeCache.from_type_name(request.type_name)
+        key_type = record_type.get_key_type()
 
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(request.key, TypeHint.for_type(key_type))

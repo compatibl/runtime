@@ -17,15 +17,15 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.record_type_binding_key import RecordTypeBindingKey
+from cl.runtime.records.stored_record_type_key import StoredRecordTypeKey
 
 
 @dataclass(slots=True, kw_only=True)
-class RecordTypeBindingQuery(DataclassMixin, QueryMixin):
-    """Query for RecordTypeBinding by the key_type_name field."""
+class StoredRecordTypeQuery(DataclassMixin, QueryMixin):
+    """Query for StoredRecordType by the key_type field."""
 
-    key_type_name: str | Condition[str] | None = None
-    """Key type name in PascalCase format."""
+    key_type: type | Condition[type] | None = None
+    """Use to query for record types stored in the table for this key type."""
 
     def get_target_type(self) -> type[KeyMixin]:
-        return RecordTypeBindingKey
+        return StoredRecordTypeKey
