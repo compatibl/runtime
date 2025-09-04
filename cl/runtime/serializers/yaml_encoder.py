@@ -79,6 +79,14 @@ def bytes_representer(dumper, data):
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
 
+def type_representer(dumper, data):
+    """Configure YAML class for serializing a type field."""
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.TYPE_OR_NONE)
+    if data_str:
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=None)
+    else:
+        return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
+
 
 # Roundtrip (typ=rt) style for the YAML writer is required to follow the formatting instructions in representers
 yaml_writer = YAML(typ="rt")
@@ -90,6 +98,7 @@ yaml_writer.representer.add_representer(dt.datetime, datetime_representer)
 yaml_writer.representer.add_representer(dt.time, time_representer)
 yaml_writer.representer.add_representer(UUID, uuid_representer)
 yaml_writer.representer.add_representer(bytes, bytes_representer)
+yaml_writer.representer.add_representer(type, type_representer)  # Eliminate duplication between YamlEncoder and YamlSerializer
 
 
 class PrimitiveToStringConstructor(SafeConstructor):

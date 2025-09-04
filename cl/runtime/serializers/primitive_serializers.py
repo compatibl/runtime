@@ -82,6 +82,23 @@ class PrimitiveSerializers:
     ).build()
     """Default primitive serializer settings for JSON."""
 
+    FOR_YAML_SERIALIZATION = PrimitiveSerializer(
+        none_format=NoneFormat.PASSTHROUGH,
+        string_format=StringFormat.PASSTHROUGH,
+        float_format=FloatFormat.PASSTHROUGH,
+        bool_format=BoolFormat.PASSTHROUGH,
+        int_format=IntFormat.PASSTHROUGH,
+        long_format=LongFormat.PASSTHROUGH,
+        date_format=DateFormat.PASSTHROUGH,
+        time_format=TimeFormat.PASSTHROUGH,
+        datetime_format=DatetimeFormat.PASSTHROUGH,
+        uuid_format=UuidFormat.PASSTHROUGH,
+        timestamp_format=TimestampFormat.PASSTHROUGH,
+        bytes_format=BytesFormat.PASSTHROUGH,
+        type_format=TypeFormat.DEFAULT,  # Convert type to typename, pass through all other field types
+    ).build()
+    """Do not perform any conversion but validate against type information if provided."""
+
     FOR_UI = PrimitiveSerializer(
         none_format=NoneFormat.PASSTHROUGH,
         string_format=StringFormat.PASSTHROUGH,

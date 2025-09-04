@@ -46,3 +46,6 @@ class TypeHints:
 
     BYTES_OR_NONE: TypeHint = TypeHint.for_type(bytes, optional=True)
     """Type hint for bytes | None."""
+
+    TYPE_OR_NONE: TypeHint = TypeHint.for_type(type, optional=True)
+    """Type hint for type | None."""

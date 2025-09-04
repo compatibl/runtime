@@ -57,7 +57,7 @@ class DataSerializers:
     """Default bidirectional data serializer settings for JSON."""
 
     FOR_YAML_SERIALIZATION = DataSerializer(
-        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        primitive_serializer=PrimitiveSerializers.FOR_YAML_SERIALIZATION,
         enum_serializer=EnumSerializers.DEFAULT,
     ).build()
     """Default bidirectional data serializer settings for JSON."""
@@ -69,7 +69,7 @@ class DataSerializers:
     """Default bidirectional data serializer settings for JSON."""
 
     FOR_YAML_REPORTING = DataSerializer(
-        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        primitive_serializer=PrimitiveSerializers.FOR_YAML_SERIALIZATION,
         enum_serializer=EnumSerializers.DEFAULT,
         type_inclusion=TypeInclusion.OMIT,
     ).build()

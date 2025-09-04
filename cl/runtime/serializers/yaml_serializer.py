@@ -26,7 +26,7 @@ from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
-from cl.runtime.records.typename import typeof
+from cl.runtime.records.typename import typeof, typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.serializer import Serializer
@@ -84,6 +84,13 @@ def bytes_representer(dumper, data):
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
 
+def type_representer(dumper, data):
+    """Configure YAML class for serializing a type field."""
+    data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.TYPE_OR_NONE)
+    if data_str:
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=None)
+    else:
+        return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
 
 def frozendict_representer(dumper, data):
     """Configure YAML class for serializing a frozendict field."""
@@ -101,7 +108,8 @@ yaml_writer.representer.add_representer(dt.datetime, datetime_representer)
 yaml_writer.representer.add_representer(dt.time, time_representer)
 yaml_writer.representer.add_representer(UUID, uuid_representer)
 yaml_writer.representer.add_representer(bytes, bytes_representer)
-yaml_writer.representer.add_representer(frozendict, frozendict_representer)
+yaml_writer.representer.add_representer(type, type_representer)
+yaml_writer.representer.add_representer(frozendict, frozendict_representer)  # TODO: ! Add to YamlEncoder as well
 
 
 class PrimitiveToStringConstructor(SafeConstructor):
@@ -114,8 +122,12 @@ class PrimitiveToStringConstructor(SafeConstructor):
             if isinstance(value, (int, float, bool)):
                 # Keep native Python types for int, float, bool
                 return value
+            elif isinstance(value, type):
+                # Convert type to typename without module
+                return typename(value)
             else:
                 # Convert everything except None to string, pass through None
+                # TODO: Check where custom formatting is applied, use PrimitiveSerializer?
                 return str(value) if (value is not None and value != "") else None
         elif isinstance(node, SequenceNode):  # , CommentedSeq)):  # Lists
             return [self.construct_object(v, deep) for v in node.value]

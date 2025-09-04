@@ -40,7 +40,7 @@ class PrimitiveSpec(TypeSpec):
         if not (
             # Supported combinations only
             self.subtype is None
-            or (self.subtype == "long" and type_name == "int")
-            or (self.subtype == "timestamp" and type_name == "str")
+            or (self.type_ is int and self.subtype == "long")
+            or (self.type_ is str and self.subtype == "timestamp")
         ):
             raise RuntimeError(f"Subtype {self.subtype} cannot be stored in class {type_name}.")
