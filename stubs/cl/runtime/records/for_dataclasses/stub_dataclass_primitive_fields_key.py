@@ -21,6 +21,7 @@ from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 
 
@@ -57,6 +58,9 @@ class StubDataclassPrimitiveFieldsKey(DataclassMixin, KeyMixin):
     """Stub field."""
 
     key_bytes_field: bytes = bytes([100, 110, 120])
+    """Stub field."""
+
+    key_type_field: type | None = StubDataclassKey
     """Stub field."""
 
     key_int_enum_field: StubIntEnum = StubIntEnum.ENUM_VALUE_2

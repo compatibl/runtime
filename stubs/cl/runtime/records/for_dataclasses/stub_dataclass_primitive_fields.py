@@ -20,6 +20,7 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 
@@ -68,6 +69,9 @@ class StubDataclassPrimitiveFields(StubDataclassPrimitiveFieldsKey, RecordMixin)
     """Stub field."""
 
     obj_bytes_large_field: bytes | None = bytes(40 * [100, 110, 120])
+    """Stub field."""
+
+    obj_type_field: type | None = StubDataclassKey
     """Stub field."""
 
     obj_int_enum_field: StubIntEnum | None = StubIntEnum.ENUM_VALUE_1
