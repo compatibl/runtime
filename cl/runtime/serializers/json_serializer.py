@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 import orjson
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.json_format import JsonFormat
 from cl.runtime.serializers.serializer import Serializer
@@ -24,8 +25,14 @@ from cl.runtime.serializers.serializer import Serializer
 def orjson_default(obj):
     """Handler for unsupported types in orjson."""
     if isinstance(obj, bytes):
-        return obj.hex()  # Convert bytes to string using hex encoding
-    raise RuntimeError(f"Object of type {obj.__class__.__name__} is not JSON serializable.")
+        # Convert bytes to string using hex encoding
+        return obj.hex()
+    elif isinstance(obj, type):
+        # Convert type to string as type name without module, with support for aliases
+        return typename(obj)
+    raise RuntimeError(
+        f"Fields of type {obj.__class__.__name__} is not supported by orjson natively.\n"
+        f"Add support using orjson_default function in json_serializer module.")
 
 
 @dataclass(slots=True, kw_only=True)
