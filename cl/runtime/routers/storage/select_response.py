@@ -18,10 +18,10 @@ from typing import Any
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typename, typeof
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.schema.type_cache import TypeCache
@@ -95,7 +95,7 @@ class SelectResponse(RecordsWithSchemaResponse):
             and (
                 # TODO (Roman): Consider adding other types to table format.
                 # Check if field is primitive, key or enum.
-                slot_v.__class__.__name__ in PRIMITIVE_TYPE_NAMES
+                is_primitive_type(typeof(slot_v))
                 or is_key_type(type(slot_v))
                 or isinstance(slot_v, Enum)
             )

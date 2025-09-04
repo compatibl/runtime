@@ -15,9 +15,9 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields impor
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite import StubDataclassComposite
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key import StubDataclassCompositeKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_other_derived import StubDataclassOtherDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_singleton import StubDataclassSingleton
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers import StubHandlers
 from stubs.cl.runtime.views.stub_data_viewers import StubDataViewers

@@ -30,7 +30,7 @@ from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
-from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typename, typeof, typenameof
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
@@ -139,7 +139,7 @@ class KeySerializer(Serializer):
             NoneChecks.guard_not_none(type_hint)
 
         # Get the class of data, which may be NoneType
-        data_type_name = typename(type(data))
+        data_type_name = typenameof(data)
 
         # Get parameters from the type chain, considering the possibility that it may be None
         schema_type_name = typename(type_hint.schema_type) if type_hint is not None else data_type_name
@@ -149,7 +149,7 @@ class KeySerializer(Serializer):
         # Ensure data type is the same as schema type if type chain is specified
         if schema_type_name is not None and data_type_name != schema_type_name:
             # Confirm that schema type is parent of data type
-            parent_type_names = TypeCache.get_parent_type_names(type(data), type_kind=TypeKind.KEY)
+            parent_type_names = TypeCache.get_parent_type_names(typeof(data), type_kind=TypeKind.KEY)
             if not parent_type_names or schema_type_name not in parent_type_names:
                 raise RuntimeError(
                     f"Key type {data_type_name} is not a subclass of the field type {schema_type_name}.\n"
@@ -201,7 +201,7 @@ class KeySerializer(Serializer):
                         # Use primitive serializer, specify type name, e.g. long (not class name, e.g. int)
                         self.primitive_serializer.serialize(self._checked_value(v), field_spec.field_type_hint)
                     ]
-                    if (v := getattr(data, field_spec.field_name)).__class__.__name__ in PRIMITIVE_TYPE_NAMES
+                    if is_primitive_type(typeof(v := getattr(data, field_spec.field_name)))
                     else (
                         [
                             # Use enum serializer, specify enum class
@@ -286,6 +286,6 @@ class KeySerializer(Serializer):
         """Return checked primitive value or enum."""
         if value is None:
             raise RuntimeError("A primitive field or enum inside a key cannot be None.")
-        if (class_name := value.__class__.__name__) not in PRIMITIVE_TYPE_NAMES and not isinstance(value, Enum):
-            raise RuntimeError(f"Type {class_name} inside key is not a primitive type, enum, or another key.")
+        if not (is_primitive_type(typeof(value)) or isinstance(value, Enum)):
+            raise RuntimeError(f"Type {typenameof(value)} inside key is not a primitive type, enum, or another key.")
         return value

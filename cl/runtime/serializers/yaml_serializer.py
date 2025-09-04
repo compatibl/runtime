@@ -25,7 +25,8 @@ from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
+from cl.runtime.records.typename import typeof
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.serializer import Serializer
@@ -146,7 +147,7 @@ class YamlSerializer(Serializer):
 
         if serialized is None:
             return ""
-        elif serialized.__class__.__name__ in PRIMITIVE_TYPE_NAMES:
+        elif is_primitive_type(typeof(serialized)):
             # Use default primitive serializer for a primitive type
             result = PrimitiveSerializers.DEFAULT.serialize(serialized)
             # Add trailing newline

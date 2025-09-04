@@ -60,7 +60,7 @@ MAPPING_TYPES = (dict, frozendict)
 MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 """Names of types that may be used to represent mappings, including abstract base classes."""
 
-PrimitiveTypes = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes
+PrimitiveTypes = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | type
 """Type alias for Python classes used to store primitive values."""
 
 SequenceTypes = list | tuple | Sequence | MutableSequence
@@ -91,7 +91,8 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
         return type_.__name__ in PRIMITIVE_TYPE_NAMES or issubclass(type_, type)
     else:
         raise RuntimeError(
-            f"The argument of is_primitive is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_primitive is an instance of type {type(type_).__name__}\n"
+            f"rather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -105,7 +106,7 @@ def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
         )
 
 
-def is_sequence_type(type_: type) -> TypeGuard[SequenceTypes]:
+def is_sequence_type(type_: type) -> TypeGuard[type[SequenceTypes]]:
     """Returns true if the argument is one of the supported sequence types."""
     if isinstance(type_, type):
         return type_.__name__ in SEQUENCE_TYPE_NAMES
@@ -115,7 +116,7 @@ def is_sequence_type(type_: type) -> TypeGuard[SequenceTypes]:
         )
 
 
-def is_mapping_type(type_: type) -> TypeGuard[MappingTypes]:
+def is_mapping_type(type_: type) -> TypeGuard[type[MappingTypes]]:
     """Returns true if the argument is one of the supported mapping types."""
     if isinstance(type_, type):
         return type_.__name__ in MAPPING_TYPE_NAMES

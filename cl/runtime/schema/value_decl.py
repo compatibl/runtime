@@ -28,6 +28,7 @@ _VALUE_DECL_NAME_MAP: dict[str, str] = {
     "datetime": "DateTime",
     "UUID": "UUID",  # TODO: Check for support in ElementDecl
     "bytes": "Binary",
+    "type": "type",
 }
 """Map from Python class name to ValueDecl name."""
 

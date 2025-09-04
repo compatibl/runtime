@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
-from cl.runtime.records.typename import typename
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
+from cl.runtime.records.typename import typename, typenameof
 from cl.runtime.schema.type_spec import TypeSpec
 
 
@@ -29,10 +29,10 @@ class PrimitiveSpec(TypeSpec):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Check that type_ is primitive
-        if (type_name := self.type_.__name__) not in PRIMITIVE_TYPE_NAMES:
+        if not is_primitive_type(self.type_):
             primitive_class_names_str = ", ".join(PRIMITIVE_TYPE_NAMES)
             raise RuntimeError(
-                f"Cannot create an instance of {typename(type(self))} for type {type_name}\n"
+                f"Cannot create an instance of {typename(type(self))} for type {typenameof(type_)}\n"
                 f"because it is not one of the supported primitive types:\n{primitive_class_names_str}"
             )
 
