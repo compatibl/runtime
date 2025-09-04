@@ -12,13 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Any
 from memoization import cached
+
+def typeof(value: Any) -> type:
+    """Return type of the specified instance, converting ABCMeta and other metaclasses to type."""
+    result = type(value)
+    if issubclass(result, type):
+        # If the result is a metaclass, convert to plain type
+        result = type
+    return result
 
 
 @cached
 def typename(type_: type) -> str:
-    """Return type name without module in PascalCase, or an alias if provided."""
-    # Accept type only, error if an instance is passed
+    """
+    Return type name without module in PascalCase, or an alias if provided.
+    This method accepts type only, error if an if instance is provided.
+    """
     if isinstance(type_, type):
         # TODO: Add support for aliases
         return type_.__name__
@@ -26,6 +37,11 @@ def typename(type_: type) -> str:
         raise RuntimeError(
             f"Function typename accepts only type but an instance of {typename(type(type_))} was provided instead."
         )
+
+
+def typenameof(value: Any) -> str:
+    """Shortcut for typename(typeof(value))."""
+    return typename(typeof(value))
 
 
 def qualname(type_: type) -> str:
@@ -37,3 +53,8 @@ def qualname(type_: type) -> str:
         raise RuntimeError(
             f"Function qualname accepts only type but an instance of {qualname(type(type_))} was provided instead."
         )
+
+
+def qualnameof(value: Any) -> str:
+    """Shortcut for qualname(typeof(value))."""
+    return typename(typeof(value))
