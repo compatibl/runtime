@@ -284,6 +284,10 @@ class Db(DbKey, RecordMixin, ABC):
     ) -> None:
         """Add record types to DB and cache."""
 
+        # Do not update stored record types if there are no new records
+        if not record_types_set:
+            return
+
         existing_records_type_set = self._get_existing_records_type_set(dataset=dataset)
         new_record_types = record_types_set - existing_records_type_set
         new_stored_record_type_records = tuple(
