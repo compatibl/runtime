@@ -27,7 +27,7 @@ def init_db() -> None:
         # Ask for confirmation before dropping the DB
         confirmation = input(
             f"Are you sure you want to delete all data in the following DB?\n\n"
-            f"Database to be deleted: {active(DataSource).get_db_id()}\n\n"
+            f"Database to be deleted: {active(DataSource).db.db_id}\n\n"
             f"This step is not reversible, all data in DB will be lost. Type 'yes' to confirm: "
             )
 

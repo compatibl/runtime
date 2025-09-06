@@ -62,7 +62,7 @@ class TypeCheck:
             return False
 
     @classmethod
-    def guard_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[KeyMixin]:
+    def guard_key_type(cls, key_type: Any, *, raise_on_fail: bool = True) -> TypeGuard[type[KeyMixin]]:
         """Check if the argument is a key type."""
         if isinstance(key_type, type) and is_key_type(key_type):
             if (type_name := typename(key_type)).endswith("Key"):

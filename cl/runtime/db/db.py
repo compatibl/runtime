@@ -25,8 +25,6 @@ from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
-from cl.runtime.records.stored_record_type import StoredRecordType
-from cl.runtime.records.stored_record_type_key import StoredRecordTypeKey
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
@@ -39,9 +37,6 @@ class Db(DbKey, RecordMixin, ABC):
 
     _tenant: str = EnvSettings.instance().env_tenant
     """Unique tenant identifier, tenants are isolated when sharing the same DB."""
-
-    _record_type_set: set[type[RecordMixin]] | None = None
-    """Dict of record type sets for each dataset."""
 
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id).build()
@@ -265,43 +260,3 @@ class Db(DbKey, RecordMixin, ABC):
             raise RuntimeError(f"Dataset identifier cannot be an empty string.")
         elif not isinstance(dataset, str):
             raise RuntimeError(f"Dataset identifier must be a string.")
-
-    def _get_existing_records_type_set(self, dataset: str) -> set[type[RecordMixin]]:
-        """Get the set of record types."""
-
-        if not self._record_type_set:
-            # Load from disk if does not exist
-            stored_record_types = self.load_all(StoredRecordTypeKey, cast_to=StoredRecordType, dataset=dataset)
-            self._record_type_set = {x.record_type for x in stored_record_types}
-            self._record_type_set.add(StoredRecordType)
-        return self._record_type_set
-
-    def _add_record_types_set(
-            self,
-            *,
-            record_types_set: set[type[RecordMixin]],
-            dataset: str,
-    ) -> None:
-        """Add record types to DB and cache."""
-
-        # Do not update stored record types if there are no new records
-        if not record_types_set:
-            return
-
-        existing_records_type_set = self._get_existing_records_type_set(dataset=dataset)
-        new_record_types = record_types_set - existing_records_type_set
-        new_stored_record_type_records = tuple(
-            StoredRecordType(record_type=x, key_type=x.get_key_type()).build()
-            for x in new_record_types
-        )
-
-        if new_stored_record_type_records:
-            # Add to DB first if there are new stored record types
-            self.save_many(
-                StoredRecordTypeKey,
-                new_stored_record_type_records,
-                dataset=dataset,
-                save_policy=SavePolicy.REPLACE,
-            )
-            # Then add to cache
-            existing_records_type_set.update(new_record_types)

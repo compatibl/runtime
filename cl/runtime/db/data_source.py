@@ -47,7 +47,7 @@ from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.records.stored_record_type import StoredRecordType
 from cl.runtime.records.stored_record_type_key import StoredRecordTypeKey
-from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typename, typeof
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_kind import TypeKind
 
@@ -77,16 +77,13 @@ class DataSource(DataSourceKey, RecordMixin):
     """Lookup these resources only here, not in any child or parent (optional)."""
 
     _pending_deletes: list[KeyMixin] | None = None
-    """
-    Keys that will be deleted on commit, including keys for which replacement records will be inserted
-    as part of the same commit.
-    """
+    """Keys that will be deleted on commit."""
 
     _pending_inserts: list[RecordMixin] | None = None
-    """
-    Records that will be inserted on commit, including replacement records for which are being deleted
-    as part of the same commit.
-    """
+    """Records that will be inserted on commit."""
+
+    _pending_replacements: list[RecordMixin] | None = None
+    """Records that will be replaced on commit."""
 
     def get_key(self) -> DataSourceKey:
         return DataSourceKey(data_source_id=self.data_source_id).build()
@@ -123,6 +120,7 @@ class DataSource(DataSourceKey, RecordMixin):
         # Initialize the list of pending deletes and inserts
         self._pending_deletes = []
         self._pending_inserts = []
+        self._pending_replacements = []
 
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource initialization and disposal."""
@@ -134,6 +132,11 @@ class DataSource(DataSourceKey, RecordMixin):
         if self._pending_inserts:
             raise RuntimeError(
                 "The list of pending inserts is not empty on __enter__.\n"
+                "Call commit or rollback before reusing the data source instance.."
+            )
+        if self._pending_replacements:
+            raise RuntimeError(
+                "The list of pending replacements is not empty on __enter__.\n"
                 "Call commit or rollback before reusing the data source instance.."
             )
         return self
@@ -657,39 +660,55 @@ class DataSource(DataSourceKey, RecordMixin):
     def commit(self) -> None:
         """Commit all pending saves and deletes."""
 
-        # Group pending deletes by key type and clear the field
-        pending_deletes_grouped_by_key_type = self._group_inputs_by_key_type(self._pending_deletes)
+        # Copy instance variables to load variables and clear the instance variables
+        pending_deletes = self._pending_deletes
         self._pending_deletes = []
-
-        # Group pending inserts by key type and clear the field
-        pending_inserts_grouped_by_key_type = self._group_inputs_by_key_type(self._pending_inserts)
+        pending_inserts = self._pending_inserts
         self._pending_inserts = []
+        pending_replacements = self._pending_replacements
+        self._pending_replacements = []
 
-        # Delete records for every key type
-        [
-            self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
-            for key_type, records_for_key_type in pending_deletes_grouped_by_key_type.items()
-        ]
-
-        # Add record types for each of the inserted records
-        records = [item for sublist in pending_inserts_grouped_by_key_type.values() for item in sublist]
-        record_types_set = set(type(record) for record in records)
-        self._get_db()._add_record_types_set(record_types_set=record_types_set, dataset=self.dataset.dataset_id)
-
-        # Insert records for each key type
-        for key_type, records_for_key_type in pending_inserts_grouped_by_key_type.items():
-            # Only after that save the records
-            self._get_db().save_many(
-                key_type,
-                records_for_key_type,
-                dataset=self.dataset.dataset_id,
-                save_policy=SavePolicy.INSERT,
+        # Record types to be inserted or replaced, with duplicates removed
+        record_types = set(typeof(x) for x in (pending_inserts + pending_replacements))
+        if record_types:
+            # Add record types without checking if they are already present, as
+            # it is faster to save all records than to check which already exist
+            record_types.add(StoredRecordType)
+            stored_record_types = tuple(
+                StoredRecordType(record_type=x, key_type=x.get_key_type()).build()
+                for x in record_types
             )
+            pending_replacements.extend(stored_record_types)
+
+        if pending_deletes:
+            [
+                self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+                for key_type, records_for_key_type in self._group_inputs_by_key_type(pending_deletes).items()
+            ]
+        if pending_inserts:
+            for key_type, records_for_key_type in self._group_inputs_by_key_type(pending_inserts).items():
+                # Only after that save the records
+                self._get_db().save_many(
+                    key_type,
+                    records_for_key_type,
+                    dataset=self.dataset.dataset_id,
+                    save_policy=SavePolicy.INSERT,
+                )
+        if pending_replacements:
+            for key_type, records_for_key_type in self._group_inputs_by_key_type(pending_replacements).items():
+                # Only after that save the records
+                self._get_db().save_many(
+                    key_type,
+                    records_for_key_type,
+                    dataset=self.dataset.dataset_id,
+                    save_policy=SavePolicy.REPLACE,
+                )
 
     def rollback(self) -> None:
         """Cancel all pending saves and deletes."""
         self._pending_deletes = []
         self._pending_inserts = []
+        self._pending_replacements = []
 
     def get_key_types(self) -> tuple[type, ...]:
         """Return stored key types in alphabetical order of type name."""
@@ -771,16 +790,13 @@ class DataSource(DataSourceKey, RecordMixin):
             return
 
         if save_policy == SavePolicy.INSERT:
-            pass
+            # Add to the list of pending inserts
+            self._pending_inserts.extend(records)
         elif save_policy == SavePolicy.REPLACE:
-            # Add to the list of pending deletes, which will execute before the inserts
-            replace_keys = [record.get_key() for record in records]
-            self._pending_deletes.extend(replace_keys)
+            # Add to the list of pending replacements
+            self._pending_replacements.extend(records)
         else:
             ErrorUtil.enum_value_error(save_policy, SavePolicy)
-
-        # Add to the list of pending inserts
-        self._pending_inserts.extend(records)
 
         # Commit immediately if commit parameter is True
         if commit:
