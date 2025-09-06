@@ -25,8 +25,9 @@ from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
-from cl.runtime.records.typename import typeof, typename
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typeof
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.serializer import Serializer
@@ -84,6 +85,7 @@ def bytes_representer(dumper, data):
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
 
+
 def type_representer(dumper, data):
     """Configure YAML class for serializing a type field."""
     data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.TYPE_OR_NONE)
@@ -91,6 +93,7 @@ def type_representer(dumper, data):
         return dumper.represent_scalar("tag:yaml.org,2002:str", data_str, style=None)
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
+
 
 def frozendict_representer(dumper, data):
     """Configure YAML class for serializing a frozendict field."""

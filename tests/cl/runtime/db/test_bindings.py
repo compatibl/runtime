@@ -14,14 +14,16 @@
 
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from stubs.cl.runtime import StubDataclassDerived, StubDataclassKey, StubDataclass
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassOtherDerived
 
 
 def test_get_common_base(default_db_fixture):
     """Test get common base type function."""
-    
+
     ds: DataSource = active(DataSource)
 
     records = [

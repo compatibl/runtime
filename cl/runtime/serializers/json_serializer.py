@@ -32,7 +32,8 @@ def orjson_default(obj):
         return typename(obj)
     raise RuntimeError(
         f"Fields of type {obj.__class__.__name__} is not supported by orjson natively.\n"
-        f"Add support using orjson_default function in json_serializer module.")
+        f"Add support using orjson_default function in json_serializer module."
+    )
 
 
 @dataclass(slots=True, kw_only=True)

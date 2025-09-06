@@ -42,14 +42,13 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
+from cl.runtime.records.stored_record_type import StoredRecordType
 from cl.runtime.records.stored_record_type_query import StoredRecordTypeQuery
 from cl.runtime.records.type_check import TypeCheck
-from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.records.stored_record_type import StoredRecordType
-from cl.runtime.records.stored_record_type_key import StoredRecordTypeKey
-from cl.runtime.records.typename import typename, typeof
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typeof
 from cl.runtime.schema.type_cache import TypeCache
-from cl.runtime.schema.type_kind import TypeKind
+from cl.runtime.serializers.key_serializers import KeySerializers
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -675,8 +674,7 @@ class DataSource(DataSourceKey, RecordMixin):
             # it is faster to save all records than to check which already exist
             record_types.add(StoredRecordType)
             stored_record_types = tuple(
-                StoredRecordType(record_type=x, key_type=x.get_key_type()).build()
-                for x in record_types
+                StoredRecordType(record_type=x, key_type=x.get_key_type()).build() for x in record_types
             )
             pending_replacements.extend(stored_record_types)
 

@@ -23,7 +23,7 @@ from ruamel.yaml.constructor import SafeConstructor
 from ruamel.yaml.nodes import MappingNode
 from ruamel.yaml.nodes import ScalarNode
 from ruamel.yaml.nodes import SequenceNode
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
+from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.typename import typeof
 from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
@@ -79,6 +79,7 @@ def bytes_representer(dumper, data):
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:null", None, style=None)
 
+
 def type_representer(dumper, data):
     """Configure YAML class for serializing a type field."""
     data_str = _PRIMITIVE_SERIALIZER.serialize(data, TypeHints.TYPE_OR_NONE)
@@ -98,7 +99,9 @@ yaml_writer.representer.add_representer(dt.datetime, datetime_representer)
 yaml_writer.representer.add_representer(dt.time, time_representer)
 yaml_writer.representer.add_representer(UUID, uuid_representer)
 yaml_writer.representer.add_representer(bytes, bytes_representer)
-yaml_writer.representer.add_representer(type, type_representer)  # Eliminate duplication between YamlEncoder and YamlSerializer
+yaml_writer.representer.add_representer(
+    type, type_representer
+)  # Eliminate duplication between YamlEncoder and YamlSerializer
 
 
 class PrimitiveToStringConstructor(SafeConstructor):

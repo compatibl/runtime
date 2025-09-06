@@ -22,7 +22,6 @@ from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.none_checks import NoneChecks
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import TObj
 from cl.runtime.records.protocols import is_abstract_type
@@ -30,11 +29,12 @@ from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
-from cl.runtime.records.typename import typename, typeof, typenameof
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typenameof
+from cl.runtime.records.typename import typeof
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.serializer import Serializer

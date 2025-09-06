@@ -19,9 +19,6 @@ from frozendict import frozendict
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import MAPPING_TYPE_NAMES
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
-from cl.runtime.records.protocols import SEQUENCE_TYPE_NAMES
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum_type
@@ -29,7 +26,8 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
-from cl.runtime.records.typename import typename, typeof
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typeof
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
@@ -346,7 +344,8 @@ class DataSerializer(Serializer):
                     if not issubclass(deserialized_type, schema_type):
                         raise RuntimeError(
                             f"Field _type={deserialized_type_name} in serialized data\n"
-                            f"is not a subclass of schema type {typename(schema_type)}.")
+                            f"is not a subclass of schema type {typename(schema_type)}."
+                        )
                 elif schema_type is not None:
                     # Otherwise use schema type if specified
                     deserialized_type = schema_type

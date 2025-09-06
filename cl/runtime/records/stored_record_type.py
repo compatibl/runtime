@@ -14,10 +14,12 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_record_type, is_key_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.stored_record_type_key import StoredRecordTypeKey
-from cl.runtime.records.typename import typenameof, typename
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typenameof
 
 
 @dataclass(slots=True, kw_only=True)
@@ -34,7 +36,7 @@ class StoredRecordType(StoredRecordTypeKey, RecordMixin):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if not is_record_type(self.record_type):
             raise RuntimeError(
-                f"Field {typenameof(self)}.record_type={typename(self.record_type)} is not a record type.")
+                f"Field {typenameof(self)}.record_type={typename(self.record_type)} is not a record type."
+            )
         if not is_key_type(self.key_type):
-            raise RuntimeError(
-                f"Field {typenameof(self)}.key_type={typename(self.key_type)} is not a key type.")
+            raise RuntimeError(f"Field {typenameof(self)}.key_type={typename(self.key_type)} is not a key type.")

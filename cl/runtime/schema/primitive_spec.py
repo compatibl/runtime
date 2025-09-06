@@ -13,8 +13,10 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_primitive_type
-from cl.runtime.records.typename import typename, typenameof
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typenameof
 from cl.runtime.schema.type_spec import TypeSpec
 
 

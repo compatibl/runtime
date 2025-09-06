@@ -15,6 +15,7 @@
 from typing import Any
 from memoization import cached
 
+
 def typeof(value: Any) -> type:
     """Return type of the specified instance, converting ABCMeta and other metaclasses to type."""
     result = type(value)

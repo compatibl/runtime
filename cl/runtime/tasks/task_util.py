@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.contexts.context_manager import active
-from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.schema.type_cache import TypeCache
