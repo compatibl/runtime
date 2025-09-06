@@ -12,6 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.typename import typeof, typenameof
+
 
 class KeyUtil:
     """Helper methods for key types."""
+
+    @classmethod
+    def get_hash(cls, key: KeyMixin) -> int:
+        """Get hash for key types only, error if not a key type or not frozen."""
+        if is_key_type(typeof(key)):
+            if key.is_frozen():
+                # Invoke hash for each field to call hash recursively for the inner key fields of composite keys
+                return hash(tuple(hash(getattr(key, field_name)) for field_name in key.get_field_names()))
+            else:
+                raise RuntimeError(f"Cannot hash an instance of {typenameof(key)} because it is not frozen.")
+        else:
+            raise RuntimeError(f"Cannot hash an instance of {typeof(key)} because it is not a key.")
