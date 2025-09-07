@@ -30,13 +30,13 @@ from cl.runtime.tasks.task_queue_key import TaskQueueKey
 class ClassMethodTask(MethodTask):
     """Invoke a @staticmethod or @classmethod, do not use for instance methods."""
 
-    type_str: str = required()
-    """Class type as dot-delimited string in module.ClassName format."""
+    type_: type = required()
+    """Class for which the class method is invoked."""
 
     def _create_log_context(self) -> TaskLog:
         """Create TaskLog with task specific info."""
         return TaskLog(
-            record_type_name=typename(TypeCache.from_qual_name(self.type_str)),
+            record_type_name=typename(self.type_),
             handler=self._title_handler_name(self.method_name),
             task_run_id=self.task_id,
         ).build()
@@ -45,12 +45,9 @@ class ClassMethodTask(MethodTask):
     def _execute(self):
         """Invoke the specified @staticmethod or @classmethod."""
 
-        # Get record type from fully qualified name in module.ClassName format
-        record_type = TypeCache.from_qual_name(self.type_str)
-
         # Method callable is already bound to cls, it is not necessary to pass cls as an explicit parameter
         method_name = self.normalized_method_name()
-        method = getattr(record_type, method_name)
+        method = getattr(self.type_, method_name)
 
         params = self.deserialized_method_params(method)
         return method(**params)
@@ -67,7 +64,7 @@ class ClassMethodTask(MethodTask):
 
         # Populate known fields
         result = cls(queue=queue)
-        result.type_str = f"{record_type.__module__}.{typename(record_type)}"
+        result.type_ = record_type
 
         # Check that __self__ is either absent (@staticmethod) or is a class (@classmethod)
         if (method_cls := getattr(method_callable, "__self__", None)) is not None and not inspect.isclass(method_cls):

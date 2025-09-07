@@ -16,7 +16,6 @@ from cl.runtime.records.typename import typename
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
@@ -68,12 +67,11 @@ class TaskUtil:
             else:
                 # Key is None, this is a @classmethod or @staticmethod
                 record_type = TypeCache.from_type_name(request.type)
-                record_type_str = f"{record_type.__module__}.{typename(record_type)}"
                 label = f"{typename(record_type)};{handler_name}"
                 handler_task = ClassMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),
-                    type_str=record_type_str,
+                    type_=record_type,
                     method_name=handler_name,
                     method_params=request_arguments,
                 ).build()
