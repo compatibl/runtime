@@ -17,15 +17,15 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.stored_record_type_key import StoredRecordTypeKey
+from cl.runtime.records.record_type_presence_key import RecordTypePresenceKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StoredRecordTypeQuery(DataclassMixin, QueryMixin):
-    """Query for StoredRecordType by the key_type field."""
+class RecordTypePresenceQuery(DataclassMixin, QueryMixin):
+    """Query for RecordTypePresence by the key_type field."""
 
     key_type: type | Condition[type] | None = None
     """Use to query for record types stored in the table for this key type."""
 
     def get_target_type(self) -> type[KeyMixin]:
-        return StoredRecordTypeKey
+        return RecordTypePresenceKey

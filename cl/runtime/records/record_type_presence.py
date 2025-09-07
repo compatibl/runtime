@@ -17,20 +17,20 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.stored_record_type_key import StoredRecordTypeKey
+from cl.runtime.records.record_type_presence_key import RecordTypePresenceKey
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
 
 
 @dataclass(slots=True, kw_only=True)
-class StoredRecordType(StoredRecordTypeKey, RecordMixin):
+class RecordTypePresence(RecordTypePresenceKey, RecordMixin):
     """Indicates that DB has a table for the specified record type."""
 
     key_type: type = required()
     """Use to query for record types stored in the table for this key type."""
 
-    def get_key(self) -> StoredRecordTypeKey:
-        return StoredRecordTypeKey(record_type=self.record_type).build()
+    def get_key(self) -> RecordTypePresenceKey:
+        return RecordTypePresenceKey(record_type=self.record_type).build()
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

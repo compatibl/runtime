@@ -45,13 +45,13 @@ def test_screens(default_db_fixture):
     assert set(x.get("TableName") for x in screens.get("Result").get("Tables")) == {
         "StubDataclassKey",
         "StubDataclassPolymorphicKey",
-        "StoredRecordTypeKey",
+        "RecordTypePresenceKey",
     }
     assert set(x.get("TypeName") for x in screens.get("Result").get("Types")) == {
         "StubDataclass",
         "StubDataclassDerived",
         "StubDataclassPolymorphic",
-        "StoredRecordType",
+        "RecordTypePresence",
     }
 
 

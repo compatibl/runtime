@@ -42,8 +42,8 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
-from cl.runtime.records.stored_record_type import StoredRecordType
-from cl.runtime.records.stored_record_type_query import StoredRecordTypeQuery
+from cl.runtime.records.record_type_presence import RecordTypePresence
+from cl.runtime.records.record_type_presence_query import RecordTypePresenceQuery
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typeof
@@ -692,11 +692,11 @@ class DataSource(DataSourceKey, RecordMixin):
             if record_types:
                 # Add presence records without checking if they are already present, as
                 # it is faster to save all records than to check which already exist
-                record_types.add(StoredRecordType)  # TODO: !!!!!!!!!! Rename to RecordTypePresence
-                stored_record_types = tuple(
-                    StoredRecordType(record_type=x, key_type=x.get_key_type()).build() for x in record_types
+                record_types.add(RecordTypePresence)
+                record_type_presences = tuple(
+                    RecordTypePresence(record_type=x, key_type=x.get_key_type()).build() for x in record_types
                 )
-                self._pending_replacements.extend(stored_record_types)
+                self._pending_replacements.extend(record_type_presences)
 
             # Invoke delete_many for all pending deletes
             if self._pending_deletions:
@@ -751,7 +751,7 @@ class DataSource(DataSourceKey, RecordMixin):
     def get_key_types(self) -> tuple[type, ...]:
         """Return stored key types in alphabetical order of type name."""
         # Load from DB as cache may be out of date, eliminate duplicates
-        key_types = set(x.key_type for x in self.load_by_type(StoredRecordType))
+        key_types = set(x.key_type for x in self.load_by_type(RecordTypePresence))
         # Sort in alphabetical order of type name
         return tuple(sorted(key_types, key=lambda x: typename(x.get_key_type())))
 
@@ -765,11 +765,11 @@ class DataSource(DataSourceKey, RecordMixin):
         """
 
         # Always load from DB as cache may be out of date
-        query = StoredRecordTypeQuery(key_type=key_type).build()
-        stored_record_types = [x.record_type for x in self.load_by_query(query, cast_to=StoredRecordType)]
+        query = RecordTypePresenceQuery(key_type=key_type).build()
+        record_type_presences = [x.record_type for x in self.load_by_query(query, cast_to=RecordTypePresence)]
 
         # Sort in alphabetical order of record_type (not the same as query sort order)
-        return tuple(sorted(stored_record_types, key=lambda x: typename(x)))
+        return tuple(sorted(record_type_presences, key=lambda x: typename(x)))
 
     def get_common_base_record_type(self, *, key_type: type) -> type:
         """Return the common type for all records stored for this key type, error if no such records."""

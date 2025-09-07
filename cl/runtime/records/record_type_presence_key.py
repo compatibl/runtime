@@ -19,7 +19,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class StoredRecordTypeKey(DataclassMixin, KeyMixin):
+class RecordTypePresenceKey(DataclassMixin, KeyMixin):
     """Indicates that DB has a table for the specified record type."""
 
     record_type: type = required()
@@ -27,4 +27,4 @@ class StoredRecordTypeKey(DataclassMixin, KeyMixin):
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return StoredRecordTypeKey
+        return RecordTypePresenceKey
