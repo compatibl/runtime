@@ -37,8 +37,8 @@ from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.bool_format import BoolFormat
 from cl.runtime.serializers.bytes_format import BytesFormat
 from cl.runtime.serializers.date_format import DateFormat

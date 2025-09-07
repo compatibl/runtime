@@ -19,14 +19,16 @@ from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import qualname
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
-from stubs.cl.runtime import StubDataclass, StubDataclassDoubleDerived, StubDataclassPrimitiveFields
+from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime import StubDataclassDoubleDerived
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassOtherDerived
+from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_underscore import (  # noqa
     __StubDataclassDoubleUnderscore,
@@ -144,7 +146,9 @@ def test_import_type():
 
     # Class does not exist error
     with pytest.raises(RuntimeError):
-        qual_name_with_unknown_class = "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.UnknownClass"
+        qual_name_with_unknown_class = (
+            "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.UnknownClass"
+        )
         TypeInfo._import_type(qual_name=qual_name_with_unknown_class)
 
 
@@ -190,6 +194,7 @@ def test_get_types():
     assert DataMixin not in enum_types
     assert KeyMixin not in enum_types
     assert RecordMixin not in enum_types
+
 
 def test_get_parent_and_self_types():
     """Test TypeInfo.get_parent_and_self_types method."""

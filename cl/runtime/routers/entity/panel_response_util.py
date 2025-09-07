@@ -20,9 +20,9 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.entity.panel_request import PanelRequest
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.views.empty_view import EmptyView

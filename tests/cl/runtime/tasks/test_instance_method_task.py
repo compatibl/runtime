@@ -36,11 +36,7 @@ def test_smoke(default_db_fixture):
     instance_handlers_on_class = [(x.get_key(), StubHandlers.run_instance_method_1a) for x in records]
     class_handlers_on_class = [(x.get_key(), StubHandlers.run_class_method_1a) for x in records]
 
-    sample_inputs = (
-        instance_handlers_on_object
-        + instance_handlers_on_class
-        + class_handlers_on_class
-    )
+    sample_inputs = instance_handlers_on_object + instance_handlers_on_class + class_handlers_on_class
 
     for sample_input in sample_inputs:
         key = sample_input[0]

@@ -14,7 +14,8 @@
 
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_key_type
-from cl.runtime.records.typename import typeof, typenameof
+from cl.runtime.records.typename import typenameof
+from cl.runtime.records.typename import typeof
 
 
 class KeyUtil:

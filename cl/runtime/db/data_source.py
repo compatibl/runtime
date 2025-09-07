@@ -47,11 +47,12 @@ from cl.runtime.records.record_type_presence_query import RecordTypePresenceQuer
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typeof
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _LOGGER = logging.getLogger(__name__)
+
 
 @dataclass(slots=True, kw_only=True)
 class DataSource(DataSourceKey, RecordMixin):
@@ -664,12 +665,10 @@ class DataSource(DataSourceKey, RecordMixin):
         try:
             # Ensure no key collisions within the deletions, insertions and replacements lists
             pending_keys = self._pending_deletions + [
-                x.get_key()
-                for x in (self._pending_insertions + self._pending_replacements)
+                x.get_key() for x in (self._pending_insertions + self._pending_replacements)
             ]
             serialized_pending_keys = [
-                KeySerializers.DELIMITED.serialize(x, type_hint=TypeHint.for_type(KeyMixin))
-                for x in pending_keys
+                KeySerializers.DELIMITED.serialize(x, type_hint=TypeHint.for_type(KeyMixin)) for x in pending_keys
             ]
             # Dictionary of keys indexed by their serialization into tuple
             seen_pending_keys = defaultdict(list)
@@ -703,7 +702,9 @@ class DataSource(DataSourceKey, RecordMixin):
                 [
                     # Delete first
                     self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
-                    for key_type, records_for_key_type in self._group_inputs_by_key_type(self._pending_deletions).items()
+                    for key_type, records_for_key_type in self._group_inputs_by_key_type(
+                        self._pending_deletions
+                    ).items()
                 ]
 
             # Invoke insert_many for all pending inserts
@@ -717,7 +718,9 @@ class DataSource(DataSourceKey, RecordMixin):
                         save_policy=SavePolicy.INSERT,
                     )
             if self._pending_replacements:
-                for key_type, records_for_key_type in self._group_inputs_by_key_type(self._pending_replacements).items():
+                for key_type, records_for_key_type in self._group_inputs_by_key_type(
+                    self._pending_replacements
+                ).items():
                     # Replace last
                     self._get_db().save_many(
                         key_type,

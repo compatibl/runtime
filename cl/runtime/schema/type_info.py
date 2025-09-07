@@ -12,23 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
-from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.for_dataclasses.extensions import required
 import importlib
 import os
 import sys
+from dataclasses import dataclass
 from importlib import import_module
 from inspect import getmembers
 from inspect import isclass
 from pkgutil import walk_packages
 from types import ModuleType
-from typing import Sequence, ClassVar, Self, Collection
+from typing import ClassVar
+from typing import Collection
+from typing import Self
+from typing import Sequence
 from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.enum_util import EnumUtil
-from cl.runtime.records.protocols import is_abstract_type
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_data_type
 from cl.runtime.records.protocols import is_enum_type
@@ -36,7 +38,8 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mixin_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record_type
-from cl.runtime.records.typename import typename, qualname
+from cl.runtime.records.typename import qualname
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -636,9 +639,7 @@ class TypeInfo(BootstrapMixin):
                 cls._check_type(subtype)
                 # Recurse into the subclass hierarchy, avoid adding duplicates
                 subtypes.update(
-                    x
-                    for x in cls._get_unfiltered_child_types_set(subtype)
-                    if is_data_key_or_record_type(x)
+                    x for x in cls._get_unfiltered_child_types_set(subtype) if is_data_key_or_record_type(x)
                 )
         return subtypes
 
@@ -665,9 +666,7 @@ class TypeInfo(BootstrapMixin):
                     # it was added to the cache since the initial check
                     module = cls._module_dict.setdefault(module_name, import_module(module_name))
                 except ModuleNotFoundError:
-                    raise RuntimeError(
-                        f"Module {module_name} is not found in TypeInfo, run init_type_info to rebuild."
-                    )
+                    raise RuntimeError(f"Module {module_name} is not found in TypeInfo, run init_type_info to rebuild.")
 
         # Get class from module, report error if not found
         try:
@@ -683,4 +682,3 @@ class TypeInfo(BootstrapMixin):
     def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:
         """Return error message for type name not found."""
         return RuntimeError(f"Type {type_name} is not found in TypeInfo, run init_type_info to rebuild.")
-

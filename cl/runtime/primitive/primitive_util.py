@@ -21,8 +21,8 @@ from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
 from cl.runtime.records.typename import typeof
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info import TypeInfo
 
 
 class PrimitiveUtil(BuilderUtil):

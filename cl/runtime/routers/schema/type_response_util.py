@@ -18,8 +18,8 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
+from cl.runtime.schema.type_info import TypeInfo
 
 
 class TypeResponseUtil:

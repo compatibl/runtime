@@ -33,8 +33,8 @@ from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
 from cl.runtime.records.typename import typeof
 from cl.runtime.schema.data_spec import DataSpec
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.key_format import KeyFormat
 from cl.runtime.serializers.serializer import Serializer

@@ -22,9 +22,7 @@ from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_record_type
-from cl.runtime.records.typename import typename, typenameof
-from cl.runtime.schema.type_info import TypeInfo
+from cl.runtime.records.typename import typenameof
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.method_task import MethodTask
@@ -99,5 +97,7 @@ class InstanceMethodTask(MethodTask):
 
         # Set label and return
         method_name_pascal_case = CaseUtil.snake_to_pascal_case(result.method_name)
-        result.label = f"{KeySerializers.DELIMITED.serialize(key, TypeHint.for_type(KeyMixin))};{method_name_pascal_case}"
+        result.label = (
+            f"{KeySerializers.DELIMITED.serialize(key, TypeHint.for_type(KeyMixin))};{method_name_pascal_case}"
+        )
         return result

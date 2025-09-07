@@ -13,9 +13,12 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.contexts.context_manager import active, activate
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from stubs.cl.runtime import StubDataclass, StubDataclassKey
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassKey
+
 
 def test_commit(multi_db_fixture):
     """Test commit method."""
@@ -25,6 +28,7 @@ def test_commit(multi_db_fixture):
     assert ds.load_one_or_none(sample.get_key()) is None
     ds.commit()
     assert ds.load_one_or_none(sample.get_key()) == sample
+
 
 def test_rollback(multi_db_fixture):
     """Test rollback method."""
@@ -39,6 +43,7 @@ def test_rollback(multi_db_fixture):
     assert ds.load_one_or_none(sample_a.get_key()) is None
     assert ds.load_one_or_none(sample_b.get_key()) == sample_b
 
+
 def test_pre_commit_exception(default_db_fixture):
     """Test an exception before commit is called."""
     try:
@@ -50,6 +55,7 @@ def test_pre_commit_exception(default_db_fixture):
         pass
     # Ensure pending operations were cleared
     assert not ds._has_pending_operations()
+
 
 def test_commit_collisions(default_db_fixture):
     """Test commit method."""

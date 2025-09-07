@@ -23,8 +23,8 @@ from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.storage.save_permanently_request import SavePermanentlyRequest
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 

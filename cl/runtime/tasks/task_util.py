@@ -14,12 +14,12 @@
 
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
-from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.class_method_task import ClassMethodTask
+from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task import Task
 
 handler_queue = CeleryQueue(queue_id="Handler Queue")

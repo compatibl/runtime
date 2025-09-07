@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.records.key_util import KeyUtil
 from stubs.cl.runtime import StubDataclassKey
-    
+
 
 def test_get_hash():
     """Test KeyMixin.get_hash method."""
@@ -32,6 +31,7 @@ def test_get_hash():
     with pytest.raises(Exception, match="not frozen"):
         # Not frozen
         KeyUtil.get_hash(StubDataclassKey(id="a"))
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
