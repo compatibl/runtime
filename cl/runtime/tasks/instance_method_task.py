@@ -23,7 +23,7 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_record_type
-from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typename, typenameof
 from cl.runtime.schema.type_cache import TypeCache
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -37,31 +37,24 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 class InstanceMethodTask(MethodTask):
     """Invoke a class instance method, do not use for @classmethod or @staticmethod."""
 
-    key_type_str: str = required()
-    """Key type as dot-delimited string in module.ClassNameKey format inclusive of Key suffix if present."""
-
-    key_str: str = required()
-    """Key as semicolon-delimited string."""
+    key: KeyMixin = required()
+    """Key of the record for which the method is invoked."""
 
     def _create_log_context(self) -> TaskLog:
         """Create TaskLog with task specific info."""
         return TaskLog(
-            record_type_name=typename(TypeCache.from_qual_name(self.key_type_str)),
+            record_type_name=typenameof(self.key),
             handler=self._title_handler_name(self.method_name),
             task_run_id=self.task_id,
-            record_key=self.key_str,
+            record_key=KeySerializers.DELIMITED.serialize(self.key),
         ).build()
 
     @override
     def _execute(self):
         """Invoke the specified instance method."""
 
-        key_type = TypeCache.from_qual_name(self.key_type_str)
-        type_hint = TypeHint.for_type(key_type)
-        key = _KEY_SERIALIZER.deserialize(self.key_str, type_hint)
-
         # Load record from storage
-        record = active(DataSource).load_one(key)  # TODO: Require record type?
+        record = active(DataSource).load_one(self.key)
 
         # Convert the name to snake_case and get method callable
         method_name = self.normalized_method_name()
@@ -75,7 +68,7 @@ class InstanceMethodTask(MethodTask):
         cls,
         *,
         queue: TaskQueueKey,
-        key_or_record: KeyMixin | None = None,
+        key: KeyMixin,
         method_callable: Callable,
     ) -> Self:
         """
@@ -86,18 +79,12 @@ class InstanceMethodTask(MethodTask):
 
         Args:
             queue: Queue that will run the task
-            key_or_record: Record or its key
+            key: Key of the instance for which the method is invoked
             method_callable: Callable bound to a class (ClassName.method_name) or its instance (obj.method_name)
         """
 
         # Populate known fields
-        result = cls(queue=queue)
-
-        # Get key type and key
-        key_type = key_or_record.get_key_type()
-        result.key_type_str = f"{key_type.__module__}.{typename(key_type)}"
-        key = key_or_record.get_key() if is_record_type(type(key_or_record)) else key_or_record
-        result.key_str = _KEY_SERIALIZER.serialize(key)
+        result = cls(queue=queue, key=key)
 
         # Two tokens because the callable is bound to a class or its instance
         method_tokens = method_callable.__qualname__.split(".")
@@ -112,5 +99,5 @@ class InstanceMethodTask(MethodTask):
 
         # Set label and return
         method_name_pascal_case = CaseUtil.snake_to_pascal_case(result.method_name)
-        result.label = f"{typename(key_type)};{result.key_str};{method_name_pascal_case}"
+        result.label = f"{KeySerializers.DELIMITED.serialize(key, TypeHint.for_type(KeyMixin))};{method_name_pascal_case}"
         return result

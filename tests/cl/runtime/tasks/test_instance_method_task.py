@@ -32,28 +32,22 @@ def test_smoke(default_db_fixture):
     ]
     active(DataSource).insert_many(records, commit=True)
 
-    object_and_instance_handler_on_object = [(x, x.run_instance_method_1a) for x in records]
-    key_and_instance_handler_on_object = [(x.get_key(), x.run_instance_method_1a) for x in records]
-    object_and_instance_handler_on_class = [(x, StubHandlers.run_instance_method_1a) for x in records]
-    key_and_instance_handler_on_class = [(x.get_key(), StubHandlers.run_instance_method_1a) for x in records]
-    object_and_class_handler_on_class = [(x, StubHandlers.run_class_method_1a) for x in records]
-    key_and_class_handler_on_class = [(x.get_key(), StubHandlers.run_class_method_1a) for x in records]
+    instance_handlers_on_object = [(x.get_key(), x.run_instance_method_1a) for x in records]
+    instance_handlers_on_class = [(x.get_key(), StubHandlers.run_instance_method_1a) for x in records]
+    class_handlers_on_class = [(x.get_key(), StubHandlers.run_class_method_1a) for x in records]
 
     sample_inputs = (
-        object_and_instance_handler_on_object
-        + key_and_instance_handler_on_object
-        + object_and_instance_handler_on_class
-        + key_and_instance_handler_on_class
-        + object_and_class_handler_on_class
-        + key_and_class_handler_on_class
+        instance_handlers_on_object
+        + instance_handlers_on_class
+        + class_handlers_on_class
     )
 
     for sample_input in sample_inputs:
-        key_or_record = sample_input[0]
+        key = sample_input[0]
         method_callable = sample_input[1]
         task = InstanceMethodTask.create(
             queue=TaskQueueKey(queue_id="Sample Queue"),
-            key_or_record=key_or_record,
+            key=key,
             method_callable=method_callable,
         ).build()
         task.run_task()
@@ -65,7 +59,7 @@ def _run_task(task_index: int):
 
     task = InstanceMethodTask.create(
         queue=TaskQueueKey(queue_id="Sample Queue"),
-        key_or_record=instance,
+        key=instance.get_key(),
         method_callable=instance.run_instance_method_1a,
     ).build()
 

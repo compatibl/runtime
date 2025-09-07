@@ -18,11 +18,12 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.status_request import StatusRequest
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 
-LEGACY_TASK_STATUS_NAMES_MAP: dict[str, str] = {  # TODO: Update UI to sync the status list
+LEGACY_TASK_STATUS_NAMES_MAP: dict[str, str] = {  # TODO: !! Update UI to sync the status list
     "PENDING": "Submitted",
     "RUNNING": "Running",
     "AWAITING": "Paused",
@@ -64,11 +65,11 @@ class StatusResponseItem(BaseModel):
             # TODO: Add support message depending on exception type.
             user_message = task.error_message
 
-            key = None
-
-            # Only InstanceMethodTask has `key_str` attribute.
             if isinstance(task, InstanceMethodTask):
-                key = task.key_str
+                # Only InstanceMethodTask has `key` field
+                key = KeySerializers.DELIMITED.serialize(task.key)
+            else:
+                key = None
 
             response_items.append(
                 StatusResponseItem(

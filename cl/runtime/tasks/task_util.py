@@ -15,6 +15,9 @@
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_hint import TypeHint
+from cl.runtime.serializers.key_serializer import KeySerializer
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.static_method_task import StaticMethodTask
@@ -51,14 +54,13 @@ class TaskUtil:
 
                 record_type = TypeCache.from_type_name(request.type)
                 key_type = record_type.get_key_type()
+                key = KeySerializers.DELIMITED.deserialize(serialized_key, TypeHint.for_type(key_type))
 
-                key_type_str = f"{key_type.__module__}.{typename(key_type)}"
                 label = f"{typename(key_type)};{serialized_key};{handler_name}"
                 handler_task = InstanceMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),
-                    key_type_str=key_type_str,
-                    key_str=serialized_key,
+                    key=key,
                     method_name=handler_name,
                     method_params=request_arguments,
                 ).build()

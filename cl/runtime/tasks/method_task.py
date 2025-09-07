@@ -25,16 +25,16 @@ from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.tasks.callable_task import CallableTask
+from cl.runtime.tasks.task import Task
 
 _UI_SERIALIZER = DataSerializers.FOR_UI
 
 # Named tuple for method param details
-ParamDetails = namedtuple("ParamDetails", ["annot", "default"])
+ParamDetails = namedtuple("ParamDetails", ["annot", "default"])  # TODO: Avoid namedtuple
 
 
 @dataclass(slots=True, kw_only=True)
-class MethodTask(CallableTask, ABC):
+class MethodTask(Task, ABC):  # TODO: Refactor this class
     """Base class for method tasks that invoke handlers from classes."""
 
     method_name: str = required()

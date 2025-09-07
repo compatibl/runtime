@@ -18,6 +18,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_util import TaskUtil
 from cl.runtime.tasks.task_util import handler_queue
@@ -48,7 +49,12 @@ class SubmitResponseItem(BaseModel):
             active(DataSource).replace_one(handler_task, commit=True)
             handler_queue.submit_task(handler_task)  # TODO: Rely on query instead
 
-            key = handler_task.key_str if isinstance(handler_task, InstanceMethodTask) else None
+            if isinstance(handler_task, InstanceMethodTask):
+                # Only InstanceMethodTask has `key` field
+                key = KeySerializers.DELIMITED.serialize(handler_task.key)
+            else:
+                key = None
+
             response_items.append(SubmitResponseItem(key=key, task_run_id=handler_task.task_id))
 
         return response_items
