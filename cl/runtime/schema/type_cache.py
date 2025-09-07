@@ -43,6 +43,7 @@ _TYPE_INFO_HEADERS = (
     "TypeName",
     "TypeKind",
     "QualName",
+    "Subtype",
 )
 """Headers of TypeInfo preload file."""
 
@@ -55,16 +56,10 @@ def is_schema_type(type_: type) -> bool:
 class TypeCache:
     """Cache of TypeInfo for the specified packages."""
 
-    _type_info_by_type_name_dict: dict[str, TypeInfo] = {}
+    _type_info_by_type_name_dict: dict[str, TypeInfo] | None = None
     """Dictionary of TypeInfo indexed by type name."""
 
-    _type_by_type_name_dict: dict[str, type] = {}
-    """Dictionary of types indexed by type name."""
-
-    _type_by_qual_name_dict: dict[str, type] = {}
-    """Dictionary of types indexed by qual name."""
-
-    _module_dict: dict[str, ModuleType] = {}
+    _module_dict: dict[str, ModuleType] | None = None
     """Dictionary of modules indexed by module name in dot-delimited format."""
 
     _packages: tuple[str, ...] = None
@@ -195,59 +190,11 @@ class TypeCache:
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
-        # Return cached type if found
-        if (result := cls._type_by_type_name_dict.get(type_name, None)) is not None:
-            return result
-
         # Next, try using cached qual name to avoid enumerating types in all packages
         if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
-            return cls.from_qual_name(type_info.qual_name)
+            return type_info.type_
         else:
             raise cls._type_name_not_found_error(type_name)
-
-    @classmethod
-    @cached
-    def from_qual_name(cls, qual_name: str) -> type:
-        """Get type from fully qualified name in module.ClassName format."""
-
-        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
-        cls._ensure_loaded()
-
-        # Return cached value if found
-        if (result := cls._type_by_qual_name_dict.get(qual_name, None)) is not None:
-            return result
-
-        # Split fully qualified name into dot-delimited snake_case module and PascalCase class name
-        module_name, class_name = qual_name.rsplit(".", 1)
-
-        # Load the module if not already in cache
-        if (module := cls._module_dict.get(module_name, None)) is None:
-            # Check that the module exists and is fully initialized
-            module = sys.modules.get(module_name)
-            module_spec = getattr(module, "__spec__", None) if module is not None else None
-            module_initializing = getattr(module_spec, "_initializing", False) if module_spec is not None else None
-            module_imported = module_initializing is False  # To ensure it is not another value evaluating to False
-
-            # Import dynamically if not already imported, report error if not found
-            if not module_imported:
-                try:
-                    # Use setdefault to avoid overwriting the module if
-                    # it was added to the cache since the initial check
-                    module = cls._module_dict.setdefault(module_name, import_module(module_name))
-                except ModuleNotFoundError:
-                    raise RuntimeError(
-                        f"Module {module_name} is not found in TypeCache, run init_type_cache to rebuild."
-                    )
-
-        # Get class from module, report error if not found
-        try:
-            # Get class from module
-            result = getattr(module, class_name)
-            # Add to the qual_name and type_name dictionaries
-            cls._add_class(result)
-            return result
-        except AttributeError:
-            raise RuntimeError(f"Class {qual_name} is not found in TypeCache, run init_type_cache to rebuild.")
 
     @classmethod
     @cached
@@ -266,7 +213,7 @@ class TypeCache:
         type_info_values = cls._type_info_by_type_name_dict.values()
         if type_kind is not None:
             type_info_values = [type_info for type_info in type_info_values if type_info.type_kind == type_kind]
-        result = tuple(cls.from_qual_name(x.qual_name) for x in type_info_values)
+        result = tuple(x.type_ for x in type_info_values)
         return result
 
     @classmethod
@@ -470,43 +417,39 @@ class TypeCache:
                     f"Only primitive types can have subtypes."
                 )
 
-        # TODO: !! Check this is not a class embedded in another class
-        qual_name = f"{class_.__module__}.{class_.__name__}"
-
         # Get type info without subclass names (which will be done on second pass after all types are loaded)
         type_info = TypeInfo(
             type_name=type_name,
             type_kind=type_kind,
-            qual_name=qual_name,
+            type_=class_,
+            subtype=subtype,
         )
 
         # Populate the dictionary
         existing_info = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
 
-        # Check for duplicate type names
-        if existing_info.qual_name != type_info.qual_name:
+        # In case of a name collision, the value of type field in existing_info will not match
+        if existing_info.type_ != type_info.type_:
             raise RuntimeError(
                 f"Two types in the imported packages share the same type name: {type_info.type_name}\n"
-                f"  - {existing_info.qual_name}\n"
-                f"  - {type_info.qual_name}\n"
-                f"Use TypeAlias to resolve the name collision.\n"
+                f"  - {existing_info.type_.__module__}.{existing_info.type_.__name__}\n"
+                f"  - {type_info.type_.__module__}.{type_info.type_.__name__}\n"
+                f"Use TypeAlias.csv preload to resolve the name collision.\n"
             )
 
     @classmethod
     def _ensure_loaded(cls):
-        """Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded."""
-        if not cls._type_info_by_type_name_dict:
-            # Load the type cache from TypeInfo.csv
-            cls._load()
+        """Load the data from TypeInfo.csv if not already loaded, do not reload."""
 
-    @classmethod
-    def _load(cls) -> None:
-        """Load type cache from TypeInfo.csv."""
+        if cls._type_info_by_type_name_dict is not None:
+            # Already loaded, exit early
+            return
 
         # Clear cache before loading
         cls._clear()
 
         # Read from the cache file
+        # TODO: !!!!!!!! Move to CsvUtil
         cache_filename = cls._get_preload_filename()
         if os.path.exists(cache_filename):
             with open(cache_filename, "r") as file:
@@ -536,14 +479,14 @@ class TypeCache:
                 # Parse a type info row
                 if len(row_tokens) == len(_TYPE_INFO_HEADERS):
                     # Extract the type name and qual name from the tokens
-                    type_name, type_kind, qual_name = row_tokens
+                    type_name, type_kind, qual_name, subtype = row_tokens
                 else:
                     expected_num_tokens = len(_TYPE_INFO_HEADERS)
                     actual_num_tokens = len(row_tokens)
                     raise RuntimeError(
                         f"Invalid number of comma-delimited tokens {actual_num_tokens} in TypeCache, "
                         f"should be {expected_num_tokens}.\n"
-                        f"Sample row: TypeName,TypeKind,module.ClassName\n"
+                        f"Sample row: TypeName,TypeKind,module.ClassName,subtype\n"
                         f"Invalid row: {row.strip()}\n"
                     )
 
@@ -551,19 +494,21 @@ class TypeCache:
                 type_info = TypeInfo(
                     type_name=type_name,
                     type_kind=EnumUtil.from_str(TypeKind, type_kind),
-                    qual_name=qual_name,
+                    type_=cls._import_type(qual_name=qual_name),
+                    subtype=subtype,
                 )
 
                 # Add to the type info dictionary
-                existing = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
+                # Use _add_class to avoid repeated code
+                existing_info = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
 
-                # Check for duplicates
-                if existing.qual_name != type_info.qual_name:
+                # In case of a name collision, the value of type field in existing_info will not match
+                if existing_info.type_ != type_info.type_:
                     raise RuntimeError(
-                        f"Two entries in TypeCache share the same type name: {type_name}\n"
-                        f"  - {existing.qual_name}\n"
-                        f"  - {type_info.qual_name}\n"
-                        f"Use TypeAlias to resolve the name collision.\n"
+                        f"Two types in the imported packages share the same type name: {type_info.type_name}\n"
+                        f"  - {existing_info.type_.__module__}.{existing_info.type_.__name__}\n"
+                        f"  - {type_info.type_.__module__}.{type_info.type_.__name__}\n"
+                        f"Use TypeAlias.csv preload to resolve the name collision.\n"
                     )
 
     @classmethod
@@ -583,19 +528,17 @@ class TypeCache:
                 # Format fields for writing
                 type_name = type_info.type_name
                 type_kind_str = EnumUtil.to_str(type_info.type_kind)
-                qual_name = type_info.qual_name
+                qual_name = f"{type_info.type_.__module__}.{type_info.type_.__name__}"
+                subtype = type_info.subtype
 
                 # Write comma-separated values for each token, with semicolons-separated lists
-                file.write(f"{type_name},{type_kind_str},{qual_name}\n")
+                file.write(f"{type_name},{type_kind_str},{qual_name},{subtype}\n")
 
     @classmethod
     def _clear(cls) -> None:
         """Clear cache before loading or rebuilding."""
         cls._type_info_by_type_name_dict = {}
-        cls._type_by_type_name_dict = {}
-        cls._type_by_qual_name_dict = {}
         cls._module_dict = {}
-        cls._cache_filename = None
 
     @classmethod
     def _get_preload_filename(cls) -> str:
@@ -669,6 +612,43 @@ class TypeCache:
                     if x not in subtypes and is_data_key_or_record_type(x)
                 )
         return subtypes
+
+    @classmethod
+    @cached
+    def _import_type(cls, *, qual_name: str) -> type:
+        """Import type using its fully qualified name in module.ClassName format."""
+
+        # Split fully qualified name into dot-delimited snake_case module and PascalCase class name
+        module_name, class_name = qual_name.rsplit(".", 1)
+
+        # Load the module if not already in cache
+        if (module := cls._module_dict.get(module_name, None)) is None:
+            # Check that the module exists and is fully initialized
+            module = sys.modules.get(module_name)
+            module_spec = getattr(module, "__spec__", None) if module is not None else None
+            module_initializing = getattr(module_spec, "_initializing", False) if module_spec is not None else None
+            module_imported = module_initializing is False  # To ensure it is not another value evaluating to False
+
+            # Import dynamically if not already imported, report error if not found
+            if not module_imported:
+                try:
+                    # Use setdefault to avoid overwriting the module if
+                    # it was added to the cache since the initial check
+                    module = cls._module_dict.setdefault(module_name, import_module(module_name))
+                except ModuleNotFoundError:
+                    raise RuntimeError(
+                        f"Module {module_name} is not found in TypeCache, run init_type_cache to rebuild."
+                    )
+
+        # Get class from module, report error if not found
+        try:
+            # Get class from module
+            result = getattr(module, class_name)
+            # Add to the qual_name and type_name dictionaries
+            cls._add_class(result)
+            return result
+        except AttributeError:
+            raise RuntimeError(f"Class {qual_name} is not found in TypeCache, run init_type_cache to rebuild.")
 
     @classmethod
     def _type_name_not_found_error(cls, type_name: str) -> RuntimeError:

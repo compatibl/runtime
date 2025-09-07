@@ -27,5 +27,8 @@ class TypeInfo(BootstrapMixin):
     type_kind: TypeKind
     """Type kind (primitive, enum, data, key, record)."""
 
-    qual_name: str
-    """Fully qualified name in module.ClassName format."""
+    type_: type
+    """Class that corresponds to the type name or alias."""
+
+    subtype: str | None = None
+    """Subtype for primitive types only (optional)."""

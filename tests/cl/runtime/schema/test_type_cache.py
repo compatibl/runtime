@@ -121,30 +121,30 @@ def test_from_type_name():
     assert TypeCache.from_type_name("StubDataclassData") is StubDataclassData
 
 
-def test_from_qual_name():
-    """Test getting class from qual names."""
+def test_import_type():
+    """Test importing class using its qualname."""
 
     # Classes that is already imported
     for imported_class in [TypeCache, TypeDecl, StubDataclass]:
-        class_info_path = f"{imported_class.__module__}.{imported_class.__name__}"
-        assert TypeCache.from_qual_name(class_info_path) == imported_class
+        qual_name = f"{imported_class.__module__}.{imported_class.__name__}"
+        assert TypeCache._import_type(qual_name=qual_name) == imported_class
 
     # Class that is dynamically imported on demand
-    do_no_import_class_path = (
+    do_no_import_qual_name = (
         "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.StubDataclassDoNotImport"
     )
-    do_no_import_class = TypeCache.from_qual_name(do_no_import_class_path)
-    assert do_no_import_class_path == f"{do_no_import_class.__module__}.{do_no_import_class.__name__}"
+    do_no_import_class = TypeCache._import_type(qual_name=do_no_import_qual_name)
+    assert do_no_import_qual_name == f"{do_no_import_class.__module__}.{do_no_import_class.__name__}"
 
     # Module does not exist error
     with pytest.raises(RuntimeError):
-        path_with_unknown_module = "unknown_module.StubDataclassDoNotImport"
-        TypeCache.from_qual_name(path_with_unknown_module)
+        qual_name_with_unknown_module = "unknown_module.StubDataclassDoNotImport"
+        TypeCache._import_type(qual_name=qual_name_with_unknown_module)
 
     # Class does not exist error
     with pytest.raises(RuntimeError):
-        path_with_unknown_class = "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.UnknownClass"
-        TypeCache.from_qual_name(path_with_unknown_class)
+        qual_name_with_unknown_class = "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.UnknownClass"
+        TypeCache._import_type(qual_name=qual_name_with_unknown_class)
 
 
 def test_get_types():
