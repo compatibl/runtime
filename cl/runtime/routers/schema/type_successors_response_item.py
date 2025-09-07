@@ -17,7 +17,7 @@ from inflection import titleize
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
 
 
@@ -39,8 +39,8 @@ class TypeSuccessorsResponseItem(BaseModel):
         """Implements /schema/type-successors route."""
 
         # Getting child record type names
-        base_record_type = TypeCache.from_type_name(request.type_name)
-        child_record_type_names = TypeCache.get_child_type_names(base_record_type, type_kind=TypeKind.RECORD)
+        base_record_type = TypeInfo.from_type_name(request.type_name)
+        child_record_type_names = TypeInfo.get_child_type_names(base_record_type, type_kind=TypeKind.RECORD)
         result = [
             TypeSuccessorsResponseItem(name=type_name, label=titleize(type_name))
             for type_name in child_record_type_names

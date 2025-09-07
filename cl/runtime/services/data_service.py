@@ -24,7 +24,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.services.screens import Screens
 from cl.runtime.services.table_screen_item import TableScreenItem
@@ -57,7 +57,7 @@ class DataService(DataclassMixin):
         types = [
             TypeScreenItem(
                 type_name=(record_type_name := typename(record_type)),
-                table_name=typename(TypeCache.from_type_name(record_type_name).get_key_type()),
+                table_name=typename(TypeInfo.from_type_name(record_type_name).get_key_type()),
                 label=titleize(record_type_name),
             )
             for record_type in ds.get_record_types()
@@ -83,7 +83,7 @@ class DataService(DataclassMixin):
         ds: DataSource = active(DataSource)
 
         # Select by table using load_all
-        type_ = cast(type[KeyMixin], TypeCache.from_type_name(table_name))
+        type_ = cast(type[KeyMixin], TypeInfo.from_type_name(table_name))
         records = ds.load_all(type_)
 
         if records:
@@ -105,7 +105,7 @@ class DataService(DataclassMixin):
         ds: DataSource = active(DataSource)
 
         # Select by type
-        type_ = cast(type[RecordMixin], TypeCache.from_type_name(type_name))
+        type_ = cast(type[RecordMixin], TypeInfo.from_type_name(type_name))
         records = ds.load_by_type(type_)
 
         # Get schema dict for type

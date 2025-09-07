@@ -18,7 +18,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
 
 
@@ -30,13 +30,13 @@ class TypeResponseUtil:
         """Supports /schema/type route."""
 
         # TODO(Roman): !!! Implement separate methods for table and type
-        if TypeCache.is_known_type_name(request.type_name):
+        if TypeInfo.is_known_type_name(request.type_name):
             # TODO: Check why empty module is passed, is module the short name prefix?
             record_type_name = request.type_name
-            record_type = TypeCache.from_type_name(record_type_name)
+            record_type = TypeInfo.from_type_name(record_type_name)
         else:
             # Get lowest common type bound to the table
-            key_type = TypeCache.from_type_name(request.type_name)
+            key_type = TypeInfo.from_type_name(request.type_name)
             record_type = active(DataSource).get_common_base_record_type(key_type=key_type)
 
         handler_args_elements = dict()

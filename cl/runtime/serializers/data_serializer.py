@@ -29,7 +29,7 @@ from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typeof
 from cl.runtime.schema.data_spec import DataSpec
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.encoder import Encoder
@@ -340,7 +340,7 @@ class DataSerializer(Serializer):
                 schema_type_name = typename(schema_type) if schema_type is not None else None
                 if deserialized_type_name is not None and deserialized_type_name != schema_type_name:
                     # If _type field is present, it must be a subclass of schema_type
-                    deserialized_type = TypeCache.from_type_name(deserialized_type_name)
+                    deserialized_type = TypeInfo.from_type_name(deserialized_type_name)
                     if not issubclass(deserialized_type, schema_type):
                         raise RuntimeError(
                             f"Field _type={deserialized_type_name} in serialized data\n"

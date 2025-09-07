@@ -17,7 +17,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -44,7 +44,7 @@ class LoadResponse(RecordsWithSchemaResponse):
 
         # TODO: !!! Do not rely on first element to detect type
         record_type_name = request.load_keys[0].type
-        record_type = TypeCache.from_type_name(record_type_name)
+        record_type = TypeInfo.from_type_name(record_type_name)
         key_type = record_type.get_key_type()
 
         # Deserialize keys in request
@@ -65,7 +65,7 @@ class LoadResponse(RecordsWithSchemaResponse):
             serialized_records = [_UI_SERIALIZER.serialize(record) for record in loaded_records]
 
             # Find a common base
-            common_base = TypeCache.get_common_base_type(types=loaded_record_types)
+            common_base = TypeInfo.get_common_base_type(types=loaded_record_types)
 
             # Create schema dict for the common base
             schema_dict = cls._get_schema_dict(common_base)
@@ -80,7 +80,7 @@ class LoadResponse(RecordsWithSchemaResponse):
     def _get_default_ui_type_state(cls, ui_type_state_requested_key: UiTypeStateKey) -> UiTypeState:
         """Return default UiTypeState with pinned all handlers."""
 
-        type_state_record_type = TypeCache.from_type_name(ui_type_state_requested_key.type_.name)
+        type_state_record_type = TypeInfo.from_type_name(ui_type_state_requested_key.type_.name)
         type_state_record_type_schema = TypeDecl.as_dict_with_dependencies(type_state_record_type)
 
         # Iterate over type declarations to get all handlers

@@ -19,7 +19,7 @@ from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.enum_spec import EnumSpec
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_spec import TypeSpec
 
 
@@ -34,7 +34,7 @@ class TypeSchema:
     def for_type_name(cls, type_name: str) -> TypeSpec:  # TODO: ! Remove this method?
         """Get or create type spec for the specified type name."""
         # Get class for the specified type name and use it to get type spec
-        class_ = TypeCache.from_type_name(type_name)
+        class_ = TypeInfo.from_type_name(type_name)
         return cls.for_type(class_)
 
     @classmethod

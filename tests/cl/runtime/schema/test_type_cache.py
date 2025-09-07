@@ -18,7 +18,7 @@ from enum import IntEnum
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
 from stubs.cl.runtime import StubDataclass
@@ -34,124 +34,124 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_underscore import _
 
 
 def test_rebuild_cache():
-    """Test TypeCache.reload_cache method, this also generates and saves a new TypeInfo.csv file."""
-    TypeCache.rebuild()
+    """Test TypeInfo.reload_cache method, this also generates and saves a new TypeInfo.csv file."""
+    TypeInfo.rebuild()
 
 
 def test_is_known_type():
     """Test is_known_type method."""
 
     # Valid cases
-    assert TypeCache.is_known_type(StubDataclass)
-    assert TypeCache.is_known_type(StubDataclassKey)
-    assert TypeCache.is_known_type(StubDataclassData)
-    assert TypeCache.is_known_type(TypeKind)
+    assert TypeInfo.is_known_type(StubDataclass)
+    assert TypeInfo.is_known_type(StubDataclassKey)
+    assert TypeInfo.is_known_type(StubDataclassData)
+    assert TypeInfo.is_known_type(TypeKind)
 
     # Invalid cases
-    assert not TypeCache.is_known_type(int)
+    assert not TypeInfo.is_known_type(int)
     with pytest.raises(RuntimeError):
         # Not a type
-        assert not TypeCache.is_known_type(123)  # noqa
+        assert not TypeInfo.is_known_type(123)  # noqa
 
 
 def test_is_known_type_name():
     """Test is_known_type_name method."""
 
     # Valid cases
-    assert TypeCache.is_known_type_name("StubDataclass")
-    assert TypeCache.is_known_type_name("StubDataclassKey")
-    assert TypeCache.is_known_type_name("StubDataclassData")
-    assert TypeCache.is_known_type_name("TypeKind")
+    assert TypeInfo.is_known_type_name("StubDataclass")
+    assert TypeInfo.is_known_type_name("StubDataclassKey")
+    assert TypeInfo.is_known_type_name("StubDataclassData")
+    assert TypeInfo.is_known_type_name("TypeKind")
 
     # Invalid cases
-    assert not TypeCache.is_known_type_name("123")
-    assert not TypeCache.is_known_type_name("int")
+    assert not TypeInfo.is_known_type_name("123")
+    assert not TypeInfo.is_known_type_name("int")
     with pytest.raises(RuntimeError):
         # Not a string
-        assert not TypeCache.is_known_type_name(StubDataclass)  # noqa
+        assert not TypeInfo.is_known_type_name(StubDataclass)  # noqa
 
 
 def test_guard_known_type():
     """Test guard_known_type method, will invoke and test guard_known_type_name as well."""
 
     # Valid cases
-    assert TypeCache.guard_known_type(StubDataclass)
-    assert TypeCache.guard_known_type(StubDataclass, type_kind=TypeKind.RECORD)
-    assert TypeCache.guard_known_type(StubDataclassKey)
-    assert TypeCache.guard_known_type(StubDataclassKey, type_kind=TypeKind.KEY)
-    assert TypeCache.guard_known_type(StubDataclassData)
-    assert TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.DATA)
+    assert TypeInfo.guard_known_type(StubDataclass)
+    assert TypeInfo.guard_known_type(StubDataclass, type_kind=TypeKind.RECORD)
+    assert TypeInfo.guard_known_type(StubDataclassKey)
+    assert TypeInfo.guard_known_type(StubDataclassKey, type_kind=TypeKind.KEY)
+    assert TypeInfo.guard_known_type(StubDataclassData)
+    assert TypeInfo.guard_known_type(StubDataclassData, type_kind=TypeKind.DATA)
 
     # Invalid cases
     with pytest.raises(Exception, match="Function typename accepts only type"):
         # Raise an error even when raise_on_fail is False when the parameter is not a str or type
-        TypeCache.guard_known_type(123, raise_on_fail=False)
+        TypeInfo.guard_known_type(123, raise_on_fail=False)
     with pytest.raises(Exception, match="Function typename accepts only type"):
-        TypeCache.guard_known_type(123)
+        TypeInfo.guard_known_type(123)
 
     # Not a record
-    assert not TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD, raise_on_fail=False)
+    assert not TypeInfo.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD, raise_on_fail=False)
     with pytest.raises(Exception):
-        TypeCache.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
+        TypeInfo.guard_known_type(StubDataclassData, type_kind=TypeKind.RECORD)
 
 
 def test_get_type_name_info():
     """Test get_type_name_info method."""
 
     # Valid cases
-    assert TypeCache.get_type_name_info("StubDataclass").type_kind == TypeKind.RECORD
-    assert TypeCache.get_type_name_info("StubDataclassKey").type_kind == TypeKind.KEY
-    assert TypeCache.get_type_name_info("StubDataclassData").type_kind == TypeKind.DATA
+    assert TypeInfo.get_type_name_info("StubDataclass").type_kind == TypeKind.RECORD
+    assert TypeInfo.get_type_name_info("StubDataclassKey").type_kind == TypeKind.KEY
+    assert TypeInfo.get_type_name_info("StubDataclassData").type_kind == TypeKind.DATA
 
     # Invalid cases
     with pytest.raises(Exception):
         # Not a string name
-        TypeCache.get_type_name_info(123)  # noqa
+        TypeInfo.get_type_name_info(123)  # noqa
     with pytest.raises(Exception):
         # Not a known type name
-        TypeCache.get_type_name_info("123")  # noqa
+        TypeInfo.get_type_name_info("123")  # noqa
 
 
 def test_from_type_name():
     """Test getting class from type names."""
 
-    assert TypeCache.from_type_name("TypeDecl") is TypeDecl
-    assert TypeCache.from_type_name("StubDataclass") is StubDataclass
-    assert TypeCache.from_type_name("StubDataclassKey") is StubDataclassKey
-    assert TypeCache.from_type_name("StubDataclassData") is StubDataclassData
+    assert TypeInfo.from_type_name("TypeDecl") is TypeDecl
+    assert TypeInfo.from_type_name("StubDataclass") is StubDataclass
+    assert TypeInfo.from_type_name("StubDataclassKey") is StubDataclassKey
+    assert TypeInfo.from_type_name("StubDataclassData") is StubDataclassData
 
 
 def test_import_type():
     """Test importing class using its qualname."""
 
     # Classes that is already imported
-    for imported_class in [TypeCache, TypeDecl, StubDataclass]:
+    for imported_class in [TypeInfo, TypeDecl, StubDataclass]:
         qual_name = f"{imported_class.__module__}.{imported_class.__name__}"
-        assert TypeCache._import_type(qual_name=qual_name) == imported_class
+        assert TypeInfo._import_type(qual_name=qual_name) == imported_class
 
     # Class that is dynamically imported on demand
     do_no_import_qual_name = (
         "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.StubDataclassDoNotImport"
     )
-    do_no_import_class = TypeCache._import_type(qual_name=do_no_import_qual_name)
+    do_no_import_class = TypeInfo._import_type(qual_name=do_no_import_qual_name)
     assert do_no_import_qual_name == f"{do_no_import_class.__module__}.{do_no_import_class.__name__}"
 
     # Module does not exist error
     with pytest.raises(RuntimeError):
         qual_name_with_unknown_module = "unknown_module.StubDataclassDoNotImport"
-        TypeCache._import_type(qual_name=qual_name_with_unknown_module)
+        TypeInfo._import_type(qual_name=qual_name_with_unknown_module)
 
     # Class does not exist error
     with pytest.raises(RuntimeError):
         qual_name_with_unknown_class = "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.UnknownClass"
-        TypeCache._import_type(qual_name=qual_name_with_unknown_class)
+        TypeInfo._import_type(qual_name=qual_name_with_unknown_class)
 
 
 def test_get_types():
-    """Test TypeCache.get_types method."""
+    """Test TypeInfo.get_types method."""
 
     # Included in data types
-    data_types = TypeCache.get_types(type_kind=TypeKind.DATA)
+    data_types = TypeInfo.get_types(type_kind=TypeKind.DATA)
     assert DataMixin in data_types
     assert StubDataclassData in data_types
     # Excluded from data types
@@ -161,7 +161,7 @@ def test_get_types():
     assert __StubDataclassDoubleUnderscore not in data_types
 
     # Included in record types
-    record_types = TypeCache.get_types(type_kind=TypeKind.RECORD)
+    record_types = TypeInfo.get_types(type_kind=TypeKind.RECORD)
     assert RecordMixin in record_types
     assert StubDataclass in record_types
     assert TypeDecl in record_types
@@ -172,7 +172,7 @@ def test_get_types():
     assert StubDataclassData not in record_types
 
     # Included in key types
-    key_types = TypeCache.get_types(type_kind=TypeKind.KEY)
+    key_types = TypeInfo.get_types(type_kind=TypeKind.KEY)
     assert KeyMixin in key_types
     assert StubDataclassKey in key_types
     # Excluded from key types
@@ -181,7 +181,7 @@ def test_get_types():
     assert StubDataclassData not in key_types
 
     # Included in enum types
-    enum_types = TypeCache.get_types(type_kind=TypeKind.ENUM)
+    enum_types = TypeInfo.get_types(type_kind=TypeKind.ENUM)
     assert StubIntEnum in enum_types
     # Excluded from enum types
     assert Enum not in enum_types  # TODO: Enum base is excluded, review
@@ -192,13 +192,13 @@ def test_get_types():
 
 
 def test_get_common_base_type():
-    """Test TypeCache.get_common_base_type method."""
-    assert TypeCache.get_common_base_type([StubDataclass]) is StubDataclass
-    assert TypeCache.get_common_base_type([StubDataclassKey]) is StubDataclassKey
-    assert TypeCache.get_common_base_type([StubDataclass, StubDataclassKey]) is StubDataclassKey
-    assert TypeCache.get_common_base_type([StubDataclass, StubDataclassKey, StubDataclassDerived]) is StubDataclassKey
-    assert TypeCache.get_common_base_type([StubDataclass, StubDataclassDerived]) is StubDataclass
-    assert TypeCache.get_common_base_type([StubDataclassOtherDerived, StubDataclassDerived]) is StubDataclass
+    """Test TypeInfo.get_common_base_type method."""
+    assert TypeInfo.get_common_base_type([StubDataclass]) is StubDataclass
+    assert TypeInfo.get_common_base_type([StubDataclassKey]) is StubDataclassKey
+    assert TypeInfo.get_common_base_type([StubDataclass, StubDataclassKey]) is StubDataclassKey
+    assert TypeInfo.get_common_base_type([StubDataclass, StubDataclassKey, StubDataclassDerived]) is StubDataclassKey
+    assert TypeInfo.get_common_base_type([StubDataclass, StubDataclassDerived]) is StubDataclass
+    assert TypeInfo.get_common_base_type([StubDataclassOtherDerived, StubDataclassDerived]) is StubDataclass
 
 
 if __name__ == "__main__":

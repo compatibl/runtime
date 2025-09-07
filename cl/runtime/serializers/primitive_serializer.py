@@ -37,7 +37,7 @@ from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import PrimitiveTypes
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.bool_format import BoolFormat
 from cl.runtime.serializers.bytes_format import BytesFormat
@@ -250,7 +250,7 @@ class PrimitiveSerializer(Serializer):
                 raise ErrorUtil.enum_value_error(value_format, BytesFormat)
         elif schema_type_name == "type":
             # Check this is a known type
-            TypeCache.guard_known_type(data)
+            TypeInfo.guard_known_type(data)
             if (type_format := self.type_format) == TypeFormat.PASSTHROUGH:
                 # Return type
                 return data
@@ -518,14 +518,14 @@ class PrimitiveSerializer(Serializer):
                     return None
                 elif isinstance(data, type):
                     # Return data after checking it is a known type
-                    assert TypeCache.guard_known_type(data)
+                    assert TypeInfo.guard_known_type(data)
                     return data
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             elif value_format == TypeFormat.DEFAULT:
                 if isinstance(data, str):
                     # Get type from string typename, must be a known type
-                    return TypeCache.from_type_name(data)
+                    return TypeInfo.from_type_name(data)
                 else:
                     raise self._deserialization_error(data, schema_type_name, value_format)
             else:

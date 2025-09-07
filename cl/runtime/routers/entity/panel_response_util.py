@@ -20,7 +20,7 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.entity.panel_request import PanelRequest
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -49,7 +49,7 @@ class PanelResponseUtil:
         """Implements /entity/panel route."""
 
         # Get the key type
-        record_type = TypeCache.from_type_name(request.type_name)
+        record_type = TypeInfo.from_type_name(request.type_name)
         key_type = record_type.get_key_type()
 
         # Deserialize key from string to object.

@@ -16,7 +16,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -41,7 +41,7 @@ class DeleteResponseUtil:
             raise RuntimeError("Bulk delete records of different key types currently is not supported.")
 
         # Expect all keys to be the same key type.
-        key_type = TypeCache.from_type_name(request.delete_keys[0].type).get_key_type()  # noqa
+        key_type = TypeInfo.from_type_name(request.delete_keys[0].type).get_key_type()  # noqa
         key_type_hint = TypeHint.for_type(key_type)  # noqa
 
         # Deserialize keys in request.

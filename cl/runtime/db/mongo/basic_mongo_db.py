@@ -32,7 +32,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -449,7 +449,7 @@ class BasicMongoDb(Db):
             return
         if is_record_type(restrict_to):
             # Add filter condition on type if it is a record type
-            child_record_type_names = TypeCache.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            child_record_type_names = TypeInfo.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
             query_dict["_type"] = {"$in": child_record_type_names}
         elif is_key_type(restrict_to):
             # Check that it matches the key type obtained from the query

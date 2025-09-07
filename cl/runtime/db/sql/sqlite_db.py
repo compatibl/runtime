@@ -33,7 +33,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -126,7 +126,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            subtype_names = TypeInfo.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             select_sql += f' WHERE "_type" IN ({placeholders})'
@@ -204,7 +204,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            subtype_names = TypeInfo.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             if where:
@@ -289,7 +289,7 @@ class SqliteDb(Db):
 
         if restrict_to is not None:
             # Add filter condition on type
-            subtype_names = TypeCache.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            subtype_names = TypeInfo.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
             if where:
@@ -529,14 +529,14 @@ class SqliteDb(Db):
         """Get columns according to the fields of all descendant classes from the specified key."""
 
         # Get child type names for key_type
-        child_record_type_names = TypeCache.get_child_type_names(key_type, type_kind=TypeKind.RECORD)
+        child_record_type_names = TypeInfo.get_child_type_names(key_type, type_kind=TypeKind.RECORD)
         result_columns = []
 
         # Iterate through child types and add unique columns.
         # Since child types are sorted by depth in the hierarchy, the base fields will be at the beginning.
         for child in child_record_type_names:
             # Add unique columns from child fields
-            child_type = cast(type[DataMixin], TypeCache.from_type_name(child))
+            child_type = cast(type[DataMixin], TypeInfo.from_type_name(child))
             add_columns = set(child_type.get_field_names()) - set(result_columns)
             result_columns.extend(add_columns)
 

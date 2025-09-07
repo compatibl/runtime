@@ -19,7 +19,7 @@ from typing import Self
 from cl.runtime.log.log_key import LogKey
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.settings.log_settings import LogSettings
 
 
@@ -49,7 +49,7 @@ class Log(LogKey, RecordMixin, ABC):
         # TODO: Review and change based on LogSettings
         if Log.__default is None:
             # Create the class specified in settings and invoke its constructor
-            log_type = TypeCache.from_type_name(LogSettings.instance().log_type)
+            log_type = TypeInfo.from_type_name(LogSettings.instance().log_type)
             Log.__default = log_type()
 
         return Log.__default

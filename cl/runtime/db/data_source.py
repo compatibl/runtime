@@ -47,7 +47,7 @@ from cl.runtime.records.record_type_presence_query import RecordTypePresenceQuer
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typeof
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 
@@ -455,7 +455,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 raise RuntimeError("Param 'restrict_to' cannot be combined with FilterMany type.")
 
             # Convert type name to type
-            record_type = TypeCache.from_type_name(filter_.record_type_name)
+            record_type = TypeInfo.from_type_name(filter_.record_type_name)
 
             # Load using the type stored in the filter as restrict_to parameter
             return self.load_by_type(
@@ -779,7 +779,7 @@ class DataSource(DataSourceKey, RecordMixin):
 
         if record_types:
             # If at least one record type is present, find the common base
-            return TypeCache.get_common_base_type(types=record_types)
+            return TypeInfo.get_common_base_type(types=record_types)
         else:
             # Empty record_types means no records stored, raise an error
             raise RuntimeError(f"Table {typename(key_type)} is empty.")

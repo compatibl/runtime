@@ -25,7 +25,7 @@ from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.env_settings import EnvSettings
@@ -211,7 +211,7 @@ class Db(DbKey, RecordMixin, ABC):
 
         # Get DB type from context settings if not specified
         if db_type is None:
-            db_type = TypeCache.from_type_name(db_settings.db_type)
+            db_type = TypeInfo.from_type_name(db_settings.db_type)
 
         # Get DB identifier if not specified
         if db_id is None:

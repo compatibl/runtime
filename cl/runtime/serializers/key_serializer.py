@@ -33,7 +33,7 @@ from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
 from cl.runtime.records.typename import typeof
 from cl.runtime.schema.data_spec import DataSpec
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.key_format import KeyFormat
@@ -258,7 +258,7 @@ class KeySerializer(Serializer):
             if is_abstract_type(schema_type):
                 # Abstract key class, the first token is data type
                 data_type_name = tokens.popleft()
-                data_type = TypeCache.from_type_name(data_type_name)
+                data_type = TypeInfo.from_type_name(data_type_name)
                 if not issubclass(data_type, schema_type):
                     raise RuntimeError(
                         f"Key type {data_type_name} is not a subclass of the field type {typename(schema_type)}.\n"

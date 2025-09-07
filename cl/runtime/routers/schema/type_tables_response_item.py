@@ -16,7 +16,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.schema.type_request import TypeRequest
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 
 
 class TypeTablesResponseItem(BaseModel):
@@ -38,6 +38,6 @@ class TypeTablesResponseItem(BaseModel):
 
         # TODO(Roman): Refactor to return a single table
         record_type_name = request.type_name
-        record_type = TypeCache.from_type_name(record_type_name)
+        record_type = TypeInfo.from_type_name(record_type_name)
         key_type_name = typename(record_type.get_key_type())  # noqa
         return [TypeTablesResponseItem(name=key_type_name)]

@@ -21,7 +21,7 @@ from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
 from cl.runtime.records.typename import typeof
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_hint import TypeHint
 
 
@@ -120,7 +120,7 @@ class PrimitiveUtil(BuilderUtil):
             return float(data)
         elif issubclass(schema_type, type):
             # Validate the type is known
-            assert TypeCache.guard_known_type(data)
+            assert TypeInfo.guard_known_type(data)
             return data
         elif is_primitive_type(schema_type):
             # Pass through other types

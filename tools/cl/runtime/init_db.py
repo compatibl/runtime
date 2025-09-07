@@ -17,7 +17,7 @@ from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.settings.preload_settings import PreloadSettings
-from tools.cl.runtime.init_type_cache import init_type_cache
+from tools.cl.runtime.init_type_info import init_type_info
 
 
 def init_db() -> None:
@@ -40,7 +40,7 @@ def init_db() -> None:
             return
 
         # Initialize type cache before loading data into DB
-        init_type_cache()
+        init_type_info()
 
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
         PreloadSettings.instance().save_and_configure()

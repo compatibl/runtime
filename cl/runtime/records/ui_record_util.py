@@ -23,7 +23,7 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.handler_declare_decl import HandlerDeclareDecl
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -55,7 +55,7 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
         """Get list of record's viewers with their types."""
 
         # TODO: Return saved view names
-        request_type = TypeCache.from_type_name(type_name)
+        request_type = TypeInfo.from_type_name(type_name)
 
         # Get actual type from record if request.key is not None
         if key is not None:
@@ -130,7 +130,7 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
         """Run viewer and process result."""
 
         # Get type of the record.
-        type_ = TypeCache.from_type_name(type_name)
+        type_ = TypeInfo.from_type_name(type_name)
 
         # Deserialize key from string to object.
         key_obj = _KEY_SERIALIZER.deserialize(key, TypeHint.for_type(type_.get_key_type()))

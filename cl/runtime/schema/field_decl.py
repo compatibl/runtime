@@ -94,7 +94,7 @@ class FieldDecl(DataclassMixin):
             dependencies: Set of types used in field or methods of the specified type, populated only if not None
         """
 
-        from cl.runtime.schema.type_cache import TypeCache  # TODO: Avoid circular dependency
+        from cl.runtime.schema.type_info import TypeInfo  # TODO: Avoid circular dependency
 
         result = cls()
         result.name = field_name

@@ -25,7 +25,7 @@ from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typeof
 from cl.runtime.routers.storage.records_with_schema_response import RecordsWithSchemaResponse
 from cl.runtime.routers.storage.select_request import SelectRequest
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
@@ -53,17 +53,17 @@ class SelectResponse(RecordsWithSchemaResponse):
         ds = active(DataSource)
 
         # TODO(Roman): !!! Implement separate methods for table and type
-        if (type_kind := TypeCache.get_type_name_info(type_name=request.type_).type_kind) == TypeKind.RECORD:
+        if (type_kind := TypeInfo.get_type_name_info(type_name=request.type_).type_kind) == TypeKind.RECORD:
             # Get records for a type
             record_type_name = request.type_
-            record_type = TypeCache.from_type_name(record_type_name)
+            record_type = TypeInfo.from_type_name(record_type_name)
             # Load records for the type
             records = ds.load_by_type(record_type)
             common_base_record_type = record_type
         elif type_kind == TypeKind.KEY:
             # Get records for a table
             key_type_name = request.type_
-            key_type = TypeCache.from_type_name(key_type_name)
+            key_type = TypeInfo.from_type_name(key_type_name)
             records = ds.load_all(key_type)
             # Get lowest common type to the records stored in the table
             common_base_record_type = ds.get_common_base_record_type(key_type=key_type)

@@ -17,7 +17,7 @@ from cl.runtime.db.filter import Filter
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 
 
 @dataclass(slots=True, kw_only=True)
@@ -31,7 +31,7 @@ class FilterByType(Filter):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Perform checks
-        record_type = TypeCache.from_type_name(self.record_type_name)
+        record_type = TypeInfo.from_type_name(self.record_type_name)
         assert TypeCheck.guard_record_type(record_type)
 
         # Set key_type_name in this class based on record_type_name

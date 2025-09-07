@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from cl.runtime.prebuild.init_file_util import InitFileUtil
-from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_info import TypeInfo
 
-def init_type_cache() -> None:
+def init_type_info() -> None:
     """Create __init__.py files to avoid missing directories and rebuild type cache."""
 
     # Create __init__.py files first to avoid missing classes in directories without __init__.py
@@ -24,10 +24,10 @@ def init_type_cache() -> None:
 
     # Rebuild type cache and save TypeInfo.csv file to the bootstrap resources directory
     print("Initializing the type cache...")
-    TypeCache.rebuild()
+    TypeInfo.rebuild()
 
 
 if __name__ == '__main__':
 
     # Initialize type cache
-    init_type_cache()
+    init_type_info()
