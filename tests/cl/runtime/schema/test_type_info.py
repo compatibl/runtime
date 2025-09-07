@@ -22,7 +22,7 @@ from cl.runtime.records.typename import qualname
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclass, StubDataclassDoubleDerived, StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
@@ -31,6 +31,7 @@ from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_underscore import (  # noqa
     __StubDataclassDoubleUnderscore,
 )
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_underscore import _StubDataclassUnderscore  # noqa
 
 
@@ -189,6 +190,31 @@ def test_get_types():
     assert DataMixin not in enum_types
     assert KeyMixin not in enum_types
     assert RecordMixin not in enum_types
+
+def test_get_parent_types():
+    """Test TypeInfo.get_parent_types method."""
+    assert TypeInfo.get_parent_types(StubDataclass) == (StubDataclass, StubDataclassKey)
+    assert TypeInfo.get_parent_types(StubDataclass, type_kind=TypeKind.RECORD) == (StubDataclass,)
+    assert TypeInfo.get_parent_types(StubDataclass, type_kind=TypeKind.KEY) == (StubDataclassKey,)
+    assert TypeInfo.get_parent_types(StubDataclassDerived) == (StubDataclass, StubDataclassDerived, StubDataclassKey)
+
+
+def test_get_child_types():
+    """Test TypeInfo.get_child_types method."""
+    assert TypeInfo.get_child_types(StubDataclassDerived) == (
+        StubDataclassDerived,
+        StubDataclassDoubleDerived,
+    )
+    assert TypeInfo.get_child_types(StubDataclassPrimitiveFieldsKey, type_kind=TypeKind.RECORD) == (
+        StubDataclassPrimitiveFields,
+    )
+    assert TypeInfo.get_child_types(StubDataclassPrimitiveFieldsKey, type_kind=TypeKind.KEY) == (
+        StubDataclassPrimitiveFieldsKey,
+    )
+    assert TypeInfo.get_child_types(StubDataclassPrimitiveFieldsKey) == (
+        StubDataclassPrimitiveFields,
+        StubDataclassPrimitiveFieldsKey,
+    )
 
 
 def test_get_common_base_type():

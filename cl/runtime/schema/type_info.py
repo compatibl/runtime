@@ -23,7 +23,7 @@ from inspect import getmembers
 from inspect import isclass
 from pkgutil import walk_packages
 from types import ModuleType
-from typing import Sequence, ClassVar, Self
+from typing import Sequence, ClassVar, Self, Collection
 from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
@@ -74,7 +74,7 @@ class TypeInfo(BootstrapMixin):
     subtype: str | None = None
     """Subtype for primitive types only (optional)."""
 
-    _type_info_by_type_name_dict: ClassVar[dict[str, Self] | None] = None
+    _type_info_dict: ClassVar[dict[str, Self] | None] = None
     """Dictionary of TypeInfo indexed by type name."""
 
     _module_dict: ClassVar[dict[str, ModuleType] | None] = None
@@ -110,7 +110,7 @@ class TypeInfo(BootstrapMixin):
 
         if isinstance(type_name, str):
             # Return True if present in dict
-            result = type_name in cls._type_info_by_type_name_dict
+            result = type_name in cls._type_info_dict
             return result
         else:
             raise RuntimeError(
@@ -164,10 +164,10 @@ class TypeInfo(BootstrapMixin):
 
         if type_kind is None:
             # If type_kind is None, only check if present in dict
-            found = type_name in cls._type_info_by_type_name_dict
+            found = type_name in cls._type_info_dict
         else:
             # Otherwise get type_info
-            type_info = cls._type_info_by_type_name_dict.get(type_name)
+            type_info = cls._type_info_dict.get(type_name)
             if found := type_info is not None:
                 # Type found in cache, compare type_kind
                 if type_info.type_kind == type_kind:
@@ -199,7 +199,7 @@ class TypeInfo(BootstrapMixin):
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
-        result = cls._type_info_by_type_name_dict.get(type_name)
+        result = cls._type_info_dict.get(type_name)
         if not result:
             packages_str = "\n".join(f"  - {package}" for package in cls._get_packages())
             raise RuntimeError(f"Type name {type_name} is not found in the imported package list:\n{packages_str}\n")
@@ -219,7 +219,7 @@ class TypeInfo(BootstrapMixin):
         cls._ensure_loaded()
 
         # Next, try using cached qual name to avoid enumerating types in all packages
-        if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
+        if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
             # Invoking build imports the class and updates type_info.type_ in cache so it does not have to be imported again
             return type_info.build().type_
         else:
@@ -239,7 +239,7 @@ class TypeInfo(BootstrapMixin):
         cls._ensure_loaded()
 
         # Filter by type_kind if specified
-        type_info_objects = cls._type_info_by_type_name_dict.values()
+        type_info_objects = cls._type_info_dict.values()
         if type_kind is not None:
             type_info_objects = [type_info for type_info in type_info_objects if type_info.type_kind == type_kind]
         result = tuple(x.build().type_ for x in type_info_objects)
@@ -264,7 +264,7 @@ class TypeInfo(BootstrapMixin):
     @cached
     def get_parent_types(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
         """
-        Return a tuple of parent types (inclusive of self) that match the predicate.
+        Return a tuple of parent types (inclusive of self) that match the predicate, sort by typename.
 
         Args:
             type_: Type for which the result is returned
@@ -456,7 +456,7 @@ class TypeInfo(BootstrapMixin):
         ).build()
 
         # Populate the dictionary
-        existing_info = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
+        existing_info = cls._type_info_dict.setdefault(type_info.type_name, type_info)
 
         # In case of a name collision, the value of type field in existing_info will not match
         if existing_info.qual_name != type_info.qual_name:
@@ -471,7 +471,7 @@ class TypeInfo(BootstrapMixin):
     def _ensure_loaded(cls):
         """Load the data from TypeInfo.csv if not already loaded, do not reload."""
 
-        if cls._type_info_by_type_name_dict is not None:
+        if cls._type_info_dict is not None:
             # Already loaded, exit early
             return
 
@@ -529,7 +529,7 @@ class TypeInfo(BootstrapMixin):
                 )
 
                 # Add to the type info dictionary
-                existing_info = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
+                existing_info = cls._type_info_dict.setdefault(type_info.type_name, type_info)
 
                 # In case of a name collision, the value of type field in existing_info will not match
                 if existing_info.qual_name != type_info.qual_name:
@@ -551,7 +551,7 @@ class TypeInfo(BootstrapMixin):
             file.write(",".join(_TYPE_INFO_HEADERS) + "\n")
 
             # Sort the TypeInfo dictionary by type name and iterate
-            sorted_type_info_list = sorted(cls._type_info_by_type_name_dict.values(), key=lambda x: x.type_name)
+            sorted_type_info_list = sorted(cls._type_info_dict.values(), key=lambda x: x.type_name)
             for type_info in sorted_type_info_list:
 
                 # Format fields for writing
@@ -566,7 +566,7 @@ class TypeInfo(BootstrapMixin):
     @classmethod
     def _clear(cls) -> None:
         """Clear cache before loading or rebuilding."""
-        cls._type_info_by_type_name_dict = {}
+        cls._type_info_dict = {}
         cls._module_dict = {}
 
     @classmethod
@@ -592,7 +592,7 @@ class TypeInfo(BootstrapMixin):
         return result
 
     @classmethod
-    def _get_data_key_or_record_types(cls, types_: Sequence[type], *, type_kind: TypeKind | None) -> tuple[type, ...]:
+    def _get_data_key_or_record_types(cls, types_: Collection[type], *, type_kind: TypeKind | None) -> tuple[type, ...]:
         """
         Sort by type name and filter by type kind, or return data, key or record types if type kind is None,
         eliminate duplicates.
@@ -616,7 +616,9 @@ class TypeInfo(BootstrapMixin):
 
         # Eliminate the duplicates and filter by predicate, excluding any mixin types
         # because this method must follow single inheritance convention
-        result = tuple(x for x in set(types_) if predicate(x) and not is_mixin_type(x))
+        result = set(x for x in set(types_) if predicate(x) and not is_mixin_type(x))
+        # Sort by type name and return
+        result = tuple(sorted(result, key=lambda x: typename(x)))
         return result
 
     @classmethod
