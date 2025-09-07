@@ -171,15 +171,6 @@ def test_record_upsert(multi_db_fixture):
     loaded_record = active(DataSource).load_one(sample.get_key())
     assert loaded_record == override_sample
 
-def test_commit(multi_db_fixture):
-    """Test commit method."""
-    sample_1 = StubDataclass().build()
-    sample_2 = StubDataclass().build()
-    sample_key_1 = StubDataclassKey().build()
-    sample_key_2 = StubDataclassKey().build()
-
-    with pytest.raises(RuntimeError, match="abc"):
-        active(DataSource).roll
 
 def test_load_by_type(multi_db_fixture):
     """Test 'load_by_type' method."""
