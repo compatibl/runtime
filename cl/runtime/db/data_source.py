@@ -48,6 +48,7 @@ from cl.runtime.records.type_check import TypeCheck
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typeof
 from cl.runtime.schema.type_cache import TypeCache
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
 
 _LOGGER = logging.getLogger(__name__)
@@ -116,7 +117,7 @@ class DataSource(DataSourceKey, RecordMixin):
             raise RuntimeError("DataSource.designated is not yet supported.")
 
         # Initialize the list of pending deletes and inserts
-        self._clear_pending()
+        self._clear_pending_operations()
 
     def __enter__(self) -> Self:
         """Supports 'with' operator for resource initialization and disposal."""
@@ -656,75 +657,92 @@ class DataSource(DataSourceKey, RecordMixin):
     def commit(self) -> None:
         """Commit all pending saves and deletes, operations will not be retried in case of an error during commit."""
 
-        # try:
+        # Exit early if there are no pending operations
+        if not self._has_pending_operations():
+            return
 
-        # Ensure no key collisions within the deletions, insertions and replacements lists
-        pending_keys = self._pending_deletions + [
-            x.get_key()
-            for x in (self._pending_insertions + self._pending_replacements)
-        ]
-        # Dictionary of keys indexed by their serialization into tuple
-        seen_pending_keys = defaultdict(list)
-        serialized_pending_keys = [KeySerializers.TUPLE.serialize(x) for x in pending_keys]
-        for serialized_pending_key, pending_key in zip(serialized_pending_keys, pending_keys):
-            seen_pending_keys[serialized_pending_key].append(pending_key)
-        # Keep only when there is more than one
-        seen_pending_keys = [v for k, v in seen_pending_keys.items() if len(v) > 1]
-        if len(seen_pending_keys):
-            seen_pending_keys_str = "\n".join(KeySerializers.DELIMITED.serialize(x) for x in seen_pending_keys)
-            raise RuntimeError(
-                f"The following keys are present more than once in the list of pending\n"
-                f"deletions, insertions or replacements for data_source_id={self.data_source_id}:\n"
-                f"{seen_pending_keys_str}"
-            )
-
-        # Records to be inserted or replaced, with duplicates removed
-        record_types = set(typeof(x) for x in (self._pending_insertions + self._pending_replacements))
-        if record_types:
-            # Add presence records without checking if they are already present, as
-            # it is faster to save all records than to check which already exist
-            record_types.add(StoredRecordType)  # TODO: !!!!!!!!!!1 Rename to RecordTypePresence
-            stored_record_types = tuple(
-                StoredRecordType(record_type=x, key_type=x.get_key_type()).build() for x in record_types
-            )
-            self._pending_replacements.extend(stored_record_types)
-
-        # Invoke delete_many for all pending deletes
-        if self._pending_deletions:
-            [
-                # Delete first
-                self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
-                for key_type, records_for_key_type in self._group_inputs_by_key_type(self._pending_deletions).items()
+        try:
+            # Ensure no key collisions within the deletions, insertions and replacements lists
+            pending_keys = self._pending_deletions + [
+                x.get_key()
+                for x in (self._pending_insertions + self._pending_replacements)
             ]
+            serialized_pending_keys = [
+                KeySerializers.DELIMITED.serialize(x, type_hint=TypeHint.for_type(KeyMixin))
+                for x in pending_keys
+            ]
+            # Dictionary of keys indexed by their serialization into tuple
+            seen_pending_keys = defaultdict(list)
+            for x in serialized_pending_keys:
+                seen_pending_keys[x].append(True)
+            # Keep only when there is more than one
+            duplicate_pending_keys = {k: v for k, v in seen_pending_keys.items() if len(v) > 1}
+            if duplicate_pending_keys:
+                duplicate_pending_keys_msgs = [f"  - {x}" for x in duplicate_pending_keys]
+                duplicate_pending_keys_str = "\n".join(msg for msg in duplicate_pending_keys_msgs)
+                raise RuntimeError(
+                    f"The following keys are present more than once in the list of\n"
+                    f"pending commit operations (deletions, insertions and replacements)\n"
+                    f"for data_source_id={self.data_source_id}:\n"
+                    f"{duplicate_pending_keys_str}"
+                )
 
-        # Invoke insert_many for all pending inserts
-        if self._pending_insertions:
-            for key_type, records_for_key_type in self._group_inputs_by_key_type(self._pending_insertions).items():
-                # Insert next
-                self._get_db().save_many(
-                    key_type,
-                    records_for_key_type,
-                    dataset=self.dataset.dataset_id,
-                    save_policy=SavePolicy.INSERT,
+            # Records to be inserted or replaced, with duplicates removed
+            record_types = set(typeof(x) for x in (self._pending_insertions + self._pending_replacements))
+            if record_types:
+                # Add presence records without checking if they are already present, as
+                # it is faster to save all records than to check which already exist
+                record_types.add(StoredRecordType)  # TODO: !!!!!!!!!! Rename to RecordTypePresence
+                stored_record_types = tuple(
+                    StoredRecordType(record_type=x, key_type=x.get_key_type()).build() for x in record_types
                 )
-        if self._pending_replacements:
-            for key_type, records_for_key_type in self._group_inputs_by_key_type(self._pending_replacements).items():
-                # Replace last
-                self._get_db().save_many(
-                    key_type,
-                    records_for_key_type,
-                    dataset=self.dataset.dataset_id,
-                    save_policy=SavePolicy.REPLACE,
-                )
-        # finally:
-        # Clear all pending operations both in case of a successful commit or an error
-        self._clear_pending()
+                self._pending_replacements.extend(stored_record_types)
+
+            # Invoke delete_many for all pending deletes
+            if self._pending_deletions:
+                [
+                    # Delete first
+                    self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+                    for key_type, records_for_key_type in self._group_inputs_by_key_type(self._pending_deletions).items()
+                ]
+
+            # Invoke insert_many for all pending inserts
+            if self._pending_insertions:
+                for key_type, records_for_key_type in self._group_inputs_by_key_type(self._pending_insertions).items():
+                    # Insert next
+                    self._get_db().save_many(
+                        key_type,
+                        records_for_key_type,
+                        dataset=self.dataset.dataset_id,
+                        save_policy=SavePolicy.INSERT,
+                    )
+            if self._pending_replacements:
+                for key_type, records_for_key_type in self._group_inputs_by_key_type(self._pending_replacements).items():
+                    # Replace last
+                    self._get_db().save_many(
+                        key_type,
+                        records_for_key_type,
+                        dataset=self.dataset.dataset_id,
+                        save_policy=SavePolicy.REPLACE,
+                    )
+        except Exception as e:
+            # Clear all pending operations before propagating
+            self._clear_pending_operations()
+            # Rethrow to propagate
+            raise e
+        else:
+            # Clear all pending operations before exiting
+            self._clear_pending_operations()
 
     def rollback(self) -> None:
         """Cancel all pending deletes, inserts and replacements."""
-        self._clear_pending()
+        self._clear_pending_operations()
 
-    def _clear_pending(self) -> None:
+    def _has_pending_operations(self) -> bool:
+        """Return True if there are pending operations."""
+        return bool(self._pending_deletions) or bool(self._pending_insertions) or bool(self._pending_replacements)
+
+    def _clear_pending_operations(self) -> None:
         """Cancel all pending operations."""
         self._pending_deletions = []
         self._pending_insertions = []

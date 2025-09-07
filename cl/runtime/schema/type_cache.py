@@ -647,7 +647,7 @@ class TypeCache:
         # TODO: Refine the inclusion logic
         result = tuple(
             x for x in set(types_) if predicate(x) and not is_mixin_type(x) and not is_abstract_type(x)
-        )  # TODO: !!!!!!!!! Do not exclude abstract
+        )  # TODO: !!!!!!!!! Do not exclude abstract?
         return result
 
     @classmethod
