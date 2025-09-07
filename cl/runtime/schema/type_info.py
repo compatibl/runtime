@@ -247,7 +247,7 @@ class TypeInfo(BootstrapMixin):
 
     @classmethod
     @cached
-    def get_parent_type_names(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
+    def get_parent_and_self_type_names(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
         """
         Return a tuple of type names for parent types (inclusive of self) that match the predicate.
 
@@ -256,13 +256,13 @@ class TypeInfo(BootstrapMixin):
             type_kind: Restrict to the specified type kind if provided (optional)
         """
         # Get types
-        result_types = cls.get_parent_types(type_, type_kind=type_kind)
+        result_types = cls.get_parent_and_self_types(type_, type_kind=type_kind)
         # Convert to names and sort
         return tuple(sorted(typename(x) for x in result_types))
 
     @classmethod
     @cached
-    def get_parent_types(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
+    def get_parent_and_self_types(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
         """
         Return a tuple of parent types (inclusive of self) that match the predicate, sort by typename.
 
@@ -276,7 +276,7 @@ class TypeInfo(BootstrapMixin):
 
     @classmethod
     @cached
-    def get_child_type_names(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
+    def get_child_and_self_type_names(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[str, ...]:
         """
         Return a tuple of type names for child types (inclusive of self) that match the predicate.
         Result is sorted by depth in hierarchy.
@@ -286,13 +286,13 @@ class TypeInfo(BootstrapMixin):
             type_kind: Restrict to the specified type kind if provided (optional)
         """
         # Get types
-        result_types = cls.get_child_types(type_, type_kind=type_kind)
+        result_types = cls.get_child_and_self_types(type_, type_kind=type_kind)
         # Convert to names and sort
         return tuple(sorted(typename(x) for x in result_types))
 
     @classmethod
     @cached
-    def get_child_types(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
+    def get_child_and_self_types(cls, type_: type, *, type_kind: TypeKind | None = None) -> tuple[type, ...]:
         """
         Return a tuple of type names for child types (inclusive of self) that match the predicate.
         Result is sorted by depth in hierarchy.
@@ -302,9 +302,9 @@ class TypeInfo(BootstrapMixin):
             type_kind: Restrict to the specified type kind if provided (optional)
         """
         # Recursively load subtypes without filtering, because filter may apply to child but not parent
-        subtypes = tuple(cls._get_unfiltered_child_types_set(type_))
-        # Filter, eliminate duplicates and sort
-        result = cls._get_data_key_or_record_types(subtypes, type_kind=type_kind)
+        subtypes_set = tuple(cls._get_unfiltered_child_types_set(type_))
+        # Filter and sort
+        result = cls._get_data_key_or_record_types(subtypes_set, type_kind=type_kind)
         return result
 
     @classmethod
@@ -317,11 +317,11 @@ class TypeInfo(BootstrapMixin):
             raise RuntimeError("The argument of get_common_base_type is None or empty.")
 
         # Dict where type is key and value is a set of its parents
-        parent_dict = {x: set(TypeInfo.get_parent_types(x)) for x in types}
+        parent_dict = {x: set(TypeInfo.get_parent_and_self_types(x)) for x in types}
         # Set of all argument types and their parents, parents of parents are already included
         all_types = set(item for values in parent_dict.values() for item in values)
         # Dict where key is the number of parents and value is type
-        all_types_depth_dict = {x: len(TypeInfo.get_parent_types(x)) for x in all_types}
+        all_types_depth_dict = {x: len(TypeInfo.get_parent_and_self_types(x)) for x in all_types}
         # Sort by the number of parents in descending order using negative length as sorting key
         sorted_all_types_depth_dict = dict(sorted(all_types_depth_dict.items(), key=lambda item: -item[1]))
         result = None
@@ -616,7 +616,7 @@ class TypeInfo(BootstrapMixin):
 
         # Eliminate the duplicates and filter by predicate, excluding any mixin types
         # because this method must follow single inheritance convention
-        result = set(x for x in set(types_) if predicate(x) and not is_mixin_type(x))
+        result = set(x for x in types_ if predicate(x) and not is_mixin_type(x))
         # Sort by type name and return
         result = tuple(sorted(result, key=lambda x: typename(x)))
         return result
@@ -638,7 +638,7 @@ class TypeInfo(BootstrapMixin):
                 subtypes.update(
                     x
                     for x in cls._get_unfiltered_child_types_set(subtype)
-                    if x not in subtypes and is_data_key_or_record_type(x)
+                    if is_data_key_or_record_type(x)
                 )
         return subtypes
 

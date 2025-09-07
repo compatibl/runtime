@@ -191,27 +191,31 @@ def test_get_types():
     assert KeyMixin not in enum_types
     assert RecordMixin not in enum_types
 
-def test_get_parent_types():
-    """Test TypeInfo.get_parent_types method."""
-    assert TypeInfo.get_parent_types(StubDataclass) == (StubDataclass, StubDataclassKey)
-    assert TypeInfo.get_parent_types(StubDataclass, type_kind=TypeKind.RECORD) == (StubDataclass,)
-    assert TypeInfo.get_parent_types(StubDataclass, type_kind=TypeKind.KEY) == (StubDataclassKey,)
-    assert TypeInfo.get_parent_types(StubDataclassDerived) == (StubDataclass, StubDataclassDerived, StubDataclassKey)
+def test_get_parent_and_self_types():
+    """Test TypeInfo.get_parent_and_self_types method."""
+    assert TypeInfo.get_parent_and_self_types(StubDataclass) == (StubDataclass, StubDataclassKey)
+    assert TypeInfo.get_parent_and_self_types(StubDataclass, type_kind=TypeKind.RECORD) == (StubDataclass,)
+    assert TypeInfo.get_parent_and_self_types(StubDataclass, type_kind=TypeKind.KEY) == (StubDataclassKey,)
+    assert TypeInfo.get_parent_and_self_types(StubDataclassDerived) == (
+        StubDataclass,
+        StubDataclassDerived,
+        StubDataclassKey,
+    )
 
 
-def test_get_child_types():
-    """Test TypeInfo.get_child_types method."""
-    assert TypeInfo.get_child_types(StubDataclassDerived) == (
+def test_get_child_and_self_types():
+    """Test TypeInfo.get_child_and_self_types method."""
+    assert TypeInfo.get_child_and_self_types(StubDataclassDerived) == (
         StubDataclassDerived,
         StubDataclassDoubleDerived,
     )
-    assert TypeInfo.get_child_types(StubDataclassPrimitiveFieldsKey, type_kind=TypeKind.RECORD) == (
+    assert TypeInfo.get_child_and_self_types(StubDataclassPrimitiveFieldsKey, type_kind=TypeKind.RECORD) == (
         StubDataclassPrimitiveFields,
     )
-    assert TypeInfo.get_child_types(StubDataclassPrimitiveFieldsKey, type_kind=TypeKind.KEY) == (
+    assert TypeInfo.get_child_and_self_types(StubDataclassPrimitiveFieldsKey, type_kind=TypeKind.KEY) == (
         StubDataclassPrimitiveFieldsKey,
     )
-    assert TypeInfo.get_child_types(StubDataclassPrimitiveFieldsKey) == (
+    assert TypeInfo.get_child_and_self_types(StubDataclassPrimitiveFieldsKey) == (
         StubDataclassPrimitiveFields,
         StubDataclassPrimitiveFieldsKey,
     )

@@ -449,7 +449,7 @@ class BasicMongoDb(Db):
             return
         if is_record_type(restrict_to):
             # Add filter condition on type if it is a record type
-            child_record_type_names = TypeInfo.get_child_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            child_record_type_names = TypeInfo.get_child_and_self_type_names(restrict_to, type_kind=TypeKind.RECORD)
             query_dict["_type"] = {"$in": child_record_type_names}
         elif is_key_type(restrict_to):
             # Check that it matches the key type obtained from the query
