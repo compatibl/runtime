@@ -18,6 +18,7 @@ from enum import IntEnum
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.records.typename import qualname
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_kind import TypeKind
@@ -126,15 +127,14 @@ def test_import_type():
 
     # Classes that is already imported
     for imported_class in [TypeInfo, TypeDecl, StubDataclass]:
-        qual_name = f"{imported_class.__module__}.{imported_class.__name__}"
-        assert TypeInfo._import_type(qual_name=qual_name) == imported_class
+        assert TypeInfo._import_type(qual_name=qualname(imported_class)) == imported_class
 
     # Class that is dynamically imported on demand
-    do_no_import_qual_name = (
+    do_not_import_qual_name = (
         "stubs.cl.runtime.records.for_dataclasses.stub_dataclass_do_not_import.StubDataclassDoNotImport"
     )
-    do_no_import_class = TypeInfo._import_type(qual_name=do_no_import_qual_name)
-    assert do_no_import_qual_name == f"{do_no_import_class.__module__}.{do_no_import_class.__name__}"
+    do_not_import_class = TypeInfo._import_type(qual_name=do_not_import_qual_name)
+    assert do_not_import_qual_name == qualname(do_not_import_class)
 
     # Module does not exist error
     with pytest.raises(RuntimeError):

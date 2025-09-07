@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.schema.type_kind import TypeKind
+from cl.runtime.records.for_dataclasses.extensions import required
 import importlib
 import os
 import sys
@@ -36,7 +36,7 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mixin_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record_type
-from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typename, qualname
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -65,8 +65,11 @@ class TypeInfo(BootstrapMixin):
     type_kind: TypeKind
     """Type kind (primitive, enum, data, key, record)."""
 
-    type_: type
-    """Class that corresponds to the type name or alias."""
+    qual_name: str
+    """Type qualname in module.ClassName format."""
+
+    type_: type = required()
+    """Class that corresponds to the type name or alias (populated in __init if not set on construction)."""
 
     subtype: str | None = None
     """Subtype for primitive types only (optional)."""
@@ -79,6 +82,14 @@ class TypeInfo(BootstrapMixin):
 
     _packages: ClassVar[tuple[str, ...] | None] = None
     """List of packages to include in the cache."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.type_ is None:
+            if self.qual_name is not None:
+                self.type_ = self._import_type(qual_name=self.qual_name)
+            else:
+                raise RuntimeError("In TypeInfo class, qual_name field must be populated before build.")
 
     @classmethod
     @cached
@@ -192,7 +203,9 @@ class TypeInfo(BootstrapMixin):
         if not result:
             packages_str = "\n".join(f"  - {package}" for package in cls._get_packages())
             raise RuntimeError(f"Type name {type_name} is not found in the imported package list:\n{packages_str}\n")
-        return result
+
+        # Invoking build imports the class and updates type_info.type_ in cache so it does not have to be imported again
+        return result.build()
 
     @classmethod
     @cached
@@ -207,7 +220,8 @@ class TypeInfo(BootstrapMixin):
 
         # Next, try using cached qual name to avoid enumerating types in all packages
         if (type_info := cls._type_info_by_type_name_dict.get(type_name, None)) is not None:
-            return type_info.type_
+            # Invoking build imports the class and updates type_info.type_ in cache so it does not have to be imported again
+            return type_info.build().type_
         else:
             raise cls._type_name_not_found_error(type_name)
 
@@ -225,10 +239,10 @@ class TypeInfo(BootstrapMixin):
         cls._ensure_loaded()
 
         # Filter by type_kind if specified
-        type_info_values = cls._type_info_by_type_name_dict.values()
+        type_info_objects = cls._type_info_by_type_name_dict.values()
         if type_kind is not None:
-            type_info_values = [type_info for type_info in type_info_values if type_info.type_kind == type_kind]
-        result = tuple(x.type_ for x in type_info_values)
+            type_info_objects = [type_info for type_info in type_info_objects if type_info.type_kind == type_kind]
+        result = tuple(x.build().type_ for x in type_info_objects)
         return result
 
     @classmethod
@@ -436,20 +450,21 @@ class TypeInfo(BootstrapMixin):
         type_info = TypeInfo(
             type_name=type_name,
             type_kind=type_kind,
+            qual_name=qualname(class_),
             type_=class_,
             subtype=subtype,
-        )
+        ).build()
 
         # Populate the dictionary
         existing_info = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
 
         # In case of a name collision, the value of type field in existing_info will not match
-        if existing_info.type_ != type_info.type_:
+        if existing_info.qual_name != type_info.qual_name:
             raise RuntimeError(
                 f"Two types in the imported packages share the same type name: {type_info.type_name}\n"
-                f"  - {existing_info.type_.__module__}.{existing_info.type_.__name__}\n"
-                f"  - {type_info.type_.__module__}.{type_info.type_.__name__}\n"
-                f"Use TypeAlias.csv preload to resolve the name collision.\n"
+                f"  - {existing_info.qual_name}\n"
+                f"  - {type_info.qual_name}\n"
+                f"Use TypeAlias.csv to resolve the name collision.\n"
             )
 
     @classmethod
@@ -509,21 +524,20 @@ class TypeInfo(BootstrapMixin):
                 type_info = TypeInfo(
                     type_name=type_name,
                     type_kind=EnumUtil.from_str(TypeKind, type_kind),
-                    type_=cls._import_type(qual_name=qual_name),
+                    qual_name=qual_name,
                     subtype=subtype,
                 )
 
                 # Add to the type info dictionary
-                # Use _add_class to avoid repeated code
                 existing_info = cls._type_info_by_type_name_dict.setdefault(type_info.type_name, type_info)
 
                 # In case of a name collision, the value of type field in existing_info will not match
-                if existing_info.type_ != type_info.type_:
+                if existing_info.qual_name != type_info.qual_name:
                     raise RuntimeError(
-                        f"Two types in the imported packages share the same type name: {type_info.type_name}\n"
-                        f"  - {existing_info.type_.__module__}.{existing_info.type_.__name__}\n"
-                        f"  - {type_info.type_.__module__}.{type_info.type_.__name__}\n"
-                        f"Use TypeAlias.csv preload to resolve the name collision.\n"
+                        f"Two types in TypeInfo.csv share the same type name: {type_info.type_name}\n"
+                        f"  - {existing_info.qual_name}\n"
+                        f"  - {type_info.qual_name}\n"
+                        f"Use TypeAlias.csv to resolve the name collision.\n"
                     )
 
     @classmethod
@@ -543,7 +557,7 @@ class TypeInfo(BootstrapMixin):
                 # Format fields for writing
                 type_name = type_info.type_name
                 type_kind_str = EnumUtil.to_str(type_info.type_kind)
-                qual_name = f"{type_info.type_.__module__}.{type_info.type_.__name__}"
+                qual_name = type_info.qual_name
                 subtype = type_info.subtype
 
                 # Write comma-separated values for each token, with semicolons-separated lists
@@ -588,7 +602,7 @@ class TypeInfo(BootstrapMixin):
             type_kind: Restrict to type kind if provided (optional), otherwise return data, key or record types
         """
 
-        # Filter based on type_kind, use set to eliminate duplicates
+        # Filter based on type_kind, only DATA, KEY, and RECORD are expected here
         if type_kind is None:
             predicate = is_data_key_or_record_type
         elif type_kind == TypeKind.DATA:
@@ -604,7 +618,7 @@ class TypeInfo(BootstrapMixin):
         # TODO: Refine the inclusion logic
         result = tuple(
             x for x in set(types_) if predicate(x) and not is_mixin_type(x) and not is_abstract_type(x)
-        )  # TODO: !!!!!!!!! Do not exclude abstract?
+        )  # TODO: !!!!!!!!! Do not exclude abstract and/or Mixin?
         return result
 
     @classmethod

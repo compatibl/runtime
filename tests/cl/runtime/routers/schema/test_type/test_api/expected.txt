@@ -80,7 +80,7 @@ cl.BaseTypeInfo:
     ModuleName: cl
   Name: BaseTypeInfo
   Label: Base Type Info
-  Comment: Base type info.
+  Comment: Information about a type for UI.
   TypeKind: Data
   DisplayKind: Basic
   Elements:

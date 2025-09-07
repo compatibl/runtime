@@ -43,3 +43,19 @@ def typename(type_: type) -> str:
 def typenameof(value: Any) -> str:
     """Shortcut for typename(typeof(value))."""
     return typename(typeof(value))
+
+
+def qualname(type_: type) -> str:
+    """Return fully qualified type name with module in module.PascalCase format without applying any aliases."""
+    # Accept type only, error if an instance is passed
+    if isinstance(type_, type):
+        return f"{type_.__module__}.{type_.__name__}"
+    else:
+        raise RuntimeError(
+            f"Function qualname accepts only type but an instance of {qualname(type(type_))} was provided instead."
+        )
+
+
+def qualnameof(value: Any) -> str:
+    """Shortcut for qualname(typeof(value))."""
+    return typename(typeof(value))
