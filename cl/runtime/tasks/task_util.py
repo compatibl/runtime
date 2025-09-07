@@ -20,7 +20,7 @@ from cl.runtime.serializers.key_serializer import KeySerializer
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
-from cl.runtime.tasks.static_method_task import StaticMethodTask
+from cl.runtime.tasks.class_method_task import ClassMethodTask
 from cl.runtime.tasks.task import Task
 
 handler_queue = CeleryQueue(queue_id="Handler Queue")
@@ -70,7 +70,7 @@ class TaskUtil:
                 record_type = TypeCache.from_type_name(request.type)
                 record_type_str = f"{record_type.__module__}.{typename(record_type)}"
                 label = f"{typename(record_type)};{handler_name}"
-                handler_task = StaticMethodTask(
+                handler_task = ClassMethodTask(
                     label=label,
                     queue=handler_queue.get_key(),
                     type_str=record_type_str,

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.tasks.static_method_task import StaticMethodTask
+from cl.runtime.tasks.class_method_task import ClassMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers
 
@@ -28,7 +28,7 @@ def test_create(default_db_fixture):
     for sample_input in sample_inputs:
         record_type = sample_input[0]
         method_callable = sample_input[1]
-        task = StaticMethodTask.create(
+        task = ClassMethodTask.create(
             queue=TaskQueueKey(queue_id="Sample Queue"), record_type=record_type, method_callable=method_callable
         ).build()
         task.run_task()

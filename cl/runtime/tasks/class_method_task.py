@@ -27,7 +27,7 @@ from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 
 @dataclass(slots=True, kw_only=True)
-class StaticMethodTask(MethodTask):
+class ClassMethodTask(MethodTask):
     """Invoke a @staticmethod or @classmethod, do not use for instance methods."""
 
     type_str: str = required()
@@ -74,7 +74,7 @@ class StaticMethodTask(MethodTask):
             raise RuntimeError(
                 f"Callable '{method_callable.__qualname__}' for task_id='{result.task_id}' is "
                 f"an instance method rather than @staticmethod or @classmethod, "
-                f"use 'InstanceMethodTask' instead of 'StaticMethodTask'."
+                f"use 'InstanceMethodTask' instead of 'ClassMethodTask'."
             )
 
         # Two tokens because the callable is bound to a class

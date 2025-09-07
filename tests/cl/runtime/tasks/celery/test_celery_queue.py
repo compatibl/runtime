@@ -18,7 +18,7 @@ from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import execute_task
-from cl.runtime.tasks.static_method_task import StaticMethodTask
+from cl.runtime.tasks.class_method_task import ClassMethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
@@ -29,7 +29,7 @@ def _create_task(queue: TaskQueueKey) -> TaskKey:
     """Create a test task."""
 
     method_callable = StubHandlers.run_static_method_1a
-    task = StaticMethodTask.create(queue=queue, record_type=StubHandlers, method_callable=method_callable).build()
+    task = ClassMethodTask.create(queue=queue, record_type=StubHandlers, method_callable=method_callable).build()
     active(DataSource).replace_one(task, commit=True)
     return task.get_key()
 
