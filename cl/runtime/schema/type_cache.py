@@ -33,7 +33,6 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mixin_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record_type
-from cl.runtime.records.typename import qualname
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
@@ -471,8 +470,8 @@ class TypeCache:
                     f"Only primitive types can have subtypes."
                 )
 
-        # Get fully qualified name
-        qual_name = qualname(class_)
+        # TODO: !! Check this is not a class embedded in another class
+        qual_name = f"{class_.__module__}.{class_.__name__}"
 
         # Get type info without subclass names (which will be done on second pass after all types are loaded)
         type_info = TypeInfo(
