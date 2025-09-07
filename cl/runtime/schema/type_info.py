@@ -615,10 +615,8 @@ class TypeInfo(BootstrapMixin):
             raise ErrorUtil.enum_value_error(type_kind, TypeKind)
 
         # Eliminate the duplicates and filter by predicate, excluding any mixin types
-        # TODO: Refine the inclusion logic
-        result = tuple(
-            x for x in set(types_) if predicate(x) and not is_mixin_type(x) and not is_abstract_type(x)
-        )  # TODO: !!!!!!!!! Do not exclude abstract and/or Mixin?
+        # because this method must follow single inheritance convention
+        result = tuple(x for x in set(types_) if predicate(x) and not is_mixin_type(x))
         return result
 
     @classmethod
