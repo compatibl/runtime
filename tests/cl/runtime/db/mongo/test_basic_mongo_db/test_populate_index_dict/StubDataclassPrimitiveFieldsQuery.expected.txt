@@ -1,0 +1,27 @@
+key_str_field: 1
+key_float_field: 1
+key_bool_field: 1
+key_int_field: 1
+key_long_field: 1
+key_date_field: 1
+key_time_field: 1
+key_date_time_field: 1
+key_uuid_field: 1
+key_bytes_field: 1
+key_int_enum_field: 1
+obj_str_field: 1
+obj_str_with_eol_field: 1
+obj_str_with_trailing_eol_field: 1
+obj_str_timestamp_field: 1
+obj_float_field: 1
+obj_bool_field: 1
+obj_int_field: 1
+obj_long_field: 1
+obj_date_field: 1
+obj_time_field: 1
+obj_date_time_field: 1
+obj_uuid_field: 1
+obj_bytes_field: 1
+obj_bytes_large_field: 1
+obj_int_enum_field: 1
+

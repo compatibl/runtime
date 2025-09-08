@@ -14,6 +14,13 @@
 
 import pytest
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
+from cl.runtime.qa.regression_guard import RegressionGuard
+from cl.runtime.records.typename import typename
+from cl.runtime.stats.experiment_key_query import ExperimentKeyQuery
+from stubs.cl.runtime import StubDataclassPrimitiveFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields_query import StubDataclassNestedFieldsQuery
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import \
+    StubDataclassPrimitiveFieldsQuery
 
 
 def test_check_db_id():
@@ -56,6 +63,23 @@ def test_check_db_id():
         BasicMongoDb(db_id="abc\\xyz")._get_db_name()
     with pytest.raises(RuntimeError):
         BasicMongoDb(db_id="abc/xyz")._get_db_name()
+
+def test_populate_index_dict():
+    """Test BasicMongoDB._populate_index_dict method."""
+    sample_types = (
+        StubDataclassPrimitiveFields,
+        StubDataclassPrimitiveFieldsQuery,
+        StubDataclassNestedFieldsQuery,
+        ExperimentKeyQuery,
+    )
+    for sample_type in sample_types:
+        result = {}
+        BasicMongoDb(db_id=typename(sample_type)).build()._populate_index_dict(
+            type_=sample_type,
+            result=result,
+        )
+        RegressionGuard(channel=typename(sample_type)).write(result)
+    RegressionGuard().verify_all()
 
 
 if __name__ == "__main__":

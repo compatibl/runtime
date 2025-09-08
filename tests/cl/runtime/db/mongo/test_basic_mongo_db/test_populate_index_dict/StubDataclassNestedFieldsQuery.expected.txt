@@ -1,0 +1,18 @@
+id: 1
+base_field.str_field: 1
+base_field.int_field: 1
+derived_field.str_field: 1
+derived_field.int_field: 1
+derived_field.derived_str_field: 1
+double_derived_field.str_field: 1
+double_derived_field.int_field: 1
+double_derived_field.derived_str_field: 1
+double_derived_field.double_derived_str_field: 1
+polymorphic_field.str_field: 1
+polymorphic_field.int_field: 1
+polymorphic_derived_field.str_field: 1
+polymorphic_derived_field.int_field: 1
+polymorphic_derived_field.derived_str_field: 1
+key_field.id: 1
+record_as_key_field.id: 1
+

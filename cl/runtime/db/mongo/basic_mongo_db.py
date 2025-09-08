@@ -25,18 +25,23 @@ from cl.runtime.db.db import Db
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
+from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_key_type, is_primitive_type, is_enum_type, is_data_key_or_record_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.type_check import TypeCheck
-from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typename, typeof
+from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
+from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.exceptions.error_util import ErrorUtil
+
 
 _INVALID_DB_NAME_SYMBOLS = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -72,6 +77,9 @@ class BasicMongoDb(Db):
 
     _mongo_collection_dict: dict[type, Collection] | None = None
     """MongoDB collection dict, collections are initialized once and stored."""
+
+    _query_types_with_index: set[type] | None = None
+    """Set of query types for which an index has already been added."""
 
     def load_many(
         self,
@@ -170,6 +178,9 @@ class BasicMongoDb(Db):
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
 
+        # Add index based on public fields of the query target type in the order of declaration from base to derived
+        self._add_index(collection=collection, query_type=typeof(query))
+
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
         # TODO: Remove table fields
@@ -228,6 +239,9 @@ class BasicMongoDb(Db):
 
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
+
+        # Add index based on public fields of the query target type in the order of declaration from base to derived
+        self._add_index(collection=collection, query_type=typeof(query))
 
         # Serialize the query
         query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
@@ -517,3 +531,58 @@ class BasicMongoDb(Db):
             "_dataset": dataset,
             "_key": {"$in": serialized_keys},
         }
+
+    def _add_index(self, *, collection: Collection, query_type: type) -> None:
+        """
+        Get flat dict of (field_name, field_order) for the specified query_type
+        with recursion into embedded data, key or record types.
+
+        Notes:
+            Return None if the index has already been created.
+        """
+        if not self._query_types_with_index:
+            # Create an empty set of query types for which the index has already been added
+            self._query_types_with_index = set()
+        if query_type not in self._query_types_with_index:
+            # Populate index dict recursively if it has not been added yet
+            index_dict = {}
+            self._populate_index_dict(type_=query_type, result=index_dict)
+            # Add index to DB in background mode
+            collection.create_index(index_dict, background=True)
+            # Add to the set of query types for which the index has already been added
+            self._query_types_with_index.add(query_type)
+
+    def _populate_index_dict(self, *, type_: type, field_prefix: str | None = None, result: dict[str, int]) -> None:
+        """
+        Populate a flat dict of (field_name, field_order) for the specified type
+        with recursion into embedded data, key or record types.
+        """
+        type_spec = CastUtil.cast(DataSpec, TypeSchema.for_type(type_))
+        for field_spec in type_spec.fields:
+
+            # Get type hint and ensure it is not a container
+            field_type_hint = field_spec.field_type_hint
+            if field_type_hint.remaining:
+                raise RuntimeError(
+                    f"Field {field_spec.field_name} in type {typename(type_)} is a container and cannot be queried.")
+
+            # Combine field prefix with field name
+            if field_prefix:
+                combined_field_prefix = f"{field_prefix}.{field_spec.field_name}"
+            else:
+                combined_field_prefix = field_spec.field_name
+
+            # Populate depending on field type
+            field_type = field_type_hint.schema_type
+            if is_primitive_type(field_type) or is_enum_type(field_type):
+                # Add a primitive or enum field
+                result[combined_field_prefix] = field_spec.field_order
+            elif is_data_key_or_record_type(field_type):
+                # Add a data, key or record field
+                self._populate_index_dict(
+                    type_=field_type,
+                    field_prefix=combined_field_prefix,
+                    result=result,
+                )
+            else:
+                raise RuntimeError(f"Cannot create index for field type {typename(field_type)}.")

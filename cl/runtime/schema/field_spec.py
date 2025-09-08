@@ -33,6 +33,17 @@ class FieldSpec(BootstrapMixin):
     where type_name may refer to a container, slotted type, or primitive type.
     """
 
+    field_order: int = 1
+    """Field order in query definition, 1 for ascending (default), -1 for descending."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.field_order not in (1, -1):
+            raise RuntimeError(
+                f"Field order can only be 1 for ascending or -1 for descending,\n"
+                f"the value of {self.field_order} for field {self.field_name} is not valid."
+                )
+
     @classmethod
     def create(
         cls,
