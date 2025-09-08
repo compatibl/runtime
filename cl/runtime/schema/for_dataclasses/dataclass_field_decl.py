@@ -43,16 +43,11 @@ class DataclassFieldDecl(FieldDecl):
         result = FieldDecl.create(record_type, field.name, field_type, field_comment)
 
         # Populate fields that require access to dataclasses metadata
+        # TODO: !!! Check why PyCharm considers this code is unreachable
         metadata = dict(field.metadata)
         if (name := metadata.pop("optional", None)) is not None:
             # Already checked in field spec
             pass
-        if (name := metadata.pop("name", None)) is not None:
-            result.name = name
-        if (label := metadata.pop("label", None)) is not None:
-            result.label = label
-        if (formatter := metadata.pop("formatter", None)) is not None:
-            result.formatter = formatter
         if (subtype := metadata.pop("subtype", None)) is not None:
             if subtype == "long":
                 if result.field_type_decl == PrimitiveDeclKeys.INT:
@@ -61,6 +56,14 @@ class DataclassFieldDecl(FieldDecl):
                     raise RuntimeError(f"Subtype 'long' is not valid for field type {result.field_type_decl.name}")
             else:
                 raise RuntimeError(f"Subtype {subtype} is not recognized.")
+        if (name := metadata.pop("name", None)) is not None:
+            result.name = name
+        if (label := metadata.pop("label", None)) is not None:
+            result.label = label
+        if (formatter := metadata.pop("formatter", None)) is not None:
+            result.formatter = formatter
+        if (descending := metadata.pop("descending", None)) is not None:
+            result.descending = descending
 
         # Check that no parsed fields remained in metadata
         if len(metadata) > 0:

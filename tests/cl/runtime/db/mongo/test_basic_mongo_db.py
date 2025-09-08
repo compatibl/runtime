@@ -73,12 +73,13 @@ def test_populate_index_dict():
         ExperimentKeyQuery,
     )
     for sample_type in sample_types:
-        result = {}
-        BasicMongoDb(db_id=typename(sample_type)).build()._populate_index_dict(
+        index_list = []
+        BasicMongoDb(db_id=typename(sample_type)).build()._populate_index(
             type_=sample_type,
-            result=result,
+            result=index_list,
         )
-        RegressionGuard(channel=typename(sample_type)).write(result)
+        index_dict = dict(index_list)
+        RegressionGuard(channel=typename(sample_type)).write(index_dict)
     RegressionGuard().verify_all()
 
 

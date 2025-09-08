@@ -18,6 +18,8 @@ from typing import Any
 from typing import Iterable
 from typing import Sequence
 from typing import cast
+
+import pymongo
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.synchronous.collection import Collection
@@ -392,14 +394,13 @@ class BasicMongoDb(Db):
             collection = mongo_db[collection_name]
 
             # Add a unique index on tenant, dataset and key in ascending order
-            collection.create_index(
-                [
-                    ("_tenant", 1),
-                    ("_dataset", 1),
-                    ("_key", 1),
-                ],
-                unique=True,
+            key_index = (
+                ("_tenant", pymongo.ASCENDING),
+                ("_dataset", pymongo.ASCENDING),
+                ("_key", pymongo.ASCENDING),
             )
+            # TODO: !!!! Add updated_index
+            collection.create_index(key_index, unique=True, background=True)
 
             # Cache for reuse
             self._mongo_collection_dict[key_type] = collection
@@ -532,29 +533,39 @@ class BasicMongoDb(Db):
             "_key": {"$in": serialized_keys},
         }
 
-    def _add_index(self, *, collection: Collection, query_type: type) -> None:
-        """
-        Get flat dict of (field_name, field_order) for the specified query_type
-        with recursion into embedded data, key or record types.
-
-        Notes:
-            Return None if the index has already been created.
-        """
+    def _add_index(
+            self,
+            *,
+            collection: Collection,
+            query_type: type,
+    ) -> None:
+        """Add index for the specified query_type."""
         if not self._query_types_with_index:
             # Create an empty set of query types for which the index has already been added
             self._query_types_with_index = set()
         if query_type not in self._query_types_with_index:
-            # Populate index dict recursively if it has not been added yet
-            index_dict = {}
-            self._populate_index_dict(type_=query_type, result=index_dict)
+
+            # First fields in the index
+            query_index = [("_tenant", pymongo.ASCENDING), ("_dataset", pymongo.ASCENDING)]
+            # Populate query fields recursively
+            self._populate_index(type_=query_type, result=query_index)
+            # Key is the last field in the index
+            query_index.append(("_key", pymongo.ASCENDING))
+
             # Add index to DB in background mode
-            collection.create_index(index_dict, background=True)
+            collection.create_index(query_index, background=True, name=typename(query_type))
             # Add to the set of query types for which the index has already been added
             self._query_types_with_index.add(query_type)
 
-    def _populate_index_dict(self, *, type_: type, field_prefix: str | None = None, result: dict[str, int]) -> None:
+    def _populate_index(
+            self,
+            *,
+            type_: type,
+            field_prefix: str | None = None,
+            result: list[tuple[str, int]],
+    ) -> None:
         """
-        Populate a flat dict of (field_name, field_order) for the specified type
+        Populate a flat dict of (field_name, ASCENDING | DESCENDING) for the specified type
         with recursion into embedded data, key or record types.
         """
         type_spec = CastUtil.cast(DataSpec, TypeSchema.for_type(type_))
@@ -576,10 +587,11 @@ class BasicMongoDb(Db):
             field_type = field_type_hint.schema_type
             if is_primitive_type(field_type) or is_enum_type(field_type):
                 # Add a primitive or enum field
-                result[combined_field_prefix] = field_spec.field_order
+                field_order = pymongo.DESCENDING if field_spec.descending else pymongo.ASCENDING
+                result.append((combined_field_prefix, field_order))
             elif is_data_key_or_record_type(field_type):
                 # Add a data, key or record field
-                self._populate_index_dict(
+                self._populate_index(
                     type_=field_type,
                     field_prefix=combined_field_prefix,
                     result=result,

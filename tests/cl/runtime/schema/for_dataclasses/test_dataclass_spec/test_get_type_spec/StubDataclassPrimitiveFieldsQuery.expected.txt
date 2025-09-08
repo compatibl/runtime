@@ -11,6 +11,7 @@ fields:
     schema_type: float
     optional: true
     condition: true
+  descending: true
 - field_name: key_bool_field
   field_type_hint:
     schema_type: bool

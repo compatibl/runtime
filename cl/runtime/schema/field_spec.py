@@ -33,16 +33,8 @@ class FieldSpec(BootstrapMixin):
     where type_name may refer to a container, slotted type, or primitive type.
     """
 
-    field_order: int = 1
-    """Field order in query definition, 1 for ascending (default), -1 for descending."""
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.field_order not in (1, -1):
-            raise RuntimeError(
-                f"Field order can only be 1 for ascending or -1 for descending,\n"
-                f"the value of {self.field_order} for field {self.field_name} is not valid."
-                )
+    descending: bool | None = None
+    """If True, field order in DB index will be DESCENDING rather than the default (ASCENDING)."""
 
     @classmethod
     def create(
@@ -50,11 +42,12 @@ class FieldSpec(BootstrapMixin):
         *,
         field_name: str,
         field_type_alias: typing.TypeAlias,
-        field_optional: bool | None = None,
+        field_optional: bool | None = None,  # TODO: ! Remove field_ prefix from this field and the ones that follow
         field_subtype: str | None = None,
         field_alias: str | None = None,
         field_label: str | None = None,
         field_formatter: str | None = None,
+        descending: bool | None = None,
         containing_type: type,
     ) -> Self:
         """
@@ -68,6 +61,7 @@ class FieldSpec(BootstrapMixin):
             field_alias: Optional name alias from field metadata, field name is used when not specified
             field_label: Optional label from field metadata, CaseUtil.titleize is used when not specified
             field_formatter: Optional formatter from field metadata, standard formatting is used when not specified
+            descending: If True, field order in DB index will be DESCENDING rather than the default (ASCENDING)
             containing_type: Type that contains the field, use to resolve the generic args at runtime
         """
 
@@ -102,5 +96,6 @@ class FieldSpec(BootstrapMixin):
         result = cls(
             field_name=field_name,
             field_type_hint=field_type_hint,
+            descending=descending,
         )
         return result

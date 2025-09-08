@@ -27,7 +27,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_qu
 )
 
 
-def test_str_query(multi_db_fixture):
+def test_str_query(basic_mongo_db_fixture):
     """Test query for a string field."""
 
     # Create test records and query and populate with sample data

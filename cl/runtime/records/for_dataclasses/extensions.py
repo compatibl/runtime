@@ -31,6 +31,7 @@ def required(
     label: str | None = None,
     subtype: str | None = None,
     formatter: str | None = None,
+    descending: bool | None = None,
 ) -> TDefault:
     """
     Use to specify a field in dataclass that can be omitted in __init__ but must be set before validation.
@@ -45,6 +46,7 @@ def required(
         label: Override titleized name in UI
         subtype: Subtype within the Python type, for example 'long' for int Python type
         formatter: Standard formatter name (without curly brackets) or raw Python format string (in curly brackets)
+        descending: If True, field order in DB index will be DESCENDING rather than the default (ASCENDING)
     """
     # Create metadata dict, include only those fields that are not None, set to None if no such fields
     metadata = {
@@ -53,6 +55,7 @@ def required(
         "label": label,
         "subtype": subtype,
         "formatter": formatter,  # TODO: switch to formatter in other places as format causes Python warnings
+        "descending": descending,
     }
 
     if default_factory is None:
@@ -89,6 +92,7 @@ def optional(
     label: str | None = None,
     subtype: str | None = None,
     formatter: str | None = None,
+    descending: bool | None = None,
 ) -> TDefault:
     """
     Use to specify an optional field in dataclass with additional parameters.
@@ -107,6 +111,7 @@ def optional(
         label: Override titleized name in UI
         subtype: Subtype within the Python type, for example 'long' for int Python type
         formatter: Standard formatter name (without curly brackets) or raw Python format string (in curly brackets)
+        descending: If True, field order in DB index will be DESCENDING rather than the default (ASCENDING)
     """
     # Create metadata dict, include only those fields that are not None, set to None if no such fields
     metadata = {
@@ -115,6 +120,7 @@ def optional(
         "label": label,
         "subtype": subtype,
         "formatter": formatter,  # TODO: switch to formatter in other places as format causes Python warnings
+        "descending": descending,
     }
 
     if default_factory is None:

@@ -1,5 +1,5 @@
 key_str_field: 1
-key_float_field: 1
+key_float_field: -1
 key_bool_field: 1
 key_int_field: 1
 key_long_field: 1
