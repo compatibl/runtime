@@ -69,7 +69,7 @@ class DataclassMixin(DataMixin, ABC):
             field_alias=metadata_dict.pop("name", None),  # TODO: ! Add support for name
             field_label=metadata_dict.pop("label", None),  # TODO: ! Add support for label
             field_formatter=metadata_dict.pop("formatter", None),  # TODO: ! Add support for formatter
-            descending=metadata_dict.pop("descending", None)
+            descending=metadata_dict.pop("descending", None),
         ).build()
 
         # Check that no keys remained in metadata after using all known keys

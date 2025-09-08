@@ -18,7 +18,6 @@ from typing import Any
 from typing import Iterable
 from typing import Sequence
 from typing import cast
-
 import pymongo
 from pymongo import MongoClient
 from pymongo.database import Database
@@ -27,14 +26,19 @@ from cl.runtime.db.db import Db
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key_type, is_primitive_type, is_enum_type, is_data_key_or_record_type
+from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.type_check import TypeCheck
-from cl.runtime.records.typename import typename, typeof
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typeof
 from cl.runtime.schema.data_spec import DataSpec
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
@@ -42,8 +46,6 @@ from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.exceptions.error_util import ErrorUtil
-
 
 _INVALID_DB_NAME_SYMBOLS = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -534,10 +536,10 @@ class BasicMongoDb(Db):
         }
 
     def _add_index(
-            self,
-            *,
-            collection: Collection,
-            query_type: type,
+        self,
+        *,
+        collection: Collection,
+        query_type: type,
     ) -> None:
         """Add index for the specified query_type."""
         if not self._query_types_with_index:
@@ -558,11 +560,11 @@ class BasicMongoDb(Db):
             self._query_types_with_index.add(query_type)
 
     def _populate_index(
-            self,
-            *,
-            type_: type,
-            field_prefix: str | None = None,
-            result: list[tuple[str, int]],
+        self,
+        *,
+        type_: type,
+        field_prefix: str | None = None,
+        result: list[tuple[str, int]],
     ) -> None:
         """
         Populate a flat dict of (field_name, ASCENDING | DESCENDING) for the specified type
@@ -575,7 +577,8 @@ class BasicMongoDb(Db):
             field_type_hint = field_spec.field_type_hint
             if field_type_hint.remaining:
                 raise RuntimeError(
-                    f"Field {field_spec.field_name} in type {typename(type_)} is a container and cannot be queried.")
+                    f"Field {field_spec.field_name} in type {typename(type_)} is a container and cannot be queried."
+                )
 
             # Combine field prefix with field name
             if field_prefix:
