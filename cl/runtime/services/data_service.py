@@ -26,6 +26,7 @@ from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
+from cl.runtime.serializers.type_hints import TypeHints
 from cl.runtime.services.screens import Screens
 from cl.runtime.services.table_screen_item import TableScreenItem
 from cl.runtime.services.type_screen_item import TypeScreenItem
@@ -94,7 +95,13 @@ class DataService(DataclassMixin):
         # Get schema dict for type
         schema_dict = cls._get_schema_dict(common_base_record_type)
 
-        result = {"Data": _UI_SERIALIZER.serialize(records), "Schema": schema_dict}
+        # TODO (Roman): Replace dict response with serializable data model
+        result = {
+            "Data": _UI_SERIALIZER.serialize(records),
+            "Schema": schema_dict,
+            "BaseType": _UI_SERIALIZER.serialize(common_base_record_type, TypeHints.TYPE_OR_NONE),
+        }
+
         return cls._wrap_to_result(result)
 
     @classmethod
@@ -111,7 +118,12 @@ class DataService(DataclassMixin):
         # Get schema dict for type
         schema_dict = cls._get_schema_dict(type_)
 
-        result = {"Data": _UI_SERIALIZER.serialize(records), "Schema": schema_dict}
+        # TODO (Roman): Replace dict response with serializable data model
+        result = {
+            "Data": _UI_SERIALIZER.serialize(records),
+            "Schema": schema_dict,
+            "BaseType": _UI_SERIALIZER.serialize(type_, TypeHints.TYPE_OR_NONE),
+        }
         return cls._wrap_to_result(result)
 
     @classmethod
