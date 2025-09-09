@@ -49,7 +49,7 @@ class DataService(DataclassMixin):
         tables = [
             TableScreenItem(
                 table_name=(key_type_name := typename(key_type)),
-                label=titleize(key_type_name),
+                label=titleize(key_type_name).removesuffix(" Key"),
             )
             for key_type in ds.get_key_types()
         ]
