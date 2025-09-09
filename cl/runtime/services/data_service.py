@@ -77,7 +77,7 @@ class DataService(DataclassMixin):
         return cls._wrap_to_result(_UI_SERIALIZER.serialize(screens))
 
     @classmethod
-    def run_select_table(cls, table_name: str):
+    def run_select_table(cls, table_name: str, skip: int | None = None, limit: int | None = None):
         """Select records by table from DB."""
 
         # Get types stored in DB
@@ -85,7 +85,7 @@ class DataService(DataclassMixin):
 
         # Select by table using load_all
         type_ = cast(type[KeyMixin], TypeInfo.from_type_name(table_name))
-        records = ds.load_all(type_)
+        records = ds.load_all(type_, skip=skip, limit=limit)
 
         if records:
             common_base_record_type = ds.get_common_base_record_type(key_type=type_)
@@ -105,7 +105,7 @@ class DataService(DataclassMixin):
         return cls._wrap_to_result(result)
 
     @classmethod
-    def run_select_type(cls, type_name: str):
+    def run_select_type(cls, type_name: str, skip: int | None = None, limit: int | None = None):
         """Select records by type from DB."""
 
         # Get types stored in DB
@@ -113,7 +113,7 @@ class DataService(DataclassMixin):
 
         # Select by type
         type_ = cast(type[RecordMixin], TypeInfo.from_type_name(type_name))
-        records = ds.load_by_type(type_)
+        records = ds.load_by_type(type_, skip=skip, limit=limit)
 
         # Get schema dict for type
         schema_dict = cls._get_schema_dict(type_)
