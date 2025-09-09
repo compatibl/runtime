@@ -555,7 +555,7 @@ class BasicMongoDb(Db):
             query_index.append(("_key", pymongo.ASCENDING))
 
             # Add index to DB in background mode
-            collection.create_index(query_index, background=True, name=typename(query_type))
+            collection.create_index(query_index, unique=True, background=True)
             # Add to the set of query types for which the index has already been added
             self._query_types_with_index.add(query_type)
 
