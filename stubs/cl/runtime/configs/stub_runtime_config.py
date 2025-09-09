@@ -88,7 +88,7 @@ class StubRuntimeConfig(Config):
             # TODO: Restore after supporting dt.date and dt.time for Mongo: *stub_dataclass_dict_fields_records,
             # TODO: Restore after supporting dt.date and dt.time for Mongo: *stub_dataclass_dict_list_fields_records,
             # TODO: Restore after supporting dt.date and dt.time for Mongo: *stub_dataclass_list_dict_fields_records,
-            # TODO: Restore after supporting dt.date and dt.time for Mongo: *stub_dataclass_primitive_fields_records,
+            *stub_dataclass_primitive_fields_records,
             *stub_dataclass_singleton_record,
             *stub_viewers_records,
             *stub_handlers_records,
