@@ -70,6 +70,7 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
 @pytest.fixture(scope="function")
 def default_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using default DB."""
+    # TODO: !!! Check if DB is mongomock before applying the patch
     with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
         yield from _db_fixture(request)
 
@@ -95,6 +96,7 @@ def basic_mongo_db_fixture(request: FixtureRequest) -> Iterator[Db]:
 @pytest.fixture(scope="function")
 def basic_mongo_mock_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using BasicMongoMockDb."""
+    # TODO: !!! Check if DB is mongomock before applying the patch
     with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
         yield from _db_fixture(request, db_type=BasicMongoMockDb)
 
@@ -105,6 +107,7 @@ def multi_db_fixture(request) -> Iterator[Db]:
     Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.
     """
+    # TODO: !!! Check if DB is mongomock before applying the patch
     with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
         yield from _db_fixture(request, db_type=request.param)
 
@@ -140,6 +143,7 @@ def work_dir_fixture(request: FixtureRequest) -> Iterator[str]:
 
 def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
     """Convert a UUID to BSON Binary object."""
+    # TODO: !!! Check if DB is mongomock before applying the patch
     return Binary(uuid_.bytes, UUID_SUBTYPE)
 
 
