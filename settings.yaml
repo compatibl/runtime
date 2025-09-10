@@ -47,5 +47,8 @@ testing:
     - SqliteDb
     - BasicMongoMockDb
 
+  # Documented in DbSettings class
+  db_type: BasicMongoMockDb
+
   # Documented in LogSettings class
   log_filename_prefix: tests

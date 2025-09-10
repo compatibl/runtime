@@ -70,7 +70,8 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
 @pytest.fixture(scope="function")
 def default_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using default DB."""
-    yield from _db_fixture(request)
+    with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
+        yield from _db_fixture(request)
 
 
 @pytest.fixture(scope="function")
@@ -94,7 +95,8 @@ def basic_mongo_db_fixture(request: FixtureRequest) -> Iterator[Db]:
 @pytest.fixture(scope="function")
 def basic_mongo_mock_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using BasicMongoMockDb."""
-    yield from _db_fixture(request, db_type=BasicMongoMockDb)
+    with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
+        yield from _db_fixture(request, db_type=BasicMongoMockDb)
 
 
 @pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb])  # TODO: Load the list from settings instead
