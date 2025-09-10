@@ -26,13 +26,15 @@ from cl.runtime.routers.schema.type_request import TypeRequest
 from cl.runtime.routers.schema.type_response_util import TypeResponseUtil
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
+from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.type_hints import TypeHints
 from cl.runtime.services.screens import Screens
 from cl.runtime.services.table_screen_item import TableScreenItem
 from cl.runtime.services.type_screen_item import TypeScreenItem
 
-# Create UI serializer
+# Create serializers
 _UI_SERIALIZER = DataSerializers.FOR_UI
+_KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
 @dataclass(slots=True)
@@ -80,6 +82,11 @@ class DataService(DataclassMixin):
     def run_select_table(cls, table_name: str, skip: int | None = None, limit: int | None = None):
         """Select records by table from DB."""
 
+        # TODO (Roman): Fix 'skip' and 'limit' in DataSource methods
+        # The 'skip' and 'limit' params are currently not working
+        limit = None
+        skip = None
+
         # Get types stored in DB
         ds: DataSource = active(DataSource)
 
@@ -95,9 +102,13 @@ class DataService(DataclassMixin):
         # Get schema dict for type
         schema_dict = cls._get_schema_dict(common_base_record_type)
 
+        # TODO (Roman): Include '_key' in UI serialization format
+        # Serialize records in UI format and add '_key' attribute
+        data = [{**_UI_SERIALIZER.serialize(x), "_key": _KEY_SERIALIZER.serialize(x.get_key())} for x in records]
+
         # TODO (Roman): Replace dict response with serializable data model
         result = {
-            "Data": _UI_SERIALIZER.serialize(records),
+            "Data": data,
             "Schema": schema_dict,
             "BaseType": _UI_SERIALIZER.serialize(common_base_record_type, TypeHints.TYPE_OR_NONE),
         }
@@ -107,6 +118,11 @@ class DataService(DataclassMixin):
     @classmethod
     def run_select_type(cls, type_name: str, skip: int | None = None, limit: int | None = None):
         """Select records by type from DB."""
+
+        # TODO (Roman): Fix 'skip' and 'limit' in DataSource methods
+        # The 'skip' and 'limit' params are currently not working
+        limit = None
+        skip = None
 
         # Get types stored in DB
         ds: DataSource = active(DataSource)
@@ -118,9 +134,13 @@ class DataService(DataclassMixin):
         # Get schema dict for type
         schema_dict = cls._get_schema_dict(type_)
 
+        # TODO (Roman): Include '_key' in UI serialization format
+        # Serialize records in UI format and add '_key' attribute
+        data = [{**_UI_SERIALIZER.serialize(x), "_key": _KEY_SERIALIZER.serialize(x.get_key())} for x in records]
+
         # TODO (Roman): Replace dict response with serializable data model
         result = {
-            "Data": _UI_SERIALIZER.serialize(records),
+            "Data": data,
             "Schema": schema_dict,
             "BaseType": _UI_SERIALIZER.serialize(type_, TypeHints.TYPE_OR_NONE),
         }
