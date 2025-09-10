@@ -82,11 +82,6 @@ class DataService(DataclassMixin):
     def run_select_table(cls, table_name: str, skip: int | None = None, limit: int | None = None):
         """Select records by table from DB."""
 
-        # TODO (Roman): Fix 'skip' and 'limit' in DataSource methods
-        # The 'skip' and 'limit' params are currently not working
-        limit = None
-        skip = None
-
         # Get types stored in DB
         ds: DataSource = active(DataSource)
 
@@ -118,11 +113,6 @@ class DataService(DataclassMixin):
     @classmethod
     def run_select_type(cls, type_name: str, skip: int | None = None, limit: int | None = None):
         """Select records by type from DB."""
-
-        # TODO (Roman): Fix 'skip' and 'limit' in DataSource methods
-        # The 'skip' and 'limit' params are currently not working
-        limit = None
-        skip = None
 
         # Get types stored in DB
         ds: DataSource = active(DataSource)

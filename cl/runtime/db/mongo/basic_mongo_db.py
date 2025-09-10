@@ -144,7 +144,7 @@ class BasicMongoDb(Db):
         # serialized_record = collection.find_one({"_key": serialized_primary_key})
 
         # Get iterable from the query sorted by '_key', execution is deferred
-        serialized_records = tuple(collection.find(query_dict).sort("_key"))
+        serialized_records = collection.find(query_dict).sort("_key")
 
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
@@ -207,7 +207,7 @@ class BasicMongoDb(Db):
         self._apply_restrict_to(query_dict=query_dict, key_type=key_type, restrict_to=restrict_to)
 
         # Get iterable from the query sorted by '_key', execution is deferred
-        serialized_records = tuple(collection.find(query_dict).sort("_key"))
+        serialized_records = collection.find(query_dict).sort("_key")
 
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)

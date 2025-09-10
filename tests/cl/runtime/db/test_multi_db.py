@@ -24,6 +24,7 @@ from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassDictFields
 from stubs.cl.runtime import StubDataclassDictListFields
 from stubs.cl.runtime import StubDataclassDoubleDerived
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassListDictFields
 from stubs.cl.runtime import StubDataclassListFields
 from stubs.cl.runtime import StubDataclassNestedFields
@@ -284,6 +285,29 @@ def test_count_by_query(multi_db_fixture):
 
     assert active(DataSource).count_by_query(eq_query) == 1
     assert active(DataSource).count_by_query(in_query) == 2
+
+
+def test_skip_and_limit(multi_db_fixture):
+    """Test Dbs work correctly with 'skip' and 'limit' params."""
+
+    records = (
+        StubDataclass(id="abc").build(),
+        StubDataclass(id="def").build(),
+    )
+
+    active(DataSource).insert_many(records=records, commit=True)
+
+    # Load with 'skip'
+    load_all_records = active(DataSource).load_all(key_type=StubDataclassKey, skip=2)
+    load_by_type_records = active(DataSource).load_by_type(record_type=StubDataclass, skip=2)
+    assert len(load_all_records) == 0
+    assert len(load_by_type_records) == 0
+
+    # Load with 'limit'
+    load_all_records = list(active(DataSource).load_all(key_type=StubDataclassKey, limit=1))
+    load_by_type_records = list(active(DataSource).load_by_type(record_type=StubDataclass, limit=1))
+    assert len(load_all_records) == 1
+    assert len(load_by_type_records) == 1
 
 
 if __name__ == "__main__":
