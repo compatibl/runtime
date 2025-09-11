@@ -29,7 +29,9 @@ from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
 from cl.runtime.db.sql.sqlite_db import SqliteDb
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
+from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
+from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 from cl.runtime.tasks.celery.celery_queue import celery_start_queue
@@ -70,9 +72,17 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
 @pytest.fixture(scope="function")
 def default_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using default DB."""
-    # TODO: !!! Check if DB is mongomock before applying the patch
-    with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
-        yield from _db_fixture(request)
+
+    # Get default Db type from settings
+    db_settings = DbSettings.instance()
+    default_db_type = TypeInfo.from_type_name(db_settings.db_type)
+
+    if default_db_type is BasicMongoMockDb:
+        # Patch 'from_uuid' method if db type is BasicMongoMockDb
+        with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
+            yield from _db_fixture(request, db_type=default_db_type)
+    else:
+        yield from _db_fixture(request, db_type=default_db_type)
 
 
 @pytest.fixture(scope="function")
@@ -96,7 +106,7 @@ def basic_mongo_db_fixture(request: FixtureRequest) -> Iterator[Db]:
 @pytest.fixture(scope="function")
 def basic_mongo_mock_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using BasicMongoMockDb."""
-    # TODO: !!! Check if DB is mongomock before applying the patch
+    # Patch 'from_uuid' method
     with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
         yield from _db_fixture(request, db_type=BasicMongoMockDb)
 
@@ -107,8 +117,11 @@ def multi_db_fixture(request) -> Iterator[Db]:
     Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.
     """
-    # TODO: !!! Check if DB is mongomock before applying the patch
-    with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
+    # Patch 'from_uuid' method if db type is BasicMongoMockDb
+    if request.param is BasicMongoMockDb:
+        with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
+            yield from _db_fixture(request, db_type=request.param)
+    else:
         yield from _db_fixture(request, db_type=request.param)
 
 
@@ -143,7 +156,6 @@ def work_dir_fixture(request: FixtureRequest) -> Iterator[str]:
 
 def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
     """Convert a UUID to BSON Binary object."""
-    # TODO: !!! Check if DB is mongomock before applying the patch
     return Binary(uuid_.bytes, UUID_SUBTYPE)
 
 
