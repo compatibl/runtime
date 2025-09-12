@@ -22,8 +22,11 @@ from cl.runtime.ui.base_type_info import BaseTypeInfo
 class TabInfo(DataclassMixin):  # TODO: Review usage of TabInfo class
     """Tab info."""
 
-    type: BaseTypeInfo = required()
-    """Type."""
+    table_name: str = required()
+    """Table name of the Tab."""
 
-    # key: Tuple | None = None  # TODO: Add generic key support
-    """Key."""
+    type_name: str | None = None
+    """Record type of the Tab."""
+
+    filter_name: str | None = None
+    """Filter name of the Tab."""

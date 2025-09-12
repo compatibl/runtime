@@ -75,27 +75,6 @@ cl.UiAppState:
     Optional: true
   Keys:
   - User
-cl.BaseTypeInfo:
-  Module:
-    ModuleName: cl
-  Name: BaseTypeInfo
-  Label: Base Type Info
-  Comment: Information about a type for UI.
-  TypeKind: Data
-  DisplayKind: Basic
-  Elements:
-  - Value:
-      Type: String
-    Name: Name
-    Comment: Name of type.
-  - Value:
-      Type: String
-    Name: Module
-    Comment: Module of type.
-  - Value:
-      Type: String
-    Name: Label
-    Comment: Label of type.
 cl.TabInfo:
   Module:
     ModuleName: cl
@@ -105,12 +84,20 @@ cl.TabInfo:
   TypeKind: Data
   DisplayKind: Basic
   Elements:
-  - Data:
-      Module:
-        ModuleName: cl
-      Name: BaseTypeInfo
-    Name: Type
-    Comment: Type.
+  - Value:
+      Type: String
+    Name: TableName
+    Comment: Table name of the Tab.
+  - Value:
+      Type: String
+    Name: TypeName
+    Comment: Record type of the Tab.
+    Optional: true
+  - Value:
+      Type: String
+    Name: FilterName
+    Comment: Filter name of the Tab.
+    Optional: true
 cl.UiAppStateKey:
   Module:
     ModuleName: cl
