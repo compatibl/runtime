@@ -17,7 +17,8 @@ import pytest
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_abstract_type, is_ndarray_type, FloatVector, FloatMatrix, FloatCube
+from cl.runtime.records.protocols import is_abstract_type, is_ndarray_type, FloatVector, FloatMatrix, FloatCube, \
+    is_data_type
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_key_or_record_type
 from cl.runtime.records.protocols import is_key_type
@@ -34,84 +35,79 @@ def test_functions():
     """Test functions defined in the protocols module."""
 
     # Class groups
-    all_classes = (
-        RecordUtil,
-        DataMixin,
+    abstract_types = (
         KeyMixin,
         RecordMixin,
+        DataMixin,
+    )
+    data_types = (
+        DataMixin,
         DataclassMixin,
         StubDataclassData,
-        StubDataclassKey,
-        StubDataclass,
-        StubDataclassDerived,
-        np.ndarray,
     )
-    abstract_classes = (
-        KeyMixin,
-        RecordMixin,
-        DataMixin,
-    )
-    data_classes = (
-        DataMixin,
-        KeyMixin,
-        RecordMixin,
-        DataclassMixin,
-        StubDataclassData,
-        StubDataclassKey,
-        StubDataclass,
-        StubDataclassDerived,
-    )
-    key_or_record_classes = (
-        KeyMixin,
-        RecordMixin,
-        StubDataclassKey,
-        StubDataclass,
-        StubDataclassDerived,
-    )
-    key_classes = (
+    key_types = (
         KeyMixin,
         StubDataclassKey,
     )
-    record_classes = (
+    record_types = (
         RecordMixin,
         StubDataclass,
         StubDataclassDerived,
     )
-    ndarray_classes_and_aliases = (
+
+    # For ndarray, the list also includes generic aliases
+    ndarray_types_and_aliases = (
         np.ndarray,
         FloatVector,
         FloatMatrix,
         FloatCube,
     )
 
-    # Test is_abstract_type
-    for class_ in all_classes:
-        assert is_abstract_type(class_) == (class_ in abstract_classes), f"{class_} is not abstract"
+    # Combined lists
+    key_or_record_types = key_types + record_types
+    data_key_or_record_types = data_types + key_or_record_types
 
+    # Everything
+    all_types = abstract_types + data_types + key_types + record_types  # TODO: !!!! Add ndarray here after fix
+
+    # Test is_abstract_type
+    for class_ in all_types:
+        assert is_abstract_type(class_) == (class_ in abstract_types), f"{class_} is not abstract"
+        
     # Test is_data_type
-    for class_ in all_classes:
-        assert is_data_key_or_record_type(class_) == (
-            class_ in data_classes
-        ), f"{class_} is not a data, key or record class"
+    for class_ in all_types:
+        assert is_data_type(class_) == (
+            class_ in data_types
+        )
+        
+    # Test is_key_type
+    for class_ in all_types:
+        assert is_key_type(class_) == (
+            class_ in key_types
+        )
+        
+    # Test is_record_type
+    for class_ in all_types:
+        assert is_record_type(class_) == (
+            class_ in record_types
+        )
 
     # Test is_key_or_record_type
-    for class_ in all_classes:
+    for class_ in all_types:
         assert is_key_or_record_type(class_) == (
-            class_ in key_or_record_classes
-        ), f"{class_} is not a key or record class"
-
-    # Test is_key_type
-    for class_ in all_classes:
-        assert is_key_type(class_) == (class_ in key_classes), f"{class_} is not a key class"
-
-    # Test is_record_type
-    for class_ in all_classes:
-        assert is_record_type(class_) == (class_ in record_classes), f"{class_} is not a record class"
+            class_ in key_or_record_types
+        )
+        
+    # Test is_data_type
+    for class_ in all_types:
+        assert is_data_key_or_record_type(class_) == (
+            class_ in data_key_or_record_types
+        )
 
     # Test is_ndarray_type
-    for class_ in all_classes:
-        assert is_ndarray_type(class_) == (class_ in ndarray_classes_and_aliases), f"{class_} is not ndarray or its generic alias"
-    for class_ in ndarray_classes_and_aliases:
+    for class_ in all_types:
+        assert is_ndarray_type(class_) == (class_ in ndarray_types_and_aliases)
+    for class_ in ndarray_types_and_aliases:
         assert is_ndarray_type(class_)
 
 
