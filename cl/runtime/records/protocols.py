@@ -99,10 +99,11 @@ def is_empty(
 
 def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     """Returns true if the argument is one of the supported primitive types."""
-    if isinstance(type_, type):
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
         # Use class names to avoid import discrepancies for UUID
         # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type
-        return type_.__name__ in PRIMITIVE_TYPE_NAMES or issubclass(type_, type)
+        return type_name in PRIMITIVE_TYPE_NAMES or issubclass(type_, type)
     else:
         raise RuntimeError(
             f"The argument of is_primitive_type is an instance of type {type(type_).__name__}\n"
@@ -112,8 +113,9 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
 
 def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
     """Derived from Enum but not one of the base enum classes and the name does not start from underscore."""
-    if isinstance(type_, type):
-        return issubclass(type_, Enum) and type_.__module__ != "enum" and not type_.__name__.startswith("_")
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
+        return issubclass(type_, Enum) and type_.__module__ != "enum" and not type_name.startswith("_")
     else:
         raise RuntimeError(
             f"The argument of is_enum_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
@@ -122,8 +124,9 @@ def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
 
 def is_sequence_type(type_: type) -> TypeGuard[type[SequenceTypes]]:
     """Returns true if the argument is one of the supported sequence types."""
-    if isinstance(type_, type):
-        return type_.__name__ in SEQUENCE_TYPE_NAMES
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
+        return type_name in SEQUENCE_TYPE_NAMES
     else:
         raise RuntimeError(
             f"The argument of is_sequence_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
@@ -132,8 +135,9 @@ def is_sequence_type(type_: type) -> TypeGuard[type[SequenceTypes]]:
 
 def is_mapping_type(type_: type) -> TypeGuard[type[MappingTypes]]:
     """Returns true if the argument is one of the supported mapping types."""
-    if isinstance(type_, type):
-        return type_.__name__ in MAPPING_TYPE_NAMES
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
+        return type_name in MAPPING_TYPE_NAMES
     else:
         raise RuntimeError(
             f"The argument of is_mapping_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
@@ -142,12 +146,10 @@ def is_mapping_type(type_: type) -> TypeGuard[type[MappingTypes]]:
 
 def is_ndarray_type(type_: type) -> TypeGuard[type[np.ndarray]]:
     """Returns true if the argument is ndarray or one of its supported generic aliases."""
-    if getattr(type_, "__name__", None) in NDARRAY_TYPE_NAMES:
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
         # Condition will match np.ndarray or generic alias for ndarray (including, currently, for NDArray)
-        return True
-    elif isinstance(type_, type):
-        # All other types
-        return False
+        return type_name in NDARRAY_TYPE_NAMES
     else:
         raise RuntimeError(
             f"The argument of is_ndarray_type is an instance of type {type(type_).__name__}\nrather than type variable for this type or a generic alias,\nuse type(arg) instead of arg."
@@ -156,7 +158,8 @@ def is_ndarray_type(type_: type) -> TypeGuard[type[np.ndarray]]:
 
 def is_abstract_type(type_: type) -> bool:
     """True if the argument is an abstract class."""
-    if isinstance(type_, type):
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
         return bool(getattr(type_, "__abstractmethods__", None))
     else:
         raise RuntimeError(
@@ -166,7 +169,8 @@ def is_abstract_type(type_: type) -> bool:
 
 def is_mixin_type(type_: type) -> bool:
     """True if the argument is a mixin class (class without instance fields), detected by classname suffix."""
-    if isinstance(type_, type):
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
         return typename(type_).endswith("Mixin")
     else:
         raise RuntimeError(
@@ -179,8 +183,9 @@ def is_builder_type(type_: type) -> bool:
     True if the argument has 'build' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    if isinstance(type_, type):
-        return hasattr(type_, "build") and not type_.__name__.startswith("_")
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
+        return hasattr(type_, "build") and not type_name.startswith("_")
     else:
         raise RuntimeError(
             f"The argument of is_builder_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
@@ -192,8 +197,9 @@ def is_data_key_or_record_type(type_: type) -> bool:
     True if the argument has 'get_field_names' method (includes data, keys and records), may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    if isinstance(type_, type):
-        return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
+        return hasattr(type_, "get_field_names") and not type_name.startswith("_")
     else:
         raise RuntimeError(
             f"The argument of is_data_key_or_record_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
@@ -205,8 +211,9 @@ def is_key_or_record_type(type_: type) -> bool:
     True if the argument has 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    if isinstance(type_, type):
-        return hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
+        return hasattr(type_, "get_key_type") and not type_name.startswith("_")
     else:
         raise RuntimeError(
             f"The argument of is_key_or_record_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
@@ -218,11 +225,12 @@ def is_data_type(type_: type) -> bool:
     True if the argument has 'get_field_names' method but not 'get_key_type' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    if isinstance(type_, type):
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
         return (
             hasattr(type_, "get_field_names")
             and not hasattr(type_, "get_key_type")
-            and not type_.__name__.startswith("_")
+            and not type_name.startswith("_")
         )
     else:
         raise RuntimeError(
@@ -235,8 +243,9 @@ def is_key_type(type_: type) -> bool:
     True if the argument has 'get_key_type' method but not 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    if isinstance(type_, type):
-        return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not type_.__name__.startswith("_")
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
+        return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not type_name.startswith("_")
     else:
         raise RuntimeError(
             f"The argument of is_key_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
@@ -248,8 +257,9 @@ def is_record_type(type_: type) -> bool:
     Return True if the argument has 'get_key' method, may be abstract or a mixin.
     Excludes classes whose name starts from underscore.
     """
-    if isinstance(type_, type):
-        return hasattr(type_, "get_key") and not type_.__name__.startswith("_")
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
+        return hasattr(type_, "get_key") and not type_name.startswith("_")
     else:
         raise RuntimeError(
             f"The argument of is_record_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
@@ -258,9 +268,10 @@ def is_record_type(type_: type) -> bool:
 
 def is_condition_type(type_: type) -> bool:
     """Returns true if the argument is one of the supported condition types."""
-    if isinstance(type_, type):
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    if (type_name := getattr(type_, "__name__", None)) is not None:
         # Use class names to avoid a cyclic reference
-        return type_.__name__ in CONDITION_TYPE_NAMES
+        return type_name in CONDITION_TYPE_NAMES
     else:
         raise RuntimeError(
             f"The argument of is_condition_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."

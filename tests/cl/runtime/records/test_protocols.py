@@ -68,7 +68,7 @@ def test_functions():
     data_key_or_record_types = data_types + key_or_record_types
 
     # Everything
-    all_types = abstract_types + data_types + key_types + record_types  # TODO: !!!! Add ndarray here after fix
+    all_types = abstract_types + data_types + key_types + record_types + ndarray_types_and_aliases
 
     # Test is_abstract_type
     for class_ in all_types:
