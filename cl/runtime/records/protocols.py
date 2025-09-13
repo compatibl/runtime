@@ -14,7 +14,7 @@
 
 import datetime as dt
 from enum import Enum
-from typing import Any
+from typing import Any, get_origin
 from typing import Mapping
 from typing import MutableMapping
 from typing import MutableSequence
@@ -22,6 +22,8 @@ from typing import Sequence
 from typing import TypeGuard
 from typing import TypeVar
 from uuid import UUID
+
+import numpy as np
 from bson import Int64
 from frozendict import frozendict
 from cl.runtime.records.typename import typename
@@ -60,14 +62,26 @@ MAPPING_TYPES = (dict, frozendict)
 MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 """Names of types that may be used to represent mappings, including abstract base classes."""
 
-PrimitiveTypes = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | type
+NDARRAY_TYPE_NAMES = ("ndarray", "NDArray")
+"""Names of types or generic aliases used for ndarray variables or generic aliases."""
+
+PrimitiveTypes = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | type  # TODO: Rename to PrimitiveType?
 """Type alias for Python classes used to store primitive values."""
 
-SequenceTypes = list | tuple | Sequence | MutableSequence
+SequenceTypes = list | tuple | Sequence | MutableSequence  # TODO: Replace by Sequence or MutableSequence?
 """Type alias for a supported sequence type."""
 
-MappingTypes = dict | frozendict | Mapping | MutableMapping
+MappingTypes = dict | frozendict | Mapping | MutableMapping  # TODO: Replace by Mapping or MutableMapping?
 """Type alias for a supported mapping type."""
+
+FloatVector = np.ndarray[tuple[int], np.dtype[np.float64]]
+"""One-dimensional NumPy array with dtype=np.float64."""
+
+FloatMatrix = np.ndarray[tuple[int, int], np.dtype[np.float64]]
+"""Two-dimensional numpy array with dtype=np.float64."""
+
+FloatCube = np.ndarray[tuple[int, int, int], np.dtype[np.float64]]
+"""Three-dimensional numpy array with dtype=np.float64, sizes are not necessarily the same (not a literal cube)."""
 
 TObj = TypeVar("TObj")
 """Generic type parameter for any object."""
@@ -91,7 +105,7 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
         return type_.__name__ in PRIMITIVE_TYPE_NAMES or issubclass(type_, type)
     else:
         raise RuntimeError(
-            f"The argument of is_primitive is an instance of type {type(type_).__name__}\n"
+            f"The argument of is_primitive_type is an instance of type {type(type_).__name__}\n"
             f"rather than type variable for this type, use type(arg) instead of arg."
         )
 
@@ -102,7 +116,7 @@ def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
         return issubclass(type_, Enum) and type_.__module__ != "enum" and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_enum is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_enum_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -112,7 +126,7 @@ def is_sequence_type(type_: type) -> TypeGuard[type[SequenceTypes]]:
         return type_.__name__ in SEQUENCE_TYPE_NAMES
     else:
         raise RuntimeError(
-            f"The argument of is_sequence is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_sequence_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -122,7 +136,21 @@ def is_mapping_type(type_: type) -> TypeGuard[type[MappingTypes]]:
         return type_.__name__ in MAPPING_TYPE_NAMES
     else:
         raise RuntimeError(
-            f"The argument of is_mapping is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_mapping_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+        )
+
+
+def is_ndarray_type(type_: type) -> TypeGuard[type[np.ndarray]]:
+    """Returns true if the argument is ndarray or one of its supported generic aliases."""
+    if getattr(type_, "__name__", None) in NDARRAY_TYPE_NAMES:
+        # Condition will match np.ndarray or generic alias for ndarray (including, currently, for NDArray)
+        return True
+    elif isinstance(type_, type):
+        # All other types
+        return False
+    else:
+        raise RuntimeError(
+            f"The argument of is_ndarray_type is an instance of type {type(type_).__name__}\nrather than type variable for this type or a generic alias,\nuse type(arg) instead of arg."
         )
 
 
@@ -132,7 +160,7 @@ def is_abstract_type(type_: type) -> bool:
         return bool(getattr(type_, "__abstractmethods__", None))
     else:
         raise RuntimeError(
-            f"The argument of is_abstract is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_abstract_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -142,7 +170,7 @@ def is_mixin_type(type_: type) -> bool:
         return typename(type_).endswith("Mixin")
     else:
         raise RuntimeError(
-            f"The argument of is_abstract is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_mixin_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -155,7 +183,7 @@ def is_builder_type(type_: type) -> bool:
         return hasattr(type_, "build") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_builder is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_builder_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -168,7 +196,7 @@ def is_data_key_or_record_type(type_: type) -> bool:
         return hasattr(type_, "get_field_names") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_data_key_or_record is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_data_key_or_record_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -181,7 +209,7 @@ def is_key_or_record_type(type_: type) -> bool:
         return hasattr(type_, "get_key_type") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_key_or_record is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_key_or_record_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -198,7 +226,7 @@ def is_data_type(type_: type) -> bool:
         )
     else:
         raise RuntimeError(
-            f"The argument of is_data is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_data_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -211,7 +239,7 @@ def is_key_type(type_: type) -> bool:
         return hasattr(type_, "get_key_type") and not hasattr(type_, "get_key") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_key is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_key_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -224,7 +252,7 @@ def is_record_type(type_: type) -> bool:
         return hasattr(type_, "get_key") and not type_.__name__.startswith("_")
     else:
         raise RuntimeError(
-            f"The argument of is_record is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_record_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )
 
 
@@ -235,5 +263,5 @@ def is_condition_type(type_: type) -> bool:
         return type_.__name__ in CONDITION_TYPE_NAMES
     else:
         raise RuntimeError(
-            f"The argument of is_enum is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_condition_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )

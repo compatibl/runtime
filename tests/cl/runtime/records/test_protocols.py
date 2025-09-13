@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import numpy as np
 import pytest
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_abstract_type
+from cl.runtime.records.protocols import is_abstract_type, is_ndarray_type, FloatVector, FloatMatrix, FloatCube
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_key_or_record_type
 from cl.runtime.records.protocols import is_key_type
@@ -43,6 +44,7 @@ def test_functions():
         StubDataclassKey,
         StubDataclass,
         StubDataclassDerived,
+        np.ndarray,
     )
     abstract_classes = (
         KeyMixin,
@@ -75,30 +77,42 @@ def test_functions():
         StubDataclass,
         StubDataclassDerived,
     )
+    ndarray_classes_and_aliases = (
+        np.ndarray,
+        FloatVector,
+        FloatMatrix,
+        FloatCube,
+    )
 
-    # Test is_abstract
+    # Test is_abstract_type
     for class_ in all_classes:
         assert is_abstract_type(class_) == (class_ in abstract_classes), f"{class_} is not abstract"
 
-    # Test is_data
+    # Test is_data_type
     for class_ in all_classes:
         assert is_data_key_or_record_type(class_) == (
             class_ in data_classes
         ), f"{class_} is not a data, key or record class"
 
-    # Test is_key_or_record
+    # Test is_key_or_record_type
     for class_ in all_classes:
         assert is_key_or_record_type(class_) == (
             class_ in key_or_record_classes
         ), f"{class_} is not a key or record class"
 
-    # Test is_key
+    # Test is_key_type
     for class_ in all_classes:
         assert is_key_type(class_) == (class_ in key_classes), f"{class_} is not a key class"
 
-    # Test is_record
+    # Test is_record_type
     for class_ in all_classes:
         assert is_record_type(class_) == (class_ in record_classes), f"{class_} is not a record class"
+
+    # Test is_ndarray_type
+    for class_ in all_classes:
+        assert is_ndarray_type(class_) == (class_ in ndarray_classes_and_aliases), f"{class_} is not ndarray or its generic alias"
+    for class_ in ndarray_classes_and_aliases:
+        assert is_ndarray_type(class_)
 
 
 if __name__ == "__main__":
