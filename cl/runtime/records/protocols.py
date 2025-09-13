@@ -28,7 +28,20 @@ from bson import Int64
 from frozendict import frozendict
 from cl.runtime.records.typename import typename
 
-PRIMITIVE_TYPES = (str, float, bool, int, Int64, dt.date, dt.time, dt.datetime, UUID, bytes, type)
+PRIMITIVE_TYPES = (
+    str,
+    float,
+    np.float64,
+    bool,
+    int,
+    Int64,
+    dt.date,
+    dt.time,
+    dt.datetime,
+    UUID,
+    bytes,
+    type,
+)
 """The list of Python classes used to store primitive types, not the same as type names."""
 
 PRIMITIVE_TYPE_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_TYPES)
@@ -65,7 +78,7 @@ MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 NDARRAY_TYPE_NAMES = ("ndarray", "NDArray")
 """Names of types or generic aliases used for ndarray variables or generic aliases."""
 
-PrimitiveTypes = str | float | bool | int | dt.date | dt.time | dt.datetime | UUID | bytes | type  # TODO: Rename to PrimitiveType?
+PrimitiveTypes = str | float | np.float64 | bool | int | Int64 | dt.date | dt.time | dt.datetime | UUID | bytes | type  # TODO: Rename to PrimitiveType?
 """Type alias for Python classes used to store primitive values."""
 
 SequenceTypes = list | tuple | Sequence | MutableSequence  # TODO: Replace by Sequence or MutableSequence?
@@ -103,7 +116,8 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     if (type_name := getattr(type_, "__name__", None)) is not None:
         # Use class names to avoid import discrepancies for UUID
         # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type
-        return type_name in PRIMITIVE_TYPE_NAMES or issubclass(type_, type)
+        # Use type_name == "dtype" to include numpy dtype generics
+        return type_name in PRIMITIVE_TYPE_NAMES or type_name == "dtype" or issubclass(type_, type)
     else:
         raise RuntimeError(
             f"The argument of is_primitive_type is an instance of type {type(type_).__name__}\n"
