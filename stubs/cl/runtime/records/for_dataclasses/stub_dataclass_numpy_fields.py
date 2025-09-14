@@ -23,7 +23,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubData
 from cl.runtime.records.for_dataclasses.extensions import required
 
 @dataclass(slots=True, kw_only=True)
-class StubDataclassNumpy(StubDataclass):
+class StubDataclassNumpyFields(StubDataclass):
     """Stub record with numpy fields."""
 
     float_vector: FloatVector = required(default_factory=lambda: np.array([1.0, 2.0]))

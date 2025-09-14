@@ -49,10 +49,9 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composi
     StubDataclassPolymorphicComposite,
 )
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_numpy import StubDataclassNumpy
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_numpy_fields import StubDataclassNumpyFields
 
 _SAMPLES = [
-    StubDataclassNumpy(),
     StubDataclass(),
     StubDataclassNestedFields(),
     StubDataclassComposite(),
@@ -78,6 +77,7 @@ _SAMPLES = [
         base_key_field=StubDataclassPolymorphicKey(),
         root_key_field=StubDataclassPolymorphicKey(),
     ),
+    StubDataclassNumpyFields(),
     StubDataclassEmptyFields(),  # Fields set to None
     StubDataclassEmptyFields(  # Fields set to empty mutable containers
         empty_str="",
@@ -111,7 +111,7 @@ _SAMPLES = [
 
 
 _INVALID_SAMPLES = [
-    (StubDataclassNumpy(untyped_ndarray=np.array([1.0, 2.0])), "is an ndarray but does not specify dtype"),  # noqa
+    (StubDataclassNumpyFields(untyped_ndarray=np.array([1.0, 2.0])), "is an ndarray but does not specify dtype"),  # noqa
 ]
 
 def test_bidirectional():
