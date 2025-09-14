@@ -17,9 +17,11 @@ import typing
 from dataclasses import dataclass
 from enum import Enum
 from typing import Self
+
+import numpy as np
 from frozendict import frozendict
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_ndarray_type, is_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.records.protocols import is_primitive_type
@@ -91,6 +93,13 @@ class TypeHint(BootstrapMixin):
         elif not self.remaining:
             raise RuntimeError(f"The type hint {self.to_str()} is a mapping but does not specify item type.")
 
+    def validate_for_ndarray(self) -> None:
+        """Raise an error if the type hint is not an ndarray."""
+        if not is_ndarray_type(self.schema_type):
+            raise RuntimeError(f"{self.to_str()} is not np.ndarray or its supported generic alias.")
+        elif not self.remaining:
+            raise RuntimeError(f"The type hint {self.to_str()} is an ndarray but does not specify dtype.")
+
     def validate_for_key(self) -> None:
         """Raise an error if the type hint is not a key."""
         if not is_key_type(self.schema_type):
@@ -150,7 +159,7 @@ class TypeHint(BootstrapMixin):
 
         # There are two possible forms of origin for optional, typing.Union and types.UnionType
         union_types = [types.UnionType, typing.Union]
-        supported_containers = [list, tuple, dict, frozendict]
+        supported_containers = [list, tuple, dict, frozendict, np.ndarray]
         while True:
             # Handle unions that introduce optionality and/or Condition
             type_alias_optional = None
@@ -258,6 +267,24 @@ class TypeHint(BootstrapMixin):
                             subtype=None,
                         )
                     )
+                elif type_alias_origin is np.ndarray:
+                    if len(type_alias_args) != 2:
+                        raise RuntimeError(
+                            f"Type hint '{cls._serialize_type_alias(type_alias)}'\n"
+                            f"for field {field_name} in {typename(containing_type)} is not supported\n"
+                            f"because it is not ndarray or NDArray with generic shape and type parameters.\n"
+                        )
+                    # Second parameter is type
+                    type_alias = type_alias_args[1]
+                    type_hint_tokens.append(
+                        TypeHint(
+                            schema_type=type_alias_origin,
+                            optional=type_alias_optional,
+                            condition=type_alias_condition,
+                            remaining=None,
+                            subtype=None,
+                        )
+                    )
                 else:
                     supported_container_names = ", ".join([typename(x) for x in supported_containers])
                     raise RuntimeError(
@@ -269,8 +296,21 @@ class TypeHint(BootstrapMixin):
                 type_alias_origin = typing.get_origin(type_alias)
                 type_alias_args = typing.get_args(type_alias)
             else:
-                # Not a container: must be a genuine type (not TypeAlias)
-                if isinstance(type_alias, type):
+                # Not a container: must be a genuine type or a generic alias
+                if is_type(type_alias):
+
+                    # Handle DTypeMeta generic alias for numpy annotations, e.g. np.dtype[np.float64]
+                    if type_alias.__name__ == "dtype":
+                        if len(type_alias_args) == 1:
+                            type_alias = type_alias_args[0]
+                            type_alias_origin = None
+                            type_alias_args = None
+                        else:
+                            raise RuntimeError(
+                                f"Generic alias {type_alias} for dtype must have exactly one\n"
+                                f"type argument, for example np.dtype[np.float64]."
+                            )
+
                     if type_alias_origin is None and not type_alias_args:
                         # Validate that subtype is compatible with the schema type
                         schema_type_name = typename(type_alias)
