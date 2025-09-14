@@ -14,12 +14,14 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from typing import Any, cast
+
+import numpy as np
 from frozendict import frozendict
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_data_key_or_record_type, is_ndarray_type
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
@@ -133,6 +135,23 @@ class DataSerializer(Serializer):
                 for dict_key, dict_value in data.items()
                 if not is_empty(dict_value)
             )
+        elif is_ndarray_type(type(data)):
+            # Deserialize ndarray into ndarray, remaining_chain must be None
+            values = tuple(float(x) for x in data.flatten())
+            if type_hint is not None:
+                type_hint.validate_for_ndarray()
+                # Type hint is present, do not specify _type
+                return frozendict({
+                    "shape": tuple(data.shape),
+                    "values": values,
+                })
+            else:
+                # Specify _type when type hint is None
+                return frozendict({
+                    "_type": "ndarray",
+                    "shape": tuple(data.shape),
+                    "values": tuple(float(x) for x in data.flatten()),
+                })
         elif is_data_key_or_record_type(type(data)):
             # Use key serializer for key types if specified
             if self.key_serializer is not None and is_key_type(type(data)):
