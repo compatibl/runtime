@@ -334,10 +334,15 @@ class DataSource(DataSourceKey, RecordMixin):
         loaded_records_dict = {k: v for k, v in zip(serialized_loaded_keys, loaded_records)}
 
         # Populate the result with records loaded using input keys, pass through None and input records
+        # Invoke build on each item (will have no effect if already invoked)
         result = tuple(
             loaded_records_dict.get(KeySerializers.TUPLE.serialize(x), None) if is_key_type(type(x)) else x
             for x in records_or_keys
         )
+
+        # Invoke build and return (build will have no effect if already invoked)
+        if result is not None:
+            result = tuple(x.build() if x is not None else x for x in result)
 
         # Cast to cast_to if specified, pass through None
         if cast_to is not None:
@@ -401,7 +406,7 @@ class DataSource(DataSourceKey, RecordMixin):
         """
         assert TypeCheck.guard_key_type(key_type)
 
-        return self._get_db().load_all(
+        result = self._get_db().load_all(
             key_type=key_type,
             dataset=self.dataset.dataset_id,
             cast_to=cast_to,
@@ -411,6 +416,11 @@ class DataSource(DataSourceKey, RecordMixin):
             limit=limit,
             skip=skip,
         )
+
+        # Invoke build and return (build will have no effect if already invoked)
+        if result is not None:
+            result = tuple(x.build() if x is not None else x for x in result)
+        return result
 
     def load_by_filter(
         self,
@@ -510,7 +520,7 @@ class DataSource(DataSourceKey, RecordMixin):
             limit: Maximum number of records to return (for pagination)
             skip: Number of records to skip (for pagination)
         """
-        return self._get_db().load_by_query(
+        result = self._get_db().load_by_query(
             query,
             dataset=self.dataset.dataset_id,
             cast_to=cast_to,
@@ -520,6 +530,11 @@ class DataSource(DataSourceKey, RecordMixin):
             limit=limit,
             skip=skip,
         )
+
+        # Invoke build and return (build will have no effect if already invoked)
+        if result is not None:
+            result = tuple(x.build() if x is not None else x for x in result)
+        return result
 
     def count_by_query(
         self,
