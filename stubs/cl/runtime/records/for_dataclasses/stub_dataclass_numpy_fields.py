@@ -17,7 +17,7 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import NDArray
 
-from cl.runtime.records.protocols import FloatVector, FloatMatrix, FloatCube
+from cl.runtime.records.protocols import FloatVector, FloatMatrix, FloatCube, FloatArray
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -26,17 +26,20 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class StubDataclassNumpyFields(StubDataclass):
     """Stub record with numpy fields."""
 
+    float_array: FloatArray = required(default_factory=lambda: np.array([1.0, 2.0]))
+    """NumPy array with dtype=np.float64 and any number of dimensions."""
+
     float_vector: FloatVector = required(default_factory=lambda: np.array([1.0, 2.0]))
-    """Stub field."""
+    """1D ndarray."""
 
     float_matrix: FloatMatrix = required(default_factory=lambda: np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]]))
-    """Stub field."""
+    """2D ndarray."""
 
     float_cube: FloatCube = required(default_factory=lambda: np.array([
         [[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0], [9.0, 10.0, 11.0, 12.0]],
         [[13.0, 14.0, 15.0, 16.0], [17.0, 18.0, 19.0, 20.0], [21.0, 22.0, 23.0, 24.0]]
     ]))
-    """Stub field."""
+    """3D ndarray."""
 
     untyped_ndarray: np.ndarray | None = None  # noqa Not a valid type hint, this is an invalid sample
     """Stub field."""

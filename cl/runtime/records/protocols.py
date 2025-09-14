@@ -88,6 +88,9 @@ SequenceTypes = list | tuple | Sequence | MutableSequence  # TODO: Replace by Se
 MappingTypes = dict | frozendict | Mapping | MutableMapping  # TODO: Replace by Mapping or MutableMapping?
 """Type alias for a supported mapping type."""
 
+FloatArray = np.ndarray[Any, np.dtype[np.float64]]
+"""NumPy array with dtype=np.float64 and any number of dimensions."""
+
 FloatVector = np.ndarray[tuple[int], np.dtype[np.float64]]
 """One-dimensional NumPy array with dtype=np.float64."""
 

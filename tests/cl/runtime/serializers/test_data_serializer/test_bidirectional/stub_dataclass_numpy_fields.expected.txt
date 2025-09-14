@@ -1,6 +1,15 @@
 {
   "_type": "StubDataclassNumpyFields",
   "id": "abc",
+  "float_array": {
+    "shape": [
+      2
+    ],
+    "values": [
+      1.0,
+      2.0
+    ]
+  },
   "float_vector": {
     "shape": [
       2
