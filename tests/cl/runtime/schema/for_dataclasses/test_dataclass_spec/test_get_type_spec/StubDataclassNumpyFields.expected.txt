@@ -4,6 +4,11 @@ fields:
 - field_name: id
   field_type_hint:
     schema_type: str
+- field_name: float_array
+  field_type_hint:
+    schema_type: ndarray
+    remaining:
+      schema_type: float64
 - field_name: float_vector
   field_type_hint:
     schema_type: ndarray
