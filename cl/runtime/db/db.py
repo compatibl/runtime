@@ -50,7 +50,7 @@ class Db(DbKey, RecordMixin, ABC):
         dataset: str,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
-    ) -> Sequence[RecordMixin]:
+    ) -> tuple[RecordMixin, ...]:
         """
         Load records for the specified keys, skipping the records that are not found.
 

@@ -67,7 +67,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         without checking if max_trials has already been reached.
         """
 
-    def view_trials(self) -> Sequence[TrialKey]:
+    def view_trials(self) -> tuple[TrialKey, ...]:
         """View trials of the experiment."""
         trial_key_query = TrialKeyQuery(experiment=self.get_key()).build()
         trials = active(DataSource).load_by_query(trial_key_query, cast_to=Trial)

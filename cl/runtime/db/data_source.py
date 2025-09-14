@@ -223,7 +223,7 @@ class DataSource(DataSourceKey, RecordMixin):
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder = SortOrder.INPUT,
-    ) -> Sequence[TRecord]:
+    ) -> tuple[TRecord, ...]:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup).
 
@@ -259,7 +259,7 @@ class DataSource(DataSourceKey, RecordMixin):
         cast_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder = SortOrder.INPUT,
-    ) -> Sequence[TRecord | None] | None:
+    ) -> tuple[TRecord | None, ...] | None:
         """
         Load records using a list of keys (if a record is passed instead of a key, it is returned without DB lookup).
 

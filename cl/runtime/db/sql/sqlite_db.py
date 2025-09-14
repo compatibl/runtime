@@ -64,7 +64,7 @@ class SqliteDb(Db):
         dataset: str,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
-    ) -> Sequence[RecordMixin]:
+    ) -> tuple[RecordMixin, ...]:
 
         # Check params
         assert TypeCheck.guard_key_type(key_type)
