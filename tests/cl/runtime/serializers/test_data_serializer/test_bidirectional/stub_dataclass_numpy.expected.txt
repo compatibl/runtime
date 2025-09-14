@@ -1,4 +1,5 @@
 {
+  "_type": "StubDataclassNumpy",
   "id": "abc",
   "float_vector": {
     "shape": [

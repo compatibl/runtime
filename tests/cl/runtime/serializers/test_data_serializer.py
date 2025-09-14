@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from types import GenericAlias
+from typing import get_origin
+
+import numpy as np
 import pytest
 import orjson
 from frozendict import frozendict
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.builder_checks import BuilderChecks
+from cl.runtime.records.protocols import FloatMatrix
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
@@ -44,8 +49,10 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composi
     StubDataclassPolymorphicComposite,
 )
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_numpy import StubDataclassNumpy
 
 _SAMPLES = [
+    StubDataclassNumpy(),
     StubDataclass(),
     StubDataclassNestedFields(),
     StubDataclassComposite(),
@@ -103,6 +110,10 @@ _SAMPLES = [
 ]
 
 
+_INVALID_SAMPLES = [
+    (StubDataclassNumpy(untyped_ndarray=np.array([1.0, 2.0])), "is an ndarray but does not specify dtype"),  # noqa
+]
+
 def test_bidirectional():
     """Test DataSerializer.serialize method with bidirectional=True."""
 
@@ -136,6 +147,11 @@ def test_bidirectional():
 
     RegressionGuard().verify_all()
 
+    for sample, match in _INVALID_SAMPLES:
+        with pytest.raises(Exception, match=match):
+            sample = sample.build()
+            serializer.serialize(sample)
+
 
 def test_unidirectional():
     """Test DataSerializer.serialize method with bidirectional=None."""
@@ -166,6 +182,11 @@ def test_unidirectional():
         guard.write(result_str)
 
     RegressionGuard().verify_all()
+
+    for sample, match in _INVALID_SAMPLES:
+        with pytest.raises(Exception, match=match):
+            sample = sample.build()
+            serializer.serialize(sample)
 
 
 if __name__ == "__main__":

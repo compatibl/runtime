@@ -55,7 +55,7 @@ class TypeSchema:
             ).build()
         else:
             raise RuntimeError(
-                f"Class {typename(type_)} implements build method but does not\n"
-                f"use one of the supported dataclass frameworks and does not\n"
+                f"Cannot invoke build method for type {typename(type_)} because it\n"
+                f"does not use one of the supported dataclass frameworks and does not\n"
                 f"have a method to generate type spec."
             )

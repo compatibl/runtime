@@ -313,7 +313,18 @@ class DataSerializer(Serializer):
                 for dict_key, dict_value in data.items()
                 if not is_empty(dict_value)
             )
-        elif isinstance(data, str):
+        elif is_ndarray_type(schema_type):
+            type_hint.validate_for_ndarray()
+            if not is_mapping_type(type(data)):
+                raise RuntimeError(
+                    f"Cannot deserialize because schema type {typename(schema_type)} is an ndarray\n"
+                    f"but data type {type(data).__name__} is not a mapping."
+                )
+            # Deserialize mapping into ndarray
+            shape = data["shape"]
+            values = data["values"]
+            return np.array(values, dtype=float).reshape(shape)  # TODO: !!! Support any dtype
+        elif isinstance(data, str):  # TODO: !! Refactor to use if/else on schema type only like the new PrimitiveSerializer
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
             if self.key_serializer is not None and is_key_type(schema_type):
                 if (
