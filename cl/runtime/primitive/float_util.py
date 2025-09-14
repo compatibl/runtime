@@ -28,17 +28,17 @@ class FloatUtil:
     should be used for any performance-critical applications.
     """
 
-    empty: float = -1.0e100
+    empty: float = -1.0e100  # TODO: Replace by constant _EMPTY_FLOAT?
     """Constant representing the empty value in non-nullable variables."""
 
-    tolerance: float = 1.0e-10
+    tolerance: float = 1.0e-10  # TODO: Replace by constant _FLOAT_TOLERANCE or _FLOAT_ROUNDOFF?
     """
     Constant representing absolute float comparison tolerance.
 
     Rounding will change the value by not more than FloatUtil.tolerance.
     """
 
-    tolerance_digits: int = int(round(-log10(tolerance)))
+    tolerance_digits: int = int(round(-log10(tolerance)))  # TODO: Replace by constant?
     """
     Constant representing decimal places in absolute float comparison tolerance.
 
@@ -59,6 +59,11 @@ class FloatUtil:
             trim=".",
         )
         return result
+
+    @classmethod
+    def round(cls, value: float) -> float:
+        """Round to roundoff tolerance for comparison."""
+        return round(float(value), cls.tolerance_digits)
 
     @classmethod
     def equal(cls, value_1: float, value_2: float) -> bool:
