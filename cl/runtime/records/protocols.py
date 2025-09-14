@@ -14,6 +14,7 @@
 
 import datetime as dt
 from enum import Enum
+from types import GenericAlias
 from typing import Any, get_origin
 from typing import Mapping
 from typing import MutableMapping
@@ -107,8 +108,13 @@ def is_empty(
     data: Any,
 ) -> bool:
     """True if the argument is None or an empty primitive type, False for an empty sequence or mapping."""
-    return data in (None, "")
+    # Do not use 'in' because data may be a sequence or mapping
+    return data is None or (isinstance(data, (str, bytes)) and len(data) == 0)
 
+def is_type(type_: type) -> TypeGuard[type | GenericAlias ]:
+    """Returns true if the argument is a genuine type or a generic alias, including third party aliases."""
+    # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    return hasattr(type_, "__name__")
 
 def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     """Returns true if the argument is one of the supported primitive types."""

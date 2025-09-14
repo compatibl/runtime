@@ -22,7 +22,7 @@ from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_abstract_type, is_ndarray_type, FloatVector, FloatMatrix, FloatCube, \
-    is_data_type, is_primitive_type
+    is_data_type, is_primitive_type, is_type
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_key_or_record_type
 from cl.runtime.records.protocols import is_key_type
@@ -96,6 +96,10 @@ def test_functions():
     # Test is_abstract_type
     for class_ in all_types:
         assert is_abstract_type(class_) == (class_ in abstract_types), f"{class_} is not abstract"
+
+    # Test is_type
+    for class_ in all_types:
+        assert is_type(class_) == True
         
     # Test is_data_type
     for class_ in all_types:
