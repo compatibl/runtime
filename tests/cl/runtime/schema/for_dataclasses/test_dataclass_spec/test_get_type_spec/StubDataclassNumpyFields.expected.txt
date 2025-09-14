@@ -1,0 +1,26 @@
+type_: StubDataclassNumpyFields
+type_kind: Record
+fields:
+- field_name: id
+  field_type_hint:
+    schema_type: str
+- field_name: float_vector
+  field_type_hint:
+    schema_type: ndarray
+    remaining:
+      schema_type: float64
+- field_name: float_matrix
+  field_type_hint:
+    schema_type: ndarray
+    remaining:
+      schema_type: float64
+- field_name: float_cube
+  field_type_hint:
+    schema_type: ndarray
+    remaining:
+      schema_type: float64
+- field_name: untyped_ndarray
+  field_type_hint:
+    schema_type: ndarray
+    optional: true
+
