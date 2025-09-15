@@ -15,7 +15,7 @@
 import datetime as dt
 from enum import Enum
 from types import GenericAlias
-from typing import Any, get_origin
+from typing import Any
 from typing import Mapping
 from typing import MutableMapping
 from typing import MutableSequence
@@ -23,7 +23,6 @@ from typing import Sequence
 from typing import TypeGuard
 from typing import TypeVar
 from uuid import UUID
-
 import numpy as np
 from bson import Int64
 from frozendict import frozendict
@@ -79,7 +78,9 @@ MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
 NDARRAY_TYPE_NAMES = ("ndarray", "NDArray")
 """Names of types or generic aliases used for ndarray variables or generic aliases."""
 
-PrimitiveTypes = str | float | np.float64 | bool | int | Int64 | dt.date | dt.time | dt.datetime | UUID | bytes | type  # TODO: Rename to PrimitiveType?
+PrimitiveTypes = (
+    str | float | np.float64 | bool | int | Int64 | dt.date | dt.time | dt.datetime | UUID | bytes | type
+)  # TODO: Rename to PrimitiveType?
 """Type alias for Python classes used to store primitive values."""
 
 SequenceTypes = list | tuple | Sequence | MutableSequence  # TODO: Replace by Sequence or MutableSequence?
@@ -114,10 +115,12 @@ def is_empty(
     # Do not use 'in' because data may be a sequence or mapping
     return data is None or (isinstance(data, (str, bytes)) and len(data) == 0)
 
-def is_type(type_: type) -> TypeGuard[type | GenericAlias ]:
+
+def is_type(type_: type) -> TypeGuard[type | GenericAlias]:
     """Returns true if the argument is a genuine type or a generic alias, including third party aliases."""
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
     return hasattr(type_, "__name__")
+
 
 def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     """Returns true if the argument is one of the supported primitive types."""
@@ -251,9 +254,7 @@ def is_data_type(type_: type) -> bool:
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
     if (type_name := getattr(type_, "__name__", None)) is not None:
         return (
-            hasattr(type_, "get_field_names")
-            and not hasattr(type_, "get_key_type")
-            and not type_name.startswith("_")
+            hasattr(type_, "get_field_names") and not hasattr(type_, "get_key_type") and not type_name.startswith("_")
         )
     else:
         raise RuntimeError(

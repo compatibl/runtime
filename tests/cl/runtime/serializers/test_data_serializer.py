@@ -12,17 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from types import GenericAlias
-from typing import get_origin
 
-import numpy as np
 import pytest
+import numpy as np
 import orjson
 from frozendict import frozendict
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.builder_checks import BuilderChecks
-from cl.runtime.records.protocols import FloatMatrix
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
@@ -44,12 +41,12 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_empty_fields import StubDataclassEmptyFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_frozendict_fields import StubDataclassFrozendictFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_numpy_fields import StubDataclassNumpyFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composite import (
     StubDataclassPolymorphicComposite,
 )
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_numpy_fields import StubDataclassNumpyFields
 
 _SAMPLES = [
     StubDataclass(),
@@ -111,8 +108,12 @@ _SAMPLES = [
 
 
 _INVALID_SAMPLES = [
-    (StubDataclassNumpyFields(untyped_ndarray=np.array([1.0, 2.0])), "is an ndarray but does not specify dtype"),  # noqa
+    (
+        StubDataclassNumpyFields(untyped_ndarray=np.array([1.0, 2.0])),
+        "is an ndarray but does not specify dtype",
+    ),  # noqa
 ]
+
 
 def test_bidirectional():
     """Test DataSerializer.serialize method with bidirectional=True."""

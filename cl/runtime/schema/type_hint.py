@@ -17,15 +17,16 @@ import typing
 from dataclasses import dataclass
 from enum import Enum
 from typing import Self
-
 import numpy as np
 from frozendict import frozendict
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_ndarray_type, is_type
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_ndarray_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
+from cl.runtime.records.protocols import is_type
 from cl.runtime.records.typename import typename
 
 

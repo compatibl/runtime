@@ -21,12 +21,13 @@ from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.records.condition_util import ConditionUtil
 from cl.runtime.records.none_checks import NoneChecks
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, is_ndarray_type
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import is_condition_type
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_ndarray_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename

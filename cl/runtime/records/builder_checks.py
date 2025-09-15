@@ -14,16 +14,15 @@
 
 from typing import Any
 from typing import TypeGuard
-
 import numpy as np
-
 from cl.runtime.primitive.float_util import FloatUtil
 from cl.runtime.records.builder_mixin import BuilderMixin
-from cl.runtime.records.protocols import is_builder_type, is_ndarray_type
+from cl.runtime.records.protocols import is_builder_type
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_ndarray_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
@@ -94,11 +93,7 @@ class BuilderChecks:
                 and all(cls.is_equal(v, other.get(k)) for k, v in data.items() if not k.startswith("_"))
             )
         elif is_ndarray_type(type(data)):
-            return (
-                is_ndarray_type(type(other))
-                and data.shape == other.shape
-                and np.allclose(data, other)
-            )
+            return is_ndarray_type(type(other)) and data.shape == other.shape and np.allclose(data, other)
         elif is_data_key_or_record_type(type(data)):
             return (
                 is_data_key_or_record_type(type(other))

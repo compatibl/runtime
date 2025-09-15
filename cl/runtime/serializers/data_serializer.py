@@ -14,18 +14,18 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, cast
-
+from typing import Any
 import numpy as np
 from frozendict import frozendict
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_data_key_or_record_type, is_ndarray_type
+from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_ndarray_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
@@ -141,17 +141,21 @@ class DataSerializer(Serializer):
             if type_hint is not None:
                 type_hint.validate_for_ndarray()
                 # Type hint is present, do not specify _type
-                return frozendict({
-                    "shape": tuple(data.shape),
-                    "values": values,
-                })
+                return frozendict(
+                    {
+                        "shape": tuple(data.shape),
+                        "values": values,
+                    }
+                )
             else:
                 # Specify _type when type hint is None
-                return frozendict({
-                    "_type": "ndarray",
-                    "shape": tuple(data.shape),
-                    "values": tuple(float(x) for x in data.flatten()),
-                })
+                return frozendict(
+                    {
+                        "_type": "ndarray",
+                        "shape": tuple(data.shape),
+                        "values": tuple(float(x) for x in data.flatten()),
+                    }
+                )
         elif is_data_key_or_record_type(type(data)):
             # Use key serializer for key types if specified
             if self.key_serializer is not None and is_key_type(type(data)):
@@ -324,7 +328,9 @@ class DataSerializer(Serializer):
             shape = data["shape"]
             values = data["values"]
             return np.array(values, dtype=float).reshape(shape)  # TODO: !!! Support any dtype
-        elif isinstance(data, str):  # TODO: !! Refactor to use if/else on schema type only like the new PrimitiveSerializer
+        elif isinstance(
+            data, str
+        ):  # TODO: !! Refactor to use if/else on schema type only like the new PrimitiveSerializer
             # Process as enum if data is a string or enum, after checking that schema type is not primitive
             if self.key_serializer is not None and is_key_type(schema_type):
                 if (

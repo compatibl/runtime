@@ -36,14 +36,16 @@ def test_format():
     )  # Float precision not enough for the fractional part .000123
     assert FloatUtil.format(0.000000000000000000000000123) == "0."
 
+
 def test_round():
     """Test round method."""
     # Return float even for int arg
     assert isinstance(FloatUtil.round(1), float)
     # Round to tolerance
-    assert FloatUtil.round(1.) == 1.
-    assert FloatUtil.round(-1.000000000000000000000000123) == -1.
-    assert FloatUtil.round(1.000000000000000000000000123) == 1.
+    assert FloatUtil.round(1.0) == 1.0
+    assert FloatUtil.round(-1.000000000000000000000000123) == -1.0
+    assert FloatUtil.round(1.000000000000000000000000123) == 1.0
+
 
 def test_to_int():
     """Test to_int method."""
