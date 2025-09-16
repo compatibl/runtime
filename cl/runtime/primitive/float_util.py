@@ -61,7 +61,7 @@ class FloatUtil:
         return result
 
     @classmethod
-    def round(cls, value: float) -> float:
+    def round(cls, value: float) -> float:  # TODO: !!!! Rename to normalize?
         """Round to roundoff tolerance for comparison."""
         return round(float(value), cls.tolerance_digits)
 
@@ -89,6 +89,26 @@ class FloatUtil:
     def more_or_equal(cls, value_1: float, value_2: float) -> bool:
         """Returns true if the value_1 is more than value_2 minus tolerance."""
         return value_1 > value_2 - cls.tolerance
+
+    @classmethod
+    def is_int(cls, value: int | float | None) -> bool:
+        """
+        Return True if value is within roundoff tolerance from an int, False otherwise.
+        Verifies that the value fits in 32-bit signed integer range.
+        """
+        check_int_32(value)
+        result = isinstance(value, int) or cls.equal(result := int(round(value)), value)
+        return result
+
+    @classmethod
+    def is_int_or_none(cls, value: int | float | None) -> bool:
+        """
+        Return True if value is None or within roundoff tolerance from an int, False otherwise.
+        Verifies that the value fits in 32-bit signed integer range.
+        """
+        check_int_32(value)
+        result = value is None or isinstance(value, int) or cls.equal(result := int(round(value)), value)
+        return result
 
     @classmethod
     def to_int_or_none(cls, value: int | float | None) -> int | None:
