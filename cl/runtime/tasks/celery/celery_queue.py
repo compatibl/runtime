@@ -110,6 +110,13 @@ def celery_delete_existing_tasks() -> None:
         os.remove(celery_file)
 
 
+def celery_ensure_dir_exists() -> None:
+    """Checks if a dir for celery exists, and creates it if it does not."""
+
+    if not os.path.exists(db_dir):
+        os.makedirs(db_dir)
+
+
 def celery_start_queue() -> None:
     """
     Start Celery workers (will exit when the current process exits).
@@ -117,6 +124,8 @@ def celery_start_queue() -> None:
     Args:
         log_dir: Directory where Celery console log file will be written
     """
+    celery_ensure_dir_exists()
+
     worker_process = multiprocessing.Process(
         target=celery_start_queue_callable, daemon=True, kwargs={"log_config": logging_config}
     )
