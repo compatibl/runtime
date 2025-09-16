@@ -23,8 +23,8 @@ from cl.runtime.settings.settings_util import SettingsUtil
 class QaSettings(Settings):
     """QA and unit test settings."""
 
-    qa_db_types: tuple[str, ...]
-    """Database type names for unit testing, at least one is required."""
+    qa_db_types: tuple[str, ...] | None = None
+    """Database type names for unit testing."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
@@ -32,4 +32,4 @@ class QaSettings(Settings):
             self.qa_db_types,
             field_name="qa_db_types",
             settings_type=type(self),
-        )
+        ) if self.qa_db_types is not None else tuple()
