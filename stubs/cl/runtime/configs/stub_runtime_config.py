@@ -36,6 +36,7 @@ from stubs.cl.runtime import StubPlotViewers
 from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_handlers import StubDataclassDerivedHandlers
 
 
 @dataclass(slots=True, kw_only=True)
@@ -68,6 +69,7 @@ class StubRuntimeConfig(Config):
 
         stub_dataclass_singleton_record = [StubDataclassSingleton()]
         stub_handlers_records = [StubHandlers(stub_id=f"M{i}") for i in range(10)]
+        stub_derived_handlers_records = [StubDataclassDerivedHandlers(stub_id=f"M_derived_{i}") for i in range(10)]
 
         # Records with stub viewers
         stub_viewers_records = [
@@ -92,6 +94,7 @@ class StubRuntimeConfig(Config):
             *stub_dataclass_singleton_record,
             *stub_viewers_records,
             *stub_handlers_records,
+            *stub_derived_handlers_records,
         ]
 
         # Build and save to DB
