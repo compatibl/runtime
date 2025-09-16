@@ -34,7 +34,7 @@ def init_db() -> None:
         # Check for lowercase 'yes'
         if confirmation == 'yes':
             print(f"\nDropping the existing DB...")
-            active(DataSource).drop_temp_db(user_approval=True)
+            active(DataSource).db.drop_temp_db(user_approval=True)
         else:
             print("\nDB drop operation aborted by the user.\n")
             return
