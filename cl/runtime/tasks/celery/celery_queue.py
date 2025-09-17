@@ -18,6 +18,9 @@ import os
 from dataclasses import dataclass
 from typing import Dict
 from typing import Final
+from urllib.parse import urlparse
+
+import redis
 from celery import Celery
 from celery.signals import setup_logging
 from cl.runtime.contexts.context_manager import activate
@@ -27,30 +30,25 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.log_config import celery_empty_logging_config
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.server.env import Env
-from cl.runtime.settings.db_settings import DbSettings
+from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue import TaskQueue
 
-CELERY_MAX_WORKERS = 4
 
 CELERY_RUN_COMMAND_QUEUE: Final[str] = "run_command"
-CELERY_MAX_RETRIES: Final[int] = 3
-CELERY_TIME_LIMIT: Final[int] = 3600 * 2  # TODO: 2 hours (configure)
 
-# Get sqlite file name of celery broker based on database id in settings
-db_dir = DbSettings.get_db_dir()
-celery_file = os.path.join(db_dir, "celery.sqlite")  # TODO: Use separate files for multiple queues
-
-celery_sqlite_uri = f"sqlalchemy+sqlite:///{celery_file}"
+celery_settings = CelerySettings.instance()
 
 celery_app = Celery(
     "worker",
-    broker=celery_sqlite_uri,
+    broker=celery_settings.celery_broker_uri,
     broker_connection_retry_on_startup=True,
 )
 
 celery_app.conf.task_track_started = True
+celery_app.conf.task_default_queue = celery_settings.celery_broker_queue
+celery_app.conf.task_time_limit = celery_settings.celery_time_limit
 
 
 @setup_logging.connect()
@@ -62,7 +60,7 @@ def config_loggers(*args, **kwargs):
     dictConfig(celery_empty_logging_config)
 
 
-@celery_app.task(max_retries=0)  # Do not retry failed tasks
+@celery_app.task(max_retries=celery_settings.celery_max_retries)  # Do not retry failed tasks
 def execute_task(
     task_id: str,
     context_snapshot_json: str,
@@ -95,9 +93,8 @@ def celery_start_queue_callable(*, log_config: Dict) -> None:
             "cl.runtime.tasks.celery.celery_queue",
             "worker",
             "--loglevel=info",
-            f"--autoscale={CELERY_MAX_WORKERS},1",
-            f"--pool=solo",  # One concurrent task per worker, do not switch to prefork (not supported on Windows)
-            f"--concurrency=1",  # Use only for prefork, one concurrent task per worker (similar to solo)
+            f"--pool={celery_settings.celery_pool_type}",
+            f"--concurrency={celery_settings.celery_workers}",
         ],
     )
 
@@ -106,15 +103,26 @@ def celery_delete_existing_tasks() -> None:
     """Delete the existing Celery tasks (will exit when the current process exits)."""
 
     # Remove sqlite file of celery broker if exists
-    if os.path.exists(celery_file):
-        os.remove(celery_file)
+    if celery_settings.celery_broker == "sqlite":
+        celery_file = celery_settings.celery_broker_uri.split("sqlite:///")[1]
 
+        # Remove sqlite file of celery broker if exists
+        if os.path.exists(celery_file):
+            os.remove(celery_file)
 
-def celery_ensure_dir_exists() -> None:
-    """Checks if a dir for celery exists, and creates it if it does not."""
+    if celery_settings.celery_broker == "redis":
+        # Parse the URI
+        parsed_uri = urlparse(celery_settings.celery_broker_uri)
+        host = parsed_uri.hostname
+        port = parsed_uri.port
+        db = parsed_uri.path.lstrip("/")
 
-    if not os.path.exists(db_dir):
-        os.makedirs(db_dir)
+        # Connect to Redis
+        redis_client = redis.StrictRedis(host=host, port=port, db=db)
+
+        # Clear the Celery queue and result backend
+        redis_client.delete(celery_settings.celery_broker_queue)
+        redis_client.flushdb()
 
 
 def celery_start_queue() -> None:
@@ -124,8 +132,6 @@ def celery_start_queue() -> None:
     Args:
         log_dir: Directory where Celery console log file will be written
     """
-    celery_ensure_dir_exists()
-
     worker_process = multiprocessing.Process(
         target=celery_start_queue_callable, daemon=True, kwargs={"log_config": logging_config}
     )
