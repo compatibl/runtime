@@ -108,10 +108,11 @@ _SAMPLES = [
 
 
 _INVALID_SAMPLES = [
-    (
-        StubDataclassNumpyFields(untyped_ndarray=np.array([1.0, 2.0])),
-        "is an ndarray but does not specify dtype",
-    ),  # noqa
+    # TODO (Roman): The Stub class must be valid for displaying on UI. Create a separate class for testing invalid fields.
+    # (
+    #     StubDataclassNumpyFields(untyped_ndarray=np.array([1.0, 2.0])),
+    #     "is an ndarray but does not specify dtype",
+    # ),  # noqa
 ]
 
 
