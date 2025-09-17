@@ -18,6 +18,7 @@ import typing
 from dataclasses import dataclass
 from typing import Self
 from uuid import UUID
+import numpy
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import PRIMITIVE_TYPES
@@ -204,6 +205,19 @@ class FieldDecl(DataclassMixin):
         # Parse the value itself
         if field_origin in supported_containers:
             raise RuntimeError("Containers within containers are not supported when building database schema.")
+        elif field_origin is numpy.ndarray:
+            # Handle numpy.ndarray-type hints as primitives with a special name
+            result.field_kind = TypeKind.PRIMITIVE
+
+            # Create base TypeDeclKey instance and clone to make unfrozen
+            base_field_type_decl = TypeDeclKey.for_type(field_type).clone()
+
+            # Rename to str representation of GenericAlias
+            base_field_type_decl.name = str(field_type)
+            base_field_type_decl.build()
+
+            result.field_type_decl = base_field_type_decl
+
         elif field_origin is None:
 
             # Assign type declaration key

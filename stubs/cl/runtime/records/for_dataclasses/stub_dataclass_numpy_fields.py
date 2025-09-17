@@ -45,5 +45,5 @@ class StubDataclassNumpyFields(StubDataclass):
     )
     """3D ndarray."""
 
-    untyped_ndarray: np.ndarray | None = None  # noqa Not a valid type hint, this is an invalid sample
-    """Stub field."""
+    # untyped_ndarray: np.ndarray | None = None  # noqa Not a valid type hint, this is an invalid sample
+    # """Stub field."""

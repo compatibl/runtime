@@ -16,6 +16,10 @@ from dataclasses import dataclass
 from typing import Self
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import FloatArray
+from cl.runtime.records.protocols import FloatCube
+from cl.runtime.records.protocols import FloatMatrix
+from cl.runtime.records.protocols import FloatVector
 
 _VALUE_DECL_NAME_MAP: dict[str, str] = {
     "str": "String",
@@ -29,6 +33,10 @@ _VALUE_DECL_NAME_MAP: dict[str, str] = {
     "UUID": "UUID",  # TODO: Check for support in ElementDecl
     "bytes": "Binary",
     "type": "type",
+    str(FloatArray): "NdFloatArray",
+    str(FloatVector): "NdFloatVector",
+    str(FloatMatrix): "NdFloatMatrix",
+    str(FloatCube): "NdFloatCube",
 }
 """Map from Python class name to ValueDecl name."""
 
