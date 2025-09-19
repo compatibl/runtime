@@ -221,8 +221,7 @@ class Db(DbKey, RecordMixin, ABC):
                 raise RuntimeError("Use pytest fixtures to create temporary DBs inside tests.")
 
         # Create and return a new DB instance
-        result = db_type(db_id=db_id)
-        return result
+        return db_type(db_id=db_id).build()
 
     def check_drop_test_db_preconditions(self) -> None:
         """Error if db_id does not start from db_test_prefix specified in settings.yaml (defaults to 'test_')."""

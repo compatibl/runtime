@@ -46,6 +46,7 @@ from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.settings.db_settings import DbSettings
 
 _INVALID_DB_NAME_SYMBOLS = r'/\\. "$*<>:|?'
 """Invalid MongoDB database name symbols."""
@@ -67,7 +68,7 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 class BasicMongoDb(Db):
     """MongoDB database without bitemporal support."""
 
-    client_uri: str = "mongodb://localhost:27017/"
+    client_uri: str | None = None
     """MongoDB client URI, defaults to mongodb://localhost:27017/"""
 
     _mongo_client: MongoClient | None = None
@@ -84,6 +85,13 @@ class BasicMongoDb(Db):
 
     _query_types_with_index: set[type] | None = None
     """Set of query types for which an index has already been added."""
+
+    def __init(self):
+        db_settings = DbSettings.instance()
+
+        # Set MongoDB URI from settings if not specified
+        if self.client_uri is None:
+            self.client_uri = db_settings.db_mongo_uri
 
     def load_many(
         self,

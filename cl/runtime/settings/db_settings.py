@@ -32,8 +32,8 @@ class DbSettings(Settings):
     db_type: str = required()
     """Database class name."""
 
-    db_uri: str | None = None
-    """Database URI (optional, defaults to a local database file or localhost)."""
+    db_mongo_uri: str = "mongodb://localhost:27017/"
+    """Mongo database URI."""
 
     db_test_prefix: str = "test_"
     """
