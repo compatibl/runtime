@@ -19,9 +19,13 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Final
 from urllib.parse import urlparse
+
+import pika
 import redis
 from celery import Celery
 from celery.signals import setup_logging
+from pika.exceptions import ChannelClosedByBroker
+
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
@@ -121,6 +125,34 @@ def celery_delete_existing_tasks() -> None:
         # Clear the Celery queue and result backend
         redis_client.delete(celery_settings.celery_broker_queue)
         redis_client.flushdb()
+
+    if celery_settings.celery_broker == "rabbitmq":
+        # Parse the URI
+        parsed_uri = urlparse(celery_settings.celery_broker_uri)
+        user, password = parsed_uri.netloc.split("@")[0].split(":")
+
+        # Connect to RabbitMQ
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=parsed_uri.hostname,
+                port=parsed_uri.port,
+                credentials=pika.PlainCredentials(user, password)
+            )
+        )
+        channel = connection.channel()
+
+        try:
+            # Check if the queue exists (passive=True) if not raise ChannelClosedByBroker
+            channel.queue_declare(queue=celery_settings.celery_broker_queue, passive=True)
+
+            # Purge all messages in the queue
+            channel.queue_purge(queue=celery_settings.celery_broker_queue)
+
+        except ChannelClosedByBroker:
+            pass
+
+        finally:
+            connection.close()
 
 
 def celery_start_queue() -> None:

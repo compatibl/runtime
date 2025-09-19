@@ -56,11 +56,11 @@ class CelerySettings(Settings):
             self._ensure_databases_dir_exists(databases_dir)
 
             self.celery_broker_uri = f"sqlalchemy+sqlite:///{celery_file}"
-        elif self.celery_broker == "redis":
+        elif self.celery_broker in ["redis", "rabbitmq"]:
             if not self.celery_broker_uri:
-                raise RuntimeError("Celery broker URI is not specified for Redis broker.")
+                raise RuntimeError("Celery broker URI is not specified for broker.")
             if not self.celery_broker_queue:
-                raise RuntimeError("Celery broker queue is not specified for Redis broker.")
+                raise RuntimeError("Celery broker queue is not specified for broker.")
         else:
             raise RuntimeError(f"Unsupported Celery broker: {self.celery_broker}")
 

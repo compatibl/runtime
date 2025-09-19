@@ -39,6 +39,13 @@ default:
       - preloads/cl
       - preloads/stubs
 
+  # Documented in CelerySettings class
+  celery_workers: 8
+  celery_pool_type: "threads"
+  celery_broker: "sqlite"
+  celery_broker_uri: "mongodb://localhost:27017/celery-{context_id}"
+  celery_broker_queue: "celery"
+
 # Test environment
 testing:
 
