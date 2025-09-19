@@ -14,7 +14,6 @@
 
 import os
 from dataclasses import dataclass
-from enum import Enum
 from typing_extensions import final
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.settings import Settings

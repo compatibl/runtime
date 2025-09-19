@@ -14,7 +14,6 @@
 
 
 import pytest
-import numpy as np
 import orjson
 from frozendict import frozendict
 from cl.runtime.primitive.case_util import CaseUtil

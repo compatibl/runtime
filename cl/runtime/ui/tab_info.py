@@ -15,7 +15,6 @@
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.ui.base_type_info import BaseTypeInfo
 
 
 @dataclass(slots=True, kw_only=True)

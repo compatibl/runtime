@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from typing import Dict
 from typing import Final
 from urllib.parse import urlparse
-
 import redis
 from celery import Celery
 from celery.signals import setup_logging
@@ -34,7 +33,6 @@ from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue import TaskQueue
-
 
 CELERY_RUN_COMMAND_QUEUE: Final[str] = "run_command"
 
