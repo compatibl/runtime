@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import logging
-
 from stubs.cl.runtime import StubHandlers
 
 _LOGGER = logging.getLogger(__name__)

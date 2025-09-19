@@ -28,8 +28,12 @@ class QaSettings(Settings):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        self.qa_db_types = SettingsUtil.to_str_tuple(
-            self.qa_db_types,
-            field_name="qa_db_types",
-            settings_type=type(self),
-        ) if self.qa_db_types is not None else tuple()
+        self.qa_db_types = (
+            SettingsUtil.to_str_tuple(
+                self.qa_db_types,
+                field_name="qa_db_types",
+                settings_type=type(self),
+            )
+            if self.qa_db_types is not None
+            else tuple()
+        )

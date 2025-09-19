@@ -388,7 +388,9 @@ class TypeInfo(BootstrapMixin):
         # Enumerate types in all modules that match is_schema_type predicate
         modules = cls._get_package_modules()
         types = tuple(
-            class_ for module in modules for _, class_ in getmembers(module, is_schema_type)
+            class_
+            for module in modules
+            for _, class_ in getmembers(module, is_schema_type)
             if module.__name__ == class_.__module__
         )
         return tuple(sorted(types, key=lambda x: x.__name__))
