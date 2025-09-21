@@ -215,7 +215,8 @@ class FloatUtil:
         check_int_54(value)
         if value is None:
             raise RuntimeError(
-                "FloatUtil.to_long_or_float() does not accept None, use to_long_or_float_or_none instead.")
+                "FloatUtil.to_long_or_float() does not accept None, use to_long_or_float_or_none instead."
+            )
         elif isinstance(value, int):
             return value
         elif cls.equal(result := int(round(value)), value):

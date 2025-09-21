@@ -66,4 +66,3 @@ class PlotColor(IntEnum):
 
     NAVY = auto()
     """Navy blue color."""
-

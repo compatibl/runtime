@@ -16,11 +16,11 @@ from dataclasses import dataclass
 import plotly.graph_objects as go
 import plotly.io as pio
 from cl.runtime.plots.plot import Plot
+from cl.runtime.plots.plot_color import PlotColor
+from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
 from cl.runtime.plots.plotting_engine import PlottingEngine
 from cl.runtime.plots.scatter_plot_3d import ScatterPlot3D
 from cl.runtime.records.typename import typenameof
-from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
-from cl.runtime.plots.plot_color import PlotColor
 
 
 @dataclass(slots=True, kw_only=True)
@@ -41,7 +41,7 @@ class PlotlyEngine(PlottingEngine):
                     pass
 
                 # If a solid surface is requested, render as a continuous surface
-                if getattr(values, 'surface_style', None) == PlotSurfaceStyle.SOLID:
+                if getattr(values, "surface_style", None) == PlotSurfaceStyle.SOLID:
                     x_list = list(values.x)
                     y_list = list(values.y)
                     z_list = list(values.z)
@@ -73,7 +73,7 @@ class PlotlyEngine(PlottingEngine):
                                 x=values.x,
                                 y=values.y,
                                 z=values.z,
-                                mode='markers',
+                                mode="markers",
                                 marker={"color": color_css, "size": 2, **marker_dict},
                                 name=values.legend,
                             )
@@ -85,24 +85,24 @@ class PlotlyEngine(PlottingEngine):
                             x=values.x,
                             y=values.y,
                             z=values.z,
-                            mode='markers',
+                            mode="markers",
                             marker={"color": color_css, "size": 2, **marker_dict},
                             name=values.legend,
                         )
                     )
             fig.update_layout(
                 scene=dict(
-                    xaxis_title=plot.x_label or '',
-                    yaxis_title=plot.y_label or '',
-                    zaxis_title=plot.z_label or '',
+                    xaxis_title=plot.x_label or "",
+                    yaxis_title=plot.y_label or "",
+                    zaxis_title=plot.z_label or "",
                     xaxis=dict(range=plot.x_lim) if plot.x_lim else {},
                     yaxis=dict(range=plot.y_lim) if plot.y_lim else {},
                     zaxis=dict(range=plot.z_lim) if plot.z_lim else {},
                 ),
                 showlegend=True,
             )
-            html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-            return html.encode('utf-8')
+            html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
+            return html.encode("utf-8")
 
         else:
             raise RuntimeError(f"{typenameof(self)} does not support rendering of {typenameof(plot)} to HTML.")
@@ -114,22 +114,22 @@ class PlotlyEngine(PlottingEngine):
             return "blue"
         else:
             mapping = {
-                PlotColor.BLACK: 'black',
-                PlotColor.WHITE: 'white',
-                PlotColor.RED: 'red',
-                PlotColor.GREEN: 'green',
-                PlotColor.BLUE: 'blue',
-                PlotColor.CYAN: 'cyan',
-                PlotColor.MAGENTA: 'magenta',
-                PlotColor.YELLOW: 'yellow',
-                PlotColor.ORANGE: 'orange',
-                PlotColor.PURPLE: 'purple',
-                PlotColor.BROWN: 'brown',
-                PlotColor.PINK: 'pink',
-                PlotColor.GRAY: 'gray',
-                PlotColor.OLIVE: 'olive',
-                PlotColor.TEAL: 'teal',
-                PlotColor.NAVY: 'navy',
+                PlotColor.BLACK: "black",
+                PlotColor.WHITE: "white",
+                PlotColor.RED: "red",
+                PlotColor.GREEN: "green",
+                PlotColor.BLUE: "blue",
+                PlotColor.CYAN: "cyan",
+                PlotColor.MAGENTA: "magenta",
+                PlotColor.YELLOW: "yellow",
+                PlotColor.ORANGE: "orange",
+                PlotColor.PURPLE: "purple",
+                PlotColor.BROWN: "brown",
+                PlotColor.PINK: "pink",
+                PlotColor.GRAY: "gray",
+                PlotColor.OLIVE: "olive",
+                PlotColor.TEAL: "teal",
+                PlotColor.NAVY: "navy",
             }
             if result := mapping.get(color):
                 return result

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.plots.plot import Plot
 from cl.runtime.plots.plotting_engine_key import PlottingEngineKey
