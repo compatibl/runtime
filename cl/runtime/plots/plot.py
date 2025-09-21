@@ -16,6 +16,7 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.plots.plot_key import PlotKey
+from cl.runtime.plots.plotting_engine import PlottingEngine
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
@@ -27,6 +28,9 @@ class Plot(PlotKey, RecordMixin, ABC):
 
     title: str = required()
     """Plot title."""
+
+    plotting_engine: PlottingEngine = PlottingEngine.MATPLOTLIB
+    """Plotting engine (defaults to Matplotlib for vector graphics output)."""
 
     def get_key(self) -> PlotKey:
         return PlotKey(plot_id=self.plot_id).build()
