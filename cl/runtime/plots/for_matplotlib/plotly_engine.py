@@ -61,6 +61,9 @@ class PlotlyEngine(PlottingEngine):
                                 colorscale=colorscale,
                                 showscale=False,
                                 opacity=0.8,
+                                name=values.legend,
+                                # Surface traces can be part of legend when named; ensure legend is shown
+                                showlegend=True,
                             )
                         )
                     else:
@@ -71,7 +74,8 @@ class PlotlyEngine(PlottingEngine):
                                 y=values.y,
                                 z=values.z,
                                 mode='markers',
-                                marker={"color": color_css, "size": 2, **marker_dict}
+                                marker={"color": color_css, "size": 2, **marker_dict},
+                                name=values.legend,
                             )
                         )
                 else:
@@ -82,7 +86,8 @@ class PlotlyEngine(PlottingEngine):
                             y=values.y,
                             z=values.z,
                             mode='markers',
-                            marker={"color": color_css, "size": 2, **marker_dict}
+                            marker={"color": color_css, "size": 2, **marker_dict},
+                            name=values.legend,
                         )
                     )
             fig.update_layout(
@@ -93,7 +98,8 @@ class PlotlyEngine(PlottingEngine):
                     xaxis=dict(range=plot.x_lim) if plot.x_lim else {},
                     yaxis=dict(range=plot.y_lim) if plot.y_lim else {},
                     zaxis=dict(range=plot.z_lim) if plot.z_lim else {},
-                )
+                ),
+                showlegend=True,
             )
             html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
             return html.encode('utf-8')
