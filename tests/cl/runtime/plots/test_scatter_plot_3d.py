@@ -1,10 +1,10 @@
-import pytest
 import numpy as np
 
 from cl.runtime.plots.for_matplotlib.plotly_engine import PlotlyEngine
-from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
 from cl.runtime.plots.scatter_plot_3d import ScatterPlot3D
 from cl.runtime.plots.scatter_values_3d import ScatterValues3D
+from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
+
 
 def create_plot():
     """Create plot for testing."""

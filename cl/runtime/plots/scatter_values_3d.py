@@ -37,7 +37,7 @@ class ScatterValues3D(DataclassMixin):
     z: list[float] = required()
     """List of Z-coordinates."""
 
-    color: PlotColor = PlotColor.BLACK
+    color: PlotColor | None = None
     """Marker and surface color."""
 
     marker_style: PlotMarkerStyle | None = None
