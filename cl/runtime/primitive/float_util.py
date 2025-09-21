@@ -111,6 +111,22 @@ class FloatUtil:
         return result
 
     @classmethod
+    def to_int(cls, value: int | float) -> int:
+        """
+        Check that float value is within roundoff tolerance from an int and return the int, error otherwise.
+        Verifies that the value fits in 32-bit signed integer range.
+        """
+        check_int_32(value)
+        if value is None:
+            raise RuntimeError("FloatUtil.to_int() does not accept None, use to_int_or_none instead.")
+        elif isinstance(value, int):
+            return value
+        elif cls.equal(result := int(round(value)), value):
+            return result
+        else:
+            raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
+
+    @classmethod
     def to_int_or_none(cls, value: int | float | None) -> int | None:
         """
         Check that float value is within roundoff tolerance from an int and return the int, error otherwise.
@@ -125,6 +141,22 @@ class FloatUtil:
             return result
         else:
             raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
+
+    @classmethod
+    def to_int_or_float(cls, value: int | float) -> int | float:
+        """
+        Check that float value is within roundoff tolerance from an int, return int if yes and float otherwise.
+        Verifies that the value fits in 32-bit signed integer range.
+        """
+        check_int_32(value)
+        if value is None:
+            raise RuntimeError("FloatUtil.to_int_or_float() does not accept None, use to_int_or_float_or_none instead.")
+        elif isinstance(value, int):
+            return value
+        elif cls.equal(result := int(round(value)), value):
+            return result
+        else:
+            return value
 
     @classmethod
     def to_int_or_float_or_none(cls, value: int | float | None) -> int | float | None:
@@ -143,6 +175,22 @@ class FloatUtil:
             return value
 
     @classmethod
+    def to_long(cls, value: int | float) -> int:
+        """
+        Check that float value is within roundoff tolerance from an long and return the long, error otherwise.
+        Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
+        """
+        check_int_54(value)
+        if value is None:
+            raise RuntimeError("FloatUtil.to_int_or_float() does not accept None, use to_int_or_float_or_none instead.")
+        elif isinstance(value, int):
+            return value
+        elif cls.equal(result := int(round(value)), value):
+            return result
+        else:
+            raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
+
+    @classmethod
     def to_long_or_none(cls, value: int | float | None) -> int | None:
         """
         Check that float value is within roundoff tolerance from an long and return the long, error otherwise.
@@ -157,6 +205,23 @@ class FloatUtil:
             return result
         else:
             raise RuntimeError(f"Cannot convert {value} to int because it is not within roundoff tolerance of an int.")
+
+    @classmethod
+    def to_long_or_float(cls, value: int | float) -> int | float:
+        """
+        Check that float value is within roundoff tolerance from an long and return the long if yes and float otherwise.
+        Verifies that the value fits in 54-bit signed integer range that can be represented as a float exactly.
+        """
+        check_int_54(value)
+        if value is None:
+            raise RuntimeError(
+                "FloatUtil.to_long_or_float() does not accept None, use to_long_or_float_or_none instead.")
+        elif isinstance(value, int):
+            return value
+        elif cls.equal(result := int(round(value)), value):
+            return result
+        else:
+            return value
 
     @classmethod
     def to_long_or_float_or_none(cls, value: int | float | None) -> int | float | None:

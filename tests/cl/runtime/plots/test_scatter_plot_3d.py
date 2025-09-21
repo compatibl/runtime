@@ -19,14 +19,14 @@ def create_plot():
             x=[1, 2, 3],
             y=[4, 5, 6],
             z=[7, 8, 9],
-        ),
+        ).build(),
         ScatterValues3D(
             x=list(x_grid.flatten()),
             y=list(y_grid.flatten()),
             z=list(z_grid.flatten()),
             marker_style=None,
             surface_style=PlotSurfaceStyle.SOLID,
-        )
+        ).build(),
     ]
     plot = ScatterPlot3D(
         data=data,
@@ -36,7 +36,7 @@ def create_plot():
         x_lim=(0, 5),
         y_lim=(0, 10),
         z_lim=(0, 15)
-    )
+    ).build()
     return plot
 
 def test_html(work_dir_fixture):
