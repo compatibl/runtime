@@ -13,10 +13,8 @@
 # limitations under the License.
 
 from abc import ABC
-from abc import abstractmethod
 from dataclasses import dataclass
 from cl.runtime.plots.plot_key import PlotKey
-from cl.runtime.plots.plotting_engine import PlottingEngine
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
@@ -28,9 +26,6 @@ class Plot(PlotKey, RecordMixin, ABC):
 
     title: str = required()
     """Plot title."""
-
-    plotting_engine: PlottingEngine = PlottingEngine.MATPLOTLIB
-    """Plotting engine (defaults to Matplotlib for vector graphics output)."""
 
     def get_key(self) -> PlotKey:
         return PlotKey(plot_id=self.plot_id).build()
@@ -48,10 +43,12 @@ class Plot(PlotKey, RecordMixin, ABC):
         """Default plot viewer."""
         return self.get_view()
 
-    @abstractmethod
     def get_view(self) -> None:
-        """Return a view object for the plot."""  # TODO: Refactor and fix return type hint
+        """Return a view object for the plot."""
+        # TODO: !!!! Replace by methods using the plotting engine
+        raise RuntimeError("Plot get_view method is deprecated, use plotting engine render methods instead.")
 
-    @abstractmethod
     def save(self, format_: str = "png") -> None:
         """Save in given format to 'base_dir/plot_id.format_'."""
+        # TODO: !!!! Replace by methods using the plotting engine
+        raise RuntimeError("Plot save method is deprecated, use plotting engine render methods instead.")

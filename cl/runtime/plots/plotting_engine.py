@@ -12,15 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from enum import IntEnum
-from enum import auto
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from cl.runtime.plots.plot import Plot
+from cl.runtime.plots.plotting_engine_key import PlottingEngineKey
+from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.record_mixin import RecordMixin
 
 
-class PlottingEngine(IntEnum):
-    """Plotting engine used to render the plot."""
+@dataclass(slots=True, kw_only=True)
+class PlottingEngine(PlottingEngineKey, RecordMixin, ABC):
+    """Base class for plot objects."""
 
-    MATPLOTLIB = auto()
-    """Matplotlib engine with vector graphics output, suitable for high-resolution printing."""
+    def get_key(self) -> PlottingEngineKey:
+        return PlottingEngineKey(plotting_engine_id=self.plotting_engine_id).build()
 
-    PLOTLY = auto()
-    """Plotly engine for interactive raster graphics output, not suitable for high-resolution printing."""
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.plotting_engine_id is None:
+            # Use globally unique UUIDv7-based timestamp if not specified
+            self.plotting_engine_id = Timestamp.create()
+
+    @abstractmethod
+    def render_html(self, plot: Plot) -> bytes:
+        """Render the plot to HTML."""

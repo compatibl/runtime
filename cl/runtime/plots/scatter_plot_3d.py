@@ -13,8 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-import numpy as np
-
 from cl.runtime.plots.plot import Plot
 from cl.runtime.plots.scatter_values_3d import ScatterValues3D
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -22,7 +20,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 
 @dataclass(slots=True, kw_only=True)
 class ScatterPlot3D(Plot):
-    """Class for creating a 2D line plot using Matplotlib."""
+    """3D scatter plot with markers and surfaces."""
 
     data: list[ScatterValues3D] = required()
     """List of values objects, each containing data and style settings."""
@@ -44,6 +42,3 @@ class ScatterPlot3D(Plot):
 
     z_lim: tuple[float, ...] | None = None
     """Y-axis limits (optional)."""
-
-    def render_html(self) -> bytes:
-        """Render the plot to HTML."""
