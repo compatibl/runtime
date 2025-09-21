@@ -43,7 +43,7 @@ class PlotlyEngine(PlottingEngine):
                         y=values.y,
                         z=values.z,
                         mode='markers',
-                        marker={"color": color, **marker_dict}
+                        marker={"color": color, "size": 2, **marker_dict}  # Setting marker size to 20% of default (default is ~10)
                     )
                 )
             fig.update_layout(
@@ -61,4 +61,3 @@ class PlotlyEngine(PlottingEngine):
 
         else:
             raise RuntimeError(f"{typenameof(self)} does not support rendering of {typenameof(plot)} to HTML.")
-
