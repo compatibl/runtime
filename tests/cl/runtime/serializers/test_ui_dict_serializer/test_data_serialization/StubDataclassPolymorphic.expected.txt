@@ -1,0 +1,5 @@
+_t: StubDataclassPolymorphic
+Id: abc
+RecordField: record_field
+RootKeyField: StubDataclassKey;abc
+

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import inspect
 from typing import Any
 from typing import Iterable
 from _pytest.fixtures import FixtureRequest
@@ -68,3 +68,26 @@ class PytestUtil:
                 raise ValueError(f"Item {item} contains only in first iterable.")
 
         return True
+
+    @classmethod
+    def log_method_info(cls, logger):
+        """Log information about the caller method using stack inspection."""
+
+        # Get logger from TaskLog
+        # Record method information from stack frame
+        current_frame = inspect.currentframe()
+        assert current_frame is not None
+
+        outer_frame = current_frame.f_back
+        assert outer_frame is not None
+
+        method_name = outer_frame.f_code.co_name
+        args, _, _, values = inspect.getargvalues(outer_frame)
+
+        # Explicitly delete the frames to avoid circular references
+        del outer_frame
+        del current_frame
+
+        # Log information
+        params_output = ",".join(f"{arg}={values[arg]}" for arg in args)
+        logger.info(f"Called {method_name}({params_output})")

@@ -13,40 +13,17 @@
 # limitations under the License.
 
 import datetime as dt
-import inspect
 import logging
 import time
 from dataclasses import dataclass
 from uuid import UUID
 from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
+from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def _log_method_info():  # TODO: Move into testing directory
-    """Print information about the caller method using stack inspection."""
-
-    # Get logger from TaskLog
-    # Record method information from stack frame
-    current_frame = inspect.currentframe()
-    assert current_frame is not None
-
-    outer_frame = current_frame.f_back
-    assert outer_frame is not None
-
-    method_name = outer_frame.f_code.co_name
-    args, _, _, values = inspect.getargvalues(outer_frame)
-
-    # Explicitly delete the frames to avoid circular references
-    del outer_frame
-    del current_frame
-
-    # Log information
-    params_output = ",".join(f"{arg}={values[arg]}" for arg in args)
-    _LOGGER.info(f"Called {method_name}({params_output})")
 
 
 @dataclass(slots=True, kw_only=True)
@@ -58,11 +35,11 @@ class StubHandlers(StubHandlersKey, RecordMixin):
 
     def run_instance_method_1a(self) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     def run_instance_method_1a_with_int_param(self, int_param: int) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     def run_instance_method_1a_with_primitive_params(
         self,
@@ -77,101 +54,101 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         bytes_param: bytes,
     ) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     def run_instance_method_1b(self) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     def run_instance_method_2a_with_params(self, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
         _LOGGER.info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters()
     def run_instance_method_2b(self, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     def run_instance_method_3a(self, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters()
     def run_instance_method_3b(self, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     @classmethod
     def run_class_method_1a(cls) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     @classmethod
     def run_class_method_1b(cls) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
     def run_class_method_2a_with_params(cls, param_1: str, param_2: str) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
         _LOGGER.info(f"param_1={param_1} param_2={param_2}")
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
     def run_class_method_2b(cls, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
     def run_class_method_3a(cls, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @classmethod
     def run_class_method_3b(cls, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     @staticmethod
     def run_static_method_1a() -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     @staticmethod
     def run_static_method_1b() -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @staticmethod
     def run_static_method_2a(param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @staticmethod
     def run_static_method_2b(param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @staticmethod
     def run_static_method_3a(*, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     @staticmethod
     def run_static_method_3b(*, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
 
     # TODO (Roman): Restore after supporting handlers with parameters
     # def run_with_args(
@@ -211,13 +188,13 @@ class StubHandlers(StubHandlersKey, RecordMixin):
 
     def run_instance_method_with_binary_param(self, pdf_file: FileData, note_param: str):
         """Stub method."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
         _LOGGER.info(f"Binary_data len={len(pdf_file.file_bytes)}")
 
     @staticmethod
     def run_class_method_with_binary_param(pdf_file: FileData):
         """Stub method."""
-        _log_method_info()
+        PytestUtil.log_method_info(_LOGGER)
         _LOGGER.info(f"Binary_data len={len(pdf_file.file_bytes)}")
 
     def run_long_handler_with_error(self):

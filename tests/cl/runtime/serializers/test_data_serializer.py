@@ -46,6 +46,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composi
     StubDataclassPolymorphicComposite,
 )
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
+from stubs.cl.runtime.records.for_pydantic.stub_pydantic import StubPydantic
 
 _SAMPLES = [
     StubDataclass(),
@@ -103,6 +104,7 @@ _SAMPLES = [
         empty_dict=frozendict({"1": "abc"}),
         empty_frozendict=frozendict({"1": "abc"}),
     ),
+    StubPydantic(),
 ]
 
 

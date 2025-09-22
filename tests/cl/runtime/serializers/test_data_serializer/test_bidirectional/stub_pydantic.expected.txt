@@ -1,0 +1,4 @@
+{
+  "_type": "StubPydantic",
+  "id": "abc"
+}

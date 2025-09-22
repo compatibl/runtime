@@ -27,6 +27,7 @@ from stubs.cl.runtime import StubDataclassOptionalFields
 from stubs.cl.runtime import StubDataclassOtherDerived
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 
 
 def test_data_serialization():
@@ -47,6 +48,7 @@ def test_data_serialization():
         StubDataclassPrimitiveFields,
         StubDataclassSingleton,
         # StubDataclassAnyFields,  TODO (Roman): Uncomment when supported consistent Any ui serialization.
+        StubDataclassPolymorphic,
     ]
 
     for sample_type in sample_types:

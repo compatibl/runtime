@@ -13,8 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
+from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_base_key import StubDataclassPolymorphicBaseKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
 
@@ -29,7 +32,7 @@ class StubDataclassPolymorphic(StubDataclassPolymorphicKey, RecordMixin):
     base_key_field: StubDataclassPolymorphicBaseKey | None = None
     """The type of this field is not the record's key type but its base."""
 
-    root_key_field: KeyMixin | None = None
+    root_key_field: KeyMixin | None = optional(default_factory=StubDataclassKey)
     """The type of this field is not the record's key type but KeyMixin."""
 
     record_as_base_key_field: StubDataclassPolymorphicBaseKey | None = None
