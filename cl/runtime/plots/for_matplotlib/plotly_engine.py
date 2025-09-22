@@ -17,8 +17,10 @@ import plotly.graph_objects as go
 import plotly.io as pio
 from cl.runtime.plots.plot import Plot
 from cl.runtime.plots.plot_color import PlotColor
+from cl.runtime.plots.plot_line_style import PlotLineStyle
 from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
 from cl.runtime.plots.plotting_engine import PlottingEngine
+from cl.runtime.plots.scatter_plot_2d import ScatterPlot2D
 from cl.runtime.plots.scatter_plot_3d import ScatterPlot3D
 from cl.runtime.records.typename import typenameof
 
@@ -55,6 +57,7 @@ class PlotlyEngine(PlottingEngine):
                             opacity=0.8,
                             showlegend=True,
                             name=values.legend,
+                            intensity=values.z
                         )
                     )
                 else:
