@@ -16,7 +16,6 @@ from dataclasses import dataclass
 from cl.runtime.plots.plot_color import PlotColor
 from cl.runtime.plots.plot_line_style import PlotLineStyle
 from cl.runtime.plots.plot_marker_style import PlotMarkerStyle
-from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 

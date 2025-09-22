@@ -14,7 +14,7 @@
 
 import numpy as np
 from cl.runtime.plots.for_matplotlib.plotly_engine import PlotlyEngine
-from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
+from cl.runtime.plots.plot_line_style import PlotLineStyle
 from cl.runtime.plots.scatter_plot_2d import ScatterPlot2D
 from cl.runtime.plots.scatter_values_2d import ScatterValues2D
 
@@ -36,7 +36,7 @@ def create_plot():
             y=list(y_grid.flatten()),
             legend="Surface",
             marker_style=None,
-            line_style=PlotSurfaceStyle.SOLID,
+            line_style=PlotLineStyle.SOLID,
         ).build(),
     ]
     plot = ScatterPlot2D(
