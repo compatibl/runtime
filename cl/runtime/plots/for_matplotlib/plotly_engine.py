@@ -17,6 +17,7 @@ import plotly.graph_objects as go
 import plotly.io as pio
 from cl.runtime.plots.plot import Plot
 from cl.runtime.plots.plot_color import PlotColor
+from cl.runtime.plots.plot_line_style import PlotLineStyle
 from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
 from cl.runtime.plots.plotting_engine import PlottingEngine
 from cl.runtime.plots.scatter_plot_2d import ScatterPlot2D
@@ -42,7 +43,7 @@ class PlotlyEngine(PlottingEngine):
                     pass
 
                 # If a solid surface is requested, render as a continuous surface
-                if getattr(values, "surface_style", None) == PlotSurfaceStyle.SOLID:
+                if values.surface_style  == PlotSurfaceStyle.SOLID:
                     x_list = list(values.x)
                     y_list = list(values.y)
                     z_list = list(values.z)
@@ -115,7 +116,7 @@ class PlotlyEngine(PlottingEngine):
                     # TODO: !!!! Map marker_style to Plotly marker attributes
                     pass
 
-                if getattr(values, "surface_style", None) == PlotSurfaceStyle.SOLID:
+                if values.line_style == PlotLineStyle.SOLID:
                     # For 2D, interpret a solid surface as a continuous line
                     fig.add_trace(
                         go.Scatter(

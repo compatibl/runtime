@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.plots.plot_color import PlotColor
+from cl.runtime.plots.plot_line_style import PlotLineStyle
 from cl.runtime.plots.plot_marker_style import PlotMarkerStyle
 from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
@@ -39,11 +40,11 @@ class ScatterValues2D(DataclassMixin):
     marker_style: PlotMarkerStyle | None = None
     """Marker style."""
 
-    surface_style: PlotSurfaceStyle | None = None
+    line_style: PlotLineStyle | None = None
     """Surface style."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.marker_style is None and self.surface_style is None:
+        if self.marker_style is None and self.line_style is None:
             # Default to circle marker if neither is specified
             self.marker_style = PlotMarkerStyle.CIRCLE

@@ -36,7 +36,7 @@ def create_plot():
             y=list(y_grid.flatten()),
             legend="Surface",
             marker_style=None,
-            surface_style=PlotSurfaceStyle.SOLID,
+            line_style=PlotSurfaceStyle.SOLID,
         ).build(),
     ]
     plot = ScatterPlot2D(
