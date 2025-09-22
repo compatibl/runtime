@@ -19,6 +19,7 @@ from cl.runtime.plots.plot import Plot
 from cl.runtime.plots.plot_color import PlotColor
 from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
 from cl.runtime.plots.plotting_engine import PlottingEngine
+from cl.runtime.plots.scatter_plot_2d import ScatterPlot2D
 from cl.runtime.plots.scatter_plot_3d import ScatterPlot3D
 from cl.runtime.records.typename import typenameof
 
@@ -104,6 +105,48 @@ class PlotlyEngine(PlottingEngine):
             html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
             return html.encode("utf-8")
 
+        elif isinstance(plot, ScatterPlot2D):
+            # Render ScatterPlot2D to HTML
+            fig = go.Figure()
+            for values in plot.data:
+                color_css = self._to_css_color(values.color)
+                marker_dict = {}
+                if values.marker_style is not None:
+                    # TODO: !!!! Map marker_style to Plotly marker attributes
+                    pass
+
+                if getattr(values, "surface_style", None) == PlotSurfaceStyle.SOLID:
+                    # For 2D, interpret a solid surface as a continuous line
+                    fig.add_trace(
+                        go.Scatter(
+                            x=values.x,
+                            y=values.y,
+                            mode="lines",
+                            line={"color": color_css},
+                            name=values.legend,
+                        )
+                    )
+                else:
+                    # Default: render as markers
+                    fig.add_trace(
+                        go.Scatter(
+                            x=values.x,
+                            y=values.y,
+                            mode="markers",
+                            marker={"color": color_css, "size": 6, **marker_dict},
+                            name=values.legend,
+                        )
+                    )
+
+            fig.update_layout(
+                xaxis_title=plot.x_label or "",
+                yaxis_title=plot.y_label or "",
+                xaxis=dict(range=plot.x_lim) if plot.x_lim else {},
+                yaxis=dict(range=plot.y_lim) if plot.y_lim else {},
+                showlegend=True,
+            )
+            html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
+            return html.encode("utf-8")
         else:
             raise RuntimeError(f"{typenameof(self)} does not support rendering of {typenameof(plot)} to HTML.")
 
