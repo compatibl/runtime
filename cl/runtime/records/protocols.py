@@ -119,7 +119,7 @@ def is_empty(
 def is_type(type_: type) -> TypeGuard[type | GenericAlias]:
     """Returns true if the argument is a genuine type or a generic alias, including third party aliases."""
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
-    return hasattr(type_, "__name__")
+    return isinstance(type_, GenericAlias) or isinstance(type_, type)
 
 
 def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
@@ -127,9 +127,10 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
     if (type_name := getattr(type_, "__name__", None)) is not None:
         # Use class names to avoid import discrepancies for UUID
-        # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type
         # Use type_name == "dtype" to include numpy dtype generics
-        return type_name in PRIMITIVE_TYPE_NAMES or type_name == "dtype" or issubclass(type_, type)
+        # Use isinstance(type_, type) to guard issubclass() against unsupported GenericAlias classes.
+        # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type.
+        return type_name in PRIMITIVE_TYPE_NAMES or type_name == "dtype" or (isinstance(type_, type) and issubclass(type_, type))
     else:
         raise RuntimeError(
             f"The argument of is_primitive_type is an instance of type {type(type_).__name__}\n"
@@ -140,8 +141,12 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
 def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
     """Derived from Enum but not one of the base enum classes and the name does not start from underscore."""
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
+    # Use isinstance(type_, type) to guard issubclass() against GenericAlias classes.
+    # Use issubclass(type_, Enum) to check if derived from Enum.
+    # Use type_.__module__ != "enum" to exclude base enum classes.
+    # Use not type_name.startswith("_") to exclude private enum classes.
     if (type_name := getattr(type_, "__name__", None)) is not None:
-        return issubclass(type_, Enum) and type_.__module__ != "enum" and not type_name.startswith("_")
+        return isinstance(type_, type) and issubclass(type_, Enum) and type_.__module__ != "enum" and not type_name.startswith("_")
     else:
         raise RuntimeError(
             f"The argument of is_enum_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
