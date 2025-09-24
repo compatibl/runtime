@@ -80,15 +80,19 @@ class PlotlyEngine(PlottingEngine):
                     xaxis=dict(range=plot.x_lim) if plot.x_lim else {},
                     yaxis=dict(range=plot.y_lim) if plot.y_lim else {},
                     zaxis=dict(range=plot.z_lim) if plot.z_lim else {},
+
+                    # TODO: Make this a setting
                     # Axis background and grid visibility
-                    xaxis_backgroundcolor="white",
-                    xaxis_showgrid=False,
-                    yaxis_backgroundcolor="white",
-                    yaxis_showgrid=False,
-                    zaxis_backgroundcolor="white",
-                    zaxis_showgrid=False,
+                    # xaxis_backgroundcolor="white",
+                    # xaxis_showgrid=False,
+                    # yaxis_backgroundcolor="white",
+                    # yaxis_showgrid=False,
+                    # zaxis_backgroundcolor="white",
+                    # zaxis_showgrid=False,
+
+                    # TODO: Make this a setting
                     # Aspect ratio mode ('data' ensures that aspect ratio matches x-y-z data ranges)
-                    aspectmode='data',
+                    # aspectmode='data',
                 ),
                 showlegend=True,
                 legend=dict(
