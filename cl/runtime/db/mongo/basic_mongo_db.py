@@ -22,6 +22,7 @@ import pymongo
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.synchronous.collection import Collection
+from pymongo.synchronous.cursor import Cursor
 from cl.runtime.db.db import Db
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
@@ -112,7 +113,10 @@ class BasicMongoDb(Db):
         collection = self._get_mongo_collection(key_type=key_type)
 
         # Query for all records in one call using $in operator
-        serialized_records = tuple(collection.find(self._get_mongo_keys_filter(keys, dataset=dataset)))
+        serialized_records = collection.find(self._get_mongo_keys_filter(keys, dataset=dataset))
+
+        # Apply sort to the iterable
+        serialized_records = self._apply_sort(serialized_records, sort_field="_key", sort_order=sort_order)
 
         # Prune the fields used by Db that are not part of the serialized record data and deserialize
         result = tuple(
@@ -151,8 +155,11 @@ class BasicMongoDb(Db):
         # serialized_primary_key = _KEY_SERIALIZER.serialize(key)
         # serialized_record = collection.find_one({"_key": serialized_primary_key})
 
-        # Get iterable from the query sorted by '_key', execution is deferred
-        serialized_records = collection.find(query_dict).sort("_key")
+        # Get iterable from the query, execution is deferred
+        serialized_records = collection.find(query_dict)
+
+        # Apply sort to the iterable
+        serialized_records = self._apply_sort(serialized_records, sort_field="_key", sort_order=sort_order)
 
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
@@ -214,8 +221,11 @@ class BasicMongoDb(Db):
         # Filter by restrict_to if specified
         self._apply_restrict_to(query_dict=query_dict, key_type=key_type, restrict_to=restrict_to)
 
-        # Get iterable from the query sorted by '_key', execution is deferred
-        serialized_records = collection.find(query_dict).sort("_key")
+        # Get iterable from the query, execution is deferred
+        serialized_records = collection.find(query_dict)
+
+        # Apply sort to the iterable
+        serialized_records = self._apply_sort(serialized_records, sort_field="_key", sort_order=sort_order)
 
         # Apply skip and limit to the iterable
         serialized_records = self._apply_limit_and_skip(serialized_records, limit=limit, skip=skip)
@@ -517,6 +527,21 @@ class BasicMongoDb(Db):
             else:
                 raise RuntimeError(f"Parameter limit={limit} is negative.")
         return serialized_records
+
+    @classmethod
+    def _apply_sort(cls, records: Cursor, sort_field: str, sort_order: SortOrder) -> Cursor:
+        """Apply sorting to the records using the specified sort field and sort order."""
+        if sort_order == SortOrder.UNORDERED:
+            return records  # no sort applied
+        elif sort_order == SortOrder.ASC:
+            return records.sort(sort_field, direction=pymongo.ASCENDING)
+        elif sort_order == SortOrder.DESC:
+            return records.sort(sort_field, direction=pymongo.DESCENDING)
+        elif sort_order == SortOrder.INPUT:
+            # Not implemented. Return unchanged records by default.
+            return records
+        else:
+            raise ValueError(f"Unsupported SortOrder: {order}")
 
     def _with_pruned_fields(
         self,

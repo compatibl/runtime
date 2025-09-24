@@ -87,6 +87,10 @@ class SqliteDb(Db):
         placeholders = ",".join("?" for _ in serialized_keys)
         select_sql = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_key" IN ({placeholders})'
 
+        if sort_order is not None:
+            # Add order by '_key' condition
+            select_sql = self._add_order(select_sql, sort_field="_key", sort_order=sort_order)
+
         # Execute SQL query
         conn = self._get_connection()
         cursor = conn.execute(select_sql, serialized_keys)
@@ -134,7 +138,7 @@ class SqliteDb(Db):
             values += subtype_names
 
         # Add order by '_key' condition
-        select_sql += ' ORDER BY "_key"'
+        select_sql = self._add_order(select_sql, sort_field="_key", sort_order=sort_order)
 
         # Add 'limit' and 'skip' conditions
         select_sql, add_params = self._add_limit_and_skip(select_sql, limit=limit, skip=skip)
@@ -220,7 +224,7 @@ class SqliteDb(Db):
             select_sql += f" WHERE {where}"
 
         # Add order by '_key' condition
-        select_sql += ' ORDER BY "_key"'
+        select_sql = self._add_order(select_sql, sort_field="_key", sort_order=sort_order)
 
         # Add 'limit' and 'skip' conditions
         select_sql, add_params = self._add_limit_and_skip(select_sql, limit=limit, skip=skip)
@@ -524,6 +528,21 @@ class SqliteDb(Db):
             add_params.append(skip)
 
         return select_sql, add_params
+
+    @classmethod
+    def _add_order(cls, select_sql: str, sort_field: str, sort_order: SortOrder) -> str:
+        """Add 'order' conditions to sql query."""
+        if sort_order == SortOrder.UNORDERED:
+            return select_sql  # no sort applied
+        elif sort_order == SortOrder.ASC:
+            return select_sql + f' ORDER BY "{sort_field}" ASC'
+        elif sort_order == SortOrder.DESC:
+            return select_sql + f' ORDER BY "{sort_field}" DESC'
+        elif sort_order == SortOrder.INPUT:
+            # Not implemented. Return unchanged query by default.
+            return select_sql
+        else:
+            raise ValueError(f"Unsupported SortOrder: {order}")
 
     @classmethod
     def _extract_columns_for_key_type(cls, key_type: type[TKey]) -> list[str]:

@@ -19,9 +19,9 @@ from typing import AsyncGenerator
 from starlette.requests import Request
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker
-from cl.runtime.events.sse_query_util import SseQueryUtil
 from cl.runtime.primitive.timestamp import Timestamp
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,10 +45,12 @@ def _handle_async_task_exception(task: asyncio.Task):
 async def _pull_events(queue: asyncio.Queue):
     while True:
         # Get unprocessed events from the DB, sorted by ascending timestamp
-        # TODO (Roman): Replace with DataSource.query() when supported
-        new_events = list(
-            reversed([x for x in SseQueryUtil.query_sorted_desc_and_limited(Event().get_key_type(), limit=100)])
-        )
+        # load_all is enough as Event key field is timestamp
+        new_events = active(DataSource).load_all(
+            key_type=Event().get_key_type(),
+            sort_order=SortOrder.DESC,
+            limit=100
+        )[::-1]
 
         # Put events to subscribed queues
         for event in new_events:

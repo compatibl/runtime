@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.db.sort_order import SortOrder
+from cl.runtime.events.event import Event
+from cl.runtime.events.event_kind import EventKind
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.conditions import In
@@ -35,6 +39,7 @@ from stubs.cl.runtime import StubDataclassSingleton
 from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased import StubDataclassAliased
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composite import (
     StubDataclassPolymorphicComposite,
@@ -268,6 +273,59 @@ def test_load_by_query(multi_db_fixture):
     to_key_str_field = lambda rec: [x.key_str_field for x in rec]
     assert to_key_str_field(active(DataSource).load_by_query(eq_query)) == ["def"]
     assert to_key_str_field(active(DataSource).load_by_query(in_query)) == ["def", "xyz"]
+
+def test_load_all_sort_order(multi_db_fixture):
+    """Test sort_order for load_all sorts by key field."""
+    records = [
+        Event(
+            timestamp=str(time.time()+i), # Timestamp is key field, so the sorting will be performed by it
+            event_kind=EventKind.LOG,
+        ).build() for i in range(5)
+    ]
+    active(DataSource).insert_many(records, commit=True)
+
+    records = active(DataSource).load_all(
+        key_type=Event().get_key_type(),
+        sort_order=SortOrder.DESC
+    )
+    assert records == tuple(sorted(records, key=lambda r: r.timestamp, reverse=True))
+
+    records = active(DataSource).load_all(
+        key_type=Event().get_key_type(),
+        sort_order=SortOrder.ASC
+    )
+    assert records == tuple(sorted(records, key=lambda r: r.timestamp))
+
+def test_load_query_sort_order(multi_db_fixture):
+    """Test sort_order for load_query sorts by key field (for now defaulted to key field)."""
+    error_records = [
+        StubDataclassDerived(
+            derived_str_field="Error",
+            id=str(time.time()+i),
+        ).build() for i in range(5)
+    ]
+    info_records = [
+        StubDataclassDerived(
+            derived_str_field="Info",
+            id=str(time.time() + i),
+        ).build() for i in range(6)
+    ]
+    active(DataSource).insert_many(error_records + info_records, commit=True)
+
+    query = StubDataclassDerivedQuery(derived_str_field="Error").build()
+    records = active(DataSource).load_by_query(
+        query,
+        sort_order=SortOrder.DESC,
+    )
+    assert records == tuple(sorted(error_records, key=lambda r: r.id, reverse=True))
+
+    query = StubDataclassDerivedQuery(derived_str_field="Info").build()
+    records = active(DataSource).load_by_query(
+        query,
+        sort_order=SortOrder.ASC
+    )
+    assert records == tuple(sorted(info_records, key=lambda r: r.id))
+
 
 
 def test_count_by_query(multi_db_fixture):

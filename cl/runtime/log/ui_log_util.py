@@ -18,7 +18,7 @@ from typing import Iterable
 from typing_extensions import Final
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.events.sse_query_util import SseQueryUtil
+from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.task_logs import TaskLogs
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
@@ -39,25 +39,26 @@ class UiLogUtil(DataclassMixin):
     @classmethod
     def run_get_flat_logs(cls) -> dict[str, Any]:
         """Return a list of the last N log messages, sorted by timestamp in ascending order."""
+        log_messages = active(DataSource).load_all(
+            key_type=LogMessage().get_key_type(),
+            limit=_LOG_HISTORY_LIMIT,
+            sort_order=SortOrder.DESC,
+        )[::-1]
 
-        log_messages = reversed(
-            list(SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT))
-        )
         return cls._wrap_to_result(log_messages)
 
     @classmethod
     def run_get_error_logs(cls) -> dict[str, Any]:
         """Return a list of the last N error log messages, sorted by timestamp in ascending order."""
 
-        log_messages = reversed(
-            [
-                x
-                for x in SseQueryUtil.query_sorted_desc_and_limited(
-                    LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT
-                )
-                if x.level.lower() == "error"
-            ]
-        )
+        log_messages = [
+            log for log in active(DataSource).load_all(
+                LogMessage().get_key_type(),
+                limit=_LOG_HISTORY_LIMIT,
+                sort_order=SortOrder.DESC,
+            ) if log.level.lower() == "error"
+        ][::-1]
+
         return cls._wrap_to_result(log_messages)
 
     @classmethod
@@ -81,7 +82,11 @@ class UiLogUtil(DataclassMixin):
 
         result = {}
         for log_message in reversed(
-            list(SseQueryUtil.query_sorted_desc_and_limited(LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT))
+            active(DataSource).load_all(
+                key_type=LogMessage().get_key_type(),
+                limit=_LOG_HISTORY_LIMIT,
+                sort_order=SortOrder.DESC
+            )
         ):
             task_run_id = log_message.task_run_id
 
