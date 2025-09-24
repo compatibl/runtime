@@ -19,6 +19,7 @@ from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.sql.sqlite_db import SqliteDb
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import TRecord
+from cl.runtime.records.typename import typename
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 
@@ -61,10 +62,13 @@ class SseQueryUtil:
         limit: int | None,
     ) -> Iterable[TRecord]:
 
-        if not db._table_exists(key_type_name):
+        key_type_name = typename(key_type)
+        table_name = key_type_name.removesuffix("Key")
+
+        if not db._table_exists(table_name=table_name):
             return tuple()
 
-        select_sql, values = f"SELECT * FROM {db._quote_identifier(key_type_name)}", []
+        select_sql, values = f"SELECT * FROM {db._quote_identifier(table_name)}", []
 
         # Add order by '_key' condition
         select_sql += f" ORDER BY {db._quote_identifier(sort_by_desc)} DESC"

@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import dataclass
+
 from cl.runtime.log.log_message import LogMessage
 
 
+@dataclass(slots=True, kw_only=True)
 class UserLogMessage(LogMessage):
     """A special class for log records that are shown to the user."""

@@ -23,6 +23,7 @@ from cl.runtime.db.db import Db
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.data_mixin import DataMixin
