@@ -44,7 +44,7 @@ class PlotlyEngine(PlottingEngine):
                     pass
 
                 # If a solid surface is requested, render as a continuous surface
-                if values.surface_style  == PlotSurfaceStyle.SOLID:
+                if values.surface_style == PlotSurfaceStyle.SOLID:
 
                     # Fallback to markers if data cannot form a grid
                     fig.add_trace(
@@ -80,8 +80,31 @@ class PlotlyEngine(PlottingEngine):
                     xaxis=dict(range=plot.x_lim) if plot.x_lim else {},
                     yaxis=dict(range=plot.y_lim) if plot.y_lim else {},
                     zaxis=dict(range=plot.z_lim) if plot.z_lim else {},
+                    # Axis background and grid visibility
+                    xaxis_backgroundcolor="white",
+                    xaxis_showgrid=False,
+                    yaxis_backgroundcolor="white",
+                    yaxis_showgrid=False,
+                    zaxis_backgroundcolor="white",
+                    zaxis_showgrid=False,
+                    # Aspect ratio mode ('data' ensures that aspect ratio matches x-y-z data ranges)
+                    aspectmode='data',
                 ),
                 showlegend=True,
+                legend=dict(
+                    # Legend styling
+                    font=dict(size=15),
+                    bordercolor="black",
+                    borderwidth=2,
+                    bgcolor="white",
+                    # Legend positioning
+                    yanchor="top",
+                    y=1,
+                    xanchor="left",
+                    x=0.01,
+                    # Keep legend item sizes consistent
+                    itemsizing='constant',
+                )
             )
             html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
             return html.encode("utf-8")
