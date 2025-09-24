@@ -31,6 +31,7 @@ class RunResponseUtil:
         for handler_task in TaskUtil.create_tasks_for_submit_request(request):
             # Run task as callable in main process
             handler_result = handler_task.run_task_in_process()
+
             results.append(handler_result)
 
         return results

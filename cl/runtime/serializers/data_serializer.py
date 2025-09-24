@@ -117,6 +117,8 @@ class DataSerializer(Serializer):
                 # TODO: !!! Check for type_kind in TypeHint instead
                 result = self.enum_serializer.serialize(data, type_hint)
                 return result
+        elif is_enum_type(type(data)):
+            return self.enum_serializer.serialize(data, type_hint)
         elif is_sequence_type(type(data)):
             # Serialize sequence into list, allowing remaining_chain to be None
             # If remaining_chain is None, it will be provided for each slotted data

@@ -13,12 +13,12 @@
 # limitations under the License.
 
 import logging
-
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
+from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic import StubPydantic
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic_data import StubPydanticData
@@ -63,7 +63,7 @@ class StubPydanticHandlers(StubPydanticHandlersKey, RecordMixin):
         data_arg: StubPydanticData,
         key_arg: StubPydanticHandlersKey,
         enum_arg: StubIntEnum,
-    ) -> StubPydantic:
+    ):
         """Handler with mixed-type args and result."""
 
         PytestUtil.log_method_info(_logger)
@@ -73,12 +73,18 @@ class StubPydanticHandlers(StubPydanticHandlersKey, RecordMixin):
         if not is_key_type(type(generic_key_arg)):
             raise RuntimeError(f"The type of 'generic_key_arg' is '{type(generic_key_arg)}' rather than Key.")
         if not isinstance(record_arg, StubPydanticNestedFields):
-            raise RuntimeError(f"The type of 'record_arg' is '{type(record_arg)}' rather than {typename(StubPydanticNestedFields)}")
+            raise RuntimeError(
+                f"The type of 'record_arg' is '{type(record_arg)}' rather than {typename(StubPydanticNestedFields)}"
+            )
         if not isinstance(data_arg, StubPydanticData):
-            raise RuntimeError(f"The type of 'data_arg' is '{type(data_arg)}' rather than {typename(StubPydanticData)}.")
+            raise RuntimeError(
+                f"The type of 'data_arg' is '{type(data_arg)}' rather than {typename(StubPydanticData)}."
+            )
         if not isinstance(key_arg, StubPydanticHandlersKey):
-            raise RuntimeError(f"The type of 'key_arg' is '{type(key_arg)}' rather than {typename(StubPydanticHandlersKey)}.")
+            raise RuntimeError(
+                f"The type of 'key_arg' is '{type(key_arg)}' rather than {typename(StubPydanticHandlersKey)}."
+            )
         if not isinstance(enum_arg, StubIntEnum):
             raise RuntimeError(f"The type of 'enum_arg' is '{type(enum_arg)}' rather than {typename(StubIntEnum)}.")
 
-        return StubPydantic().build()
+        return DataSerializers.FOR_UI.serialize(StubPydantic().build())

@@ -13,93 +13,98 @@
 # limitations under the License.
 
 import inspect
-import re
 from abc import ABC
-from collections import namedtuple
+from abc import abstractmethod
 from dataclasses import dataclass
 from types import FunctionType
 from types import MethodType
-from inflection import underscore
+from typing_extensions import Any
+from typing_extensions import override
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
+from cl.runtime.serializers.json_encoders import JsonEncoders
 from cl.runtime.tasks.task import Task
 
-_UI_SERIALIZER = DataSerializers.FOR_UI
-
-# Named tuple for method param details
-ParamDetails = namedtuple("ParamDetails", ["annot", "default"])  # TODO: Avoid namedtuple
+_json_serializer = DataSerializers.FOR_JSON
 
 
 @dataclass(slots=True, kw_only=True)
-class MethodTask(Task, ABC):  # TODO: Refactor this class
+class MethodTask(Task, ABC):
     """Base class for method tasks that invoke handlers from classes."""
 
     method_name: str = required()
-    """The name of @staticmethod in snake_case or PascalCase format."""
+    """The name of method in snake_case format."""
 
-    method_params: dict[str, str] | None = optional(default_factory=lambda: {})  # TODO: Allow values other than string
-    """Values for task arguments, if any."""
+    method_args: str | None = None
+    """Encoded method args as a JSON string. Use 'self.decode_args()' method to get dict."""
 
-    def normalized_method_name(self) -> str:
-        """If method name has uppercase letters, assume it is PascalCase and convert to snake_case."""
-        result = self.method_name
-        if any(c.isupper() for c in result):
-            # Use inflection library
-            result = underscore(result)
-            # In addition, add underscore before numbers
-            result = re.sub(r"([0-9]+)", r"_\1", result)
+    def __init(self):
+        # Encode method_args to str if assigned dict
+        if isinstance(self.method_args, dict):
+            if self.method_args:
+                type_hints = self.get_method_arg_type_hints()
+                encoded_args = self._encode_args(self.method_args, type_hints)
+                self.method_args = encoded_args
+            else:
+                self.method_args = None
 
-        return result
+    @abstractmethod
+    def get_method_callable(self) -> FunctionType | MethodType:
+        """Get method callable for Task."""
+        raise NotImplementedError()
 
-    @classmethod
-    def _get_method_param_details(cls, method_callable: FunctionType | MethodType) -> dict[str, ParamDetails]:
-        """For a given method/function, extract a dictionary of parameter names to param details."""
+    @override
+    def _execute(self):
+        """Invoke the specified instance method."""
 
+        # Get method callable
+        method = self.get_method_callable()
+
+        # Get args dict
+        args = self.decode_args()
+
+        # Run method
+        return method(**args)
+
+    def get_method_arg_type_hints(self) -> dict[str, TypeHint]:
+        """Return method argument type hints."""
+
+        method_callable = self.get_method_callable()
         signature = inspect.signature(method_callable)
-        param_details = {
-            name: ParamDetails(param.annotation, param.default)
+
+        # Create TypeHint objects from signature params
+        return {
+            name: TypeHint.for_type_alias(type_alias=param.annotation, containing_type=self.__class__, field_name=name)
             for name, param in signature.parameters.items()
             if param.annotation != inspect.Parameter.empty
         }
 
-        return param_details
+    def decode_args(self) -> dict[str, Any]:
+        """Decode and deserialize task method arguments to dict format."""
 
-    def deserialized_method_params(self, method_callable: FunctionType | MethodType) -> dict:
-        """For every method's param - deserialize its value and assign back to it's param name."""
+        if self.method_args is None:
+            return {}
 
-        if not self.method_params:
-            return dict()
+        # Get method type hints
+        type_hints = self.get_method_arg_type_hints()
 
-        # Convert names back to snake_case
-        params = {
-            CaseUtil.pascal_to_snake_case(param_name): param_value
-            for param_name, param_value in self.method_params.items()
-        }
+        # Decode str arguments to dict
+        serialized_args = JsonEncoders.COMPACT.decode(self.method_args)
 
-        # Get param details from method callable
-        param_details = self._get_method_param_details(method_callable)
+        # Deserialize dict method arguments using method type hints
+        return {k: _json_serializer.deserialize(v, type_hints.get(k)) for k, v in serialized_args.items()}
 
-        # Deserialize each param value
-        for param_name, param_value in params.items():
+    @classmethod
+    def _encode_args(cls, args: dict[str, Any], type_hints: dict[str, TypeHint]) -> str:
+        """Serialize and encode method args in dict format to str."""
 
-            # Create TypeHint for parameter
-            type_hint = (
-                TypeHint.for_type_alias(
-                    type_alias=_param_details.annot, containing_type=self.__class__, field_name=param_name
-                )
-                if (_param_details := param_details.get(param_name)) is not None
-                else None
-            )
+        # Serialize dict arguments using method type hints
+        serialized_args = {k: _json_serializer.serialize(v, type_hints.get(k)) for k, v in args.items()}
 
-            param_value = _UI_SERIALIZER.deserialize(param_value, type_hint=type_hint)
-
-            # Assign deserialized value instead of dict
-            params[param_name] = param_value
-
-        return params
+        # Encode serialized args from dict to str
+        return JsonEncoders.COMPACT.encode(serialized_args)
 
     @classmethod
     def _title_handler_name(cls, handler_name: str) -> str:

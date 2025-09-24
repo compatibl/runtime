@@ -13,11 +13,19 @@
   "record_as_base_key_field": {
     "_type": "StubDataclassPolymorphic",
     "id": "abc",
-    "record_field": "record_field"
+    "record_field": "record_field",
+    "root_key_field": {
+      "_type": "StubDataclassKey",
+      "id": "abc"
+    }
   },
   "record_as_root_key_field": {
     "_type": "StubDataclassPolymorphic",
     "id": "abc",
-    "record_field": "record_field"
+    "record_field": "record_field",
+    "root_key_field": {
+      "_type": "StubDataclassKey",
+      "id": "abc"
+    }
   }
 }

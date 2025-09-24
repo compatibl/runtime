@@ -23,38 +23,37 @@ _simple_handler_submit_request = SubmitRequest(
 _handler_with_primitive_args_and_result_request = SubmitRequest(
     type="StubPydanticHandlers",
     method="HandlerWithPrimitiveArgsAndResult",
-    arguments={ # noqa
+    arguments={  # noqa
         "StrArg": "str_value",
         "IntArg": 22,
         "FloatArg": 33.3,
-    }
+    },
 )
 
 _handler_with_mixed_args_and_result_request = SubmitRequest(
     type="StubPydanticHandlers",
     method="HandlerWithMixedArgsAndResult",
-    arguments={ # noqa
+    arguments={  # noqa
         "StrArg": "str_value",
         "GenericKeyArg": "StubPydanticKey;stub_generic_key_id1",
-        "RecordArg": {
-            "_t": "StubPydanticNestedFields"
-        },
-        "DataArg": {
-            "_t": "StubPydanticData"
-        },
+        "RecordArg": {"_t": "StubPydanticNestedFields"},
+        "DataArg": {"_t": "StubPydanticData"},
         "KeyArg": "stub_key_id1",
         "EnumArg": "EnumValue1",
-    }
+    },
 )
+
 
 def test_method_simple_handler():
     response = RunResponseUtil.get_response(_simple_handler_submit_request)
     assert response == [None]
 
+
 def test_method_handler_with_primitive_args_and_result():
     response = RunResponseUtil.get_response(_handler_with_primitive_args_and_result_request)
     assert response == ["Completed"]
 
+
 def test_method_handler_with_mixed_args_and_result():
     response = RunResponseUtil.get_response(_handler_with_mixed_args_and_result_request)
-    ...
+    assert response == [{"Id": "abc", "_t": "StubPydantic"}]

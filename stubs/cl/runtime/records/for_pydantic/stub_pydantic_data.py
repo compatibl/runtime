@@ -23,5 +23,3 @@ class StubPydanticData(PydanticMixin):
 
     data_field_2: int | None = 11
     """Stub field 2."""
-
-

@@ -14,9 +14,10 @@
 
 import inspect
 from dataclasses import dataclass
+from types import FunctionType
+from types import MethodType
 from typing import Callable
 from typing import Self
-from typing_extensions import override
 from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -32,6 +33,9 @@ class ClassMethodTask(MethodTask):
     type_: type = required()
     """Class for which the class method is invoked."""
 
+    def get_method_callable(self) -> FunctionType | MethodType:
+        return getattr(self.type_, self.method_name)
+
     def _create_log_context(self) -> TaskLog:
         """Create TaskLog with task specific info."""
         return TaskLog(
@@ -39,17 +43,6 @@ class ClassMethodTask(MethodTask):
             handler=self._title_handler_name(self.method_name),
             task_run_id=self.task_id,
         ).build()
-
-    @override
-    def _execute(self):
-        """Invoke the specified @staticmethod or @classmethod."""
-
-        # Method callable is already bound to cls, it is not necessary to pass cls as an explicit parameter
-        method_name = self.normalized_method_name()
-        method = getattr(self.type_, method_name)
-
-        params = self.deserialized_method_params(method)
-        return method(**params)
 
     @classmethod
     def create(

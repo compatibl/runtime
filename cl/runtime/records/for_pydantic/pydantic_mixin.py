@@ -15,9 +15,9 @@
 from abc import ABC
 from typing import Self
 from memoization import cached
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic.fields import FieldInfo
-
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec

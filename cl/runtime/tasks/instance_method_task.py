@@ -13,9 +13,10 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from types import FunctionType
+from types import MethodType
 from typing import Callable
 from typing import Self
-from typing_extensions import override
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.task_log import TaskLog
@@ -38,6 +39,12 @@ class InstanceMethodTask(MethodTask):
     key: KeyMixin = required()
     """Key of the record for which the method is invoked."""
 
+    def get_method_callable(self) -> FunctionType | MethodType:
+        # Load record from Db
+        record = active(DataSource).load_one(self.key)
+
+        return getattr(record, self.method_name)
+
     def _create_log_context(self) -> TaskLog:
         """Create TaskLog with task specific info."""
         return TaskLog(
@@ -46,20 +53,6 @@ class InstanceMethodTask(MethodTask):
             task_run_id=self.task_id,
             record_key=KeySerializers.DELIMITED.serialize(self.key),
         ).build()
-
-    @override
-    def _execute(self):
-        """Invoke the specified instance method."""
-
-        # Load record from storage
-        record = active(DataSource).load_one(self.key)
-
-        # Convert the name to snake_case and get method callable
-        method_name = self.normalized_method_name()
-        method = getattr(record, method_name)
-
-        params = self.deserialized_method_params(method)
-        return method(**params)
 
     @classmethod
     def create(
