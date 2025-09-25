@@ -13,16 +13,19 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing_extensions import final
+from cl.runtime.db.query_mixin import QueryMixin
+from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.views.view import View
+from cl.runtime.views.view_key import ViewKey
 
 
-@final
-@dataclass(slots=True, kw_only=True)
-class RecordListView(View):
-    """View that displays a list of record specified via their primary keys."""
+@dataclass(slots=True)
+class ViewKeyQuery(DataclassMixin, QueryMixin):
+    """Query all views for given record."""
 
-    records: list[KeyMixin] = required()
-    """Primary keys of the displayed records."""
+    view_for: KeyMixin = required()
+    """Generic key of the record for which the view is provided."""
+
+    def get_target_type(self) -> type[KeyMixin]:
+        return ViewKey

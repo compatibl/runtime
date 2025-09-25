@@ -1,5 +1,5 @@
 _t: RecordView
-ViewFor: media_viewers
+ViewFor: StubViewersKey;media_viewers
 ViewName: dag
 Record:
   _t: Dag

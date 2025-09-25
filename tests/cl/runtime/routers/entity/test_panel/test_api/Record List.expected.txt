@@ -1,5 +1,5 @@
 _t: RecordListView
-ViewFor: data_viewers
+ViewFor: StubViewersKey;data_viewers
 ViewName: record_list
 Records:
 - _t: StubDataclassNestedFields

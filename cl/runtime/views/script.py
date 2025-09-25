@@ -13,17 +13,14 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.views.script_language import ScriptLanguage
+from cl.runtime.views.view import View
 
 
 @dataclass(slots=True, kw_only=True)
-class Script(DataclassMixin):
+class Script(View):
     """Script body element."""
-
-    name: str = required()
-    """Script name."""
 
     language: ScriptLanguage | None = None
     """Script Language."""

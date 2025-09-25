@@ -1,5 +1,5 @@
 _t: RecordView
-ViewFor: data_viewers
+ViewFor: StubViewersKey;data_viewers
 ViewName: nested_fields
 Record:
   _t: StubDataclassNestedFields

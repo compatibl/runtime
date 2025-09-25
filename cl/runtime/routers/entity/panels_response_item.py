@@ -23,6 +23,7 @@ from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.views.view_persistence_util import ViewPersistenceUtil
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
@@ -36,6 +37,9 @@ class PanelsResponseItem(BaseModel):
     kind: str | None
     """Type of the record, e.g. Primary."""
 
+    persistable: bool | None
+    """Whether the panel is persistent."""
+
     class Config:
         alias_generator = CaseUtil.snake_to_pascal_case
         populate_by_name = True
@@ -47,6 +51,8 @@ class PanelsResponseItem(BaseModel):
         record_type = TypeInfo.from_type_name(request.type_name)
         key_type = record_type.get_key_type()
 
+        persisted_views = []
+
         # Get actual type from record if request.key is not None
         if request.key is not None:
             # Deserialize ui key
@@ -55,19 +61,35 @@ class PanelsResponseItem(BaseModel):
             # If the record is not found, display panel tabs for the base type
             record = active(DataSource).load_one_or_none(key)
             actual_type = record_type if record is None else type(record)
+            if record is not None:
+                # Get persisted views for this record
+                persisted_views = ViewPersistenceUtil.load_all_views_for_record(record)
         else:
             actual_type = record_type
 
         # Get handlers from TypeDecl
         handlers = declare.handlers if (declare := TypeDecl.for_type(actual_type).declare) is not None else None
 
-        if handlers is not None and handlers:
-            return [
-                PanelsResponseItem(name=handler.label, kind=cls.get_panel_kind(handler))
+        result = [
+            PanelsResponseItem(
+                name=persisted_view.view_name,
+                kind=ViewPersistenceUtil.get_panel_kind_from_view(persisted_view),
+                persistable=True,
+            )
+            for persisted_view in persisted_views
+        ]
+
+        if handlers:
+            result += [
+                PanelsResponseItem(
+                    name=handler.label,
+                    kind=cls.get_panel_kind(handler),
+                    persistable=False,
+                )
                 for handler in handlers
                 if handler.type_ == "Viewer"
             ]
-        return []
+        return result
 
     @classmethod
     def get_panel_kind(cls, handler: HandlerDeclareDecl) -> str | None:

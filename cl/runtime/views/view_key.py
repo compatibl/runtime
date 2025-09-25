@@ -22,8 +22,8 @@ from cl.runtime.records.key_mixin import KeyMixin
 class ViewKey(DataclassMixin, KeyMixin):
     """This type is returned from a viewer method as object or key."""
 
-    view_for: str = required()
-    """Generic key in ClassName;key_field_1;key_field_2 format of the record for which the view is provided."""
+    view_for: KeyMixin = required()
+    """Generic key of the record for which the view is provided."""
 
     view_name: str = required()
     """Name of the view displayed in the front end."""

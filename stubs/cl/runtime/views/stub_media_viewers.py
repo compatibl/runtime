@@ -126,7 +126,7 @@ class StubMediaViewers(StubViewers):
         """Stub viewer returning a Markdown text."""
 
         return Script(
-            name="Stub markdown text.",
+            view_name="Stub markdown text.",
             language=ScriptLanguage.MARKDOWN,
             body=[
                 "# Test markdown.",

@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from typing_extensions import final
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.views.view import View
 
 
@@ -23,5 +24,5 @@ from cl.runtime.views.view import View
 class RecordView(View):
     """View that displays another record specified via its primary key."""
 
-    record: str = required()
+    record: KeyMixin = required()
     """Primary key of the displayed record."""
