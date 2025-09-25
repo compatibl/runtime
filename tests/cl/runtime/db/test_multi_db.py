@@ -40,6 +40,7 @@ from stubs.cl.runtime import StubDataclassTupleFields
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_aliased import StubDataclassAliased
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_numpy_fields import StubDataclassNumpyFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composite import (
     StubDataclassPolymorphicComposite,
@@ -83,6 +84,7 @@ _SAMPLES = [
             base_key_field=StubDataclassPolymorphicKey(id="abc18"),
             root_key_field=StubDataclassPolymorphicKey(id="abc18"),
         ),
+        StubDataclassNumpyFields(),
     ]
 ]
 
@@ -301,13 +303,13 @@ def test_load_query_sort_order(multi_db_fixture):
     error_records = [
         StubDataclassDerived(
             derived_str_field="Error",
-            id=str(time.time()+i),
+            id=f"A{i}",
         ).build() for i in range(5)
     ]
     info_records = [
         StubDataclassDerived(
             derived_str_field="Info",
-            id=str(time.time() + i),
+            id=f"B{i}",
         ).build() for i in range(6)
     ]
     active(DataSource).insert_many(error_records + info_records, commit=True)
