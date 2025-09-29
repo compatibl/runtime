@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import logging
+
+from typing_extensions import Any
+
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
-from cl.runtime.serializers.data_serializers import DataSerializers
 from stubs.cl.runtime import StubIntEnum
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic import StubPydantic
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic_data import StubPydanticData
@@ -63,7 +65,7 @@ class StubPydanticHandlers(StubPydanticHandlersKey, RecordMixin):
         data_arg: StubPydanticData,
         key_arg: StubPydanticHandlersKey,
         enum_arg: StubIntEnum,
-    ):
+    ) -> StubPydantic:
         """Handler with mixed-type args and result."""
 
         PytestUtil.log_method_info(_logger)
@@ -87,4 +89,15 @@ class StubPydanticHandlers(StubPydanticHandlersKey, RecordMixin):
         if not isinstance(enum_arg, StubIntEnum):
             raise RuntimeError(f"The type of 'enum_arg' is '{type(enum_arg)}' rather than {typename(StubIntEnum)}.")
 
-        return DataSerializers.FOR_UI.serialize(StubPydantic().build())
+        return StubPydantic().build()
+
+    @classmethod
+    def run_handler_with_dict_result(cls) -> dict[str, Any]:
+        """Handler with dict result."""
+        return {
+            "Result": {
+                "Messages": ["msg_1", "msg_2"],
+                "Value": 123,
+                "Name": "stub_name"
+            }
+        }

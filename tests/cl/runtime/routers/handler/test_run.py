@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.handler.run_response_util import RunResponseUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
+from stubs.cl.runtime.records.for_pydantic.stub_pydantic import StubPydantic
 
-_simple_handler_submit_request = SubmitRequest(
+
+_simple_handler_request = SubmitRequest(
     type="StubPydanticHandlers",
     method="SimpleHandler",
 )
@@ -43,9 +46,29 @@ _handler_with_mixed_args_and_result_request = SubmitRequest(
     },
 )
 
+_handler_with_dict_result_request = SubmitRequest(
+    type="StubPydanticHandlers",
+    method="HandlerWithDictResult",
+)
+
+
+def _api_run(run_request: SubmitRequest):
+    """Execute run request with test API client."""
+    request_body = run_request.model_dump()
+
+    with QaClient() as test_client:
+        response = test_client.post("/handler/run", json=request_body)
+        assert response.status_code == 200
+        return response.json()
+
 
 def test_method_simple_handler():
-    response = RunResponseUtil.get_response(_simple_handler_submit_request)
+    response = RunResponseUtil.get_response(_simple_handler_request)
+    assert response == [None]
+
+
+def test_api_simple_method():
+    response = _api_run(_simple_handler_request)
     assert response == [None]
 
 
@@ -54,6 +77,30 @@ def test_method_handler_with_primitive_args_and_result():
     assert response == ["Completed"]
 
 
+def test_api_handler_with_primitive_args_and_result():
+    response = _api_run(_handler_with_primitive_args_and_result_request)
+    assert response == ["Completed"]
+
+
 def test_method_handler_with_mixed_args_and_result():
     response = RunResponseUtil.get_response(_handler_with_mixed_args_and_result_request)
-    assert response == [{"Id": "abc", "_t": "StubPydantic"}]
+    assert len(response) == 1
+    assert isinstance(response[0], StubPydantic)
+
+
+def test_api_handler_with_mixed_args_and_result():
+    response = _api_run(_handler_with_mixed_args_and_result_request)
+    assert len(response) == 1
+    assert response[0] == StubPydantic().build().model_dump()
+
+
+def test_method_handler_with_dict_result():
+    response = RunResponseUtil.get_response(_handler_with_dict_result_request)
+    assert len(response) == 1
+    assert response[0] is not None
+
+
+def test_api_handler_with_dict_result():
+    response = _api_run(_handler_with_dict_result_request)
+    assert len(response) == 1
+    assert response[0] is not None
