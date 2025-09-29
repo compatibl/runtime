@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
 from typing import Any
 from typing import cast
 from inflection import titleize
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
+from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
@@ -37,8 +36,7 @@ _UI_SERIALIZER = DataSerializers.FOR_UI
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
-@dataclass(slots=True)
-class DataService(DataclassMixin):
+class DataService(PydanticMixin):
     """Service class for data-related actions."""
 
     @classmethod

@@ -92,9 +92,10 @@ class StubPydanticHandlers(StubPydanticHandlersKey, RecordMixin):
         return StubPydantic().build()
 
     @classmethod
-    def run_handler_with_dict_result(cls) -> dict[str, Any]:
+    def run_handler_with_dict_result(cls) -> None:
         """Handler with dict result."""
-        return {
+        # TODO (Roman): Review dict[str, Any] support
+        return {  # noqa
             "Result": {
                 "Messages": ["msg_1", "msg_2"],
                 "Value": 123,
