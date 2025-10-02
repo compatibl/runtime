@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing import Any
-from typing import Iterable
 from typing_extensions import Final
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
@@ -37,7 +36,7 @@ class UiLogUtil(DataclassMixin):
     """UI logs util class."""
 
     @classmethod
-    def run_get_flat_logs(cls) -> dict[str, Any]:
+    def run_get_flat_logs(cls) -> list[dict[str, Any]]:
         """Return a list of the last N log messages, sorted by timestamp in ascending order."""
         log_messages = active(DataSource).load_all(
             key_type=LogMessage().get_key_type(),
@@ -45,10 +44,10 @@ class UiLogUtil(DataclassMixin):
             sort_order=SortOrder.DESC,
         )[::-1]
 
-        return cls._wrap_to_result(log_messages)
+        return list(_UI_SERIALIZER.serialize(x) for x in log_messages)
 
     @classmethod
-    def run_get_error_logs(cls) -> dict[str, Any]:
+    def run_get_error_logs(cls) -> list[dict[str, Any]]:
         """Return a list of the last N error log messages, sorted by timestamp in ascending order."""
 
         log_messages = [
@@ -59,7 +58,7 @@ class UiLogUtil(DataclassMixin):
             ) if log.level.lower() == "error"
         ][::-1]
 
-        return cls._wrap_to_result(log_messages)
+        return list(_UI_SERIALIZER.serialize(x) for x in log_messages)
 
     @classmethod
     def _get_task_status(cls, task_run_id: str) -> TaskStatus:
@@ -77,7 +76,7 @@ class UiLogUtil(DataclassMixin):
         return task.status
 
     @classmethod
-    def run_get_logs_by_task(cls) -> dict[str, Any]:
+    def run_get_logs_by_task(cls) -> list[dict[str, Any]]:
         """Return last N log messages aggregated by task_run_id and sorted by timestamp in ascending order."""
 
         result = {}
@@ -106,9 +105,4 @@ class UiLogUtil(DataclassMixin):
 
             result[task_run_id].logs.append(log_message)
 
-        return cls._wrap_to_result(result.values())
-
-    @classmethod
-    def _wrap_to_result(cls, result: Iterable[Any]) -> dict[str, Any]:
-        serialized_result = list(_UI_SERIALIZER.serialize(x) for x in result)
-        return {"Result": serialized_result}
+        return list(_UI_SERIALIZER.serialize(x) for x in result.values())
