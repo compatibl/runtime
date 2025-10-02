@@ -98,7 +98,7 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
                 if h.type_ == "Viewer"
             ]
 
-        return {"Result": result}
+        return result
 
     @classmethod
     def run_load_record_panel(
@@ -111,7 +111,7 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
         """Load the content of the record's viewer and return in dictionary format."""
 
         try:
-            return {"Result": cls._get_panel_content(type_name, key, panel_id, params)}
+            return cls._get_panel_content(type_name, key, panel_id, params)
         except Exception as e:
             # Log exception manually because the FastAPI logger will not be triggered.
             _LOGGER.error(str(e), exc_info=True)
@@ -131,7 +131,7 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
                 word_wrap=True,
             )
             # Return custom error response.
-            return {"Result": _UI_SERIALIZER.serialize(error_view)}
+            return _UI_SERIALIZER.serialize(error_view)
 
     @classmethod
     def _get_panel_kind(cls, handler: HandlerDeclareDecl) -> str | None:
