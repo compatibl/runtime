@@ -258,6 +258,11 @@ declare:
     label: Long Handler With Error
     type_: Job
     static: false
+  - name: save_to_db
+    label: Save To Db
+    comment: Stub method.
+    type_: Job
+    static: false
   - name: static_method_1a
     label: Static Method 1A
     comment: Stub handler.

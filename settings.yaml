@@ -52,10 +52,8 @@ testing:
   # Documented in QaSettings class
   qa_db_types:
     - SqliteDb
+    - BasicMongoDb
     - BasicMongoMockDb
-
-  # Documented in DbSettings class
-  db_type: BasicMongoMockDb
 
   # Documented in LogSettings class
   log_filename_prefix: tests

@@ -24,7 +24,7 @@ from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.records.typename import typename
+from stubs.cl.runtime import StubDataclass
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.tasks.class_method_task import ClassMethodTask
 from cl.runtime.tasks.task_util import handler_queue
@@ -235,9 +235,8 @@ class StubHandlers(StubHandlersKey, RecordMixin):
             active(DataSource).replace_one(task, commit=True)
             handler_queue.submit_task(task)
 
-    # TODO (Roman): Uncomment for tasks/test_submit.
-    # def run_save_to_db(self):
-    #     """Stub method."""
-    #     record_to_save = StubDataclass(id="saved_from_handler").build()
-    #     active(DataSource).replace_one(record_to_save, commit=True)
-    #     _LOGGER.info(f"Record {record_to_save} has been saved to db from handler.")
+    def run_save_to_db(self):
+        """Stub method."""
+        record_to_save = StubDataclass(id="saved_from_handler").build()
+        active(DataSource).replace_one(record_to_save, commit=True)
+        _LOGGER.info(f"Record {record_to_save} has been saved to db from handler.")

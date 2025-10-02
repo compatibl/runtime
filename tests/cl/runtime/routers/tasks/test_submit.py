@@ -32,12 +32,15 @@ def get_simple_requests(key_str: str):
             "dataset": "",
             "type": "StubHandlers",
             "keys": [key_str],
-            "method": "run_instance_method_1b",
+            "arguments": {},
+            "method": "instance_method_1a",
         },
         {
             "dataset": "",
             "type": "StubHandlers",
-            "method": "run_static_method_1a",
+            "method": "static_method_1a",
+            "keys": [],
+            "arguments": {},
         },
     ]
 
@@ -49,12 +52,12 @@ def get_save_to_db_requests(key_str: str):
             "dataset": "",
             "type": "StubHandlers",
             "keys": [key_str],
-            "method": "run_save_to_db",
+            "method": "save_to_db",
+            "arguments": {},
         }
     ]
 
 
-@pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
 def test_method(default_db_fixture, celery_queue_fixture):
     """Test coroutine for /tasks/run route."""
 
@@ -90,11 +93,9 @@ def test_method(default_db_fixture, celery_queue_fixture):
         assert actual_records == expected_records
 
 
-@pytest.mark.skip("Celery tasks lock sqlite db file.")  # TODO (Roman): resolve conflict
-def test_api(celery_queue_fixture):
+def test_api(default_db_fixture, celery_queue_fixture):
     """Test REST API for /tasks/submit route."""
-
-    stub_handlers = StubHandlers()
+    stub_handlers = StubHandlers().build()
     key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())
     active(DataSource).replace_one(stub_handlers, commit=True)
 
@@ -122,8 +123,8 @@ def test_api(celery_queue_fixture):
 
             test_client.post("/tasks/submit", json=request)
             request_object = SubmitRequest(**request)
-            response_items = SubmitResponseItem.run_tasks(request_object)
-            [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id)) for response_item in response_items]
+            response_items = SubmitResponseItem.get_response(request_object)
+            [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build()) for response_item in response_items]
             actual_records = list(active(DataSource).load_many(expected_keys))
             assert actual_records == expected_records
 
