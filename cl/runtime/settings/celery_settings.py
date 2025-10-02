@@ -24,6 +24,9 @@ from cl.runtime.settings.settings import Settings
 class CelerySettings(Settings):
     """Celery settings."""
 
+    celery_is_embedded_worker: bool = True
+    """Flag that indicates whether the Celery worker runs embedded within the backend process."""
+
     celery_broker: str = "sqlite"
     """Celery broker to be used."""
 
@@ -33,7 +36,7 @@ class CelerySettings(Settings):
     celery_broker_queue: str = "celery"
     """Celery broker queue."""
 
-    celery_workers: int = 6
+    celery_workers: int = 2
     """Maximum number of workers for Celery."""
 
     celery_max_retries: int = 0
@@ -42,7 +45,7 @@ class CelerySettings(Settings):
     celery_time_limit: int = 3600 * 2
     """Time limit for Celery tasks in seconds."""
 
-    celery_pool_type: str = "threads"
+    celery_pool_type: str = "solo"
     """Pool type for Celery workers."""
 
     def __init(self) -> None:

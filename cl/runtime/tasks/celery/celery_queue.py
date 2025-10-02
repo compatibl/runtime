@@ -16,7 +16,7 @@ import logging.config
 import multiprocessing
 import os
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 from typing import Final
 from urllib.parse import urlparse
 
@@ -155,33 +155,36 @@ def celery_delete_existing_tasks() -> None:
             connection.close()
 
 
-def celery_start_queue() -> None:
-    """
-    Start Celery workers (will exit when the current process exits).
-
-    Args:
-        log_dir: Directory where Celery console log file will be written
-    """
-    worker_process = multiprocessing.Process(
-        target=celery_start_queue_callable, daemon=True, kwargs={"log_config": logging_config}
-    )
-    worker_process.start()
-
-
 @dataclass(slots=True, kw_only=True)
 class CeleryQueue(TaskQueue):
     """Execute tasks using Celery."""
 
+    __celery_worker_process: Optional[multiprocessing.Process] = None
+
     # max_workers: int = required()  # TODO: Implement support for max_workers
     """The maximum number of processes running concurrently."""
 
-    # TODO: @abstractmethod
-    def run_start_queue(self) -> None:
+    @classmethod
+    def run_start_queue(cls) -> None:
         """Start queue workers."""
+        worker_process = multiprocessing.Process(
+            target=celery_start_queue_callable,
+            daemon=True,
+            kwargs={"log_config": logging_config},
+        )
+        worker_process.start()
 
-    # TODO: @abstractmethod
-    def run_stop_queue(self) -> None:
+        cls.__celery_worker_process = worker_process
+
+    @classmethod
+    def run_stop_queue(cls) -> None:
         """Cancel all active runs and stop queue workers."""
+        if cls.__celery_worker_process is not None:
+            # TODO: graceful shutdown of the celery_app
+            cls.__celery_worker_process.terminate()
+            cls.__celery_worker_process.join()
+            cls.__celery_worker_process = None
+            celery_delete_existing_tasks()
 
     def submit_task(self, task: TaskKey):
 

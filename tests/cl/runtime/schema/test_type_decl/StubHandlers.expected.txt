@@ -105,6 +105,11 @@ declare:
           comment: Embedded binary content to be displayed as the current view.
       name: PdfFile
     static: true
+  - name: generate_list_of_long_handlers
+    label: Generate List Of Long Handlers
+    comment: Generate a lot of long handlers.
+    type_: Job
+    static: true
   - name: instance_method_1a
     label: Instance Method 1A
     comment: Stub handler.
@@ -248,7 +253,7 @@ declare:
   - name: long_handler
     label: Long Handler
     type_: Job
-    static: false
+    static: true
   - name: long_handler_with_error
     label: Long Handler With Error
     type_: Job

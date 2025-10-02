@@ -33,8 +33,8 @@ from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.env_kind import EnvKind
+from cl.runtime.tasks.celery.celery_queue import celery_app
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
-from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 
 
 def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iterator[Db]:
@@ -130,7 +130,12 @@ def celery_queue_fixture():
     """Pytest session fixture to start Celery test queue for test execution."""
     print("Starting celery workers, will delete the existing tasks.")
     celery_delete_existing_tasks()
-    celery_start_queue()  # TODO: Make test celery a separate queue
+
+    celery_app.conf.update(
+        task_always_eager=True,
+        task_eager_propagates=True
+    )
+
     yield
     celery_delete_existing_tasks()
     print("Stopping celery workers and cleaning up tasks.")

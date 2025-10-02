@@ -29,10 +29,11 @@ from cl.runtime.routers.context_middleware import ContextMiddleware
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.server.env import Env
 from cl.runtime.settings.api_settings import ApiSettings
+from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.settings.preload_settings import PreloadSettings
 from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
-from cl.runtime.tasks.celery.celery_queue import celery_start_queue
 
 # Server
 server_app = FastAPI()
@@ -86,10 +87,11 @@ def run_backend() -> None:
     with activate(Env().build()), activate(DataSource(db=Db.create()).build()):
 
         # TODO: This only works for the Mongo celery backend
-        celery_delete_existing_tasks()
+        if CelerySettings.instance().celery_is_embedded_worker:
+            celery_delete_existing_tasks()
 
-        # Start Celery workers (will exit when the current process exits)
-        celery_start_queue()
+            # Start Celery workers (will exit when the current process exits)
+            CeleryQueue.run_start_queue()
 
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
         PreloadSettings.instance().save_and_configure()
