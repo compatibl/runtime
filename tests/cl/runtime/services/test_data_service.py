@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.services.data_service import DataService
+from cl.runtime.services.data.data_service import DataService
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic import StubDataclassPolymorphic
@@ -25,9 +25,9 @@ def test_screens(default_db_fixture):
 
     # Check that screens are empty when db is empty.
     screens = DataService.run_screens()
-    assert not screens.get("Result").get("Tables")
-    assert not screens.get("Result").get("Types")
-    assert not screens.get("Result").get("Filters")
+    assert not screens.tables
+    assert not screens.types
+    assert not screens.filters
 
     ds: DataSource = active(DataSource)
 
@@ -42,12 +42,12 @@ def test_screens(default_db_fixture):
 
     # Check screens data
     screens = DataService.run_screens()
-    assert set(x.get("TableName") for x in screens.get("Result").get("Tables")) == {
+    assert set(x.table_name for x in screens.tables) == {
         "StubDataclassKey",
         "StubDataclassPolymorphicKey",
         "RecordTypePresenceKey",
     }
-    assert set(x.get("TypeName") for x in screens.get("Result").get("Types")) == {
+    assert set(x.type_name for x in screens.types) == {
         "StubDataclass",
         "StubDataclassDerived",
         "StubDataclassPolymorphic",
@@ -59,13 +59,13 @@ def test_select(default_db_fixture):
 
     # Check that select results are empty when db is empty
     select_table = DataService.run_select_table(table_name="StubDataclassKey")
-    assert not select_table.get("Result").get("Data")
+    assert not select_table.data
 
     select_type = DataService.run_select_type(type_name="StubDataclass")
-    assert not select_type.get("Result").get("Data")
+    assert not select_type.data
 
     select_derived_type = DataService.run_select_type(type_name="StubDataclassDerived")
-    assert not select_derived_type.get("Result").get("Data")
+    assert not select_derived_type.data
 
     ds: DataSource = active(DataSource)
 
@@ -81,7 +81,7 @@ def test_select(default_db_fixture):
 
     # Check select results
     select_table = DataService.run_select_table(table_name="StubDataclassKey")
-    assert set(x.get("Id") for x in select_table.get("Result").get("Data")) == {
+    assert set(x.get("Id") for x in select_table.data) == {
         "stub_1",
         "stub_2",
         "stub_derived_1",
@@ -89,7 +89,7 @@ def test_select(default_db_fixture):
     }
 
     select_type = DataService.run_select_type(type_name="StubDataclass")
-    assert set(x.get("Id") for x in select_type.get("Result").get("Data")) == {
+    assert set(x.get("Id") for x in select_type.data) == {
         "stub_1",
         "stub_2",
         "stub_derived_1",
@@ -97,7 +97,7 @@ def test_select(default_db_fixture):
     }
 
     select_derived_type = DataService.run_select_type(type_name="StubDataclassDerived")
-    assert set(x.get("Id") for x in select_derived_type.get("Result").get("Data")) == {
+    assert set(x.get("Id") for x in select_derived_type.data) == {
         "stub_derived_1",
         "stub_derived_2",
     }

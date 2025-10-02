@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
 from typing import cast
 from inflection import titleize
 from cl.runtime.contexts.context_manager import active
@@ -27,9 +26,10 @@ from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.serializers.type_hints import TypeHints
-from cl.runtime.services.screens import Screens
-from cl.runtime.services.table_screen_item import TableScreenItem
-from cl.runtime.services.type_screen_item import TypeScreenItem
+from cl.runtime.services.data.screens_response import ScreensResponse
+from cl.runtime.services.data.select_data_response import SelectDataResponse
+from cl.runtime.services.data.table_screen_item import TableScreenItem
+from cl.runtime.services.data.type_screen_item import TypeScreenItem
 
 # Create serializers
 _UI_SERIALIZER = DataSerializers.FOR_UI
@@ -40,7 +40,7 @@ class DataService(PydanticMixin):
     """Service class for data-related actions."""
 
     @classmethod
-    def run_screens(cls) -> dict[str, Any]:
+    def run_screens(cls) -> ScreensResponse:
         """Return data about screens that can be opened according to records in DB."""
 
         ds = active(DataSource)
@@ -68,16 +68,16 @@ class DataService(PydanticMixin):
         # Build 'filters' as a list of queries stored in db
         filters = []
 
-        screens = Screens(
+        screens = ScreensResponse(
             tables=tables,
             types=types,
             filters=filters,
         )
 
-        return cls._wrap_to_result(_UI_SERIALIZER.serialize(screens))
+        return screens
 
     @classmethod
-    def run_select_table(cls, table_name: str, skip: int | None = None, limit: int | None = None):
+    def run_select_table(cls, table_name: str, skip: int | None = None, limit: int | None = None) -> SelectDataResponse:
         """Select records by table from DB."""
 
         # Get types stored in DB
@@ -95,21 +95,19 @@ class DataService(PydanticMixin):
         # Get schema dict for type
         schema_dict = cls._get_schema_dict(common_base_record_type)
 
-        # TODO (Roman): Include '_key' in UI serialization format
         # Serialize records in UI format and add '_key' attribute
         data = [{**_UI_SERIALIZER.serialize(x), "_key": _KEY_SERIALIZER.serialize(x.get_key())} for x in records]
 
-        # TODO (Roman): Replace dict response with serializable data model
-        result = {
-            "Data": data,
-            "Schema": schema_dict,
-            "BaseType": _UI_SERIALIZER.serialize(common_base_record_type, TypeHints.TYPE_OR_NONE),
-        }
+        result = SelectDataResponse(
+            data=data,
+            schema_=schema_dict,  # noqa
+            base_type=_UI_SERIALIZER.serialize(common_base_record_type, TypeHints.TYPE_OR_NONE),
+        )
 
-        return cls._wrap_to_result(result)
+        return result
 
     @classmethod
-    def run_select_type(cls, type_name: str, skip: int | None = None, limit: int | None = None):
+    def run_select_type(cls, type_name: str, skip: int | None = None, limit: int | None = None) -> SelectDataResponse:
         """Select records by type from DB."""
 
         # Get types stored in DB
@@ -122,28 +120,22 @@ class DataService(PydanticMixin):
         # Get schema dict for type
         schema_dict = cls._get_schema_dict(type_)
 
-        # TODO (Roman): Include '_key' in UI serialization format
         # Serialize records in UI format and add '_key' attribute
         data = [{**_UI_SERIALIZER.serialize(x), "_key": _KEY_SERIALIZER.serialize(x.get_key())} for x in records]
 
-        # TODO (Roman): Replace dict response with serializable data model
-        result = {
-            "Data": data,
-            "Schema": schema_dict,
-            "BaseType": _UI_SERIALIZER.serialize(type_, TypeHints.TYPE_OR_NONE),
-        }
-        return cls._wrap_to_result(result)
+        result = SelectDataResponse(
+            data=data,
+            schema_=schema_dict,  # noqa
+            base_type=_UI_SERIALIZER.serialize(type_, TypeHints.TYPE_OR_NONE),
+        )
+
+        return result
 
     @classmethod
     def run_select_filter(cls, table_name: str, filter_name: str):
         """Select records by filter from DB."""
 
         raise NotImplementedError("Select by filter currently is not supported.")
-
-    @classmethod
-    def _wrap_to_result(cls, result: Any) -> dict[str, Any]:
-        # TODO (Roman): Temporary conversion according to the current UI format. Needs to be refactored
-        return {"Result": result}
 
     @classmethod
     def _get_schema_dict(cls, type_: type | None) -> dict[str, dict]:

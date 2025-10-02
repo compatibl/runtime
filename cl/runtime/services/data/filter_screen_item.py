@@ -12,17 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
-from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 
 
-@dataclass(slots=True, kw_only=True)
-class TableScreenItem(DataclassMixin):
-    """Single Table screen item."""
+class FilterScreenItem(PydanticMixin):
+    """Single Filter screen item."""
 
-    table_name: str = required()
-    """Table name."""
+    table_name: str
+    """Name of the Table to which the Filter belongs."""
 
-    label: str | None = None
-    """Table label."""
+    filter_name: str
+    """Filter name. Unique within a single table."""

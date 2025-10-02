@@ -18,6 +18,7 @@ from memoization import cached
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic.fields import FieldInfo
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
@@ -27,7 +28,9 @@ from cl.runtime.schema.field_spec import FieldSpec
 class PydanticMixin(BaseModel, DataMixin, ABC):
     """Implements abstract methods in DataMixin for Pydantic-based data, key or record classes."""
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True, alias_generator=CaseUtil.snake_to_pascal_case, populate_by_name=True
+    )
 
     def __init__(self, *args, **kwargs):
         # Support positional args in model __init__
@@ -74,7 +77,7 @@ class PydanticMixin(BaseModel, DataMixin, ABC):
             containing_type=containing_type,
             field_optional=not field_info.is_required(),
             field_subtype=extra_metadata.pop("subtype", None),
-            field_alias=field_info.alias or extra_metadata.pop("name", None),
+            field_alias=None,
             field_label=extra_metadata.pop("label", None),
             field_formatter=extra_metadata.pop("formatter", None),
             descending=extra_metadata.pop("descending", None),

@@ -12,20 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
-from cl.runtime.records.for_dataclasses.extensions import required
+from pydantic import Field
+from typing_extensions import Any
+from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 
 
-@dataclass(slots=True, kw_only=True)
-class TypeScreenItem(DataclassMixin):
-    """Single Type screen item."""
+class SelectDataResponse(PydanticMixin):
+    """Select data response."""
 
-    table_name: str = required()
-    """Name of the Table to which the Type belongs."""
+    data: list[Any]
+    """Selected data."""
 
-    type_name: str = required()
-    """Type name."""
+    schema_: dict[str, Any] = Field(alias="Schema")
+    """Schema dict."""
 
-    label: str | None = None
-    """Type label."""
+    base_type: str
+    """Base type as entry point in schema dict."""

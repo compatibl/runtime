@@ -13,9 +13,6 @@
 # limitations under the License.
 
 import logging
-
-from typing_extensions import Any
-
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_key_type
@@ -95,10 +92,4 @@ class StubPydanticHandlers(StubPydanticHandlersKey, RecordMixin):
     def run_handler_with_dict_result(cls) -> None:
         """Handler with dict result."""
         # TODO (Roman): Review dict[str, Any] support
-        return {  # noqa
-            "Result": {
-                "Messages": ["msg_1", "msg_2"],
-                "Value": 123,
-                "Name": "stub_name"
-            }
-        }
+        return {"Result": {"Messages": ["msg_1", "msg_2"], "Value": 123, "Name": "stub_name"}}  # noqa

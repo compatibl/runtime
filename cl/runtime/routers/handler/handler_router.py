@@ -19,7 +19,7 @@ from fastapi import Body
 from fastapi import Depends
 from cl.runtime.routers.dependencies.context_headers import ContextHeaders
 from cl.runtime.routers.dependencies.context_headers import get_context_headers
-from cl.runtime.routers.handler.run_response_util import RunResponseUtil
+from cl.runtime.routers.handler.run_response_item import RunResponseItem
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.routers.tasks.submit_request_body import SubmitRequestBody
 
@@ -33,7 +33,7 @@ async def post_run(
 ) -> Any:
     """Run handler in main process."""
 
-    return RunResponseUtil.get_response(
+    return RunResponseItem.get_response(
         SubmitRequest(
             user=context_headers.user,
             env=context_headers.env,

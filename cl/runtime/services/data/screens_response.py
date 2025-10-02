@@ -12,23 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from dataclasses import dataclass
-from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
-from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.services.filter_screen_item import FilterScreenItem
-from cl.runtime.services.table_screen_item import TableScreenItem
-from cl.runtime.services.type_screen_item import TypeScreenItem
+from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
+from cl.runtime.services.data.filter_screen_item import FilterScreenItem
+from cl.runtime.services.data.table_screen_item import TableScreenItem
+from cl.runtime.services.data.type_screen_item import TypeScreenItem
 
 
-@dataclass(slots=True, kw_only=True)
-class Screens(DataclassMixin):
+class ScreensResponse(PydanticMixin):
     """Class for screens data."""
 
-    tables: list[TableScreenItem] = required()
+    tables: list[TableScreenItem]
     """List of Tables that can be selected."""
 
-    types: list[TypeScreenItem] = required()
+    types: list[TypeScreenItem]
     """List of Types that can be selected."""
 
-    filters: list[FilterScreenItem] = required()
+    filters: list[FilterScreenItem]
     """List of Filters that can be selected."""

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from typing_extensions import Any
+from typing_extensions import Self
+from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.task_util import TaskUtil
@@ -21,17 +23,20 @@ from cl.runtime.tasks.task_util import TaskUtil
 _UI_SERIALIZER = DataSerializers.FOR_UI
 
 
-class RunResponseUtil:
-    """Response util for the /handler/run route."""
+class RunResponseItem(PydanticMixin):
+    """Response item for the /handler/run route."""
+
+    result: Any
+    """Run result."""
 
     @classmethod
-    def get_response(cls, request: SubmitRequest) -> list[Any]:
+    def get_response(cls, request: SubmitRequest) -> list[Self]:
 
         results = []
         for handler_task in TaskUtil.create_tasks_for_submit_request(request):
             # Run task as callable in main process
             handler_result = handler_task.run_task_in_process()
 
-            results.append(handler_result)
+            results.append(cls(result=handler_result))
 
         return results
