@@ -26,6 +26,12 @@ cl.UiAppState:
     Vector: true
     Optional: true
   - Value:
+      Type: String
+    Name: Favorites
+    Comment: Information about favorite tables, types and filters.
+    Vector: true
+    Optional: true
+  - Value:
       Type: Int
     Name: ActiveTabIndex
     Comment: Index of active opened tab.

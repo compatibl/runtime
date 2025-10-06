@@ -28,6 +28,9 @@ class UiAppState(UiAppStateKey, RecordMixin):
     opened_tabs: list[TabInfo] | None = None
     """Information about opened tabs."""
 
+    favorites: list[str] | None = None
+    """Information about favorite tables, types and filters."""
+
     active_tab_index: int | None = None
     """Index of active opened tab."""
 

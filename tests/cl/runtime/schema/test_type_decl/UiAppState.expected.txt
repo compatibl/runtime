@@ -25,6 +25,12 @@ elements:
   vector: true
   optional: true
 - value:
+    type_: String
+  name: Favorites
+  comment: Information about favorite tables, types and filters.
+  vector: true
+  optional: true
+- value:
     type_: Int
   name: ActiveTabIndex
   comment: Index of active opened tab.

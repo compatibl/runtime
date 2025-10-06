@@ -10,6 +10,12 @@ fields:
     optional: true
     remaining:
       schema_type: TabInfo
+- field_name: favorites
+  field_type_hint:
+    schema_type: list
+    optional: true
+    remaining:
+      schema_type: str
 - field_name: active_tab_index
   field_type_hint:
     schema_type: int
