@@ -548,12 +548,13 @@ class TypeInfo(BootstrapMixin):
                     )
 
                 # Create type info object without child class names
+                # Invoking build imports the class and updates type_info.type_ in cache so it does not have to be imported again
                 type_info = TypeInfo(
                     type_name=type_name,
                     type_kind=EnumUtil.from_str(TypeKind, type_kind),
                     qual_name=qual_name,
                     subtype=subtype,
-                )
+                ).build()
 
                 # Add to the type info dictionary
                 existing_info = cls._type_info_dict.setdefault(type_info.type_name, type_info)
