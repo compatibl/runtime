@@ -258,6 +258,10 @@ class TypeInfo(BootstrapMixin):
             type_: Type for which the result is returned
             type_kind: Restrict to the specified type kind if provided (optional)
         """
+
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
         # Get types
         result_types = cls.get_parent_and_self_types(type_, type_kind=type_kind)
         # Convert to names and sort
@@ -273,6 +277,10 @@ class TypeInfo(BootstrapMixin):
             type_: Type for which the result is returned
             type_kind: Restrict to the specified type kind if provided (optional)
         """
+
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
         # Get filtered list of MRO types
         result = cls._get_data_key_or_record_types(type_.mro(), type_kind=type_kind)
         return result
@@ -288,6 +296,10 @@ class TypeInfo(BootstrapMixin):
             type_: Type for which the result is returned
             type_kind: Restrict to the specified type kind if provided (optional)
         """
+
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
         # Get types
         result_types = cls.get_child_and_self_types(type_, type_kind=type_kind)
         # Convert to names and sort
@@ -304,6 +316,10 @@ class TypeInfo(BootstrapMixin):
             type_: Type for which the result is returned
             type_kind: Restrict to the specified type kind if provided (optional)
         """
+        
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
+
         # Recursively load subtypes without filtering, because filter may apply to child but not parent
         subtypes_set = tuple(cls._get_unfiltered_child_types_set(type_))
         # Filter and sort
@@ -314,6 +330,9 @@ class TypeInfo(BootstrapMixin):
     @cached
     def get_common_base_type(cls, types: Sequence[type]) -> type:
         """Return PascalCase record type name of the closest common base to the argument types."""
+
+        # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
+        cls._ensure_loaded()
 
         # Ensure the argument is not empty
         if not types:
