@@ -17,7 +17,6 @@ from cl.runtime.log.log_config import logging_config
 from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.tasks.celery.celery_queue import celery_app
 
-
 celery_settings = CelerySettings.instance()
 
 

@@ -16,16 +16,15 @@ import logging.config
 import multiprocessing
 import os
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict
 from typing import Final
+from typing import Optional
 from urllib.parse import urlparse
-
 import pika
 import redis
 from celery import Celery
 from celery.signals import setup_logging
 from pika.exceptions import ChannelClosedByBroker
-
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
@@ -134,9 +133,7 @@ def celery_delete_existing_tasks() -> None:
         # Connect to RabbitMQ
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(
-                host=parsed_uri.hostname,
-                port=parsed_uri.port,
-                credentials=pika.PlainCredentials(user, password)
+                host=parsed_uri.hostname, port=parsed_uri.port, credentials=pika.PlainCredentials(user, password)
             )
         )
         channel = connection.channel()

@@ -19,6 +19,3 @@ from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 @dataclass(slots=True, kw_only=True)
 class LayoutElementBase(DataclassMixin):
     """Base class for layout elements used in the UiTypeLayout."""
-
-
-

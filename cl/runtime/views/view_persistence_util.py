@@ -31,7 +31,6 @@ class ViewPersistenceUtil:
         )
         return persisted_view
 
-
     @staticmethod
     def load_all_views_for_record(record: KeyMixin) -> list[View]:
         """Load all persisted views for a record."""
@@ -42,7 +41,7 @@ class ViewPersistenceUtil:
         return list(persisted_views)
 
     @staticmethod
-    def get_panel_kind_from_view(view: View) ->  str | None:
+    def get_panel_kind_from_view(view: View) -> str | None:
         """Get type of the view."""
         if view.view_name == "view_self":
             return "Primary"

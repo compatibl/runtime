@@ -89,11 +89,7 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
 
         if handlers:
             result += [
-                {
-                    "Name": h.label,
-                    "Kind": cls._get_panel_kind(h),
-                    "Persistable": False
-                }
+                {"Name": h.label, "Kind": cls._get_panel_kind(h), "Persistable": False}
                 for h in handlers
                 if h.type_ == "Viewer"
             ]

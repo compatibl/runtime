@@ -134,10 +134,7 @@ def celery_queue_fixture():
     # Here we configure Celery to run in "eager mode":
     # tasks are executed right away in the current process,
     # without starting a worker or using the broker.
-    celery_app.conf.update(
-        task_always_eager=True,
-        task_eager_propagates=True
-    )
+    celery_app.conf.update(task_always_eager=True, task_eager_propagates=True)
 
     yield
     celery_delete_existing_tasks()

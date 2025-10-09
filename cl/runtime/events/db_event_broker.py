@@ -46,11 +46,9 @@ async def _pull_events(queue: asyncio.Queue):
     while True:
         # Get unprocessed events from the DB, sorted by ascending timestamp
         # load_all is enough as Event key field is timestamp
-        new_events = active(DataSource).load_all(
-            key_type=Event().get_key_type(),
-            sort_order=SortOrder.DESC,
-            limit=100
-        )[::-1]
+        new_events = active(DataSource).load_all(key_type=Event().get_key_type(), sort_order=SortOrder.DESC, limit=100)[
+            ::-1
+        ]
 
         # Put events to subscribed queues
         for event in new_events:

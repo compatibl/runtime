@@ -51,11 +51,13 @@ class UiLogUtil(DataclassMixin):
         """Return a list of the last N error log messages, sorted by timestamp in ascending order."""
 
         log_messages = [
-            log for log in active(DataSource).load_all(
+            log
+            for log in active(DataSource).load_all(
                 LogMessage().get_key_type(),
                 limit=_LOG_HISTORY_LIMIT,
                 sort_order=SortOrder.DESC,
-            ) if log.level.lower() == "error"
+            )
+            if log.level.lower() == "error"
         ][::-1]
 
         return list(_UI_SERIALIZER.serialize(x) for x in log_messages)
@@ -82,9 +84,7 @@ class UiLogUtil(DataclassMixin):
         result = {}
         for log_message in reversed(
             active(DataSource).load_all(
-                key_type=LogMessage().get_key_type(),
-                limit=_LOG_HISTORY_LIMIT,
-                sort_order=SortOrder.DESC
+                key_type=LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT, sort_order=SortOrder.DESC
             )
         ):
             task_run_id = log_message.task_run_id

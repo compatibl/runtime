@@ -130,7 +130,11 @@ def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
         # Use type_name == "dtype" to include numpy dtype generics
         # Use isinstance(type_, type) to guard issubclass() against unsupported GenericAlias classes.
         # Use issubclass(type_, type) to include ABCMeta and other metaclasses of type.
-        return type_name in PRIMITIVE_TYPE_NAMES or type_name == "dtype" or (isinstance(type_, type) and issubclass(type_, type))
+        return (
+            type_name in PRIMITIVE_TYPE_NAMES
+            or type_name == "dtype"
+            or (isinstance(type_, type) and issubclass(type_, type))
+        )
     else:
         raise RuntimeError(
             f"The argument of is_primitive_type is an instance of type {type(type_).__name__}\n"
@@ -146,7 +150,12 @@ def is_enum_type(type_: type) -> TypeGuard[type[Enum]]:
     # Use type_.__module__ != "enum" to exclude base enum classes.
     # Use not type_name.startswith("_") to exclude private enum classes.
     if (type_name := getattr(type_, "__name__", None)) is not None:
-        return isinstance(type_, type) and issubclass(type_, Enum) and type_.__module__ != "enum" and not type_name.startswith("_")
+        return (
+            isinstance(type_, type)
+            and issubclass(type_, Enum)
+            and type_.__module__ != "enum"
+            and not type_name.startswith("_")
+        )
     else:
         raise RuntimeError(
             f"The argument of is_enum_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."

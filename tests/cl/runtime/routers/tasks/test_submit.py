@@ -124,7 +124,10 @@ def test_api(default_db_fixture, celery_queue_fixture):
             test_client.post("/tasks/submit", json=request)
             request_object = SubmitRequest(**request)
             response_items = SubmitResponseItem.get_response(request_object)
-            [Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build()) for response_item in response_items]
+            [
+                Task.wait_for_completion(TaskKey(task_id=response_item.task_run_id).build())
+                for response_item in response_items
+            ]
             actual_records = list(active(DataSource).load_many(expected_keys))
             assert actual_records == expected_records
 

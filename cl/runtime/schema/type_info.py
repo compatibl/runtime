@@ -316,7 +316,7 @@ class TypeInfo(BootstrapMixin):
             type_: Type for which the result is returned
             type_kind: Restrict to the specified type kind if provided (optional)
         """
-        
+
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 

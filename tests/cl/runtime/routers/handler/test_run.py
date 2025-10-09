@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.handler.run_response_item import RunResponseItem
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
@@ -109,4 +108,3 @@ def test_api_handler_with_dict_result():
 
 if __name__ == "__main__":
     pytest.main([__file__])
-

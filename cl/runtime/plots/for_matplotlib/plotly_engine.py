@@ -57,7 +57,7 @@ class PlotlyEngine(PlottingEngine):
                             opacity=0.8,
                             showlegend=True,
                             name=values.legend,
-                            intensity=values.z
+                            intensity=values.z,
                         )
                     )
                 else:
@@ -80,7 +80,6 @@ class PlotlyEngine(PlottingEngine):
                     xaxis=dict(range=plot.x_lim) if plot.x_lim else {},
                     yaxis=dict(range=plot.y_lim) if plot.y_lim else {},
                     zaxis=dict(range=plot.z_lim) if plot.z_lim else {},
-
                     # TODO: Make this a setting
                     # Axis background and grid visibility
                     # xaxis_backgroundcolor="white",
@@ -89,7 +88,6 @@ class PlotlyEngine(PlottingEngine):
                     # yaxis_showgrid=False,
                     # zaxis_backgroundcolor="white",
                     # zaxis_showgrid=False,
-
                     # TODO: Make this a setting
                     # Aspect ratio mode ('data' ensures that aspect ratio matches x-y-z data ranges)
                     # aspectmode='data',
@@ -107,8 +105,8 @@ class PlotlyEngine(PlottingEngine):
                     xanchor="left",
                     x=0.01,
                     # Keep legend item sizes consistent
-                    itemsizing='constant',
-                )
+                    itemsizing="constant",
+                ),
             )
             html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
             return html.encode("utf-8")
