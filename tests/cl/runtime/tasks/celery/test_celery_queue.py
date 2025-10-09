@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from unittest.mock import patch
+from unittest.mock import MagicMock
+
 import pytest
+from celery.exceptions import Reject
+
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.db.data_source import DataSource
@@ -68,6 +73,20 @@ def test_api(celery_queue_fixture):
     # Submit task and check for its completion
     queue.submit_task(task_key)
     Task.wait_for_completion(task_key)
+
+
+def test_reached_tenant_limit(default_db_fixture):
+    """Test reached tenant limit of tasks."""
+    context_snapshot_json = ContextSnapshot.capture_active().to_json()
+
+    mock_instance = MagicMock(celery_max_tenant_tasks=0)
+    mock_instance.celery_max_tenant_tasks = 0
+    with patch("cl.runtime.tasks.celery.celery_queue.celery_settings", new=mock_instance):
+        with pytest.raises(Reject):
+            execute_task(
+            "test_task_id",
+            context_snapshot_json,
+            )
 
 
 if __name__ == "__main__":

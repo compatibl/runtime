@@ -23,6 +23,7 @@ from urllib.parse import urlparse
 import pika
 import redis
 from celery import Celery
+from celery.exceptions import Reject
 from celery.signals import setup_logging
 from pika.exceptions import ChannelClosedByBroker
 from cl.runtime.contexts.context_manager import activate
@@ -35,7 +36,10 @@ from cl.runtime.server.env import Env
 from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
+from cl.runtime.tasks.task_query import TaskQuery
 from cl.runtime.tasks.task_queue import TaskQueue
+from cl.runtime.tasks.task_status import TaskStatus
+
 
 CELERY_RUN_COMMAND_QUEUE: Final[str] = "run_command"
 
@@ -61,7 +65,7 @@ def config_loggers(*args, **kwargs):
     dictConfig(celery_empty_logging_config)
 
 
-@celery_app.task(max_retries=celery_settings.celery_max_retries)  # Do not retry failed tasks
+@celery_app.task(max_retries=celery_settings.celery_max_retries, acks_late=True)  # Do not retry failed tasks
 def execute_task(
     task_id: str,
     context_snapshot_json: str,
@@ -70,6 +74,12 @@ def execute_task(
 
     # Deserialize context from 'context_data' parameter to run with the same settings as the caller context
     with ContextSnapshot.from_json(context_snapshot_json):
+        # The task is running.
+        running_query = TaskQuery(status=TaskStatus.RUNNING).build()
+        running_tasks = active(DataSource).load_by_query(running_query, cast_to=Task)
+
+        if len(running_tasks) >= celery_settings.celery_max_tenant_tasks:
+            raise Reject("Tenant exceeded task limit", requeue=True)
 
         # Load and run the task
         task_key = TaskKey(task_id=task_id).build()

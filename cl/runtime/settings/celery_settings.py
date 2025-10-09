@@ -48,6 +48,9 @@ class CelerySettings(Settings):
     celery_pool_type: str = "solo"
     """Pool type for Celery workers."""
 
+    celery_max_tenant_tasks: int = 10
+    """Maximum number of tenant tasks at the same time."""
+
     def __init(self) -> None:
         if not self.celery_broker:
             raise RuntimeError("Celery broker is not specified in settings.")
