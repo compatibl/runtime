@@ -19,6 +19,8 @@ from typing import Self
 from typing import Sequence
 from typing import cast
 from more_itertools import consume
+
+from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
@@ -69,8 +71,8 @@ class DataSource(DataSourceKey, RecordMixin):
     tenant: TenantKey = required()
     """Tenant within the database (initialized to the common tenant if not specified)."""
 
-    parent: DataSourceKey | None = None
-    """Search in parent if not found in self, default data source is always added as ultimate parent (optional)."""
+    parent: DataSourceKey = required()
+    """Search in parent if not found in self, default data source is always added as ultimate parent."""
 
     included: list[ResourceKey] | None = None
     """Lookup here only the resources on this list, continue to parent for all other resources (optional)."""
@@ -116,9 +118,12 @@ class DataSource(DataSourceKey, RecordMixin):
         if self.tenant is None:
             self.tenant = Tenant.get_common()
 
+        # Set parent to active DataSource or create default
+        if self.parent is None:
+            active_ds = active_or_none(DataSource)
+            self.parent = active_ds if active_ds is not None else DataSource().build()
+
         # TODO: These features are not yet supported
-        if self.parent is not None:
-            raise RuntimeError("DataSource.parent is not yet supported.")
         if self.included is not None:
             raise RuntimeError("DataSource.included is not yet supported.")
         if self.excluded is not None:
@@ -357,7 +362,12 @@ class DataSource(DataSourceKey, RecordMixin):
         # Cast to cast_to if specified, pass through None
         if cast_to is not None:
             result = tuple(CastUtil.cast_or_none(cast_to, x) for x in result)
-        return result
+
+        # If result is empty return from parent DataSource
+        if not result:
+            return self.parent.load_many_or_none(records_or_keys, cast_to=cast_to, project_to=project_to, sort_order=sort_order)
+        else:
+            return result
 
     def load_by_type(
         self,
@@ -431,7 +441,12 @@ class DataSource(DataSourceKey, RecordMixin):
         # Invoke build and return (build will have no effect if already invoked)
         if result is not None:
             result = tuple(x.build() if x is not None else x for x in result)
-        return result
+
+        # If result is empty return from parent DataSource
+        if not result:
+            return self.parent.load_all(key_type, cast_to=cast_to, restrict_to=restrict_to, project_to=project_to, sort_order=sort_order, limit=limit, skip=skip)
+        else:
+            return result
 
     def load_by_filter(
         self,
@@ -546,7 +561,12 @@ class DataSource(DataSourceKey, RecordMixin):
         # Invoke build and return (build will have no effect if already invoked)
         if result is not None:
             result = tuple(x.build() if x is not None else x for x in result)
-        return result
+
+        # If result is empty return from parent DataSource
+        if not result:
+            return self.load_by_query(query, cast_to=cast_to, restrict_to=restrict_to, project_to=project_to, sort_order=sort_order, limit=limit, skip=skip)
+        else:
+            return result
 
     def count_by_query(
         self,
@@ -561,12 +581,18 @@ class DataSource(DataSourceKey, RecordMixin):
             query: Contains query conditions to match
             restrict_to: Include only this type and its subtypes, skip other types
         """
-        return self._get_db().count_by_query(
+        result = self._get_db().count_by_query(
             query,
             dataset=self.dataset.dataset_id,
             tenant=self.tenant.tenant_id,
             restrict_to=restrict_to,
         )
+
+        # If result is empty return from parent DataSource
+        if result == 0:
+            return self.parent.count_by_query()
+        else:
+            return result
 
     def insert_one(
         self,

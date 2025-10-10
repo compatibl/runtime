@@ -84,7 +84,7 @@ def run_backend() -> None:
     # Set up logging config
     logging.config.dictConfig(logging_config)
 
-    with activate(Env().build()), activate(DataSource(db=Db.create()).build()):
+    with activate(Env().build()), activate(DataSource().build()):
 
         # TODO: This only works for the Mongo celery backend
         if CelerySettings.instance().celery_is_embedded_worker:
