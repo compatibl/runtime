@@ -20,7 +20,7 @@ from typing import Sequence
 from typing import cast
 from more_itertools import consume
 
-from cl.runtime.contexts.context_manager import active_or_none
+from cl.runtime.contexts.context_manager import active_or_none, active_or_default
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
@@ -54,6 +54,7 @@ from cl.runtime.records.typename import typeof
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.server.env import Env
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -71,8 +72,8 @@ class DataSource(DataSourceKey, RecordMixin):
     tenant: TenantKey = required()
     """Tenant within the database (initialized to the common tenant if not specified)."""
 
-    parent: DataSourceKey = required()
-    """Search in parent if not found in self, default data source is always added as ultimate parent."""
+    parent: DataSourceKey | None = None
+    """Search in parent if not found in self, default data source is always added as ultimate parent (optional)."""
 
     included: list[ResourceKey] | None = None
     """Lookup here only the resources on this list, continue to parent for all other resources (optional)."""
@@ -118,10 +119,10 @@ class DataSource(DataSourceKey, RecordMixin):
         if self.tenant is None:
             self.tenant = Tenant.get_common()
 
-        # Set parent to active DataSource or create default
+        # Create default parent with the same Db
         if self.parent is None:
-            active_ds = active_or_none(DataSource)
-            self.parent = active_ds if active_ds is not None else DataSource().build()
+            # TODO (Roman): Create default parent Db
+            ...
 
         # TODO: These features are not yet supported
         if self.included is not None:
@@ -364,7 +365,7 @@ class DataSource(DataSourceKey, RecordMixin):
             result = tuple(CastUtil.cast_or_none(cast_to, x) for x in result)
 
         # If result is empty return from parent DataSource
-        if not result:
+        if not result and self.parent:
             return self.parent.load_many_or_none(records_or_keys, cast_to=cast_to, project_to=project_to, sort_order=sort_order)
         else:
             return result
@@ -443,7 +444,7 @@ class DataSource(DataSourceKey, RecordMixin):
             result = tuple(x.build() if x is not None else x for x in result)
 
         # If result is empty return from parent DataSource
-        if not result:
+        if not result and self.parent:
             return self.parent.load_all(key_type, cast_to=cast_to, restrict_to=restrict_to, project_to=project_to, sort_order=sort_order, limit=limit, skip=skip)
         else:
             return result
@@ -563,8 +564,8 @@ class DataSource(DataSourceKey, RecordMixin):
             result = tuple(x.build() if x is not None else x for x in result)
 
         # If result is empty return from parent DataSource
-        if not result:
-            return self.load_by_query(query, cast_to=cast_to, restrict_to=restrict_to, project_to=project_to, sort_order=sort_order, limit=limit, skip=skip)
+        if not result and self.parent:
+            return self.parent.load_by_query(query, cast_to=cast_to, restrict_to=restrict_to, project_to=project_to, sort_order=sort_order, limit=limit, skip=skip)
         else:
             return result
 
@@ -589,7 +590,7 @@ class DataSource(DataSourceKey, RecordMixin):
         )
 
         # If result is empty return from parent DataSource
-        if result == 0:
+        if result == 0 and self.parent:
             return self.parent.count_by_query()
         else:
             return result

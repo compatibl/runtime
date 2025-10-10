@@ -486,7 +486,7 @@ class SqliteDb(Db):
         table_name = self._get_validated_table_name(key_type=key_type)
 
         # List of columns that are present in the table by default
-        column_defs = ["_key PRIMARY KEY", "_type"]
+        column_defs = ["_key", "_type"]
 
         # Validate and quote data type columns
         column_defs.extend(

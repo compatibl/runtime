@@ -14,9 +14,10 @@
 
 import pytest
 import time
-from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.context_manager import active, activate
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.sort_order import SortOrder
+from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_kind import EventKind
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
@@ -363,6 +364,34 @@ def test_skip_and_limit(multi_db_fixture):
     load_by_type_records = list(active(DataSource).load_by_type(record_type=StubDataclass, limit=1))
     assert len(load_all_records) == 1
     assert len(load_by_type_records) == 1
+
+
+def test_save_with_parent(multi_db_fixture):
+    records = (
+        StubDataclass(id="abc").build(),
+        StubDataclass(id="def").build(),
+    )
+
+    base_data_source = active(DataSource)
+
+    base_data_source.insert_many(records=records, commit=True)
+
+    child_data_source = DataSource(
+        db = base_data_source.db,
+        dataset=base_data_source.dataset,
+        tenant=TenantKey(tenant_id="test_tenant"),
+        parent=base_data_source,
+    ).build()
+
+    child_data_source.insert_many(records, commit=True)
+
+    base_ds_result = base_data_source.load_by_type(StubDataclass)
+
+    assert not base_ds_result
+
+    child_ds_result = child_data_source.load_by_type(StubDataclass)
+
+    assert PytestUtil.assert_equals_iterable_without_ordering(child_ds_result, records)
 
 
 if __name__ == "__main__":

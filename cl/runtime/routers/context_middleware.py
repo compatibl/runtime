@@ -37,7 +37,7 @@ class ContextMiddleware:
 
             # Activate contexts for this call
             with activate(Env().build()):
-                with activate(DataSource(db=Db.create()).build()):
+                with activate(DataSource().build()):
                     # TODO: Create a test setting to enable this other than by uncommenting
                     # await asyncio.sleep(duration)
                     await self.app(scope, receive, send)
