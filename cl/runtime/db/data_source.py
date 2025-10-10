@@ -32,6 +32,8 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.resource_key import ResourceKey
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
+from cl.runtime.db.tenant import Tenant
+from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.cast_util import CastUtil
@@ -62,7 +64,10 @@ class DataSource(DataSourceKey, RecordMixin):
     """Database where lookup is performed (initialized to DB from the current context if not specified)."""
 
     dataset: DatasetKey = required()
-    """Dataset within the database (initialized to the dataset from the current context if not specified)."""
+    """Dataset within the database (initialized to the root dataset if not specified)."""
+
+    tenant: TenantKey = required()
+    """Tenant within the database (initialized to the common tenant if not specified)."""
 
     parent: DataSourceKey | None = None
     """Search in parent if not found in self, default data source is always added as ultimate parent (optional)."""
@@ -103,9 +108,13 @@ class DataSource(DataSourceKey, RecordMixin):
 
         _LOGGER.info(f"Connected to DB type '{typename(type(self.db))}', db_id = '{self.db.db_id}'.")
 
-        # Load dataset, use root dataset if not specified
+        # Use root dataset if not specified
         if self.dataset is None:
             self.dataset = Dataset.get_root()
+
+        # Use common tenant if not specified
+        if self.tenant is None:
+            self.tenant = Tenant.get_common()
 
         # TODO: These features are not yet supported
         if self.parent is not None:
@@ -320,6 +329,7 @@ class DataSource(DataSourceKey, RecordMixin):
                 key_type,
                 keys_for_key_type,
                 dataset=self.dataset.dataset_id,
+                tenant=self.tenant.tenant_id,
                 project_to=project_to,
                 sort_order=db_sort_order,
             )
@@ -409,6 +419,7 @@ class DataSource(DataSourceKey, RecordMixin):
         result = self._get_db().load_all(
             key_type=key_type,
             dataset=self.dataset.dataset_id,
+            tenant=self.tenant.tenant_id,
             cast_to=cast_to,
             restrict_to=restrict_to,
             project_to=project_to,
@@ -523,6 +534,7 @@ class DataSource(DataSourceKey, RecordMixin):
         result = self._get_db().load_by_query(
             query,
             dataset=self.dataset.dataset_id,
+            tenant=self.tenant.tenant_id,
             cast_to=cast_to,
             restrict_to=restrict_to,
             project_to=project_to,
@@ -552,6 +564,7 @@ class DataSource(DataSourceKey, RecordMixin):
         return self._get_db().count_by_query(
             query,
             dataset=self.dataset.dataset_id,
+            tenant=self.tenant.tenant_id,
             restrict_to=restrict_to,
         )
 
@@ -716,7 +729,12 @@ class DataSource(DataSourceKey, RecordMixin):
             if self._pending_deletions:
                 [
                     # Delete first
-                    self._get_db().delete_many(key_type, records_for_key_type, dataset=self.dataset.dataset_id)
+                    self._get_db().delete_many(
+                        key_type,
+                        records_for_key_type,
+                        dataset=self.dataset.dataset_id,
+                        tenant=self.tenant.tenant_id,
+                    )
                     for key_type, records_for_key_type in self._group_inputs_by_key_type(
                         self._pending_deletions
                     ).items()
@@ -730,6 +748,7 @@ class DataSource(DataSourceKey, RecordMixin):
                         key_type,
                         records_for_key_type,
                         dataset=self.dataset.dataset_id,
+                        tenant=self.tenant.tenant_id,
                         save_policy=SavePolicy.INSERT,
                     )
             if self._pending_replacements:
@@ -741,6 +760,7 @@ class DataSource(DataSourceKey, RecordMixin):
                         key_type,
                         records_for_key_type,
                         dataset=self.dataset.dataset_id,
+                        tenant=self.tenant.tenant_id,
                         save_policy=SavePolicy.REPLACE,
                     )
         except Exception as e:
