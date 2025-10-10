@@ -100,6 +100,7 @@ class BasicMongoDb(Db):
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
     ) -> tuple[RecordMixin, ...]:
@@ -108,6 +109,7 @@ class BasicMongoDb(Db):
         assert TypeCheck.guard_key_type(key_type)
         assert TypeCheck.guard_key_sequence(keys)
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
@@ -130,6 +132,7 @@ class BasicMongoDb(Db):
         key_type: type[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -141,6 +144,7 @@ class BasicMongoDb(Db):
         # Check params
         assert TypeCheck.guard_key_type(key_type)
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
@@ -176,6 +180,7 @@ class BasicMongoDb(Db):
         query: QueryMixin,
         *,
         dataset: str,
+        tenant: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -189,6 +194,7 @@ class BasicMongoDb(Db):
 
         # Check dataset
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         # Get table name from key type and check it has an acceptable format
         query_target_type = query.get_target_type()
@@ -246,6 +252,7 @@ class BasicMongoDb(Db):
         query: QueryMixin,
         *,
         dataset: str,
+        tenant: str,
         restrict_to: type | None = None,
     ) -> int:
 
@@ -254,6 +261,7 @@ class BasicMongoDb(Db):
 
         # Check dataset
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         # Get table name from key type and check it has an acceptable format
         query_target_type = query.get_target_type()
@@ -296,6 +304,7 @@ class BasicMongoDb(Db):
         records: Sequence[RecordMixin],
         *,
         dataset: str,
+        tenant: str,
         save_policy: SavePolicy,
     ) -> None:
 
@@ -303,6 +312,7 @@ class BasicMongoDb(Db):
         assert TypeCheck.guard_key_type(key_type)
         assert TypeCheck.guard_record_sequence(records)
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
@@ -312,14 +322,12 @@ class BasicMongoDb(Db):
             # Serialize key
             serialized_key = _KEY_SERIALIZER.serialize(record.get_key())
             key_dict = {
-                "_tenant": self._tenant,
                 "_dataset": dataset,
                 "_key": serialized_key,
             }
 
             # Serialize record
             serialized_record = _RECORD_SERIALIZER.serialize(record)
-            serialized_record["_tenant"] = self._tenant
             serialized_record["_dataset"] = dataset
             serialized_record["_key"] = serialized_key
 
@@ -336,12 +344,14 @@ class BasicMongoDb(Db):
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
     ) -> None:
 
         # Check params
         assert TypeCheck.guard_key_type(key_type)
         assert TypeCheck.guard_key_sequence(keys)
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         # Get MongoDB collection for the key type
         collection = self._get_mongo_collection(key_type=key_type)
@@ -553,7 +563,6 @@ class BasicMongoDb(Db):
 
         # Remove or pop and validate
         del record_dict["_id"]
-        assert record_dict.pop("_tenant") == self._tenant
         assert record_dict.pop("_dataset") == expected_dataset
         del record_dict["_key"]
 
@@ -563,7 +572,6 @@ class BasicMongoDb(Db):
         """Get filter for loading records that match one of the specified keys."""
         serialized_keys = tuple(_KEY_SERIALIZER.serialize(key) for key in keys)
         return {
-            "_tenant": self._tenant,
             "_dataset": dataset,
             "_key": {"$in": serialized_keys},
         }

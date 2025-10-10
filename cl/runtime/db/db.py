@@ -28,15 +28,11 @@ from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
-from cl.runtime.settings.env_settings import EnvSettings
 
 
 @dataclass(slots=True, kw_only=True)
 class Db(DbKey, RecordMixin, ABC):
     """Polymorphic data storage with dataset isolation."""
-
-    _tenant: str = EnvSettings.instance().env_tenant
-    """Unique tenant identifier, tenants are isolated when sharing the same DB."""
 
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id).build()
@@ -48,6 +44,7 @@ class Db(DbKey, RecordMixin, ABC):
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
     ) -> tuple[RecordMixin, ...]:
@@ -58,6 +55,7 @@ class Db(DbKey, RecordMixin, ABC):
             key_type: Key type determines the database table
             keys: Sequence of keys, type(key) must match the key_type argument for each key
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             project_to: Use some or all fields from the stored record to create and return instances of this type
             sort_order: Sort by key fields in the specified order, reversing for fields marked as DESC
         """
@@ -68,6 +66,7 @@ class Db(DbKey, RecordMixin, ABC):
         key_type: type[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -81,6 +80,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             key_type: Key type determines the database table
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: Include only this type and its subtypes, skip other types
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -95,6 +95,7 @@ class Db(DbKey, RecordMixin, ABC):
         query: QueryMixin,
         *,
         dataset: str,
+        tenant: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -108,6 +109,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: Include only this type and its subtypes, skip other types
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -122,6 +124,7 @@ class Db(DbKey, RecordMixin, ABC):
         query: QueryMixin,
         *,
         dataset: str,
+        tenant: str,
         restrict_to: type | None = None,
     ) -> int:
         """
@@ -130,6 +133,7 @@ class Db(DbKey, RecordMixin, ABC):
         Args:
             query: Contains query conditions to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             restrict_to: Include only this type and its subtypes, skip other types
         """
 
@@ -140,6 +144,7 @@ class Db(DbKey, RecordMixin, ABC):
         records: Sequence[RecordMixin],
         *,
         dataset: str,
+        tenant: str,
         save_policy: SavePolicy,
     ) -> None:
         """
@@ -149,6 +154,7 @@ class Db(DbKey, RecordMixin, ABC):
             key_type: Key type determines the database table
             records: Sequence of records to save, record.get_key_type() must match the key_type argument for each record
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             save_policy: Insert vs. replace policy, partial update is not included due to design considerations
         """
 
@@ -159,6 +165,7 @@ class Db(DbKey, RecordMixin, ABC):
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
     ) -> None:
         """
         Delete multiple records, all of which must have the specified key type.
@@ -167,6 +174,7 @@ class Db(DbKey, RecordMixin, ABC):
             key_type: Key type determines the database table
             keys: Sequence of keys to delete, type(key) must match the key_type argument for each key
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
         """
 
     @abstractmethod
@@ -259,3 +267,13 @@ class Db(DbKey, RecordMixin, ABC):
             raise RuntimeError(f"Dataset identifier cannot be an empty string.")
         elif not isinstance(dataset, str):
             raise RuntimeError(f"Dataset identifier must be a string.")
+
+    @classmethod
+    def _check_tenant(cls, tenant: str) -> None:
+        """Error if tenant is None, an empty string, or has invalid format."""
+        if tenant is None:
+            raise RuntimeError(f"Tenant identifier cannot be None.")
+        elif tenant == "":
+            raise RuntimeError(f"Tenant identifier cannot be an empty string.")
+        elif not isinstance(tenant, str):
+            raise RuntimeError(f"Tenant identifier must be a string.")

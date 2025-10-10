@@ -63,6 +63,7 @@ class SqliteDb(Db):
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
         project_to: type[TRecord] | None = None,
         sort_order: SortOrder,  # Default value not provided due to the lack of natural default for this method
     ) -> tuple[RecordMixin, ...]:
@@ -71,6 +72,7 @@ class SqliteDb(Db):
         assert TypeCheck.guard_key_type(key_type)
         assert TypeCheck.guard_key_sequence(keys)
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         if not keys:
             return []
@@ -106,6 +108,7 @@ class SqliteDb(Db):
         key_type: type[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -117,6 +120,7 @@ class SqliteDb(Db):
         # Check params
         assert TypeCheck.guard_key_type(key_type)
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         if project_to is not None:
             raise RuntimeError(f"{typename(type(self))} does not currently support 'project_to' option.")
@@ -167,6 +171,7 @@ class SqliteDb(Db):
         query: QueryMixin,
         *,
         dataset: str,
+        tenant: str,
         cast_to: type[TRecord] | None = None,
         restrict_to: type[TRecord] | None = None,
         project_to: type[TRecord] | None = None,
@@ -180,6 +185,7 @@ class SqliteDb(Db):
 
         # Check dataset
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         if project_to is not None:
             raise RuntimeError(f"{typename(type(self))} does not currently support 'project_to' option.")
@@ -259,6 +265,7 @@ class SqliteDb(Db):
         query: QueryMixin,
         *,
         dataset: str,
+        tenant: str,
         restrict_to: type | None = None,
     ) -> int:
 
@@ -267,6 +274,7 @@ class SqliteDb(Db):
 
         # Check dataset
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         # Get table name from key type and check it has an acceptable format
         table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
@@ -321,6 +329,7 @@ class SqliteDb(Db):
         records: Sequence[RecordMixin],
         *,
         dataset: str,
+        tenant: str,
         save_policy: SavePolicy,
     ) -> None:
 
@@ -328,6 +337,7 @@ class SqliteDb(Db):
         assert TypeCheck.guard_key_type(key_type)
         assert TypeCheck.guard_record_sequence(records)
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         if not records:
             return
@@ -376,12 +386,14 @@ class SqliteDb(Db):
         keys: Sequence[KeyMixin],
         *,
         dataset: str,
+        tenant: str,
     ) -> None:
 
         # Check params
         assert TypeCheck.guard_key_type(key_type)
         assert TypeCheck.guard_key_sequence(keys)
         self._check_dataset(dataset)
+        self._check_tenant(tenant)
 
         if not keys:
             return
