@@ -366,32 +366,77 @@ def test_skip_and_limit(multi_db_fixture):
     assert len(load_by_type_records) == 1
 
 
-def test_save_with_parent(multi_db_fixture):
+# TODO (Roman): Support tenant in SqliteDb
+def test_parent_data_source(basic_mongo_db_fixture):
+    """Test DataSource works correctly with parent."""
     records = (
         StubDataclass(id="abc").build(),
         StubDataclass(id="def").build(),
     )
 
-    base_data_source = active(DataSource)
+    base_ds = active(DataSource)
 
-    base_data_source.insert_many(records=records, commit=True)
-
-    child_data_source = DataSource(
-        db = base_data_source.db,
-        dataset=base_data_source.dataset,
+    # Create child DataSource with parent set to the base
+    child_ds = DataSource(
+        db = base_ds.db,
+        dataset=base_ds.dataset,
         tenant=TenantKey(tenant_id="test_tenant"),
-        parent=base_data_source,
+        parent=base_ds,
     ).build()
 
-    child_data_source.insert_many(records, commit=True)
+    # Insert records to child DataSource
+    # Expect that load from base will be empty
+    child_ds.insert_many(records, commit=True)
 
-    base_ds_result = base_data_source.load_by_type(StubDataclass)
-
+    # Check that load from the base is empty
+    base_ds_result = base_ds.load_by_type(StubDataclass)
     assert not base_ds_result
 
-    child_ds_result = child_data_source.load_by_type(StubDataclass)
-
+    # Check that load from the child is not empty
+    child_ds_result = child_ds.load_by_type(StubDataclass)
     assert PytestUtil.assert_equals_iterable_without_ordering(child_ds_result, records)
+
+    # Save record to base DataSource
+    # Expect that load from child will return record from base
+    base_only_record = StubDataclass(id="base_only").build()
+    base_ds.insert_one(base_only_record, commit=True)
+
+    base_ds_result = base_ds.load_one(base_only_record.get_key())
+    assert base_ds_result == base_only_record
+
+    # Get record from base DataSource
+    child_ds_result = child_ds.load_one(base_only_record.get_key())
+    assert child_ds_result == base_only_record
+
+
+# TODO (Roman): Support tenant in SqliteDb
+def test_parent_data_source_delete(basic_mongo_db_fixture):
+    """Test DataSource delete works correctly with parent."""
+
+    base_ds = active(DataSource)
+
+    # Create child DataSource with parent set to the base
+    child_ds = DataSource(
+        db = base_ds.db,
+        dataset=base_ds.dataset,
+        tenant=TenantKey(tenant_id="test_tenant"),
+        parent=base_ds,
+    ).build()
+
+    base_only_record = StubDataclass(id="abc").build()
+
+    records = (
+        base_only_record,
+        StubDataclass(id="def").build(),
+    )
+
+    # Insert records to base DataSource and delete in child DataSource
+    base_ds.insert_many(records, commit=True)
+    child_ds.delete_one(base_only_record.get_key(), commit=True)
+
+    # Check that record exists in the base DataSource
+    base_ds_result = base_ds.load_one(base_only_record.get_key())
+    assert base_ds_result == base_only_record
 
 
 if __name__ == "__main__":

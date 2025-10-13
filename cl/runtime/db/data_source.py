@@ -365,7 +365,8 @@ class DataSource(DataSourceKey, RecordMixin):
             result = tuple(CastUtil.cast_or_none(cast_to, x) for x in result)
 
         # If result is empty return from parent DataSource
-        if not result and self.parent:
+        not_none_result = [x for x in result if x]
+        if not not_none_result and self.parent:
             return self.parent.load_many_or_none(records_or_keys, cast_to=cast_to, project_to=project_to, sort_order=sort_order)
         else:
             return result

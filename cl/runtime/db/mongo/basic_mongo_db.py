@@ -115,7 +115,7 @@ class BasicMongoDb(Db):
         collection = self._get_mongo_collection(key_type=key_type)
 
         # Query for all records in one call using $in operator
-        serialized_records = collection.find(self._get_mongo_keys_filter(keys, dataset=dataset))
+        serialized_records = collection.find(self._get_mongo_keys_filter(keys, dataset=dataset, tenant=tenant))
 
         # Apply sort to the iterable
         serialized_records = self._apply_sort(serialized_records, sort_field="_key", sort_order=sort_order)
@@ -150,7 +150,10 @@ class BasicMongoDb(Db):
         collection = self._get_mongo_collection(key_type=key_type)
 
         # Create a query dictionary
-        query_dict = {}
+        query_dict = {
+            "_dataset": dataset,
+            "_tenant": tenant,
+        }
 
         # Filter by restrict_to if specified
         self._apply_restrict_to(query_dict=query_dict, key_type=key_type, restrict_to=restrict_to)
@@ -206,8 +209,14 @@ class BasicMongoDb(Db):
         # Add index based on public fields of the query target type in the order of declaration from base to derived
         self._add_index(collection=collection, query_type=typeof(query))
 
-        # Serialize the query
-        query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
+        # Create query dict
+        query_dict = {
+            "_dataset": dataset,
+            "_tenant": tenant,
+        }
+
+        # Serialize the query and update query dict
+        query_dict.update(BootstrapSerializers.FOR_MONGO_QUERY.serialize(query))
         # TODO: Remove table fields
 
         # Convert op_* fields to MongoDB $* syntax
@@ -273,8 +282,14 @@ class BasicMongoDb(Db):
         # Add index based on public fields of the query target type in the order of declaration from base to derived
         self._add_index(collection=collection, query_type=typeof(query))
 
-        # Serialize the query
-        query_dict = BootstrapSerializers.FOR_MONGO_QUERY.serialize(query)
+        # Create query dict
+        query_dict = {
+            "_dataset": dataset,
+            "_tenant": tenant,
+        }
+
+        # Serialize the query and update query dict
+        query_dict.update(BootstrapSerializers.FOR_MONGO_QUERY.serialize(query))
         # TODO: Remove table fields
 
         # Convert op_* fields to MongoDB $* syntax
@@ -324,12 +339,14 @@ class BasicMongoDb(Db):
             key_dict = {
                 "_dataset": dataset,
                 "_key": serialized_key,
+                "_tenant": tenant,
             }
 
             # Serialize record
             serialized_record = _RECORD_SERIALIZER.serialize(record)
             serialized_record["_dataset"] = dataset
             serialized_record["_key"] = serialized_key
+            serialized_record["_tenant"] = tenant
 
             if save_policy == SavePolicy.INSERT:
                 collection.insert_one(serialized_record)
@@ -357,7 +374,7 @@ class BasicMongoDb(Db):
         collection = self._get_mongo_collection(key_type=key_type)
 
         # Create filter and delete
-        keys_filter = self._get_mongo_keys_filter(keys, dataset=dataset)
+        keys_filter = self._get_mongo_keys_filter(keys, dataset=dataset, tenant=tenant)
         collection.delete_many(keys_filter)
 
     def drop_test_db(self) -> None:
@@ -568,11 +585,12 @@ class BasicMongoDb(Db):
 
         return record_dict
 
-    def _get_mongo_keys_filter(self, keys: Sequence[KeyMixin], *, dataset: str) -> dict[str, Any]:
+    def _get_mongo_keys_filter(self, keys: Sequence[KeyMixin], *, dataset: str, tenant: str) -> dict[str, Any]:
         """Get filter for loading records that match one of the specified keys."""
         serialized_keys = tuple(_KEY_SERIALIZER.serialize(key) for key in keys)
         return {
             "_dataset": dataset,
+            "_tenant": tenant,
             "_key": {"$in": serialized_keys},
         }
 
