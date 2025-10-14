@@ -16,7 +16,7 @@ import logging.config
 import multiprocessing
 import os
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, ClassVar
 from typing import Final
 from typing import Optional
 from urllib.parse import urlparse
@@ -156,7 +156,7 @@ def celery_delete_existing_tasks() -> None:
 class CeleryQueue(TaskQueue):
     """Execute tasks using Celery."""
 
-    __celery_worker_process: Optional[multiprocessing.Process] = None
+    __celery_worker_process: ClassVar[multiprocessing.Process | None] = None
 
     # max_workers: int = required()  # TODO: Implement support for max_workers
     """The maximum number of processes running concurrently."""
