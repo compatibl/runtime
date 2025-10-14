@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import defaultdict
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any
 from typing import Optional
 from typing import Type
+
+from frozendict import frozendict
+
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.typename import typename
 
-_STACK_DICT_VAR: ContextVar[Optional[defaultdict[tuple[type, str | None], list[RecordMixin]]]] = ContextVar(
+_STACK_DICT_VAR: ContextVar[Optional[frozendict[tuple[str, str | None], tuple[RecordMixin]]]] = ContextVar(
     "_STACK_DICT_VAR",
     default=None,
 )
@@ -32,18 +34,9 @@ Each asynchronous environment has its own stack dictionary.
 """
 
 
-def _get_or_create_stack_dict() -> defaultdict[tuple[type, str | None], list[RecordMixin]]:
-    """Get or create stack dictionary for the current asynchronous environment indexed by context key."""
-    stack_dict = _STACK_DICT_VAR.get()
-    if stack_dict is None:
-        stack_dict = defaultdict(list)
-        _STACK_DICT_VAR.set(stack_dict)
-    return stack_dict
-
-
-def _get_or_create_stack(context_type: Type[RecordMixin], context_id: str | None = None) -> list[RecordMixin]:
+def _get_key_in_stack_dict(context_type: Type[RecordMixin], context_id: str | None = None) -> tuple[str, str | None]:
     """
-    Get or create stack for the (context_key_type, context_id) pair in the current asynchronous environment.
+    Get (context_key_type, context_id) pair in the current asynchronous environment as a key is stack dict.
 
     Args:
         context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
@@ -53,10 +46,10 @@ def _get_or_create_stack(context_type: Type[RecordMixin], context_id: str | None
         raise RuntimeError("Using an empty string as context_id is ambiguous, use None instead.")
 
     key_type_name = typename(context_type.get_key_type())
-    return _get_or_create_stack_dict()[(key_type_name, context_id)]
+    return key_type_name, context_id
 
 
-def make_active_and_return_stack(context: TRecord, context_id: str | None = None) -> list[RecordMixin]:
+def make_active_and_return_stack(context: TRecord, context_id: str | None = None) -> tuple[RecordMixin, ...]:
     """
     Similar to make_active(...) but returns context stack rather than the context.
 
@@ -76,14 +69,27 @@ def make_active_and_return_stack(context: TRecord, context_id: str | None = None
         if returned_context is not None and returned_context is not context:
             raise RuntimeError("To use activate(context), context.__enter__() must return self or None.")
 
-    # Get context stack for the __enter__ method in the current asynchronous environment
-    context_stack = _get_or_create_stack(type(context), context_id)
-
     # Activate the argument context by appending it to the context stack
-    context_stack.append(context)
+    context_stack_dict = _STACK_DICT_VAR.get()
+
+    if context_stack_dict is None:
+        context_stack_dict = {}
+
+    context_stack_key = _get_key_in_stack_dict(type(context), context_id)
+    current_stack = context_stack_dict.get(context_stack_key)
+
+    if current_stack is None:
+        current_stack = tuple()
+
+    # Build update stack value by adding item to end
+    update_stack = current_stack + (context,)
+    update_stack_dict = frozendict({**context_stack_dict, context_stack_key: update_stack})
+
+    # Update stack dict with new value
+    _STACK_DICT_VAR.set(update_stack_dict)
 
     # Return for error checking purposes only
-    return context_stack
+    return update_stack
 
 
 def make_active(context: TRecord, context_id: str | None = None) -> TRecord:
@@ -113,7 +119,7 @@ def make_inactive(
     exc_type: Any = None,
     exc_val: Any = None,
     exc_tb: Any = None,
-    expected_stack: list[RecordMixin] | None = None,
+    expected_stack: tuple[RecordMixin, ...] | None = None,
 ) -> None:
     """
     Make context inactive and revert to the previous active context (if any).
@@ -134,15 +140,21 @@ def make_inactive(
     """
 
     # Get context stack for the __exit__ method in the current asynchronous environment
-    context_stack = _get_or_create_stack(type(context), context_id)
+    context_stack_dict = _STACK_DICT_VAR.get()
+    if context_stack_dict is None:
+        context_stack_dict = {}
+
+    # Get current context stack
+    context_stack_key = _get_key_in_stack_dict(type(context), context_id)
+    current_stack = context_stack_dict.get(context_stack_key)
 
     # Validate stack integrity and restore previous current
-    if not context_stack:
+    if not current_stack:
         raise RuntimeError(
             f"Context stack for context type {typename(type(context))} and context_id={context_id}\n"
             f"has been cleared inside 'with activate(...)' clause."
         )
-    elif expected_stack and context_stack is not expected_stack:
+    elif expected_stack and current_stack != expected_stack:
         # Perform this check only if expected_stack is not None
         raise RuntimeError(
             f"Context stack for context type {typename(type(context))} and context_id={context_id}\n"
@@ -150,9 +162,17 @@ def make_inactive(
         )
 
     # Deactivate the currently active context by removing it from the context stack
-    if context_stack[-1] is context:
+    if current_stack[-1] is context:
+
+        if current_stack is None:
+            current_stack = tuple()
+
+        # Build update stack value by removing item from end
+        update_stack = current_stack[:-1]
+        update_stack_dict = frozendict({**context_stack_dict, context_stack_key: update_stack})
+
         # Remove the top item in stack only if it is the same as context passed to this method
-        context_stack.pop()
+        _STACK_DICT_VAR.set(update_stack_dict)
     else:
         raise RuntimeError(
             f"Active context for context type {typename(type(context))} and context_id={context_id}\n"
@@ -257,8 +277,15 @@ def active_or_none(context_type: type[TRecord], context_id: str | None = None) -
         context_type: Type of the context, active contexts are separate for each (context_key_type, context_id) pair.
         context_id: Optional context identifier for independent activation of multiple contexts of the same type.
     """
-    stack = _get_or_create_stack(context_type, context_id)
-    return stack[-1].cast(context_type) if stack else None
+    context_stack_dict = _STACK_DICT_VAR.get()
+
+    if context_stack_dict is None:
+        context_stack_dict = {}
+
+    context_stack_key = _get_key_in_stack_dict(context_type, context_id)
+
+    current_stack = context_stack_dict.get(context_stack_key)
+    return current_stack[-1].cast(context_type) if current_stack else None
 
 
 def active_or_default(context_type: type[TRecord]) -> TRecord:
