@@ -29,12 +29,12 @@ from cl.runtime.records.data_mixin import TDataDict
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
-_LOGGER = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @dataclass(slots=True, kw_only=True)
 class EventBroker(EventBrokerKey, RecordMixin, ABC):
-    """Record class for Event Broker."""
+    """Event Broker class for publishing and subscribing events."""
 
     tenant: TenantKey = required()
     """Tenant within the EventBroker (initialized to the common tenant if not specified)."""
@@ -52,7 +52,7 @@ class EventBroker(EventBrokerKey, RecordMixin, ABC):
 
     @classmethod
     def create(cls) -> Self:
-        """Factory method to create event broker from settings."""
+        """Factory method to create Event Broker from settings."""
 
         from cl.runtime.events.db_event_broker import DbEventBroker
 
@@ -62,15 +62,8 @@ class EventBroker(EventBrokerKey, RecordMixin, ABC):
         return broker_type().build()
 
     @abstractmethod
-    async def connect(self) -> None:
-        """Establish connection to the broker."""
-        raise NotImplementedError
-
     async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[TDataDict, None]:
-        """
-        Subscribe to a topic/channel.
-        Should return an async generator yielding events.
-        """
+        """Subscribe to a topic/channel. Return an async generator yielding events."""
         raise NotImplementedError
 
     @abstractmethod
@@ -82,22 +75,10 @@ class EventBroker(EventBrokerKey, RecordMixin, ABC):
         """Publish an Event to a topic/channel synchronously."""
         raise NotImplementedError
 
-    @abstractmethod
-    async def close(self) -> None:
-        """Close connection to the broker."""
-        raise NotImplementedError
-
-    async def __aenter__(self):
-        """
-        Called when entering the async context manager.
-        Automatically connects to the broker.
-        """
-        await self.connect()
+    def __enter__(self):
+        """Enter the sync context. Called during the make_active() method."""
         return self
 
-    async def __aexit__(self, exc_type, exc, tb):
-        """
-        Called when exiting the async context manager.
-        Ensures a graceful shutdown by closing the broker connection.
-        """
-        await self.close()
+    def __exit__(self, exc_type, exc, tb):
+        """Exit the sync context. Called during the make_inactive() method."""
+        return None

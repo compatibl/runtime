@@ -30,18 +30,18 @@ _UI_SERIALIZER = DataSerializers.FOR_UI
 async def _event_generator(request: Request):
     """Async generator of events for /events route response."""
 
-    async with active(EventBroker) as event_broker:
-        async for event_data in event_broker.subscribe(topic="events", request=request):
-            # Get event kind
-            event_kind = CaseUtil.pascal_to_upper_case(event_data.get("EventKind"))
+    event_broker = active(EventBroker)
+    async for event_data in event_broker.subscribe(topic="events", request=request):
+        # Get event kind
+        event_kind = CaseUtil.pascal_to_upper_case(event_data.get("EventKind"))
 
-            # Serialize event and convert to JSON string because SSE protocol requires text-based 'data' field
-            event_data = orjson.dumps(event_data).decode("utf-8")
+        # Serialize event and convert to JSON string because SSE protocol requires text-based 'data' field
+        event_data = orjson.dumps(event_data).decode("utf-8")
 
-            # Create dict event in format required by EventSourceResponse
-            processed_event = {"event": event_kind, "data": event_data}
+        # Create dict event in format required by EventSourceResponse
+        processed_event = {"event": event_kind, "data": event_data}
 
-            yield processed_event
+        yield processed_event
 
 
 @router.get("/events")
