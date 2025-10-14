@@ -20,13 +20,16 @@ import orjson
 from fastapi import FastAPI
 from httpx import ASGITransport
 from httpx import AsyncClient
+
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.events.event import Event
+from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.events.event_kind import EventKind
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.routers.sse.sse_router import _event_generator as original_event_generator  # noqa
 
-_LOGGER = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 _test_event_loop = asyncio.new_event_loop()
 asyncio.set_event_loop(_test_event_loop)
@@ -45,20 +48,25 @@ async def _listen_events(client):
 
 
 async def _publish_events(client):
+    event_broker = active(EventBroker)
+    events_topic = "events"
+
     await asyncio.sleep(0.3)
-    _LOGGER.info("1 - Info")
+    _logger.info("1 - Info")
     await asyncio.sleep(0.1)
-    _LOGGER.info("2 - Info", extra={"event": Event(event_kind=EventKind.TASK_STARTED)})
+    _logger.info("2 - Info")
+    event_broker.sync_publish(events_topic, Event(event_kind=EventKind.TASK_STARTED).build())
     await asyncio.sleep(0.3)
-    _LOGGER.warning("3 - Warning")
+    _logger.warning("3 - Warning")
     await asyncio.sleep(0.2)
-    _LOGGER.error("4 - Error")
+    _logger.error("4 - Error")
     await asyncio.sleep(0.1)
-    _LOGGER.info("5 - Info", extra={"event": Event(event_kind=EventKind.TASK_FINISHED)})
+    _logger.info("5 - Info")
+    event_broker.sync_publish(events_topic, Event(event_kind=EventKind.TASK_FINISHED).build())
 
     # Ensure reaching limit in event generator to avoid timeout error
     for i in range(10):
-        _LOGGER.info(f"Event to reach limit - #{i}.")
+        _logger.info(f"Event to reach limit - #{i}.")
 
 
 async def _publish_and_listen_events(listeners_count: int):

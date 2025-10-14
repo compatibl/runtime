@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.events.event_kind import EventKind
 from cl.runtime.events.task_event import TaskEvent
 from cl.runtime.events.task_finished_event import TaskFinishedEvent
@@ -33,7 +34,7 @@ from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from cl.runtime.tasks.task_status import TaskStatus
 
-_LOGGER = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @dataclass(slots=True, kw_only=True)
@@ -99,11 +100,14 @@ class Task(TaskKey, RecordMixin, ABC):
 
     def run_task(self) -> None:
         """Invoke execute with task status updates and exception handling."""
+        event_broker = active(EventBroker)
+        events_topic = "events"
 
         # Activate logging context for the task
         with activate(self._create_log_context()):
             try:
-                _LOGGER.info("Start task execution.", extra={"event": TaskEvent(event_kind=EventKind.TASK_STARTED)})
+                _logger.info("Start task execution.")
+                event_broker.sync_publish(events_topic, TaskEvent(event_kind=EventKind.TASK_STARTED).build())
 
                 # Save with Running status
                 update = self.clone()
@@ -115,13 +119,8 @@ class Task(TaskKey, RecordMixin, ABC):
 
             except Exception as e:  # noqa
 
-                _LOGGER.error(
-                    "Task failed with exception.",
-                    exc_info=True,
-                    extra={
-                        "event": TaskFinishedEvent(event_kind=EventKind.TASK_FINISHED, status=TaskStatus.FAILED),
-                    },
-                )
+                _logger.error("Task failed with exception.", exc_info=True)
+                event_broker.sync_publish(events_topic, TaskFinishedEvent(event_kind=EventKind.TASK_FINISHED, status=TaskStatus.FAILED).build())
 
                 # Save with Failed status and execution info
                 update = self.clone()
@@ -133,12 +132,8 @@ class Task(TaskKey, RecordMixin, ABC):
                 active(DataSource).replace_one(update.build(), commit=True)
             else:
 
-                _LOGGER.info(
-                    "Task completed successfully.",
-                    extra={
-                        "event": TaskFinishedEvent(event_kind=EventKind.TASK_FINISHED, status=TaskStatus.COMPLETED),
-                    },
-                )
+                _logger.info("Task completed successfully.")
+                event_broker.sync_publish(events_topic, TaskFinishedEvent(event_kind=EventKind.TASK_FINISHED, status=TaskStatus.COMPLETED).build())
 
                 # Record the end time
                 end_time = DatetimeUtil.now()

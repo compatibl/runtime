@@ -56,10 +56,5 @@ class EventLogHandler(logging.Handler):
             elif record.levelno >= logging.WARNING:
                 event_broker.sync_publish("events", Event(event_kind=EventKind.WARNING).build())
 
-            # Publish event from extras
-            if (event := getattr(record, "event", None)) is not None:
-                event.build()
-                event_broker.sync_publish("events", event)
-
         except Exception:
             self.handleError(record)
