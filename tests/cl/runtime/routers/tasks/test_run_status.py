@@ -21,6 +21,7 @@ from cl.runtime.routers.tasks.status_request import StatusRequest
 from cl.runtime.routers.tasks.status_response_item import StatusResponseItem
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_queue import TaskQueue
+from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
@@ -28,12 +29,10 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import
 def _save_tasks_and_get_requests() -> list[Dict]:
     """Creates and saves tasks."""
 
-    task_queue = active(TaskQueue)
     # Create handler tasks
-    queue_key = task_queue.get_key()
     tasks = [
         InstanceMethodTask.create(
-            queue=queue_key,
+            queue=TaskQueueKey(queue_id="Handlers Queue"),
             key=StubHandlersKey(stub_id=f"{i}").build(),
             method_callable=StubHandlers.run_instance_method_1a,
         ).build()

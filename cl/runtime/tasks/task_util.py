@@ -14,7 +14,7 @@
 
 from typing_extensions import Any
 
-from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.typename import typename
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
@@ -27,7 +27,7 @@ from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.method_task import MethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_queue import TaskQueue
-
+from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 _ui_serializer = DataSerializers.FOR_UI
 
@@ -64,7 +64,9 @@ class TaskUtil:
         # Normalize handler name to handler functions naming format
         handler_name = cls._normalize_handler_name(request.method)
 
-        task_queue = active(TaskQueue)
+        task_queue = active_or_none(TaskQueue)
+        # TODO (Roman): Make 'queue' field in Task optional
+        task_queue_key = task_queue.get_key() if task_queue else TaskQueueKey(queue_id="Handlers Queue").build()
         tasks = []
 
         for serialized_key in requested_keys:
@@ -81,7 +83,7 @@ class TaskUtil:
                 label = f"{typename(key_type)};{serialized_key};{handler_name}"
                 handler_task = InstanceMethodTask(
                     label=label,
-                    queue=task_queue.get_key(),
+                    queue=task_queue_key,
                     key=key,
                     method_name=handler_name,
                 )
@@ -96,7 +98,7 @@ class TaskUtil:
                 label = f"{typename(record_type)};{handler_name}"
                 handler_task = ClassMethodTask(
                     label=label,
-                    queue=task_queue.get_key(),
+                    queue=task_queue_key,
                     type_=record_type,
                     method_name=handler_name,
                 )

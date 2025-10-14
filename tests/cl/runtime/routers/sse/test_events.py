@@ -21,7 +21,7 @@ from fastapi import FastAPI
 from httpx import ASGITransport
 from httpx import AsyncClient
 
-from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.context_manager import active, activate
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.events.event_kind import EventKind
@@ -38,13 +38,15 @@ asyncio.set_event_loop(_test_event_loop)
 async def _listen_events(client):
     headers = {"Accept": "text/event-stream"}
 
-    async with client.stream("GET", "/sse/events", headers=headers) as response:
-        assert response.status_code == 200
-        event_stream_lines = []
-        async for line in response.aiter_lines():
-            event_stream_lines.append(line)
+    # Create separate Event Broker for each listener
+    with activate(EventBroker.create()):
+        async with client.stream("GET", "/sse/events", headers=headers) as response:
+            assert response.status_code == 200
+            event_stream_lines = []
+            async for line in response.aiter_lines():
+                event_stream_lines.append(line)
 
-        return event_stream_lines
+            return event_stream_lines
 
 
 async def _publish_events(client):
@@ -73,7 +75,7 @@ async def _publish_and_listen_events(listeners_count: int):
     app = FastAPI()
     ServerUtil.include_routers(app)
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        listen_tasks = (_listen_events(client),) * listeners_count
+        listen_tasks = (_listen_events(client) for _ in range(listeners_count))
         *listen_results, _ = await asyncio.gather(*listen_tasks, _publish_events(client))
 
         return listen_results
@@ -137,13 +139,13 @@ def test_events(default_db_fixture):
 
 
 def test_events_multi_listener(default_db_fixture):
-
+    listeners_count = 10
     with patch("cl.runtime.routers.sse.sse_router._event_generator", mock_event_generator_limited):
         # Run coroutines to publish and listen events in parallel asynchronously
         listen_results = _test_event_loop.run_until_complete(
-            asyncio.wait_for(_publish_and_listen_events(10), timeout=10.0)
+            asyncio.wait_for(_publish_and_listen_events(listeners_count), timeout=10.0)
         )
-        assert len(listen_results) == 10
+        assert len(listen_results) == listeners_count
 
         assert all(listen_result and listen_result == listen_results[0] for listen_result in listen_results)
 

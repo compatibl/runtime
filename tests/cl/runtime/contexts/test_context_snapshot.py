@@ -32,7 +32,7 @@ def _perform_serialization_test(contexts: list[RecordMixin]):
 
     # Check that the contexts passed to this method match captured contexts
     # after serialization roundtrip regardless of order
-    if contexts:
+    if original.contexts:
         not_in_contexts = [ctx for ctx in contexts if ctx not in deserialized.contexts]
         assert len(not_in_contexts) == 0
     else:
