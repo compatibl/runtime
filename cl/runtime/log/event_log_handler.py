@@ -14,6 +14,8 @@
 
 import logging
 from logging import LogRecord
+
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.events.event_kind import EventKind
@@ -45,7 +47,7 @@ class EventLogHandler(logging.Handler):
         try:
             # Publish log event
             log_event = self._create_log_event(record)
-            event_broker = EventBroker.create()
+            event_broker = active(EventBroker)
             event_broker.sync_publish("events", log_event)
 
             # If log record level is Error or Warning - trigger additional Error or Warning event

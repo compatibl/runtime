@@ -15,16 +15,40 @@
 import logging
 from abc import ABC
 from abc import abstractmethod
+from dataclasses import dataclass
 from typing import AsyncGenerator
 from typing import Self
 from fastapi import Request
+
+from cl.runtime.db.tenant import Tenant
+from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.events.event import Event
+from cl.runtime.events.event_broker_key import EventBrokerKey
+from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.data_mixin import TDataDict
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.record_mixin import RecordMixin
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class EventBroker(ABC):
-    """Base class for event broker."""
+@dataclass(slots=True, kw_only=True)
+class EventBroker(EventBrokerKey, RecordMixin, ABC):
+    """Record class for Event Broker."""
+
+    tenant: TenantKey = required()
+    """Tenant within the EventBroker (initialized to the common tenant if not specified)."""
+
+    def get_key(self):
+        return EventBrokerKey(broker_id=self.broker_id)
+
+    def __init(self):
+        # Use globally unique UUIDv7-based timestamp if not specified
+        if self.broker_id is None:
+            self.broker_id = Timestamp.create()
+
+        if self.tenant is None:
+            self.tenant = Tenant.get_common()
 
     @classmethod
     def create(cls) -> Self:
@@ -35,30 +59,18 @@ class EventBroker(ABC):
         # TODO (Roman): Get event broker type from settings.
         broker_type = DbEventBroker
 
-        return broker_type()
+        return broker_type().build()
 
     @abstractmethod
     async def connect(self) -> None:
         """Establish connection to the broker."""
         raise NotImplementedError
 
-    async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[Event, None]:
+    async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[TDataDict, None]:
         """
         Subscribe to a topic/channel.
         Should return an async generator yielding events.
         """
-
-        while True:
-            if request and await request.is_disconnected():
-                _LOGGER.debug("SSE: Client disconnected from SSE. Stop sending events.")
-                break
-
-            # Wait for the next event from the queue
-            yield await self._get_event()
-
-    @abstractmethod
-    async def _get_event(self) -> Event:
-        """Get event from broker source. Wait for event if source is empty."""
         raise NotImplementedError
 
     @abstractmethod

@@ -16,7 +16,10 @@ import orjson
 from fastapi import APIRouter
 from fastapi import Request
 from sse_starlette import EventSourceResponse
+
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.events.event_broker import EventBroker
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 router = APIRouter()
@@ -27,15 +30,16 @@ _UI_SERIALIZER = DataSerializers.FOR_UI
 async def _event_generator(request: Request):
     """Async generator of events for /events route response."""
 
-    async with EventBroker.create() as event_broker:
-        async for event in event_broker.subscribe(topic="events", request=request):
+    async with active(EventBroker) as event_broker:
+        async for event_data in event_broker.subscribe(topic="events", request=request):
+            # Get event kind
+            event_kind = CaseUtil.pascal_to_upper_case(event_data.get("EventKind"))
 
             # Serialize event and convert to JSON string because SSE protocol requires text-based 'data' field
-            event_data = _UI_SERIALIZER.serialize(event)
             event_data = orjson.dumps(event_data).decode("utf-8")
 
             # Create dict event in format required by EventSourceResponse
-            processed_event = {"event": event.event_kind.name, "data": event_data}
+            processed_event = {"event": event_kind, "data": event_data}
 
             yield processed_event
 

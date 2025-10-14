@@ -27,6 +27,7 @@ from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
 from cl.runtime.db.sql.sqlite_db import SqliteDb
+from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.schema.type_info import TypeInfo
@@ -168,3 +169,10 @@ def convert_uuid_to_binary(uuid_: uuid.UUID, uuid_representation=None):
 def configure_logging_fixture(request: FixtureRequest):
     """Configure logging with basic config."""
     logging.config.dictConfig(logging_config)
+
+
+@pytest.fixture(scope="function")
+def event_broker_fixture(request: FixtureRequest) -> Iterator[EventBroker]:
+    """Pytest module fixture to setup event broker."""
+    with activate(EventBroker.create()) as event_broker:
+        yield event_broker

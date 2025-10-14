@@ -15,6 +15,7 @@
 import asyncio
 import logging
 from collections import deque
+from dataclasses import dataclass
 from typing import AsyncGenerator
 from starlette.requests import Request
 from cl.runtime.contexts.context_manager import active
@@ -23,11 +24,16 @@ from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.data_mixin import TDataDict
+from cl.runtime.serializers.data_serializers import DataSerializers
 
-_LOGGER = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
-_PULL_EVENTS_DELAY = 3.0
+_pull_events_delay = 3.0
 """Delay in seconds to check new events in DB."""
+
+_event_buffer_maxlen = 100
+"""Max number of sent events in buffer."""
 
 
 def _handle_async_task_exception(task: asyncio.Task):
@@ -39,7 +45,7 @@ def _handle_async_task_exception(task: asyncio.Task):
         # Ignore task canceled error
         pass
     except Exception:
-        _LOGGER.error("DB SSE pull events task failed.", exc_info=True)
+        _logger.error("DB SSE pull events task failed.", exc_info=True)
 
 
 async def _pull_events(queue: asyncio.Queue):
@@ -55,38 +61,45 @@ async def _pull_events(queue: asyncio.Queue):
             await queue.put(event)
 
         # Wait for delay
-        await asyncio.sleep(_PULL_EVENTS_DELAY)
+        await asyncio.sleep(_pull_events_delay)
 
 
+@dataclass(slots=True, kw_only=True)
 class DbEventBroker(EventBroker):
     """
     Event broker that uses current DataSource as transport for events.
-    Constantly checks if there are new events in the DB and sends them to the queue.
+    Continuously checks if there are new events in the DB and sends them to the queue.
     """
 
-    _event_type: type = Event
-    """Type of event records."""
+    _sent_event_buffer: deque[str] | None = None
+    """Buffer queue for sent events."""
 
-    _event_buffer_maxlen: int = 100
-    """Max number of sent events in buffer."""
+    _from_timestamp: str | None = None
+    """Set start timestamp for filtering old events."""
 
-    def __init__(self):
-        # Buffer queue for sent events
-        self._sent_event_buffer: deque[str] = deque(maxlen=self._event_buffer_maxlen)
+    _event_queue: asyncio.Queue[Event] | None = None
+    """Buffer queue for events."""
 
-        # Set start timestamp for filtering old events
-        self._from_timestamp = Timestamp.create()
+    _pull_events_task: asyncio.Task | None = None
+    """Async Task for pulling Events from DB."""
 
-        # Buffer queue for event
-        self._event_queue: asyncio.Queue[Event] = asyncio.Queue()
+    def __init(self):
+        if self._sent_event_buffer is None:
+            self._sent_event_buffer: deque[str] = deque(maxlen=100)
 
-        # Async Task for pulling Events from DB.
-        self._pull_events_task: asyncio.Task | None = None
+        if self._from_timestamp is None:
+            self._from_timestamp = Timestamp.create()
+
+        if self._event_queue is None:
+            self._event_queue: asyncio.Queue[Event] = asyncio.Queue()
+
+        if self._pull_events_task is None:
+            self._pull_events_task: asyncio.Task | None = None
 
     async def connect(self) -> None:
         return None
 
-    async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[Event, None]:
+    async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[TDataDict, None]:
 
         # Start pulling events from db in parallel async task
         if self._pull_events_task is None:
@@ -94,11 +107,15 @@ class DbEventBroker(EventBroker):
             pull_events_task.add_done_callback(_handle_async_task_exception)
             self._pull_events_task = pull_events_task
 
-        # Yield events from base subscribe() implementation
-        async for event in super(DbEventBroker, self).subscribe(topic=topic, request=request):
-            yield event
+        while True:
+            if request and await request.is_disconnected():
+                _logger.debug("SSE: Client disconnected from SSE. Stop sending events.")
+                break
 
-    async def _get_event(self) -> Event:
+            # Wait for the next event from the queue
+            yield await self._get_event()
+
+    async def _get_event(self) -> TDataDict:
         # Await event in queue
         while True:
             event = await self._event_queue.get()
@@ -106,7 +123,8 @@ class DbEventBroker(EventBroker):
             # Filter old or already sent events
             if event.timestamp > self._from_timestamp and event.timestamp not in self._sent_event_buffer:
                 self._sent_event_buffer.append(event.timestamp)
-                return event
+                event_data = DataSerializers.FOR_UI.serialize(event)
+                return event_data
 
     async def publish(self, topic: str, event: Event) -> None:
         return self.sync_publish(topic, event)
