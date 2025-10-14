@@ -15,6 +15,11 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
+
+from cl.runtime.db.tenant import Tenant
+from cl.runtime.db.tenant_key import TenantKey
+from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
 
@@ -31,8 +36,19 @@ class TaskQueue(TaskQueueKey, ABC):
           the Running and optionally Paused state and ending in one of Completed, Failed, or Cancelled states
     """
 
+    tenant: TenantKey = required()
+    """Tenant within the TaskQueue (initialized to the common tenant if not specified)."""
+
     timeout_sec: int = 10
     """Optional timeout in seconds, queue will stop after reaching this timeout."""
+
+    def __init(self):
+        # Use globally unique UUIDv7-based timestamp if not specified
+        if self.queue_id is None:
+            self.queue_id = Timestamp.create()
+
+        if self.tenant is None:
+            self.tenant = Tenant.get_common()
 
     def get_key(self) -> TaskQueueKey:
         return TaskQueueKey(queue_id=self.queue_id).build()

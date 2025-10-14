@@ -23,9 +23,10 @@ from cl.runtime.file.file_data import FileData
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.tasks.class_method_task import ClassMethodTask
-from cl.runtime.tasks.task_util import handler_queue
+from cl.runtime.tasks.task_queue import TaskQueue
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
@@ -222,9 +223,10 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         record_type = TypeInfo.from_type_name(cls.__name__)
         long_handler_name = cls.run_long_handler.__name__
         label = f"{typename(record_type)};{long_handler_name}"
+        task_queue = active(TaskQueue)
         handler_task = ClassMethodTask(
             label=label,
-            queue=handler_queue.get_key(),
+            queue=task_queue.get_key(),
             type_=record_type,
             method_name=long_handler_name,
         )
@@ -232,7 +234,7 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         for i in range(100):
             task = handler_task.build()
             active(DataSource).replace_one(task, commit=True)
-            handler_queue.submit_task(task)
+            task_queue.submit_task(task)
 
     def run_save_to_db(self):
         """Stub method."""

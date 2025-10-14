@@ -34,7 +34,7 @@ from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.env_kind import EnvKind
-from cl.runtime.tasks.celery.celery_queue import celery_app
+from cl.runtime.tasks.celery.celery_queue import celery_app, CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 
 
@@ -137,7 +137,9 @@ def celery_queue_fixture():
     # without starting a worker or using the broker.
     celery_app.conf.update(task_always_eager=True, task_eager_propagates=True)
 
-    yield
+    with activate(CeleryQueue(queue_id="Test Handler Queue").build()):
+        yield
+
     celery_delete_existing_tasks()
     print("Stopping celery workers and cleaning up tasks.")
 
@@ -171,7 +173,7 @@ def configure_logging_fixture(request: FixtureRequest):
     logging.config.dictConfig(logging_config)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session", autouse=True)
 def event_broker_fixture(request: FixtureRequest) -> Iterator[EventBroker]:
     """Pytest module fixture to setup event broker."""
     with activate(EventBroker.create()) as event_broker:

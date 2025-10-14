@@ -20,8 +20,8 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
+from cl.runtime.tasks.task_queue import TaskQueue
 from cl.runtime.tasks.task_util import TaskUtil
-from cl.runtime.tasks.task_util import handler_queue
 
 
 class SubmitResponseItem(BaseModel):
@@ -42,12 +42,13 @@ class SubmitResponseItem(BaseModel):
         """Submit tasks and return list of task response items."""
 
         response_items = []
+        task_queue = active(TaskQueue)
 
         for handler_task in TaskUtil.create_tasks_for_submit_request(request):
 
             # Save and submit task
             active(DataSource).replace_one(handler_task, commit=True)
-            handler_queue.submit_task(handler_task)  # TODO: Rely on query instead
+            task_queue.submit_task(handler_task)  # TODO: Rely on query instead
 
             if isinstance(handler_task, InstanceMethodTask):
                 # Only InstanceMethodTask has `key` field

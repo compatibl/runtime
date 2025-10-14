@@ -19,8 +19,8 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.result_request import ResultRequest
 from cl.runtime.routers.tasks.result_response_item import ResultResponseItem
-from cl.runtime.routers.tasks.submit_response_item import handler_queue
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
+from cl.runtime.tasks.task_queue import TaskQueue
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
@@ -28,8 +28,9 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import
 def _save_tasks_and_get_requests() -> list[Dict]:
     """Creates and saves tasks."""
 
+    task_queue = active(TaskQueue)
     # Create handler tasks
-    queue_key = handler_queue.get_key()
+    queue_key = task_queue.get_key()
     tasks = [
         InstanceMethodTask.create(
             queue=queue_key,
