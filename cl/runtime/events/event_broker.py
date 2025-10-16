@@ -51,7 +51,7 @@ class EventBroker(EventBrokerKey, RecordMixin, ABC):
             self.tenant = Tenant.get_common()
 
     @classmethod
-    def create(cls) -> Self:
+    def create(cls, *, tenant: TenantKey | None = None) -> Self:
         """Factory method to create Event Broker from settings."""
 
         from cl.runtime.events.db_event_broker import DbEventBroker
@@ -59,7 +59,7 @@ class EventBroker(EventBrokerKey, RecordMixin, ABC):
         # TODO (Roman): Get event broker type from settings.
         broker_type = DbEventBroker
 
-        return broker_type().build()
+        return broker_type(tenant=tenant).build()
 
     @abstractmethod
     async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[TDataDict, None]:

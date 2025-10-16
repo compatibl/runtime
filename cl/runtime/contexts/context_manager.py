@@ -163,10 +163,6 @@ def make_inactive(
 
     # Deactivate the currently active context by removing it from the context stack
     if current_stack[-1] is context:
-
-        if current_stack is None:
-            current_stack = tuple()
-
         # Build update stack value by removing item from end
         update_stack = current_stack[:-1]
         update_stack_dict = frozendict({**context_stack_dict, context_stack_key: update_stack})
