@@ -64,6 +64,10 @@ _RECORD_SERIALIZER = DataSerializers.FOR_MONGO
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 """Used for key serialization."""
 
+# TODO (Roman): Clean up open connections on worker shutdown
+_mongo_client_dict: dict[tuple[type, str | None], MongoClient] = {}
+"""Mongo client dict for caching and reusing Mongo connection."""
+
 
 @dataclass(slots=True, kw_only=True)
 class BasicMongoDb(Db):
@@ -459,13 +463,25 @@ class BasicMongoDb(Db):
 
     def _get_mongo_client(self) -> MongoClient:
         """Get MongoDB client object, MongoMock will override."""
+
+        # TODO (Roman): Refactor. Consider removing _mongo_client from instance-level fields
         if self._mongo_client is None:
             mongo_client_type = self._get_mongo_client_type()
-            self._mongo_client = mongo_client_type(
-                self.client_uri,
-                tz_aware=True,
-                uuidRepresentation="standard",
-            )
+
+            mongo_client_key = (mongo_client_type, self.client_uri)
+            cached_mongo_client = _mongo_client_dict.get(mongo_client_key)
+
+            if cached_mongo_client is None:
+                mongo_client = mongo_client_type(
+                    self.client_uri,
+                    tz_aware=True,
+                    uuidRepresentation="standard",
+                )
+                self._mongo_client = mongo_client
+                _mongo_client_dict[mongo_client_key] = mongo_client
+            else:
+                self._mongo_client = cached_mongo_client
+
         return self._mongo_client
 
     def _get_db_name(self) -> str:
