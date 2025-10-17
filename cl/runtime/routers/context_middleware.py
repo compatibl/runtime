@@ -16,7 +16,6 @@ from starlette.types import ASGIApp
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.db.db import Db
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.server.env import Env
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
@@ -38,7 +37,12 @@ class ContextMiddleware:
         with ContextSnapshot().build():
 
             # Activate contexts for this call
-            with activate(Env().build()), activate(DataSource().build()), activate(EventBroker.create()), activate(CeleryQueue(queue_id="Handler Queue").build()):
+            with (
+                activate(Env().build()),
+                activate(DataSource().build()),
+                activate(EventBroker.create()),
+                activate(CeleryQueue(queue_id="Handler Queue").build()),
+            ):
                 # TODO: Create a test setting to enable this other than by uncommenting
                 # await asyncio.sleep(duration)
                 await self.app(scope, receive, send)

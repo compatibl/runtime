@@ -16,9 +16,9 @@ import logging.config
 import multiprocessing
 import os
 from dataclasses import dataclass
-from typing import Dict, ClassVar
+from typing import ClassVar
+from typing import Dict
 from typing import Final
-from typing import Optional
 from urllib.parse import urlparse
 import pika
 import redis

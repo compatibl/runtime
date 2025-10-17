@@ -14,7 +14,7 @@
 
 import pytest
 import time
-from cl.runtime.contexts.context_manager import active, activate
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.db.tenant_key import TenantKey
@@ -378,7 +378,7 @@ def test_parent_data_source(basic_mongo_db_fixture):
 
     # Create child DataSource with parent set to the base
     child_ds = DataSource(
-        db = base_ds.db,
+        db=base_ds.db,
         dataset=base_ds.dataset,
         tenant=TenantKey(tenant_id="test_tenant"),
         parent=base_ds,
@@ -417,7 +417,7 @@ def test_parent_data_source_delete(basic_mongo_db_fixture):
 
     # Create child DataSource with parent set to the base
     child_ds = DataSource(
-        db = base_ds.db,
+        db=base_ds.db,
         dataset=base_ds.dataset,
         tenant=TenantKey(tenant_id="test_tenant"),
         parent=base_ds,

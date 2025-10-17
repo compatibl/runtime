@@ -34,7 +34,8 @@ from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.env_kind import EnvKind
-from cl.runtime.tasks.celery.celery_queue import celery_app, CeleryQueue
+from cl.runtime.tasks.celery.celery_queue import CeleryQueue
+from cl.runtime.tasks.celery.celery_queue import celery_app
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 
 

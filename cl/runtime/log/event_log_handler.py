@@ -14,7 +14,6 @@
 
 import logging
 from logging import LogRecord
-
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker

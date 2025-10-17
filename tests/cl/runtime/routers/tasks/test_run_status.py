@@ -20,7 +20,6 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.tasks.status_request import StatusRequest
 from cl.runtime.routers.tasks.status_response_item import StatusResponseItem
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
-from cl.runtime.tasks.task_queue import TaskQueue
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey

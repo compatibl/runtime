@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fastapi import FastAPI, Depends
+from fastapi import Depends
+from fastapi import FastAPI
 from cl.runtime.routers.app import app_router
 from cl.runtime.routers.auth import auth_router
 from cl.runtime.routers.entity import entity_router
@@ -37,9 +38,21 @@ class ServerUtil:
         server_app.include_router(auth_router.router, prefix="/auth", tags=["Authorization"])
 
         # Routers with Auth dependency
-        server_app.include_router(sse_router.router, prefix="/sse", tags=["SSE"], dependencies=[Depends(activate_auth_context)])
-        server_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"], dependencies=[Depends(activate_auth_context)])
-        server_app.include_router(storage_router.router, prefix="/storage", tags=["Storage"], dependencies=[Depends(activate_auth_context)])
-        server_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"], dependencies=[Depends(activate_auth_context)])
-        server_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"], dependencies=[Depends(activate_auth_context)])
-        server_app.include_router(handler_router.router, prefix="/handler", tags=["Handler"], dependencies=[Depends(activate_auth_context)])
+        server_app.include_router(
+            sse_router.router, prefix="/sse", tags=["SSE"], dependencies=[Depends(activate_auth_context)]
+        )
+        server_app.include_router(
+            schema_router.router, prefix="/schema", tags=["Schema"], dependencies=[Depends(activate_auth_context)]
+        )
+        server_app.include_router(
+            storage_router.router, prefix="/storage", tags=["Storage"], dependencies=[Depends(activate_auth_context)]
+        )
+        server_app.include_router(
+            entity_router.router, prefix="/entity", tags=["Entity"], dependencies=[Depends(activate_auth_context)]
+        )
+        server_app.include_router(
+            tasks_router.router, prefix="/tasks", tags=["Tasks"], dependencies=[Depends(activate_auth_context)]
+        )
+        server_app.include_router(
+            handler_router.router, prefix="/handler", tags=["Handler"], dependencies=[Depends(activate_auth_context)]
+        )

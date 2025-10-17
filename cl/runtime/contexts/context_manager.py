@@ -17,9 +17,7 @@ from contextvars import ContextVar
 from typing import Any
 from typing import Optional
 from typing import Type
-
 from frozendict import frozendict
-
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
 from cl.runtime.records.typename import typename

@@ -20,8 +20,8 @@ import orjson
 from fastapi import FastAPI
 from httpx import ASGITransport
 from httpx import AsyncClient
-
-from cl.runtime.contexts.context_manager import active, activate
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.events.event_kind import EventKind

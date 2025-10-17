@@ -17,8 +17,8 @@ from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_db_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_mock_db_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import celery_queue_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import configure_logging_fixture  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import event_broker_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import default_db_fixture  # noqa
+from cl.runtime.qa.pytest.pytest_fixtures import event_broker_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import multi_db_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import sqlite_db_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import work_dir_fixture  # noqa

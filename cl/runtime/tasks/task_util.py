@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing_extensions import Any
-
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.typename import typename

@@ -19,7 +19,6 @@ from typing import Self
 from typing import Sequence
 from typing import cast
 from more_itertools import consume
-
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
@@ -363,7 +362,9 @@ class DataSource(DataSourceKey, RecordMixin):
         # If result is empty return from parent DataSource
         not_none_result = [x for x in result if x]
         if not not_none_result and self.parent:
-            return self.parent.load_many_or_none(records_or_keys, cast_to=cast_to, project_to=project_to, sort_order=sort_order)
+            return self.parent.load_many_or_none(
+                records_or_keys, cast_to=cast_to, project_to=project_to, sort_order=sort_order
+            )
         else:
             return result
 
@@ -442,7 +443,15 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # If result is empty return from parent DataSource
         if not result and self.parent:
-            return self.parent.load_all(key_type, cast_to=cast_to, restrict_to=restrict_to, project_to=project_to, sort_order=sort_order, limit=limit, skip=skip)
+            return self.parent.load_all(
+                key_type,
+                cast_to=cast_to,
+                restrict_to=restrict_to,
+                project_to=project_to,
+                sort_order=sort_order,
+                limit=limit,
+                skip=skip,
+            )
         else:
             return result
 
@@ -562,7 +571,15 @@ class DataSource(DataSourceKey, RecordMixin):
 
         # If result is empty return from parent DataSource
         if not result and self.parent:
-            return self.parent.load_by_query(query, cast_to=cast_to, restrict_to=restrict_to, project_to=project_to, sort_order=sort_order, limit=limit, skip=skip)
+            return self.parent.load_by_query(
+                query,
+                cast_to=cast_to,
+                restrict_to=restrict_to,
+                project_to=project_to,
+                sort_order=sort_order,
+                limit=limit,
+                skip=skip,
+            )
         else:
             return result
 

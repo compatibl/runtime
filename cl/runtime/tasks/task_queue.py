@@ -15,7 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-
 from cl.runtime.db.tenant import Tenant
 from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.primitive.timestamp import Timestamp

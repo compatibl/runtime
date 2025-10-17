@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from typing import AsyncGenerator
 from typing import Self
 from fastapi import Request
-
 from cl.runtime.db.tenant import Tenant
 from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.events.event import Event

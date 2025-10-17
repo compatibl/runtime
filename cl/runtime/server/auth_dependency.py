@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import logging
-
-from cl.runtime.contexts.context_manager import activate, active
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.events.event_broker import EventBroker
@@ -39,7 +39,11 @@ async def activate_auth_context():
 
         # Create and activate contexts with the authenticated user's tenant
         # This is needed to ensure an isolated user environment within the API route call
-        with activate(DataSource(tenant=tenant).build()), activate(EventBroker.create(tenant=tenant)), activate(CeleryQueue(tenant=tenant, queue_id="Handler Queue").build()):
+        with (
+            activate(DataSource(tenant=tenant).build()),
+            activate(EventBroker.create(tenant=tenant)),
+            activate(CeleryQueue(tenant=tenant, queue_id="Handler Queue").build()),
+        ):
 
             # Log info message but don't save to db to make invisible for user
             _logger.info(f"Activate auth context for tenant {tenant.tenant_id}.", extra={"save_to_db": False})
@@ -49,7 +53,10 @@ async def activate_auth_context():
             key_types = data_source.get_key_types()
             if not key_types:
                 # Log info message but don't save to db to make invisible for user
-                _logger.info(f"Tenant {tenant.tenant_id} is not present in Db. Perform save and configure.", extra={"save_to_db": False})
+                _logger.info(
+                    f"Tenant {tenant.tenant_id} is not present in Db. Perform save and configure.",
+                    extra={"save_to_db": False},
+                )
                 PreloadSettings.instance().save_and_configure()
 
             yield
