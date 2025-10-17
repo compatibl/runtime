@@ -63,7 +63,11 @@ class EventBroker(EventBrokerKey, RecordMixin, ABC):
 
     @abstractmethod
     async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[TDataDict, None]:
-        """Subscribe to a topic/channel. Return an async generator yielding events."""
+        """
+        Subscribe to a topic/channel. Return an async generator yielding events.
+        Don't use active(...) inside the subscribe() method, as it will be executed in a separate async task.
+        Isolated endpoint context created with Depends(...) will be unavailable.
+        """
         raise NotImplementedError
 
     @abstractmethod

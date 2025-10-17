@@ -25,6 +25,7 @@ from cl.runtime.events.event import Event
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.data_mixin import TDataDict
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 _logger = logging.getLogger(__name__)
@@ -48,11 +49,11 @@ def _handle_async_task_exception(task: asyncio.Task):
         _logger.error("DB SSE pull events task failed.", exc_info=True)
 
 
-async def _pull_events(queue: asyncio.Queue):
+async def _pull_events(queue: asyncio.Queue, data_source: DataSource):
     while True:
         # Get unprocessed events from the DB, sorted by ascending timestamp
         # load_all is enough as Event key field is timestamp
-        new_events = active(DataSource).load_all(key_type=Event().get_key_type(), sort_order=SortOrder.DESC, limit=100)[
+        new_events = data_source.load_all(key_type=Event().get_key_type(), sort_order=SortOrder.DESC, limit=100)[
             ::-1
         ]
 
@@ -71,6 +72,9 @@ class DbEventBroker(EventBroker):
     Continuously checks if there are new events in the DB and sends them to the queue.
     """
 
+    data_source: DataSource = required()
+    """Data source used for pulling events."""
+
     _sent_event_buffer: deque[str] | None = None
     """Buffer queue for sent events."""
 
@@ -84,6 +88,12 @@ class DbEventBroker(EventBroker):
     """Async Task for pulling Events from DB."""
 
     def __init(self):
+
+        # Set active DataSource if not specified. Use instance-level DataSource instead of active(DataSource)
+        # to allow FastAPI execute streaming response generator in a separate async task
+        if self.data_source is None:
+            self.data_source = active(DataSource)
+
         if self._sent_event_buffer is None:
             self._sent_event_buffer: deque[str] = deque(maxlen=100)
 
@@ -96,14 +106,11 @@ class DbEventBroker(EventBroker):
         if self._pull_events_task is None:
             self._pull_events_task: asyncio.Task | None = None
 
-    async def connect(self) -> None:
-        return None
-
     async def subscribe(self, topic: str, request: Request | None = None) -> AsyncGenerator[TDataDict, None]:
 
         # Start pulling events from db in parallel async task
         if self._pull_events_task is None:
-            pull_events_task = asyncio.create_task(_pull_events(self._event_queue))
+            pull_events_task = asyncio.create_task(_pull_events(self._event_queue, self.data_source))
             pull_events_task.add_done_callback(_handle_async_task_exception)
             self._pull_events_task = pull_events_task
 
@@ -131,7 +138,7 @@ class DbEventBroker(EventBroker):
 
     def sync_publish(self, topic: str, event: Event) -> None:
         # Publish event by just saving to DB
-        active(DataSource).replace_one(event, commit=True)
+        self.data_source.replace_one(event, commit=True)
 
     async def close(self) -> None:
         # Cancel pull events task

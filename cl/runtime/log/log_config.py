@@ -148,16 +148,21 @@ def _make_filter_db_logs():
     """Filter logs to be stored in db."""
 
     def filter_(record):
+
         # Filter out third-party lib info logs
-        third_party_logs = record.levelno <= logging.INFO and record.name.startswith(("uvicorn", "celery"))
+        runtime_logs = "cl.runtime" in record.name
+        third_party_important_logs = not runtime_logs and record.levelno > logging.INFO
 
         # Filter out if the log was created outside the DataSource
-        outside_data_context = active_or_none(DataSource) is None
+        inside_data_source = active_or_none(DataSource) is not None
 
-        return not any(
+        # Get save_to_db flag from log record extras. True by default
+        save_to_db = getattr(record, "save_to_db", True)
+
+        return any(
             (
-                third_party_logs,
-                outside_data_context,
+                runtime_logs and inside_data_source and save_to_db,
+                third_party_important_logs and inside_data_source,
             )
         )
 

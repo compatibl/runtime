@@ -20,7 +20,6 @@ from typing import Sequence
 from typing import cast
 from more_itertools import consume
 
-from cl.runtime.contexts.context_manager import active_or_none, active_or_default
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
@@ -54,7 +53,6 @@ from cl.runtime.records.typename import typeof
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.key_serializers import KeySerializers
-from cl.runtime.server.env import Env
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -108,8 +106,6 @@ class DataSource(DataSourceKey, RecordMixin):
             self.db = Db.create()  # TODO: Move initialization code here?
         elif is_key_type(type(self.db)):
             self.db = self.load_one(self.db)
-
-        _LOGGER.info(f"Connected to DB type '{typename(type(self.db))}', db_id = '{self.db.db_id}'.")
 
         # Use root dataset if not specified
         if self.dataset is None:

@@ -19,13 +19,14 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.context_manager import activate, active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.db import Db
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.log.log_config import uvicorn_empty_logging_config
+from cl.runtime.records.typename import typename
 from cl.runtime.routers.context_middleware import ContextMiddleware
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.server.env import Env
@@ -78,6 +79,8 @@ server_app.add_middleware(ContextMiddleware)
 # Add routers
 ServerUtil.include_routers(server_app)
 
+_logger = logging.getLogger(__name__)
+
 
 def run_backend() -> None:
     """Run REST backend."""
@@ -86,6 +89,9 @@ def run_backend() -> None:
     logging.config.dictConfig(logging_config)
 
     with activate(Env().build()), activate(DataSource().build()), activate(EventBroker.create()):
+
+        data_source = active(DataSource)
+        _logger.info(f"Connected to DB type '{typename(type(data_source.db))}', db_id = '{data_source.db.db_id}'.")
 
         # TODO: This only works for the Mongo celery backend
         if CelerySettings.instance().celery_is_embedded_worker:

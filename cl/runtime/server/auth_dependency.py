@@ -12,16 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.contexts.context_manager import activate
+import logging
+
+from cl.runtime.contexts.context_manager import activate, active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.events.event_broker import EventBroker
+from cl.runtime.settings.preload_settings import PreloadSettings
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 
+_logger = logging.getLogger(__name__)
 
-async def activate_auth_contexts():
+
+async def activate_auth_context():
     """Perform authorization code and activate contexts with user 'tenant'."""
-
     # TODO (Roman): Add settings to enable auth
     auth_enabled = False
 
@@ -33,7 +37,19 @@ async def activate_auth_contexts():
         # TODO (Roman): Perform authentication to get user 'tenant'
         tenant = TenantKey(tenant_id="_Stub_Tenant")
 
-        # Create and activate contexts with the authenticated user's tenant.
-        # This is needed to ensure an isolated user environment within the API route call.
+        # Create and activate contexts with the authenticated user's tenant
+        # This is needed to ensure an isolated user environment within the API route call
         with activate(DataSource(tenant=tenant).build()), activate(EventBroker.create(tenant=tenant)), activate(CeleryQueue(tenant=tenant, queue_id="Handler Queue").build()):
+
+            # Log info message but don't save to db to make invisible for user
+            _logger.info(f"Activate auth context for tenant {tenant.tenant_id}.", extra={"save_to_db": False})
+
+            # If the tenant does not yet exist in the Db, create the initial state of the Db
+            data_source = active(DataSource)
+            key_types = data_source.get_key_types()
+            if not key_types:
+                # Log info message but don't save to db to make invisible for user
+                _logger.info(f"Tenant {tenant.tenant_id} is not present in Db. Perform save and configure.", extra={"save_to_db": False})
+                PreloadSettings.instance().save_and_configure()
+
             yield

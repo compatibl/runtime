@@ -23,7 +23,7 @@ from cl.runtime.routers.settings import settings_router
 from cl.runtime.routers.sse import sse_router
 from cl.runtime.routers.storage import storage_router
 from cl.runtime.routers.tasks import tasks_router
-from cl.runtime.server.auth_dependency import activate_auth_contexts
+from cl.runtime.server.auth_dependency import activate_auth_context
 
 
 class ServerUtil:
@@ -37,9 +37,9 @@ class ServerUtil:
         server_app.include_router(auth_router.router, prefix="/auth", tags=["Authorization"])
 
         # Routers with Auth dependency
-        server_app.include_router(sse_router.router, prefix="/sse", tags=["SSE"], dependencies=[Depends(activate_auth_contexts)])
-        server_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"], dependencies=[Depends(activate_auth_contexts)])
-        server_app.include_router(storage_router.router, prefix="/storage", tags=["Storage"], dependencies=[Depends(activate_auth_contexts)])
-        server_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"], dependencies=[Depends(activate_auth_contexts)])
-        server_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"], dependencies=[Depends(activate_auth_contexts)])
-        server_app.include_router(handler_router.router, prefix="/handler", tags=["Handler"], dependencies=[Depends(activate_auth_contexts)])
+        server_app.include_router(sse_router.router, prefix="/sse", tags=["SSE"], dependencies=[Depends(activate_auth_context)])
+        server_app.include_router(schema_router.router, prefix="/schema", tags=["Schema"], dependencies=[Depends(activate_auth_context)])
+        server_app.include_router(storage_router.router, prefix="/storage", tags=["Storage"], dependencies=[Depends(activate_auth_context)])
+        server_app.include_router(entity_router.router, prefix="/entity", tags=["Entity"], dependencies=[Depends(activate_auth_context)])
+        server_app.include_router(tasks_router.router, prefix="/tasks", tags=["Tasks"], dependencies=[Depends(activate_auth_context)])
+        server_app.include_router(handler_router.router, prefix="/handler", tags=["Handler"], dependencies=[Depends(activate_auth_context)])

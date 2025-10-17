@@ -27,10 +27,9 @@ router = APIRouter()
 _UI_SERIALIZER = DataSerializers.FOR_UI
 
 
-async def _event_generator(request: Request):
+async def _event_generator(request: Request, event_broker: EventBroker):
     """Async generator of events for /events route response."""
 
-    event_broker = active(EventBroker)
     async for event_data in event_broker.subscribe(topic="events", request=request):
         # Get event kind
         event_kind = CaseUtil.pascal_to_upper_case(event_data.get("EventKind"))
@@ -47,4 +46,8 @@ async def _event_generator(request: Request):
 @router.get("/events")
 async def events(request: Request) -> EventSourceResponse:
     """Server event stream route."""
-    return EventSourceResponse(_event_generator(request))
+    event_broker = active(EventBroker)
+
+    # Don't use active(...) inside _event_generator function, as it will be executed in a separate async task
+    # Context created with Depends(...) will be unavailable
+    return EventSourceResponse(_event_generator(request, event_broker))
