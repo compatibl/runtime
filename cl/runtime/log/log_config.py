@@ -151,7 +151,7 @@ def _make_filter_db_logs():
 
         # Filter out third-party lib info logs
         runtime_logs = "cl.runtime" in record.name
-        third_party_important_logs = not runtime_logs and record.levelno > logging.INFO
+        third_party_important_logs = (not runtime_logs) and record.levelno > logging.INFO
 
         # Filter out if the log was created outside the DataSource
         inside_data_source = active_or_none(DataSource) is not None

@@ -173,7 +173,7 @@ def configure_logging_fixture(request: FixtureRequest):
     logging.config.dictConfig(logging_config)
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="function")
 def event_broker_fixture(request: FixtureRequest) -> Iterator[EventBroker]:
     """Pytest module fixture to setup event broker."""
     with activate(EventBroker.create()) as event_broker:

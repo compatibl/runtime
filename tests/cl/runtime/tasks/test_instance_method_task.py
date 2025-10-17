@@ -22,7 +22,7 @@ from stubs.cl.runtime import StubHandlers
 TASK_COUNT = 3
 
 
-def test_smoke(default_db_fixture):
+def test_smoke(default_db_fixture, event_broker_fixture):
     """Smoke test."""
     records = [
         sample.build()

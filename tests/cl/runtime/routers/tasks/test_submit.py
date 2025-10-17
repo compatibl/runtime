@@ -58,7 +58,7 @@ def get_save_to_db_requests(key_str: str):
     ]
 
 
-def test_method(default_db_fixture, celery_queue_fixture):
+def test_method(default_db_fixture, celery_queue_fixture, event_broker_fixture):
     """Test coroutine for /tasks/run route."""
 
     stub_handlers = StubHandlers().build()
@@ -93,7 +93,7 @@ def test_method(default_db_fixture, celery_queue_fixture):
         assert actual_records == expected_records
 
 
-def test_api(default_db_fixture, celery_queue_fixture):
+def test_api(default_db_fixture, celery_queue_fixture, event_broker_fixture):
     """Test REST API for /tasks/submit route."""
     stub_handlers = StubHandlers().build()
     key_str = KeySerializers.DELIMITED.serialize(stub_handlers.get_key())

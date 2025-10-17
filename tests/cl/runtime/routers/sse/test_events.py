@@ -29,7 +29,8 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.routers.sse.sse_router import _event_generator as original_event_generator  # noqa
 
-_logger = logging.getLogger(__name__)
+# Create logger with test name. Logger name is important property for log filters
+_logger = logging.getLogger(f"tests.cl.runtime.{__name__}")
 
 _test_event_loop = asyncio.new_event_loop()
 asyncio.set_event_loop(_test_event_loop)
@@ -81,11 +82,11 @@ async def _publish_and_listen_events(listeners_count: int):
         return listen_results
 
 
-async def mock_event_generator_limited(request):
+async def mock_event_generator_limited(request, event_broker):
 
     max_events = 10
     count = 0
-    async for event in original_event_generator(request):
+    async for event in original_event_generator(request, event_broker):
         yield event
         count += 1
         if count >= max_events:
@@ -121,7 +122,7 @@ def _parse_stream_lines(stream_lines: list[str]) -> list[dict]:
     return events
 
 
-def test_events(default_db_fixture):
+def test_events(default_db_fixture, event_broker_fixture):
 
     with patch("cl.runtime.routers.sse.sse_router._event_generator", mock_event_generator_limited):
         # Run coroutines to publish and listen events in parallel asynchronously
@@ -138,7 +139,7 @@ def test_events(default_db_fixture):
         RegressionGuard().verify_all()
 
 
-def test_events_multi_listener(default_db_fixture):
+def test_events_multi_listener(default_db_fixture, event_broker_fixture):
     listeners_count = 10
     with patch("cl.runtime.routers.sse.sse_router._event_generator", mock_event_generator_limited):
         # Run coroutines to publish and listen events in parallel asynchronously
