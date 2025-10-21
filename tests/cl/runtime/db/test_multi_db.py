@@ -367,7 +367,7 @@ def test_skip_and_limit(multi_db_fixture):
 
 
 # TODO (Roman): Support tenant in SqliteDb
-def test_parent_data_source(basic_mongo_db_fixture):
+def test_parent_data_source(multi_db_fixture):
     """Test DataSource works correctly with parent."""
     records = (
         StubDataclass(id="abc").build(),
@@ -410,7 +410,7 @@ def test_parent_data_source(basic_mongo_db_fixture):
 
 
 # TODO (Roman): Support tenant in SqliteDb
-def test_parent_data_source_delete(basic_mongo_db_fixture):
+def test_parent_data_source_delete(multi_db_fixture):
     """Test DataSource delete works correctly with parent."""
 
     base_ds = active(DataSource)
@@ -437,6 +437,52 @@ def test_parent_data_source_delete(basic_mongo_db_fixture):
     # Check that record exists in the base DataSource
     base_ds_result = base_ds.load_one(base_only_record.get_key())
     assert base_ds_result == base_only_record
+
+
+def test_load_all_only_for_tenant(multi_db_fixture):
+    """Test load all record only for tenant."""
+    base_ds = active(DataSource)
+
+    # Create child DataSource with parent set to the base
+    child_ds = DataSource(
+        db=base_ds.db,
+        dataset=base_ds.dataset,
+        tenant=TenantKey(tenant_id="test_tenant"),
+        parent=base_ds,
+    ).build()
+
+    base_only_record = StubDataclass(id="abc").build()
+
+    records = (
+        base_only_record,
+        StubDataclass(id="def").build(),
+    )
+    child_ds.insert_many(records, commit=True)
+
+    records = child_ds.load_all(key_type=StubDataclassKey)
+    assert len(records) == 2
+
+    records = active(DataSource).load_all(key_type=StubDataclassKey)
+    assert len(records) == 0
+
+
+def test_load_record_from_another_tenant(multi_db_fixture):
+    """Test load record from another tenant."""
+    base_ds = active(DataSource)
+
+    # Create child DataSource with parent set to the base
+    child_ds = DataSource(
+        db=base_ds.db,
+        dataset=base_ds.dataset,
+        tenant=TenantKey(tenant_id="test_tenant"),
+        parent=base_ds,
+    ).build()
+
+    records = StubDataclass(id="abc").build()
+
+    child_ds.insert_many((records,), commit=True)
+
+    assert active(DataSource).load_one_or_none(records.get_key()) is None
 
 
 if __name__ == "__main__":

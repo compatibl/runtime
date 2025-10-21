@@ -87,7 +87,8 @@ class SqliteDb(Db):
 
         # Build SQL query to select records by keys
         placeholders = ",".join("?" for _ in serialized_keys)
-        select_sql = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_key" IN ({placeholders})'
+        values = [tenant, *serialized_keys]
+        select_sql = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ? AND "_key" IN ({placeholders})'
 
         if sort_order is not None:
             # Add order by '_key' condition
@@ -95,7 +96,7 @@ class SqliteDb(Db):
 
         # Execute SQL query
         conn = self._get_connection()
-        cursor = conn.execute(select_sql, serialized_keys)
+        cursor = conn.execute(select_sql, values)
 
         # Deserialize records and return
         return [
@@ -131,14 +132,14 @@ class SqliteDb(Db):
         if not self._table_exists(table_name=table_name):
             return tuple()
 
-        select_sql, values = f"SELECT * FROM {self._quote_identifier(table_name)}", []
+        select_sql, values = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ?', [tenant]
 
         if restrict_to is not None:
             # Add filter condition on type
             subtype_names = TypeInfo.get_child_and_self_type_names(restrict_to, type_kind=TypeKind.RECORD)
             placeholders = ",".join("?" for _ in subtype_names)
 
-            select_sql += f' WHERE "_type" IN ({placeholders})'
+            select_sql += f' AND "_type" IN ({placeholders})'
             values += subtype_names
 
         # Add order by '_key' condition
@@ -211,7 +212,7 @@ class SqliteDb(Db):
             )
 
         # Build SQL query to select records in table by conditions
-        where, values = self._convert_query_dict_to_sql_syntax(query_dict)
+        where, values = self._convert_query_dict_to_sql_syntax(query_dict, tenant)
 
         if restrict_to is not None:
             # Add filter condition on type
@@ -224,10 +225,10 @@ class SqliteDb(Db):
             where += f'"_type" IN ({placeholders})'
             values += subtype_names
 
-        select_sql = f"SELECT * FROM {self._quote_identifier(table_name)}"
+        select_sql = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ?'
 
         if where:
-            select_sql += f" WHERE {where}"
+            select_sql += f" AND {where}"
 
         # Add order by '_key' condition
         select_sql = self._add_order(select_sql, sort_field="_key", sort_order=sort_order)
@@ -298,7 +299,7 @@ class SqliteDb(Db):
             )
 
         # Build SQL query to count records in table by conditions
-        where, values = self._convert_query_dict_to_sql_syntax(query_dict)
+        where, values = self._convert_query_dict_to_sql_syntax(query_dict, tenant)
 
         if restrict_to is not None:
             # Add filter condition on type
@@ -311,10 +312,10 @@ class SqliteDb(Db):
             where += f'"_type" IN ({placeholders})'
             values += subtype_names
 
-        select_sql = f"SELECT COUNT(*) FROM {self._quote_identifier(table_name)}"
+        select_sql = f'SELECT COUNT(*) FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ?'
 
         if where:
-            select_sql += f" WHERE {where}"
+            select_sql += f" AND {where}"
 
         # Execute SQL query
         conn = self._get_connection()
@@ -352,6 +353,7 @@ class SqliteDb(Db):
         for record in records:
             serialized_record = _DATA_SERIALIZER.serialize(record)
             serialized_record["_key"] = _KEY_SERIALIZER.serialize(record.get_key())
+            serialized_record["_tenant"] = tenant
             serialized_records.append(serialized_record)
 
         # Dynamically determine all relevant columns to use for query
@@ -408,11 +410,12 @@ class SqliteDb(Db):
 
         # Build SQL query to delete records by keys
         placeholders = ",".join("?" for _ in serialized_keys)
-        select_sql = f'DELETE FROM {self._quote_identifier(table_name)} WHERE "_key" IN ({placeholders})'
+        values = [tenant, *serialized_keys]
+        select_sql = f'DELETE FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ? AND "_key" IN ({placeholders})'
 
         # Execute SQL query
         conn = self._get_connection()
-        conn.execute(select_sql, serialized_keys)
+        conn.execute(select_sql, values)
 
     def drop_test_db(self) -> None:
         # Check preconditions
@@ -486,7 +489,7 @@ class SqliteDb(Db):
         table_name = self._get_validated_table_name(key_type=key_type)
 
         # List of columns that are present in the table by default
-        column_defs = ["_key", "_type"]
+        column_defs = ["_key", "_type", "_tenant"]
 
         # Validate and quote data type columns
         column_defs.extend(
@@ -496,7 +499,8 @@ class SqliteDb(Db):
             )
         )
 
-        sql = f"CREATE TABLE IF NOT EXISTS {self._quote_identifier(table_name)} ({', '.join(column_defs)})"
+        sql = f'CREATE TABLE IF NOT EXISTS {self._quote_identifier(table_name)} ' +\
+              f'({", ".join(column_defs)}, PRIMARY KEY (_key, _tenant));'
 
         conn = self._get_connection()
         conn.execute(sql)
@@ -554,7 +558,7 @@ class SqliteDb(Db):
             # Not implemented. Return unchanged query by default.
             return select_sql
         else:
-            raise ValueError(f"Unsupported SortOrder: {order}")
+            raise ValueError(f"Unsupported SortOrder: {sort_order}")
 
     @classmethod
     def _extract_columns_for_key_type(cls, key_type: type[TKey]) -> list[str]:
@@ -611,7 +615,7 @@ class SqliteDb(Db):
         return f'"{escaped}"'
 
     @classmethod
-    def _convert_query_dict_to_sql_syntax(cls, query_dict: dict) -> tuple[str, list]:
+    def _convert_query_dict_to_sql_syntax(cls, query_dict: dict, tenant: str) -> tuple[str, list]:
         """
         Create query dict to SQL syntax 'WHERE' clause.
         Returns a tuple of two values, where the first is an SQL string with placeholders,
@@ -619,7 +623,7 @@ class SqliteDb(Db):
         """
 
         clauses = []
-        values = []
+        values = [tenant]
 
         for key, value in query_dict.items():
             if isinstance(value, dict):
