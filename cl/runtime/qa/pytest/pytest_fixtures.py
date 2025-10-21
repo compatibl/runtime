@@ -34,6 +34,7 @@ from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.env_kind import EnvKind
+from cl.runtime.settings.sse_settings import SseSettings
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_app
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
@@ -176,6 +177,23 @@ def configure_logging_fixture(request: FixtureRequest):
 
 @pytest.fixture(scope="function")
 def event_broker_fixture(request: FixtureRequest) -> Iterator[EventBroker]:
-    """Pytest module fixture to setup event broker."""
-    with activate(EventBroker.create()) as event_broker:
+    """Pytest module fixture to setup Event Broker."""
+
+    sse_settings = SseSettings.instance()
+
+    broker_type = TypeInfo.from_type_name(sse_settings.sse_broker_type)
+
+    # Set test Event Broker id to test name, prefixed by 'test_'
+    test_name = PytestUtil.get_test_path_from_request(request, name_only=True)
+    broker_id = test_name.replace(".", ":")
+
+    broker = EventBroker.create(broker_type=broker_type, broker_id=broker_id)
+
+    # Remove test broker data before unit test
+    broker.drop_test_broker()
+
+    with activate(broker) as event_broker:
         yield event_broker
+
+    # Remove test broker data after unit test
+    broker.drop_test_broker()

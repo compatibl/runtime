@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.settings.settings import Settings
 
@@ -30,9 +31,6 @@ class SseSettings(Settings):
     sse_broker_uri: str | None = None
     """Event broker URI."""
 
-    sse_exchange: str | None = "sse_exchange"
-    """Exchange name."""
-
     sse_test_prefix: str = "test_"
     """
     Prefix for unit test Event Broker that are created and deleted automatically.
@@ -45,6 +43,3 @@ class SseSettings(Settings):
     def __init(self) -> None:
         if not self.sse_broker_type:
             raise RuntimeError("Event broker is not specified in settings.")
-
-        if not self.sse_exchange:
-            raise RuntimeError("Exchange name is not specified.")

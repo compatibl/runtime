@@ -40,7 +40,7 @@ async def _listen_events(client):
     headers = {"Accept": "text/event-stream"}
 
     # Create separate Event Broker for each listener
-    with activate(EventBroker.create()):
+    with activate(active(EventBroker).clone().build()):
         async with client.stream("GET", "/sse/events", headers=headers) as response:
             assert response.status_code == 200
             event_stream_lines = []

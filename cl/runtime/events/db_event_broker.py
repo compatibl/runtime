@@ -142,3 +142,7 @@ class DbEventBroker(EventBroker):
         # Cancel pull events task
         if self._pull_events_task is not None:
             self._pull_events_task.cancel()
+
+    def drop_test_broker(self) -> None:
+        # Do nothing. Rely on active Db teardown
+        self.check_drop_test_broker_preconditions()
