@@ -27,6 +27,8 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.data_mixin import TDataDict
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.schema.type_info import TypeInfo
+from cl.runtime.settings.sse_settings import SseSettings
 
 _logger = logging.getLogger(__name__)
 
@@ -53,10 +55,9 @@ class EventBroker(EventBrokerKey, RecordMixin, ABC):
     def create(cls, *, tenant: TenantKey | None = None) -> Self:
         """Factory method to create Event Broker from settings."""
 
-        from cl.runtime.events.db_event_broker import DbEventBroker
-
-        # TODO (Roman): Get event broker type from settings.
-        broker_type = DbEventBroker
+        # Get broker type from settings
+        sse_settings = SseSettings.instance()
+        broker_type = TypeInfo.from_type_name(sse_settings.sse_broker_type)
 
         return broker_type(tenant=tenant).build()
 

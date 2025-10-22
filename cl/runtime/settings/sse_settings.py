@@ -1,0 +1,50 @@
+# Copyright (C) 2023-present The Project Contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from dataclasses import dataclass
+from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.settings.settings import Settings
+
+
+@dataclass(slots=True, kw_only=True)
+class SseSettings(Settings):
+    """Settings for Server-Sent Events (SSE)."""
+
+    sse_broker_id: str = required()
+    """Event broker identifier."""
+
+    sse_broker_type: str = "DbEventBroker"
+    """Event broker to be used."""
+
+    sse_broker_uri: str | None = None
+    """Event broker URI."""
+
+    sse_exchange: str | None = "sse_exchange"
+    """Exchange name."""
+
+    sse_test_prefix: str = "test_"
+    """
+    Prefix for unit test Event Broker that are created and deleted automatically.
+
+    Notes:
+        DROPPING THE EVENT BROKER AUTOMATICALLY AS PART OF A UNIT TEST WILL FAIL
+        UNLESS BROKER_ID STARTS FROM THIS PREFIX
+    """
+
+    def __init(self) -> None:
+        if not self.sse_broker_type:
+            raise RuntimeError("Event broker is not specified in settings.")
+
+        if not self.sse_exchange:
+            raise RuntimeError("Exchange name is not specified.")
