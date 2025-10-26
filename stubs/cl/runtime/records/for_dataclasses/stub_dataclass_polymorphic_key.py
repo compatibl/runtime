@@ -21,9 +21,6 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_base_ke
 class StubDataclassPolymorphicKey(StubDataclassPolymorphicBaseKey):
     """Stub derived key."""
 
-    id: str = "abc"
-    """Unique identifier."""
-
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
         return StubDataclassPolymorphicKey
