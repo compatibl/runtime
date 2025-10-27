@@ -19,7 +19,7 @@ from cl.runtime.stats.classifier_trial import ClassifierTrial
 
 @dataclass(slots=True, kw_only=True)
 class SupervisedClassifierTrial(ClassifierTrial):
-    """Supervised classifier experiment trial has string actual and expected results representing the class label."""
+    """Specifies the actual class label assigned by this trial and its expected (correct) value."""
 
-    expected: str = required()
-    """Expected result of the classifier trial (class label)."""
+    expected_label: str = required()
+    """Expected class label for trial."""

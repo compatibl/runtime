@@ -16,15 +16,11 @@ from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.stats.experiment_key import ExperimentKey
 
 
 @dataclass(slots=True)
 class TrialKey(DataclassMixin, KeyMixin):
     """Abstract base class for a single trial of a statistical experiment."""
-
-    experiment: ExperimentKey = required()
-    """Experiment for which the trial is performed."""
 
     timestamp: str = required()
     """Trial timestamp must be unique for each experiment but not globally."""

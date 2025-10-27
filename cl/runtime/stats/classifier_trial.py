@@ -19,7 +19,7 @@ from cl.runtime.stats.trial import Trial
 
 @dataclass(slots=True, kw_only=True)
 class ClassifierTrial(Trial):
-    """Unsupervised classifier experiment trial has string result type representing the class label."""
+    """Specifies the class label assigned by this trial."""
 
-    actual: str = required()
-    """Actual result of the classifier trial (class label)."""
+    label: str = required()
+    """Class label assigned by this trial."""

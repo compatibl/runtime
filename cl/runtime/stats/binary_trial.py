@@ -19,7 +19,7 @@ from cl.runtime.stats.trial import Trial
 
 @dataclass(slots=True, kw_only=True)
 class BinaryTrial(Trial):
-    """Unsupervised binary experiment trial has boolean result type."""
+    """Specifies the outcome (True or False) of this trial."""
 
-    actual: bool = required()
-    """Actual result of the binary trial (True or False)."""
+    outcome: bool = required()
+    """Outcome of this trial (True or False)."""

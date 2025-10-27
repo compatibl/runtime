@@ -19,7 +19,7 @@ from cl.runtime.stats.binary_trial import BinaryTrial
 
 @dataclass(slots=True, kw_only=True)
 class SupervisedBinaryTrial(BinaryTrial):
-    """Supervised binary experiment trial has boolean actual and expected result types."""
+    """Specifies the actual outcome by this trial (True or False) and its expected (correct) value."""
 
-    expected: bool = required()
-    """Expected result of the binary trial (True or False)."""
+    expected_outcome: bool = required()
+    """Expected outcome of this trial (True or False)."""
