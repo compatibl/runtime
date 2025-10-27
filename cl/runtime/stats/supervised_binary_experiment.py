@@ -19,7 +19,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.stats.binary_experiment import BinaryExperiment
 from cl.runtime.stats.supervised_binary_trial import SupervisedBinaryTrial
-from cl.runtime.stats.trial_key_query import TrialKeyQuery
+from cl.runtime.stats.trial_query import TrialQuery
 
 
 @dataclass(slots=True, kw_only=True)
@@ -34,7 +34,7 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
         group_labels = []
         bar_labels = []
         values = []
-        trial_query = TrialKeyQuery(experiment=self.get_key()).build()
+        trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=SupervisedBinaryTrial)
 
         for scenario in self.scenarios:

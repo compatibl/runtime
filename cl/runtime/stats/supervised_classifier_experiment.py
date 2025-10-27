@@ -21,7 +21,7 @@ from cl.runtime.plots.heat_map_plot import HeatMapPlot
 from cl.runtime.plots.multi_plot import MultiPlot
 from cl.runtime.stats.classifier_experiment import ClassifierExperiment
 from cl.runtime.stats.supervised_classifier_trial import SupervisedClassifierTrial
-from cl.runtime.stats.trial_key_query import TrialKeyQuery
+from cl.runtime.stats.trial_query import TrialQuery
 
 
 @dataclass(slots=True, kw_only=True)
@@ -33,7 +33,7 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
             raise RuntimeError("Experiment must have scenarios to build a plot.")
 
         plots = []
-        trial_query = TrialKeyQuery(experiment=self.get_key()).build()
+        trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=SupervisedClassifierTrial)
         num_labels = len(self.class_labels)
 

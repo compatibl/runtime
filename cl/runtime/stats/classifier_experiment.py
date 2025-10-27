@@ -21,7 +21,7 @@ from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.stats.classifier_trial import ClassifierTrial
 from cl.runtime.stats.experiment import Experiment
-from cl.runtime.stats.trial_key_query import TrialKeyQuery
+from cl.runtime.stats.trial_query import TrialQuery
 
 
 @dataclass(slots=True, kw_only=True)
@@ -42,7 +42,7 @@ class ClassifierExperiment(Experiment, ABC):
         values = []
 
         scenario_counts = []
-        trial_query = TrialKeyQuery(experiment=self.get_key()).build()
+        trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=ClassifierTrial)
 
         for scenario in self.scenarios:
