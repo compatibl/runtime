@@ -47,7 +47,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
 
     def get_key(self) -> ExperimentKey:
-        return ExperimentKey(experiment_kind=self.experiment_kind, experiment_id=self.experiment_id).build()
+        return ExperimentKey(experiment_id=self.experiment_id).build()
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

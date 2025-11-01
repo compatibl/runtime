@@ -19,15 +19,11 @@ from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.stats.experiment_key import ExperimentKey
-from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 
 
 @dataclass(slots=True, kw_only=True)
 class ExperimentKeyQuery(DataclassMixin, QueryMixin):
-    """Query for ExperimentKey by the experiment_kind and experiment_id fields."""
-
-    experiment_kind: ExperimentKindKey = required()
-    """Experiment records are separated for each experiment kind."""
+    """Query for ExperimentKey by experiment_id."""
 
     experiment_id: str | Condition[str] | None = None
     """Experiment identifier must be unique for each experiment kind but not globally."""

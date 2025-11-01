@@ -16,15 +16,11 @@ from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 
 
 @dataclass(slots=True)
 class ExperimentScenarioKey(DataclassMixin, KeyMixin):
     """One of multiple scenarios for an experiment."""
-
-    experiment_kind: ExperimentKindKey = required()
-    """Experiment scenarios are separated by experiment kind."""
 
     experiment_scenario_id: str = required()
     """Unique experiment scenario identifier."""

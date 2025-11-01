@@ -16,28 +16,18 @@ import pytest
 import random
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.stats.experiment_kind import ExperimentKind
-from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 from cl.runtime.stats.experiment_scenario import ExperimentScenario
 from stubs.cl.runtime.stats.stub_binary_experiment import StubBinaryExperiment
 
 
 def test_smoke(multi_db_fixture):
     """Test for BinaryExperiment class."""
-
-    exp_type = ExperimentKind(kind_id="Test").build()
-    sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
-
-    active(DataSource).replace_one(exp_type, commit=True)
-    active(DataSource).replace_one(sc1, commit=True)
-
     # Create and run the experiment
     experiment = StubBinaryExperiment(
-        experiment_kind=ExperimentKindKey(kind_id="TestBinaryExperiment"),
         experiment_id="test_binary_experiment.test_smoke",
         max_trials=5,
         scenarios=[
-            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
+            ExperimentScenario(experiment_scenario_id="Test1"),
         ],
     )
     experiment.run_all()
@@ -46,19 +36,11 @@ def test_smoke(multi_db_fixture):
 
 
 def test_plot(multi_db_fixture, work_dir_fixture):
-    exp_type = ExperimentKind(kind_id="Test").build()
-    sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
-    sc2 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2").build()
-
-    active(DataSource).replace_one(exp_type, commit=True)
-    active(DataSource).replace_many([sc1, sc2], commit=True)
-
     experiment = StubBinaryExperiment(
-        experiment_kind=ExperimentKindKey(kind_id="Test"),
         experiment_id="Test",
         scenarios=[
-            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
-            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2"),
+            ExperimentScenario(experiment_scenario_id="Test1"),
+            ExperimentScenario(experiment_scenario_id="Test2"),
         ],
         max_trials=5,
     )

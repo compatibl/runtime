@@ -16,51 +16,32 @@ import pytest
 import random
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.stats.experiment_kind import ExperimentKind
-from cl.runtime.stats.experiment_kind_key import ExperimentKindKey
 from cl.runtime.stats.experiment_scenario import ExperimentScenario
 from stubs.cl.runtime.stats.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
 
 
 def test_smoke(multi_db_fixture):
     """Test for BinaryExperiment class with supervised=True."""
-
-    exp_type = ExperimentKind(kind_id="Test").build()
-    sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
-
-    active(DataSource).replace_one(exp_type, commit=True)
-    active(DataSource).replace_one(sc1, commit=True)
-
     # Create and run the experiment
     experiment = StubSupervisedClassifierExperiment(
-        experiment_kind=ExperimentKindKey(kind_id="TestSupervisedClassifierExperiment"),
         experiment_id="test_supervised_classifier_experiment.test_smoke",
         class_labels=["A", "B", "C"],
         max_trials=5,
         scenarios=[
-            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
+            ExperimentScenario(experiment_scenario_id="Test1"),
         ],
     )
     experiment.run_all()
 
 
 def test_plot(multi_db_fixture, work_dir_fixture):
-
-    exp_type = ExperimentKind(kind_id="Test").build()
-    sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()
-    sc2 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2").build()
-
-    active(DataSource).replace_one(exp_type, commit=True)
-    active(DataSource).replace_many([sc1, sc2], commit=True)
-
     experiment = StubSupervisedClassifierExperiment(
-        experiment_kind=ExperimentKindKey(kind_id="Test"),
         experiment_id="Test",
         scenarios=[
-            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1"),
-            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test2"),
-            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test3"),
-            ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test4"),
+            ExperimentScenario(experiment_scenario_id="Test1"),
+            ExperimentScenario(experiment_scenario_id="Test2"),
+            ExperimentScenario(experiment_scenario_id="Test3"),
+            ExperimentScenario(experiment_scenario_id="Test4"),
         ],
         max_trials=15,
         class_labels=["A", "B", "C"],

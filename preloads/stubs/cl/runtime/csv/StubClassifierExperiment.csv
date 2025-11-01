@@ -1,3 +1,3 @@
-experiment_kind,experiment_id,class_labels,scenarios,max_trials,max_parallel
-StubClassifierExperimentKind1,StubClassifierExperiment11,"[""A"", ""B"", ""C""]","[""StubClassifierExperimentKind1;StubClassifierExperimentScenario11A"",""StubClassifierExperimentKind1;StubClassifierExperimentScenario11B""]",,
-StubClassifierExperimentKind2,StubClassifierExperiment21,"[""A"", ""B"", ""C""]","[""StubClassifierExperimentKind2;StubClassifierExperimentScenario11A"",""StubClassifierExperimentKind2;StubClassifierExperimentScenario11B""]","""5""","""2"""
+experiment_id,class_labels,scenarios,max_trials,max_parallel
+StubClassifierExperiment11,"[""A"", ""B"", ""C""]","[""StubClassifierExperimentScenario11A"",""StubClassifierExperimentScenario11B""]",,
+StubClassifierExperiment21,"[""A"", ""B"", ""C""]","[""StubClassifierExperimentScenario11A"",""StubClassifierExperimentScenario11B""]","""5""","""2"""
