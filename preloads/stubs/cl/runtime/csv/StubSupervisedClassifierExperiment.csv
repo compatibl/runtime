@@ -1,3 +1,3 @@
-experiment_id,class_labels,scenarios,max_trials,max_parallel
-StubSupervisedClassifierExperiment11,"[""A"", ""B"", ""C""]","[""StubSupervisedClassifierExperimentScenario11A"",""StubSupervisedClassifierExperimentScenario11B""]",,
-StubSupervisedClassifierExperiment21,"[""A"", ""B"", ""C""]","[""StubSupervisedClassifierExperimentScenario11A"",""StubSupervisedClassifierExperimentScenario11B""]","""5""","""2"""
+experiment_id,class_labels,conditions,max_trials,max_parallel
+StubSupervisedClassifierExperiment11,"[""A"", ""B"", ""C""]","[""StubSupervisedClassifierExperimentCondition11A"",""StubSupervisedClassifierExperimentCondition11B""]",,
+StubSupervisedClassifierExperiment21,"[""A"", ""B"", ""C""]","[""StubSupervisedClassifierExperimentCondition11A"",""StubSupervisedClassifierExperimentCondition11B""]","""5""","""2"""

@@ -16,7 +16,7 @@ import pytest
 import random
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.stats.experiment_scenario import ExperimentScenario
+from cl.runtime.stats.experiment_condition import ExperimentCondition
 from stubs.cl.runtime.stats.stub_classifier_experiment import StubClassifierExperiment
 
 
@@ -27,8 +27,8 @@ def test_smoke(multi_db_fixture):
         experiment_id="test_classifier_experiment.test_smoke",
         max_trials=5,
         class_labels=["A", "B", "C"],
-        scenarios=[
-            ExperimentScenario(experiment_scenario_id="Test1"),
+        conditions=[
+            ExperimentCondition(experiment_condition_id="Test1"),
         ],
     )
     experiment.run_all()
@@ -37,9 +37,9 @@ def test_smoke(multi_db_fixture):
 def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubClassifierExperiment(
         experiment_id="Test",
-        scenarios=[
-            ExperimentScenario(experiment_scenario_id="Test1"),
-            ExperimentScenario(experiment_scenario_id="Test2"),
+        conditions=[
+            ExperimentCondition(experiment_condition_id="Test1"),
+            ExperimentCondition(experiment_condition_id="Test2"),
         ],
         max_trials=5,
         class_labels=["A", "B", "C"],

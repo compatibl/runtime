@@ -19,12 +19,12 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ExperimentScenarioKey(DataclassMixin, KeyMixin):
-    """One of multiple scenarios for an experiment."""
+class ExperimentConditionKey(DataclassMixin, KeyMixin):
+    """Condition under which an experiment is performed."""
 
-    experiment_scenario_id: str = required()
-    """Unique experiment scenario identifier."""
+    experiment_condition_id: str = required()
+    """Condition identifier must be globally unique across all experiments."""
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return ExperimentScenarioKey
+        return ExperimentConditionKey

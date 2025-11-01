@@ -15,12 +15,12 @@
 from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
+from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
 
 
 @dataclass(slots=True, kw_only=True)
-class ExperimentScenario(ExperimentScenarioKey, RecordMixin, ABC):
-    """One of multiple scenarios for an experiment."""
+class ExperimentCondition(ExperimentConditionKey, RecordMixin, ABC):
+    """Condition under which an experiment is performed."""
 
-    def get_key(self) -> ExperimentScenarioKey:
-        return ExperimentScenarioKey(experiment_scenario_id=self.experiment_scenario_id).build()
+    def get_key(self) -> ExperimentConditionKey:
+        return ExperimentConditionKey(experiment_condition_id=self.experiment_condition_id).build()

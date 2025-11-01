@@ -34,26 +34,26 @@ class ClassifierExperiment(Experiment, ABC):
     def get_plot(self, plot_id: str) -> StackBarPlot:
         """Builds and returns plot for Classifier Experiment."""
 
-        if not self.scenarios:
-            raise RuntimeError("Experiment must have scenarios to build a plot.")
+        if not self.conditions:
+            raise RuntimeError("Experiment must have one or more condition to build a plot.")  # TODO: !!! Support no conditions
 
         group_labels = []
         bar_labels = []
         values = []
 
-        scenario_counts = []
+        condition_counts = []
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=ClassifierTrial)
 
-        for scenario in self.scenarios:
-            trials = self.get_scenario_trials(all_trials, scenario)
+        for condition in self.conditions:
+            trials = self.get_condition_trials(all_trials, condition)
             total = len(trials)
             class_counts = Counter(trial.label for trial in trials)
-            scenario_counts.append((scenario.experiment_scenario_id, class_counts, total))
+            condition_counts.append((condition.experiment_condition_id, class_counts, total))
 
-        for scenario_id, counts, total in scenario_counts:
+        for condition_id, counts, total in condition_counts:
             for class_label in self.class_labels:
-                group_labels.append(scenario_id)
+                group_labels.append(condition_id)
                 bar_labels.append(class_label)
                 values.append(counts.get(class_label, 0) / total)
 

@@ -24,7 +24,7 @@ from cl.runtime.plots.plot import Plot
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.stats.experiment_key import ExperimentKey
-from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
+from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
 from cl.runtime.stats.trial import Trial
 from cl.runtime.stats.trial_key import TrialKey
 from cl.runtime.stats.trial_query import TrialQuery
@@ -37,14 +37,14 @@ TTrial = TypeVar("TTrial", bound=Trial)
 class Experiment(ExperimentKey, RecordMixin, ABC):
     """Abstract base class for a statistical experiment."""
 
-    scenarios: list[ExperimentScenarioKey] | None = None
-    """Experiment scenarios (optional)."""
+    conditions: list[ExperimentConditionKey] | None = None
+    """Conditions for which the experiment is performed (optional)."""
 
-    max_trials: int | None = None
-    """Maximum number of trials to run per scenario (optional)."""
+    max_trials: int | None = None  # TODO: !!! Rename field to trials
+    """Maximum number of trials to run per condition (optional)."""
 
-    max_parallel: int | None = None
-    """Maximum number of trials to run in parallel (optional, do not restrict if not set)."""
+    max_parallel: int | None = None  # TODO: !!! Rename field
+    """Maximum number of trials to run in parallel across all conditions (optional, do not restrict if not set)."""
 
     def get_key(self) -> ExperimentKey:
         return ExperimentKey(experiment_id=self.experiment_id).build()
@@ -61,7 +61,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             )
 
     @abstractmethod
-    def create_trial(self, scenario: ExperimentScenarioKey) -> Trial:
+    def create_trial(self, condition: ExperimentConditionKey | None = None) -> Trial:
         """
         Create and return a new trial record with actual and (if applicable) expected fields
         without checking if max_trials has already been reached.
@@ -81,9 +81,9 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def view_plot(self) -> PngView:
         return self.get_plot(self.experiment_id).get_view()
 
-    def save_trial(self, scenario: ExperimentScenarioKey) -> None:
+    def save_trial(self, condition: ExperimentConditionKey) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
-        trial = self.create_trial(scenario)
+        trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)
 
     def run_one(self) -> None:
@@ -91,8 +91,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         # This will raise an error if the maximum number of trials has been reached
         self._query_remaining_trials_and_check_limit()
         # Create and save one trial
-        for scenario in self.scenarios:
-            self.save_trial(scenario)
+        for condition in self.conditions:
+            self.save_trial(condition)
 
     def run_many(self, *, num_trials: int) -> None:
         """Run up to the specified number of trials, stop when max_trials is reached or exceeded."""
@@ -104,8 +104,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         if self.max_parallel is None or self.max_parallel <= 1:
             # Run sequentially
             for _ in range(num_remaining):
-                for scenario in self.scenarios:
-                    self.save_trial(scenario)
+                for condition in self.conditions:
+                    self.save_trial(condition)
         else:
             # TODO: Implement parallel execution of trials
             raise RuntimeError(f"Cannot run trials in parallel for experiment {self.experiment_id}.")
@@ -123,8 +123,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         if self.max_parallel is None or self.max_parallel <= 1:
             # Run sequentially
             for _ in range(num_remaining):
-                for scenario in self.scenarios:
-                    self.save_trial(scenario)
+                for condition in self.conditions:
+                    self.save_trial(condition)
         else:
             # TODO: Implement parallel execution of trials
             raise RuntimeError(f"Cannot run trials in parallel for experiment {self.experiment_id}.")
@@ -181,11 +181,15 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             )
         return result
 
-    def get_scenario_trials(self, all_trials: Sequence[TTrial], scenario: ExperimentScenarioKey) -> tuple[TTrial, ...]:
-        """Get trials of the particular scenario from all trials."""
-        trials = tuple(trial for trial in all_trials if trial.scenario == scenario)
+    def get_condition_trials(
+            self,
+            all_trials: Sequence[TTrial],
+            condition: ExperimentConditionKey,
+    ) -> tuple[TTrial, ...]:
+        """Return trials for the specified condition."""
+        trials = tuple(trial for trial in all_trials if trial.condition == condition)
         if not trials:
             raise RuntimeError(
-                f"No trials for experiment {self.experiment_id} and scenario {scenario.experiment_scenario_id}."
+                f"No trials found for experiment={self.experiment_id} and condition={condition.experiment_condition_id}."
             )
         return trials

@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.stats.experiment_scenario import ExperimentScenario
+from cl.runtime.stats.experiment_condition import ExperimentCondition
 from stubs.cl.runtime.stats.stub_binary_experiment import StubBinaryExperiment
 
 
@@ -24,8 +24,8 @@ def test_run_many(multi_db_fixture):
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
         experiment_id="test_run_many.max_trials_not_set",
-        scenarios=[
-            ExperimentScenario(experiment_scenario_id="Test1"),
+        conditions=[
+            ExperimentCondition(experiment_condition_id="Test1"),
         ],
     )
 
@@ -43,8 +43,8 @@ def test_run_many(multi_db_fixture):
     max_trials_set = StubBinaryExperiment(
         experiment_id="test_run_many.max_trials_set",
         max_trials=5,
-        scenarios=[
-            ExperimentScenario(experiment_scenario_id="Test1"),
+        conditions=[
+            ExperimentCondition(experiment_condition_id="Test1"),
         ],
     )
 
@@ -77,8 +77,8 @@ def test_run_all(multi_db_fixture):
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
         experiment_id="test_run_all.max_trials_not_set",
-        scenarios=[
-            ExperimentScenario(experiment_scenario_id="Test1"),
+        conditions=[
+            ExperimentCondition(experiment_condition_id="Test1"),
         ],
     )
 
@@ -90,8 +90,8 @@ def test_run_all(multi_db_fixture):
     max_trials_set = StubBinaryExperiment(
         experiment_id="test_run_all.max_trials_set",
         max_trials=5,
-        scenarios=[
-            ExperimentScenario(experiment_scenario_id="Test1"),
+        conditions=[
+            ExperimentCondition(experiment_condition_id="Test1"),
         ],
     )
 

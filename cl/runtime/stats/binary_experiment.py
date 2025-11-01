@@ -29,8 +29,8 @@ class BinaryExperiment(Experiment, ABC):
     def get_plot(self, plot_id: str) -> StackBarPlot:
         """Builds and returns plot for Binary Experiment."""
 
-        if not self.scenarios:
-            raise RuntimeError("Experiment must have scenarios to build a plot.")
+        if not self.conditions:
+            raise RuntimeError("Experiment must have one or more condition to build a plot.")  # TODO: !!! Support no conditions
 
         group_labels = []
         bar_labels = []
@@ -38,15 +38,15 @@ class BinaryExperiment(Experiment, ABC):
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=BinaryTrial)
 
-        for scenario in self.scenarios:
+        for condition in self.conditions:
 
-            trials = self.get_scenario_trials(all_trials, scenario)
+            trials = self.get_condition_trials(all_trials, condition)
             total = len(trials)
 
             true_trials = sum(trial.outcome for trial in trials)
             false_trials = total - true_trials
 
-            group_labels.extend([scenario.experiment_scenario_id] * 2)
+            group_labels.extend([condition.experiment_condition_id] * 2)
             bar_labels.extend(["True", "False"])
             values.extend([true_trials / total, false_trials / total])
 

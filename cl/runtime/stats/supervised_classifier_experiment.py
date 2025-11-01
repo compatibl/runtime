@@ -29,16 +29,16 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
     """Supervised classifier experiment with string actual and expected results representing the class label."""
 
     def get_plot(self, plot_id: str) -> MultiPlot:
-        if not self.scenarios:
-            raise RuntimeError("Experiment must have scenarios to build a plot.")
+        if not self.conditions:
+            raise RuntimeError("Experiment must have one or more condition to build a plot.")  # TODO: Support no conditions
 
         plots = []
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=SupervisedClassifierTrial)
         num_labels = len(self.class_labels)
 
-        for scenario in self.scenarios:
-            trials = self.get_scenario_trials(all_trials, scenario)
+        for condition in self.conditions:
+            trials = self.get_condition_trials(all_trials, condition)
 
             y_true = [trial.label for trial in trials]
             y_pred = [trial.expected_label for trial in trials]
@@ -57,8 +57,8 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
             expected_values = [0.0] * len(received_values)
 
             heatmap = HeatMapPlot(
-                plot_id=f"{plot_id}_{scenario.experiment_scenario_id}",
-                title=f"{scenario.experiment_scenario_id}",
+                plot_id=f"{plot_id}_{condition.experiment_condition_id}",
+                title=f"{condition.experiment_condition_id}",
                 row_labels=row_labels,
                 col_labels=col_labels,
                 received_values=received_values,
