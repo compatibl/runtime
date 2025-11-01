@@ -40,8 +40,8 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
         for scenario in self.scenarios:
             trials = self.get_scenario_trials(all_trials, scenario)
 
-            y_true = [trial.actual for trial in trials]
-            y_pred = [trial.expected for trial in trials]
+            y_true = [trial.label for trial in trials]
+            y_pred = [trial.expected_label for trial in trials]
 
             matrix = np.zeros((num_labels, num_labels), dtype=int)
             label_to_index = {label: i for i, label in enumerate(self.class_labels)}

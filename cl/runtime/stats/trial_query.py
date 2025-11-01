@@ -18,7 +18,7 @@ from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.stats.experiment_base_key import ExperimentBaseKey
+from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.trial_key import TrialKey
 
@@ -27,7 +27,7 @@ from cl.runtime.stats.trial_key import TrialKey
 class TrialQuery(DataclassMixin, QueryMixin):
     """Query for Trial by the experiment and timestamp fields."""
 
-    experiment: ExperimentBaseKey = required()
+    experiment: ExperimentKey = required()
     """Experiment for which the trial is performed."""
 
     timestamp: str | Condition[str] | None = None  # TODO: Use UUID based timestamp for faster range queries

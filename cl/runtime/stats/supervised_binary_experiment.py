@@ -44,13 +44,13 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
             tp = tn = fp = fn = 0
 
             for trial in trials:
-                if trial.actual and trial.expected:
+                if trial.outcome and trial.expected_outcome:
                     tp += 1
-                elif not trial.actual and not trial.expected:
+                elif not trial.outcome and not trial.expected_outcome:
                     tn += 1
-                elif trial.actual and not trial.expected:
+                elif trial.outcome and not trial.expected_outcome:
                     fp += 1
-                elif not trial.actual and trial.expected:
+                elif not trial.outcome and trial.expected_outcome:
                     fn += 1
 
             group_labels.extend([scenario.experiment_scenario_id] * 4)

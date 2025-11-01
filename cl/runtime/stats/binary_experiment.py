@@ -19,12 +19,11 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.stats.binary_trial import BinaryTrial
 from cl.runtime.stats.experiment import Experiment
-from cl.runtime.stats.experiment_mixin import ExperimentMixin
 from cl.runtime.stats.trial_query import TrialQuery
 
 
 @dataclass(slots=True, kw_only=True)
-class BinaryExperiment(ExperimentMixin, ABC):
+class BinaryExperiment(Experiment, ABC):
     """Unsupervised binary experiment with boolean result type."""
 
     def get_plot(self, plot_id: str) -> StackBarPlot:
@@ -44,7 +43,7 @@ class BinaryExperiment(ExperimentMixin, ABC):
             trials = self.get_scenario_trials(all_trials, scenario)
             total = len(trials)
 
-            true_trials = sum(trial.actual for trial in trials)
+            true_trials = sum(trial.outcome for trial in trials)
             false_trials = total - true_trials
 
             group_labels.extend([scenario.experiment_scenario_id] * 2)

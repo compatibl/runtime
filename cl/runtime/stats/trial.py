@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.stats.experiment_base_key import ExperimentBaseKey
+from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.stats.trial_key import TrialKey
 
@@ -26,7 +26,7 @@ from cl.runtime.stats.trial_key import TrialKey
 class Trial(TrialKey, RecordMixin, ABC):
     """Abstract base class for a single trial of a statistical experiment."""
 
-    experiment: ExperimentBaseKey = required()
+    experiment: ExperimentKey = required()
     """Experiment for which the trial is performed."""
 
     scenario: ExperimentScenarioKey | None = None

@@ -23,7 +23,7 @@ from stubs.cl.runtime.stats.stub_classifier_experiment import StubClassifierExpe
 
 
 def test_smoke(multi_db_fixture):
-    """Test for ClassifierExperimentMixin."""
+    """Test for ClassifierExperiment."""
 
     exp_type = ExperimentKind(kind_id="Test").build()
     sc1 = ExperimentScenario(experiment_kind=ExperimentKindKey(kind_id="Test"), experiment_scenario_id="Test1").build()

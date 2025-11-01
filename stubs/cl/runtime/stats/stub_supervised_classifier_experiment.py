@@ -27,8 +27,8 @@ class StubSupervisedClassifierExperiment(SupervisedClassifierExperiment):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
     def create_trial(self, scenario: ExperimentScenarioKey) -> SupervisedClassifierTrial:
-        actual = random.choice(self.class_labels)
-        expected = random.choice(self.class_labels)
+        label = random.choice(self.class_labels)
+        expected_label = random.choice(self.class_labels)
         return SupervisedClassifierTrial(
-            experiment=self.get_key(), actual=actual, expected=expected, scenario=scenario
+            experiment=self.get_key(), label=label, expected_label=expected_label, scenario=scenario
         ).build()

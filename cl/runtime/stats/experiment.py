@@ -27,7 +27,7 @@ from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.experiment_scenario_key import ExperimentScenarioKey
 from cl.runtime.stats.trial import Trial
 from cl.runtime.stats.trial_key import TrialKey
-from cl.runtime.stats.trial_key_query import TrialKeyQuery
+from cl.runtime.stats.trial_query import TrialQuery
 from cl.runtime.views.png_view import PngView
 
 TTrial = TypeVar("TTrial", bound=Trial)
@@ -69,8 +69,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def view_trials(self) -> tuple[TrialKey, ...]:
         """View trials of the experiment."""
-        trial_key_query = TrialKeyQuery(experiment=self.get_key()).build()
-        trials = active(DataSource).load_by_query(trial_key_query, cast_to=Trial)
+        trial_query = TrialQuery(experiment=self.get_key()).build()
+        trials = active(DataSource).load_by_query(trial_query, cast_to=Trial)
         trial_keys = [x.get_key() for x in trials]  # TODO: Use project_to instead of get_key
         return trial_keys
 
@@ -131,8 +131,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def query_existing_trials(self) -> int:
         """Get the remaining of existing trials."""
-        trial_key_query = TrialKeyQuery(experiment=self.get_key()).build()
-        num_existing_trials = active(DataSource).count_by_query(trial_key_query)
+        trial_query = TrialQuery(experiment=self.get_key()).build()
+        num_existing_trials = active(DataSource).count_by_query(trial_query)
         return num_existing_trials
 
     def query_remaining_trials(self, *, num_trials: int | None = None) -> int | None:

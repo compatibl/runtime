@@ -48,7 +48,7 @@ class ClassifierExperiment(Experiment, ABC):
         for scenario in self.scenarios:
             trials = self.get_scenario_trials(all_trials, scenario)
             total = len(trials)
-            class_counts = Counter(trial.actual for trial in trials)
+            class_counts = Counter(trial.label for trial in trials)
             scenario_counts.append((scenario.experiment_scenario_id, class_counts, total))
 
         for scenario_id, counts, total in scenario_counts:
