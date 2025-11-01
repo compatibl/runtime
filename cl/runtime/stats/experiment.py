@@ -30,8 +30,6 @@ from cl.runtime.stats.trial_key import TrialKey
 from cl.runtime.stats.trial_query import TrialQuery
 from cl.runtime.views.png_view import PngView
 
-TTrial = TypeVar("TTrial", bound=Trial)
-
 
 @dataclass(slots=True, kw_only=True)
 class Experiment(ExperimentKey, RecordMixin, ABC):
@@ -183,9 +181,9 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def get_condition_trials(
             self,
-            all_trials: Sequence[TTrial],
+            all_trials: Sequence[Trial],
             condition: ExperimentConditionKey,
-    ) -> tuple[TTrial, ...]:
+    ) -> tuple[Trial, ...]:
         """Return trials for the specified condition."""
         trials = tuple(trial for trial in all_trials if trial.condition == condition)
         if not trials:
