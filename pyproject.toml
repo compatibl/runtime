@@ -31,6 +31,7 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 addopts = "-p no:warnings"
 asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
 
 [tool.mypy]
 python_version = "3.11"
