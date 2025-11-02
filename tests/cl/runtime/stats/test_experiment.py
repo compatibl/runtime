@@ -70,7 +70,6 @@ def test_launch_many_trials(multi_db_fixture):
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (0,)
 
 
-
 def test_launch_all_trials(multi_db_fixture):
     """Test for the functionality of base Experiment class."""
     # Create and run the experiment with max_trials not set

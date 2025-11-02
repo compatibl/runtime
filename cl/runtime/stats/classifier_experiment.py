@@ -35,7 +35,9 @@ class ClassifierExperiment(Experiment, ABC):
         """Builds and returns plot for Classifier Experiment."""
 
         if not self.conditions:
-            raise RuntimeError("Experiment must have one or more condition to build a plot.")  # TODO: !!! Support no conditions
+            raise RuntimeError(
+                "Experiment must have one or more condition to build a plot."
+            )  # TODO: !!! Support no conditions
 
         group_labels = []
         bar_labels = []

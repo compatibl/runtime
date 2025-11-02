@@ -14,8 +14,6 @@
 
 import pytest
 import random
-from cl.runtime.contexts.context_manager import active
-from cl.runtime.db.data_source import DataSource
 from cl.runtime.stats.experiment_condition import ExperimentCondition
 from stubs.cl.runtime.stats.stub_supervised_binary_experiment import StubSupervisedBinaryExperiment
 

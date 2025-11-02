@@ -19,7 +19,6 @@ from dataclasses import dataclass
 from typing import AsyncGenerator
 from typing import Self
 from fastapi import Request
-
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.db.tenant import Tenant
 from cl.runtime.db.tenant_key import TenantKey

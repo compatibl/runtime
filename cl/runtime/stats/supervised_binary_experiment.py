@@ -29,7 +29,9 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
     def get_plot(self, plot_id: str) -> StackBarPlot:
         """Builds and returns plot for Supervised Binary Experiment."""
         if not self.conditions:
-            raise RuntimeError("Experiment must have one or more condition to build a plot.")  # TODO: Support no conditions
+            raise RuntimeError(
+                "Experiment must have one or more condition to build a plot."
+            )  # TODO: Support no conditions
 
         group_labels = []
         bar_labels = []

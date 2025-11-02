@@ -18,8 +18,6 @@ from cl.runtime.records.conditions import Condition
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
-from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.trial_key import TrialKey
 

@@ -40,7 +40,6 @@ from cl.runtime.tasks.task_query import TaskQuery
 from cl.runtime.tasks.task_queue import TaskQueue
 from cl.runtime.tasks.task_status import TaskStatus
 
-
 CELERY_RUN_COMMAND_QUEUE: Final[str] = "run_command"
 
 celery_settings = CelerySettings.instance()

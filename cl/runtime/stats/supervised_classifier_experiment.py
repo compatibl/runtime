@@ -30,7 +30,9 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
 
     def get_plot(self, plot_id: str) -> MultiPlot:
         if not self.conditions:
-            raise RuntimeError("Experiment must have one or more condition to build a plot.")  # TODO: Support no conditions
+            raise RuntimeError(
+                "Experiment must have one or more condition to build a plot."
+            )  # TODO: Support no conditions
 
         plots = []
         num_labels = len(self.class_labels)

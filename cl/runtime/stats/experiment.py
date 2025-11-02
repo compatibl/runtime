@@ -15,8 +15,6 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Sequence
-from typing import TypeVar
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.exceptions.user_error import UserError
@@ -25,8 +23,8 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.stats.experiment_condition import ExperimentCondition
-from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
+from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.trial import Trial
 from cl.runtime.stats.trial_key import TrialKey
 from cl.runtime.stats.trial_query import TrialQuery
@@ -133,7 +131,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             Requires a DB query and may be slow, cache the result if possible.
         """
         trial_query = TrialQuery(experiment=self.get_key()).build()
-        trials = active(DataSource).load_by_query(trial_query) # TODO: Use project_to=Trial to reduce data transfer
+        trials = active(DataSource).load_by_query(trial_query)  # TODO: Use project_to=Trial to reduce data transfer
         counts = tuple(sum(1 for t in trials if t.condition == c) for c in self.conditions)
         return counts
 
@@ -148,16 +146,15 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         if max_trials <= 0:
             raise RuntimeError(f"Parameter max_additional_trials={max_trials} must be a positive number.")
         if self.max_trials is not None and max_trials > self.max_trials:
-            raise UserError(
-                f"Parameter max_trials={max_trials} exceeds Experiment.max_trials={self.max_trials}."
-            )
+            raise UserError(f"Parameter max_trials={max_trials} exceeds Experiment.max_trials={self.max_trials}.")
 
         # Check that max_trials is not exceeded
         num_completed_trials = self.calc_num_completed_trials()
         if any(x > max_trials for x in num_completed_trials):
             raise UserError(
                 f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
-                f"exceeds max_trials={self.max_trials}.")
+                f"exceeds max_trials={self.max_trials}."
+            )
 
         # Because of the preceding check, the tuple will have non-negative elements
         num_additional_trials = tuple(max_trials - x for x in num_completed_trials)

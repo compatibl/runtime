@@ -380,7 +380,7 @@ class BasicMongoDb(Db):
         # Create filter and delete
         keys_filter = self._get_mongo_keys_filter(keys, dataset=dataset, tenant=tenant)
         collection.delete_many(keys_filter)
-        
+
     def delete_by_query(
         self,
         query: QueryMixin,

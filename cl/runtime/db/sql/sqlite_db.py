@@ -88,7 +88,9 @@ class SqliteDb(Db):
         # Build SQL query to select records by keys
         placeholders = ",".join("?" for _ in serialized_keys)
         values = [tenant, *serialized_keys]
-        select_sql = f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ? AND "_key" IN ({placeholders})'
+        select_sql = (
+            f'SELECT * FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ? AND "_key" IN ({placeholders})'
+        )
 
         if sort_order is not None:
             # Add order by '_key' condition
@@ -411,7 +413,9 @@ class SqliteDb(Db):
         # Build SQL query to delete records by keys
         placeholders = ",".join("?" for _ in serialized_keys)
         values = [tenant, *serialized_keys]
-        select_sql = f'DELETE FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ? AND "_key" IN ({placeholders})'
+        select_sql = (
+            f'DELETE FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ? AND "_key" IN ({placeholders})'
+        )
 
         # Execute SQL query
         conn = self._get_connection()
@@ -509,8 +513,10 @@ class SqliteDb(Db):
             )
         )
 
-        sql = f'CREATE TABLE IF NOT EXISTS {self._quote_identifier(table_name)} ' +\
-              f'({", ".join(column_defs)}, PRIMARY KEY (_key, _tenant));'
+        sql = (
+            f"CREATE TABLE IF NOT EXISTS {self._quote_identifier(table_name)} "
+            + f'({", ".join(column_defs)}, PRIMARY KEY (_key, _tenant));'
+        )
 
         conn = self._get_connection()
         conn.execute(sql)

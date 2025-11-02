@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest.mock import patch
-from unittest.mock import MagicMock
-
 import pytest
+from unittest.mock import MagicMock
+from unittest.mock import patch
 from celery.exceptions import Reject
-
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.db.data_source import DataSource
@@ -84,8 +82,8 @@ def test_reached_tenant_limit(default_db_fixture):
     with patch("cl.runtime.tasks.celery.celery_queue.celery_settings", new=mock_instance):
         with pytest.raises(Reject):
             execute_task(
-            "test_task_id",
-            context_snapshot_json,
+                "test_task_id",
+                context_snapshot_json,
             )
 
 
