@@ -87,7 +87,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)
 
-    def launch_one_trial(self) -> None:
+    def run_launch_one_trial(self) -> None:
         """Run one trial for each condition, error if max_trials is already reached or exceeded."""
         if self.max_parallel is not None and self.max_parallel != 1:
             raise RuntimeError(f"Parallel trial execution is not yet supported.")
@@ -101,7 +101,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             # Run one additional trial for each condition
             self.save_trial(condition)
 
-    def launch_many_trials(self, *, max_trials: int) -> None:
+    def run_launch_many_trials(self, *, max_trials: int) -> None:
         """Run to reach the specified maximum number of trials for each condition."""
         if self.max_parallel is not None and self.max_parallel != 1:
             raise RuntimeError(f"Parallel trial execution is not yet supported.")
@@ -112,11 +112,11 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                 if trial_idx < num_additional_trials[condition_idx]:
                     self.save_trial(condition)
 
-    def launch_all_trials(self) -> None:
+    def run_launch_all_trials(self) -> None:
         """Run trials until Experiment.max_trials is reached or exceeded."""
         if self.max_trials is None:
             raise RuntimeError("Experiment.run_all() requires Experiment.max_trials to be set.")
-        self.launch_many_trials(max_trials=self.max_trials)
+        self.run_launch_many_trials(max_trials=self.max_trials)
 
     def run_delete_completed_trials(self) -> None:
         """Delete completed trials for all conditions."""
