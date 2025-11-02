@@ -33,12 +33,15 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
             raise RuntimeError("Experiment must have one or more condition to build a plot.")  # TODO: Support no conditions
 
         plots = []
-        trial_query = TrialQuery(experiment=self.get_key()).build()
-        all_trials = active(DataSource).load_by_query(trial_query, cast_to=SupervisedClassifierTrial)
         num_labels = len(self.class_labels)
 
+        # Get trials for all conditions
+        trial_query = TrialQuery(experiment=self.get_key()).build()
+        all_trials = active(DataSource).load_by_query(trial_query, cast_to=SupervisedClassifierTrial)
+
         for condition in self.conditions:
-            trials = self.get_condition_trials(all_trials, condition)
+            # Get trials for the condition
+            trials = tuple(trial for trial in all_trials if trial.condition == condition)
 
             y_true = [trial.label for trial in trials]
             y_pred = [trial.expected_label for trial in trials]

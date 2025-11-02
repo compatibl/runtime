@@ -42,11 +42,15 @@ class ClassifierExperiment(Experiment, ABC):
         values = []
 
         condition_counts = []
+
+        # Get trials for all conditions
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=ClassifierTrial)
 
         for condition in self.conditions:
-            trials = self.get_condition_trials(all_trials, condition)
+            # Get trials for the condition
+            trials = tuple(trial for trial in all_trials if trial.condition == condition)
+
             total = len(trials)
             class_counts = Counter(trial.label for trial in trials)
             condition_counts.append((condition.experiment_condition_id, class_counts, total))

@@ -26,10 +26,7 @@ def test_smoke(multi_db_fixture):
     experiment = StubBinaryExperiment(
         experiment_id="test_binary_experiment.test_smoke",
         max_trials=5,
-        conditions=[
-            ExperimentCondition(experiment_condition_id="Test1"),
-        ],
-    )
+    ).build()
     experiment.run_all()
     trials = experiment.view_trials()
     assert len(trials) == 5

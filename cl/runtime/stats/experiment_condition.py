@@ -19,7 +19,7 @@ from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
 
 
 @dataclass(slots=True, kw_only=True)
-class ExperimentCondition(ExperimentConditionKey, RecordMixin, ABC):
+class ExperimentCondition(ExperimentConditionKey, RecordMixin):
     """Condition under which an experiment is performed."""
 
     def get_key(self) -> ExperimentConditionKey:

@@ -29,8 +29,8 @@ class Trial(TrialKey, RecordMixin, ABC):
     experiment: ExperimentKey = required()
     """Experiment for which the trial is performed."""
 
-    condition: ExperimentConditionKey | None = None
-    """Experiment condition for which the trial is performed (optional)."""
+    condition: ExperimentConditionKey = required()
+    """Experiment condition for which the trial is performed."""
 
     def get_key(self) -> TrialKey:
         return TrialKey(timestamp=self.timestamp).build()
