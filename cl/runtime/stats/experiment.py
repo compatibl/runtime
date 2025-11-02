@@ -91,10 +91,20 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def run_one(self) -> None:
         """Run one trial for each condition, error if max_trials is already reached or exceeded."""
-        self.run_many(max_trials=1)
+        if self.max_parallel is not None and self.max_parallel != 1:
+            raise RuntimeError(f"Parallel trial execution is not yet supported.")
+        num_completed_trials = self.calc_num_completed_trials()
+        if self.max_trials is not None and any(x >= self.max_trials for x in num_completed_trials):
+            raise UserError(
+                f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
+                f"has already reached or exceeded max_trials={self.max_trials}."
+            )
+        for condition in self.conditions:  # TODO: !! Make parallel
+            # Run one additional trial for each condition
+            self.save_trial(condition)
 
-    def run_many(self, *, max_trials: int | None = None) -> None:
-        """Run up to the specified number of trials, do not exceed max_trials per condition."""
+    def run_to(self, *, max_trials: int) -> None:
+        """Run to reach the specified maximum number of trials for each condition."""
         if self.max_parallel is not None and self.max_parallel != 1:
             raise RuntimeError(f"Parallel trial execution is not yet supported.")
         num_additional_trials = self.calc_num_additional_trials(max_trials)
@@ -106,7 +116,14 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def run_all(self) -> None:
         """Run trials until the specified total number (max_trials) is reached or exceeded."""
-        self.run_many(max_trials=None)
+        if self.max_trials is None:
+            raise RuntimeError("Experiment.run_all() requires Experiment.max_trials to be set.")
+        self.run_to(max_trials=self.max_trials)
+
+    def run_delete_completed_trials(self) -> None:
+        """Delete completed trials for all conditions."""
+        trial_query = TrialQuery(experiment=self.get_key()).build()
+        trials = active(DataSource).delete_many()
 
     def calc_num_completed_trials(self) -> tuple[int, ...]:
         """
@@ -120,7 +137,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         counts = tuple(sum(1 for t in trials if t.condition == c) for c in self.conditions)
         return counts
 
-    def calc_num_additional_trials(self, max_additional_trials: int | None = None) -> tuple[int, ...]:
+    def calc_num_additional_trials(self, max_trials: int) -> tuple[int, ...]:
         """
         Get the number of additional trials for each condition by running a query for the completed trials,
         error if max_trials is exceeded for any condition.
@@ -128,23 +145,20 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         Notes:
             Requires a DB query and may be slow, cache the result if possible.
         """
-        if max_additional_trials is not None and max_additional_trials <= 0:
-            raise RuntimeError(
-                f"Parameter max_additional_trials={max_additional_trials} must be None or a positive number.")
-        if self.max_trials is not None:
-            num_completed_trials = self.calc_num_completed_trials()
-            num_additional_trials = tuple(self.max_trials - x for x in num_completed_trials)
-            if max_additional_trials is not None:
-                num_additional_trials = tuple(min(x, max_additional_trials) for x in num_additional_trials)
+        if max_trials <= 0:
+            raise RuntimeError(f"Parameter max_additional_trials={max_trials} must be a positive number.")
+        if self.max_trials is not None and max_trials > self.max_trials:
+            raise UserError(
+                f"Parameter max_trials={max_trials} exceeds Experiment.max_trials={self.max_trials}."
+            )
 
-            # Perform checks
-            if any(x < 0 for x in num_additional_trials):
-                raise UserError(
-                    f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
-                    f"exceeds max_trials={self.max_trials}.")
-            return num_additional_trials
-        elif max_additional_trials is not None:
-            num_additional_trials = (max_additional_trials,) * len(self.conditions)
-            return num_additional_trials
-        else:
-            raise RuntimeError("At least one of max_trials or max_additional_trials must be specified.")
+        # Check that max_trials is not exceeded
+        num_completed_trials = self.calc_num_completed_trials()
+        if any(x > max_trials for x in num_completed_trials):
+            raise UserError(
+                f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
+                f"exceeds max_trials={self.max_trials}.")
+
+        # Because of the preceding check, the tuple will have non-negative elements
+        num_additional_trials = tuple(max_trials - x for x in num_completed_trials)
+        return num_additional_trials
