@@ -13,6 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
 
@@ -21,5 +23,15 @@ from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
 class ExperimentCondition(ExperimentConditionKey, RecordMixin):
     """Condition under which an experiment is performed."""
 
+    label: str = required()
+    """Short label to use in charts and reporting, defaults to condition_id."""
+
     def get_key(self) -> ExperimentConditionKey:
         return ExperimentConditionKey(condition_id=self.condition_id).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        if self.label is None:
+            self.label = self.condition_id
+
+

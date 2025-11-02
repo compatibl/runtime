@@ -19,6 +19,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.stats.binary_trial import BinaryTrial
 from cl.runtime.stats.experiment import Experiment
+from cl.runtime.stats.experiment_condition import ExperimentCondition
 from cl.runtime.stats.trial_query import TrialQuery
 
 
@@ -42,15 +43,16 @@ class BinaryExperiment(Experiment, ABC):
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=BinaryTrial)
 
-        for condition in self.conditions:
+        conditions = active(DataSource).load_many(self.conditions, cast_to=ExperimentCondition)
+        for condition in conditions:
             # Get trials for the condition
-            trials = tuple(trial for trial in all_trials if trial.condition == condition)
+            trials = tuple(trial for trial in all_trials if trial.condition == condition.get_key())
             total = len(trials)
 
             true_trials = sum(trial.outcome for trial in trials)
             false_trials = total - true_trials
 
-            group_labels.extend([condition.condition_id] * 2)
+            group_labels.extend([condition.label] * 2)
             bar_labels.extend(["True", "False"])
             values.extend([true_trials / total, false_trials / total])
 
