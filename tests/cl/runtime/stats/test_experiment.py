@@ -17,7 +17,7 @@ from cl.runtime.stats.experiment_condition import ExperimentCondition
 from stubs.cl.runtime.stats.stub_binary_experiment import StubBinaryExperiment
 
 
-def test_run_to(multi_db_fixture):
+def test_launch_many_trials(multi_db_fixture):
     """Test for the functionality of base Experiment class."""
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
@@ -30,10 +30,10 @@ def test_run_to(multi_db_fixture):
     # Run the experiment in stages
     assert max_trials_not_set.calc_num_completed_trials() == (0,)
 
-    max_trials_not_set.run_one()
+    max_trials_not_set.launch_one_trial()
     assert max_trials_not_set.calc_num_completed_trials() == (1,)
 
-    max_trials_not_set.run_to(max_trials=3)
+    max_trials_not_set.launch_many_trials(max_trials=3)
     assert max_trials_not_set.calc_num_completed_trials() == (3,)
 
     # Create and run the experiment with max_trials set to 5
@@ -46,36 +46,36 @@ def test_run_to(multi_db_fixture):
     assert max_trials_set.calc_num_completed_trials() == (0,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (5,)
 
-    max_trials_set.run_to(max_trials=1)
+    max_trials_set.launch_many_trials(max_trials=1)
     assert max_trials_set.calc_num_completed_trials() == (1,)
     assert max_trials_set.calc_num_additional_trials(max_trials=1) == (0,)
     assert max_trials_set.calc_num_additional_trials(max_trials=2) == (1,)
 
-    max_trials_set.run_one()
+    max_trials_set.launch_one_trial()
     assert max_trials_set.calc_num_completed_trials() == (2,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (3,)
 
-    max_trials_set.run_to(max_trials=3)
+    max_trials_set.launch_many_trials(max_trials=3)
     assert max_trials_set.calc_num_completed_trials() == (3,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (2,)
 
     # No trials remaining, error message
     with pytest.raises(RuntimeError, match="exceeds"):
-        max_trials_set.run_to(max_trials=6)
+        max_trials_set.launch_many_trials(max_trials=6)
     assert max_trials_set.calc_num_completed_trials() == (3,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (2,)
 
-    max_trials_set.run_to(max_trials=5)
+    max_trials_set.launch_many_trials(max_trials=5)
     assert max_trials_set.calc_num_completed_trials() == (5,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (0,)
 
 
 
-def test_run_all(multi_db_fixture):
+def test_launch_all_trials(multi_db_fixture):
     """Test for the functionality of base Experiment class."""
     # Create and run the experiment with max_trials not set
     max_trials_not_set = StubBinaryExperiment(
-        experiment_id="test_run_all.max_trials_not_set",
+        experiment_id="test_launch_all_trials.max_trials_not_set",
         conditions=[
             ExperimentCondition(experiment_condition_id="Test1"),
         ],
@@ -83,11 +83,11 @@ def test_run_all(multi_db_fixture):
 
     with pytest.raises(RuntimeError):
         # Cannot run_all if max_trials is not set
-        max_trials_not_set.run_all()
+        max_trials_not_set.launch_all_trials()
 
     # Create and run the experiment with max_trials set to 5
     max_trials_set = StubBinaryExperiment(
-        experiment_id="test_run_all.max_trials_set",
+        experiment_id="test_launch_all_trials.max_trials_set",
         max_trials=5,
         conditions=[
             ExperimentCondition(experiment_condition_id="Test1"),
@@ -98,16 +98,16 @@ def test_run_all(multi_db_fixture):
     assert max_trials_set.calc_num_completed_trials() == (0,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (5,)
 
-    max_trials_set.run_one()
+    max_trials_set.launch_one_trial()
     assert max_trials_set.calc_num_completed_trials() == (1,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (4,)
 
-    max_trials_set.run_all()
+    max_trials_set.launch_all_trials()
     assert max_trials_set.calc_num_completed_trials() == (5,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (0,)
 
     # No trials remaining, error message
-    max_trials_set.run_all()
+    max_trials_set.launch_all_trials()
     assert max_trials_set.calc_num_completed_trials() == (5,)
     assert max_trials_set.calc_num_additional_trials(max_trials=5) == (0,)
 
