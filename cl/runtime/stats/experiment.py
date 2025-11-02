@@ -123,7 +123,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def run_delete_completed_trials(self) -> None:
         """Delete completed trials for all conditions."""
         trial_query = TrialQuery(experiment=self.get_key()).build()
-        trials = active(DataSource).delete_many()
+        active(DataSource).delete_by_query(trial_query)
 
     def calc_num_completed_trials(self) -> tuple[int, ...]:
         """
