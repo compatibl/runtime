@@ -181,7 +181,7 @@ class SqliteDb(Db):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
 
-        # Check that query has been frozen
+        # Check that the query has been frozen
         query.check_frozen()
 
         # Check dataset
@@ -270,7 +270,7 @@ class SqliteDb(Db):
         restrict_to: type | None = None,
     ) -> int:
 
-        # Check that query has been frozen
+        # Check that the query has been frozen
         query.check_frozen()
 
         # Check dataset
@@ -416,6 +416,16 @@ class SqliteDb(Db):
         # Execute SQL query
         conn = self._get_connection()
         conn.execute(select_sql, values)
+
+    def delete_by_query(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str,
+        tenant: str,
+        restrict_to: type | None = None,
+    ) -> None:
+        raise NotImplementedError()  # TODO: !!!! Implement
 
     def drop_test_db(self) -> None:
         # Check preconditions

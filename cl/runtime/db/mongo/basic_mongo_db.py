@@ -196,7 +196,7 @@ class BasicMongoDb(Db):
         skip: int | None = None,
     ) -> tuple[TRecord, ...]:
 
-        # Check that query has been frozen
+        # Check that the query has been frozen
         query.check_frozen()
 
         # Check dataset
@@ -269,7 +269,7 @@ class BasicMongoDb(Db):
         restrict_to: type | None = None,
     ) -> int:
 
-        # Check that query has been frozen
+        # Check that the query has been frozen
         query.check_frozen()
 
         # Check dataset
@@ -306,7 +306,7 @@ class BasicMongoDb(Db):
         elif not issubclass(restrict_to, query_target_type):
             # Ensure restrict_to is a subclass of the query target type
             raise RuntimeError(
-                f"In {typename(type(self))}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"In {typename(type(self))}.count_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
                 f"of the target type {typename(query_target_type)} for {typename(query)}."
             )
 
@@ -380,6 +380,62 @@ class BasicMongoDb(Db):
         # Create filter and delete
         keys_filter = self._get_mongo_keys_filter(keys, dataset=dataset, tenant=tenant)
         collection.delete_many(keys_filter)
+        
+    def delete_by_query(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str,
+        tenant: str,
+        restrict_to: type | None = None,
+    ) -> None:
+
+        # Check that the query has been frozen
+        query.check_frozen()
+
+        # Check dataset
+        self._check_dataset(dataset)
+        self._check_tenant(tenant)
+
+        # Get table name from key type and check it has an acceptable format
+        query_target_type = query.get_target_type()
+        key_type = query_target_type.get_key_type()
+
+        # Get MongoDB collection for the key type
+        collection = self._get_mongo_collection(key_type=key_type)
+
+        # Add index based on public fields of the query target type in the order of declaration from base to derived
+        self._add_index(collection=collection, query_type=typeof(query))
+
+        # Create query dict
+        query_dict = {
+            "_dataset": dataset,
+            "_tenant": tenant,
+        }
+
+        # Serialize the query and update query dict
+        query_dict.update(BootstrapSerializers.FOR_MONGO_QUERY.serialize(query))
+        # TODO: Remove table fields
+
+        # Convert op_* fields to MongoDB $* syntax
+        query_dict = self._convert_op_fields_to_mongo_syntax(query_dict)
+
+        # Validate restrict_to or use the query target type if not specified
+        if restrict_to is None:
+            # Default to the query target type
+            restrict_to = query_target_type
+        elif not issubclass(restrict_to, query_target_type):
+            # Ensure restrict_to is a subclass of the query target type
+            raise RuntimeError(
+                f"In {typename(type(self))}.count_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"of the target type {typename(query_target_type)} for {typename(query)}."
+            )
+
+        # Filter by restrict_to if specified
+        self._apply_restrict_to(query_dict=query_dict, key_type=key_type, restrict_to=restrict_to)
+
+        # Delete from DB
+        collection.delete_many(query_dict)
 
     def drop_test_db(self) -> None:
         # Check preconditions

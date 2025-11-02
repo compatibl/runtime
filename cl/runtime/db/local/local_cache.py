@@ -154,6 +154,16 @@ class LocalCache(Db):
     ) -> None:
         raise NotImplementedError()
 
+    def delete_by_query(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str,
+        tenant: str,
+        restrict_to: type | None = None,
+    ) -> None:
+        raise NotImplementedError()
+
     def drop_test_db(self) -> None:
         # Check preconditions
         self.check_drop_test_db_preconditions()

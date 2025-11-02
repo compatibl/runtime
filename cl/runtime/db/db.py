@@ -178,6 +178,25 @@ class Db(DbKey, RecordMixin, ABC):
         """
 
     @abstractmethod
+    def delete_by_query(
+        self,
+        query: QueryMixin,
+        *,
+        dataset: str,
+        tenant: str,
+        restrict_to: type | None = None,
+    ) -> None:
+        """
+        Delete records that match the specified query.
+
+        Args:
+            query: Contains query conditions to match
+            dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
+            tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
+            restrict_to: Include only this type and its subtypes, skip other types
+        """
+
+    @abstractmethod
     def drop_test_db(self) -> None:
         """
         Drop a database as part of a unit test.

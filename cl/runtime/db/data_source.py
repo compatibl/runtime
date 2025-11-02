@@ -724,6 +724,26 @@ class DataSource(DataSourceKey, RecordMixin):
         if commit:
             self.commit()
 
+    def delete_by_query(
+        self,
+        query: QueryMixin,
+        *,
+        restrict_to: type | None = None,
+    ) -> None:
+        """
+        Delete records that match the specified query from this data source only, do not touch the parent data source.
+
+        Args:
+            query: Contains query conditions to match
+            restrict_to: Delete only records of this type and its subtypes, skip other types
+        """
+        self._get_db().delete_by_query(
+            query,
+            dataset=self.dataset.dataset_id,
+            tenant=self.tenant.tenant_id,
+            restrict_to=restrict_to,
+        )
+
     def commit(self) -> None:
         """Commit all pending saves and deletes, operations will not be retried in case of an error during commit."""
 
