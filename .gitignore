@@ -6,7 +6,7 @@ syntax: glob
 **/.pytest_cache
 **/*secrets*
 **/__pycache__
-**/venv
+**/.venv
 *.egg
 *.egg-info/
 *.idea

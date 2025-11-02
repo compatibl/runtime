@@ -3,7 +3,7 @@ recursive = true
 in-place = true
 remove-all-unused-imports = true
 ignore-init-module-imports = true
-exclude = ["venv", ".git", "__pycache__"]
+exclude = [".venv", ".git", "__pycache__"]
 
 [tool.black]
 line-length = 120
