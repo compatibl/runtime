@@ -62,8 +62,8 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
             expected_values = [0.0] * len(received_values)
 
             heatmap = HeatMapPlot(
-                plot_id=f"{plot_id}_{condition.experiment_condition_id}",
-                title=f"{condition.experiment_condition_id}",
+                plot_id=f"{plot_id}_{condition.condition_id}",
+                title=f"{condition.condition_id}",
                 row_labels=row_labels,
                 col_labels=col_labels,
                 received_values=received_values,

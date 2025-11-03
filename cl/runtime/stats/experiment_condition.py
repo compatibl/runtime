@@ -22,4 +22,4 @@ class ExperimentCondition(ExperimentConditionKey, RecordMixin):
     """Condition under which an experiment is performed."""
 
     def get_key(self) -> ExperimentConditionKey:
-        return ExperimentConditionKey(experiment_condition_id=self.experiment_condition_id).build()
+        return ExperimentConditionKey(condition_id=self.condition_id).build()

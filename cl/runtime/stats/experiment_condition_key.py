@@ -22,7 +22,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 class ExperimentConditionKey(DataclassMixin, KeyMixin):
     """Condition under which an experiment is performed."""
 
-    experiment_condition_id: str = required()
+    condition_id: str = required()
     """Condition identifier must be globally unique across all experiments."""
 
     @classmethod

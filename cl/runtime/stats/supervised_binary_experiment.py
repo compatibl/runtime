@@ -58,7 +58,7 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
                 elif not trial.outcome and trial.expected_outcome:
                     fn += 1
 
-            group_labels.extend([condition.experiment_condition_id] * 4)
+            group_labels.extend([condition.condition_id] * 4)
             bar_labels.extend(["TP", "TN", "FP", "FN"])
             values.extend(
                 [

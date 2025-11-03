@@ -23,7 +23,7 @@ def test_launch_many_trials(multi_db_fixture):
     max_trials_not_set = StubBinaryExperiment(
         experiment_id="test_run_many.max_trials_not_set",
         conditions=[
-            ExperimentCondition(experiment_condition_id="Test1"),
+            ExperimentCondition(condition_id="Test1"),
         ],
     ).build()
 
@@ -76,7 +76,7 @@ def test_launch_all_trials(multi_db_fixture):
     max_trials_not_set = StubBinaryExperiment(
         experiment_id="test_launch_all_trials.max_trials_not_set",
         conditions=[
-            ExperimentCondition(experiment_condition_id="Test1"),
+            ExperimentCondition(condition_id="Test1"),
         ],
     ).build()
 
@@ -89,7 +89,7 @@ def test_launch_all_trials(multi_db_fixture):
         experiment_id="test_launch_all_trials.max_trials_set",
         max_trials=5,
         conditions=[
-            ExperimentCondition(experiment_condition_id="Test1"),
+            ExperimentCondition(condition_id="Test1"),
         ],
     ).build()
 

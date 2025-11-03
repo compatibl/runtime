@@ -55,7 +55,7 @@ class ClassifierExperiment(Experiment, ABC):
 
             total = len(trials)
             class_counts = Counter(trial.label for trial in trials)
-            condition_counts.append((condition.experiment_condition_id, class_counts, total))
+            condition_counts.append((condition.condition_id, class_counts, total))
 
         for condition_id, counts, total in condition_counts:
             for class_label in self.class_labels:

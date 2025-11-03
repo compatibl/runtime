@@ -26,7 +26,7 @@ def test_smoke(multi_db_fixture):
         max_trials=5,
         class_labels=["A", "B", "C"],
         conditions=[
-            ExperimentCondition(experiment_condition_id="Test1"),
+            ExperimentCondition(condition_id="Test1"),
         ],
     )
     experiment.run_launch_all_trials()
@@ -36,8 +36,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubClassifierExperiment(
         experiment_id="Test",
         conditions=[
-            ExperimentCondition(experiment_condition_id="Test1"),
-            ExperimentCondition(experiment_condition_id="Test2"),
+            ExperimentCondition(condition_id="Test1"),
+            ExperimentCondition(condition_id="Test2"),
         ],
         max_trials=5,
         class_labels=["A", "B", "C"],

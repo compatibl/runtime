@@ -50,7 +50,7 @@ class BinaryExperiment(Experiment, ABC):
             true_trials = sum(trial.outcome for trial in trials)
             false_trials = total - true_trials
 
-            group_labels.extend([condition.experiment_condition_id] * 2)
+            group_labels.extend([condition.condition_id] * 2)
             bar_labels.extend(["True", "False"])
             values.extend([true_trials / total, false_trials / total])
 

@@ -51,7 +51,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.conditions is None:
             # Specify default condition if none are provided
-            self.conditions = [ExperimentCondition(experiment_condition_id="Default").build()]
+            self.conditions = [ExperimentCondition(condition_id="Default").build()]
         if self.max_trials is not None and self.max_trials <= 0:
             raise RuntimeError(
                 f"{typename(type(self))}.max_trials={self.max_trials} must be None or a positive number."
