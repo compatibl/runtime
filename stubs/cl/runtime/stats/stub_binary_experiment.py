@@ -26,7 +26,7 @@ class StubBinaryExperiment(BinaryExperiment):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self, condition: ExperimentConditionKey | None = None) -> BinaryTrial:
+    def create_trial(self, condition: ExperimentConditionKey) -> BinaryTrial:
         outcome = random.choice([True, False])
         return BinaryTrial(
             experiment=self.get_key(),

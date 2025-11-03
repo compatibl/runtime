@@ -62,7 +62,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             )
 
     @abstractmethod
-    def create_trial(self, condition: ExperimentConditionKey | None = None) -> Trial:
+    def create_trial(self, condition: ExperimentConditionKey) -> Trial:
         """
         Create and return a new trial record with actual and (if applicable) expected fields
         without checking if max_trials has already been reached.
