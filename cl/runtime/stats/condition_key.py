@@ -19,7 +19,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ExperimentConditionKey(DataclassMixin, KeyMixin):
+class ConditionKey(DataclassMixin, KeyMixin):
     """Condition under which an experiment is performed."""
 
     condition_id: str = required()
@@ -27,4 +27,4 @@ class ExperimentConditionKey(DataclassMixin, KeyMixin):
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return ExperimentConditionKey
+        return ConditionKey

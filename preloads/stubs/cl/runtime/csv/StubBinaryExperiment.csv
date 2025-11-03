@@ -1,3 +1,3 @@
 experiment_id,conditions,max_trials,max_parallel
-StubBinaryExperiment11,"[""StubExperimentConditionA"",""StubExperimentConditionB""]",,
-StubBinaryExperiment21,"[""StubExperimentConditionA"",""StubExperimentConditionB""]","""5""","""1"""
+StubBinaryExperiment11,"[""StubConditionA"",""StubConditionB""]",,
+StubBinaryExperiment21,"[""StubConditionA"",""StubConditionB""]","""5""","""1"""

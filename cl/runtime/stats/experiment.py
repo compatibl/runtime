@@ -22,8 +22,8 @@ from cl.runtime.plots.plot import Plot
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
-from cl.runtime.stats.experiment_condition import ExperimentCondition
-from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
+from cl.runtime.stats.condition import Condition
+from cl.runtime.stats.condition_key import ConditionKey
 from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.trial import Trial
 from cl.runtime.stats.trial_key import TrialKey
@@ -35,7 +35,7 @@ from cl.runtime.views.png_view import PngView
 class Experiment(ExperimentKey, RecordMixin, ABC):
     """Abstract base class for a statistical experiment."""
 
-    conditions: list[ExperimentConditionKey] = required()
+    conditions: list[ConditionKey] = required()
     """Conditions for which the experiment is performed (optional)."""
 
     max_trials: int | None = None
@@ -51,7 +51,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.conditions is None:
             # Specify default condition if none are provided
-            self.conditions = [ExperimentCondition(condition_id="Default").build()]
+            self.conditions = [Condition(condition_id="Default").build()]
         if self.max_trials is not None and self.max_trials <= 0:
             raise RuntimeError(
                 f"{typename(type(self))}.max_trials={self.max_trials} must be None or a positive number."
@@ -62,7 +62,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             )
 
     @abstractmethod
-    def create_trial(self, condition: ExperimentConditionKey) -> Trial:
+    def create_trial(self, condition: ConditionKey) -> Trial:
         """
         Create and return a new trial record with actual and (if applicable) expected fields
         without checking if max_trials has already been reached.
@@ -82,7 +82,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def view_plot(self) -> PngView:
         return self.get_plot(self.experiment_id).get_view()
 
-    def save_trial(self, condition: ExperimentConditionKey) -> None:
+    def save_trial(self, condition: ConditionKey) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
         trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)

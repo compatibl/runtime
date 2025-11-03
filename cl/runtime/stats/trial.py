@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
+from cl.runtime.stats.condition_key import ConditionKey
 from cl.runtime.stats.experiment_key import ExperimentKey
 from cl.runtime.stats.trial_key import TrialKey
 
@@ -29,7 +29,7 @@ class Trial(TrialKey, RecordMixin, ABC):
     experiment: ExperimentKey = required()
     """Experiment for which the trial is performed."""
 
-    condition: ExperimentConditionKey = required()
+    condition: ConditionKey = required()
     """Experiment condition for which the trial is performed."""
 
     def get_key(self) -> TrialKey:

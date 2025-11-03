@@ -20,7 +20,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.heat_map_plot import HeatMapPlot
 from cl.runtime.plots.multi_plot import MultiPlot
 from cl.runtime.stats.classifier_experiment import ClassifierExperiment
-from cl.runtime.stats.experiment_condition import ExperimentCondition
+from cl.runtime.stats.condition import Condition
 from cl.runtime.stats.supervised_classifier_trial import SupervisedClassifierTrial
 from cl.runtime.stats.trial_query import TrialQuery
 
@@ -42,7 +42,7 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=SupervisedClassifierTrial)
 
-        conditions = active(DataSource).load_many(self.conditions, cast_to=ExperimentCondition)
+        conditions = active(DataSource).load_many(self.conditions, cast_to=Condition)
         for condition in conditions:
             # Get trials for the condition
             trials = tuple(trial for trial in all_trials if trial.condition == condition.get_key())

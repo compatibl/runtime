@@ -16,7 +16,7 @@ import random
 from dataclasses import dataclass
 from cl.runtime.stats.binary_experiment import BinaryExperiment
 from cl.runtime.stats.binary_trial import BinaryTrial
-from cl.runtime.stats.experiment_condition_key import ExperimentConditionKey
+from cl.runtime.stats.condition_key import ConditionKey
 
 
 @dataclass(slots=True, kw_only=True)
@@ -26,7 +26,7 @@ class StubBinaryExperiment(BinaryExperiment):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self, condition: ExperimentConditionKey) -> BinaryTrial:
+    def create_trial(self, condition: ConditionKey) -> BinaryTrial:
         outcome = random.choice([True, False])
         return BinaryTrial(
             experiment=self.get_key(),
