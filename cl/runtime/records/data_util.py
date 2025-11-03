@@ -19,10 +19,10 @@ from more_itertools import consume
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.primitive_util import PrimitiveUtil
 from cl.runtime.records.builder_util import BuilderUtil
-from cl.runtime.records.condition_util import ConditionUtil
+from cl.runtime.records.predicate_util import PredicateUtil
 from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
-from cl.runtime.records.protocols import is_condition_type
+from cl.runtime.records.protocols import is_predicate_type
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_empty
 from cl.runtime.records.protocols import is_enum_type
@@ -153,13 +153,13 @@ class DataUtil(BuilderUtil):
                                 )
                                 if is_enum_type(type(field_value))
                                 else (
-                                    ConditionUtil.build_(
+                                    PredicateUtil.build_(
                                         field_value,
                                         field_spec.field_type_hint,
                                         outer_type_name=typename(data_type),
                                         field_name=field_name,
                                     )
-                                    if is_condition_type(type(field_value))
+                                    if is_predicate_type(type(field_value))
                                     else cls.build_(
                                         field_value,
                                         field_spec.field_type_hint,

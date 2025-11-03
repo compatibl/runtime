@@ -48,7 +48,7 @@ class _TestCase:
     def get_type_hint(self) -> TypeHint:
         """Get type hint for the test."""
         return TypeHint(
-            schema_type=self.type_, optional=(self.value is None), condition=None, remaining=None, subtype=self.subtype
+            schema_type=self.type_, optional=(self.value is None), predicate=None, remaining=None, subtype=self.subtype
         )
 
 

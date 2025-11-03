@@ -15,12 +15,12 @@
 import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.records.conditions import And
-from cl.runtime.records.conditions import Exists
-from cl.runtime.records.conditions import In
-from cl.runtime.records.conditions import Not
-from cl.runtime.records.conditions import NotIn
-from cl.runtime.records.conditions import Or
+from cl.runtime.records.predicates import And
+from cl.runtime.records.predicates import Exists
+from cl.runtime.records.predicates import In
+from cl.runtime.records.predicates import Not
+from cl.runtime.records.predicates import NotIn
+from cl.runtime.records.predicates import Or
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
     StubDataclassPrimitiveFieldsQuery,

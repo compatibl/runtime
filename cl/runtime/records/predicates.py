@@ -22,11 +22,11 @@ from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 
 
-class Condition(Generic[TObj], BootstrapMixin, ABC):
-    """Common base class of all query conditions."""
+class Predicate(Generic[TObj], BootstrapMixin, ABC):
+    """Common base class of all predicates."""
 
 
-class Range(Generic[TObj], Condition[TObj]):
+class Range(Generic[TObj], Predicate[TObj]):
     """Range with one or two bounds."""
 
     __slots__ = (
@@ -63,7 +63,7 @@ class Range(Generic[TObj], Condition[TObj]):
         self.op_lte = lte
 
 
-class Gt(Generic[TObj], Condition[TObj]):
+class Gt(Generic[TObj], Predicate[TObj]):
     """Matches when the argument is greater than the value."""
 
     __slots__ = ("op_gt",)
@@ -79,7 +79,7 @@ class Gt(Generic[TObj], Condition[TObj]):
             raise RuntimeError(f"Argument of Gt operator has type {typename(type(value))} which is not a primitive.")
 
 
-class Gte(Generic[TObj], Condition[TObj]):
+class Gte(Generic[TObj], Predicate[TObj]):
     """Matches when the argument is greater than or equal to the value."""
 
     __slots__ = ("op_gte",)
@@ -95,7 +95,7 @@ class Gte(Generic[TObj], Condition[TObj]):
             raise RuntimeError(f"Argument of Gte operator has type {typename(type(value))} which is not a primitive.")
 
 
-class Lt(Generic[TObj], Condition[TObj]):
+class Lt(Generic[TObj], Predicate[TObj]):
     """Matches when the argument is less than the value."""
 
     __slots__ = ("op_lt",)
@@ -111,7 +111,7 @@ class Lt(Generic[TObj], Condition[TObj]):
             raise RuntimeError(f"Argument of Lt operator has type {typename(type(value))} which is not a primitive.")
 
 
-class Lte(Generic[TObj], Condition[TObj]):
+class Lte(Generic[TObj], Predicate[TObj]):
     """Matches when the argument is less than or equal to the value."""
 
     __slots__ = ("op_lte",)
@@ -127,46 +127,46 @@ class Lte(Generic[TObj], Condition[TObj]):
             raise RuntimeError(f"Argument of Lte operator has type {typename(type(value))} which is not a primitive.")
 
 
-class And(Generic[TObj], Condition[TObj]):
+class And(Generic[TObj], Predicate[TObj]):
     """Matches when all of the conditions match."""
 
     __slots__ = ("op_and",)
 
-    op_and: tuple[Condition[TObj] | TObj, ...]
+    op_and: tuple[Predicate[TObj] | TObj, ...]
     """The sequence of conditions or values in And operator."""
 
-    def __init__(self, *args: Condition[TObj] | TObj):
+    def __init__(self, *args: Predicate[TObj] | TObj):
         """Create from the sequence of conditions to match."""
         self.op_and = tuple(args)
 
 
-class Or(Generic[TObj], Condition[TObj]):
+class Or(Generic[TObj], Predicate[TObj]):
     """Matches when at least one of the conditions matches."""
 
     __slots__ = ("op_or",)
 
-    op_or: tuple[Condition[TObj] | TObj, ...]
+    op_or: tuple[Predicate[TObj] | TObj, ...]
     """The sequence of conditions or values in Or operator."""
 
-    def __init__(self, *args: Condition[TObj] | TObj):
+    def __init__(self, *args: Predicate[TObj] | TObj):
         """Create from the sequence of conditions to match."""
         self.op_or = tuple(args)
 
 
-class Not(Generic[TObj], Condition[TObj]):
+class Not(Generic[TObj], Predicate[TObj]):
     """Matches when the argument does not match and vice versa."""
 
     __slots__ = ("op_not",)
 
-    op_not: Condition[TObj] | TObj
+    op_not: Predicate[TObj] | TObj
     """Applies Not operator to the value."""
 
-    def __init__(self, value: Condition | TObj):
+    def __init__(self, value: Predicate | TObj):
         """Matches when the argument does not match and vice versa."""
         self.op_not = value
 
 
-class Exists(Generic[TObj], Condition[TObj]):
+class Exists(Generic[TObj], Predicate[TObj]):
     """Matches not None if true, matches None if false."""
 
     __slots__ = ("op_exists",)
@@ -182,7 +182,7 @@ class Exists(Generic[TObj], Condition[TObj]):
             raise RuntimeError(f"Argument of Exists operator has type {typename(type(value))} which is not a bool.")
 
 
-class In(Generic[TObj], Condition[TObj]):
+class In(Generic[TObj], Predicate[TObj]):
     """Matches when the argument is equal to one of the values."""
 
     __slots__ = ("op_in",)
@@ -200,7 +200,7 @@ class In(Generic[TObj], Condition[TObj]):
             raise RuntimeError(f"Argument of In operator has type {typename(type(values))} which is not a sequence.")
 
 
-class NotIn(Generic[TObj], Condition[TObj]):
+class NotIn(Generic[TObj], Predicate[TObj]):
     """Matches when the argument is not equal to any of the values."""
 
     __slots__ = ("op_nin",)

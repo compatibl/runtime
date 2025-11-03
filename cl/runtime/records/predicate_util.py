@@ -17,7 +17,7 @@ from cl.runtime.records.builder_util import BuilderUtil
 from cl.runtime.schema.type_hint import TypeHint
 
 
-class ConditionUtil(BuilderUtil):
+class PredicateUtil(BuilderUtil):
     """Helper methods for key types."""
 
     @classmethod

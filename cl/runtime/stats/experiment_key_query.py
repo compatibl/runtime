@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.db.query_mixin import QueryMixin
-from cl.runtime.records.conditions import Condition
+from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.stats.experiment_key import ExperimentKey
@@ -24,7 +24,7 @@ from cl.runtime.stats.experiment_key import ExperimentKey
 class ExperimentKeyQuery(DataclassMixin, QueryMixin):
     """Query for ExperimentKey by experiment_id."""
 
-    experiment_id: str | Condition[str] | None = None
+    experiment_id: str | Predicate[str] | None = None
     """Experiment identifier must be unique for each experiment kind but not globally."""
 
     def get_target_type(self) -> type[KeyMixin]:

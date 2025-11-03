@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.db.query_mixin import QueryMixin
-from cl.runtime.records.conditions import Condition
+from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime import StubDataclass
@@ -24,7 +24,7 @@ from stubs.cl.runtime import StubDataclass
 class StubDataclassQuery(DataclassMixin, QueryMixin):
     """Query for StubDataclass."""
 
-    id: str | Condition[str] | None = None
+    id: str | Predicate[str] | None = None
     """Unique identifier."""
 
     @classmethod

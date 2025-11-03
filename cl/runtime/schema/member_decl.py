@@ -37,5 +37,5 @@ class MemberDecl(DataclassMixin):
     query: TypeDeclKey | None = None
     """Query element declaration."""
 
-    condition: TypeDeclKey | None = None
-    """Condition element declaration."""
+    predicate: TypeDeclKey | None = None
+    """Predicate element declaration."""

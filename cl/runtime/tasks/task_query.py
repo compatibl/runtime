@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.db.query_mixin import QueryMixin
-from cl.runtime.records.conditions import Condition
+from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.tasks.task import Task
@@ -32,7 +32,7 @@ class TaskQuery(DataclassMixin, QueryMixin):
     queue: TaskQueueKey | None = None
     """The queue that will run the task once it is saved."""
 
-    status: TaskStatus | Condition[TaskStatus] | None = None
+    status: TaskStatus | Predicate[TaskStatus] | None = None
     """Begins from Pending, continues to Running or Paused, and ends with Completed, Failed, or Cancelled."""
 
     def get_target_type(self) -> type[KeyMixin]:

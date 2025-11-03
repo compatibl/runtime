@@ -5,5 +5,5 @@ fields:
   field_type_hint:
     schema_type: str
     optional: true
-    condition: true
+    predicate: true
 

@@ -13,17 +13,17 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.conditions import And
-from cl.runtime.records.conditions import Exists
-from cl.runtime.records.conditions import Gt
-from cl.runtime.records.conditions import Gte
-from cl.runtime.records.conditions import In
-from cl.runtime.records.conditions import Lt
-from cl.runtime.records.conditions import Lte
-from cl.runtime.records.conditions import Not
-from cl.runtime.records.conditions import NotIn
-from cl.runtime.records.conditions import Or
-from cl.runtime.records.conditions import Range
+from cl.runtime.records.predicates import And
+from cl.runtime.records.predicates import Exists
+from cl.runtime.records.predicates import Gt
+from cl.runtime.records.predicates import Gte
+from cl.runtime.records.predicates import In
+from cl.runtime.records.predicates import Lt
+from cl.runtime.records.predicates import Lte
+from cl.runtime.records.predicates import Not
+from cl.runtime.records.predicates import NotIn
+from cl.runtime.records.predicates import Or
+from cl.runtime.records.predicates import Range
 from stubs.cl.runtime import StubDataclass
 
 

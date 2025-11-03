@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.conditions import Condition
+from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassQuery
@@ -23,7 +23,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDa
 class StubDataclassDerivedQuery(StubDataclassQuery):
     """Query for StubDataclassDerived."""
 
-    derived_str_field: str | Condition[str] | None = None
+    derived_str_field: str | Predicate[str] | None = None
     """Stub field."""
 
     def get_target_type(self) -> type[KeyMixin]:

@@ -5,40 +5,40 @@ fields:
   field_type_hint:
     schema_type: str
     optional: true
-    condition: true
+    predicate: true
 - field_name: base_field
   field_type_hint:
     schema_type: StubDataclassData
     optional: true
-    condition: true
+    predicate: true
 - field_name: derived_field
   field_type_hint:
     schema_type: StubDataclassDerivedData
     optional: true
-    condition: true
+    predicate: true
 - field_name: double_derived_field
   field_type_hint:
     schema_type: StubDataclassDoubleDerivedData
     optional: true
-    condition: true
+    predicate: true
 - field_name: polymorphic_field
   field_type_hint:
     schema_type: StubDataclassData
     optional: true
-    condition: true
+    predicate: true
 - field_name: polymorphic_derived_field
   field_type_hint:
     schema_type: StubDataclassDerivedData
     optional: true
-    condition: true
+    predicate: true
 - field_name: key_field
   field_type_hint:
     schema_type: StubDataclassKey
     optional: true
-    condition: true
+    predicate: true
 - field_name: record_as_key_field
   field_type_hint:
     schema_type: StubDataclassKey
     optional: true
-    condition: true
+    predicate: true
 

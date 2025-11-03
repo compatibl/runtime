@@ -47,9 +47,9 @@ PRIMITIVE_TYPES = (
 PRIMITIVE_TYPE_NAMES = frozenset(type_.__name__ for type_ in PRIMITIVE_TYPES)
 """The list of Python class names used to store primitive types, not the same as type names."""
 
-CONDITION_TYPE_NAMES = (
+PREDICATE_TYPE_NAMES = (
+    "Predicate",  # Abstract base
     "And",
-    "Condition",  # Abstract base
     "Exists",
     "Gt",
     "Gte",
@@ -61,7 +61,7 @@ CONDITION_TYPE_NAMES = (
     "Or",
     "Range",
 )
-"""Names of types that may be used to represent conditions, including abstract base classes."""
+"""Names of types that may be used to represent predicates, including abstract base classes."""
 
 SEQUENCE_TYPES = (list, tuple)
 """Types that may be used to represent sequences, excluding abstract base classes."""
@@ -188,7 +188,7 @@ def is_ndarray_type(type_: type) -> TypeGuard[type[np.ndarray]]:
     """Returns true if the argument is ndarray or one of its supported generic aliases."""
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
     if (type_name := getattr(type_, "__name__", None)) is not None:
-        # Condition will match np.ndarray or generic alias for ndarray (including, currently, for NDArray)
+        # Will match np.ndarray or generic alias for ndarray (including, currently, for NDArray)
         return type_name in NDARRAY_TYPE_NAMES
     else:
         raise RuntimeError(
@@ -304,13 +304,13 @@ def is_record_type(type_: type) -> bool:
         )
 
 
-def is_condition_type(type_: type) -> bool:
-    """Returns true if the argument is one of the supported condition types."""
+def is_predicate_type(type_: type) -> bool:
+    """Returns true if the argument is one of the supported query predicate types."""
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
     if (type_name := getattr(type_, "__name__", None)) is not None:
         # Use class names to avoid a cyclic reference
-        return type_name in CONDITION_TYPE_NAMES
+        return type_name in PREDICATE_TYPE_NAMES
     else:
         raise RuntimeError(
-            f"The argument of is_condition_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
+            f"The argument of is_predicate_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
         )

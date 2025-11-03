@@ -545,7 +545,7 @@ class DataSource(DataSourceKey, RecordMixin):
         Load records that match the specified query.
 
         Args:
-            query: Contains query conditions to match
+            query: Contains predicates to match
             cast_to: Cast the result to this type (error if not a subtype)
             restrict_to: Include only this type and its subtypes, skip other types
             project_to: Use some or all fields from the stored record to create and return instances of this type
@@ -593,7 +593,7 @@ class DataSource(DataSourceKey, RecordMixin):
         Return the count of records that match the specified query.
 
         Args:
-            query: Contains query conditions to match
+            query: Contains predicates to match
             restrict_to: Include only this type and its subtypes, skip other types
         """
         result = self._get_db().count_by_query(
@@ -734,7 +734,7 @@ class DataSource(DataSourceKey, RecordMixin):
         Delete records that match the specified query from this data source only, do not touch the parent data source.
 
         Args:
-            query: Contains query conditions to match
+            query: Contains predicates to match
             restrict_to: Delete only records of this type and its subtypes, skip other types
         """
         self._get_db().delete_by_query(

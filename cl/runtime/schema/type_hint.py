@@ -40,8 +40,8 @@ class TypeHint(BootstrapMixin):
     optional: bool | None
     """True if the type hint is a union with None, None otherwise."""
 
-    condition: bool | None
-    """True if the type hint includes T | Condition[T], None otherwise."""
+    predicate: bool | None
+    """True if the type hint includes T | Predicate[T], None otherwise."""
 
     remaining: Self | None
     """Remaining chain if present, None otherwise."""
@@ -56,10 +56,10 @@ class TypeHint(BootstrapMixin):
             if self.remaining is not None
             else f"{typename(self.schema_type)}"
         )
-        if self.condition and self.optional:
-            return f"{base} | Condition[{base}] | None"
-        elif self.condition:
-            return f"{base} | Condition[{base}]"
+        if self.predicate and self.optional:
+            return f"{base} | Predicate[{base}] | None"
+        elif self.predicate:
+            return f"{base} | Predicate[{base}]"
         elif self.optional:
             return f"{base} | None"
         else:
@@ -116,7 +116,7 @@ class TypeHint(BootstrapMixin):
         class_: type,
         *,
         optional: bool = None,
-        condition: bool = None,
+        predicate: bool = None,
         subtype: str | None = None,
     ) -> Self:
         """Create type hint for a class with optional parameters."""
@@ -127,7 +127,7 @@ class TypeHint(BootstrapMixin):
         return TypeHint(
             schema_type=class_,
             optional=optional,
-            condition=condition,
+            predicate=predicate,
             remaining=None,
             subtype=subtype,
         )
@@ -162,9 +162,9 @@ class TypeHint(BootstrapMixin):
         union_types = [types.UnionType, typing.Union]
         supported_containers = [list, tuple, dict, frozendict, np.ndarray]
         while True:
-            # Handle unions that introduce optionality and/or Condition
+            # Handle unions that specify optionality and/or predicates
             type_alias_optional = None
-            type_alias_condition = None
+            type_alias_predicate = None
 
             if type_alias_origin in union_types:
                 args = list(type_alias_args)
@@ -174,36 +174,36 @@ class TypeHint(BootstrapMixin):
                     type_alias_optional = True
                     args.remove(type(None))
 
-                # Detect and strip Condition[T]
-                condition_arg = next(
+                # Detect and strip Predicate[T]
+                predicate_arg = next(
                     (
                         a
                         for a in args
-                        if typing.get_origin(a) is not None and typing.get_origin(a).__name__ == "Condition"
+                        if typing.get_origin(a) is not None and typing.get_origin(a).__name__ == "Predicate"
                     ),
                     None,
                 )
-                if condition_arg is not None:
-                    type_alias_condition = True
-                    args.remove(condition_arg)
-                    (cond_inner,) = typing.get_args(condition_arg)
+                if predicate_arg is not None:
+                    type_alias_predicate = True
+                    args.remove(predicate_arg)
+                    (cond_inner,) = typing.get_args(predicate_arg)
                 else:
                     cond_inner = None
 
-                # After removing None and Condition, there must be exactly one base type
+                # After removing None and Predicate, there must be exactly one base type
                 if len(args) != 1:
                     raise RuntimeError(
                         f"Union type hint '{cls._serialize_type_alias(type_alias)}'\n"
                         f"for field {field_name} in {typename(containing_type)} is not supported.\n"
-                        f"Expected forms: 'T', 'T | None', 'T | Condition[T]', or 'T | Condition[T] | None'.\n"
+                        f"Expected forms: 'T', 'T | None', 'T | Predicate[T]', or 'T | Predicate[T] | None'.\n"
                     )
 
                 base_type = args[0]
 
-                # If Condition is present, its inner type must match the base
-                if type_alias_condition and cond_inner is not base_type:
+                # If Predicate type is present, its inner type must match the base
+                if type_alias_predicate and cond_inner is not base_type:
                     raise RuntimeError(
-                        f"Condition parameter does not match base type in union "
+                        f"Predicate parameter does not match base type in union "
                         f"'{cls._serialize_type_alias(type_alias)}'."
                     )
 
@@ -228,7 +228,7 @@ class TypeHint(BootstrapMixin):
                         TypeHint(
                             schema_type=list,
                             optional=type_alias_optional,
-                            condition=type_alias_condition,
+                            predicate=type_alias_predicate,
                             remaining=None,
                             subtype=None,
                         )
@@ -245,7 +245,7 @@ class TypeHint(BootstrapMixin):
                         TypeHint(
                             schema_type=tuple,
                             optional=type_alias_optional,
-                            condition=type_alias_condition,
+                            predicate=type_alias_predicate,
                             remaining=None,
                             subtype=None,
                         )
@@ -263,7 +263,7 @@ class TypeHint(BootstrapMixin):
                         TypeHint(
                             schema_type=type_alias_origin,
                             optional=type_alias_optional,
-                            condition=type_alias_condition,
+                            predicate=type_alias_predicate,
                             remaining=None,
                             subtype=None,
                         )
@@ -281,7 +281,7 @@ class TypeHint(BootstrapMixin):
                         TypeHint(
                             schema_type=type_alias_origin,
                             optional=type_alias_optional,
-                            condition=type_alias_condition,
+                            predicate=type_alias_predicate,
                             remaining=None,
                             subtype=None,
                         )
@@ -327,7 +327,7 @@ class TypeHint(BootstrapMixin):
                             TypeHint(
                                 schema_type=type_alias,
                                 optional=type_alias_optional,
-                                condition=type_alias_condition,
+                                predicate=type_alias_predicate,
                                 remaining=None,
                                 subtype=field_subtype,
                             )
@@ -370,7 +370,7 @@ class TypeHint(BootstrapMixin):
             return TypeHint(
                 schema_type=head.schema_type,
                 optional=head.optional,
-                condition=head.condition,
+                predicate=head.predicate,
                 remaining=cls._link_type_hint_tokens(tail),
                 subtype=head.subtype,
             )

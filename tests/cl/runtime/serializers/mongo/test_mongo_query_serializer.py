@@ -16,10 +16,10 @@ import pytest
 import orjson
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.records.conditions import Exists
-from cl.runtime.records.conditions import In
-from cl.runtime.records.conditions import NotIn
-from cl.runtime.records.conditions import Range
+from cl.runtime.records.predicates import Exists
+from cl.runtime.records.predicates import In
+from cl.runtime.records.predicates import NotIn
+from cl.runtime.records.predicates import Range
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery

@@ -22,7 +22,7 @@ from cl.runtime.events.event import Event
 from cl.runtime.events.event_kind import EventKind
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.builder_checks import BuilderChecks
-from cl.runtime.records.conditions import In
+from cl.runtime.records.predicates import In
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived

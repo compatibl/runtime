@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.conditions import Condition
+from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
@@ -27,25 +27,25 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDa
 class StubDataclassNestedFieldsQuery(StubDataclassQuery):
     """Stub derived class."""
 
-    base_field: StubDataclassData | Condition[StubDataclassData] | None = None
+    base_field: StubDataclassData | Predicate[StubDataclassData] | None = None
     """Stub field."""
 
-    derived_field: StubDataclassDerivedData | Condition[StubDataclassDerivedData] | None = None
+    derived_field: StubDataclassDerivedData | Predicate[StubDataclassDerivedData] | None = None
     """Stub field."""
 
-    double_derived_field: StubDataclassDoubleDerivedData | Condition[StubDataclassDoubleDerivedData] | None = None
+    double_derived_field: StubDataclassDoubleDerivedData | Predicate[StubDataclassDoubleDerivedData] | None = None
     """Stub field."""
 
-    polymorphic_field: StubDataclassData | Condition[StubDataclassData] | None = None
+    polymorphic_field: StubDataclassData | Predicate[StubDataclassData] | None = None
     """Declared StubDataclassData but provided an instance of StubDataclassDerivedData."""
 
-    polymorphic_derived_field: StubDataclassDerivedData | Condition[StubDataclassDerivedData] | None = None
+    polymorphic_derived_field: StubDataclassDerivedData | Predicate[StubDataclassDerivedData] | None = None
     """Declared StubDataclassDerivedData but provided an instance of StubDataclassDoubleDerivedData."""
 
-    key_field: StubDataclassKey | Condition[StubDataclassKey] | None = None
+    key_field: StubDataclassKey | Predicate[StubDataclassKey] | None = None
     """Stub field."""
 
-    record_as_key_field: StubDataclassKey | Condition[StubDataclassKey] | None = None
+    record_as_key_field: StubDataclassKey | Predicate[StubDataclassKey] | None = None
     """Stub field with key type initialized to record type instance."""
 
     def get_target_type(self) -> type[KeyMixin]:

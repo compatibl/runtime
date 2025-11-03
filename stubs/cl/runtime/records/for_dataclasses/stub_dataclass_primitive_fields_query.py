@@ -16,7 +16,7 @@ import datetime as dt
 from dataclasses import dataclass
 from uuid import UUID
 from cl.runtime.db.query_mixin import QueryMixin
-from cl.runtime.records.conditions import Condition
+from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.key_mixin import KeyMixin
@@ -28,82 +28,82 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields im
 class StubDataclassPrimitiveFieldsQuery(DataclassMixin, QueryMixin):
     """Stub record whose elements are primitive types."""
 
-    key_str_field: str | Condition[str] | None = None
+    key_str_field: str | Predicate[str] | None = None
     """Stub field."""
 
-    key_float_field: float | Condition[float] | None = optional(descending=True)
+    key_float_field: float | Predicate[float] | None = optional(descending=True)
     """Stub field in descending order."""
 
-    key_bool_field: bool | Condition[bool] | None = None
+    key_bool_field: bool | Predicate[bool] | None = None
     """Stub field."""
 
-    key_int_field: int | Condition[int] | None = None
+    key_int_field: int | Predicate[int] | None = None
     """Stub field."""
 
-    key_long_field: int | Condition[int] | None = None
+    key_long_field: int | Predicate[int] | None = None
     """The default is maximum safe signed int for JSON: 2^53 - 1."""
 
-    key_date_field: dt.date | Condition[dt.date] | None = None
+    key_date_field: dt.date | Predicate[dt.date] | None = None
     """Stub field."""
 
-    key_time_field: dt.time | Condition[dt.time] | None = None
+    key_time_field: dt.time | Predicate[dt.time] | None = None
     """Stub field."""
 
-    key_date_time_field: dt.datetime | Condition[dt.datetime] | None = None
+    key_date_time_field: dt.datetime | Predicate[dt.datetime] | None = None
     """Stub field."""
 
-    key_uuid_field: UUID | Condition[UUID] | None = None
+    key_uuid_field: UUID | Predicate[UUID] | None = None
     """Stub field."""
 
-    key_bytes_field: bytes | Condition[bytes] | None = None
+    key_bytes_field: bytes | Predicate[bytes] | None = None
     """Stub field."""
 
-    key_int_enum_field: StubIntEnum | Condition[StubIntEnum] | None = None
+    key_int_enum_field: StubIntEnum | Predicate[StubIntEnum] | None = None
     """Stub field."""
 
-    obj_str_field: str | Condition[str] | None = None
+    obj_str_field: str | Predicate[str] | None = None
     """Stub field."""
 
-    obj_str_with_eol_field: str | Condition[str] | None = None
+    obj_str_with_eol_field: str | Predicate[str] | None = None
     """Stub field."""
 
-    obj_str_with_trailing_eol_field: str | Condition[str] | None = None
+    obj_str_with_trailing_eol_field: str | Predicate[str] | None = None
     """Stub field."""
 
-    obj_str_timestamp_field: str | Condition[str] | None = None
+    obj_str_timestamp_field: str | Predicate[str] | None = None
     """Stub field."""
 
-    obj_float_field: float | Condition[float] | None = None
+    obj_float_field: float | Predicate[float] | None = None
     """Stub field."""
 
-    obj_bool_field: bool | Condition[bool] | None = None
+    obj_bool_field: bool | Predicate[bool] | None = None
     """Stub field."""
 
-    obj_int_field: int | Condition[int] | None = None
+    obj_int_field: int | Predicate[int] | None = None
     """Stub field."""
 
-    obj_long_field: int | Condition[int] | None = None
+    obj_long_field: int | Predicate[int] | None = None
     """The default is maximum safe signed int for JSON: 2^53 - 1."""
 
-    obj_date_field: dt.date | Condition[dt.date] | None = None
+    obj_date_field: dt.date | Predicate[dt.date] | None = None
     """Stub field."""
 
-    obj_time_field: dt.time | Condition[dt.time] | None = None
+    obj_time_field: dt.time | Predicate[dt.time] | None = None
     """Stub field."""
 
-    obj_date_time_field: dt.datetime | Condition[dt.datetime] | None = None
+    obj_date_time_field: dt.datetime | Predicate[dt.datetime] | None = None
     """Stub field."""
 
-    obj_uuid_field: UUID | Condition[UUID] | None = None
+    obj_uuid_field: UUID | Predicate[UUID] | None = None
     """Stub field."""
 
-    obj_bytes_field: bytes | Condition[bytes] | None = None
+    obj_bytes_field: bytes | Predicate[bytes] | None = None
     """Stub field."""
 
-    obj_bytes_large_field: bytes | Condition[bytes] | None = None
+    obj_bytes_large_field: bytes | Predicate[bytes] | None = None
     """Stub field."""
 
-    obj_int_enum_field: StubIntEnum | Condition[StubIntEnum] | None = None
+    obj_int_enum_field: StubIntEnum | Predicate[StubIntEnum] | None = None
     """Stub field."""
 
     def get_target_type(self) -> type[KeyMixin]:

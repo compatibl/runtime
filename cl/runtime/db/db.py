@@ -107,7 +107,7 @@ class Db(DbKey, RecordMixin, ABC):
         Load records that match the specified query.
 
         Args:
-            query: Contains query conditions to match
+            query: Contains predicates to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             cast_to: Cast the result to this type (error if not a subtype)
@@ -131,7 +131,7 @@ class Db(DbKey, RecordMixin, ABC):
         Return the count of records that match the specified query.
 
         Args:
-            query: Contains query conditions to match
+            query: Contains predicates to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             restrict_to: Include only this type and its subtypes, skip other types
@@ -190,7 +190,7 @@ class Db(DbKey, RecordMixin, ABC):
         Delete records that match the specified query.
 
         Args:
-            query: Contains query conditions to match
+            query: Contains predicates to match
             dataset: Backslash-delimited dataset argument is combined with self.base_dataset if specified
             tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             restrict_to: Include only this type and its subtypes, skip other types

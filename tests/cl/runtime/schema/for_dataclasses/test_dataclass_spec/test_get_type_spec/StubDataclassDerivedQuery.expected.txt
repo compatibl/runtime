@@ -5,10 +5,10 @@ fields:
   field_type_hint:
     schema_type: str
     optional: true
-    condition: true
+    predicate: true
 - field_name: derived_str_field
   field_type_hint:
     schema_type: str
     optional: true
-    condition: true
+    predicate: true
 

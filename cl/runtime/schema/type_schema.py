@@ -14,7 +14,7 @@
 
 from enum import Enum
 from memoization import cached
-from cl.runtime.records.conditions import Condition
+from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.data_spec import DataSpec
@@ -47,8 +47,8 @@ class TypeSchema:
         elif is_data_key_or_record_type(type_):  # TODO: ! Use guard methods to prevent static type checker warning
             # Data, key or record type
             return type_.get_type_spec()
-        elif issubclass(type_, Condition):
-            # Generic condition type
+        elif issubclass(type_, Predicate):
+            # Generic predicate type
             return DataSpec(
                 type_=type_,
                 fields=[],  # TODO: !!! Currently fields are not serialized, implement a custom serializer
