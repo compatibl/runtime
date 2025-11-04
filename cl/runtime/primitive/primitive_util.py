@@ -21,6 +21,7 @@ from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
 from cl.runtime.records.typename import typeof
+from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info import TypeInfo
 
@@ -52,11 +53,12 @@ class PrimitiveUtil(BuilderUtil):
 
         # To allow ABCMeta and other metaclasses derived from type to pass the check
         data_type = typeof(data)
+        data_type_name = typename(data_type)
 
         # Ensure there is no remaining component (type hint is not a sequence or mapping)
         if type_hint is not None and type_hint.remaining:
             raise RuntimeError(
-                f"Data is an instance of a primitive class {data_class_name} which is\n"
+                f"Data is an instance of a primitive class {data_type_name} which is\n"
                 f"incompatible with a composite type hint:\n"
                 f"{type_hint.to_str()}."
             )
@@ -99,7 +101,7 @@ class PrimitiveUtil(BuilderUtil):
                 location_str = cls._get_location_str(
                     typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
-                raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_class_name}.{location_str}")
+                raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_type_name}.{location_str}")
         elif schema_type is int:
             # Perform range check based on subtype
             if subtype is None:
@@ -114,7 +116,7 @@ class PrimitiveUtil(BuilderUtil):
                 location_str = cls._get_location_str(
                     typename(type(data)), type_hint, outer_type_name=outer_type_name, field_name=field_name
                 )
-                raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_class_name}.{location_str}")
+                raise RuntimeError(f"Subtype {subtype} is not valid for data type {data_type_name}.{location_str}")
         elif schema_type is float:
             # Convert to float in case the argument is int
             return float(data)
@@ -127,8 +129,8 @@ class PrimitiveUtil(BuilderUtil):
             # TODO: !!! Add validation of datetime and other types, including for whole milliseconds
             return data
         else:
-            primitive_class_names_str = "\n".join(PRIMITIVE_TYPE_NAMES)
+            primitive_types_names_str = "\n".join(PRIMITIVE_TYPE_NAMES)
             raise RuntimeError(
                 f"Type {typenameof(data)} is not a valid value type for a primitive field:\n"
-                f"{primitive_class_names_str}\n"
+                f"{primitive_types_names_str}\n"
             )

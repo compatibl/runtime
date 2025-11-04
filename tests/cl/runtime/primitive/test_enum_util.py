@@ -32,9 +32,9 @@ def test_from_str():
     with pytest.raises(UserError):
         EnumUtil.from_str(StubIntEnum, "A", field_name="my_field")
     with pytest.raises(UserError):
-        EnumUtil.from_str(StubIntEnum, "A", class_name="MyClass")
+        EnumUtil.from_str(StubIntEnum, "A", type_name="MyClass")
     with pytest.raises(UserError):
-        EnumUtil.from_str(StubIntEnum, "A", field_name="my_field", class_name="MyClass")
+        EnumUtil.from_str(StubIntEnum, "A", field_name="my_field", type_name="MyClass")
 
 
 if __name__ == "__main__":

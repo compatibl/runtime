@@ -140,31 +140,31 @@ class BootstrapSerializer(Serializer):
     def _serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
         """Serialize data to a dictionary without encoding."""
 
-        data_class_name = type(data).__name__
+        data_type_name = type(data).__name__
         if data is None:
             if (value_format := self.none_format) == NoneFormat.PASSTHROUGH:
                 # Pass through None for untyped serialization
                 return None
             else:
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
-        elif data_class_name == "str":
+        elif data_type_name == "str":
             # Return None for an empty string
             return data if data else None
-        elif data_class_name == "float":
+        elif data_type_name == "float":
             if (value_format := self.float_format) == FloatFormat.PASSTHROUGH:
                 return data
             elif value_format == FloatFormat.DEFAULT:
                 return FloatUtil.format(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, FloatFormat)
-        elif data_class_name == "bool":
+        elif data_type_name == "bool":
             if (value_format := self.bool_format) == BoolFormat.PASSTHROUGH:
                 return data
             elif value_format == BoolFormat.DEFAULT:
                 return BoolUtil.to_str_or_none(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, BoolFormat)
-        elif data_class_name == "int":
+        elif data_type_name == "int":
             # Check if the value falls into int32 range
             if is_int_32(data):
                 # Check that the value fits into 32-bit signed integer range
@@ -186,7 +186,7 @@ class BootstrapSerializer(Serializer):
                     raise ErrorUtil.enum_value_error(value_format, LongFormat)
             else:
                 raise RuntimeError(f"Value {data} does not fit into 54-bit signed integer range, cannot serialize.")
-        elif data_class_name == "date":
+        elif data_type_name == "date":
             if (value_format := self.date_format) == DateFormat.PASSTHROUGH:
                 return data
             elif value_format == DateFormat.DEFAULT:
@@ -195,7 +195,7 @@ class BootstrapSerializer(Serializer):
                 return DateUtil.to_iso_int(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, DateFormat)
-        elif data_class_name == "time":
+        elif data_type_name == "time":
             if (value_format := self.time_format) == TimeFormat.PASSTHROUGH:
                 return data
             elif value_format == TimeFormat.DEFAULT:
@@ -204,14 +204,14 @@ class BootstrapSerializer(Serializer):
                 return TimeUtil.to_iso_int(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, TimeFormat)
-        elif data_class_name == "datetime":
+        elif data_type_name == "datetime":
             if (value_format := self.datetime_format) == DatetimeFormat.PASSTHROUGH:
                 return data
             elif value_format == DatetimeFormat.DEFAULT:
                 return DatetimeUtil.to_str(data)
             else:
                 raise ErrorUtil.enum_value_error(value_format, DatetimeFormat)
-        elif data_class_name == "UUID":
+        elif data_type_name == "UUID":
             if data.version != 7:
                 # Use UuidFormat for UUID versions other than version 7
                 if (value_format := self.uuid_format) == UuidFormat.PASSTHROUGH:
@@ -233,7 +233,7 @@ class BootstrapSerializer(Serializer):
                     return UuidUtil.to_str(data)
                 else:
                     raise ErrorUtil.enum_value_error(value_format, TimestampFormat)
-        elif data_class_name == "bytes":
+        elif data_type_name == "bytes":
             if (value_format := self.bytes_format) == BytesFormat.PASSTHROUGH:
                 return data
             elif value_format == BytesFormat.DEFAULT:

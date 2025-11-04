@@ -113,19 +113,19 @@ class TypeHint(BootstrapMixin):
     @classmethod
     def for_type(
         cls,
-        class_: type,
+        type_: type,
         *,
         optional: bool = None,
         predicate: bool = None,
         subtype: str | None = None,
     ) -> Self:
         """Create type hint for a class with optional parameters."""
-        class_name = typename(class_)
-        if (subtype == "long" and class_ is not int) or (subtype == "timestamp" and class_ is not str):
-            raise RuntimeError(f"Subtype {subtype} is not valid for class {class_name}.")
+        type_name = typename(type_)
+        if (subtype == "long" and type_ is not int) or (subtype == "timestamp" and type_ is not str):
+            raise RuntimeError(f"Subtype {subtype} is not valid for class {type_name}.")
 
         return TypeHint(
-            schema_type=class_,
+            schema_type=type_,
             optional=optional,
             predicate=predicate,
             remaining=None,

@@ -62,7 +62,7 @@ def test_required():
 
     samples = [
         ClassLabelKey(),  # noqa - missing a required field in key
-        ClassLabel(class_name="en-US"),  # noqa - missing a required field in record
+        ClassLabel(type_name="en-US"),  # noqa - missing a required field in record
     ]
 
     for sample in samples:

@@ -17,6 +17,7 @@ from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
+from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.schema.type_spec import TypeSpec
 
 
@@ -32,10 +33,10 @@ class PrimitiveSpec(TypeSpec):
 
         # Check that type_ is primitive
         if not is_primitive_type(self.type_):
-            primitive_class_names_str = ", ".join(PRIMITIVE_TYPE_NAMES)
+            primitive_type_names_str = ", ".join(PRIMITIVE_TYPE_NAMES)
             raise RuntimeError(
-                f"Cannot create an instance of {typename(type(self))} for type {typenameof(type_)}\n"
-                f"because it is not one of the supported primitive types:\n{primitive_class_names_str}"
+                f"Cannot create an instance of {typename(type(self))} for type {typenameof(self.type_)}\n"
+                f"because it is not one of the supported primitive types:\n{primitive_type_names_str}"
             )
 
         # Check subtype compatibility

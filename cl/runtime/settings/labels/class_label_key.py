@@ -28,8 +28,8 @@ class ClassLabelKey(DataclassMixin, KeyMixin):
         - This UI setting does not affect the REST API
     """
 
-    class_name: str = required()
-    """Class name without module (the setting will apply to this class name in every module)."""
+    type_name: str = required()
+    """Type name without module (the setting will apply to this class name in every module)."""
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:

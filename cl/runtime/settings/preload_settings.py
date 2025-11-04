@@ -54,9 +54,9 @@ class PreloadSettings(Settings):
         csv_files = self._get_files("csv")
         if final_record_types is not None:
             # Limit to the specified types
-            record_class_names = [typename(record_type) for record_type in final_record_types]
+            record_type_names = [typename(record_type) for record_type in final_record_types]
             csv_files = [
-                csv_file for csv_file in csv_files if os.path.basename(csv_file).split(".")[0] in record_class_names
+                csv_file for csv_file in csv_files if os.path.basename(csv_file).split(".")[0] in record_type_names
             ]
 
         # Preload from CSV

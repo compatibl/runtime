@@ -101,15 +101,15 @@ class DataUtil(BuilderUtil):
             # Keep track of which init methods in class hierarchy were already called
             invoked = set()
             # Reverse the MRO to start from base to derived
-            for class_ in reversed(data_type.__mro__):
+            for type_ in reversed(data_type.__mro__):
                 # Remove leading underscores from the class name when generating mangling for __init
                 # to support classes that start from _ to mark them as protected
-                class_init = getattr(class_, f"_{class_.__name__.lstrip('_')}__init", None)
-                if class_init is not None and (qualname := class_init.__qualname__) not in invoked:
+                type_init = getattr(type_, f"_{type_.__name__.lstrip('_')}__init", None)
+                if type_init is not None and (qualname := type_init.__qualname__) not in invoked:
                     # Add qualname to invoked to prevent executing the same method twice
                     invoked.add(qualname)
                     # Invoke '__init' method if it exists, otherwise do nothing
-                    class_init(data)
+                    type_init(data)
 
             # Perform check against the schema if provided irrespective of the type inclusion setting
             if schema_type is not None and schema_type != data_type:
@@ -196,12 +196,12 @@ class DataUtil(BuilderUtil):
             # Optional, perform full type hint validation if not None
             if data is not None:
                 # Get the actual type name of data, which may be a type
-                data_class_name = typename(type(data))
+                data_type_name = typename(type(data))
                 # Get the expected type name, which may include subtypes such as long or timestamp
                 schema_type_name = typename(type_hint.schema_type) if type_hint is not None else None
-                if data_class_name != schema_type_name:
+                if data_type_name != schema_type_name:
                     raise RuntimeError(
-                        f"An empty instance of primitive type has type {data_class_name}\n"
+                        f"An empty instance of primitive type has type {data_type_name}\n"
                         f"while {schema_type_name} was expected."
                     )
             return None

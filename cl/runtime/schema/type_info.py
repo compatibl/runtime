@@ -370,7 +370,7 @@ class TypeInfo(BootstrapMixin):
         cls._clear()
 
         # Add each class after performing checks for duplicates
-        consume(cls._add_class(class_) for class_ in cls._get_package_types())
+        consume(cls._add_type(type_) for type_ in cls._get_package_types())
 
         # Overwrite the cache file on disk with the new data
         cls._save()
@@ -407,25 +407,25 @@ class TypeInfo(BootstrapMixin):
         # Enumerate types in all modules that match is_schema_type predicate
         modules = cls._get_package_modules()
         types = tuple(
-            class_
+            type_
             for module in modules
-            for _, class_ in getmembers(module, is_schema_type)
-            if module.__name__ == class_.__module__
+            for _, type_ in getmembers(module, is_schema_type)
+            if module.__name__ == type_.__module__
         )
         return tuple(sorted(types, key=lambda x: x.__name__))
 
     @classmethod
-    def _get_type_kind(cls, class_: type) -> TypeKind | None:
+    def _get_type_kind(cls, type_: type) -> TypeKind | None:
         """Get type kind of the class, return None if not a framework class."""
-        if is_primitive_type(class_):
+        if is_primitive_type(type_):
             return TypeKind.PRIMITIVE
-        elif is_enum_type(class_):
+        elif is_enum_type(type_):
             return TypeKind.ENUM
-        elif is_key_type(class_):
+        elif is_key_type(type_):
             return TypeKind.KEY
-        elif is_record_type(class_):
+        elif is_record_type(type_):
             return TypeKind.RECORD
-        elif is_data_key_or_record_type(class_):
+        elif is_data_key_or_record_type(type_):
             return TypeKind.DATA
         else:
             # Return None if not a framework class
@@ -447,29 +447,29 @@ class TypeInfo(BootstrapMixin):
             )
 
     @classmethod
-    def _add_class(cls, class_: type, *, subtype: str | None = None) -> None:
+    def _add_type(cls, type_: type, *, subtype: str | None = None) -> None:
         """Add the specified class to the qual_name and type_name dicts without overwriting the existing values."""
 
         # TODO: Exclude types in TypeExclude.csv
 
         # Error if the class is imported from a module that is not in the package list
-        cls._check_type(class_)
+        cls._check_type(type_)
 
-        type_kind = cls._get_type_kind(class_)
+        type_kind = cls._get_type_kind(type_)
         if type_kind is None:
             # Skip if not a framework class
             return
 
         if type_kind == TypeKind.PRIMITIVE:
             # Apply subtype if specified for a primitive type
-            type_name = subtype if subtype else class_.__name__
+            type_name = subtype if subtype else type_.__name__
         else:
             # Get type name with aliases applied
-            type_name = typename(class_)
+            type_name = typename(type_)
             # Ensure subtype is not specified for non-primitive types
             if subtype:
                 raise RuntimeError(
-                    f"Subtype {subtype} is specified for non-primitive class {class_.__name__}.\n"
+                    f"Subtype {subtype} is specified for non-primitive class {type_.__name__}.\n"
                     f"Only primitive types can have subtypes."
                 )
 
@@ -477,8 +477,8 @@ class TypeInfo(BootstrapMixin):
         type_info = TypeInfo(
             type_name=type_name,
             type_kind=type_kind,
-            qual_name=qualname(class_),
-            type_=class_,
+            qual_name=qualname(type_),
+            type_=type_,
             subtype=subtype,
         ).build()
 
@@ -674,7 +674,7 @@ class TypeInfo(BootstrapMixin):
         """Import type using its fully qualified name in module.ClassName format."""
 
         # Split fully qualified name into dot-delimited snake_case module and PascalCase class name
-        module_name, class_name = qual_name.rsplit(".", 1)
+        module_name, type_name = qual_name.rsplit(".", 1)
 
         # Load the module if not already in cache
         if (module := cls._module_dict.get(module_name, None)) is None:
@@ -696,9 +696,9 @@ class TypeInfo(BootstrapMixin):
         # Get class from module, report error if not found
         try:
             # Get class from module
-            result = getattr(module, class_name)
+            result = getattr(module, type_name)
             # Add to the qual_name and type_name dictionaries
-            cls._add_class(result)
+            cls._add_type(result)
             return result
         except AttributeError:
             raise RuntimeError(f"Class {qual_name} is not found in TypeInfo, run init_type_info to rebuild.")

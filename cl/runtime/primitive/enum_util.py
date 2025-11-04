@@ -38,21 +38,21 @@ class EnumUtil(BuilderUtil):
         value: str | None,
         *,
         field_name: str | None = None,
-        class_name: str | None = None,
+        type_name: str | None = None,
     ) -> TEnum:
         """Convert PascalCase string to Enum instance."""
         # Convert from PascalCase to UPPER_CASE for matching but not error reporting
         if CaseUtil.is_pascal_case(value):
             uppercase_value = CaseUtil.pascal_to_upper_case(value)
         else:
-            description = cls.get_description(enum_type, value, field_name=field_name, class_name=class_name)
+            description = cls.get_description(enum_type, value, field_name=field_name, type_name=type_name)
             raise UserError(f"The {description} is UPPER_CASE, use PascalCase instead.")
 
         try:
             # Use item name, not value which may be numerical for IntEnum
             return enum_type[uppercase_value]
         except KeyError:
-            description = cls.get_description(enum_type, value, field_name=field_name, class_name=class_name)
+            description = cls.get_description(enum_type, value, field_name=field_name, type_name=type_name)
             valid_values = "".join([f"  - {CaseUtil.upper_to_pascal_case(e.name)}\n" for e in enum_type])
             raise UserError(f"Invalid {description}. Valid choices:\n{valid_values}")
 
@@ -63,7 +63,7 @@ class EnumUtil(BuilderUtil):
         value: str | None,
         *,
         field_name: str | None = None,
-        class_name: str | None = None,
+        type_name: str | None = None,
     ) -> str:
         description = f"value '{value}' for "
         if not StringUtil.is_empty(field_name):
@@ -72,8 +72,8 @@ class EnumUtil(BuilderUtil):
             description = description + f"field '{field_name}'"
         else:
             description = description + f"type {enum_type.__name__}"
-        if not StringUtil.is_empty(class_name):
-            description = description + f" in record type {class_name}"
+        if not StringUtil.is_empty(type_name):
+            description = description + f" in record type {type_name}"
         return description
 
     @classmethod

@@ -124,12 +124,12 @@ class PrimitiveSerializer(Serializer):
                 raise ErrorUtil.enum_value_error(value_format, NoneFormat)
 
         # To allow ABCMeta and other metaclasses derived from type to pass the check
-        data_class_name = "type" if isinstance(data, type) else typename(type(data))
+        data_type_name = "type" if isinstance(data, type) else typename(type(data))
 
         # Ensure there is no remaining component (type hint is not a sequence or mapping)
         if type_hint is not None and type_hint.remaining:
             raise RuntimeError(
-                f"Data is an instance of a primitive class {data_class_name} which is\n"
+                f"Data is an instance of a primitive class {data_type_name} which is\n"
                 f"incompatible with a composite type hint:\n"
                 f"{type_hint.to_str()}."
             )
@@ -138,17 +138,17 @@ class PrimitiveSerializer(Serializer):
         if type_hint is not None:
             schema_type_name = typename(type_hint.schema_type)
         else:
-            schema_type_name = data_class_name
+            schema_type_name = data_type_name
 
         # Validate that data type is compatible with schema type, allowing
         # mixing of int and float subject to subsequent validation of data value
         if (
-            data_class_name != schema_type_name
-            and not (data_class_name == "int" and schema_type_name == "float")
-            and not (data_class_name == "float" and schema_type_name == "int")
+            data_type_name != schema_type_name
+            and not (data_type_name == "int" and schema_type_name == "float")
+            and not (data_type_name == "float" and schema_type_name == "int")
         ):
             raise RuntimeError(
-                f"Data type '{data_class_name}' cannot be stored in a field declared as '{schema_type_name}'."
+                f"Data type '{data_type_name}' cannot be stored in a field declared as '{schema_type_name}'."
             )
 
         # Validate that subtype is compatible with schema_type_name

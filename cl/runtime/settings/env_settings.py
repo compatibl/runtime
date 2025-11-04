@@ -84,7 +84,7 @@ class EnvSettings(Settings):
                     EnvKind,
                     env_kind_pascal_case,
                     field_name="env_kind",
-                    class_name="EnvSettings",
+                    type_name="EnvSettings",
                 )
             elif not is_enum_type(type(self.env_kind)):
                 raise RuntimeError(

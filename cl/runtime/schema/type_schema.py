@@ -34,8 +34,8 @@ class TypeSchema:
     def for_type_name(cls, type_name: str) -> TypeSpec:  # TODO: ! Remove this method?
         """Get or create type spec for the specified type name."""
         # Get class for the specified type name and use it to get type spec
-        class_ = TypeInfo.from_type_name(type_name)
-        return cls.for_type(class_)
+        type_ = TypeInfo.from_type_name(type_name)
+        return cls.for_type(type_)
 
     @classmethod
     @cached

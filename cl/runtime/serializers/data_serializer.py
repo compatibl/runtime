@@ -79,7 +79,7 @@ class DataSerializer(Serializer):
         """Perform checks without changing the data."""
         if (self.inner_serializer is not None) ^ (self.inner_encoder is not None):
             raise ErrorUtil.mutually_required_fields_error(
-                ["inner_serializer", "inner_encoder"], class_name=self.__class__.__name__
+                ["inner_serializer", "inner_encoder"], type_name=self.__class__.__name__
             )
 
     def serialize(self, data: Any, type_hint: TypeHint | None = None) -> Any:
