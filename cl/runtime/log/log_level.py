@@ -25,7 +25,7 @@ class LogLevel(IntEnum):
     """Confirmation that things are working as expected."""
 
     WARNING = 30
-    """Something unexpected happened, or an error might occur in the near future (e.g. ‘disk space low’)."""
+    """Something unexpected happened, or an error might occur in the near future (e.g., disk space low)."""
 
     ERROR = 40
     """The program has not been able to perform some function but may still be able to continue running."""
