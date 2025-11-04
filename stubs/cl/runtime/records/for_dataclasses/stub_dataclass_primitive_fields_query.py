@@ -16,10 +16,10 @@ import datetime as dt
 from dataclasses import dataclass
 from uuid import UUID
 from cl.runtime.db.query_mixin import QueryMixin
-from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.predicates import Predicate
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 

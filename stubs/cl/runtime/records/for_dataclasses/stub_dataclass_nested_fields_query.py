@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.records.predicates import Predicate
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.predicates import Predicate
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
