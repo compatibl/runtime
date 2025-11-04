@@ -19,18 +19,12 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ClassLabelKey(DataclassMixin, KeyMixin):
-    """
-    Custom class label overrides the standard 'ClassName' -> 'Class Label' transformation.
-
-    Notes:
-        - The setting will apply to this class name in every module
-        - This UI setting does not affect the REST API
-    """
+class TypeLabelKey(DataclassMixin, KeyMixin):
+    """Defines a custom type label to display of class name in UI, does not affect the code or rest API."""
 
     type_name: str = required()
-    """Type name without module (the setting will apply to this class name in every module)."""
+    """Type name without module (the setting will apply to this type in every module)."""
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return ClassLabelKey
+        return TypeLabelKey

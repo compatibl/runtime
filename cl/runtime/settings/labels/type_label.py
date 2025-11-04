@@ -15,21 +15,15 @@
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.settings.labels.class_label_key import ClassLabelKey
+from cl.runtime.settings.labels.type_label_key import TypeLabelKey
 
 
 @dataclass(slots=True, kw_only=True)
-class ClassLabel(ClassLabelKey, RecordMixin):
-    """
-    Custom class label overrides the standard 'ClassName' -> 'Class Label' transformation.
+class TypeLabel(TypeLabelKey, RecordMixin):
+    """Defines a custom type label to display of class name in UI, does not affect the code or rest API."""
 
-    Notes:
-        - The setting will apply to this class name in every module
-        - This UI setting does not affect the REST API
-    """
+    type_label: str = required()
+    """Custom type label to display of class name in UI, does not affect the code or rest API."""
 
-    class_label: str = required()
-    """Custom class label overrides the standard 'ClassName' -> 'Class Label' transformation."""
-
-    def get_key(self) -> ClassLabelKey:
-        return ClassLabelKey(type_name=self.type_name).build()
+    def get_key(self) -> TypeLabelKey:
+        return TypeLabelKey(type_name=self.type_name).build()

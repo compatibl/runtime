@@ -15,8 +15,8 @@
 import pytest
 from cl.runtime.records.data_util import DataUtil
 from cl.runtime.schema.type_hint import TypeHint
-from cl.runtime.settings.labels.class_label import ClassLabel
-from cl.runtime.settings.labels.class_label_key import ClassLabelKey
+from cl.runtime.settings.labels.type_label import TypeLabel
+from cl.runtime.settings.labels.type_label_key import TypeLabelKey
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -61,8 +61,8 @@ def test_required():
     """Test validation of the field type during build."""
 
     samples = [
-        ClassLabelKey(),  # noqa - missing a required field in key
-        ClassLabel(type_name="en-US"),  # noqa - missing a required field in record
+        TypeLabelKey(),  # noqa - missing a required field in key
+        TypeLabel(type_name="en-US"),  # noqa - missing a required field in record
     ]
 
     for sample in samples:
