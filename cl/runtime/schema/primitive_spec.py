@@ -17,7 +17,6 @@ from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
-from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.schema.type_spec import TypeSpec
 
 
