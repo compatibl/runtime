@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.stats.classifier_trial import ClassifierTrial
+from cl.runtime.stat.classifier_trial import ClassifierTrial
 
 
 @dataclass(slots=True, kw_only=True)

@@ -22,12 +22,12 @@ from cl.runtime.plots.plot import Plot
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
-from cl.runtime.stats.condition import Condition
-from cl.runtime.stats.condition_key import ConditionKey
-from cl.runtime.stats.experiment_key import ExperimentKey
-from cl.runtime.stats.trial import Trial
-from cl.runtime.stats.trial_key import TrialKey
-from cl.runtime.stats.trial_query import TrialQuery
+from cl.runtime.stat.condition import Condition
+from cl.runtime.stat.condition_key import ConditionKey
+from cl.runtime.stat.experiment_key import ExperimentKey
+from cl.runtime.stat.trial import Trial
+from cl.runtime.stat.trial_key import TrialKey
+from cl.runtime.stat.trial_query import TrialQuery
 from cl.runtime.views.png_view import PngView
 
 

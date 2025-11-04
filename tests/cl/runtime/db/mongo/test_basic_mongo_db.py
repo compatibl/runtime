@@ -16,7 +16,7 @@ import pytest
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.typename import typename
-from cl.runtime.stats.experiment_key_query import ExperimentKeyQuery
+from cl.runtime.stat.experiment_key_query import ExperimentKeyQuery
 from stubs.cl.runtime import StubDataclassPrimitiveFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields_query import StubDataclassNestedFieldsQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (

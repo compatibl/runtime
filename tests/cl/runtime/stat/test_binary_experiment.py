@@ -14,8 +14,8 @@
 
 import pytest
 import random
-from cl.runtime.stats.condition import Condition
-from stubs.cl.runtime.stats.stub_binary_experiment import StubBinaryExperiment
+from cl.runtime.stat.condition import Condition
+from stubs.cl.runtime.stat.stub_binary_experiment import StubBinaryExperiment
 
 
 def test_smoke(multi_db_fixture):

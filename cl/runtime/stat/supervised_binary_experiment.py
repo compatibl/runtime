@@ -17,10 +17,10 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
-from cl.runtime.stats.binary_experiment import BinaryExperiment
-from cl.runtime.stats.condition import Condition
-from cl.runtime.stats.supervised_binary_trial import SupervisedBinaryTrial
-from cl.runtime.stats.trial_query import TrialQuery
+from cl.runtime.stat.binary_experiment import BinaryExperiment
+from cl.runtime.stat.condition import Condition
+from cl.runtime.stat.supervised_binary_trial import SupervisedBinaryTrial
+from cl.runtime.stat.trial_query import TrialQuery
 
 
 @dataclass(slots=True, kw_only=True)

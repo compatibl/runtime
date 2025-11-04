@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.stats.condition import Condition
-from stubs.cl.runtime.stats.stub_binary_experiment import StubBinaryExperiment
+from cl.runtime.stat.condition import Condition
+from stubs.cl.runtime.stat.stub_binary_experiment import StubBinaryExperiment
 
 
 def test_launch_many_trials(multi_db_fixture):

@@ -17,9 +17,9 @@ from dataclasses import dataclass
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.stats.condition_key import ConditionKey
-from cl.runtime.stats.experiment_key import ExperimentKey
-from cl.runtime.stats.trial_key import TrialKey
+from cl.runtime.stat.condition_key import ConditionKey
+from cl.runtime.stat.experiment_key import ExperimentKey
+from cl.runtime.stat.trial_key import TrialKey
 
 
 @dataclass(slots=True, kw_only=True)

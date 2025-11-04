@@ -14,8 +14,8 @@
 
 import pytest
 import random
-from cl.runtime.stats.condition import Condition
-from stubs.cl.runtime.stats.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
+from cl.runtime.stat.condition import Condition
+from stubs.cl.runtime.stat.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
 
 
 def test_smoke(multi_db_fixture):

@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.stats.binary_trial import BinaryTrial
+from cl.runtime.stat.binary_trial import BinaryTrial
 
 
 @dataclass(slots=True, kw_only=True)

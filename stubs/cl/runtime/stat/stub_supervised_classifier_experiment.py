@@ -14,9 +14,9 @@
 
 import random
 from dataclasses import dataclass
-from cl.runtime.stats.condition_key import ConditionKey
-from cl.runtime.stats.supervised_classifier_experiment import SupervisedClassifierExperiment
-from cl.runtime.stats.supervised_classifier_trial import SupervisedClassifierTrial
+from cl.runtime.stat.condition_key import ConditionKey
+from cl.runtime.stat.supervised_classifier_experiment import SupervisedClassifierExperiment
+from cl.runtime.stat.supervised_classifier_trial import SupervisedClassifierTrial
 
 
 @dataclass(slots=True, kw_only=True)

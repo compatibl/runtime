@@ -19,10 +19,10 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.stats.classifier_trial import ClassifierTrial
-from cl.runtime.stats.condition import Condition
-from cl.runtime.stats.experiment import Experiment
-from cl.runtime.stats.trial_query import TrialQuery
+from cl.runtime.stat.classifier_trial import ClassifierTrial
+from cl.runtime.stat.condition import Condition
+from cl.runtime.stat.experiment import Experiment
+from cl.runtime.stat.trial_query import TrialQuery
 
 
 @dataclass(slots=True, kw_only=True)

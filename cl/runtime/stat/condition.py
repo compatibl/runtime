@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.stats.condition_key import ConditionKey
+from cl.runtime.stat.condition_key import ConditionKey
 
 
 @dataclass(slots=True, kw_only=True)
