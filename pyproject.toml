@@ -50,7 +50,6 @@ warn_unreachable = true
 # Import discovery
 namespace_packages = true
 explicit_package_bases = true
-mypy_path = ["C:\\Source\\TradeEntry\\Code\\runtime-build\\runtime"]
 
 # Per-module options
 [[tool.mypy.overrides]]
