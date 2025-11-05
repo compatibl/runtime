@@ -31,11 +31,6 @@ class SaveResponseUtil:
         if not request.records:
             return []
 
-        # TODO (Roman): Align UiTypeState data model and UiTypeState dict from ui.
-        # Skip saving UiTypeState objects.
-        if request.records[0].get("_t") == "UiTypeState":
-            return [KeyRequestItem(key="", type="") for _ in range(len(request.records))]
-
         deserialized_records = tuple(_UI_SERIALIZER.deserialize(record_dict) for record_dict in request.records)
 
         # Check if all received records are of the same key type.
