@@ -53,7 +53,7 @@ class ClassifierExperiment(Experiment, ABC):
         conditions = active(DataSource).load_many(self.conditions, cast_to=Condition)
         for condition in conditions:
             # Get trials for the condition
-            trials = tuple(trial for trial in all_trials if trial.condition == condition.get_key())
+            trials = tuple(trial for trial in all_trials if trial.condition == condition)
 
             total = len(trials)
             class_counts = Counter(trial.label for trial in trials)
