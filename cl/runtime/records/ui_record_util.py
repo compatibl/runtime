@@ -71,7 +71,12 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
             actual_type = request_type if record is None else type(record)
             if record is not None:
                 # Get persisted views for this record
-                persisted_views = ViewPersistenceUtil.load_all_views_for_record(record)
+                # TODO (Roman): Currently, loading Views by query does not work for Record types that have key fields
+                #  of type 'date'. Fix query serialization so that it works for all supported types.
+                try:
+                    persisted_views = ViewPersistenceUtil.load_all_views_for_record(record)
+                except Exception:
+                    persisted_views = []
         else:
             actual_type = request_type
 
