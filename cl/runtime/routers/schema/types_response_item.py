@@ -19,6 +19,8 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.typename import typename
+from cl.runtime.schema.type_info import TypeInfo
+from cl.runtime.schema.type_kind import TypeKind
 
 
 class TypesResponseItem(BaseModel):
@@ -38,35 +40,22 @@ class TypesResponseItem(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def get_types(cls) -> list[TypesResponseItem]:  # TODO(Roman): !!! Separate routes for types and tables
+    def get_types(cls) -> list[TypesResponseItem]:
         """Implements /schema/types route."""
 
-        # Get types stored in DB
-        record_types = (ds := active(DataSource)).get_record_types()
+        # Get cached classes (does not rebuild cache)
+        record_types = TypeInfo.get_types(type_kind=TypeKind.RECORD)
 
         # Add types to result
         types_result = [
             TypesResponseItem(
-                name=(record_type_name := typename(record_type)),
-                label=titleize(record_type_name),
+                name=typename(record_type),
+                label=titleize(typename(record_type)),  # TODO: Make label different from name or remove
             )
             for record_type in record_types
         ]
 
-        # Add tables to result
-        tables_result = [
-            TypesResponseItem(
-                name=(key_type_name := typename(key_type)),
-                # TODO: Remove suffix key when a separate method, currently this would cause a name collision between table and type
-                label=key_type_name,
-                kind="Table",
-            )
-            for key_type in ds.get_key_types()
-        ]
-
-        # Check name collisions between types and tables
-        cls._check_name_collisions(types_result, tables_result)
-        return tables_result + types_result
+        return types_result
 
     @classmethod
     def _check_name_collisions(cls, types: list[TypesResponseItem], tables: list[TypesResponseItem]) -> None:
