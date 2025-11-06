@@ -54,7 +54,7 @@ def test_html(work_dir_fixture):
 
     # Render
     plot = create_plot()
-    engine = PlotlyEngine()
+    engine = PlotlyEngine(div_id="test")
     html_bytes = engine.render_html(plot)
 
     # Basic checks of result

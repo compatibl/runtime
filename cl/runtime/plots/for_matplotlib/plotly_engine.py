@@ -29,6 +29,9 @@ from cl.runtime.records.typename import typenameof
 class PlotlyEngine(PlottingEngine):
     """Plotting engine using Plotly library."""
 
+    div_id: str | None = None
+    """Optional id for the figure <div> element to avoid output variations due to GUID use."""
+
     def render_html(self, plot: Plot) -> bytes:
         """Render the plot to HTML."""
 
@@ -108,7 +111,7 @@ class PlotlyEngine(PlottingEngine):
                     itemsizing="constant",
                 ),
             )
-            html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
+            html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn", div_id=self.div_id)
             return html.encode("utf-8")
 
         elif isinstance(plot, ScatterPlot2D):
@@ -151,7 +154,7 @@ class PlotlyEngine(PlottingEngine):
                 yaxis=dict(range=plot.y_lim) if plot.y_lim else {},
                 showlegend=True,
             )
-            html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
+            html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn", div_id=self.div_id)
             return html.encode("utf-8")
         else:
             raise RuntimeError(f"{typenameof(self)} does not support rendering of {typenameof(plot)} to HTML.")
