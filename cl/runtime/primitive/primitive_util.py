@@ -85,7 +85,7 @@ class PrimitiveUtil(BuilderUtil):
         if (schema_type == int and subtype not in (None, "long")) or (
             schema_type == str and subtype not in (None, "timestamp")
         ):
-            raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{schema_type_name}'.")
+            raise RuntimeError(f"Subtype '{subtype}' cannot be stored in class '{typename(schema_type)}'.")
 
         # Validate based schema_type_name, taking into account subtype
         if schema_type is str:
