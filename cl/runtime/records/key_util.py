@@ -12,14 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import cast
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_key_type, is_record_type
+from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typenameof
 from cl.runtime.records.typename import typeof
 
 
 class KeyUtil:
     """Helper methods for key types."""
+
+    @classmethod
+    def is_equal(cls, obj: KeyMixin, other: KeyMixin) -> bool:
+        """Compare keys when arguments are keys or records."""
+        obj_key = cast(RecordMixin, obj).get_key() if is_record_type(type(obj)) else obj
+        other_key = cast(RecordMixin, other).get_key() if is_record_type(type(other)) else other
+        return obj_key == other_key
 
     @classmethod
     def get_hash(cls, key: KeyMixin) -> int:

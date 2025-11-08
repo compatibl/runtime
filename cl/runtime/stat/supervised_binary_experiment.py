@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
+from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.stat.binary_experiment import BinaryExperiment
 from cl.runtime.stat.condition import Condition
 from cl.runtime.stat.supervised_binary_trial import SupervisedBinaryTrial
@@ -45,7 +46,7 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
         conditions = active(DataSource).load_many(self.conditions, cast_to=Condition)
         for condition in conditions:
             # Get trials for the condition
-            trials = tuple(trial for trial in all_trials if trial.condition == condition)
+            trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.condition, condition))
             total = len(trials)
 
             tp = tn = fp = fn = 0

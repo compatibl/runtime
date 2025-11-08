@@ -19,6 +19,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.stat.classifier_trial import ClassifierTrial
 from cl.runtime.stat.condition import Condition
 from cl.runtime.stat.experiment import Experiment
@@ -53,7 +54,7 @@ class ClassifierExperiment(Experiment, ABC):
         conditions = active(DataSource).load_many(self.conditions, cast_to=Condition)
         for condition in conditions:
             # Get trials for the condition
-            trials = tuple(trial for trial in all_trials if trial.condition == condition)
+            trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.condition, condition))
 
             total = len(trials)
             class_counts = Counter(trial.label for trial in trials)
