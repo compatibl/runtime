@@ -16,7 +16,7 @@ import random
 from dataclasses import dataclass
 from cl.runtime.stat.classifier_experiment import ClassifierExperiment
 from cl.runtime.stat.classifier_trial import ClassifierTrial
-from cl.runtime.stat.condition_key import ConditionKey
+from cl.runtime.params.param_key import ParamKey
 
 
 @dataclass(slots=True, kw_only=True)
@@ -26,7 +26,7 @@ class StubClassifierExperiment(ClassifierExperiment):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self, condition: ConditionKey) -> ClassifierTrial:
+    def create_trial(self, condition: ParamKey) -> ClassifierTrial:
         label = random.choice(self.class_labels)
         return ClassifierTrial(
             experiment=self.get_key(),

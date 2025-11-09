@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.stat.condition_key import ConditionKey
+from cl.runtime.params.param_key import ParamKey
 from cl.runtime.stat.experiment_key import ExperimentKey
 from cl.runtime.stat.trial_key import TrialKey
 
@@ -29,8 +29,8 @@ class Trial(TrialKey, RecordMixin, ABC):
     experiment: ExperimentKey = required()
     """Experiment for which the trial is performed."""
 
-    condition: ConditionKey = required()
-    """Experiment condition for which the trial is performed."""
+    condition: ParamKey = required()
+    """Experiment parameter (condition) for which the trial is performed."""
 
     def get_key(self) -> TrialKey:
         return TrialKey(timestamp=self.timestamp).build()

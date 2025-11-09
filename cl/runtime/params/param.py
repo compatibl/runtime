@@ -15,21 +15,21 @@
 from dataclasses import dataclass
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.stat.condition_key import ConditionKey
+from cl.runtime.params.param_key import ParamKey
 
 
 @dataclass(slots=True, kw_only=True)
-class Condition(ConditionKey, RecordMixin):
-    """Condition under which an experiment is performed."""
+class Param(ParamKey, RecordMixin):
+    """Parameter with a unique identifier."""
 
     label: str = required()
-    """Short label to use in charts and reporting, defaults to condition_id."""
+    """Short label to use in charts and reporting, defaults to param_id."""
 
-    def get_key(self) -> ConditionKey:
-        return ConditionKey(condition_id=self.condition_id).build()
+    def get_key(self) -> ParamKey:
+        return ParamKey(param_id=self.param_id).build()
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.label is None:
             # Use condition_id as label if not specified
-            self.label = self.condition_id
+            self.label = self.param_id

@@ -14,7 +14,7 @@
 
 import random
 from dataclasses import dataclass
-from cl.runtime.stat.condition_key import ConditionKey
+from cl.runtime.params.param_key import ParamKey
 from cl.runtime.stat.supervised_classifier_experiment import SupervisedClassifierExperiment
 from cl.runtime.stat.supervised_classifier_trial import SupervisedClassifierTrial
 
@@ -26,7 +26,7 @@ class StubSupervisedClassifierExperiment(SupervisedClassifierExperiment):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-    def create_trial(self, condition: ConditionKey) -> SupervisedClassifierTrial:
+    def create_trial(self, condition: ParamKey) -> SupervisedClassifierTrial:
         label = random.choice(self.class_labels)
         expected_label = random.choice(self.class_labels)
         return SupervisedClassifierTrial(

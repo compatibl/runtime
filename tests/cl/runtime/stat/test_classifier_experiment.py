@@ -14,7 +14,7 @@
 
 import pytest
 import random
-from cl.runtime.stat.condition import Condition
+from cl.runtime.params.param import Param
 from stubs.cl.runtime.stat.stub_classifier_experiment import StubClassifierExperiment
 
 
@@ -26,7 +26,7 @@ def test_smoke(multi_db_fixture):
         max_trials=5,
         class_labels=["A", "B", "C"],
         conditions=[
-            Condition(condition_id="Test1"),
+            Param(param_id="Test1"),
         ],
     )
     experiment.run_launch_all_trials()
@@ -36,8 +36,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubClassifierExperiment(
         experiment_id="Test",
         conditions=[
-            Condition(condition_id="Test1"),
-            Condition(condition_id="Test2"),
+            Param(param_id="Test1"),
+            Param(param_id="Test2"),
         ],
         max_trials=5,
         class_labels=["A", "B", "C"],

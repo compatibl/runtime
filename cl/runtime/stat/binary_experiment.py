@@ -19,7 +19,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.stat.binary_trial import BinaryTrial
-from cl.runtime.stat.condition import Condition
+from cl.runtime.params.param import Param
 from cl.runtime.stat.experiment import Experiment
 from cl.runtime.stat.trial_query import TrialQuery
 
@@ -44,7 +44,7 @@ class BinaryExperiment(Experiment, ABC):
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=BinaryTrial)
 
-        conditions = active(DataSource).load_many(self.conditions, cast_to=Condition)
+        conditions = active(DataSource).load_many(self.conditions, cast_to=Param)
         for condition in conditions:
             # Get trials for the condition
             trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.condition, condition))

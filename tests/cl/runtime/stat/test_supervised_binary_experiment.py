@@ -14,7 +14,7 @@
 
 import pytest
 import random
-from cl.runtime.stat.condition import Condition
+from cl.runtime.params.param import Param
 from stubs.cl.runtime.stat.stub_supervised_binary_experiment import StubSupervisedBinaryExperiment
 
 
@@ -25,7 +25,7 @@ def test_smoke(multi_db_fixture):
         experiment_id="test_supervised_binary_experiment.test_smoke",
         max_trials=5,
         conditions=[
-            Condition(condition_id="Test1"),
+            Param(param_id="Test1"),
         ],
     )
     experiment.run_launch_all_trials()
@@ -35,8 +35,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubSupervisedBinaryExperiment(
         experiment_id="Test",
         conditions=[
-            Condition(condition_id="Test1"),
-            Condition(condition_id="Test2"),
+            Param(param_id="Test1"),
+            Param(param_id="Test2"),
         ],
         max_trials=5,
     )

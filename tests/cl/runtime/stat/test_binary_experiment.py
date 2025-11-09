@@ -14,7 +14,7 @@
 
 import pytest
 import random
-from cl.runtime.stat.condition import Condition
+from cl.runtime.params.param import Param
 from stubs.cl.runtime.stat.stub_binary_experiment import StubBinaryExperiment
 
 
@@ -34,8 +34,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubBinaryExperiment(
         experiment_id="Test",
         conditions=[
-            Condition(condition_id="Test1"),
-            Condition(condition_id="Test2"),
+            Param(param_id="Test1"),
+            Param(param_id="Test2"),
         ],
         max_trials=5,
     )
