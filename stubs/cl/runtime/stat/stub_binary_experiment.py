@@ -30,6 +30,6 @@ class StubBinaryExperiment(BinaryExperiment):
         outcome = random.choice([True, False])
         return BinaryTrial(
             experiment=self.get_key(),
-            condition=condition,
+            param=condition,
             outcome=outcome,
         ).build()

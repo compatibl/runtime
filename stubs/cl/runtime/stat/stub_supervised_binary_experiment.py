@@ -31,7 +31,7 @@ class StubSupervisedBinaryExperiment(SupervisedBinaryExperiment):
         expected_outcome = random.choice([True, False])
         return SupervisedBinaryTrial(
             experiment=self.get_key(),
-            condition=condition,
+            param=condition,
             outcome=outcome,
             expected_outcome=expected_outcome,
         ).build()

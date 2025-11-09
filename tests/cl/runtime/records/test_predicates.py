@@ -343,10 +343,10 @@ def test_lte_condition():
         Lte(None)
 
 
-def test_nested_conditions():
-    """Test complex nested conditions."""
+def test_nested_predicates():
+    """Test complex nested predicates."""
 
-    # Create a complex nested condition
+    # Create a complex nested predicate
     range_cond = Range(gt=5, lt=10)
     gt_cond = Gt(3)
     gte_cond = Gte(5)
@@ -355,7 +355,7 @@ def test_nested_conditions():
     in_cond = In([1, 2, 3])
     exists_cond = Exists(True)
 
-    # And with nested conditions
+    # And with nested predicates
     and_nested = And(range_cond, gt_cond, gte_cond, in_cond, exists_cond)
     assert len(and_nested.op_and) == 5
     assert isinstance(and_nested.op_and[0], Range)
@@ -364,7 +364,7 @@ def test_nested_conditions():
     assert isinstance(and_nested.op_and[3], In)
     assert isinstance(and_nested.op_and[4], Exists)
 
-    # Or with nested conditions
+    # Or with nested predicates
     or_nested = Or(range_cond, lt_cond, lte_cond, in_cond, exists_cond)
     assert len(or_nested.op_or) == 5
     assert isinstance(or_nested.op_or[0], Range)
@@ -373,20 +373,20 @@ def test_nested_conditions():
     assert isinstance(or_nested.op_or[3], In)
     assert isinstance(or_nested.op_or[4], Exists)
 
-    # Not with nested condition
+    # Not with nested predicate
     not_nested = Not(gt_cond)
     assert isinstance(not_nested.op_not, Gt)
 
     # Complex nesting
-    complex_condition = And(Or(range_cond, gt_cond, lt_cond), Not(exists_cond), And(gte_cond, lte_cond, 1, 2, 3))
-    assert len(complex_condition.op_and) == 3
-    assert isinstance(complex_condition.op_and[0], Or)
-    assert isinstance(complex_condition.op_and[1], Not)
-    assert isinstance(complex_condition.op_and[2], And)
+    complex_predicate = And(Or(range_cond, gt_cond, lt_cond), Not(exists_cond), And(gte_cond, lte_cond, 1, 2, 3))
+    assert len(complex_predicate.op_and) == 3
+    assert isinstance(complex_predicate.op_and[0], Or)
+    assert isinstance(complex_predicate.op_and[1], Not)
+    assert isinstance(complex_predicate.op_and[2], And)
 
 
-def test_condition_with_stub_dataclass():
-    """Test conditions with stub dataclass instances."""
+def test_dataclass_predicates():
+    """Test predicates with stub dataclass instances."""
 
     # Create a stub dataclass instance
     stub_instance = StubDataclass()

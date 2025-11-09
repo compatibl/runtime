@@ -31,5 +31,5 @@ class Param(ParamKey, RecordMixin):
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.label is None:
-            # Use condition_id as label if not specified
+            # Use param_id as label if not specified
             self.label = self.param_id

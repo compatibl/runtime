@@ -30,6 +30,6 @@ class StubClassifierExperiment(ClassifierExperiment):
         label = random.choice(self.class_labels)
         return ClassifierTrial(
             experiment=self.get_key(),
-            condition=condition,
+            param=condition,
             label=label,
         ).build()

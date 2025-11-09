@@ -31,7 +31,7 @@ class StubSupervisedClassifierExperiment(SupervisedClassifierExperiment):
         expected_label = random.choice(self.class_labels)
         return SupervisedClassifierTrial(
             experiment=self.get_key(),
-            condition=condition,
+            param=condition,
             label=label,
             expected_label=expected_label,
         ).build()

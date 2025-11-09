@@ -30,7 +30,7 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
 
     def get_plot(self, plot_id: str) -> StackBarPlot:
         """Builds and returns plot for Supervised Binary Experiment."""
-        if not self.conditions:
+        if not self.params:
             raise RuntimeError(
                 "Experiment must have one or more condition to build a plot."
             )  # TODO: Support no conditions
@@ -43,10 +43,10 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=SupervisedBinaryTrial)
 
-        conditions = active(DataSource).load_many(self.conditions, cast_to=Param)
-        for condition in conditions:
+        params = active(DataSource).load_many(self.params, cast_to=Param)
+        for param in params:
             # Get trials for the condition
-            trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.condition, condition))
+            trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.param, param))
             total = len(trials)
 
             tp = tn = fp = fn = 0
@@ -61,7 +61,7 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
                 elif not trial.outcome and trial.expected_outcome:
                     fn += 1
 
-            group_labels.extend([condition.label] * 4)
+            group_labels.extend([param.label] * 4)
             bar_labels.extend(["TP", "TN", "FP", "FN"])
             values.extend(
                 [

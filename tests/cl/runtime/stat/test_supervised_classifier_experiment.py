@@ -25,7 +25,7 @@ def test_smoke(multi_db_fixture):
         experiment_id="test_supervised_classifier_experiment.test_smoke",
         class_labels=["A", "B", "C"],
         max_trials=5,
-        conditions=[
+        params=[
             Param(param_id="Test1"),
         ],
     )
@@ -35,7 +35,7 @@ def test_smoke(multi_db_fixture):
 def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubSupervisedClassifierExperiment(
         experiment_id="Test",
-        conditions=[
+        params=[
             Param(param_id="Test1"),
             Param(param_id="Test2"),
             Param(param_id="Test3"),

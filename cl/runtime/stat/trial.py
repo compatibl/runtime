@@ -29,7 +29,7 @@ class Trial(TrialKey, RecordMixin, ABC):
     experiment: ExperimentKey = required()
     """Experiment for which the trial is performed."""
 
-    condition: ParamKey = required()
+    param: ParamKey = required()
     """Experiment parameter (condition) for which the trial is performed."""
 
     def get_key(self) -> TrialKey:

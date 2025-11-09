@@ -1,3 +1,3 @@
-condition_id,label
-StubConditionA,A
-StubConditionB,B
+param_id,label
+StubParam1,Label1
+StubParam2,Label2

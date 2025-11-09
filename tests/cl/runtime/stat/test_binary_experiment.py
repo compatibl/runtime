@@ -33,7 +33,7 @@ def test_smoke(multi_db_fixture):
 def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubBinaryExperiment(
         experiment_id="Test",
-        conditions=[
+        params=[
             Param(param_id="Test1"),
             Param(param_id="Test2"),
         ],
