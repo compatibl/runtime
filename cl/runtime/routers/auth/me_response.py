@@ -13,9 +13,16 @@
 # limitations under the License.
 
 from __future__ import annotations
+from dataclasses import field
 from pydantic import BaseModel
+from cl.runtime.contexts.utils.user_secrets_util import UserSecretsUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.user_request import UserRequest
+
+def _get_user_secrets_public_key() -> str:
+    private_key = UserSecretsUtil.get_rsa_private_key()
+    public_key = UserSecretsUtil.get_rsa_public_key(private_key=private_key)
+    return public_key
 
 
 class MeResponse(BaseModel):
@@ -38,6 +45,9 @@ class MeResponse(BaseModel):
 
     scopes: list[str] | None
     """List of scopes for the user."""
+
+    user_secrets_public_key: str | None = field(default_factory=_get_user_secrets_public_key)
+    """Optional public key for encrypting sensitive user data on the frontend before transmission to the backend."""
 
     class Config:
         alias_generator = CaseUtil.snake_to_pascal_case

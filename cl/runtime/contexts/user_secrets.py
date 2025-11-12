@@ -21,8 +21,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cl.runtime.contexts.context_manager import active_or_default
+from cl.runtime.contexts.utils.user_secrets_util import UserSecretsUtil
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
-from cl.runtime.secret_providers.secret_provider import SecretProvider
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -75,8 +75,8 @@ class UserSecrets(DataclassMixin):
         encrypted_value_bytes = base64.b64decode(encrypted_value)
 
         # Load the private key
-        secret_provider = SecretProvider.create()
-        private_key: RSAPrivateKey = secret_provider.get_rsa_private_key("USER_SECRETS_PRIVATE_CERT")
+        # Temporary minimal private cert support
+        private_key: RSAPrivateKey = UserSecretsUtil.get_rsa_private_key()
 
         # Decrypt the value
         decrypted_value_bytes = private_key.decrypt(
