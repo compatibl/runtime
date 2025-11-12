@@ -119,11 +119,11 @@ class StringUtil:
 
     @classmethod
     def humanreadable_hash(
-            cls,
-            text: str,
-            *,
-            text_params: Iterable[str] | None = None,
-            hash_params: Iterable[str] | None = None,
+        cls,
+        text: str,
+        *,
+        text_params: Iterable[str] | None = None,
+        hash_params: Iterable[str] | None = None,
     ) -> str:
         """
         Create unique hash with human-readable prefix
@@ -147,7 +147,7 @@ class StringUtil:
         hash_params_str = "".join(str(x) for x in hash_params) if hash_params else ""
 
         hash_input = f"{text}{hash_params_str}" if hash_params_str else text
-        hash_string = hashlib.sha256(hash_input.encode('utf-8')).hexdigest()
+        hash_string = hashlib.sha256(hash_input.encode("utf-8")).hexdigest()
 
         if text_params_str:
             digest = f"{digest} ({text_params_str}, {hash_string})"

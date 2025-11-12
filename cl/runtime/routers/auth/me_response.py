@@ -19,6 +19,7 @@ from cl.runtime.contexts.utils.user_secrets_util import UserSecretsUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.user_request import UserRequest
 
+
 def _get_user_secrets_public_key() -> str:
     private_key = UserSecretsUtil.get_rsa_private_key()
     public_key = UserSecretsUtil.get_rsa_public_key(private_key=private_key)

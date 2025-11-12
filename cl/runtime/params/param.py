@@ -13,9 +13,9 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from cl.runtime.params.param_key import ParamKey
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
-from cl.runtime.params.param_key import ParamKey
 
 
 @dataclass(slots=True, kw_only=True)

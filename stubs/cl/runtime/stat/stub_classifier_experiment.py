@@ -14,9 +14,9 @@
 
 import random
 from dataclasses import dataclass
+from cl.runtime.params.param_key import ParamKey
 from cl.runtime.stat.classifier_experiment import ClassifierExperiment
 from cl.runtime.stat.classifier_trial import ClassifierTrial
-from cl.runtime.params.param_key import ParamKey
 
 
 @dataclass(slots=True, kw_only=True)
