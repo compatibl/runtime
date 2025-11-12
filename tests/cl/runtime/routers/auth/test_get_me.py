@@ -14,6 +14,7 @@
 
 import pytest
 from typing import Any
+from cl.runtime.contexts.utils.user_secrets_util import UserSecretsUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.auth.me_response import MeResponse
@@ -36,6 +37,7 @@ def get_expected_result(request_obj: UserRequest) -> dict[str, Any]:
         "LastName": None,
         "Email": None,
         "Scopes": ["Read", "Write", "Execute", "Developer"],
+        "UserSecretsPublicKey": UserSecretsUtil.get_rsa_public_key(UserSecretsUtil.get_rsa_private_key()),
     }
 
 
