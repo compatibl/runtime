@@ -116,3 +116,51 @@ class StringUtil:
         # Encode to bytes using UTF-8 and get the MD5 hash in hexadecimal format
         result = hashlib.md5(value.encode("utf-8"))
         return result
+
+    @classmethod
+    def humanreadable_hash(
+            cls,
+            text: str,
+            *,
+            text_params: Iterable[str] | None = None,
+            hash_params: Iterable[str] | None = None,
+    ) -> str:
+        """
+        Create unique hash with human-readable prefix
+        """
+
+        # Shorten text if required, this also makes it single line
+        if "\n" in text or len(text) > 80:
+            # Get the first 160 characters, replace all whitespace by a single space and then truncate to 80
+            digest = text[:160].strip()
+            digest = _WHITESPACE_RE.sub(" ", digest).strip()
+            digest = digest[:80].strip()
+        else:
+            digest = text
+
+        # Prune empty text parameters and create a comma-delimited string
+        text_params = tuple(x for x in text_params if x is not None) if text_params else None
+        text_params_str = ", ".join(str(x) for x in text_params) if text_params else ""
+
+        # Prune empty hash parameters and create a comma-delimited string
+        hash_params = tuple(x for x in hash_params if x is not None) if hash_params else None
+        hash_params_str = "".join(str(x) for x in hash_params) if hash_params else ""
+
+        hash_input = f"{text}{hash_params_str}" if hash_params_str else text
+        hash_string = hashlib.sha256(hash_input.encode('utf-8')).hexdigest()
+
+        if text_params_str:
+            digest = f"{digest} ({text_params_str}, {hash_string})"
+        else:
+            digest = f"{digest} ({hash_string})"
+
+        delimiters = [name for sub, name in _DISALLOWED_DELIMITERS.items() if sub in digest]
+        if delimiters:
+            delimiters_str = "\n".join(delimiters)
+            raise UserError(
+                f"A digest contains disallowed delimiters:\n"
+                f"Disallowed delimiters found: {delimiters_str}\n"
+                f"Digest: {digest}\n",
+            )
+
+        return digest
