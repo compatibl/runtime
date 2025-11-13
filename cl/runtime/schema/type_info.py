@@ -509,7 +509,7 @@ class TypeInfo(BootstrapMixin):
         # TODO: !!!!!!!! Move to CsvUtil
         cache_filename = cls._get_preload_filename()
         if os.path.exists(cache_filename):
-            with open(cache_filename, "r") as file:
+            with open(cache_filename, "r", encoding="utf-8") as file:
                 rows = file.readlines()
         else:
             # Cache file does not exist, error message
@@ -574,7 +574,7 @@ class TypeInfo(BootstrapMixin):
         # Tuples of (type_name, qual_name) sorted by type name
         cache_filename = cls._get_preload_filename()
         os.makedirs(os.path.dirname(cache_filename), exist_ok=True)
-        with open(cache_filename, "w") as file:
+        with open(cache_filename, "w", encoding="utf-8") as file:
             # Write header row
             file.write(",".join(_TYPE_INFO_HEADERS) + "\n")
 

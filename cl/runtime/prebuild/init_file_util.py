@@ -62,7 +62,7 @@ class InitFileUtil:
                         missing_files.append(str(init_file_path))
                         if apply_fix:
                             # Create an empty __init__.py file if it is missing but other .py files are present
-                            with open(init_file_path, "w") as f:
+                            with open(init_file_path, "w", encoding="utf-8") as f:
                                 pass
 
         if missing_files:

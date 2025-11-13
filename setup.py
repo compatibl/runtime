@@ -1,9 +1,9 @@
 import setuptools
 
-with open('./README.md', 'r') as readme_file:
+with open('./README.md', 'r', encoding="utf-8") as readme_file:
     readme = readme_file.read()
 
-with open('./tools/cl/runtime/package_requirements.txt') as package_requirements:
+with open('./tools/cl/runtime/package_requirements.txt', encoding="utf-8") as package_requirements:
     install_requires = [line.strip() for line in package_requirements.readlines()]
 
 setuptools.setup(

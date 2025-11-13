@@ -60,6 +60,6 @@ async def get_app_index(_):
     if static_dir:
         index_file = os.path.join(static_dir, "index.html")
         if os.path.isfile(index_file):
-            with open(index_file, "r") as file:
+            with open(index_file, "r", encoding="utf-8") as file:
                 return file.read()
     return RedirectResponse(url="/docs")

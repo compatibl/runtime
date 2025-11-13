@@ -78,7 +78,7 @@ class CopyrightUtil:
             package_root = ProjectSettings.get_package_root(package)
             license_file_path = os.path.join(package_root, "LICENSE")
             if os.path.exists(license_file_path):
-                with open(license_file_path, "r") as license_file:
+                with open(license_file_path, "r", encoding="utf-8") as license_file:
                     # LICENSE file found, check it is Apache 2.0 license
                     license_str = license_file.read()
                     license_md5 = StringUtil.md5_hex(license_str)
@@ -129,7 +129,7 @@ class CopyrightUtil:
                         # Load the file
                         file_path = os.path.join(dir_path, filename)
                         remaining_lines = None
-                        with open(file_path, "r") as file:
+                        with open(file_path, "r", encoding="utf-8") as file:
                             # Check for the correct copyright header (disregard the trailing blank line)
                             file_header = file.read(len(copyright_header))
                             file_header_md5 = StringUtil.md5_hex(file_header)
@@ -152,7 +152,7 @@ class CopyrightUtil:
                             # Combine the copyright header with trailing blank line with
                             # 'next_line' and 'remaining_lines' and write back to the file
                             updated_text = copyright_header + "\n" + next_line + "".join(remaining_lines)
-                            with open(file_path, "w") as file:
+                            with open(file_path, "w", encoding="utf-8") as file:
                                 file.write(updated_text)
 
         if files_with_copyright_header_error:

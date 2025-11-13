@@ -170,7 +170,7 @@ class RegressionGuard:
             os.makedirs(received_dir)
 
         if self.ext == "txt" or self.ext == "yaml":
-            with open(received_path, "a") as file:
+            with open(received_path, "a", encoding="utf-8") as file:
                 file.write(self._format_txt(value))
                 # Flush immediately to ensure all of the output is on disk in the event of test exception
                 file.flush()
@@ -265,9 +265,9 @@ class RegressionGuard:
         if os.path.exists(expected_path):
 
             # Read both files
-            with open(received_path, "r") as received_file:
+            with open(received_path, "r", encoding="utf-8") as received_file:
                 received_lines = list(received_file.readlines())
-            with open(expected_path, "r") as expected_file:
+            with open(expected_path, "r", encoding="utf-8") as expected_file:
                 expected_lines = list(expected_file.readlines())
 
             # Expected file exists, ensure there is the same number of lines and all lines match
@@ -293,7 +293,7 @@ class RegressionGuard:
                 )
 
                 # Write the complete unified diff into to the diff file
-                with open(diff_path, "w") as diff_file:
+                with open(diff_path, "w", encoding="utf-8") as diff_file:
                     diff_file.write("".join(diff))
 
                 # Truncate to max_lines and surround by begin/end lines for generate exception text
