@@ -26,7 +26,7 @@ class UserSecretsUtil:
 
     @staticmethod
     def get_rsa_private_key() -> RSAPrivateKey:
-        filepath = Path(ProjectSettings.instance().project_root) / "deployment/keys/private_key.pem"
+        filepath = Path(ProjectSettings.instance().project_root) / "deployment/.secrets/private_key.pem"
 
         if not os.path.exists(filepath):
             UserSecretsUtil.generate_rsa_private_key()
@@ -56,7 +56,7 @@ class UserSecretsUtil:
             encryption_algorithm=serialization.NoEncryption(),
         )
 
-        filepath = Path(ProjectSettings.instance().project_root) / "deployment/keys/private_key.pem"
+        filepath = Path(ProjectSettings.instance().project_root) / "deployment/.secrets/private_key.pem"
 
         filepath.parent.mkdir(parents=True, exist_ok=True)
 
