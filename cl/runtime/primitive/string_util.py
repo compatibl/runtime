@@ -118,7 +118,7 @@ class StringUtil:
         return result
 
     @classmethod
-    def humanreadable_hash(
+    def human_readable_hash(
         cls,
         text: str,
         *,
