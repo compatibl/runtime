@@ -20,6 +20,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_data_type
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import typename
@@ -227,15 +228,15 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
 
         # If the result is a list of keys or list of records, convert it to an appropriate View.
         elif isinstance(viewer_result, (list, tuple)):
-
             # Check iterable value type by first item.
-            if is_key_type(type(viewer_result[0])):  # TODO: Complete check instead of first item for viewer_result[0]
+            first_item_type =type(viewer_result[0]) # TODO: Complete check instead of first item for viewer_result[0]
+            if is_key_type(first_item_type):
                 return KeyListView(view_for=view_for, view_name=view_name, keys=viewer_result)
-            elif is_record_type(type(viewer_result[0])):
+            elif is_record_type(first_item_type) or is_data_type(first_item_type):
                 return RecordListView(view_for=view_for, view_name=view_name, records=viewer_result)
             else:
                 raise RuntimeError(
-                    f"If the viewer result is iterable it must be a list of keys or a list of records. "
+                    f"If the viewer result is iterable it must be a list of keys, list of records or list of data. "
                     f"Other is not supported. Received: {viewer_result}."
                 )
         else:

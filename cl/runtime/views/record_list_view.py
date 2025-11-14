@@ -14,8 +14,8 @@
 
 from dataclasses import dataclass
 from typing_extensions import final
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.views.view import View
 
 
@@ -24,5 +24,5 @@ from cl.runtime.views.view import View
 class RecordListView(View):
     """View that displays a list of record specified via their primary keys."""
 
-    records: list[KeyMixin] = required()
-    """Primary keys of the displayed records."""
+    records: list[DataMixin] = required()
+    """Displayed records."""
