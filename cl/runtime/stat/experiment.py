@@ -75,6 +75,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             experiment_run = self.clone()
             # Append timestamp to experiment ID and save
             experiment_run.experiment_id = f"{self.experiment_id}.{Timestamp.create()}"
+            experiment_run.build()
             active(DataSource).insert_one(experiment_run, commit=True)
             # Delegate to the resume method of the run
             experiment_run._resume()
