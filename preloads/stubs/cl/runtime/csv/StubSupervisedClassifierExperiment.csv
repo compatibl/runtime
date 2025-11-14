@@ -1,3 +1,2 @@
-experiment_id,class_labels,cases,max_trials
-StubSupervisedClassifierExperiment11,"[""A"", ""B"", ""C""]","[""StubParam1"",""StubParam2""]",
+experiment_id,class_labels,cases,num_trials
 StubSupervisedClassifierExperiment21,"[""A"", ""B"", ""C""]","[""StubParam1"",""StubParam2""]","""5"""

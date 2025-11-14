@@ -40,8 +40,8 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     cases: list[ParamKey] = required()
     """Cases (conditions) for which the experiment is performed (optional)."""
 
-    max_trials: int = required()
-    """Maximum number of trials to run per condition (optional)."""
+    num_trials: int = required()
+    """Number of trials to run per condition (optional)."""
 
     def get_key(self) -> ExperimentKey:
         return ExperimentKey(experiment_id=self.experiment_id).build()
@@ -53,10 +53,10 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             # Specify default case if none are provided
             self.cases = [Param(param_id="Default").build()]  # TODO: !! Use a dedicated class DefaultCase
 
-        if self.max_trials is None:
+        if self.num_trials is None:
             raise RuntimeError(f"{typename(type(self))}.max_trials is None.")
-        elif self.max_trials <= 0:
-            raise RuntimeError(f"{typename(type(self))}.max_trials={self.max_trials} is not a positive number.")
+        elif self.num_trials <= 0:
+            raise RuntimeError(f"{typename(type(self))}.max_trials={self.num_trials} is not a positive number.")
 
     @abstractmethod
     def create_trial(self, condition: ParamKey) -> Trial:
@@ -155,12 +155,12 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """
         # Check that max_trials is not exceeded
         num_completed_trials = self.calc_num_completed_trials()
-        if any(x > self.max_trials for x in num_completed_trials):
+        if any(x > self.num_trials for x in num_completed_trials):
             raise UserError(
                 f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
-                f"exceeds max_trials={self.max_trials}."
+                f"exceeds max_trials={self.num_trials}."
             )
 
         # Because of the preceding check, the tuple will have non-negative elements
-        num_additional_trials = tuple(self.max_trials - x for x in num_completed_trials)
+        num_additional_trials = tuple(self.num_trials - x for x in num_completed_trials)
         return num_additional_trials

@@ -24,7 +24,7 @@ def test_resume(multi_db_fixture):
     # Create and run the experiment with max_trials set to 5
     max_trials_set = StubBinaryExperiment(
         experiment_id=f"test_launch_all_trials.max_trials_set.{Timestamp.create()}",
-        max_trials=2,
+        num_trials=2,
         cases=[
             Param(param_id="Test1"),
         ],

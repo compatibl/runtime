@@ -1,3 +1,2 @@
-experiment_id,cases,max_trials
-StubBinaryExperiment11,"[""StubParam1"",""StubParam2""]",
+experiment_id,cases,num_trials
 StubBinaryExperiment21,"[""StubParam1"",""StubParam2""]","""5"""

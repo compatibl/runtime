@@ -25,7 +25,7 @@ def test_smoke(multi_db_fixture):
     experiment = StubSupervisedClassifierExperiment(
         experiment_id=f"test_supervised_classifier_experiment.test_smoke.{Timestamp.create()}",
         class_labels=["A", "B", "C"],
-        max_trials=5,
+        num_trials=5,
         cases=[
             Param(param_id="Test1"),
         ],
@@ -42,7 +42,7 @@ def test_plot(multi_db_fixture, work_dir_fixture):
             Param(param_id="Test3"),
             Param(param_id="Test4"),
         ],
-        max_trials=15,
+        num_trials=15,
         class_labels=["A", "B", "C"],
     )
     random.seed(0)
