@@ -70,32 +70,6 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """Get plot for the experiment."""
 
     def run_launch(self) -> None:
-        """Create a copy of this experiment and launch all trials on the copy (the copy is called a run)."""
-        if not self.is_run():
-            experiment_run = self.clone()
-            # Append timestamp to experiment ID and save
-            experiment_run.experiment_id = f"{self.experiment_id}.{Timestamp.create()}"
-            experiment_run.build()
-            active(DataSource).insert_one(experiment_run, commit=True)
-            # Delegate to the resume method of the run
-            experiment_run._resume()
-        else:
-            # Error if already a run
-            raise RuntimeError(
-                "- Launch cannot be called when the record is already a run (ID ends with a timestamp).\n"
-                "- Use Resume instead to complete any missing trials without changes to parameters.")
-
-    def run_resume(self) -> None:
-        """Resume experiment on this record to complete missing trials (error if this record is not a run)."""
-        if self.is_run():
-            self._resume()
-        else:
-            # Error if not a run
-            raise RuntimeError(
-                "- Resume cannot be called when the record is not a run (ID does not end with a timestamp).\n"
-                "- Use Launch instead which will create a new run with the current timestamp.")
-
-    def _resume(self) -> None:
         """Run to reach the specified maximum number of trials for each condition."""
         num_additional_trials = self.calc_num_additional_trials()
         for trial_idx in range(max(num_additional_trials)):
