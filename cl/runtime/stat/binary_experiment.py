@@ -46,16 +46,19 @@ class BinaryExperiment(Experiment, ABC):
 
         params = active(DataSource).load_many(self.cases, cast_to=Param)
         for param in params:
-            # Get trials for the condition
-            trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.param, param))
-            total = len(trials)
-
-            true_trials = sum(trial.outcome for trial in trials)
-            false_trials = total - true_trials
 
             group_labels.extend([param.label] * 2)
             bar_labels.extend(["True", "False"])
-            values.extend([true_trials / total, false_trials / total])
+
+            # Get trials for the condition
+            trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.param, param))
+            total = len(trials)
+            if total != 0:
+                true_trials = sum(trial.outcome for trial in trials)
+                false_trials = total - true_trials
+                values.extend([true_trials / total, false_trials / total])
+            else:
+                values.extend([0., 0.])
 
         result = StackBarPlot(
             plot_id=plot_id,

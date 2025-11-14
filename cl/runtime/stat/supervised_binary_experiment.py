@@ -45,12 +45,18 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
 
         params = active(DataSource).load_many(self.cases, cast_to=Param)
         for param in params:
+
+            group_labels.extend([param.label] * 4)
+            bar_labels.extend(["TP", "TN", "FP", "FN"])
+
             # Get trials for the condition
             trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.param, param))
             total = len(trials)
+            if total == 0:
+                values.extend([0.] * 4)
+                continue
 
             tp = tn = fp = fn = 0
-
             for trial in trials:
                 if trial.outcome and trial.expected_outcome:
                     tp += 1
@@ -61,8 +67,6 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
                 elif not trial.outcome and trial.expected_outcome:
                     fn += 1
 
-            group_labels.extend([param.label] * 4)
-            bar_labels.extend(["TP", "TN", "FP", "FN"])
             values.extend(
                 [
                     tp / total,

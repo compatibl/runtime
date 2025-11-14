@@ -64,7 +64,7 @@ class ClassifierExperiment(Experiment, ABC):
             for class_label in self.class_labels:
                 group_labels.append(param_id)
                 bar_labels.append(class_label)
-                values.append(counts.get(class_label, 0) / total)
+                values.append(counts.get(class_label, 0) / total if total else 0.)
 
         result = StackBarPlot(
             plot_id=plot_id,
