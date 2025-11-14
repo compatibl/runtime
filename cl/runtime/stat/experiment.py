@@ -43,9 +43,6 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     max_trials: int = required()
     """Maximum number of trials to run per condition (optional)."""
 
-    max_parallel: int | None = None
-    """Maximum number of trials to run in parallel across all conditions (optional, do not restrict if not set)."""
-
     def get_key(self) -> ExperimentKey:
         return ExperimentKey(experiment_id=self.experiment_id).build()
 
@@ -60,11 +57,6 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             raise RuntimeError(f"{typename(type(self))}.max_trials is None.")
         elif self.max_trials <= 0:
             raise RuntimeError(f"{typename(type(self))}.max_trials={self.max_trials} is not a positive number.")
-
-        if self.max_parallel is None:
-            self.max_parallel = 1
-        elif self.max_parallel <= 0:
-            raise RuntimeError(f"{typename(type(self))}.max_parallel={self.max_parallel} is not a positive number.")
 
     @abstractmethod
     def create_trial(self, condition: ParamKey) -> Trial:
