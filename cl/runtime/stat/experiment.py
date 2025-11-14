@@ -26,6 +26,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
+from cl.runtime.stat.binary_trial import BinaryTrial
 from cl.runtime.stat.experiment_key import ExperimentKey
 from cl.runtime.stat.trial import Trial
 from cl.runtime.stat.trial_key import TrialKey
@@ -42,6 +43,12 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     num_trials: int = required()
     """Number of trials to run per condition (optional)."""
+
+    num_completed: float | None = None
+    """Number of trials completed per condition (calculated, may be fractional)."""
+
+    score: float | None = None
+    """Score in percent (calculated)."""
 
     def get_key(self) -> ExperimentKey:
         return ExperimentKey(experiment_id=self.experiment_id).build()
@@ -71,23 +78,30 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def run_launch(self) -> None:
         """Run to reach the specified maximum number of trials for each condition."""
-        num_additional_trials = self.calc_num_additional_trials()
-        for trial_idx in range(max(num_additional_trials)):
-            for param_idx, param in enumerate(self.cases):  # TODO: !! Make parallel
-                # Run up to num_additional_trials for the current condition
-                if trial_idx < num_additional_trials[param_idx]:
-                    self.save_trial(param)
+
+        # Retry running num_retries times
+        num_retries = 3
+        for _ in range(num_retries):
+            num_additional_trials = self.calc_num_additional_trials()
+            for trial_idx in range(max(num_additional_trials)):
+                # Run trial for each case
+                for case_idx, case in enumerate(self.cases):  # TODO: !! Make parallel
+                    # Run up to num_additional_trials for the current condition
+                    if trial_idx < num_additional_trials[case_idx]:
+                        self.save_trial(case)
+
+                # Calculate and save score to the experiment by querying trials
+                self.run_score()
 
     def view_cases(self) -> tuple[ParamKey, ...]:
         """View cases of the experiment."""
         return tuple(self.cases)
 
-    def view_trials(self) -> tuple[TrialKey, ...]:
+    def view_trials(self) -> tuple[BinaryTrial, ...]:
         """View trials of the experiment."""
         trial_query = TrialQuery(experiment=self.get_key()).build()
-        trials = active(DataSource).load_by_query(trial_query, cast_to=Trial)
-        trial_keys = tuple(x.get_key() for x in trials)  # TODO: Use project_to instead of get_key
-        return trial_keys
+        trials = active(DataSource).load_by_query(trial_query, cast_to=BinaryTrial)
+        return trials
 
     def view_plot(self) -> PngView:
         return self.get_plot(self.experiment_id).get_view()
@@ -107,6 +121,18 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """Create and save a new trial record without checking if num_trials has already been reached."""
         trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)
+
+    def run_score(self) -> None:
+        """Save score to the experiment."""
+        # Update score by querying trials
+        trials = self.view_trials()
+        num_completed = len(trials) / len(self.cases)
+        num_successes = sum(1 for trial in trials if trial.outcome) / len(self.cases)
+        score = 100 * float(num_successes) / float(num_completed) if num_completed > 0 else 0.0
+        experiment = self.clone()
+        experiment.num_completed = num_completed
+        experiment.score = score
+        active(DataSource).replace_one(experiment.build(), commit=True)
 
     def calc_num_completed_trials(self) -> tuple[int, ...]:
         """
