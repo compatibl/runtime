@@ -29,7 +29,6 @@ from cl.runtime.records.typename import typename
 from cl.runtime.stat.binary_trial import BinaryTrial
 from cl.runtime.stat.experiment_key import ExperimentKey
 from cl.runtime.stat.trial import Trial
-from cl.runtime.stat.trial_key import TrialKey
 from cl.runtime.stat.trial_query import TrialQuery
 from cl.runtime.views.png_view import PngView
 
@@ -97,10 +96,10 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """View cases of the experiment."""
         return tuple(self.cases)
 
-    def view_trials(self) -> tuple[BinaryTrial, ...]:
+    def view_trials(self) -> tuple[Trial, ...]:
         """View trials of the experiment."""
         trial_query = TrialQuery(experiment=self.get_key()).build()
-        trials = active(DataSource).load_by_query(trial_query, cast_to=BinaryTrial)
+        trials = active(DataSource).load_by_query(trial_query, cast_to=Trial)
         return trials
 
     def view_plot(self) -> PngView:
@@ -124,10 +123,12 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def run_score(self) -> None:
         """Save score to the experiment."""
+
+        # TODO: Make abstract and implement for other experiment types
         # Update score by querying trials
         trials = self.view_trials()
         num_completed = len(trials) / len(self.cases)
-        num_successes = sum(1 for trial in trials if trial.outcome) / len(self.cases)
+        num_successes = sum(1 for trial in trials if isinstance(trial, BinaryTrial) and trial.outcome) / len(self.cases)
         score = 100 * float(num_successes) / float(num_completed) if num_completed > 0 else 0.0
         experiment = self.clone()
         experiment.num_completed = num_completed
