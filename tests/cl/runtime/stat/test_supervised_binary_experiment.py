@@ -24,7 +24,7 @@ def test_smoke(multi_db_fixture):
     experiment = StubSupervisedBinaryExperiment(
         experiment_id="test_supervised_binary_experiment.test_smoke",
         max_trials=5,
-        params=[
+        cases=[
             Param(param_id="Test1"),
         ],
     )
@@ -34,7 +34,7 @@ def test_smoke(multi_db_fixture):
 def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubSupervisedBinaryExperiment(
         experiment_id="Test",
-        params=[
+        cases=[
             Param(param_id="Test1"),
             Param(param_id="Test2"),
         ],

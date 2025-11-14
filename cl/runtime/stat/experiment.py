@@ -36,8 +36,8 @@ from cl.runtime.views.png_view import PngView
 class Experiment(ExperimentKey, RecordMixin, ABC):
     """Abstract base class for a statistical experiment."""
 
-    params: list[ParamKey] = required()
-    """Parameters (conditions) for which the experiment is performed (optional)."""
+    cases: list[ParamKey] = required()
+    """Cases (conditions) for which the experiment is performed (optional)."""
 
     max_trials: int | None = None
     """Maximum number of trials to run per condition (optional)."""
@@ -50,9 +50,9 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.params is None:
+        if self.cases is None:
             # Specify default condition if none are provided
-            self.params = [Param(param_id="Default").build()]
+            self.cases = [Param(param_id="Default").build()]
         if self.max_trials is not None and self.max_trials <= 0:
             raise RuntimeError(
                 f"{typename(type(self))}.max_trials={self.max_trials} must be None or a positive number."
@@ -98,7 +98,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                 f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
                 f"has already reached or exceeded max_trials={self.max_trials}."
             )
-        for param in self.params:  # TODO: !! Make parallel
+        for param in self.cases:  # TODO: !! Make parallel
             # Run one additional trial for each condition
             self.save_trial(param)
 
@@ -108,7 +108,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             raise RuntimeError(f"Parallel trial execution is not yet supported.")
         num_additional_trials = self.calc_num_additional_trials(max_trials)
         for trial_idx in range(max(num_additional_trials)):
-            for param_idx, param in enumerate(self.params):  # TODO: !! Make parallel
+            for param_idx, param in enumerate(self.cases):  # TODO: !! Make parallel
                 # Run up to num_additional_trials for the current condition
                 if trial_idx < num_additional_trials[param_idx]:
                     self.save_trial(param)
@@ -133,7 +133,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """
         trial_query = TrialQuery(experiment=self.get_key()).build()
         trials = active(DataSource).load_by_query(trial_query)  # TODO: Use project_to=Trial to reduce data transfer
-        counts = tuple(sum(1 for t in trials if KeyUtil.is_equal(t.param, c)) for c in self.params)
+        counts = tuple(sum(1 for t in trials if KeyUtil.is_equal(t.param, c)) for c in self.cases)
         return counts
 
     def calc_num_additional_trials(self, max_trials: int) -> tuple[int, ...]:
