@@ -67,7 +67,7 @@ class UserSecrets(DataclassMixin):
         # Get secret by key, return None if key is not present
         encrypted_value = encrypted_secrets.get(secret_name_in_ui_format)
         if encrypted_value is None:
-            _LOGGER.info(
+            _LOGGER.debug(
                 f"UserSecrets.decrypt_secret: secret with key '{secret_name}' is not found.",
             )
             return None
