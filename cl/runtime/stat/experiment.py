@@ -69,19 +69,9 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         without checking if max_trials has already been reached.
         """
 
-    def view_trials(self) -> tuple[TrialKey, ...]:
-        """View trials of the experiment."""
-        trial_query = TrialQuery(experiment=self.get_key()).build()
-        trials = active(DataSource).load_by_query(trial_query, cast_to=Trial)
-        trial_keys = [x.get_key() for x in trials]  # TODO: Use project_to instead of get_key
-        return trial_keys
-
     @abstractmethod
     def get_plot(self, plot_id: str) -> Plot:
         """Get plot for the experiment."""
-
-    def view_plot(self) -> PngView:
-        return self.get_plot(self.experiment_id).get_view()
 
     def save_trial(self, condition: ParamKey) -> None:
         """Create and save a new trial record without checking if max_trials has already been reached."""
@@ -91,7 +81,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def run_launch_one_trial(self) -> None:
         """Run one trial for each condition, error if max_trials is already reached or exceeded."""
         if self.max_parallel is not None and self.max_parallel != 1:
-            raise RuntimeError(f"Parallel trial execution is not yet supported.")
+            raise RuntimeError("Parallel trial execution is not yet supported.")
         num_completed_trials = self.calc_num_completed_trials()
         if self.max_trials is not None and any(x >= self.max_trials for x in num_completed_trials):
             raise UserError(
@@ -123,6 +113,20 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """Delete completed trials for all conditions."""
         trial_query = TrialQuery(experiment=self.get_key()).build()
         active(DataSource).delete_by_query(trial_query)
+        
+    def view_cases(self) -> tuple[ParamKey, ...]:
+        """View cases of the experiment."""
+        return tuple(self.cases)
+
+    def view_trials(self) -> tuple[TrialKey, ...]:
+        """View trials of the experiment."""
+        trial_query = TrialQuery(experiment=self.get_key()).build()
+        trials = active(DataSource).load_by_query(trial_query, cast_to=Trial)
+        trial_keys = tuple(x.get_key() for x in trials)  # TODO: Use project_to instead of get_key
+        return trial_keys
+
+    def view_plot(self) -> PngView:
+        return self.get_plot(self.experiment_id).get_view()
 
     def calc_num_completed_trials(self) -> tuple[int, ...]:
         """
