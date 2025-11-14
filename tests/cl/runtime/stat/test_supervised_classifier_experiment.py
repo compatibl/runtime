@@ -30,7 +30,7 @@ def test_smoke(multi_db_fixture):
             Param(param_id="Test1"),
         ],
     )
-    experiment._resume()
+    experiment.run_launch()
 
 
 def test_plot(multi_db_fixture, work_dir_fixture):
@@ -46,7 +46,7 @@ def test_plot(multi_db_fixture, work_dir_fixture):
         class_labels=["A", "B", "C"],
     )
     random.seed(0)
-    experiment._resume()
+    experiment.run_launch()
 
     experiment.get_plot("test_supervised_classifier_experiment.supervised_classifier_experiment_plot").save(
         format_="svg"

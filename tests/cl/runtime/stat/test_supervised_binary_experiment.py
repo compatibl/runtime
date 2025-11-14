@@ -29,7 +29,7 @@ def test_smoke(multi_db_fixture):
             Param(param_id="Test1"),
         ],
     )
-    experiment._resume()
+    experiment.run_launch()
 
 
 def test_plot(multi_db_fixture, work_dir_fixture):
@@ -42,7 +42,7 @@ def test_plot(multi_db_fixture, work_dir_fixture):
         num_trials=5,
     )
     random.seed(0)
-    experiment._resume()
+    experiment.run_launch()
 
     experiment.get_plot("test_supervised_binary_experiment.supervised_binary_experiment_plot").save(format_="svg")
 

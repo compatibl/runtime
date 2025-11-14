@@ -34,7 +34,7 @@ def test_resume(multi_db_fixture):
     assert num_trials_set.calc_num_completed_trials() == (0,)
     assert num_trials_set.calc_num_additional_trials() == (2,)
 
-    num_trials_set._resume()
+    num_trials_set.run_launch()
     assert num_trials_set.calc_num_completed_trials() == (2,)
     assert num_trials_set.calc_num_additional_trials() == (0,)
 
