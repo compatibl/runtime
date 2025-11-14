@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import time
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
@@ -28,6 +29,9 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.stat.binary_trial import BinaryTrial
 from cl.runtime.stat.experiment_key import ExperimentKey
+from cl.runtime.stat.experiment_stats import ExperimentStats
+from cl.runtime.stat.experiment_stats_key import ExperimentStatsKey
+from cl.runtime.stat.experiment_stats_view import ExperimentStatsView
 from cl.runtime.stat.trial import Trial
 from cl.runtime.stat.trial_query import TrialQuery
 from cl.runtime.views.png_view import PngView
@@ -78,6 +82,10 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def run_launch(self) -> None:
         """Run to reach the specified maximum number of trials for each condition."""
 
+        # Measure experiment execution time for performance statistics.
+        # For multiple trials, also compute the average time per trial.
+        start = time.perf_counter()
+
         # Retry running num_retries times
         num_retries = 3
         for _ in range(num_retries):
@@ -92,6 +100,11 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                 # Calculate and save score to the experiment by querying trials
                 self.run_score()
 
+        # Save the statistics
+        end = time.perf_counter()
+        exec_time = end - start
+        self.save_stats(exec_time, num_retries)
+
     def view_cases(self) -> tuple[ParamKey, ...]:
         """View cases of the experiment."""
         return tuple(self.cases)
@@ -104,6 +117,17 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def view_plot(self) -> PngView:
         return self.get_plot(self.experiment_id).get_view()
+
+    def view_stats(self) -> ExperimentStatsView:
+        """View the experiment's statistics."""
+        stats = active(DataSource).load_one_or_none(
+            ExperimentStatsKey(experiment=self.get_key()).build(),
+            cast_to=ExperimentStats,
+        )
+        if stats:
+            return stats.get_view()
+        # Return an empty view if no statistics are saved
+        return ExperimentStatsView().build()
 
     def is_run(self) -> bool:
         """Return True if the record's dot-delimited ID ends with a timestamp."""
@@ -120,6 +144,28 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """Create and save a new trial record without checking if num_trials has already been reached."""
         trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)
+
+    def save_stats(self, exec_time: float, retry_count: int = 0) -> None:
+        """
+        Save experiment run statistics.
+
+        Metrics saved:
+            total_time_sec: Total execution time of the experiment.
+            retry_count: Number of retries during the experiment.
+            time_per_trial_sec: Average time per trial, accounting for retries.
+        """
+
+        exp = active(DataSource).load_one(self.get_key(), cast_to=Experiment)
+        trial_count = exp.num_completed
+        time_per_retry = (exec_time / retry_count) if retry_count else 0
+        time_per_trial = (time_per_retry / trial_count) if trial_count else 0
+        stats = ExperimentStats(
+            experiment=self.get_key(),
+            retry_count=retry_count,
+            total_time=exec_time,
+            time_per_trial=time_per_trial
+        ).build()
+        active(DataSource).replace_one(stats, commit=True)
 
     def run_score(self) -> None:
         """Save score to the experiment."""
