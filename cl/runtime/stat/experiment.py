@@ -54,15 +54,15 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             self.cases = [Param(param_id="Default").build()]  # TODO: !! Use a dedicated class DefaultCase
 
         if self.num_trials is None:
-            raise RuntimeError(f"{typename(type(self))}.max_trials is None.")
+            raise RuntimeError(f"{typename(type(self))}.num_trials is None.")
         elif self.num_trials <= 0:
-            raise RuntimeError(f"{typename(type(self))}.max_trials={self.num_trials} is not a positive number.")
+            raise RuntimeError(f"{typename(type(self))}.num_trials={self.num_trials} is not a positive number.")
 
     @abstractmethod
     def create_trial(self, condition: ParamKey) -> Trial:
         """
         Create and return a new trial record with actual and (if applicable) expected fields
-        without checking if max_trials has already been reached.
+        without checking if num_trials has already been reached.
         """
 
     @abstractmethod
@@ -130,7 +130,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             return False
 
     def save_trial(self, condition: ParamKey) -> None:
-        """Create and save a new trial record without checking if max_trials has already been reached."""
+        """Create and save a new trial record without checking if num_trials has already been reached."""
         trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)
 
@@ -149,17 +149,17 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def calc_num_additional_trials(self) -> tuple[int, ...]:
         """
         Get the number of additional trials for each condition by running a query for the completed trials,
-        error if max_trials is exceeded for any condition.
+        error if num_trials is exceeded for any condition.
 
         Notes:
             Requires a DB query and may be slow, cache the result if possible.
         """
-        # Check that max_trials is not exceeded
+        # Check that num_trials is not exceeded
         num_completed_trials = self.calc_num_completed_trials()
         if any(x > self.num_trials for x in num_completed_trials):
             raise UserError(
                 f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
-                f"exceeds max_trials={self.num_trials}."
+                f"exceeds num_trials={self.num_trials}."
             )
 
         # Because of the preceding check, the tuple will have non-negative elements

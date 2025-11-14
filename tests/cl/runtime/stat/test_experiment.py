@@ -21,9 +21,9 @@ from stubs.cl.runtime.stat.stub_binary_experiment import StubBinaryExperiment
 def test_resume(multi_db_fixture):
     """Test for the functionality of base Experiment class."""
 
-    # Create and run the experiment with max_trials set to 5
-    max_trials_set = StubBinaryExperiment(
-        experiment_id=f"test_launch_all_trials.max_trials_set.{Timestamp.create()}",
+    # Create and run the experiment with num_trials set to 5
+    num_trials_set = StubBinaryExperiment(
+        experiment_id=f"test_launch_all_trials.num_trials_set.{Timestamp.create()}",
         num_trials=2,
         cases=[
             Param(param_id="Test1"),
@@ -31,12 +31,12 @@ def test_resume(multi_db_fixture):
     ).build()
 
     # Run the experiment in stages
-    assert max_trials_set.calc_num_completed_trials() == (0,)
-    assert max_trials_set.calc_num_additional_trials() == (2,)
+    assert num_trials_set.calc_num_completed_trials() == (0,)
+    assert num_trials_set.calc_num_additional_trials() == (2,)
 
-    max_trials_set._resume()
-    assert max_trials_set.calc_num_completed_trials() == (2,)
-    assert max_trials_set.calc_num_additional_trials() == (0,)
+    num_trials_set._resume()
+    assert num_trials_set.calc_num_completed_trials() == (2,)
+    assert num_trials_set.calc_num_additional_trials() == (0,)
 
 
 if __name__ == "__main__":
