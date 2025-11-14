@@ -15,6 +15,7 @@
 import pytest
 import random
 from cl.runtime.params.param import Param
+from cl.runtime.primitive.timestamp import Timestamp
 from stubs.cl.runtime.stat.stub_supervised_binary_experiment import StubSupervisedBinaryExperiment
 
 
@@ -22,18 +23,18 @@ def test_smoke(multi_db_fixture):
     """Test for SupervisedBinaryExperiment class."""
     # Create and run the experiment
     experiment = StubSupervisedBinaryExperiment(
-        experiment_id="test_supervised_binary_experiment.test_smoke",
+        experiment_id=f"test_supervised_binary_experiment.test_smoke.{Timestamp.create()}",
         max_trials=5,
         cases=[
             Param(param_id="Test1"),
         ],
     )
-    experiment.run_launch_all_trials()
+    experiment._resume()
 
 
 def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubSupervisedBinaryExperiment(
-        experiment_id="Test",
+        experiment_id=f"Test.{Timestamp.create()}",
         cases=[
             Param(param_id="Test1"),
             Param(param_id="Test2"),
@@ -41,7 +42,7 @@ def test_plot(multi_db_fixture, work_dir_fixture):
         max_trials=5,
     )
     random.seed(0)
-    experiment.run_launch_all_trials()
+    experiment._resume()
 
     experiment.get_plot("test_supervised_binary_experiment.supervised_binary_experiment_plot").save(format_="svg")
 

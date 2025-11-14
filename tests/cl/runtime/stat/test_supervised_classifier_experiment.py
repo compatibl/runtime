@@ -15,6 +15,7 @@
 import pytest
 import random
 from cl.runtime.params.param import Param
+from cl.runtime.primitive.timestamp import Timestamp
 from stubs.cl.runtime.stat.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
 
 
@@ -22,19 +23,19 @@ def test_smoke(multi_db_fixture):
     """Test for BinaryExperiment class with supervised=True."""
     # Create and run the experiment
     experiment = StubSupervisedClassifierExperiment(
-        experiment_id="test_supervised_classifier_experiment.test_smoke",
+        experiment_id=f"test_supervised_classifier_experiment.test_smoke.{Timestamp.create()}",
         class_labels=["A", "B", "C"],
         max_trials=5,
         cases=[
             Param(param_id="Test1"),
         ],
     )
-    experiment.run_launch_all_trials()
+    experiment._resume()
 
 
 def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubSupervisedClassifierExperiment(
-        experiment_id="Test",
+        experiment_id=f"Test.{Timestamp.create()}",
         cases=[
             Param(param_id="Test1"),
             Param(param_id="Test2"),
@@ -45,7 +46,7 @@ def test_plot(multi_db_fixture, work_dir_fixture):
         class_labels=["A", "B", "C"],
     )
     random.seed(0)
-    experiment.run_launch_all_trials()
+    experiment._resume()
 
     experiment.get_plot("test_supervised_classifier_experiment.supervised_classifier_experiment_plot").save(
         format_="svg"

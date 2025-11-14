@@ -21,6 +21,7 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.params.param import Param
 from cl.runtime.params.param_key import ParamKey
 from cl.runtime.plots.plot import Plot
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
@@ -39,7 +40,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     cases: list[ParamKey] = required()
     """Cases (conditions) for which the experiment is performed (optional)."""
 
-    max_trials: int | None = None
+    max_trials: int = required()
     """Maximum number of trials to run per condition (optional)."""
 
     max_parallel: int | None = None
@@ -50,17 +51,20 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
         if self.cases is None:
-            # Specify default condition if none are provided
-            self.cases = [Param(param_id="Default").build()]
-        if self.max_trials is not None and self.max_trials <= 0:
-            raise RuntimeError(
-                f"{typename(type(self))}.max_trials={self.max_trials} must be None or a positive number."
-            )
-        if self.max_parallel is not None and self.max_parallel <= 0:
-            raise RuntimeError(
-                f"{typename(type(self))}.max_parallel={self.max_parallel} must be None or a positive number."
-            )
+            # Specify default case if none are provided
+            self.cases = [Param(param_id="Default").build()]  # TODO: !! Use a dedicated class DefaultCase
+
+        if self.max_trials is None:
+            raise RuntimeError(f"{typename(type(self))}.max_trials is None.")
+        elif self.max_trials <= 0:
+            raise RuntimeError(f"{typename(type(self))}.max_trials={self.max_trials} is not a positive number.")
+
+        if self.max_parallel is None:
+            self.max_parallel = 1
+        elif self.max_parallel <= 0:
+            raise RuntimeError(f"{typename(type(self))}.max_parallel={self.max_parallel} is not a positive number.")
 
     @abstractmethod
     def create_trial(self, condition: ParamKey) -> Trial:
@@ -73,47 +77,40 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def get_plot(self, plot_id: str) -> Plot:
         """Get plot for the experiment."""
 
-    def save_trial(self, condition: ParamKey) -> None:
-        """Create and save a new trial record without checking if max_trials has already been reached."""
-        trial = self.create_trial(condition)
-        active(DataSource).replace_one(trial, commit=True)
+    def run_launch(self) -> None:
+        """Create a copy of this experiment and launch all trials on the copy (the copy is called a run)."""
+        if not self.is_run():
+            experiment_run = self.clone()
+            # Append timestamp to experiment ID and save
+            experiment_run.experiment_id = f"{self.experiment_id}.{Timestamp.create()}"
+            active(DataSource).insert_one(experiment_run, commit=True)
+            # Delegate to the resume method of the run
+            experiment_run._resume()
+        else:
+            # Error if already a run
+            raise RuntimeError(
+                "- Launch cannot be called when the record is already a run (ID ends with a timestamp).\n"
+                "- Use Resume instead to complete any missing trials without changes to parameters.")
 
-    def run_launch_one_trial(self) -> None:
-        """Run one trial for each condition, error if max_trials is already reached or exceeded."""
-        if self.max_parallel is not None and self.max_parallel != 1:
-            raise RuntimeError("Parallel trial execution is not yet supported.")
-        num_completed_trials = self.calc_num_completed_trials()
-        if self.max_trials is not None and any(x >= self.max_trials for x in num_completed_trials):
-            raise UserError(
-                f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
-                f"has already reached or exceeded max_trials={self.max_trials}."
-            )
-        for param in self.cases:  # TODO: !! Make parallel
-            # Run one additional trial for each condition
-            self.save_trial(param)
+    def run_resume(self) -> None:
+        """Resume experiment on this record to complete missing trials (error if this record is not a run)."""
+        if self.is_run():
+            self._resume()
+        else:
+            # Error if not a run
+            raise RuntimeError(
+                "- Resume cannot be called when the record is not a run (ID does not end with a timestamp).\n"
+                "- Use Launch instead which will create a new run with the current timestamp.")
 
-    def run_launch_many_trials(self, *, max_trials: int) -> None:
+    def _resume(self) -> None:
         """Run to reach the specified maximum number of trials for each condition."""
-        if self.max_parallel is not None and self.max_parallel != 1:
-            raise RuntimeError(f"Parallel trial execution is not yet supported.")
-        num_additional_trials = self.calc_num_additional_trials(max_trials)
+        num_additional_trials = self.calc_num_additional_trials()
         for trial_idx in range(max(num_additional_trials)):
             for param_idx, param in enumerate(self.cases):  # TODO: !! Make parallel
                 # Run up to num_additional_trials for the current condition
                 if trial_idx < num_additional_trials[param_idx]:
                     self.save_trial(param)
 
-    def run_launch_all_trials(self) -> None:
-        """Run trials until Experiment.max_trials is reached or exceeded."""
-        if self.max_trials is None:
-            raise RuntimeError("Experiment.run_all() requires Experiment.max_trials to be set.")
-        self.run_launch_many_trials(max_trials=self.max_trials)
-
-    def run_delete_completed_trials(self) -> None:
-        """Delete completed trials for all conditions."""
-        trial_query = TrialQuery(experiment=self.get_key()).build()
-        active(DataSource).delete_by_query(trial_query)
-        
     def view_cases(self) -> tuple[ParamKey, ...]:
         """View cases of the experiment."""
         return tuple(self.cases)
@@ -128,6 +125,22 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def view_plot(self) -> PngView:
         return self.get_plot(self.experiment_id).get_view()
 
+    def is_run(self) -> bool:
+        """Return True if the record's dot-delimited ID ends with a timestamp."""
+        tokens = self.experiment_id.split(".")
+        if len(tokens) >= 2:
+            # Dot delimited, check that the last token is a valid timestamp
+            timestamp_token = tokens[-1]
+            return Timestamp.guard_valid(timestamp_token, raise_on_fail=False)
+        else:
+            # Not dot delimited, cannot be a run
+            return False
+
+    def save_trial(self, condition: ParamKey) -> None:
+        """Create and save a new trial record without checking if max_trials has already been reached."""
+        trial = self.create_trial(condition)
+        active(DataSource).replace_one(trial, commit=True)
+
     def calc_num_completed_trials(self) -> tuple[int, ...]:
         """
         Get the number of completed trials for each condition by running a query.
@@ -140,7 +153,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         counts = tuple(sum(1 for t in trials if KeyUtil.is_equal(t.param, c)) for c in self.cases)
         return counts
 
-    def calc_num_additional_trials(self, max_trials: int) -> tuple[int, ...]:
+    def calc_num_additional_trials(self) -> tuple[int, ...]:
         """
         Get the number of additional trials for each condition by running a query for the completed trials,
         error if max_trials is exceeded for any condition.
@@ -148,19 +161,14 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         Notes:
             Requires a DB query and may be slow, cache the result if possible.
         """
-        if max_trials <= 0:
-            raise RuntimeError(f"Parameter max_additional_trials={max_trials} must be a positive number.")
-        if self.max_trials is not None and max_trials > self.max_trials:
-            raise UserError(f"Parameter max_trials={max_trials} exceeds Experiment.max_trials={self.max_trials}.")
-
         # Check that max_trials is not exceeded
         num_completed_trials = self.calc_num_completed_trials()
-        if any(x > max_trials for x in num_completed_trials):
+        if any(x > self.max_trials for x in num_completed_trials):
             raise UserError(
                 f"For at least one condition, the number of completed trials {max(num_completed_trials)}\n"
                 f"exceeds max_trials={self.max_trials}."
             )
 
         # Because of the preceding check, the tuple will have non-negative elements
-        num_additional_trials = tuple(max_trials - x for x in num_completed_trials)
+        num_additional_trials = tuple(self.max_trials - x for x in num_completed_trials)
         return num_additional_trials
