@@ -79,7 +79,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     def get_plot(self, plot_id: str) -> Plot:
         """Get plot for the experiment."""
 
-    def run_launch(self) -> None:
+    def run_run(self) -> None:
         """Run to reach the specified maximum number of trials for each condition."""
 
         # Measure experiment execution time for performance statistics.
@@ -98,7 +98,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                         self.save_trial(case)
 
                 # Calculate and save score to the experiment by querying trials
-                self.run_score()
+                self.save_score()
 
         # Save the statistics
         end = time.perf_counter()
@@ -167,7 +167,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         ).build()
         active(DataSource).replace_one(stats, commit=True)
 
-    def run_score(self) -> None:
+    def save_score(self) -> None:
         """Save score to the experiment."""
 
         # TODO: Make abstract and implement for other experiment types
