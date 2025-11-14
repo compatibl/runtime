@@ -26,6 +26,7 @@ from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 
 _LOGGER = logging.getLogger(__name__)
 
+
 def populate_user_secrets_from_scope(scope: Dict[str, Any]) -> dict[str, str]:
     """Extract user keys from ASGI scope headers with 'cl-user-key-*' prefix."""
 
@@ -37,7 +38,7 @@ def populate_user_secrets_from_scope(scope: Dict[str, Any]) -> dict[str, str]:
     for name, value in raw_headers:
         name_lower = name.lower()
         if name_lower.startswith(prefix):
-            key = name_lower[len(prefix):].decode()
+            key = name_lower[len(prefix) :].decode()
             user_keys[key] = value.decode()
 
     return user_keys
@@ -62,7 +63,7 @@ class UserSecrets(DataclassMixin):
         if user_secrets is None or ((encrypted_secrets := user_secrets.encrypted_secrets) is None):
             return None
 
-        secret_name_in_ui_format = secret_name.replace('_', '-').lower()
+        secret_name_in_ui_format = secret_name.replace("_", "-").lower()
         # Get secret by key, return None if key is not present
         encrypted_value = encrypted_secrets.get(secret_name_in_ui_format)
         if encrypted_value is None:
