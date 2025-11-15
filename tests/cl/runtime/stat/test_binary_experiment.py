@@ -26,7 +26,7 @@ def test_smoke(multi_db_fixture):
         experiment_id=f"test_binary_experiment.test_smoke.{Timestamp.create()}",
         num_trials=5,
     ).build()
-    experiment.run_launch()
+    experiment.run_run()
     trials = experiment.view_trials()
     assert len(trials) == 5
 
@@ -41,7 +41,7 @@ def test_plot(multi_db_fixture, work_dir_fixture):
         num_trials=5,
     )
     random.seed(0)
-    experiment.run_launch()
+    experiment.run_run()
 
     experiment.get_plot("test_binary_experiment_plot.binary_experiment_plot").save(format_="svg")
 
