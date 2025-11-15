@@ -429,7 +429,55 @@ class SqliteDb(Db):
         tenant: str,
         restrict_to: type | None = None,
     ) -> None:
-        raise NotImplementedError()  # TODO: !!!! Implement
+        # Check that the query has been frozen
+        query.check_frozen()
+
+        # Check dataset
+        self._check_dataset(dataset)
+        self._check_tenant(tenant)
+
+        # Get table name from key type and check it has an acceptable format
+        table_name = self._get_validated_table_name(key_type=query.get_target_type().get_key_type())
+
+        if not self._table_exists(table_name=table_name):
+            return
+
+        # Serialize the query
+        query_dict = BootstrapSerializers.FOR_SQLITE_QUERY.serialize(query)
+
+        # Validate restrict_to or use the query target type if not specified
+        if restrict_to is None:
+            # Default to the query target type
+            restrict_to = query.get_target_type()
+        elif not issubclass(restrict_to, (query_target_type := query.get_target_type())):
+            # Ensure restrict_to is a subclass of the query target type
+            raise RuntimeError(
+                f"In {typename(type(self))}.load_by_query, restrict_to={typename(restrict_to)} is not a subclass\n"
+                f"of the target type {typename(query_target_type)} for {typename(query)}."
+            )
+
+        # Build SQL query to select records in table by conditions
+        where, values = self._convert_query_dict_to_sql_syntax(query_dict, tenant)
+
+        if restrict_to is not None:
+            # Add filter condition on type
+            subtype_names = TypeInfo.get_child_and_self_type_names(restrict_to, type_kind=TypeKind.RECORD)
+            placeholders = ",".join("?" for _ in subtype_names)
+
+            if where:
+                where += " AND "
+
+            where += f'"_type" IN ({placeholders})'
+            values += subtype_names
+
+        delete_sql = f'DELETE FROM {self._quote_identifier(table_name)} WHERE "_tenant" = ?'
+
+        if where:
+            delete_sql += f" AND {where}"
+
+        # Execute SQL query
+        conn = self._get_connection()
+        conn.execute(delete_sql, values)
 
     def drop_test_db(self) -> None:
         # Check preconditions
