@@ -80,7 +80,13 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """Get plot for the experiment."""
 
     def run_run(self) -> None:
-        """Run to reach the specified maximum number of trials for each condition."""
+        """Run to reach the specified number of trials for each case."""
+        # Run reset and then resume
+        self.run_reset()
+        self.run_resume()
+
+    def run_resume(self) -> None:
+        """Resume to reach specified number of trials for each condition, keeping previously existing trials."""
 
         # Measure experiment execution time for performance statistics.
         # For multiple trials, also compute the average time per trial.
@@ -104,6 +110,19 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         end = time.perf_counter()
         exec_time = end - start
         self.save_stats(exec_time, num_retries)
+
+    def run_reset(self) -> None:
+        """Delete all existing trials."""
+
+        # Delete all existing trials
+        trial_query = TrialQuery(experiment=self.get_key()).build()
+        active(DataSource).delete_by_query(trial_query)
+
+        # Reset score and status
+        obj = self.clone()
+        obj.score = 0.0
+        obj.num_completed = 0.0
+        active(DataSource).replace_one(obj.build(), commit=True)
 
     def view_cases(self) -> tuple[ParamKey, ...]:
         """View cases of the experiment."""
