@@ -150,7 +150,8 @@ def _make_filter_db_logs():
     def filter_(record):
 
         # Filter out third-party lib info logs
-        runtime_logs = "cl.runtime" in record.name
+        # TODO (Roman): Use packages from settings
+        runtime_logs = "cl." in record.name
         third_party_important_logs = (not runtime_logs) and record.levelno > logging.INFO
 
         # Filter out if the log was created outside the DataSource
