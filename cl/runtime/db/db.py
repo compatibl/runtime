@@ -267,13 +267,10 @@ class Db(DbKey, RecordMixin, ABC):
         Check user approval and raise an error if db_id does not start from db_temp_prefix
         specified in settings.yaml (defaults to 'temp_').
         """
-        if not user_approval:
-            raise RuntimeError(f"Cannot drop a temporary DB from code without explicit user approval.")
-
         db_settings = DbSettings.instance()
-        if not self.db_id.startswith(db_settings.db_temp_prefix):
+        if not user_approval and not self.db_id.startswith(db_settings.db_temp_prefix):
             raise RuntimeError(
-                f"Cannot drop a DB from code even with user approval because its db_id={self.db_id}\n"
+                f"Cannot drop a DB from code without user approval because its db_id={self.db_id}\n"
                 f"does not start from temporary DB prefix '{db_settings.db_temp_prefix}'."
             )
 
