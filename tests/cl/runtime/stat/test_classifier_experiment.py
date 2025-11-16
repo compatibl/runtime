@@ -14,7 +14,7 @@
 
 import pytest
 import random
-from cl.runtime.params.param import Param
+from cl.runtime.stat.case import Case
 from cl.runtime.primitive.timestamp import Timestamp
 from stubs.cl.runtime.stat.stub_classifier_experiment import StubClassifierExperiment
 
@@ -27,7 +27,7 @@ def test_smoke(multi_db_fixture):
         num_trials=5,
         class_labels=["A", "B", "C"],
         cases=[
-            Param(param_id="Test1"),
+            Case(param_id="Test1"),
         ],
     )
     experiment.run_run()
@@ -37,8 +37,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubClassifierExperiment(
         experiment_id=f"Test.{Timestamp.create()}",
         cases=[
-            Param(param_id="Test1"),
-            Param(param_id="Test2"),
+            Case(param_id="Test1"),
+            Case(param_id="Test2"),
         ],
         num_trials=5,
         class_labels=["A", "B", "C"],

@@ -19,7 +19,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ParamKey(DataclassMixin, KeyMixin):
+class CaseKey(DataclassMixin, KeyMixin):
     """Parameter with a unique identifier."""
 
     param_id: str = required()
@@ -27,4 +27,4 @@ class ParamKey(DataclassMixin, KeyMixin):
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return ParamKey
+        return CaseKey

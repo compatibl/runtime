@@ -14,7 +14,7 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.params.param_key import ParamKey
+from cl.runtime.stat.case_key import CaseKey
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
@@ -29,7 +29,7 @@ class Trial(TrialKey, RecordMixin, ABC):
     experiment: ExperimentKey = required()
     """Experiment for which the trial is performed."""
 
-    param: ParamKey = required()
+    param: CaseKey = required()
     """Experiment parameter (condition) for which the trial is performed."""
 
     def get_key(self) -> TrialKey:

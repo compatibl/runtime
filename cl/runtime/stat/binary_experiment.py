@@ -16,7 +16,7 @@ from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.params.param import Param
+from cl.runtime.stat.case import Case
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.stat.binary_trial import BinaryTrial
@@ -44,7 +44,7 @@ class BinaryExperiment(Experiment, ABC):
         trial_query = TrialQuery(experiment=self.get_key()).build()
         all_trials = active(DataSource).load_by_query(trial_query, cast_to=BinaryTrial)
 
-        params = active(DataSource).load_many(self.cases, cast_to=Param)
+        params = active(DataSource).load_many(self.cases, cast_to=Case)
         for param in params:
 
             group_labels.extend([param.label] * 2)

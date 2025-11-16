@@ -13,20 +13,20 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from cl.runtime.params.param_key import ParamKey
+from cl.runtime.stat.case_key import CaseKey
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class Param(ParamKey, RecordMixin):
+class Case(CaseKey, RecordMixin):
     """Parameter with a unique identifier."""
 
     label: str = required()
     """Short label to use in charts and reporting, defaults to param_id."""
 
-    def get_key(self) -> ParamKey:
-        return ParamKey(param_id=self.param_id).build()
+    def get_key(self) -> CaseKey:
+        return CaseKey(param_id=self.param_id).build()
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""

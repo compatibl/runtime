@@ -14,7 +14,7 @@
 
 import pytest
 import random
-from cl.runtime.params.param import Param
+from cl.runtime.stat.case import Case
 from cl.runtime.primitive.timestamp import Timestamp
 from stubs.cl.runtime.stat.stub_supervised_binary_experiment import StubSupervisedBinaryExperiment
 
@@ -26,7 +26,7 @@ def test_smoke(multi_db_fixture):
         experiment_id=f"test_supervised_binary_experiment.test_smoke.{Timestamp.create()}",
         num_trials=5,
         cases=[
-            Param(param_id="Test1"),
+            Case(param_id="Test1"),
         ],
     )
     experiment.run_run()
@@ -36,8 +36,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubSupervisedBinaryExperiment(
         experiment_id=f"Test.{Timestamp.create()}",
         cases=[
-            Param(param_id="Test1"),
-            Param(param_id="Test2"),
+            Case(param_id="Test1"),
+            Case(param_id="Test2"),
         ],
         num_trials=5,
     )

@@ -14,7 +14,7 @@
 
 import pytest
 import random
-from cl.runtime.params.param import Param
+from cl.runtime.stat.case import Case
 from cl.runtime.primitive.timestamp import Timestamp
 from stubs.cl.runtime.stat.stub_binary_experiment import StubBinaryExperiment
 
@@ -35,8 +35,8 @@ def test_plot(multi_db_fixture, work_dir_fixture):
     experiment = StubBinaryExperiment(
         experiment_id=f"Test.{Timestamp.create()}",
         cases=[
-            Param(param_id="Test1"),
-            Param(param_id="Test2"),
+            Case(param_id="Test1"),
+            Case(param_id="Test2"),
         ],
         num_trials=5,
     )

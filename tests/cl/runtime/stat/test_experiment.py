@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.params.param import Param
+from cl.runtime.stat.case import Case
 from cl.runtime.primitive.timestamp import Timestamp
 from stubs.cl.runtime.stat.stub_binary_experiment import StubBinaryExperiment
 
@@ -26,7 +26,7 @@ def test_resume(multi_db_fixture):
         experiment_id=f"test_launch_all_trials.num_trials_set.{Timestamp.create()}",
         num_trials=2,
         cases=[
-            Param(param_id="Test1"),
+            Case(param_id="Test1"),
         ],
     ).build()
 

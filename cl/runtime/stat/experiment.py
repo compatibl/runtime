@@ -19,8 +19,8 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.log.exceptions.user_error import UserError
-from cl.runtime.params.param import Param
-from cl.runtime.params.param_key import ParamKey
+from cl.runtime.stat.case import Case
+from cl.runtime.stat.case_key import CaseKey
 from cl.runtime.plots.plot import Plot
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -41,7 +41,7 @@ from cl.runtime.views.png_view import PngView
 class Experiment(ExperimentKey, RecordMixin, ABC):
     """Abstract base class for a statistical experiment."""
 
-    cases: list[ParamKey] = required()
+    cases: list[CaseKey] = required()
     """Cases (conditions) for which the experiment is performed (optional)."""
 
     num_trials: int = required()
@@ -61,7 +61,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
         if self.cases is None:
             # Specify default case if none are provided
-            self.cases = [Param(param_id="Default").build()]  # TODO: !! Use a dedicated class DefaultCase
+            self.cases = [Case(param_id="Default").build()]  # TODO: !! Use a dedicated class DefaultCase
 
         if self.num_trials is None:
             raise RuntimeError(f"{typename(type(self))}.num_trials is None.")
@@ -69,7 +69,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             raise RuntimeError(f"{typename(type(self))}.num_trials={self.num_trials} is not a positive number.")
 
     @abstractmethod
-    def create_trial(self, condition: ParamKey) -> Trial:
+    def create_trial(self, condition: CaseKey) -> Trial:
         """
         Create and return a new trial record with actual and (if applicable) expected fields
         without checking if num_trials has already been reached.
@@ -124,7 +124,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         obj.num_completed = 0.0
         active(DataSource).replace_one(obj.build(), commit=True)
 
-    def view_cases(self) -> tuple[ParamKey, ...]:
+    def view_cases(self) -> tuple[CaseKey, ...]:
         """View cases of the experiment."""
         return tuple(self.cases)
 
@@ -159,7 +159,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
             # Not dot delimited, cannot be a run
             return False
 
-    def save_trial(self, condition: ParamKey) -> None:
+    def save_trial(self, condition: CaseKey) -> None:
         """Create and save a new trial record without checking if num_trials has already been reached."""
         trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)
