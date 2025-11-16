@@ -98,9 +98,14 @@ class CsvUtil:
                 for value in row:
                     # Valid only if none of the values should be wrapped
                     should_wrap = cls.should_wrap(value)
-                    is_valid = is_valid and not should_wrap
-                    # Wrap value if required
-                    updated_row.append(f'"{value}"' if should_wrap else value)
+                    wrapped_value = f'"{value}"' if should_wrap else value
+                    # Do not wrap lists or dicts stored as strings
+                    if wrapped_value and wrapped_value.startswith('"['):  # TODO: ! Add dict exclusion
+                        wrapped_value = wrapped_value[1:]
+                    if wrapped_value and wrapped_value.endswith(']"'):  # TODO: ! Add dict exclusion
+                        wrapped_value = wrapped_value[:-1]
+                    is_valid = wrapped_value == value
+                    updated_row.append(wrapped_value)
                 updated_rows.append(updated_row)
 
         # Overwrite only if apply_fix is True and is_valid is False
