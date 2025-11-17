@@ -91,7 +91,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
         if self.progress != "Done":
             # Record an interrupt request
-            interrupt = ExperimentInterrupt(experiment=self.get_key(), action="Pause").build()
+            interrupt = ExperimentInterrupt(experiment=self.get_key(), action="Paused").build()
             active(DataSource).replace_one(interrupt, commit=True)
 
             # Indicate that pause is requested
@@ -137,7 +137,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                 elapsed_sec = end - start
                 self.save_score(elapsed_sec=elapsed_sec, action_notice=action)
 
-                if action == "Pause":
+                if action == "Paused":
                     # Exit from the loop if pause is requested
                     break
 
