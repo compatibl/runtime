@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from types import FunctionType
 from types import MethodType
 from typing import Iterable
+from typing import get_type_hints
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -92,10 +93,22 @@ class HandlerDeclareBlockDecl(DataclassMixin):
 
         # Process method's return type
         # TODO: Add support of return comment
-        if (return_type := member.__annotations__.get("return", None)) is not None:
+        if (return_type := cls._get_return_type(member)) is not None:
             handler.return_ = HandlerVariableDecl.create(value_type=return_type, record_type=record_type)
 
         return handler
+
+    @classmethod
+    def _get_return_type(cls, member: FunctionType | MethodType) -> type | None:
+        """Get return type from method signature."""
+        func = member.__func__ if isinstance(member, MethodType) else member
+
+        try:
+            hints = get_type_hints(func)
+        except Exception:
+            return None
+
+        return hints.get("return")
 
     @classmethod
     def _get_handler_label(cls, member_name: str) -> str:
@@ -109,13 +122,27 @@ class HandlerDeclareBlockDecl(DataclassMixin):
         """Extract parameters from a given method"""
         params: list[HandlerParamDecl] = []
 
+        func = method.__func__ if isinstance(method, MethodType) else method
+
+        try:
+            type_hints = get_type_hints(func)
+        except Exception:
+            # In case of any resolution issues, fall back to raw annotations
+            type_hints = {}
+
         method_signature = inspect.signature(method)
         method_params = method_signature.parameters
         for param_name, param in method_params.items():
             if param_name in {"self", "cls"}:
                 continue
 
-            variable_decl = HandlerVariableDecl.create(param.annotation, param.annotation)
+            # Prefer resolved type from get_type_hints, fall back to raw annotation
+            annotation = type_hints.get(param_name, param.annotation)
+
+            if annotation is inspect.Signature.empty:
+                continue
+
+            variable_decl = HandlerVariableDecl.create(annotation, annotation)
             param_decl = HandlerParamDecl.create(
                 name=CaseUtil.snake_to_pascal_case(param_name),
                 variable_decl=variable_decl,

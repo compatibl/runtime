@@ -21,6 +21,7 @@ from typing import get_args
 from typing import get_origin
 from memoization import cached
 from cl.runtime.records.protocols import is_mapping_type
+from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.schema.member_decl import MemberDecl
@@ -53,6 +54,7 @@ class HandlerVariableDecl(MemberDecl):
             value_type: Type of the value
         """
         from cl.runtime.schema.type_decl import TypeDecl
+        from cl.runtime.schema.enum_decl import EnumDecl
 
         result = cls()
 
@@ -94,6 +96,8 @@ class HandlerVariableDecl(MemberDecl):
             result.value = ValueDecl.for_type(value_type_)
         elif value_type_.__name__.endswith("Key"):
             result.key_ = TypeDecl.for_type(value_type_, skip_handlers=True)
+        elif is_enum_type(value_type_):
+            result.enum = EnumDecl.for_type(value_type_, skip_handlers=True)
         elif inspect.isclass(value_type_):
             result.data = TypeDecl.for_type(value_type_, skip_handlers=True)
         else:
