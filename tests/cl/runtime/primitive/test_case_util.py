@@ -115,7 +115,8 @@ def test_pascal_to_upper_case():
 def test_check_snake_case():
     # Valid cases
     CaseUtil.check_snake_case("valid_snake_case_1")
-    CaseUtil.check_snake_case("another_valid_3d_case_2_3")
+    CaseUtil.check_snake_case("another_valid_3d_case_2")
+    CaseUtil.check_snake_case("another_valid_case_2026")
 
     # Invalid cases
     check_raises_error(
@@ -137,7 +138,13 @@ def test_check_snake_case():
         CaseUtil.check_snake_case,
         "invalid_snake_case2",
         "String invalid_snake_case2 is not snake_case because it does not follow the rule "
-        "for separators in front of digits.",
+        "for separators in front and between digits.",
+    )
+    check_raises_error(
+        CaseUtil.check_snake_case,
+        "invalid_snake_case_1_2",
+        "String invalid_snake_case_1_2 is not snake_case because it does not follow the rule "
+        "for separators in front and between digits.",
     )
 
 
@@ -193,6 +200,7 @@ def test_check_upper_case():
     # Valid cases
     CaseUtil.check_upper_case("VALID_UPPER_CASE_1")
     CaseUtil.check_upper_case("UPPER_CASE_3D_EXAMPLE_2")
+    CaseUtil.check_upper_case("UPPER_CASE_3D_EXAMPLE_23")
 
     # Invalid cases
     check_raises_error(
@@ -209,7 +217,13 @@ def test_check_upper_case():
         CaseUtil.check_upper_case,
         "UPPER_CASE2",
         "String UPPER_CASE2 is not UPPER_CASE because it does not follow the rule "
-        "for separators in front of digits.",
+        "for separators in front and between digits.",
+    )
+    check_raises_error(
+        CaseUtil.check_upper_case,
+        "UPPER_CASE_2_3",
+        "String UPPER_CASE_2_3 is not UPPER_CASE because it does not follow the rule "
+        "for separators in front and between digits.",
     )
 
 
@@ -223,6 +237,7 @@ def test_round_trip_conversions():
         ("Abc2", "abc_2"),
         ("Abc2D", "abc_2d"),
         ("Abc2Def", "abc_2def"),
+        ("Abc12", "abc_12"),
         # From PascalCase without dot delimiter
         ("AbcDef", "abc_def"),
         # From PascalCase with dot delimiter

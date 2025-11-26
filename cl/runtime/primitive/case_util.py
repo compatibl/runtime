@@ -31,8 +31,8 @@ _digit_separator_re: Pattern = re.compile(r"([a-zA-Z])(\d)")
 _consecutive_cap_re: Pattern = re.compile(r"([A-Z])([A-Z])")
 """This pattern looks for uppercase sequences and adds an underscore between them if needed"""
 
-_digit_without_underscore_re: Pattern = re.compile(r"(?<!_)\d")
-"""Digit without underscore pattern"""
+_digit_underscore_violations_re: Pattern = re.compile(r"(?<=\d)_(?=\d)|(?<![_\d])\d")
+"""Digit without preceding underscore or underscore between digits pattern"""
 
 _digit_without_space_re: Pattern = re.compile(r"(?<! )\d")
 """Digit without space pattern"""
@@ -291,12 +291,13 @@ class CaseUtil:
 
     @classmethod
     def _check_snake_case_digit_separator(cls, value: str) -> None:
-        """Error message stating string does not follow the custom rule for separators in front of digits"""
+        """Error message stating string does not follow the custom rule for digit separators"""
         # snake_case must have an underscore in front of digits
-        if _digit_without_underscore_re.search(value):
+        # snake_case forbids underscore between digits
+        if _digit_underscore_violations_re.search(value):
             raise RuntimeError(
                 f"String {value} is not snake_case because it does not follow the rule "
-                f"for separators in front of digits.",
+                f"for separators in front and between digits.",
             )
 
     @classmethod
@@ -311,13 +312,13 @@ class CaseUtil:
 
     @classmethod
     def _check_upper_case_digit_separator(cls, value: str) -> None:
-        """Error message stating string does not follow the custom rule for separators in front of digits"""
+        """Error message stating string does not follow the custom rule for digit separators"""
         # Make a round trip from snake_case to PascalCase and back to snake_case to check
         # if the value stays the same
-        if _digit_without_underscore_re.search(value):
+        if _digit_underscore_violations_re.search(value):
             raise RuntimeError(
                 f"String {value} is not UPPER_CASE because it does not follow the rule "
-                f"for separators in front of digits.",
+                f"for separators in front and between digits.",
             )
 
     @classmethod
