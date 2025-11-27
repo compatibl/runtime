@@ -14,7 +14,7 @@
 
 import inspect
 from dataclasses import dataclass
-from types import FunctionType
+from types import FunctionType, NoneType
 from types import MethodType
 from typing import Iterable
 from typing import get_type_hints
@@ -93,7 +93,8 @@ class HandlerDeclareBlockDecl(DataclassMixin):
 
         # Process method's return type
         # TODO: Add support of return comment
-        if (return_type := cls._get_return_type(member)) is not None:
+        # TODO (Roman): Consider the differentiation between no return annotation and None return annotation.
+        if (return_type := cls._get_return_type(member)) not in (None, NoneType):
             handler.return_ = HandlerVariableDecl.create(value_type=return_type, record_type=record_type)
 
         return handler
