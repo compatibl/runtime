@@ -27,6 +27,8 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
+from cl.runtime.stat.experiment_interrupt import ExperimentInterrupt
+from cl.runtime.stat.experiment_interrupt_key import ExperimentInterruptKey
 from cl.runtime.stat.experiment_key import ExperimentKey
 from cl.runtime.stat.trial import Trial
 from cl.runtime.stat.trial_query import TrialQuery
@@ -84,8 +86,31 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         self.run_reset()
         self.run_resume()
 
+    def run_pause(self) -> None:
+        """Pause gracefully at the next complete trial iteration for all cases (may take up to 1 min)."""
+
+        if self.progress != "Done":
+            # Record an interrupt request
+            interrupt = ExperimentInterrupt(experiment=self.get_key(), action="Pause").build()
+            active(DataSource).replace_one(interrupt, commit=True)
+
+            # Indicate that pause is requested
+            elapsed_sec = float(self.elapsed_sec) if self.elapsed_sec is not None else 0.0
+            self.save_score(elapsed_sec=elapsed_sec, action_notice="Pause Requested")
+
+    def _cancel_pause(self) -> None:
+        """Cancel pause request."""
+        interrupt_key = ExperimentInterruptKey(experiment=self.get_key()).build()
+        active(DataSource).delete_one(interrupt_key, commit=True)
+
     def run_resume(self) -> None:
         """Resume to reach specified number of trials for each condition, keeping previously existing trials."""
+
+        # Cancel pause request if any
+        self._cancel_pause()
+
+        # Save score in the beginning
+        self.save_score(elapsed_sec=0.0, action_notice=None)
 
         # Measure experiment execution time for performance statistics.
         # For multiple trials, also compute the average time per trial.
@@ -102,13 +127,25 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                     if trial_idx < num_additional_trials[case_idx]:
                         self.save_trial(case)
 
+                # Check for an interrupt request
+                interrupt_key = ExperimentInterruptKey(experiment=self.get_key()).build()
+                interrupt = active(DataSource).load_one_or_none(interrupt_key)
+                action = interrupt.action if interrupt is not None else None
+
                 # Update experiment statistics after each full round of trials
                 end = time.perf_counter()
                 elapsed_sec = end - start
-                self.save_score(elapsed_sec=elapsed_sec)
+                self.save_score(elapsed_sec=elapsed_sec, action_notice="Paused")
+
+                if action == "Pause":
+                    # Exit from the loop if pause is requested
+                    break
 
     def run_reset(self) -> None:
         """Delete all existing trials."""
+
+        # Cancel pause request if any
+        self._cancel_pause()
 
         # Delete all existing trials
         trial_query = TrialQuery(experiment=self.get_key()).build()
@@ -150,7 +187,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)
 
-    def save_score(self, *, elapsed_sec: float) -> None:
+    def save_score(self, *, elapsed_sec: float, action_notice: str | None = None) -> None:
         """Save score to the experiment."""
 
         # TODO: Make abstract and implement for other experiment types
@@ -159,12 +196,15 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         trials = self.view_trials()
         num_completed = len(trials)
         num_total = self.num_trials * num_cases
+        num_remaining = num_total - num_completed
 
         # Clone experiment to save with updated fields
         experiment = self.clone()
 
         # Report progress
-        if num_completed == 0:
+        if action_notice is not None:
+            experiment.progress = action_notice
+        elif num_completed == 0:
             experiment.progress = None
         elif num_completed < num_total:
             experiment.progress = f"{num_completed} / {num_total}"
@@ -176,7 +216,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         # Report time
         experiment.elapsed_sec = str(round(elapsed_sec, 0))
         if num_completed > 0:
-            experiment.remaining_sec = str(round(elapsed_sec * (num_total - num_completed) / num_completed, 0))
+            experiment.remaining_sec = str(round(elapsed_sec * num_remaining / num_completed, 0))
         else:
             experiment.remaining_sec = None
 
