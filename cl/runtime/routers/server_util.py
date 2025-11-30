@@ -24,6 +24,7 @@ from cl.runtime.routers.settings import settings_router
 from cl.runtime.routers.sse import sse_router
 from cl.runtime.routers.storage import storage_router
 from cl.runtime.routers.tasks import tasks_router
+from cl.runtime.routers.workers.workers_router import router as workers_router
 from cl.runtime.server.auth_dependency import activate_auth_context
 
 
@@ -55,4 +56,7 @@ class ServerUtil:
         )
         server_app.include_router(
             handler_router.router, prefix="/handler", tags=["Handler"], dependencies=[Depends(activate_auth_context)]
+        )
+        server_app.include_router(
+            workers_router, prefix="/workers", tags=["Workers"], dependencies=[Depends(activate_auth_context)]
         )
