@@ -88,8 +88,11 @@ class DataService(PydanticMixin):
         records = ds.load_all(type_, skip=skip, limit=limit)
 
         if records:
-            common_base_record_type = ds.get_common_base_record_type(key_type=type_)
+            # Get the common type of the records stored in the table
+            record_types = [type(record) for record in records]
+            common_base_record_type = TypeInfo.get_common_base_type(types=record_types)
         else:
+            # Default to type_ when there are no records
             common_base_record_type = type_
 
         # Get schema dict for type

@@ -21,7 +21,7 @@ from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassOtherDerived
 
 
-def test_get_common_base(default_db_fixture):
+def test_get_common_base_record_type(default_db_fixture):
     """Test get common base type function."""
 
     ds: DataSource = active(DataSource)
@@ -34,12 +34,13 @@ def test_get_common_base(default_db_fixture):
     # Save derived records
     ds.replace_many(records, commit=True)
 
-    # Expect the base type to be 'StubDataclassDerived'
+    # Get the common type of the records stored in the table, or the table's key type if it is empty
     common_base_type = ds.get_common_base_record_type(key_type=StubDataclassKey)
     assert common_base_type == StubDataclassDerived
 
-    # Save other derived record, then the base type should be 'StubDataclass'
+    # Save other derived record, the common base type becomes StubDataclass
     ds.replace_one(StubDataclassOtherDerived(id="stub_other_derived").build(), commit=True)
 
+    # Get the common type of the records stored in the table, or the table's key type if it is empty
     common_base_type = ds.get_common_base_record_type(key_type=StubDataclassKey)
     assert common_base_type == StubDataclass

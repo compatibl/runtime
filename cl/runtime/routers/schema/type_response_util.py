@@ -35,7 +35,7 @@ class TypeResponseUtil:
             record_type_name = request.type_name
             record_type = TypeInfo.from_type_name(record_type_name)
         else:
-            # Get lowest common type bound to the table
+            # Get the common type of the records stored in the table, or the table's key type if it is empty
             key_type = TypeInfo.from_type_name(request.type_name)
             record_type = active(DataSource).get_common_base_record_type(key_type=key_type)
 

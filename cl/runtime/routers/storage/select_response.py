@@ -65,8 +65,14 @@ class SelectResponse(RecordsWithSchemaResponse):
             key_type_name = request.type_
             key_type = TypeInfo.from_type_name(key_type_name)
             records = ds.load_all(key_type)
-            # Get lowest common type to the records stored in the table
-            common_base_record_type = ds.get_common_base_record_type(key_type=key_type)
+
+            if records:
+                # Get the common type of the records stored in the table
+                record_types = [type(record) for record in records]
+                common_base_record_type = TypeInfo.get_common_base_type(types=record_types)
+            else:
+                # Default to key type when there are no records
+                common_base_record_type = key_type
         else:
             raise RuntimeError(f"Type {request.type_} is neither a record nor a key.")
 

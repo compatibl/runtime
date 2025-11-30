@@ -871,7 +871,7 @@ class DataSource(DataSourceKey, RecordMixin):
         return tuple(sorted(record_type_presences, key=lambda x: typename(x)))
 
     def get_common_base_record_type(self, *, key_type: type) -> type:
-        """Return the common type for all records stored for this key type, error if no such records."""
+        """Get the common type of the records stored in the table, or the table's key type if it is empty."""
 
         # Get record types stored for this key type
         record_types = self.get_record_types(key_type=key_type)
@@ -880,8 +880,8 @@ class DataSource(DataSourceKey, RecordMixin):
             # If at least one record type is present, find the common base
             return TypeInfo.get_common_base_type(types=record_types)
         else:
-            # Empty record_types means no records stored, raise an error
-            raise RuntimeError(f"Table {typename(key_type)} is empty.")
+            # Empty table, return
+            return key_type
 
     def _get_db(self) -> Db:
         """Cast db key type to record type, the record is already loaded by the __init method."""
