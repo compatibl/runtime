@@ -14,6 +14,7 @@
 
 from dataclasses import dataclass
 from fastapi import Header
+from fastapi import Request
 from typing_extensions import Annotated
 
 
@@ -30,8 +31,12 @@ class ContextHeaders:
     user: str | None
     """User identifier or identity token"""
 
+    user_keys: dict[str, str] | None
+    """User keys."""
+
 
 def get_context_headers(
+    request: Request,
     environment: Annotated[
         str | None, Header(description="Name of the environment (database), e.g. 'Dev;Runtime;V2'")
     ] = None,
@@ -39,4 +44,7 @@ def get_context_headers(
     user: Annotated[str | None, Header(description="User identifier or identity token")] = None,
 ) -> ContextHeaders:
     """Extract information about the context from the headers. Database, dataset and username."""
-    return ContextHeaders(env=environment, dataset=dataset, user=user)
+    user_keys = {
+        k[len("cl-user-key-") :]: v for k, v in request.headers.items() if k.lower().startswith("cl-user-key-")
+    }
+    return ContextHeaders(env=environment, dataset=dataset, user=user, user_keys=user_keys)
