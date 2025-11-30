@@ -15,33 +15,14 @@
 import base64
 import logging
 from dataclasses import dataclass
-from typing import Any
-from typing import Dict
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cl.runtime.contexts.context_manager import active_or_default
-from cl.runtime.contexts.utils.user_secrets_util import UserSecretsUtil
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
+from cl.runtime.secret_providers.secret_provider import SecretProvider
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def populate_user_secrets_from_scope(scope: Dict[str, Any]) -> dict[str, str]:
-    """Extract user keys from ASGI scope headers with 'cl-user-key-*' prefix."""
-
-    user_keys: dict[str, str] = {}
-
-    raw_headers = scope.get("headers") or []
-    prefix = b"cl-user-key-"
-
-    for name, value in raw_headers:
-        name_lower = name.lower()
-        if name_lower.startswith(prefix):
-            key = name_lower[len(prefix) :].decode()
-            user_keys[key] = value.decode()
-
-    return user_keys
 
 
 @dataclass(slots=True, kw_only=True)
@@ -55,15 +36,20 @@ class UserSecrets(DataclassMixin):
     def get_key_type(cls) -> type:  # TODO: Remove after deriving from RecordMixin
         return UserSecrets
 
-    def decrypt_secret(self, secret_name: str) -> str | None:
-        """Decrypt the specified secret in UserSecrets, None if no active UserSecrets or the secret is not found."""
+    @classmethod
+    def decrypt_secret(cls, secret_name: str) -> str | None:
+        """Decrypt the specified secret in UserContext, None if no active UserContext or the secret is not found."""
 
         # Get secrets field of the current user secrets context, return None if not specified
-        user_secrets = active_or_default(UserSecrets)
+        user_secrets = active_or_default(
+            UserSecrets
+        )  # TODO: !! Convert UserSecrets to record to compare identity by key
         if user_secrets is None or ((encrypted_secrets := user_secrets.encrypted_secrets) is None):
             return None
 
+        # TODO (Roman): Align secrets format
         secret_name_in_ui_format = secret_name.replace("_", "-").lower()
+
         # Get secret by key, return None if key is not present
         encrypted_value = encrypted_secrets.get(secret_name_in_ui_format)
         if encrypted_value is None:
@@ -76,8 +62,8 @@ class UserSecrets(DataclassMixin):
         encrypted_value_bytes = base64.b64decode(encrypted_value)
 
         # Load the private key
-        # Temporary minimal private cert support
-        private_key: RSAPrivateKey = UserSecretsUtil.get_rsa_private_key()
+        secret_provider = SecretProvider.create()
+        private_key: RSAPrivateKey = secret_provider.get_rsa_private_key("USER-SECRETS-PRIVATE-CERT")
 
         # Decrypt the value
         decrypted_value_bytes = private_key.decrypt(

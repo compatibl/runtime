@@ -14,7 +14,9 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
+from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
+from cl.runtime.contexts.user_secrets import UserSecrets
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
@@ -44,18 +46,21 @@ class SubmitResponseItem(BaseModel):
         response_items = []
         task_queue = active(TaskQueue)
 
-        for handler_task in TaskUtil.create_tasks_for_submit_request(request):
+        # Enter user secrets context
+        with activate(UserSecrets(encrypted_secrets=request.user_keys).build()):
 
-            # Save and submit task
-            active(DataSource).replace_one(handler_task, commit=True)
-            task_queue.submit_task(handler_task)  # TODO: Rely on query instead
+            for handler_task in TaskUtil.create_tasks_for_submit_request(request):
 
-            if isinstance(handler_task, InstanceMethodTask):
-                # Only InstanceMethodTask has `key` field
-                key = KeySerializers.DELIMITED.serialize(handler_task.key)
-            else:
-                key = None
+                # Save and submit task
+                active(DataSource).replace_one(handler_task, commit=True)
+                task_queue.submit_task(handler_task)  # TODO: Rely on query instead
 
-            response_items.append(SubmitResponseItem(key=key, task_run_id=handler_task.task_id))
+                if isinstance(handler_task, InstanceMethodTask):
+                    # Only InstanceMethodTask has `key` field
+                    key = KeySerializers.DELIMITED.serialize(handler_task.key)
+                else:
+                    key = None
 
-        return response_items
+                response_items.append(SubmitResponseItem(key=key, task_run_id=handler_task.task_id))
+
+            return response_items

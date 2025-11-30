@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing_extensions import Any
-from typing_extensions import Self
+from typing import Any
+from typing import Self
+from cl.runtime.contexts.context_manager import activate
+from cl.runtime.contexts.user_secrets import UserSecrets
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -32,11 +35,20 @@ class RunResponseItem(PydanticMixin):
     @classmethod
     def get_response(cls, request: SubmitRequest) -> list[Self]:
 
-        results = []
-        for handler_task in TaskUtil.create_tasks_for_submit_request(request):
-            # Run task as callable in main process
-            handler_result = handler_task.run_task_in_process()
+        # Enter user secrets context
+        with activate(UserSecrets(encrypted_secrets=request.user_keys).build()):
 
-            results.append(cls(result=handler_result))
+            results = []
+            for handler_task in TaskUtil.create_tasks_for_submit_request(request):
+                # Run task as callable in main process
+                handler_result = handler_task.run_task_in_process()
+                if (
+                    handler_result
+                    and not isinstance(handler_result, PydanticMixin)
+                    and isinstance(handler_result, DataMixin)
+                ):
+                    # Serialize data instances
+                    handler_result = _UI_SERIALIZER.serialize(handler_result)
+                results.append(cls(result=handler_result))
 
-        return results
+            return results

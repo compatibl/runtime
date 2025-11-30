@@ -29,3 +29,6 @@ class SubmitRequest(ContextRequest):
 
     arguments: dict | None = None
     """Arguments dict, e.g. {"ArgumentName": 123}."""
+
+    user_keys: dict[str, str] | None = None
+    """User keys which could be required by the running method."""
