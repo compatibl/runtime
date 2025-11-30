@@ -70,6 +70,8 @@ class DataSourceTool(DataSourceToolKey, RecordMixin):
                     for record in records:
                         serialized_data = _json_serializer.serialize(record)
                         file_name = urllib.parse.quote(_KEY_SERIALIZER.serialize(record.get_key()), safe="")
+
+                        raise RuntimeError("Local file save is not available in this environment.") # TODO: !!! Determine alternative for cloud envs
                         storage.save_object(f"{file_name}.json", json.dumps(serialized_data))
 
             for root, dirs, files in os.walk(base_path):
