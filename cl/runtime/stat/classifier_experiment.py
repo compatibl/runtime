@@ -17,10 +17,10 @@ from collections import Counter
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.stat.case import Case
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
+from cl.runtime.stat.case import Case
 from cl.runtime.stat.classifier_trial import ClassifierTrial
 from cl.runtime.stat.experiment import Experiment
 from cl.runtime.stat.trial_query import TrialQuery
@@ -64,7 +64,7 @@ class ClassifierExperiment(Experiment, ABC):
             for class_label in self.class_labels:
                 group_labels.append(param_id)
                 bar_labels.append(class_label)
-                values.append(counts.get(class_label, 0) / total if total else 0.)
+                values.append(counts.get(class_label, 0) / total if total else 0.0)
 
         result = StackBarPlot(
             plot_id=plot_id,

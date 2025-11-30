@@ -16,10 +16,10 @@ from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.stat.case import Case
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.stat.binary_experiment import BinaryExperiment
+from cl.runtime.stat.case import Case
 from cl.runtime.stat.supervised_binary_trial import SupervisedBinaryTrial
 from cl.runtime.stat.trial_query import TrialQuery
 
@@ -53,7 +53,7 @@ class SupervisedBinaryExperiment(BinaryExperiment, ABC):
             trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.param, param))
             total = len(trials)
             if total == 0:
-                values.extend([0.] * 4)
+                values.extend([0.0] * 4)
                 continue
 
             tp = tn = fp = fn = 0

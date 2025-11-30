@@ -14,8 +14,8 @@
 
 import pytest
 import random
-from cl.runtime.stat.case import Case
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.stat.case import Case
 from stubs.cl.runtime.stat.stub_supervised_classifier_experiment import StubSupervisedClassifierExperiment
 
 

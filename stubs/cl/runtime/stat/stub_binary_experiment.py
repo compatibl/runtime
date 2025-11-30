@@ -14,9 +14,9 @@
 
 import random
 from dataclasses import dataclass
-from cl.runtime.stat.case_key import CaseKey
 from cl.runtime.stat.binary_experiment import BinaryExperiment
 from cl.runtime.stat.binary_trial import BinaryTrial
+from cl.runtime.stat.case_key import CaseKey
 
 
 @dataclass(slots=True, kw_only=True)

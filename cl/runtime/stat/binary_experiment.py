@@ -16,10 +16,10 @@ from abc import ABC
 from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.stat.case import Case
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.stat.binary_trial import BinaryTrial
+from cl.runtime.stat.case import Case
 from cl.runtime.stat.experiment import Experiment
 from cl.runtime.stat.trial_query import TrialQuery
 
@@ -58,7 +58,7 @@ class BinaryExperiment(Experiment, ABC):
                 false_trials = total - true_trials
                 values.extend([true_trials / total, false_trials / total])
             else:
-                values.extend([0., 0.])
+                values.extend([0.0, 0.0])
 
         result = StackBarPlot(
             plot_id=plot_id,

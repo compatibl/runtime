@@ -14,10 +14,10 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from cl.runtime.stat.case_key import CaseKey
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.stat.case_key import CaseKey
 from cl.runtime.stat.experiment_key import ExperimentKey
 from cl.runtime.stat.trial_key import TrialKey
 

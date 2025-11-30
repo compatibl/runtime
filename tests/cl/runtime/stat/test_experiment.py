@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.stat.case import Case
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.stat.case import Case
 from stubs.cl.runtime.stat.stub_binary_experiment import StubBinaryExperiment
 
 
