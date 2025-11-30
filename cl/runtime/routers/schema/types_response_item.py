@@ -16,6 +16,7 @@ from __future__ import annotations
 from inflection import titleize
 from pydantic import BaseModel
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.records.protocols import is_abstract_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
@@ -51,6 +52,7 @@ class TypesResponseItem(BaseModel):
                 label=titleize(typename(record_type)),  # TODO: Make label different from name or remove
             )
             for record_type in record_types
+            if not is_abstract_type(record_type)
         ]
 
         return types_result

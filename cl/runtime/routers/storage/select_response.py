@@ -97,7 +97,7 @@ class SelectResponse(RecordsWithSchemaResponse):
         table_fields = {
             CaseUtil.snake_to_pascal_case_keep_trailing_underscore(slot)
             for slot in all_slots
-            if (slot_v := getattr(record, slot))
+            if (slot_v := getattr(record, slot)) is not None
             and (
                 # TODO (Roman): Consider adding other types to table format.
                 # Check if field is primitive, key or enum.
