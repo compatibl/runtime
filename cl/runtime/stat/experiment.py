@@ -135,7 +135,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                 # Update experiment statistics after each full round of trials
                 end = time.perf_counter()
                 elapsed_sec = end - start
-                self.save_score(elapsed_sec=elapsed_sec, action_notice="Paused")
+                self.save_score(elapsed_sec=elapsed_sec, action_notice=action)
 
                 if action == "Pause":
                     # Exit from the loop if pause is requested
