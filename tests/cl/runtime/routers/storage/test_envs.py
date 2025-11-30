@@ -16,15 +16,8 @@ import pytest
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.env_response_item import EnvResponseItem
 
-expected_result = [
-    {
-        "Name": "Dev;Runtime;V2",
-        "Parent": "",  # TODO: Check if None is also accepted
-    }
-]
 
-
-def test_method():
+def test_method(default_db_fixture):
     """Test coroutine for /storage/envs route."""
 
     # Run the coroutine wrapper added by the FastAPI decorator and get the result.
@@ -37,7 +30,7 @@ def test_method():
     assert all(isinstance(x, EnvResponseItem) for x in result)
 
     # Check if each item in the result is a valid EnvResponseItem instance.
-    assert result == [EnvResponseItem(**x) for x in expected_result]
+    assert result == [EnvResponseItem(name="test_envs.test_method", parent="")]
 
 
 def test_api():
@@ -48,7 +41,7 @@ def test_api():
         result = response.json()
 
         # Check result
-        assert result == expected_result
+        assert result == [{"Name": "test_envs.test_api", "Parent": ""}]
 
 
 if __name__ == "__main__":

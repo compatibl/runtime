@@ -47,7 +47,7 @@ async def _listen_events(client):
             async for line in response.aiter_lines():
                 event_stream_lines.append(line)
 
-            return event_stream_lines
+    return event_stream_lines
 
 
 async def _publish_events(client):

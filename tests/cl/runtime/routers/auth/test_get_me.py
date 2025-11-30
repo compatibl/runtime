@@ -14,11 +14,13 @@
 
 import pytest
 from typing import Any
-from cl.runtime.contexts.utils.user_secrets_util import UserSecretsUtil
+from cl.runtime.contexts.context_manager import active
+from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.auth.me_response import MeResponse
-from cl.runtime.routers.auth.me_response import UserRequest
+from cl.runtime.routers.auth.me_response import _get_user_secrets_public_key
+from cl.runtime.routers.user_request import UserRequest
 
 request_headers = [{}, {"User": "TestUser"}]
 
@@ -27,8 +29,7 @@ def get_expected_result(request_obj: UserRequest) -> dict[str, Any]:
     """Get expected result for the user."""
 
     # Get user from the request or use default value if not specified
-    # TODO: Obtain default user from settings
-    user = request_obj.user if request_obj.user is not None else "root"
+    user = active(DataSource).tenant.tenant_id
 
     return {
         "Id": user,
@@ -37,11 +38,11 @@ def get_expected_result(request_obj: UserRequest) -> dict[str, Any]:
         "LastName": None,
         "Email": None,
         "Scopes": ["Read", "Write", "Execute", "Developer"],
-        "UserSecretsPublicKey": UserSecretsUtil.get_rsa_public_key(UserSecretsUtil.get_rsa_private_key()),
+        "UserSecretsPublicKey": _get_user_secrets_public_key(),
     }
 
 
-def test_method():
+def test_method(default_db_fixture):
     """Test coroutine for /auth/me route."""
 
     for headers in request_headers:
@@ -55,7 +56,7 @@ def test_method():
         assert result == MeResponse(**expected_result)
 
 
-def test_api():
+def test_api(default_db_fixture):
     """Test REST API for /auth/me route."""
     with QaClient() as test_client:
         for headers in request_headers:
