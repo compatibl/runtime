@@ -50,7 +50,7 @@ class ProjectSettings:
     project_levels: int = required()
     """Number of levels in project layout (one or two)."""
 
-    project_storage: str = "storage" # TODO: !!! Review field name and default value
+    project_storage: str = "storage"  # TODO: !!! Review field name and default value
     """Directory for user-specified files."""
 
     __instance: ClassVar[ProjectSettings] = None

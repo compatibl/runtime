@@ -20,10 +20,10 @@ import posixpath
 import shutil
 import urllib.parse
 import zipfile
-from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import Future
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime
-
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.data_source_tool_key import DataSourceToolKey
@@ -71,7 +71,9 @@ class DataSourceTool(DataSourceToolKey, RecordMixin):
                         serialized_data = _json_serializer.serialize(record)
                         file_name = urllib.parse.quote(_KEY_SERIALIZER.serialize(record.get_key()), safe="")
 
-                        raise RuntimeError("Local file save is not available in this environment.") # TODO: !!! Determine alternative for cloud envs
+                        raise RuntimeError(
+                            "Local file save is not available in this environment."
+                        )  # TODO: !!! Determine alternative for cloud envs
                         storage.save_object(f"{file_name}.json", json.dumps(serialized_data))
 
             for root, dirs, files in os.walk(base_path):
@@ -101,9 +103,10 @@ class DataSourceTool(DataSourceToolKey, RecordMixin):
             ds.replace_many(records, commit=True)
             return len(records)
 
-        with ThreadPoolExecutor(max_workers=max_workers) as executor, zipfile.ZipFile(
-            io.BytesIO(file.file_bytes), "r"
-        ) as zipf:
+        with (
+            ThreadPoolExecutor(max_workers=max_workers) as executor,
+            zipfile.ZipFile(io.BytesIO(file.file_bytes), "r") as zipf,
+        ):
             last_dir = None
             parsed_files = 0
             committed_files = 0
@@ -181,9 +184,7 @@ class DataSourceTool(DataSourceToolKey, RecordMixin):
 
                 try:
                     with zipf.open(info) as fh:
-                        batch.append(
-                            _json_serializer.deserialize(json.loads(fh.read().decode("utf-8")))
-                        )
+                        batch.append(_json_serializer.deserialize(json.loads(fh.read().decode("utf-8"))))
                     parsed_files += 1
 
                     # commit in batches and log progress when a batch is queued for commit
