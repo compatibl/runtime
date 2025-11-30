@@ -72,6 +72,10 @@ class CharUtil:
         if value is None or value == "":
             return None
 
+        # Replace the Excel format for Boolean values with our format
+        if value in ("TRUE", "FALSE"):
+            value = value.lower()
+
         # Search for flagged characters
         flagged_chars = list(set(re.findall(_FLAGGED_CHARS_REGEX, value)))
         if flagged_chars:
