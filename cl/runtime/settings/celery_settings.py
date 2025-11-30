@@ -30,7 +30,7 @@ class CelerySettings(Settings):
     celery_broker: str = "sqlite"
     """Celery broker to be used."""
 
-    celery_broker_uri: str = "redis://localhost:6379/0"
+    celery_broker_uri: str = "sqlalchemy+sqlite:///{project_dir}/celery-{context_id}.db"
     """Celery broker URI. The value from config file is ignored for `sqlite` broker."""
 
     celery_broker_queue: str = "celery"
@@ -51,6 +51,18 @@ class CelerySettings(Settings):
     celery_max_tenant_tasks: int = 10
     """Maximum number of tenant tasks at the same time."""
 
+    celery_multiprocess_pool: bool = True
+    """Use multiple worker processes instead of single embedded worker (Windows optimization)."""
+
+    celery_worker_restart_interval: int = 60
+    """Interval in seconds to check and restart dead workers."""
+
+    celery_worker_log_level: str = "info"
+    """Log level for worker processes."""
+
+    celery_worker_optimization: bool = True
+    """Enable Windows-specific optimizations (no gossip, mingle, heartbeat)."""
+
     def __init(self) -> None:
         if not self.celery_broker:
             raise RuntimeError("Celery broker is not specified in settings.")
@@ -62,7 +74,7 @@ class CelerySettings(Settings):
             self._ensure_databases_dir_exists(databases_dir)
 
             self.celery_broker_uri = f"sqlalchemy+sqlite:///{celery_file}"
-        elif self.celery_broker in ["redis", "rabbitmq"]:
+        elif self.celery_broker in ["redis", "rabbitmq", "sqs", "mongodb"]:
             if not self.celery_broker_uri:
                 raise RuntimeError("Celery broker URI is not specified for broker.")
             if not self.celery_broker_queue:
