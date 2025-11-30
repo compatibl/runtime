@@ -27,11 +27,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
-from cl.runtime.stat.binary_trial import BinaryTrial
 from cl.runtime.stat.experiment_key import ExperimentKey
-from cl.runtime.stat.experiment_stats import ExperimentStats
-from cl.runtime.stat.experiment_stats_key import ExperimentStatsKey
-from cl.runtime.stat.experiment_stats_view import ExperimentStatsView
 from cl.runtime.stat.trial import Trial
 from cl.runtime.stat.trial_query import TrialQuery
 from cl.runtime.views.png_view import PngView
@@ -47,11 +43,14 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
     num_trials: int = required()
     """Number of trials to run per condition (optional)."""
 
-    num_completed: float | None = None
-    """Number of trials completed per condition (calculated, may be fractional)."""
+    progress: str | None = None
+    """Progress in percent (calculated)."""
 
-    score: float | None = None
-    """Score in percent (calculated)."""
+    elapsed_sec: str | None = None
+    """Elapsed wall clock time in seconds."""
+
+    remaining_sec: str | None = None
+    """Remaining wall clock time in seconds."""
 
     def get_key(self) -> ExperimentKey:
         return ExperimentKey(experiment_id=self.experiment_id).build()
@@ -103,13 +102,10 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
                     if trial_idx < num_additional_trials[case_idx]:
                         self.save_trial(case)
 
-                # Calculate and save score to the experiment by querying trials
-                self.save_score()
-
-        # Save the statistics
-        end = time.perf_counter()
-        exec_time = end - start
-        self.save_stats(exec_time, num_retries)
+                # Update experiment statistics after each full round of trials
+                end = time.perf_counter()
+                elapsed_sec = end - start
+                self.save_score(elapsed_sec=elapsed_sec)
 
     def run_reset(self) -> None:
         """Delete all existing trials."""
@@ -120,8 +116,9 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
         # Reset score and status
         obj = self.clone()
-        obj.score = 0.0
-        obj.num_completed = 0.0
+        obj.progress = None
+        obj.elapsed_sec = None
+        obj.remaining_sec = None
         active(DataSource).replace_one(obj.build(), commit=True)
 
     def view_cases(self) -> tuple[CaseKey, ...]:
@@ -136,17 +133,6 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
 
     def view_plot(self) -> PngView:
         return self.get_plot(self.experiment_id).get_view()
-
-    def view_stats(self) -> ExperimentStatsView:
-        """View the experiment's statistics."""
-        stats = active(DataSource).load_one_or_none(
-            ExperimentStatsKey(experiment=self.get_key()).build(),
-            cast_to=ExperimentStats,
-        )
-        if stats:
-            return stats.get_view()
-        # Return an empty view if no statistics are saved
-        return ExperimentStatsView().build()
 
     def is_run(self) -> bool:
         """Return True if the record's dot-delimited ID ends with a timestamp."""
@@ -164,40 +150,37 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         trial = self.create_trial(condition)
         active(DataSource).replace_one(trial, commit=True)
 
-    def save_stats(self, exec_time: float, retry_count: int = 0) -> None:
-        """
-        Save experiment run statistics.
-
-        Metrics saved:
-            total_time_sec: Total execution time of the experiment.
-            retry_count: Number of retries during the experiment.
-            time_per_trial_sec: Average time per trial, accounting for retries.
-        """
-
-        exp = active(DataSource).load_one(self.get_key(), cast_to=Experiment)
-        trial_count = exp.num_completed
-        time_per_retry = (exec_time / retry_count) if retry_count else 0
-        time_per_trial = (time_per_retry / trial_count) if trial_count else 0
-        stats = ExperimentStats(
-            experiment=self.get_key(),
-            retry_count=retry_count,
-            total_time=exec_time,
-            time_per_trial=time_per_trial
-        ).build()
-        active(DataSource).replace_one(stats, commit=True)
-
-    def save_score(self) -> None:
+    def save_score(self, *, elapsed_sec: float) -> None:
         """Save score to the experiment."""
 
         # TODO: Make abstract and implement for other experiment types
         # Update score by querying trials
+        num_cases = len(self.cases)
         trials = self.view_trials()
-        num_completed = len(trials) / len(self.cases)
-        num_successes = sum(1 for trial in trials if isinstance(trial, BinaryTrial) and trial.outcome) / len(self.cases)
-        score = 100 * float(num_successes) / float(num_completed) if num_completed > 0 else 0.0
+        num_completed = len(trials)
+        num_total = self.num_trials * num_cases
+
+        # Clone experiment to save with updated fields
         experiment = self.clone()
-        experiment.num_completed = num_completed
-        experiment.score = score
+
+        # Report progress
+        if num_completed == 0:
+            experiment.progress = None
+        elif num_completed < num_total:
+            experiment.progress = f"{num_completed} / {num_total}"
+        elif num_completed == num_total:
+            experiment.progress = "Done"
+        else:
+            experiment.progress = "Excess Trials"
+
+        # Report time
+        experiment.elapsed_sec = str(round(elapsed_sec, 0))
+        if num_completed > 0:
+            experiment.remaining_sec = str(round(elapsed_sec * (num_total - num_completed) / num_completed, 0))
+        else:
+            experiment.remaining_sec = None
+
+        # Save
         active(DataSource).replace_one(experiment.build(), commit=True)
 
     def calc_num_completed_trials(self) -> tuple[int, ...]:
