@@ -20,6 +20,7 @@ from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.log.log_message import LogMessage
 from cl.runtime.log.task_logs import TaskLogs
+from cl.runtime.log.ui_clear_logs_marker import UiClearLogsMarker
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.task_query import TaskQuery
@@ -38,27 +39,17 @@ class UiLogUtil(DataclassMixin):
     @classmethod
     def run_get_flat_logs(cls) -> list[dict[str, Any]]:
         """Return a list of the last N log messages, sorted by timestamp in ascending order."""
-        log_messages = active(DataSource).load_all(
-            key_type=LogMessage().get_key_type(),
-            limit=_LOG_HISTORY_LIMIT,
-            sort_order=SortOrder.DESC,
-        )[::-1]
+        log_messages = cls._get_ui_logs()
+        log_messages = log_messages[::-1]
 
         return list(_UI_SERIALIZER.serialize(x) for x in log_messages)
 
     @classmethod
     def run_get_error_logs(cls) -> list[dict[str, Any]]:
         """Return a list of the last N error log messages, sorted by timestamp in ascending order."""
-
-        log_messages = [
-            log
-            for log in active(DataSource).load_all(
-                LogMessage().get_key_type(),
-                limit=_LOG_HISTORY_LIMIT,
-                sort_order=SortOrder.DESC,
-            )
-            if log.level.lower() == "error"
-        ][::-1]
+        log_messages = cls._get_ui_logs()
+        log_messages = [log for log in log_messages if log.level.lower() == "error"]
+        log_messages = log_messages[::-1]
 
         return list(_UI_SERIALIZER.serialize(x) for x in log_messages)
 
@@ -82,11 +73,12 @@ class UiLogUtil(DataclassMixin):
         """Return last N log messages aggregated by task_run_id and sorted by timestamp in ascending order."""
 
         result = {}
-        for log_message in reversed(
-            active(DataSource).load_all(
-                key_type=LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT, sort_order=SortOrder.DESC
-            )
-        ):
+
+        # TODO (Roman): Ensure consistency when part of the Task logs have been purged
+        log_messages = cls._get_ui_logs()
+        log_messages = log_messages[::-1]
+
+        for log_message in log_messages:
             task_run_id = log_message.task_run_id
 
             if task_run_id is None:
@@ -106,3 +98,43 @@ class UiLogUtil(DataclassMixin):
             result[task_run_id].logs.append(log_message)
 
         return list(_UI_SERIALIZER.serialize(x) for x in result.values())
+
+    @classmethod
+    def run_clear_logs(cls) -> None:
+        """Save clear logs marker with Timestamp of now."""
+        clear_logs_timestamp = UiClearLogsMarker().build()
+        active(DataSource).replace_one(clear_logs_timestamp, commit=True)
+
+    @classmethod
+    def _get_last_clear_logs_timestamp(cls) -> UiClearLogsMarker | None:
+        """Get last ClearLogsMarker record or None if not found."""
+
+        # Get UiClearLogsMarker by query with limit 1
+        clear_logs_timestamps = active(DataSource).load_all(
+            key_type=UiClearLogsMarker().get_key_type(),
+            limit=1,
+            sort_order=SortOrder.DESC,
+        )
+
+        # If UiClearLogsMarker record is not found, return None
+        if clear_logs_timestamps:
+            return clear_logs_timestamps[0]
+        else:
+            return None
+
+    @classmethod
+    def _get_ui_logs(cls) -> tuple[LogMessage, ...]:
+        """Get last LogMessage records sorted by DESC. Filter logs by UiClearLogsMarker if exists."""
+
+        logs = active(DataSource).load_all(
+            key_type=LogMessage().get_key_type(), limit=_LOG_HISTORY_LIMIT, sort_order=SortOrder.DESC
+        )
+
+        # Filter out logs created before cleaning
+        clear_logs = cls._get_last_clear_logs_timestamp()
+        if clear_logs is not None:
+            for i, log in enumerate(logs):
+                if log.timestamp <= clear_logs.clear_logs_timestamp:
+                    return logs[:i]
+
+        return logs

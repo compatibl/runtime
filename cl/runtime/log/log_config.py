@@ -170,6 +170,28 @@ def _make_filter_db_logs():
     return filter_
 
 
+def _make_filter_suppress_keyboard_interrupt():
+    """Suppress KeyboardInterrupt and CancelledError tracebacks during graceful shutdown."""
+
+    def filter_(record):
+        if record.levelno != logging.ERROR:
+            return True
+
+        # Combine message and exception text for pattern matching
+        text = f"{record.getMessage()} {record.exc_text or ''}"
+
+        # Suppress only shutdown-related tracebacks:
+        # 1. Both KeyboardInterrupt and CancelledError (shutdown cascade)
+        # 2. KeyboardInterrupt from signal handler (Ctrl+C)
+        is_shutdown_traceback = ("KeyboardInterrupt" in text and "CancelledError" in text) or (
+            "KeyboardInterrupt" in text and ("signal.raise_signal" in text or "uvicorn.server" in text)
+        )
+
+        return not is_shutdown_traceback
+
+    return filter_
+
+
 # Empty config to suppress default celery logger. Used to propagate all logs to root logger.
 celery_empty_logging_config = {"version": 1, "disable_existing_loggers": False, "loggers": {"celery": {}}}
 
@@ -214,6 +236,9 @@ logging_config = {
             "default_empty": ".",
         },
         "db_logs_filter": {"()": "cl.runtime.log.log_config._make_filter_db_logs"},
+        "suppress_keyboard_interrupt_filter": {
+            "()": "cl.runtime.log.log_config._make_filter_suppress_keyboard_interrupt"
+        },
     },
     "handlers": {
         "file_handler": {
@@ -228,7 +253,7 @@ logging_config = {
         "stderr_handler": {
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stderr",
-            "filters": ["add_contextual_info_filter", "above_error_level_filter"],
+            "filters": ["add_contextual_info_filter", "above_error_level_filter", "suppress_keyboard_interrupt_filter"],
             "formatter": "console_formatter",
         },
         "stdout_handler": {
