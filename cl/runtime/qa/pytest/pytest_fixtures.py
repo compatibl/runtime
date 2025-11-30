@@ -27,6 +27,7 @@ from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
 from cl.runtime.db.mongo.basic_mongo_mock_db import BasicMongoMockDb
 from cl.runtime.db.sql.sqlite_db import SqliteDb
+from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
@@ -40,7 +41,13 @@ from cl.runtime.tasks.celery.celery_queue import celery_app
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 
 
-def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iterator[Db]:
+@pytest.fixture
+def tenant_fixture(request: FixtureRequest):
+    """Parametrize tenant_fixture to change tenant within test."""
+    return getattr(request, "param", None)
+
+
+def _db_fixture(request: FixtureRequest, *, db_type: type | None = None, tenant: str | None = None) -> Iterator[Db]:
     """Setup and teardown a temporary databases in DB of the specified type."""
 
     # Set test DB name to test name in dot-delimited snake_case format, prefixed by 'temp_'
@@ -58,6 +65,9 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
         # Replace dots by semicolons
         db_id = test_name.replace(".", ";")
 
+        # Extract tenant from fixture request params
+        tenant = TenantKey(tenant_id=tenant) if tenant else None
+
         # Create a new DB instance of the specified type (use the type from settings if None)
         db = Db.create(db_type=db_type, db_id=db_id)
 
@@ -65,7 +75,7 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
         db.drop_test_db()
 
         # Run with the created DB, return db from the fixture
-        with activate(DataSource(db=db).build()):
+        with activate(DataSource(db=db, tenant=tenant).build()):
             yield db
 
         # Delete all existing records in unit test DB after the test
@@ -73,7 +83,7 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None) -> Iter
 
 
 @pytest.fixture(scope="function")
-def default_db_fixture(request: FixtureRequest) -> Iterator[Db]:
+def default_db_fixture(request: FixtureRequest, tenant_fixture) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using default DB."""
 
     # Get default Db type from settings
@@ -83,19 +93,19 @@ def default_db_fixture(request: FixtureRequest) -> Iterator[Db]:
     if default_db_type is BasicMongoMockDb:
         # Patch 'from_uuid' method if db type is BasicMongoMockDb
         with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
-            yield from _db_fixture(request, db_type=default_db_type)
+            yield from _db_fixture(request, db_type=default_db_type, tenant=tenant_fixture)
     else:
-        yield from _db_fixture(request, db_type=default_db_type)
+        yield from _db_fixture(request, db_type=default_db_type, tenant=tenant_fixture)
 
 
 @pytest.fixture(scope="function")
-def sqlite_db_fixture(request: FixtureRequest) -> Iterator[Db]:
+def sqlite_db_fixture(request: FixtureRequest, tenant_fixture) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using SqliteDB."""
-    yield from _db_fixture(request, db_type=SqliteDb)
+    yield from _db_fixture(request, db_type=SqliteDb, tenant=tenant_fixture)
 
 
 @pytest.fixture(scope="function")
-def basic_mongo_db_fixture(request: FixtureRequest) -> Iterator[Db]:
+def basic_mongo_db_fixture(request: FixtureRequest, tenant_fixture) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases using BasicMongoDb.
 
@@ -103,19 +113,19 @@ def basic_mongo_db_fixture(request: FixtureRequest) -> Iterator[Db]:
         This requires a running MongoDB server with DB create and drop permissions.
         If this is not available, use basic_mongo_mock_db_fixture instead.
     """
-    yield from _db_fixture(request, db_type=BasicMongoDb)
+    yield from _db_fixture(request, db_type=BasicMongoDb, tenant=tenant_fixture)
 
 
 @pytest.fixture(scope="function")
-def basic_mongo_mock_db_fixture(request: FixtureRequest) -> Iterator[Db]:
+def basic_mongo_mock_db_fixture(request: FixtureRequest, tenant_fixture) -> Iterator[Db]:
     """Pytest module fixture to setup and teardown temporary databases using BasicMongoMockDb."""
     # Patch 'from_uuid' method
     with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
-        yield from _db_fixture(request, db_type=BasicMongoMockDb)
+        yield from _db_fixture(request, db_type=BasicMongoMockDb, tenant=tenant_fixture)
 
 
 @pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb])  # TODO: Load the list from settings instead
-def multi_db_fixture(request) -> Iterator[Db]:
+def multi_db_fixture(request, tenant_fixture) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types
     that do not require a running server.
@@ -123,9 +133,9 @@ def multi_db_fixture(request) -> Iterator[Db]:
     # Patch 'from_uuid' method if db type is BasicMongoMockDb
     if request.param is BasicMongoMockDb:
         with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
-            yield from _db_fixture(request, db_type=request.param)
+            yield from _db_fixture(request, db_type=request.param, tenant=tenant_fixture)
     else:
-        yield from _db_fixture(request, db_type=request.param)
+        yield from _db_fixture(request, db_type=request.param, tenant=tenant_fixture)
 
 
 @pytest.fixture(scope="session")  # TODO: Use a named celery queue for each test
