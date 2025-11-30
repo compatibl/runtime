@@ -98,10 +98,10 @@ class ProjectSettings:
         project_levels = cls.instance().project_levels
         relative_path = package.replace(".", os.sep)
         if project_levels == 1:
-            # One-level project, search directly under project root
+            # Monorepo project, search directly under project root
             search_paths = [os.path.normpath(os.path.join(project_root, relative_path, "__init__.py"))]
         elif project_levels == 2:
-            # Two-level project, check each dot-delimited package token in reverse order as potential package root
+            # Multirepo project, check each dot-delimited package token in reverse order as potential package root
             package_tokens = package.split(".")
             package_tokens.reverse()
             search_paths = [
