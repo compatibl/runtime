@@ -15,8 +15,6 @@
 from starlette.types import ASGIApp
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
-from cl.runtime.contexts.user_secrets import UserSecrets
-from cl.runtime.contexts.user_secrets import populate_user_secrets_from_scope
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.server.env import Env
@@ -44,7 +42,6 @@ class ContextMiddleware:
                 activate(DataSource().build()),
                 activate(EventBroker.create()),
                 activate(CeleryQueue(queue_id="Handler Queue").build()),
-                activate(UserSecrets(encrypted_secrets=populate_user_secrets_from_scope(scope)).build()),
             ):
                 # TODO: Create a test setting to enable this other than by uncommenting
                 # await asyncio.sleep(duration)
