@@ -119,7 +119,7 @@ class Task(TaskKey, RecordMixin, ABC):
 
             except Exception as e:  # noqa
 
-                _logger.error("Task failed with exception.", exc_info=True)
+                _logger.error(repr(e), exc_info=True)
                 event_broker.sync_publish(
                     events_topic,
                     TaskFinishedEvent(event_kind=EventKind.TASK_FINISHED, status=TaskStatus.FAILED).build(),

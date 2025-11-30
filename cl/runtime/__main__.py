@@ -30,6 +30,7 @@ from cl.runtime.records.typename import typename
 from cl.runtime.routers.context_middleware import ContextMiddleware
 from cl.runtime.routers.server_util import ServerUtil
 from cl.runtime.server.env import Env
+from cl.runtime.server.shutdown_aware_server import ShutdownAwareServer
 from cl.runtime.settings.api_settings import ApiSettings
 from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.settings.preload_settings import PreloadSettings
@@ -100,6 +101,12 @@ def run_backend() -> None:
             # Start Celery workers (will exit when the current process exits)
             CeleryQueue.run_start_queue()
 
+            # Start health monitoring for multiprocess pool
+            if CelerySettings.instance().celery_multiprocess_pool:
+                from cl.runtime.tasks.celery.worker_health_monitor import WorkerHealthMonitor
+
+                WorkerHealthMonitor.start_monitoring()
+
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
         PreloadSettings.instance().save_and_configure()
 
@@ -114,12 +121,21 @@ def run_backend() -> None:
         webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}")
 
         # Run Uvicorn using hostname and port specified by Dynaconf
-        uvicorn.run(
+        config = uvicorn.Config(
             server_app,
             host=api_settings.api_hostname,
             port=api_settings.api_port,
             log_config=uvicorn_empty_logging_config,
         )
+        server = ShutdownAwareServer(config)
+
+        try:
+            server.run()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if CelerySettings.instance().celery_is_embedded_worker:
+                CeleryQueue.run_stop_queue()
 
 
 if __name__ == "__main__":

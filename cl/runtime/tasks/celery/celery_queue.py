@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import logging.config
 import multiprocessing
 import os
@@ -53,6 +54,7 @@ celery_app = Celery(
 celery_app.conf.task_track_started = True
 celery_app.conf.task_default_queue = celery_settings.celery_broker_queue
 celery_app.conf.task_time_limit = celery_settings.celery_time_limit
+celery_app.conf.worker_prefetch_multiplier = 1  # One task per worker for better control
 
 
 @setup_logging.connect()
@@ -120,6 +122,36 @@ def celery_delete_existing_tasks() -> None:
         if os.path.exists(celery_file):
             os.remove(celery_file)
 
+    if celery_settings.celery_broker == "mongodb":
+        # Parse MongoDB URI to extract database name
+        # Format: mongodb://localhost:27017/celery-{context_id}
+        try:
+            from pymongo import MongoClient
+
+            # Delete stuck RUNNING/PENDING tasks from previous backend runs
+            all_tasks: tuple[Task, ...] = active(DataSource).load_all(key_type=TaskKey)
+            stuck_tasks = [task for task in all_tasks if task.status in (TaskStatus.RUNNING, TaskStatus.PENDING)]
+
+            if stuck_tasks:
+                logging.getLogger(__name__).warning(
+                    "Deleting %s stuck tasks from previous backend run", len(stuck_tasks)
+                )
+                active(DataSource).delete_many([task.get_key() for task in stuck_tasks], commit=True)
+
+            # Clear Celery broker database
+            mongo_client = MongoClient(celery_settings.celery_broker_uri)
+            db_name = celery_settings.celery_broker_uri.split("/")[-1]
+            mongo_db = mongo_client[db_name]
+
+            for collection_name in mongo_db.list_collection_names():
+                mongo_db.drop_collection(collection_name)
+
+            mongo_client.close()
+            logging.getLogger(__name__).info("Cleared MongoDB Celery broker database: %s", db_name)
+
+        except Exception as e:
+            logging.getLogger(__name__).warning("Failed to clear MongoDB Celery broker: %s", e)
+
     if celery_settings.celery_broker == "redis":
         # Parse the URI
         parsed_uri = urlparse(celery_settings.celery_broker_uri)
@@ -166,6 +198,7 @@ class CeleryQueue(TaskQueue):
     """Execute tasks using Celery."""
 
     __celery_worker_process: ClassVar[multiprocessing.Process | None] = None
+    __use_multiprocess_pool: ClassVar[bool] = False
 
     # max_workers: int = required()  # TODO: Implement support for max_workers
     """The maximum number of processes running concurrently."""
@@ -173,26 +206,48 @@ class CeleryQueue(TaskQueue):
     @classmethod
     def run_start_queue(cls) -> None:
         """Start queue workers."""
-        worker_process = multiprocessing.Process(
-            target=celery_start_queue_callable,
-            daemon=True,
-            kwargs={"log_config": logging_config},
-        )
-        worker_process.start()
+        celery_settings = CelerySettings.instance()
 
-        cls.__celery_worker_process = worker_process
+        # Check if multiprocess pool is enabled
+        if celery_settings.celery_multiprocess_pool:
+            # Use new Manager for pool of processes
+            from cl.runtime.tasks.celery.worker_process_manager import WorkerProcessManager
+
+            cls.__use_multiprocess_pool = True
+            manager = WorkerProcessManager.instance()
+            manager.start_workers()
+            logging.getLogger(__name__).info(
+                f"Started multiprocess worker pool with {celery_settings.celery_workers} workers"
+            )
+        else:
+            # Old mode - single embedded worker
+            worker_process = multiprocessing.Process(
+                target=celery_start_queue_callable,
+                daemon=True,
+                kwargs={"log_config": logging_config},
+            )
+            worker_process.start()
+            cls.__celery_worker_process = worker_process
 
     @classmethod
     def run_stop_queue(cls) -> None:
         """Cancel all active runs and stop queue workers."""
-        if cls.__celery_worker_process is not None:
-            # TODO: graceful shutdown of the celery_app
+        if cls.__use_multiprocess_pool:
+            # Stop all processes through Manager
+            from cl.runtime.tasks.celery.worker_process_manager import WorkerProcessManager
+
+            manager = WorkerProcessManager.instance()
+            manager.stop_workers()
+            cls.__use_multiprocess_pool = False
+        elif cls.__celery_worker_process is not None:
+            # Old mode
             cls.__celery_worker_process.terminate()
             cls.__celery_worker_process.join()
             cls.__celery_worker_process = None
-            celery_delete_existing_tasks()
 
-    def submit_task(self, task: TaskKey):
+        celery_delete_existing_tasks()
+
+    def submit_task(self, task: TaskKey) -> None:
 
         # Wrap into Env
         with activate(Env().build()):
@@ -208,6 +263,72 @@ class CeleryQueue(TaskQueue):
 
             # Submit task to Celery with completed and error links
             execute_task_signature.apply_async(
+                task_id=task.task_id,  # Use our custom task ID instead of auto-generated UUID
                 retry=False,  # Do not retry in case the task fails
                 ignore_result=True,  # TODO: Do not publish to the Celery result backend
             )
+
+    def cancel_task(self, task_id: str) -> bool:
+        """Cancel a specific task by ID. Returns True if cancellation was attempted."""
+        try:
+            logging.getLogger(__name__).info("Revoking task: %s", task_id)
+            celery_app.control.revoke(task_id, terminate=True, signal="SIGTERM")
+            return True
+        except Exception as e:
+            logging.getLogger(__name__).error("Failed to revoke task %s: %s", task_id, e)
+            return False
+
+    def cancel_tasks_batch(self, task_ids: list[str]) -> bool:
+        """Cancel multiple tasks by killing workers and purging queue."""
+        if not task_ids:
+            return False
+
+        try:
+            celery_settings = CelerySettings.instance()
+            logger = logging.getLogger(__name__)
+            logger.info("Cancelling %d tasks", len(task_ids))
+
+            # Single-worker mode: just revoke
+            if not celery_settings.celery_multiprocess_pool or not self.__use_multiprocess_pool:
+                celery_app.control.revoke(task_ids, terminate=True)
+                return True
+
+            # Multi-worker mode: kill all workers and purge queue
+            import signal
+            from cl.runtime.tasks.celery.worker_process_manager import WorkerProcessManager
+
+            manager = WorkerProcessManager.instance()
+            worker_pids = manager.get_worker_pids()
+
+            # Kill all workers
+            for worker_id, pid in worker_pids.items():
+                try:
+                    os.kill(pid, signal.SIGTERM)
+                    logger.info("Killed worker %d (PID %s)", worker_id, pid)
+                except Exception as e:
+                    logger.warning("Failed to kill worker %d: %s", worker_id, e)
+
+            # Purge MongoDB queue
+            if celery_settings.celery_broker == "mongodb":
+                try:
+                    from pymongo import MongoClient
+
+                    mongo_client = MongoClient(celery_settings.celery_broker_uri)
+                    db_name = celery_settings.celery_broker_uri.split("/")[-1]
+                    mongo_db = mongo_client[db_name]
+
+                    for collection_name in mongo_db.list_collection_names():
+                        mongo_db.drop_collection(collection_name)
+
+                    logger.info("Purged MongoDB queue")
+                    mongo_client.close()
+                except Exception as e:
+                    logger.warning("Failed to purge queue: %s", e)
+
+            # Revoke in Celery
+            celery_app.control.revoke(task_ids, terminate=True)
+            return True
+
+        except Exception as e:
+            logger.error("Failed to cancel tasks: %s", e)
+            return False

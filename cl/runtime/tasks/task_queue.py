@@ -59,3 +59,11 @@ class TaskQueue(TaskQueueKey, ABC):
     @abstractmethod
     def run_stop_queue(self) -> None:
         """Exit after completing all currently executing tasks."""
+
+    @abstractmethod
+    def cancel_task(self, task_id: str) -> bool:
+        """Cancel a specific task by ID. Returns True if cancellation was attempted."""
+
+    @abstractmethod
+    def cancel_tasks_batch(self, task_ids: list[str]) -> bool:
+        """Cancel multiple tasks at once. Returns True if cancellation was attempted."""

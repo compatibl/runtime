@@ -18,6 +18,8 @@ from fastapi import Body
 from fastapi import Depends
 from cl.runtime.routers.dependencies.context_headers import ContextHeaders
 from cl.runtime.routers.dependencies.context_headers import get_context_headers
+from cl.runtime.routers.tasks.cancel_request import CancelRequest
+from cl.runtime.routers.tasks.cancel_response_item import CancelResponseItem
 from cl.runtime.routers.tasks.result_request import ResultRequest
 from cl.runtime.routers.tasks.result_response_item import ResultResponseItem
 from cl.runtime.routers.tasks.status_request import StatusRequest
@@ -46,25 +48,43 @@ async def post_submit(
             method=submit_body.method,
             keys=submit_body.keys,
             arguments=submit_body.arguments,
+            user_keys=context_headers.user_keys,
         )
     )
 
 
-@router.post("/cancel", response_model=list)
+@router.post("/cancel", response_model=list[CancelResponseItem])
 async def post_cancel(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa
-    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to cancel.")],  # noqa
-) -> list:
-    """Bulk cancel tasks by run ids."""
-    raise NotImplementedError("/tasks/cancel route is not implemented.")
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to cancel.")],
+) -> list[CancelResponseItem]:
+    """Cancel tasks by run ids."""
+
+    return CancelResponseItem.get_response(
+        CancelRequest(
+            user=context_headers.user,
+            env=context_headers.env,
+            dataset=context_headers.dataset,
+            task_run_ids=task_run_ids.task_run_ids,
+        )
+    )
 
 
-@router.post("/cancel_all", response_model=list)
+@router.post("/cancel_all", response_model=list[CancelResponseItem])
 async def post_cancel_all(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa
-) -> list:
+    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
+) -> list[CancelResponseItem]:
     """Cancel all running tasks."""
-    raise NotImplementedError("/tasks/cancel_all route is not implemented.")
+
+    return CancelResponseItem.get_response(
+        CancelRequest(
+            user=context_headers.user,
+            env=context_headers.env,
+            dataset=context_headers.dataset,
+            task_run_ids=[],  # Empty list for cancel_all
+            cancel_all=True,
+        )
+    )
 
 
 @router.post("/status", response_model=list[StatusResponseItem])

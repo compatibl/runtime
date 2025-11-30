@@ -77,3 +77,13 @@ class ProcessQueue(TaskQueue):
 
     def run_stop_queue(self) -> None:
         raise NotImplementedError()
+
+    def cancel_task(self, task_id: str) -> bool:
+        """Cancel a specific task by ID. Returns True if cancellation was attempted."""
+        # ProcessQueue runs tasks synchronously - cancellation not supported
+        return False
+
+    def cancel_tasks_batch(self, task_ids: list[str]) -> bool:
+        """Cancel multiple tasks at once. Returns True if cancellation was attempted."""
+        # ProcessQueue runs tasks synchronously - cancellation not supported
+        return False

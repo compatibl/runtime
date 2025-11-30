@@ -138,7 +138,7 @@ class DbEventBroker(EventBroker):
         # Publish event by just saving to DB
         self.data_source.replace_one(event, commit=True)
 
-    async def close(self) -> None:
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         # Cancel pull events task
         if self._pull_events_task is not None:
             self._pull_events_task.cancel()
