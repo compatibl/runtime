@@ -18,10 +18,15 @@ from dataclasses import field
 from typing import Self
 from pydantic import BaseModel
 from cl.runtime._version import __api_schema_version__
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.routers.settings.env_info import EnvInfo
+from cl.runtime.server.env import Env
 from cl.runtime.settings.env_settings import EnvSettings
+
+SESSION_ID = Timestamp.create()
 
 
 def _collect_package_versions() -> dict[str, str]:
@@ -49,7 +54,7 @@ def _collect_package_versions() -> dict[str, str]:
 
 def _get_envs() -> list[EnvInfo]:
     """Return stub envs."""
-    return [EnvInfo(name="Dev;Runtime;V2", parent="")]  # TODO: Use Dynaconf for the default
+    return [EnvInfo(name=active(Env).env_id, parent="")]  # TODO: Use Dynaconf for the default
 
 
 class SettingsResponse(BaseModel):
@@ -141,6 +146,9 @@ class SettingsResponse(BaseModel):
 
     When False, handler interfaces remain visible and accessible even in full-screen mode.
     """
+
+    session_id: str = field(default=SESSION_ID)
+    """Session ID of the runtime application. Used for determining if frontend needs to be reloaded."""
 
     @classmethod
     def get_response(cls) -> Self:

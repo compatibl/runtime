@@ -14,7 +14,9 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.server.env import Env
 
 
 class EnvResponseItem(BaseModel):
@@ -36,7 +38,7 @@ class EnvResponseItem(BaseModel):
 
         # Default response when running locally without authorization
         result_dict = {
-            "Name": "Dev;Runtime;V2",
+            "Name": active(Env).env_id,
             "Parent": "",  # TODO: Check if None is also accepted
         }
 
