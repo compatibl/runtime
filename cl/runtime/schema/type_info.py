@@ -41,7 +41,6 @@ from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import qualname
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
-from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
 
 _TYPE_INFO_HEADERS = (
@@ -82,9 +81,6 @@ class TypeInfo(BootstrapMixin):
 
     _module_dict: ClassVar[dict[str, ModuleType] | None] = None
     """Dictionary of modules indexed by module name in dot-delimited format."""
-
-    _packages: ClassVar[tuple[str, ...] | None] = None
-    """List of packages to include in the cache."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
@@ -204,8 +200,9 @@ class TypeInfo(BootstrapMixin):
 
         result = cls._type_info_dict.get(type_name)
         if not result:
-            packages_str = "\n".join(f"  - {package}" for package in cls._get_packages())
-            raise RuntimeError(f"Type name {type_name} is not found in the imported package list:\n{packages_str}\n")
+            raise RuntimeError(
+                f"Type name {type_name} is not found in EnvSettings.env_packages or TypeInfo requires rebuild."
+            )
 
         # Invoking build imports the class and updates type_info.type_ in cache so it does not have to be imported again
         return result.build()
@@ -363,31 +360,27 @@ class TypeInfo(BootstrapMixin):
             raise RuntimeError(f"No common base is found for the following records:\n{record_type_names_str}")
 
     @classmethod
-    def rebuild(cls) -> None:
+    def rebuild(cls, *, packages: Sequence[str]) -> None:
         """Reload types from packages and save a new TypeInfo.csv file to the bootstrap resources directory."""
 
         # Clear the existing data
         cls._clear()
 
+        # Set the packages variable
+        packages = tuple(packages)
+        if not packages:
+            raise RuntimeError("Packages list provided to rebuild is None or empty.")
+
         # Add each class after performing checks for duplicates
-        consume(cls._add_type(type_) for type_ in cls._get_package_types())
+        consume(cls._add_type(type_) for type_ in cls._get_package_types(packages=packages))
 
         # Overwrite the cache file on disk with the new data
         cls._save()
 
     @classmethod
-    def _get_packages(cls) -> tuple[str, ...]:
-        """Get the list of packages specified in settings."""
-        if cls._packages is None:
-            # Get the list of packages from settings
-            cls._packages = tuple(EnvSettings.instance().env_packages)
-        return cls._packages
-
-    @classmethod
-    def _get_package_modules(cls) -> tuple[ModuleType, ...]:
+    def _get_package_modules(cls, *, packages: Sequence[str]) -> tuple[ModuleType, ...]:
         """Get the list of modules in the packages specified in settings."""
         modules = []
-        packages = cls._get_packages()
         for package in packages:
             # Import root module of the package
             root_module = importlib.import_module(package)
@@ -402,10 +395,10 @@ class TypeInfo(BootstrapMixin):
         return tuple(sorted(modules, key=lambda x: x.__name__))
 
     @classmethod
-    def _get_package_types(cls) -> tuple[type, ...]:
+    def _get_package_types(cls, *, packages: Sequence[str]) -> tuple[type, ...]:
         """Get the list of types in the packages specified in settings."""
         # Enumerate types in all modules that match is_schema_type predicate
-        modules = cls._get_package_modules()
+        modules = cls._get_package_modules(packages=packages)
         types = tuple(
             type_
             for module in modules
@@ -432,28 +425,10 @@ class TypeInfo(BootstrapMixin):
             return None
 
     @classmethod
-    def _check_type(cls, type_: type) -> None:
-        """Check that the class is in the package list."""
-
-        # Error if the class is imported from a module that is not in the package list
-        packages = cls._get_packages()
-        if not any(type_.__module__.startswith(package) for package in packages):
-            packages_str = "\n".join(f"  - {package}" for package in packages)
-            raise RuntimeError(
-                f"Buildable class {type_.__name__} is declared in module {type_.__module__}\n"
-                f"which is not in one of the imported packages. Move the class to an imported package\n"
-                f"so it can always be loaded from databases and storage, or exclude it via TypeExclude.csv.\n"
-                f"Imported packages:\n{packages_str}"
-            )
-
-    @classmethod
     def _add_type(cls, type_: type, *, subtype: str | None = None) -> None:
         """Add the specified class to the qual_name and type_name dicts without overwriting the existing values."""
 
         # TODO: Exclude types in TypeExclude.csv
-
-        # Error if the class is imported from a module that is not in the package list
-        cls._check_type(type_)
 
         type_kind = cls._get_type_kind(type_)
         if type_kind is None:
@@ -660,8 +635,6 @@ class TypeInfo(BootstrapMixin):
         for subtype in type_.__subclasses__():
             # Exclude self from subtypes
             if subtype is not type_:
-                # Check that the subclass is in the package list
-                cls._check_type(subtype)
                 # Recurse into the subclass hierarchy, avoid adding duplicates
                 subtypes.update(
                     x for x in cls._get_unfiltered_child_types_set(subtype) if is_data_key_or_record_type(x)

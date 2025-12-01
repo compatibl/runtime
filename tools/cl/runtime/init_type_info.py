@@ -14,6 +14,8 @@
 
 from cl.runtime.prebuild.init_file_util import InitFileUtil
 from cl.runtime.schema.type_info import TypeInfo
+from cl.runtime.settings.env_settings import EnvSettings
+
 
 def init_type_info() -> None:
     """Create __init__.py files to avoid missing directories and rebuild type cache."""
@@ -24,7 +26,8 @@ def init_type_info() -> None:
 
     # Rebuild type cache and save TypeInfo.csv file to the bootstrap resources directory
     print("Initializing the type cache...")
-    TypeInfo.rebuild()
+    packages = EnvSettings.instance().env_packages
+    TypeInfo.rebuild(packages=packages)
 
 
 if __name__ == '__main__':
