@@ -77,6 +77,7 @@ def save_test_records(entries: list[RecordMixin]) -> tuple[list[RecordMixin], Pa
     save_records_to_csv(entries, str(file_path.absolute()))
     return entries, file_path
 
+
 def test_roundtrip(default_db_fixture):
     for test_entries in (*stub_entries,):
         file_path = None
@@ -91,7 +92,9 @@ def test_roundtrip(default_db_fixture):
             # Load from CSV to DB
             dir_path = str(file_path.parent)
             records_from_csv = CsvFileUtil.load_all(dirs=[dir_path], record_types=[record_type])
-            active(DataSource)._get_db().drop_test_db()  # TODO: !!!! Implement delete_by_type in DataSource and use it here
+            active(
+                DataSource
+            )._get_db().drop_test_db()  # TODO: !!!! Implement delete_by_type in DataSource and use it here
             active(DataSource).insert_many(records_from_csv, commit=True)
 
             # Load from DB and compare to the originals

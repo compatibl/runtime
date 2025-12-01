@@ -26,6 +26,7 @@ from cl.runtime.tasks.class_method_task import ClassMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from cl.runtime.tasks.task_status import TaskStatus
 
+
 @pytest.mark.skip(reason="Skip until storage location issue is resolved")
 def test_export(multi_db_fixture):
     """Test export data as zip archive."""
@@ -54,6 +55,7 @@ def test_export(multi_db_fixture):
             deserialized_data = _json_serializer.deserialize(json_data)
 
             assert deserialized_data == record
+
 
 @pytest.mark.skip(reason="Skip until storage location issue is resolved")
 def test_filter_by_type(multi_db_fixture):

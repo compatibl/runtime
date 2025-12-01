@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import csv
+import os
 from fnmatch import fnmatch
-from typing import Any, Sequence
-
-from cl.runtime.configs.config import Config
-from cl.runtime.contexts.context_manager import active
+from typing import Any
+from typing import Sequence
 from cl.runtime.csv_util import CsvUtil
-from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.char_util import CharUtil
@@ -39,11 +36,11 @@ class CsvFileUtil:
 
     @classmethod
     def load_all(
-            cls,
-            *,
-            dirs: Sequence[str],
-            ext: str = "csv",
-            record_types: Sequence[type] | None = None,
+        cls,
+        *,
+        dirs: Sequence[str],
+        ext: str = "csv",
+        record_types: Sequence[type] | None = None,
     ) -> tuple[RecordMixin]:
         """Load records from CSV files with the specified extension in the specified directory."""
 

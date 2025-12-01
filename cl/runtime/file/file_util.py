@@ -14,7 +14,8 @@
 
 import os
 import re
-from typing import TypeGuard, Sequence
+from typing import Sequence
+from typing import TypeGuard
 
 _INVALID_FILENAME_SYMBOLS = r'/\\<>:"|?*\x00\n'
 """Invalid filename symbols."""

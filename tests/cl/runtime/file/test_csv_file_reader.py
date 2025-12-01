@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-import os
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.prebuild.csv_file_util import CsvFileUtil
