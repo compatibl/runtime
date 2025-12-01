@@ -63,7 +63,7 @@ class CsvFileReader(Reader):
 
             # Save records to the specified database
             if records:
-                active(DataSource).replace_many(records, commit=True)
+                active(DataSource).insert_many(records, commit=True)
 
     def _deserialize_row(self, row_dict: dict[str, Any]) -> RecordMixin:
         """Deserialize row into a record."""
