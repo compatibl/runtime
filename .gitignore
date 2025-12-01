@@ -7,6 +7,7 @@ syntax: glob
 **/.*secrets*
 **/__pycache__
 **/.venv
+*.db
 *.egg
 *.egg-info/
 *.idea
@@ -16,6 +17,7 @@ syntax: glob
 deployments/
 build/
 dist/
+logs/
 
 # Using regexp syntax
 syntax: regexp
