@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import pytest
-from pathlib import Path
+import os
+import shutil
 from typing import Iterable
 import pandas as pd
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_file_util import CsvFileUtil
+from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
@@ -69,28 +71,29 @@ def save_records_to_csv(records: Iterable, file_path: str) -> None:
 
     # Use pandas df to transform list of dicts to table format and write to file
     df = pd.DataFrame(record_dicts)
+
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
     df.to_csv(file_path, index=False)
 
 
-def save_test_records(entries: list[RecordMixin]) -> tuple[list[RecordMixin], Path]:
-    file_path = Path(__file__).parent.joinpath(f"{typename(type(entries[0]))}.csv")
-    save_records_to_csv(entries, str(file_path.absolute()))
-    return entries, file_path
+def save_test_records(entries: list[RecordMixin]) -> list[RecordMixin]:
+    base_path = QaUtil.get_test_dir_from_call_stack()
+    file_path = os.path.join(base_path, f"{typename(type(entries[0]))}.csv")
+    save_records_to_csv(entries, file_path)
+    return entries
 
 
 def test_roundtrip(default_db_fixture):
+    dir_path = QaUtil.get_test_dir_from_call_stack()
     for test_entries in (*stub_entries,):
-        file_path = None
         try:
             # Save to CSV
-            expected_records, file_path = save_test_records(test_entries)
-            expected_keys = [record.get_key() for record in expected_records]
+            expected_records = save_test_records(test_entries)
 
             # The same type for all records in this for loop iteration
             record_type = type(expected_records[0])
 
             # Load from CSV to DB
-            dir_path = str(file_path.parent)
             records_from_csv = CsvFileUtil.load_all(dirs=[dir_path], record_types=[record_type])
             active(
                 DataSource
@@ -101,8 +104,8 @@ def test_roundtrip(default_db_fixture):
             records_from_db = active(DataSource).load_by_type(record_type)
             assert BuilderChecks.is_equal(records_from_db, expected_records)
         finally:
-            if file_path is not None:
-                file_path.unlink(missing_ok=True)
+            if os.path.exists(dir_path):
+                shutil.rmtree(dir_path)
 
 
 if __name__ == "__main__":
