@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.prebuild.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_file_util import CsvFileUtil
 from cl.runtime.qa.qa_util import QaUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived

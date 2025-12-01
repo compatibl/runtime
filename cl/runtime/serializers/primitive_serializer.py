@@ -19,7 +19,7 @@ from enum import IntEnum
 from typing import Any
 from uuid import UUID
 from bson import Int64
-from cl.runtime.csv_util import CsvUtil
+from cl.runtime.serializers.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.date_util import DateUtil

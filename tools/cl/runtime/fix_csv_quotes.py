@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.prebuild.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_file_util import CsvFileUtil
 
 if __name__ == '__main__':
 

@@ -17,7 +17,7 @@ import os
 from fnmatch import fnmatch
 from typing import Any
 from typing import Sequence
-from cl.runtime.csv_util import CsvUtil
+from cl.runtime.serializers.csv_util import CsvUtil
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.char_util import CharUtil

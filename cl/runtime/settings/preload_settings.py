@@ -13,11 +13,13 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from itertools import chain
+
 from typing_extensions import final
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.prebuild.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_file_util import CsvFileUtil
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
 
@@ -48,7 +50,10 @@ class PreloadSettings(Settings):
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
 
         # Load records from files
-        records = CsvFileUtil.load_all(dirs=self.preload_dirs, record_types=record_types)
+        csv_records = CsvFileUtil.load_all(dirs=self.preload_dirs, record_types=record_types)
+        json_records = []
+        yaml_records = []
+        records = list(chain(csv_records, json_records, yaml_records))
 
         if records:
             # Insert to database

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.prebuild.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_file_util import CsvFileUtil
 
 
 def test_csv_quotes():

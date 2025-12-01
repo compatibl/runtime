@@ -18,7 +18,7 @@ from typing import Iterable
 import pandas as pd
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.prebuild.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_file_util import CsvFileUtil
 from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename

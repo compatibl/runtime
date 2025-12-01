@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.csv_util import CsvUtil
+from cl.runtime.serializers.csv_util import CsvUtil
 
 
 def test_requires_quotes():
