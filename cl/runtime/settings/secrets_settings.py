@@ -17,7 +17,7 @@ from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
-class SecretSettings(Settings):  # TODO: !!!! Rename to SecretsSettings (plural)
+class SecretsSettings(Settings):  # TODO: !!!! Rename to SecretsSettings (plural)
     """Settings for secrets management."""
 
     secret_enable: bool | None = None
@@ -30,5 +30,5 @@ class SecretSettings(Settings):  # TODO: !!!! Rename to SecretsSettings (plural)
     """Secrets provider configuration."""
 
     def __init(self):
-        if self.secret_provider is None:
-            self.secret_provider = {"type": "LocalSecretProvider"}
+        if self.secrets_provider is None:
+            self.secrets_provider = {"type": "LocalSecretsProvider"}

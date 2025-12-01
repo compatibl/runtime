@@ -18,12 +18,12 @@ from dataclasses import dataclass
 from datetime import datetime
 import ruamel.yaml
 from cl.runtime.primitive.datetime_util import DatetimeUtil
-from cl.runtime.secret_providers.secret_provider import SecretProvider
+from cl.runtime.secrets.secrets_provider import SecretsProvider
 from cl.runtime.settings.project_settings import ProjectSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class LocalSecretProvider(SecretProvider):
+class LocalSecretsProvider(SecretsProvider):
     """Retrieve secrets from local file based vault."""
 
     path_to_secrets: str = "keys/"

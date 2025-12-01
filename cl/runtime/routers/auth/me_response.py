@@ -19,17 +19,17 @@ from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.secret_providers.secret_provider import SecretProvider
-from cl.runtime.settings.secret_settings import SecretSettings
+from cl.runtime.secrets.secrets_provider import SecretsProvider
+from cl.runtime.settings.secrets_settings import SecretsSettings
 
 
 def _get_user_secrets_public_key() -> str | None:
     """Gets the public key for encrypting sensitive user data in the client before transmission to the server."""
 
-    secret_settings = SecretSettings.instance()
-    if secret_settings.secret_enable:
+    secret_settings = SecretsSettings.instance()
+    if secret_settings.secrets_enable:
         # Secrets enabled, retrieve the public key
-        secret_provider = SecretProvider.create()
+        secret_provider = SecretsProvider.create()
         private_key = secret_provider.get_rsa_private_key("USER-SECRETS-PRIVATE-CERT")
         public_key = secret_provider.get_rsa_public_key(private_key=private_key)
         return public_key

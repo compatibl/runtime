@@ -16,7 +16,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
-from cl.runtime.contexts.user_secrets import UserSecrets
+from cl.runtime.secrets.user_secrets import UserSecrets
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest

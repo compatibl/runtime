@@ -21,18 +21,18 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.schema.type_info import TypeInfo
-from cl.runtime.settings.secret_settings import SecretSettings
+from cl.runtime.settings.secrets_settings import SecretsSettings
 
 
 @dataclass(slots=True, kw_only=True)
-class SecretProvider(DataclassMixin, ABC):
+class SecretsProvider(DataclassMixin, ABC):
     """Class to provide access to secrets."""
 
     @classmethod
     def create(cls) -> Self:
         """Create Secret Provider from settings."""
 
-        provider_config_dict = SecretSettings.instance().secret_provider
+        provider_config_dict = SecretsSettings.instance().secrets_provider
 
         # Transform frozendict from settings to dict to get and remove provider type from data
         provider_config_dict = dict(provider_config_dict)

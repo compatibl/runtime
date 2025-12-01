@@ -128,7 +128,7 @@ LayoutStackElement,Data,cl.runtime.ui.layout_stack_element.LayoutStackElement,No
 LinePlot,Record,cl.runtime.plots.line_plot.LinePlot,None
 LocalBinaryFile,Data,cl.runtime.storage.local_binary_file.LocalBinaryFile,None
 LocalCache,Record,cl.runtime.db.local.local_cache.LocalCache,None
-LocalSecretProvider,Data,cl.runtime.secret_providers.local_secret_provider.LocalSecretProvider,None
+LocalSecretsProvider,Data,cl.runtime.secrets.local_secret_provider.LocalSecretsProvider,None
 LocalStorage,Record,cl.runtime.storage.local_storage.LocalStorage,None
 LocalTextFile,Data,cl.runtime.storage.local_text_file.LocalTextFile,None
 Locale,Record,cl.runtime.parsers.locale.Locale,None
@@ -203,8 +203,8 @@ ScatterValues3D,Data,cl.runtime.plots.scatter_values_3d.ScatterValues3D,None
 ScreensResponse,Data,cl.runtime.services.data.screens_response.ScreensResponse,None
 Script,Record,cl.runtime.views.script.Script,None
 ScriptLanguage,Enum,cl.runtime.views.script_language.ScriptLanguage,None
-SecretProvider,Data,cl.runtime.secret_providers.secret_provider.SecretProvider,None
-SecretSettings,Data,cl.runtime.settings.secret_settings.SecretSettings,None
+SecretsProvider,Data,cl.runtime.secrets.secrets_provider.SecretsProvider,None
+SecretsSettings,Data,cl.runtime.settings.secrets_settings.SecretsSettings,None
 SelectDataResponse,Data,cl.runtime.services.data.select_data_response.SelectDataResponse,None
 Serializer,Data,cl.runtime.serializers.serializer.Serializer,None
 Settings,Data,cl.runtime.settings.settings.Settings,None
@@ -347,7 +347,7 @@ UiTypeStateKey,Key,cl.runtime.ui.ui_type_state_key.UiTypeStateKey,None
 User,Record,cl.runtime.ui.user.User,None
 UserKey,Key,cl.runtime.ui.user_key.UserKey,None
 UserLogMessage,Record,cl.runtime.log.user_log_message.UserLogMessage,None
-UserSecrets,Key,cl.runtime.contexts.user_secrets.UserSecrets,None
+UserSecrets,Key,cl.runtime.secrets.user_secrets.UserSecrets,None
 UuidFormat,Enum,cl.runtime.serializers.uuid_format.UuidFormat,None
 ValueDecl,Data,cl.runtime.schema.value_decl.ValueDecl,None
 View,Record,cl.runtime.views.view.View,None
