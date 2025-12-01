@@ -17,9 +17,17 @@ from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
-class SecretSettings(Settings):
+class SecretSettings(Settings):  # TODO: !!!! Rename to SecretsSettings (plural)
+    """Settings for secrets management."""
+
+    secret_enable: bool | None = None
+    """Enable user secrets (requires managing user key in the client)."""
+
     secret_path_to_secrets: str = "keys"
-    secret_provider: dict[str, str] = None
+    """Path to store secrets."""
+
+    secret_provider: dict[str, str] = None  # TODO: !!!! Refactor to avoid a dict
+    """Secrets provider configuration."""
 
     def __init(self):
         if self.secret_provider is None:

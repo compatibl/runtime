@@ -20,13 +20,22 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.secret_providers.secret_provider import SecretProvider
+from cl.runtime.settings.secret_settings import SecretSettings
 
 
-def _get_user_secrets_public_key() -> str:
-    secret_provider = SecretProvider.create()
-    private_key = secret_provider.get_rsa_private_key("USER-SECRETS-PRIVATE-CERT")
-    public_key = secret_provider.get_rsa_public_key(private_key=private_key)
-    return public_key
+def _get_user_secrets_public_key() -> str | None:
+    """Gets the public key for encrypting sensitive user data in the client before transmission to the server."""
+
+    secret_settings = SecretSettings.instance()
+    if secret_settings.secret_enable:
+        # Secrets enabled, retrieve the public key
+        secret_provider = SecretProvider.create()
+        private_key = secret_provider.get_rsa_private_key("USER-SECRETS-PRIVATE-CERT")
+        public_key = secret_provider.get_rsa_public_key(private_key=private_key)
+        return public_key
+    else:
+        # Secrets not enabled, return None
+        return None
 
 
 class MeResponse(BaseModel):
