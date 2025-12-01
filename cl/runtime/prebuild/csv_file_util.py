@@ -13,14 +13,95 @@
 # limitations under the License.
 
 import os
+import csv
 from fnmatch import fnmatch
+from typing import Any, Sequence
+
+from cl.runtime.configs.config import Config
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.csv_util import CsvUtil
+from cl.runtime.db.data_source import DataSource
+from cl.runtime.file.file_util import FileUtil
+from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.primitive.char_util import CharUtil
+from cl.runtime.records.record_mixin import RecordMixin
+from cl.runtime.records.typename import typename
+from cl.runtime.schema.type_info import TypeInfo
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
+
+_SERIALIZER = DataSerializers.FOR_CSV
 
 
 class CsvFileUtil:
     """Helper class for working with CSV files."""
+
+    @classmethod
+    def load_all(
+            cls,
+            *,
+            dirs: Sequence[str],
+            ext: str = "csv",
+            record_types: Sequence[type] | None = None,
+    ) -> tuple[RecordMixin]:
+        """Load records from CSV files with the specified extension in the specified directory."""
+
+        # Enumerate files in the specified directories
+        file_paths = FileUtil.enumerate_files(dirs=dirs, ext=ext)
+
+        # Restrict to specified final record types if provided
+        if record_types is not None:
+            # Limit to the specified final record types
+            record_type_names = [typename(record_type) for record_type in record_types]
+            file_paths = [
+                file_path for file_path in file_paths if os.path.basename(file_path).split(".")[0] in record_type_names
+            ]
+
+        # Iterate over files
+        result = []
+        for file_path in file_paths:
+
+            # Record type is ClassName without extension in PascalCase
+            filename = os.path.basename(file_path)
+            filename_without_extension, _ = os.path.splitext(filename)
+
+            if not CaseUtil.is_pascal_case(filename_without_extension):
+                dirname = os.path.dirname(filename)
+                raise RuntimeError(
+                    f"Filename of a CSV preload file {filename} in directory {dirname} must be "
+                    f"ClassName or its alias in PascalCase without module."
+                )
+
+            # Get record type
+            record_type = TypeInfo.from_type_name(filename_without_extension)
+
+            with open(file_path, mode="r", encoding="utf-8") as file:
+
+                # The reader is an iterable of row dicts
+                csv_reader = csv.DictReader(file)
+                row_dicts = [row_dict for row_dict in csv_reader]
+
+                invalid_rows = set(
+                    index
+                    for index, row_dict in enumerate(row_dicts)
+                    for key in row_dict.keys()
+                    if key is None or key == ""  # TODO: Add other checks for invalid keys
+                )
+
+                if invalid_rows:
+                    rows_str = "".join([f"Row: {invalid_row}\n" for invalid_row in invalid_rows])
+                    raise RuntimeError(
+                        f"Misaligned values found in the following rows of CSV file: {file_path}\n"
+                        f"Check the placement of commas and double quotes.\n" + rows_str
+                    )
+
+                # Deserialize rows into records and add to the result
+                loaded = [cls._deserialize_row(record_type=record_type, row_dict=row_dict) for row_dict in row_dicts]
+                result.extend(loaded)
+
+        # Convert to tuple and return
+        return tuple(result)
 
     @classmethod
     def check_or_fix_quotes(
@@ -98,3 +179,14 @@ class CsvFileUtil:
         elif verbose:
             files_list = "".join([f"    {x}\n" for x in sorted(all_root_paths)])
             print(f"Verified field wrapping in the following CSV preload(s):\n{files_list}")
+
+    @classmethod
+    def _deserialize_row(cls, *, record_type: type, row_dict: dict[str, Any]) -> RecordMixin:
+        """Deserialize row into a record."""
+
+        # Normalize chars and set None for empty strings
+        row_dict = {CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()}
+        row_dict["_type"] = typename(record_type)
+
+        result = _SERIALIZER.deserialize(row_dict).build()
+        return result

@@ -14,12 +14,12 @@
 
 import os
 from dataclasses import dataclass
-from typing import final
 from typing_extensions import final
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.file.csv_file_reader import CsvFileReader
+from cl.runtime.file.file_util import FileUtil
+from cl.runtime.prebuild.csv_file_util import CsvFileUtil
 from cl.runtime.records.typename import typename
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
@@ -47,48 +47,18 @@ class PreloadSettings(Settings):
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.preload_dirs = ProjectSettings.instance().normalize_paths("dirs", self.preload_dirs)
 
-    def save_and_configure(self, *, final_record_types: list[type] | None = None) -> None:
+    def save_and_configure(self, *, record_types: list[type] | None = None) -> None:
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
 
-        # Create a list of CSV preloads
-        csv_files = self._get_files("csv")
-        if final_record_types is not None:
-            # Limit to the specified types
-            record_type_names = [typename(record_type) for record_type in final_record_types]
-            csv_files = [
-                csv_file for csv_file in csv_files if os.path.basename(csv_file).split(".")[0] in record_type_names
-            ]
+        # Load records from files
+        records = CsvFileUtil.load_all(dirs=self.preload_dirs, record_types=record_types)
 
-        # Preload from CSV
-        [CsvFileReader(file_path=csv_file).csv_to_db() for csv_file in csv_files]
+        if records:
+            # Insert to database
+            active(DataSource).insert_many(records, commit=True)
 
-        # TODO: Process YAML and JSON preloads
+            # Execute run_config on all preloaded Config records
+            config_records = [record for record in records if isinstance(record, Config)]
+            tuple(config_record.run_configure() for config_record in config_records)
 
-        # Execute run_config on all preloaded Config records
-        config_records = active(DataSource).load_by_type(Config)
-        tuple(config_record.run_configure() for config_record in config_records)
 
-    def _get_files(self, ext: str) -> list[str]:
-        # Return empty list if no dirs are specified in settings
-        if self.preload_dirs is None or len(self.preload_dirs) == 0:
-            return []
-
-        # Normalize dirs to remove redundant slash at the end
-        dirs = [os.path.normpath(x) for x in self.preload_dirs]
-
-        # Add dot prefix from ext if not included
-        ext = f".{ext}" if not ext.startswith(".") else ext
-
-        # Walk through the directory tree for each specified preload dir
-        result = []
-        for preload_dir in dirs:
-            for dir_path, dir_names, filenames in os.walk(preload_dir):
-
-                dir_name = os.path.basename(dir_path)
-                if not dir_name.startswith("."):
-                    # Add files with extension ext except from a dot-prefixed directory
-                    result.extend(os.path.normpath(os.path.join(dir_path, f)) for f in filenames if f.endswith(ext))
-
-                # Modify list in place to exclude dot-prefixed directories
-                dir_names[:] = [d for d in dir_names if not d.startswith(".")]
-        return result

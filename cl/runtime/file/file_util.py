@@ -14,7 +14,7 @@
 
 import os
 import re
-from typing import TypeGuard
+from typing import TypeGuard, Sequence
 
 _INVALID_FILENAME_SYMBOLS = r'/\\<>:"|?*\x00\n'
 """Invalid filename symbols."""
@@ -31,6 +31,34 @@ _INVALID_PATH_RE = re.compile(f"[{_INVALID_PATH_SYMBOLS}]")
 
 class FileUtil:
     """Utilities for working with files."""
+
+    @classmethod
+    def enumerate_files(cls, *, dirs: Sequence[str], ext: str) -> tuple[str]:
+        """Return the list of absolute file paths under the specified directories with the specified extension."""
+
+        # Return empty list if no dirs are specified in settings
+        if not dirs:
+            return tuple()
+
+        # Normalize dirs to remove redundant slash at the end
+        dirs = tuple(os.path.normpath(x) for x in dirs)
+
+        # Add dot prefix from ext if not included
+        ext = f".{ext}" if not ext.startswith(".") else ext
+
+        # Walk through the directory tree for each specified preload dir
+        result = []
+        for dir in dirs:
+            for dir_path, dir_names, filenames in os.walk(dir):
+
+                dir_name = os.path.basename(dir_path)
+                if not dir_name.startswith("."):
+                    # Add files with extension ext except from a dot-prefixed directory
+                    result.extend(os.path.normpath(os.path.join(dir_path, f)) for f in filenames if f.endswith(ext))
+
+                # Modify list in place to exclude dot-prefixed directories
+                dir_names[:] = [d for d in dir_names if not d.startswith(".")]
+        return tuple(result)
 
     @classmethod
     def guard_valid_filename(cls, filename: str, *, raise_on_fail: bool = True) -> TypeGuard[str]:

@@ -18,7 +18,7 @@ from typing import Iterable
 import pandas as pd
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.file.csv_file_reader import CsvFileReader
+from cl.runtime.prebuild.csv_file_util import CsvFileUtil
 from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
@@ -77,22 +77,26 @@ def save_test_records(entries: list[RecordMixin]) -> tuple[list[RecordMixin], Pa
     save_records_to_csv(entries, str(file_path.absolute()))
     return entries, file_path
 
-
-def read_records_from_csv(file_path: Path, entry_type: type[RecordMixin]):
-    loader = CsvFileReader(file_path=str(file_path.absolute()))
-    loader.csv_to_db()
-
-
 def test_roundtrip(default_db_fixture):
     for test_entries in (*stub_entries,):
         file_path = None
         try:
-            expected_entries, file_path = save_test_records(test_entries)
-            entry_type = type(expected_entries[0])
+            # Save to CSV
+            expected_records, file_path = save_test_records(test_entries)
+            expected_keys = [record.get_key() for record in expected_records]
 
-            read_records_from_csv(file_path, entry_type)
-            actual_records = tuple(active(DataSource).load_by_type(entry_type))
-            assert BuilderChecks.is_equal(actual_records, expected_entries)
+            # The same type for all records in this for loop iteration
+            record_type = type(expected_records[0])
+
+            # Load from CSV to DB
+            dir_path = str(file_path.parent)
+            records_from_csv = CsvFileUtil.load_all(dirs=[dir_path], record_types=[record_type])
+            active(DataSource)._get_db().drop_test_db()  # TODO: !!!! Implement delete_by_type in DataSource and use it here
+            active(DataSource).insert_many(records_from_csv, commit=True)
+
+            # Load from DB and compare to the originals
+            records_from_db = active(DataSource).load_by_type(record_type)
+            assert BuilderChecks.is_equal(records_from_db, expected_records)
         finally:
             if file_path is not None:
                 file_path.unlink(missing_ok=True)

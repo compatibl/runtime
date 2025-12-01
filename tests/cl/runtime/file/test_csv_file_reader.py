@@ -16,7 +16,7 @@ import pytest
 import os
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.file.csv_file_reader import CsvFileReader
+from cl.runtime.prebuild.csv_file_util import CsvFileUtil
 from cl.runtime.qa.qa_util import QaUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -25,22 +25,19 @@ from stubs.cl.runtime import StubDataclassNestedFields
 
 
 def test_csv_file_reader(default_db_fixture):
-    """Test CsvFileReader class."""
+    """Test CsvFileUtil class."""
 
     # Create a new instance of local cache for the test
     env_dir = QaUtil.get_test_dir_from_call_stack()
-    file_path = os.path.join(env_dir, "StubDataclassDerived.csv")
-    # TODO: Change the API not to take record type or make it optional
-    file_reader = CsvFileReader(file_path=file_path)
-    file_reader.csv_to_db()
 
-    file_path = os.path.join(env_dir, "StubDataclassNestedFields.csv")
-    file_reader = CsvFileReader(file_path=file_path)
-    file_reader.csv_to_db()
+    records = CsvFileUtil.load_all(dirs=[env_dir], record_types=[StubDataclassDerived])
+    active(DataSource).insert_many(records, commit=True)
 
-    file_path = os.path.join(env_dir, "StubDataclassComposite.csv")
-    file_reader = CsvFileReader(file_path=file_path)
-    file_reader.csv_to_db()
+    records = CsvFileUtil.load_all(dirs=[env_dir], record_types=[StubDataclassNestedFields])
+    active(DataSource).insert_many(records, commit=True)
+
+    records = CsvFileUtil.load_all(dirs=[env_dir], record_types=[StubDataclassComposite])
+    active(DataSource).insert_many(records, commit=True)
 
     # Verify
     # TODO: Check count using load_by_type or count method of Db when created
