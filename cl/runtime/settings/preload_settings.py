@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from itertools import chain
-
 from typing_extensions import final
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.context_manager import active
@@ -55,10 +54,7 @@ class PreloadSettings(Settings):
         }
 
         # Get records stored in preload directories
-        record_lists = [
-            reader.load_all(dirs=self.preload_dirs, ext=ext)
-            for ext, reader in reader_dict.items()
-        ]
+        record_lists = [reader.load_all(dirs=self.preload_dirs, ext=ext) for ext, reader in reader_dict.items()]
 
         # Chain records into a single list
         records = list(chain(*record_lists))

@@ -18,7 +18,8 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import TEnum
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
-from cl.runtime.records.typename import typename, typenameof
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typenameof
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.settings.settings import Settings
@@ -146,10 +147,10 @@ class SettingsUtil:
 
     @classmethod
     def to_object(
-            cls,
-            *,
-            settings: Settings,
-            prefix: str,
+        cls,
+        *,
+        settings: Settings,
+        prefix: str,
     ) -> Any:
         """Create a new object from a group of settings fields with the same prefix, error if none are set."""
         result = cls.to_object_or_none(
@@ -162,10 +163,10 @@ class SettingsUtil:
 
     @classmethod
     def to_object_or_none(
-            cls,
-            *,
-            settings: Settings,
-            prefix: str,
+        cls,
+        *,
+        settings: Settings,
+        prefix: str,
     ) -> Any:
         """Create a new object from a group of settings fields with the same prefix, return None if none are set."""
 
@@ -174,11 +175,7 @@ class SettingsUtil:
 
         # Get a dict with all fields that have the prefix
         field_names = SlotsUtil.get_field_names(type(settings))
-        result_dict = {
-            x.removeprefix(prefix): getattr(settings, x, None)
-            for x in field_names if x.startswith(prefix)
-        }
-
+        result_dict = {x.removeprefix(prefix): getattr(settings, x, None) for x in field_names if x.startswith(prefix)}
 
         # Remove all values that are None
         result_dict = {k: v for k, v in result_dict.items() if v is not None}

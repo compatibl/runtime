@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.settings.settings import Settings
 from cl.runtime.settings.settings_util import SettingsUtil

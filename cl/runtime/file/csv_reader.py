@@ -14,18 +14,16 @@
 
 import csv
 import os
-from fnmatch import fnmatch
 from typing import Any
 from typing import Sequence
-
-from cl.runtime.file.reader import Reader
-from cl.runtime.serializers.csv_util import CsvUtil
 from cl.runtime.file.file_util import FileUtil
+from cl.runtime.file.reader import Reader
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.char_util import CharUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_info import TypeInfo
+from cl.runtime.serializers.csv_util import CsvUtil
 from cl.runtime.serializers.data_serializers import DataSerializers
 
 _SERIALIZER = DataSerializers.FOR_CSV
@@ -120,7 +118,7 @@ class CsvReader(Reader):
             file_include_patterns: Optional list of filename glob patterns to include
             file_exclude_patterns: Optional list of filename glob patterns to exclude
         """
-        
+
         # Enumerate files in the specified directories, taking into account include and exclude patterns
         file_paths = FileUtil.enumerate_files(
             dirs=dirs,

@@ -16,7 +16,6 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Sequence
-
 from cl.runtime.file.reader_key import ReaderKey
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.record_mixin import RecordMixin
@@ -46,12 +45,10 @@ class Reader(ReaderKey, RecordMixin, ABC):
     ) -> tuple[RecordMixin]:
         """
         Load records from files in the specified dirs with the specified extension.
-        
+
         Args:
             dirs: Directories where file search is performed
             ext: File extension to search for without the leading dot (e.g., "json" or "csv")
             file_include_patterns: Optional list of filename glob patterns to include
             file_exclude_patterns: Optional list of filename glob patterns to exclude
         """
-
-

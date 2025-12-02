@@ -36,12 +36,12 @@ class FileUtil:
 
     @classmethod
     def enumerate_files(
-            cls,
-            *,
-            dirs: Sequence[str],
-            ext: str,
-            file_include_patterns: Sequence[str] | None = None,
-            file_exclude_patterns: Sequence[str] | None = None,
+        cls,
+        *,
+        dirs: Sequence[str],
+        ext: str,
+        file_include_patterns: Sequence[str] | None = None,
+        file_exclude_patterns: Sequence[str] | None = None,
     ) -> tuple[str]:
         """
         Return the list of absolute file paths under the specified directories with the specified extension.

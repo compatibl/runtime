@@ -19,7 +19,6 @@ from enum import IntEnum
 from typing import Any
 from uuid import UUID
 from bson import Int64
-from cl.runtime.serializers.csv_util import CsvUtil
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.primitive.bool_util import BoolUtil
 from cl.runtime.primitive.date_util import DateUtil
@@ -41,6 +40,7 @@ from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.bool_format import BoolFormat
 from cl.runtime.serializers.bytes_format import BytesFormat
+from cl.runtime.serializers.csv_util import CsvUtil
 from cl.runtime.serializers.date_format import DateFormat
 from cl.runtime.serializers.datetime_format import DatetimeFormat
 from cl.runtime.serializers.float_format import FloatFormat

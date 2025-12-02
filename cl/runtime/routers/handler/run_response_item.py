@@ -15,10 +15,10 @@
 from typing import Any
 from typing import Self
 from cl.runtime.contexts.context_manager import activate
-from cl.runtime.secrets.user_secrets import UserSecrets
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
+from cl.runtime.secrets.user_secrets import UserSecrets
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.task_util import TaskUtil
 

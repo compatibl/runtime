@@ -13,13 +13,12 @@
 # limitations under the License.
 
 from dataclasses import field
-from typing import Self, cast
+from typing import Self
 from fastapi import Request
 from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.secrets.secrets_provider import SecretsProvider
 from cl.runtime.settings.secrets_settings import SecretsSettings
 
 

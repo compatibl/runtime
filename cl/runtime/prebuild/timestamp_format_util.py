@@ -12,13 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import re
-from fnmatch import fnmatch
-from typing import Sequence
-
-from cl.runtime.settings.env_settings import EnvSettings
-from cl.runtime.settings.project_settings import ProjectSettings
 
 
 class TimestampFormatUtil:
