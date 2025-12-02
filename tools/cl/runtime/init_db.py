@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import sys
+
+from cl.runtime.configurations.preload_configuration import PreloadConfiguration
 from cl.runtime.db.db import Db
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
@@ -50,7 +52,7 @@ def init_db(*, force: bool = False) -> None:
         init_type_info()
 
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
-        PreloadSettings.instance().save_and_configure()
+        PreloadConfiguration().build().run_configure()
         print("Done\n")
 
 

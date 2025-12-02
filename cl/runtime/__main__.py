@@ -19,6 +19,8 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
+
+from cl.runtime.configurations.preload_configuration import PreloadConfiguration
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
@@ -107,8 +109,8 @@ def run_backend() -> None:
 
                 WorkerHealthMonitor.start_monitoring()
 
-        # Save records from preload directory to DB and execute run_configure on all preloaded Config records
-        PreloadSettings.instance().save_and_configure()
+        # Save preloads to DB and invoke run_configure for any Configuration records with autorun=True
+        PreloadConfiguration().build().run_configure()
 
         # Find wwwroot directory, error if not found
         wwwroot_dir = ProjectLayout.get_wwwroot()

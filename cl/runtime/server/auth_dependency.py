@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import logging
+
+from cl.runtime.configurations.preload_configuration import PreloadConfiguration
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
@@ -57,6 +59,8 @@ async def activate_auth_context():
                     f"Tenant {tenant.tenant_id} is not present in Db. Perform save and configure.",
                     extra={"save_to_db": False},
                 )
-                PreloadSettings.instance().save_and_configure()
+
+                # Save preloads to DB and invoke run_configure for any Configuration records with autorun=True
+                PreloadConfiguration().build().run_configure()
 
             yield

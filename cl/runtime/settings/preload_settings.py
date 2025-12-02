@@ -13,14 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from itertools import chain
-from typing import Sequence
-
 from typing_extensions import final
-from cl.runtime.configurations.configuration import Configuration
-from cl.runtime.contexts.context_manager import active
-from cl.runtime.db.data_source import DataSource
-from cl.runtime.file.csv_reader import CsvReader
 from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.settings import Settings
 
@@ -46,52 +39,3 @@ class PreloadSettings(Settings):
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.preload_dirs = ProjectLayout.normalize_paths("dirs", self.preload_dirs)
-
-    def save_and_configure(
-        self,
-        *,
-        dirs: Sequence[str] | None = None,
-        file_include_patterns: Sequence[str] | None = None,
-        file_exclude_patterns: Sequence[str] | None = None,
-    ):
-        """
-        Load records from files in the specified dirs and extension and save them to the active data source.
-
-        Args:
-            dirs: Directories where file search is performed
-            file_include_patterns: Optional list of filename glob patterns to include
-            file_exclude_patterns: Optional list of filename glob patterns to exclude
-        """
-
-        # Use preload_dirs if dirs not specified
-        dirs = dirs or self.preload_dirs
-
-        # Specify readers for each file extension
-        reader_dict = {
-            "csv": CsvReader().build(),
-        }
-
-        # Get records stored in preload directories
-        record_lists = [
-            reader.load_all(
-                dirs=dirs,
-                ext=ext,
-                file_include_patterns=file_include_patterns,
-                file_exclude_patterns=file_exclude_patterns,
-            )
-            for ext, reader in reader_dict.items()
-        ]
-
-        # Chain records into a single list
-        records = list(chain(*record_lists))
-
-        if records:
-            # Insert into the active data source
-            active(DataSource).insert_many(records, commit=True)
-
-            # Execute run_configure on all preloaded Configuration records with autorun=True
-            autorun_configurations = [
-                record for record in records
-                if isinstance(record, Configuration) and record.autorun
-            ]
-            tuple(autorun_configuration.run_configure() for autorun_configuration in autorun_configurations)
