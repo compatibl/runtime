@@ -19,7 +19,7 @@ from typing_extensions import final
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.file.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_reader import CsvReader
 from cl.runtime.settings.project_settings import ProjectSettings
 from cl.runtime.settings.settings import Settings
 
@@ -46,15 +46,24 @@ class PreloadSettings(Settings):
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.preload_dirs = ProjectSettings.instance().normalize_paths("dirs", self.preload_dirs)
 
-    def save_and_configure(self, *, record_types: list[type] | None = None) -> None:
+    def save_and_configure(self) -> None:
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
 
-        # Load records from files
-        csv_records = CsvFileUtil.load_all(dirs=self.preload_dirs, record_types=record_types)
-        json_records = []
-        yaml_records = []
-        records = list(chain(csv_records, json_records, yaml_records))
+        # Specify readers for each file extension
+        reader_dict = {
+            "csv": CsvReader().build(),
+        }
 
+        # Get records stored in preload directories
+        record_lists = [
+            reader.load_all(dirs=self.preload_dirs, ext=ext)
+            for ext, reader in reader_dict.items()
+        ]
+
+        # Chain records into a single list
+        records = list(chain(*record_lists))
+
+        # Store in active data source if present
         if records:
             # Insert to database
             active(DataSource).insert_many(records, commit=True)

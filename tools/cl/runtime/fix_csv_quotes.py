@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.file.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_reader import CsvReader
 
 if __name__ == '__main__':
 
     # Create __init__.py files in subdirectories except for tests
-    CsvFileUtil.check_or_fix_quotes(
+    CsvReader.check_or_fix_quotes(
         apply_fix=True,
         verbose=True,
         # Prevent fixing of the unit test samples

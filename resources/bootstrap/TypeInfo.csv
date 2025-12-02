@@ -31,6 +31,7 @@ ConfusionMatrixPlot,Record,cl.runtime.plots.confusion_matrix_plot.ConfusionMatri
 ContainerDecl,Data,cl.runtime.schema.container_decl.ContainerDecl,None
 ContainerKind,Enum,cl.runtime.schema.container_kind.ContainerKind,None
 ContextSnapshot,Data,cl.runtime.contexts.context_snapshot.ContextSnapshot,None
+CsvReader,Record,cl.runtime.file.csv_reader.CsvReader,None
 Dag,Record,cl.runtime.view.dag.dag.Dag,None
 DagEdge,Data,cl.runtime.view.dag.dag_edge.DagEdge,None
 DagKey,Key,cl.runtime.view.dag.dag_key.DagKey,None
@@ -184,6 +185,8 @@ PydanticMixin,Data,cl.runtime.records.for_pydantic.pydantic_mixin.PydanticMixin,
 QaSettings,Data,cl.runtime.settings.qa_settings.QaSettings,None
 QueryMixin,Data,cl.runtime.db.query_mixin.QueryMixin,None
 Range,Data,cl.runtime.records.predicates.Range,None
+Reader,Record,cl.runtime.file.reader.Reader,None
+ReaderKey,Key,cl.runtime.file.reader_key.ReaderKey,None
 RecordDecl,Record,cl.runtime.schema.record_decl.RecordDecl,None
 RecordListView,Record,cl.runtime.views.record_list_view.RecordListView,None
 RecordMixin,Record,cl.runtime.records.record_mixin.RecordMixin,None

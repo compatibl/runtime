@@ -13,14 +13,19 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.file.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_reader import CsvReader
+from cl.runtime.settings.preload_settings import PreloadSettings
 
 
-def test_csv_quotes():
+def test_csv_preload_quotes():
     """Prebuild test to check that CSV preloads follow the format rules."""
 
-    # Get the list files where copyright header is missing, incorrect, or not followed by a blank line
-    CsvFileUtil.check_or_fix_quotes(
+    # Get the list of preload CSV files where copyright header is missing, incorrect, or not followed by a blank line
+    preload_settings = PreloadSettings.instance()
+    csv_reader = CsvReader().build()
+    csv_reader.check_or_fix_quotes(
+        dirs=preload_settings.preload_dirs,
+        ext="csv",
         apply_fix=False,
         # Prevent fixing of the unit test samples
         file_exclude_patterns=[

@@ -17,6 +17,8 @@ import os
 from fnmatch import fnmatch
 from typing import Any
 from typing import Sequence
+
+from cl.runtime.file.reader import Reader
 from cl.runtime.serializers.csv_util import CsvUtil
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.primitive.case_util import CaseUtil
@@ -25,35 +27,28 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
-from cl.runtime.settings.env_settings import EnvSettings
-from cl.runtime.settings.project_settings import ProjectSettings
 
 _SERIALIZER = DataSerializers.FOR_CSV
 
 
-class CsvFileUtil:
+class CsvReader(Reader):
     """Helper class for working with CSV files."""
 
-    @classmethod
     def load_all(
-        cls,
+        self,
         *,
         dirs: Sequence[str],
-        ext: str = "csv",
-        record_types: Sequence[type] | None = None,
+        ext: str,
+        file_include_patterns: Sequence[str] | None = None,
+        file_exclude_patterns: Sequence[str] | None = None,
     ) -> tuple[RecordMixin]:
-        """Load records from CSV files with the specified extension in the specified directory."""
 
-        # Enumerate files in the specified directories
-        file_paths = FileUtil.enumerate_files(dirs=dirs, ext=ext)
-
-        # Restrict to specified final record types if provided
-        if record_types is not None:
-            # Limit to the specified final record types
-            record_type_names = [typename(record_type) for record_type in record_types]
-            file_paths = [
-                file_path for file_path in file_paths if os.path.basename(file_path).split(".")[0] in record_type_names
-            ]
+        file_paths = FileUtil.enumerate_files(
+            dirs=dirs,
+            ext=ext,
+            file_include_patterns=file_include_patterns,
+            file_exclude_patterns=file_exclude_patterns,
+        )
 
         # Iterate over files
         result = []
@@ -94,7 +89,7 @@ class CsvFileUtil:
                     )
 
                 # Deserialize rows into records and add to the result
-                loaded = [cls._deserialize_row(record_type=record_type, row_dict=row_dict) for row_dict in row_dicts]
+                loaded = [self._deserialize_row(record_type=record_type, row_dict=row_dict) for row_dict in row_dicts]
                 result.extend(loaded)
 
         # Convert to tuple and return
@@ -104,10 +99,12 @@ class CsvFileUtil:
     def check_or_fix_quotes(
         cls,
         *,
+        dirs: Sequence[str],
+        ext: str,
         apply_fix: bool,
         verbose: bool = False,
-        file_include_patterns: list[str] | None = None,
-        file_exclude_patterns: list[str] | None = None,
+        file_include_patterns: Sequence[str] | None = None,
+        file_exclude_patterns: Sequence[str] | None = None,
     ) -> None:
         """
         Check csv preload files in all subdirectories of 'root_path' to ensure that each field that
@@ -116,52 +113,29 @@ class CsvFileUtil:
         or triggering JSON loading.
 
         Args:
+            dirs: Directories where file search is performed
+            ext: File extension to search for without the leading dot (e.g., "csv")
             apply_fix: If True, modify CSV so each field containing numbers or symbols is surrounded by quotes
             verbose: Print messages about fixes to stdout if specified
             file_include_patterns: Optional list of filename glob patterns to include
             file_exclude_patterns: Optional list of filename glob patterns to exclude
         """
+        
+        # Enumerate files in the specified directories, taking into account include and exclude patterns
+        file_paths = FileUtil.enumerate_files(
+            dirs=dirs,
+            ext=ext,
+            file_include_patterns=file_include_patterns,
+            file_exclude_patterns=file_exclude_patterns,
+        )
 
-        # The list of packages from context settings
-        packages = EnvSettings.instance().env_packages
-
-        missing_files = []
-        all_root_paths = set()
-        for package in packages:
-            # Add paths to source and stubs directories
-            if (x := ProjectSettings.get_source_root(package)) is not None and x not in all_root_paths:
-                all_root_paths.add(x)
-            if (x := ProjectSettings.get_stubs_root(package)) is not None and x not in all_root_paths:
-                all_root_paths.add(x)
-            if (x := ProjectSettings.get_tests_root(package)) is not None and x not in all_root_paths:
-                all_root_paths.add(x)
-            if (x := ProjectSettings.get_preloads_root(package)) is not None and x not in all_root_paths:
-                all_root_paths.add(x)
-
-        # Use default include patterns if not specified by the caller
-        if file_include_patterns is None:
-            file_include_patterns = ["*.csv"]
-
-        # Use default exclude patterns if not specified by the caller
-        if file_exclude_patterns is None:
-            file_exclude_patterns = []
-
-        # Apply to each element of root_paths
+        # Iterate over filenames
         files_with_error = []
-        for root_path in all_root_paths:
-            # Walk the directory tree
-            for dir_path, dir_names, filenames in os.walk(root_path):
-                # Apply exclude patterns
-                filenames = [x for x in filenames if not any(fnmatch(x, y) for y in file_exclude_patterns)]
-                # Apply include patterns
-                filenames = [x for x in filenames if any(fnmatch(x, y) for y in file_include_patterns)]
-                # Iterate over filenames
-                for filename in filenames:
-                    # Load the file
-                    file_path = str(os.path.join(dir_path, filename))
-                    is_valid = CsvUtil.check_or_fix_quotes(file_path, apply_fix=apply_fix)
-                    if not is_valid:
-                        files_with_error.append(file_path)
+        for file_path in file_paths:
+            # Load the file
+            is_valid = CsvUtil.check_or_fix_quotes(file_path, apply_fix=apply_fix)
+            if not is_valid:
+                files_with_error.append(file_path)
 
         if files_with_error:
             files_list = "".join([f"    {file}\n" for file in files_with_error])
@@ -174,8 +148,8 @@ class CsvFileUtil:
             elif verbose:
                 print(msg)
         elif verbose:
-            files_list = "".join([f"    {x}\n" for x in sorted(all_root_paths)])
-            print(f"Verified field wrapping in the following CSV preload(s):\n{files_list}")
+            files_list = "".join([f"    {x}\n" for x in sorted(file_paths)])
+            print(f"Verified field wrapping in the following CSV preload files:\n{files_list}")
 
     @classmethod
     def _deserialize_row(cls, *, record_type: type, row_dict: dict[str, Any]) -> RecordMixin:

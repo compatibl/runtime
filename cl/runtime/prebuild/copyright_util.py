@@ -14,6 +14,8 @@
 
 import os
 from fnmatch import fnmatch
+from typing import Sequence
+
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.project_settings import ProjectSettings
@@ -52,8 +54,8 @@ class CopyrightUtil:
         *,
         fix_trailing_blank_line: bool = False,
         verbose: bool = False,
-        file_include_patterns: list[str] | None = None,
-        file_exclude_patterns: list[str] | None = None,
+        file_include_patterns: Sequence[str] | None = None,
+        file_exclude_patterns: Sequence[str] | None = None,
     ) -> None:
         """
         Check that the correct copyright header (Apache or default, based on the presence of Apache LICENSE file at
@@ -119,12 +121,16 @@ class CopyrightUtil:
             for root_path in package_root_paths:
                 # Walk the directory tree
                 for dir_path, dir_names, filenames in os.walk(root_path):
-                    # Apply exclude patterns
-                    filenames = [x for x in filenames if not any(fnmatch(x, y) for y in file_exclude_patterns)]
 
-                    # Apply include patterns
-                    filenames = [x for x in filenames if any(fnmatch(x, y) for y in file_include_patterns)]
+                    # Apply the file include patterns
+                    if file_include_patterns is not None:
+                        filenames = [x for x in filenames if any(fnmatch(x, y) for y in file_include_patterns)]
 
+                    # Apply the file exclude patterns
+                    if file_exclude_patterns is not None:
+                        filenames = [x for x in filenames if not any(fnmatch(x, y) for y in file_exclude_patterns)]
+
+                    # Verify files that satisfy both patterns
                     for filename in filenames:
                         # Load the file
                         file_path = os.path.join(dir_path, filename)

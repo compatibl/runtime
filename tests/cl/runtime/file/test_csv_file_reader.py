@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.file.csv_file_util import CsvFileUtil
+from cl.runtime.file.csv_reader import CsvReader
 from cl.runtime.qa.qa_util import QaUtil
 from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
@@ -29,13 +29,14 @@ def test_csv_file_reader(default_db_fixture):
     # Create a new instance of local cache for the test
     env_dir = QaUtil.get_test_dir_from_call_stack()
 
-    records = CsvFileUtil.load_all(dirs=[env_dir], record_types=[StubDataclassDerived])
+    csv_reader = CsvReader().build()
+    records = csv_reader.load_all(dirs=[env_dir], ext="csv", file_include_patterns=["StubDataclassDerived.*"])
     active(DataSource).insert_many(records, commit=True)
 
-    records = CsvFileUtil.load_all(dirs=[env_dir], record_types=[StubDataclassNestedFields])
+    records = csv_reader.load_all(dirs=[env_dir], ext="csv", file_include_patterns=["StubDataclassNestedFields.*"])
     active(DataSource).insert_many(records, commit=True)
 
-    records = CsvFileUtil.load_all(dirs=[env_dir], record_types=[StubDataclassComposite])
+    records = csv_reader.load_all(dirs=[env_dir], ext="csv", file_include_patterns=["StubDataclassComposite.*"])
     active(DataSource).insert_many(records, commit=True)
 
     # Verify

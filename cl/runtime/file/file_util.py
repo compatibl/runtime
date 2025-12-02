@@ -14,6 +14,7 @@
 
 import os
 import re
+from fnmatch import fnmatch
 from typing import Sequence
 from typing import TypeGuard
 
@@ -34,8 +35,23 @@ class FileUtil:
     """Utilities for working with files."""
 
     @classmethod
-    def enumerate_files(cls, *, dirs: Sequence[str], ext: str) -> tuple[str]:
-        """Return the list of absolute file paths under the specified directories with the specified extension."""
+    def enumerate_files(
+            cls,
+            *,
+            dirs: Sequence[str],
+            ext: str,
+            file_include_patterns: Sequence[str] | None = None,
+            file_exclude_patterns: Sequence[str] | None = None,
+    ) -> tuple[str]:
+        """
+        Return the list of absolute file paths under the specified directories with the specified extension.
+
+        Args:
+            dirs: Directories where file search is performed
+            ext: File extension to search for without the leading dot (e.g., "json" or "csv")
+            file_include_patterns: Optional list of filename glob patterns to include
+            file_exclude_patterns: Optional list of filename glob patterns to exclude
+        """
 
         # Return empty list if no dirs are specified in settings
         if not dirs:
@@ -52,6 +68,15 @@ class FileUtil:
         for dir in dirs:
             for dir_path, dir_names, filenames in os.walk(dir):
 
+                # Apply the file include patterns
+                if file_include_patterns is not None:
+                    filenames = [x for x in filenames if any(fnmatch(x, y) for y in file_include_patterns)]
+
+                # Apply the file exclude patterns
+                if file_exclude_patterns is not None:
+                    filenames = [x for x in filenames if not any(fnmatch(x, y) for y in file_exclude_patterns)]
+
+                # Append the files that satisfy both patterns to the result
                 dir_name = os.path.basename(dir_path)
                 if not dir_name.startswith("."):
                     # Add files with extension ext except from a dot-prefixed directory
@@ -59,6 +84,7 @@ class FileUtil:
 
                 # Modify list in place to exclude dot-prefixed directories
                 dir_names[:] = [d for d in dir_names if not d.startswith(".")]
+
         return tuple(result)
 
     @classmethod
