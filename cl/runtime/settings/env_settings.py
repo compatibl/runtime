@@ -134,14 +134,14 @@ class EnvSettings(Settings):
 
         if self.env_dir is None:
             # Default if not specified via Dynaconf
-            self.env_dir = ProjectSettings.instance().get_resources_root()
+            self.env_dir = ProjectSettings.get_resources_root()
         else:
             # Check for safety before substitution
             IdentifierUtil.guard_valid_identifier(self.env_dir, allow_braces=True, allow_directory_separators=True)
             # Perform variable substitution
             env_dir_vars = {
-                "project_root": ProjectSettings.instance().get_project_root(),
-                "project_resources": ProjectSettings.instance().get_resources_root(),  # TODO: Update after ProjectSettings changes
+                "project_root": ProjectSettings.get_project_root(),
+                "project_resources": ProjectSettings.get_resources_root(),  # TODO: Update after ProjectSettings changes
                 "env_id": self.env_id,
                 "env_kind": CaseUtil.upper_to_snake_case(self.env_kind.name),
                 "env_user": self.env_user,

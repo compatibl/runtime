@@ -45,7 +45,7 @@ class PreloadSettings(Settings):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
-        self.preload_dirs = ProjectSettings.instance().normalize_paths("dirs", self.preload_dirs)
+        self.preload_dirs = ProjectSettings.normalize_paths("dirs", self.preload_dirs)
 
     def save_and_configure(
         self,

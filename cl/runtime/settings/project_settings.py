@@ -12,64 +12,91 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations  # TODO: ! Review all instances of __future__ and eliminate if not needed
 import os
-from dataclasses import dataclass
 from pathlib import Path
-from typing import ClassVar
 from typing import Iterable
-from typing import Self
-from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.typename import typename
 
-SETTINGS_FILES_ENVVAR = "CL_SETTINGS_FILES"
-"""The name of environment variable used to override the settings file(s) names or locations."""
+# Possible project root locations for each layout relative to this module
+MULTIREPO_ROOT_DIR = os.path.normpath(Path(__file__).parents[4])
+MONOREPO_ROOT_DIR = os.path.normpath(Path(__file__).parents[3])
+
+# Filenames used to detect project root
+root_filenames = [".env", "settings.yaml", "settings.json", "settings.toml"]
+
+PROJECT_ROOT = None
+PROJECT_LEVELS = None
+try:
+    if os.path.exists(MULTIREPO_ROOT_DIR):
+        # Supermodule directory takes priority but only if it contains one of the settings files
+        if any(os.path.exists(os.path.join(MULTIREPO_ROOT_DIR, x)) for x in root_filenames):
+            PROJECT_ROOT = MULTIREPO_ROOT_DIR
+            PROJECT_LEVELS = 2
+# Handle the possibility that directory access is prohibited
+except FileNotFoundError:
+    pass
+except PermissionError:
+    pass
+
+if PROJECT_ROOT is None:
+    try:
+        if os.path.exists(MONOREPO_ROOT_DIR):
+            # Monorepo directory is searched next
+            if any(os.path.exists(os.path.join(MONOREPO_ROOT_DIR, x)) for x in root_filenames):
+                PROJECT_ROOT = MONOREPO_ROOT_DIR
+                PROJECT_LEVELS = 1
+    # Handle the possibility that directory access is prohibited
+    except FileNotFoundError:
+        pass
+    except PermissionError:
+        pass
+
+# Error if still not found
+if PROJECT_ROOT is None:
+    root_filenames_str = "\n".join(root_filenames)
+    raise RuntimeError(
+        f"Project root could not be confirmed by the presence of at least one of the following files:\n"
+        f"{root_filenames_str}\n\n"
+        f"Project root locations searched:\n"
+        f"1. {MULTIREPO_ROOT_DIR}\n"
+        f"2. {MONOREPO_ROOT_DIR}\n"
+    )
+
+if PROJECT_LEVELS not in (1, 2):
+    raise RuntimeError(f"{PROJECT_LEVELS} project levels found, only 1 or 2 levels are supported.")
 
 
-@dataclass(slots=True, kw_only=True)
 class ProjectSettings:  # TODO: !!!! Derive from Settings or rename to ProjectUtil or ProjectLayout and make static
     """
     Information about the project location and layout used to search for settings and packages.
     This class finds the location of .env or settings.yaml and detects one of two supported layouts:
 
-    One-level (suitable only for monorepo git layout):
+    One-level (suitable for monorepo git layout):
         - project and packages root (one level layout)
             -- project files
             -- package files (files from all packages are interleaved under a common root)
 
-    Two-level (suitable for monorepo, submodules or subtree git layout):
+    Two-level (suitable for submodules or subtree git layout):
         - project root (first level of two-level layout)
             -- project files
             -- package root (second level of two-level layout)
                 --- package files (files from each package are under a separate package root)
     """
 
-    project_root: str = required()
-    """Project root directory is the location of .env or settings.yaml file."""
-
-    project_levels: int = required()
-    """Number of levels in project layout (one or two)."""
-
-    project_storage: str = "storage"  # TODO: !!! Review field name and default value
-    """Directory for user-specified files."""
-
-    __instance: ClassVar[ProjectSettings] = None
-    """Singleton instance."""
-
-    def __init(self) -> None:
-        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
-        if self.project_levels != 1 and self.project_levels != 2:
-            raise RuntimeError(f"Field 'ProjectSettings.project_levels' must be 1 or 2.")
-
     @classmethod
     def get_project_root(cls) -> str:
         """Project root directory is the location of .env or settings.yaml file."""
-        return cls.instance().project_root
+        return PROJECT_ROOT
+
+    @classmethod
+    def get_project_levels(cls) -> int:
+        """Number of levels in project layout (one or two)."""
+        return PROJECT_LEVELS
 
     @classmethod
     def get_resources_root(cls) -> str:
         """Contains resources that persist across multiple code runs."""
-        return os.path.join(cls.instance().project_root, "resources")
+        return os.path.join(PROJECT_ROOT, "resources")
 
     @classmethod
     def get_package_root(cls, package: str) -> str:
@@ -97,18 +124,16 @@ class ProjectSettings:  # TODO: !!!! Derive from Settings or rename to ProjectUt
         Args:
             package: Dot-delimited package root, e.g. 'cl.runtime'
         """
-        project_root = cls.instance().project_root
-        project_levels = cls.instance().project_levels
         relative_path = package.replace(".", os.sep)
-        if project_levels == 1:
+        if PROJECT_LEVELS == 1:
             # One-level project, search directly under project root
-            search_paths = [os.path.normpath(os.path.join(project_root, relative_path, "__init__.py"))]
-        elif project_levels == 2:
+            search_paths = [os.path.normpath(os.path.join(PROJECT_ROOT, relative_path, "__init__.py"))]
+        elif PROJECT_LEVELS == 2:
             # Two-level project, check each dot-delimited package token in reverse order as potential package root
             package_tokens = package.split(".")
             package_tokens.reverse()
             search_paths = [
-                os.path.normpath(os.path.join(project_root, x, relative_path, "__init__.py")) for x in package_tokens
+                os.path.normpath(os.path.join(PROJECT_ROOT, x, relative_path, "__init__.py")) for x in package_tokens
             ]
         else:
             raise RuntimeError(f"Field 'ProjectSettings.project_levels' must be 1 or 2.")
@@ -184,8 +209,7 @@ class ProjectSettings:  # TODO: !!!! Derive from Settings or rename to ProjectUt
 
     @classmethod
     def get_preloads_root(cls, package: str) -> str | None:
-        """
-        Preloads root directory for the specified package.
+        """Preloads root directory for the specified package.
 
         Notes:
             The presence of __init__.py is not required for preloads
@@ -271,61 +295,3 @@ class ProjectSettings:  # TODO: !!!! Derive from Settings or rename to ProjectUt
         result = os.path.normpath(result)
         return result
 
-    @classmethod
-    def instance(cls) -> Self:
-        """Return singleton instance."""
-        # Check if cached value exists, load if not found
-        if cls.__instance is None:
-            env_settings_files = os.getenv(SETTINGS_FILES_ENVVAR)
-            if env_settings_files:
-                # TODO: Handle by replacing settings.yaml in search by the specified list
-                raise RuntimeError(
-                    f"Override of the Dynaconf settings file(s) names or locations using envvar "
-                    f"'{SETTINGS_FILES_ENVVAR}' is not supported in this version."
-                )
-
-            # Possible project root locations for each layout relative to this module
-            superproject_root_dir = os.path.normpath(Path(__file__).parents[4])
-            monorepo_root_dir = os.path.normpath(Path(__file__).parents[3])
-
-            # Settings filenames to search
-            settings_filenames = [".env", "settings.yaml"]
-
-            project_root = None
-            project_levels = None
-            try:
-                if os.path.exists(superproject_root_dir):
-                    # Supermodule directory takes priority but only if it contains one of the settings files
-                    if any(os.path.exists(os.path.join(superproject_root_dir, x)) for x in settings_filenames):
-                        project_root = superproject_root_dir
-                        project_levels = 2
-            # Handle the possibility that directory access is prohibited
-            except FileNotFoundError:
-                pass
-            except PermissionError:
-                pass
-
-            if project_root is None:
-                try:
-                    if os.path.exists(monorepo_root_dir):
-                        # Monorepo directory is searched next
-                        if any(os.path.exists(os.path.join(monorepo_root_dir, x)) for x in settings_filenames):
-                            project_root = monorepo_root_dir
-                            project_levels = 1
-                # Handle the possibility that directory access is prohibited
-                except FileNotFoundError:
-                    pass
-                except PermissionError:
-                    pass
-
-            # Error if still not found
-            if project_root is None:
-                raise RuntimeError(
-                    f"""Project settings ('.env' or 'settings.yaml' files) could not be found. Locations searched:
-1. {superproject_root_dir}
-2. {monorepo_root_dir}
-"""
-                )
-            obj = ProjectSettings(project_root=project_root, project_levels=project_levels)
-            cls.__instance = obj
-        return cls.__instance

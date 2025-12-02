@@ -27,7 +27,6 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.typename import typename
-from cl.runtime.settings.project_settings import SETTINGS_FILES_ENVVAR
 from cl.runtime.settings.project_settings import ProjectSettings
 
 # Load dotenv first (the priority order is envvars first, then dotenv, then settings.yaml and .secrets.yaml)
@@ -44,7 +43,7 @@ _all_settings = Dynaconf(
     environments=True,
     envvar_prefix="CL",
     env_switcher="CL_SETTINGS_ENV",
-    envvar=SETTINGS_FILES_ENVVAR,
+    envvar="CL_SETTINGS_FILES",
     settings_files=[
         # Specify the exact path to prevent uncertainty associated with searching in multiple directories
         os.path.normpath(os.path.join(ProjectSettings.get_project_root(), "settings.yaml")),

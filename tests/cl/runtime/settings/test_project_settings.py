@@ -25,26 +25,23 @@ def test_project_settings():
     two_level_root_dir = os.path.normpath(Path(__file__).parents[5])
     one_level_root_dir = os.path.normpath(Path(__file__).parents[4])
 
-    # Create settings
-    project_settings = ProjectSettings.instance()
-
     # Check project root
-    if project_settings.project_levels == 1:
-        assert project_settings.project_root == one_level_root_dir
-        assert project_settings.get_package_root("cl.runtime") == project_settings.project_root
-        assert project_settings.get_source_root("cl.runtime") == os.path.normpath(
-            os.path.join(project_settings.project_root, "cl", "runtime")
+    if (project_levels := ProjectSettings.get_project_levels()) == 1:
+        assert ProjectSettings.get_project_root() == one_level_root_dir
+        assert ProjectSettings.get_package_root("cl.runtime") == ProjectSettings.get_project_root()
+        assert ProjectSettings.get_source_root("cl.runtime") == os.path.normpath(
+            os.path.join(ProjectSettings.get_project_root(), "cl", "runtime")
         )
-    elif project_settings.project_levels == 2:
-        assert project_settings.project_root == two_level_root_dir
-        assert project_settings.get_package_root("cl.runtime") == os.path.normpath(
-            os.path.join(project_settings.project_root, "runtime")
+    elif project_levels == 2:
+        assert ProjectSettings.get_project_root() == two_level_root_dir
+        assert ProjectSettings.get_package_root("cl.runtime") == os.path.normpath(
+            os.path.join(ProjectSettings.get_project_root(), "runtime")
         )
-        assert project_settings.get_source_root("cl.runtime") == os.path.normpath(
-            os.path.join(project_settings.project_root, "runtime", "cl", "runtime")
+        assert ProjectSettings.get_source_root("cl.runtime") == os.path.normpath(
+            os.path.join(ProjectSettings.get_project_root(), "runtime", "cl", "runtime")
         )
     else:
-        raise RuntimeError(f"ProjectSettings.project_levels={project_settings.project_levels} is not 1 or 2.")
+        raise RuntimeError(f"The number of project levels {project_levels} is not 1 or 2.")
 
 
 if __name__ == "__main__":

@@ -82,7 +82,7 @@ class LocalSecretsProvider(SecretsProvider):
         }
 
     def _get_secrets_dir(self) -> pathlib.Path:
-        return pathlib.Path(ProjectSettings.instance().project_root).joinpath(pathlib.Path(self.path_to_secrets))
+        return pathlib.Path(ProjectSettings.get_project_root()).joinpath(pathlib.Path(self.path_to_secrets))
 
     def _load_secrets(self) -> dict[str, dict]:
         secrets_path = self._get_secrets_dir() / ".secrets.yaml"
