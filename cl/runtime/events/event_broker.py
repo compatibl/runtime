@@ -45,7 +45,8 @@ class EventBroker(EventBrokerKey, RecordMixin, ABC):
     def get_key(self):
         return EventBrokerKey(broker_id=self.broker_id)
 
-    def __init(self):
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         # Use globally unique UUIDv7-based timestamp if not specified
         if self.broker_id is None:
             self.broker_id = Timestamp.create()

@@ -26,6 +26,7 @@ class UiClearLogsMarker(UiClearLogsMarkerKey, RecordMixin):
     def get_key(self) -> KeyMixin:
         return UiClearLogsMarkerKey(clear_logs_timestamp=self.clear_logs_timestamp).build()
 
-    def __init(self):
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.clear_logs_timestamp is None:
             self.clear_logs_timestamp = Timestamp.create()

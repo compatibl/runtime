@@ -85,7 +85,8 @@ class DbEventBroker(EventBroker):
     _pull_events_task: asyncio.Task | None = None
     """Async Task for pulling Events from DB."""
 
-    def __init(self):
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Set active DataSource if not specified. Use instance-level DataSource instead of active(DataSource)
         # to allow FastAPI execute streaming response generator in a separate async task

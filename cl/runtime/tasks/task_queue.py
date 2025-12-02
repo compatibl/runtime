@@ -41,7 +41,9 @@ class TaskQueue(TaskQueueKey, ABC):
     timeout_sec: int = 10
     """Optional timeout in seconds, queue will stop after reaching this timeout."""
 
-    def __init(self):
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
         # Use globally unique UUIDv7-based timestamp if not specified
         if self.queue_id is None:
             self.queue_id = Timestamp.create()

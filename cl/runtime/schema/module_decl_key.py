@@ -33,7 +33,9 @@ class ModuleDeclKey(DataclassMixin, KeyMixin):
     def get_key_type(cls) -> type[KeyMixin]:
         return ModuleDeclKey
 
-    def __init(self):
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+
         # TODO (Roman): Change the schema so that UI does not have to concatenate the module and type name to get the
         #  key in the schema dict. Sensitive case: drill down polymorphic field when the field value is a derived class,
         #  but in the declaration it is a base class.

@@ -91,7 +91,8 @@ class BasicMongoDb(Db):
     _query_types_with_index: set[type] | None = None
     """Set of query types for which an index has already been added."""
 
-    def __init(self):
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         db_settings = DbSettings.instance()
 
         # Set MongoDB URI from settings if not specified

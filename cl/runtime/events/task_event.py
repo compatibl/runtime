@@ -35,7 +35,8 @@ class TaskEvent(Event):
     record_key: str | None = None
     """Record key on which handler is run."""
 
-    def __init(self):
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         if self.task_run_id is None:
             log_context = active_or_none(TaskLog)
 
