@@ -25,8 +25,8 @@ ClassMethodTask,Record,cl.runtime.tasks.class_method_task.ClassMethodTask,None
 ClassifierExperiment,Record,cl.runtime.stat.classifier_experiment.ClassifierExperiment,None
 ClassifierTrial,Record,cl.runtime.stat.classifier_trial.ClassifierTrial,None
 ColumnState,Data,cl.runtime.ui.column_state.ColumnState,None
-Config,Record,cl.runtime.configs.config.Config,None
-ConfigKey,Key,cl.runtime.configs.config_key.ConfigKey,None
+Config,Record,cl.runtime.configurations.configuration.Config,None
+ConfigKey,Key,cl.runtime.configurations.configuration_key.ConfigKey,None
 ConfusionMatrixPlot,Record,cl.runtime.plots.confusion_matrix_plot.ConfusionMatrixPlot,None
 ContainerDecl,Data,cl.runtime.schema.container_decl.ContainerDecl,None
 ContainerKind,Enum,cl.runtime.schema.container_kind.ContainerKind,None
@@ -280,7 +280,7 @@ StubPydanticHandlersKey,Key,stubs.cl.runtime.records.for_pydantic.stub_pydantic_
 StubPydanticKey,Key,stubs.cl.runtime.records.for_pydantic.stub_pydantic_key.StubPydanticKey,None
 StubPydanticNestedFields,Record,stubs.cl.runtime.records.for_pydantic.stub_pydantic_nested_fields.StubPydanticNestedFields,None
 StubRelabeledIntEnum,Enum,stubs.cl.runtime.records.enum.stub_relabeled_int_enum.StubRelabeledIntEnum,None
-StubRuntimeConfig,Record,stubs.cl.runtime.configs.stub_runtime_config.StubRuntimeConfig,None
+StubRuntimeConfig,Record,stubs.cl.runtime.configurations.stub_runtime_config.StubRuntimeConfig,None
 StubSlotted,Record,stubs.cl.runtime.records.for_slotted.stub_slotted.StubSlotted,None
 StubSlottedKey,Key,stubs.cl.runtime.records.for_slotted.stub_slotted_key.StubSlottedKey,None
 StubSupervisedBinaryExperiment,Record,stubs.cl.runtime.stat.stub_supervised_binary_experiment.StubSupervisedBinaryExperiment,None

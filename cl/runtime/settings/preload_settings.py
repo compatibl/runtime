@@ -17,7 +17,7 @@ from itertools import chain
 from typing import Sequence
 
 from typing_extensions import final
-from cl.runtime.configs.config import Config
+from cl.runtime.configurations.configuration import Configuration
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_reader import CsvReader
@@ -85,11 +85,13 @@ class PreloadSettings(Settings):
         # Chain records into a single list
         records = list(chain(*record_lists))
 
-        # Store in active data source if present
         if records:
-            # Insert to database
+            # Insert into the active data source
             active(DataSource).insert_many(records, commit=True)
 
-            # Execute run_config on all preloaded Config records
-            config_records = [record for record in records if isinstance(record, Config)]
-            tuple(config_record.run_configure() for config_record in config_records)
+            # Execute run_configure on all preloaded Configuration records with autorun=True
+            autorun_configurations = [
+                record for record in records
+                if isinstance(record, Configuration) and record.autorun
+            ]
+            tuple(autorun_configuration.run_configure() for autorun_configuration in autorun_configurations)

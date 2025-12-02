@@ -15,17 +15,23 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from cl.runtime.configs.config_key import ConfigKey
+
+from grpclib.config import Configuration
+
+from cl.runtime.configurations.configuration_key import ConfigurationKey
 from cl.runtime.records.record_mixin import RecordMixin
 
 
 @dataclass(slots=True, kw_only=True)
-class Config(ConfigKey, RecordMixin, ABC):
-    """Performs configuration using parameters specified in this record."""
+class Configuration(ConfigurationKey, RecordMixin, ABC):
+    """Performs configuration when run_configure is invoked."""
 
-    def get_key(self) -> ConfigKey:
-        return ConfigKey(config_id=self.config_id).build()
+    autorun: bool | None = None
+    """Set this flag to invoke run_configure automatically after preloads are completed."""
+
+    def get_key(self) -> ConfigurationKey:
+        return ConfigurationKey(configuration_id=self.configuration_id).build()
 
     @abstractmethod
     def run_configure(self) -> None:
-        """Perform configuration using parameters specified in this record."""
+        """Perform configuration."""

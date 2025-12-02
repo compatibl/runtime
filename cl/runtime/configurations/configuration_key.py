@@ -19,12 +19,12 @@ from cl.runtime.records.key_mixin import KeyMixin
 
 
 @dataclass(slots=True)
-class ConfigKey(DataclassMixin, KeyMixin):
-    """Performs configuration using parameters specified in this record."""
+class ConfigurationKey(DataclassMixin, KeyMixin):
+    """Performs configuration when run_configure is invoked."""
 
-    config_id: str = required()
+    configuration_id: str = required()
     """Unique configuration identifier."""
 
     @classmethod
     def get_key_type(cls) -> type[KeyMixin]:
-        return ConfigKey
+        return ConfigurationKey
