@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations
+from __future__ import annotations  # TODO: ! Review all instances of __future__ and eliminate if not needed
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -27,7 +27,7 @@ SETTINGS_FILES_ENVVAR = "CL_SETTINGS_FILES"
 
 
 @dataclass(slots=True, kw_only=True)
-class ProjectSettings:
+class ProjectSettings:  # TODO: !!!! Derive from Settings or rename to ProjectUtil or ProjectLayout and make static
     """
     Information about the project location and layout used to search for settings and packages.
     This class finds the location of .env or settings.yaml and detects one of two supported layouts:
