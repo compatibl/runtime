@@ -18,7 +18,12 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.protocols import TEnum
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
-from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typename, typenameof
+from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
+from cl.runtime.serializers.slots_util import SlotsUtil
+from cl.runtime.settings.settings import Settings
+
+_SERIALIZER = BootstrapSerializers.DEFAULT
 
 
 class SettingsUtil:
@@ -140,7 +145,66 @@ class SettingsUtil:
             )
 
     @classmethod
-    def parse_comma_delimited_string(cls, value: str) -> tuple[str, ...]:
+    def to_object(
+            cls,
+            *,
+            settings: Settings,
+            prefix: str,
+    ) -> Any:
+        """Create a new object from a group of settings fields with the same prefix, error if none are set."""
+        result = cls.to_object_or_none(
+            settings=settings,
+            prefix=prefix,
+        )
+        if result is None:
+            raise RuntimeError(f"Required field(s) with prefix '{prefix}' are not set in {typenameof(settings)}.")
+        return result
+
+    @classmethod
+    def to_object_or_none(
+            cls,
+            *,
+            settings: Settings,
+            prefix: str,
+    ) -> Any:
+        """Create a new object from a group of settings fields with the same prefix, return None if none are set."""
+
+        # Add the trailing underscore if not included in argument
+        prefix = prefix if prefix.endswith("_") else prefix + "_"
+
+        # Get a dict with all fields that have the prefix
+        field_names = SlotsUtil.get_field_names(type(settings))
+        result_dict = {
+            x.removeprefix(prefix): getattr(settings, x, None)
+            for x in field_names if x.startswith(prefix)
+        }
+
+
+        # Remove all values that are None
+        result_dict = {k: v for k, v in result_dict.items() if v is not None}
+
+        # Deserialize and build if not empty
+        if result_dict:
+            if (result_type_name := result_dict.pop(prefix + "type_name", None)) is not None:
+                # Rename the key for type if present
+                result_dict["_type"] = result_type_name
+            else:
+                # Error message otherwise
+                raise RuntimeError(
+                    f"Attribute '{prefix}type_name' is required in {typenameof(settings)}\n"
+                    f"to create an object with prefix '{prefix}'."
+                )
+
+            # Deserialize based on _type
+            result = _SERIALIZER.deserialize(result_dict).build()
+            return result
+        else:
+            # None of the fields with the specified prefix are set, return None
+            return None
+
+    @classmethod
+    def parse_comma_delimited_string(cls, value: str) -> tuple[str, ...]:  # TODO: Check if this is used anywhere
+        """Parse a comma-delimited string into a tuple of strings."""
         # Remove square brackets if present
         value = value.strip().strip("[]")
         # Split by commas and strip whitespace from each value
