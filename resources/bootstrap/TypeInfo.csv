@@ -128,7 +128,7 @@ LayoutStackElement,Data,cl.runtime.ui.layout_stack_element.LayoutStackElement,No
 LinePlot,Record,cl.runtime.plots.line_plot.LinePlot,None
 LocalBinaryFile,Data,cl.runtime.storage.local_binary_file.LocalBinaryFile,None
 LocalCache,Record,cl.runtime.db.local.local_cache.LocalCache,None
-LocalSecretsProvider,Data,cl.runtime.secrets.local_secret_provider.LocalSecretsProvider,None
+LocalSecretsProvider,Data,cl.runtime.secrets.local_secrets_provider.LocalSecretsProvider,None
 LocalStorage,Record,cl.runtime.storage.local_storage.LocalStorage,None
 LocalTextFile,Data,cl.runtime.storage.local_text_file.LocalTextFile,None
 Locale,Record,cl.runtime.parsers.locale.Locale,None

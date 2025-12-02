@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import field
-from typing import Self
+from typing import Self, cast
 from fastapi import Request
 from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import active
@@ -26,15 +26,14 @@ from cl.runtime.settings.secrets_settings import SecretsSettings
 def _get_user_secrets_public_key() -> str | None:
     """Gets the public key for encrypting sensitive user data in the client before transmission to the server."""
 
-    secret_settings = SecretsSettings.instance()
-    if secret_settings.secrets_enable:
-        # Secrets enabled, retrieve the public key
-        secret_provider = SecretsProvider.create()
-        private_key = secret_provider.get_rsa_private_key("USER-SECRETS-PRIVATE-CERT")
-        public_key = secret_provider.get_rsa_public_key(private_key=private_key)
+    secrets_provider = SecretsSettings.instance().get_secrets_provider_or_none()
+    if secrets_provider:
+        # Secrets provider is specified, retrieve the public key
+        private_key = secrets_provider.get_rsa_private_key("USER-SECRETS-PRIVATE-CERT")
+        public_key = secrets_provider.get_rsa_public_key(private_key=private_key)
         return public_key
     else:
-        # Secrets not enabled, return None
+        # Secrets provider is not enabled, return None
         return None
 
 

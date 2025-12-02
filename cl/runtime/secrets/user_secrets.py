@@ -15,12 +15,15 @@
 import base64
 import logging
 from dataclasses import dataclass
+from typing import cast
+
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.secrets.secrets_provider import SecretsProvider
+from cl.runtime.settings.secrets_settings import SecretsSettings
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,8 +65,9 @@ class UserSecrets(DataclassMixin):
         encrypted_value_bytes = base64.b64decode(encrypted_value)
 
         # Load the private key
-        secret_provider = SecretsProvider.create()
-        private_key: RSAPrivateKey = secret_provider.get_rsa_private_key("USER-SECRETS-PRIVATE-CERT")
+        secrets_settings = SecretsSettings.instance()
+        secrets_provider = cast(SecretsProvider, secrets_settings.get_secrets_provider_or_none())
+        private_key: RSAPrivateKey = secrets_provider.get_rsa_private_key("USER-SECRETS-PRIVATE-CERT")
 
         # Decrypt the value
         decrypted_value_bytes = private_key.decrypt(

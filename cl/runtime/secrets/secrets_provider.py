@@ -15,56 +15,42 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Self
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
-from cl.runtime.schema.type_info import TypeInfo
-from cl.runtime.settings.secrets_settings import SecretsSettings
 
 
 @dataclass(slots=True, kw_only=True)
 class SecretsProvider(DataclassMixin, ABC):
     """Class to provide access to secrets."""
 
-    @classmethod
-    def create(cls) -> Self:
-        """Create Secret Provider from settings."""
-
-        provider_config_dict = SecretsSettings.instance().secrets_provider
-
-        # Transform frozendict from settings to dict to get and remove provider type from data
-        provider_config_dict = dict(provider_config_dict)
-        provider_type = provider_config_dict.pop("type")
-        if provider_type is None:
-            raise RuntimeError(
-                f"Attribute 'type' is required in Secret Provider config. Invalid config:\n {provider_config_dict}"
-            )
-
-        return TypeInfo.from_type_name(provider_type)(**provider_config_dict).build()
-
     @abstractmethod
     def add_secret(self, name: str, value) -> None:
-        raise NotImplementedError
+        """
+        Add secret to vault.
+
+        Args:
+            name: secret name
+            value: secret value
+        """
 
     @abstractmethod
     def get_secret(self, secret_name: str) -> dict[str, str]:
         """
-        Get last version of secret from vault
+        Get last version of secret from vault.
 
         Args:
-            secret_name (str): secret name
+            secret_name: secret name
 
         Returns:
             dict: {"value": <secret value>, "version": <secret version>}
         """
-        raise NotImplementedError()
 
     @abstractmethod
     def get_secret_by_version(self, secret_name: str, version: str) -> dict[str, str]:
         """
-        Get specified version of secret from vault
+        Get specified version of secret from vault.
 
         Args:
             secret_name (str): secret name
@@ -73,18 +59,18 @@ class SecretsProvider(DataclassMixin, ABC):
         Returns:
             dict: {"value": <secret value>, "version": <secret version>}
         """
-        raise NotImplementedError()
 
     def get_rsa_private_key(self, secret_name: str, version: str | None = None) -> RSAPrivateKey:
+        """Get RSA private key."""
         if version:
             private_key_str = self.get_secret_by_version(secret_name, version)["value"]
         else:
             private_key_str = self.get_secret(secret_name)["value"]
-
         return serialization.load_pem_private_key(private_key_str.encode(), password=None, backend=default_backend())
 
     @classmethod
     def get_rsa_public_key(cls, private_key: RSAPrivateKey) -> str:
+        """Get RSA public key."""
         public_key_obj = private_key.public_key()
         public_key = public_key_obj.public_bytes(
             encoding=serialization.Encoding.PEM,

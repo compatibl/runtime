@@ -13,22 +13,30 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+
+from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.settings.settings import Settings
+from cl.runtime.settings.settings_util import SettingsUtil
 
 
 @dataclass(slots=True, kw_only=True)
-class SecretsSettings(Settings):  # TODO: !!!! Rename to SecretsSettings (plural)
+class SecretsSettings(Settings):
     """Settings for secrets management."""
-
-    secrets_enable: bool | None = None
-    """Enable user secrets (requires managing user key in the client)."""
 
     secrets_path: str = "keys"
     """Path to store secrets defined relative to resources root."""
 
-    secrets_provider: dict[str, str] = None  # TODO: !!!! Refactor to avoid a dict
-    """Secrets provider configuration."""
+    secrets_provider_type_name: str | None = None
+    """Secrets provider type name."""
 
-    def __init(self):
-        if self.secrets_provider is None:
-            self.secrets_provider = {"type": "LocalSecretsProvider"}  # TODO: !!!! Refactor to avoid type name
+    _secrets_provider: DataMixin | None = None
+    """Secrets provider instance if specified (type hint is not specified to avoid a cyclic reference)."""
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        # Create a SecretsProvider instance
+        self._secrets_provider = SettingsUtil.to_object_or_none(settings=self, prefix="secrets_provider")
+
+    def get_secrets_provider_or_none(self) -> DataMixin | None:
+        """Get secrets provider instance (type hint is not specified to avoid a cyclic reference)."""
+        return self._secrets_provider
