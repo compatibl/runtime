@@ -14,6 +14,8 @@
 
 from dataclasses import dataclass
 from itertools import chain
+from typing import Sequence
+
 from typing_extensions import final
 from cl.runtime.configs.config import Config
 from cl.runtime.contexts.context_manager import active
@@ -45,8 +47,24 @@ class PreloadSettings(Settings):
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.preload_dirs = ProjectSettings.instance().normalize_paths("dirs", self.preload_dirs)
 
-    def save_and_configure(self) -> None:
-        """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
+    def save_and_configure(
+        self,
+        *,
+        dirs: Sequence[str] | None = None,
+        file_include_patterns: Sequence[str] | None = None,
+        file_exclude_patterns: Sequence[str] | None = None,
+    ):
+        """
+        Load records from files in the specified dirs and extension and save them to the active data source.
+
+        Args:
+            dirs: Directories where file search is performed
+            file_include_patterns: Optional list of filename glob patterns to include
+            file_exclude_patterns: Optional list of filename glob patterns to exclude
+        """
+
+        # Use preload_dirs if dirs not specified
+        dirs = dirs or self.preload_dirs
 
         # Specify readers for each file extension
         reader_dict = {
@@ -54,7 +72,15 @@ class PreloadSettings(Settings):
         }
 
         # Get records stored in preload directories
-        record_lists = [reader.load_all(dirs=self.preload_dirs, ext=ext) for ext, reader in reader_dict.items()]
+        record_lists = [
+            reader.load_all(
+                dirs=dirs,
+                ext=ext,
+                file_include_patterns=file_include_patterns,
+                file_exclude_patterns=file_exclude_patterns,
+            )
+            for ext, reader in reader_dict.items()
+        ]
 
         # Chain records into a single list
         records = list(chain(*record_lists))
