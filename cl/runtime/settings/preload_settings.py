@@ -21,7 +21,7 @@ from cl.runtime.configs.config import Config
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_reader import CsvReader
-from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.settings import Settings
 
 
@@ -45,7 +45,7 @@ class PreloadSettings(Settings):
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
-        self.preload_dirs = ProjectSettings.normalize_paths("dirs", self.preload_dirs)
+        self.preload_dirs = ProjectLayout.normalize_paths("dirs", self.preload_dirs)
 
     def save_and_configure(
         self,

@@ -34,7 +34,7 @@ from cl.runtime.server.shutdown_aware_server import ShutdownAwareServer
 from cl.runtime.settings.api_settings import ApiSettings
 from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.settings.preload_settings import PreloadSettings
-from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 
@@ -111,7 +111,7 @@ def run_backend() -> None:
         PreloadSettings.instance().save_and_configure()
 
         # Find wwwroot directory, error if not found
-        wwwroot_dir = ProjectSettings.get_wwwroot()
+        wwwroot_dir = ProjectLayout.get_wwwroot()
 
         # Mount static client files
         server_app.mount("/", StaticFiles(directory=wwwroot_dir, html=True))

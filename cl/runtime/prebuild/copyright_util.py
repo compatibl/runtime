@@ -17,7 +17,7 @@ from fnmatch import fnmatch
 from typing import Sequence
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.settings.env_settings import EnvSettings
-from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.file.project_layout import ProjectLayout
 
 APACHE_LICENSE_MD5 = "f9154a63c383844813d6abf79e4230d1"
 
@@ -76,7 +76,7 @@ class CopyrightUtil:
         for package in packages:
 
             # Check if the LICENSE file at package root is Apache 2.0
-            package_root = ProjectSettings.get_package_root(package)
+            package_root = ProjectLayout.get_package_root(package)
             license_file_path = os.path.join(package_root, "LICENSE")
             if os.path.exists(license_file_path):
                 with open(license_file_path, "r", encoding="utf-8") as license_file:
@@ -90,13 +90,13 @@ class CopyrightUtil:
 
             # Add paths to source, stubs, and test directories
             package_root_paths = []
-            if (x := ProjectSettings.get_source_root(package)) is not None and x not in all_root_paths:
+            if (x := ProjectLayout.get_source_root(package)) is not None and x not in all_root_paths:
                 package_root_paths.append(x)
                 all_root_paths.add(x)
-            if (x := ProjectSettings.get_stubs_root(package)) is not None and x not in all_root_paths:
+            if (x := ProjectLayout.get_stubs_root(package)) is not None and x not in all_root_paths:
                 package_root_paths.append(x)
                 all_root_paths.add(x)
-            if (x := ProjectSettings.get_tests_root(package)) is not None and x not in all_root_paths:
+            if (x := ProjectLayout.get_tests_root(package)) is not None and x not in all_root_paths:
                 package_root_paths.append(x)
                 all_root_paths.add(x)
 

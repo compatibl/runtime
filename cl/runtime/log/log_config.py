@@ -22,7 +22,7 @@ from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.settings.log_settings import LogSettings
-from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.file.project_layout import ProjectLayout
 
 max_log_file_size_bytes = 1024 * 1024 * 10  # 10MB
 """Max log file in bytes, after this size is reached older records will be erased"""
@@ -54,7 +54,7 @@ def get_log_filename() -> str:
             )
 
     # Create log directory and filename relative to project root.
-    project_root = ProjectSettings.get_project_root()
+    project_root = ProjectLayout.get_project_root()
     log_dir = os.path.join(project_root, "logs")
     result = os.path.join(log_dir, result)
 

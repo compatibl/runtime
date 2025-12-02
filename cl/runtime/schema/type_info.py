@@ -41,7 +41,7 @@ from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import qualname
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
-from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.file.project_layout import ProjectLayout
 
 _TYPE_INFO_HEADERS = (
     "TypeName",
@@ -575,7 +575,7 @@ class TypeInfo(BootstrapMixin):
     @classmethod
     def _get_preload_filename(cls) -> str:
         """Get the filename for the qual name cache."""
-        resources_root = ProjectSettings.get_resources_root()
+        resources_root = ProjectLayout.get_resources_root()
         result = os.path.join(resources_root, "bootstrap/TypeInfo.csv")
         return result
 

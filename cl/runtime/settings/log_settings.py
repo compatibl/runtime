@@ -19,7 +19,7 @@ from typing_extensions import final
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.records.typename import typename
-from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.settings import Settings
 
 
@@ -69,6 +69,6 @@ class LogSettings(Settings):
     def get_log_dir(cls) -> str:
         """Get database directory (optional, defaults to '{project_root}/logs')."""
         if (result := LogSettings.instance().log_dir) is None:
-            project_root = ProjectSettings.get_project_root()
+            project_root = ProjectLayout.get_project_root()
             result = os.path.join(project_root, "logs")
         return result

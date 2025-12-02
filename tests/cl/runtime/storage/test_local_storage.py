@@ -15,7 +15,7 @@
 import pytest
 import os
 from cl.runtime.qa.regression_guard import RegressionGuard
-from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.storage.local_storage import LocalStorage
 from cl.runtime.storage.storage_mode import StorageMode
 
@@ -35,7 +35,7 @@ def test_local_storage():
 
     guard = RegressionGuard()
     abs_dir = guard.abs_dir
-    rel_dir = os.path.relpath(abs_dir, start=ProjectSettings.get_project_root())
+    rel_dir = os.path.relpath(abs_dir, start=ProjectLayout.get_project_root())
     extensions = ("txt", "bin")
     with LocalStorage(rel_dir=rel_dir).build() as storage:
         for extension in extensions:
@@ -92,7 +92,7 @@ def test_local_storage_exceptions():
     # Test invalid storage modes
     guard = RegressionGuard()
     abs_dir = guard.abs_dir
-    rel_dir = os.path.relpath(abs_dir, start=ProjectSettings.get_project_root())
+    rel_dir = os.path.relpath(abs_dir, start=ProjectLayout.get_project_root())
     extensions = ("txt", "bin")
     with LocalStorage(rel_dir=rel_dir, storage_mode=StorageMode.READ_ONLY).build() as storage:
         with pytest.raises(Exception):

@@ -66,7 +66,7 @@ if PROJECT_LEVELS not in (1, 2):
     raise RuntimeError(f"{PROJECT_LEVELS} project levels found, only 1 or 2 levels are supported.")
 
 
-class ProjectSettings:  # TODO: !!!! Derive from Settings or rename to ProjectUtil or ProjectLayout and make static
+class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil or ProjectLayout and make static
     """
     Information about the project location and layout used to search for settings and packages.
     This class finds the location of .env or settings.yaml and detects one of two supported layouts:
@@ -136,7 +136,7 @@ class ProjectSettings:  # TODO: !!!! Derive from Settings or rename to ProjectUt
                 os.path.normpath(os.path.join(PROJECT_ROOT, x, relative_path, "__init__.py")) for x in package_tokens
             ]
         else:
-            raise RuntimeError(f"Field 'ProjectSettings.project_levels' must be 1 or 2.")
+            raise RuntimeError(f"Field 'ProjectLayout.project_levels' must be 1 or 2.")
 
         # Find the first directory with __init__.py
         init_path = next((x for x in search_paths if os.path.exists(x)), None)

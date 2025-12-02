@@ -14,7 +14,7 @@
 
 import os
 from cl.runtime.settings.env_settings import EnvSettings
-from cl.runtime.settings.project_settings import ProjectSettings
+from cl.runtime.file.project_layout import ProjectLayout
 
 
 class InitFileUtil:
@@ -43,9 +43,9 @@ class InitFileUtil:
         all_root_paths = set()
         for package in packages:
             # Add paths to source and stubs directories
-            if (x := ProjectSettings.get_source_root(package)) is not None and x not in all_root_paths:
+            if (x := ProjectLayout.get_source_root(package)) is not None and x not in all_root_paths:
                 all_root_paths.add(x)
-            if (x := ProjectSettings.get_stubs_root(package)) is not None and x not in all_root_paths:
+            if (x := ProjectLayout.get_stubs_root(package)) is not None and x not in all_root_paths:
                 all_root_paths.add(x)
 
         # Apply to each element of root_paths
