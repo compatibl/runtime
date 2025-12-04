@@ -15,10 +15,8 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-
-from grpclib.config import Configuration
-
 from cl.runtime.configurations.configuration_key import ConfigurationKey
+from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.record_mixin import RecordMixin
 
 
@@ -31,6 +29,12 @@ class Configuration(ConfigurationKey, RecordMixin, ABC):
 
     def get_key(self) -> ConfigurationKey:
         return ConfigurationKey(configuration_id=self.configuration_id).build()
+
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
+        # Use globally unique UUIDv7-based timestamp if not specified
+        if self.configuration_id is None:
+            self.configuration_id = Timestamp.create()
 
     @abstractmethod
     def run_configure(self) -> None:

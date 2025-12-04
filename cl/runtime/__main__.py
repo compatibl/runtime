@@ -35,7 +35,6 @@ from cl.runtime.server.env import Env
 from cl.runtime.server.shutdown_aware_server import ShutdownAwareServer
 from cl.runtime.settings.api_settings import ApiSettings
 from cl.runtime.settings.celery_settings import CelerySettings
-from cl.runtime.settings.preload_settings import PreloadSettings
 from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks

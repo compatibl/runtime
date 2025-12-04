@@ -21,9 +21,7 @@ from cl.runtime.configurations.configuration import Configuration
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_reader import CsvReader
-from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.preload_settings import PreloadSettings
-from cl.runtime.settings.settings import Settings
 
 
 @dataclass(slots=True, kw_only=True)
@@ -34,7 +32,7 @@ class PreloadConfiguration(Configuration):
     dirs: Sequence[str] | None = None
     """Directories where file search is performed."""
 
-    file_include_patterns: Sequence[str] | None = None,
+    file_include_patterns: Sequence[str] | None = None
     """Optional list of filename glob patterns to include."""
 
     file_exclude_patterns: Sequence[str] | None = None
