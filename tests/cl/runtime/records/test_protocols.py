@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
 from typing import Sequence, MutableSequence, Mapping, MutableMapping
 
 import pytest
@@ -69,6 +70,10 @@ def test_functions():
         KeyMixin,
         RecordMixin,
         DataMixin,
+        collections.abc.MutableSequence,
+        collections.abc.Sequence,
+        collections.abc.MutableMapping,
+        collections.abc.Mapping,
     )
 
     # Data types
@@ -121,14 +126,14 @@ def test_functions():
 
     # Everything
     all_types = (
-        primitive_types_and_aliases +
-        abstract_types +
-        data_types +
-        key_types +
-        record_types +
-        sequence_types_and_aliases +
-        mapping_types_and_aliases +
-        ndarray_types_and_aliases
+        *primitive_types_and_aliases,
+        *abstract_types,
+        *data_types,
+        *key_types,
+        *record_types,
+        *sequence_types_and_aliases,
+        *mapping_types_and_aliases,
+        *ndarray_types_and_aliases
     )
 
     # Test is_primitive_type

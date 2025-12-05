@@ -19,7 +19,7 @@ from enum import Enum
 from typing import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, SEQUENCE_TYPES, MAPPING_TYPES, NDARRAY_TYPE_NAMES, \
-    NDARRAY_TYPES
+    NDARRAY_TYPES, CONTAINER_TYPE_NAMES, CONTAINER_TYPES
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.records.protocols import is_ndarray_type
@@ -212,7 +212,7 @@ class TypeHint(BootstrapMixin):
                 type_alias_args = typing.get_args(type_alias)
 
             # Parse container definitions and primitive/enum types
-            is_container = type_alias_origin in supported_containers
+            is_container = type_alias_origin in CONTAINER_TYPES
             if is_container:
                 # Process tuple[type, ...] separately because it uses ellipsis
                 if type_alias_origin is tuple:
@@ -288,10 +288,10 @@ class TypeHint(BootstrapMixin):
                         )
                     )
                 else:
-                    supported_container_names = ", ".join(tuple(set(typename(x) for x in supported_containers)))
+                    container_type_name_str = "\n".join(CONTAINER_TYPE_NAMES)
                     raise RuntimeError(
-                        f"Container type {type_alias_origin.__name__} is not one of the supported container types "
-                        f"{supported_container_names}."
+                        f"Container type {type_alias_origin.__name__} is not one of the supported container types:\n"
+                        f"{container_type_name_str}."
                     )
 
                 # Strip container wrapper

@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
 import datetime as dt
 from enum import Enum
+from inspect import isabstract
 from types import GenericAlias
 from typing import Any, get_origin
 from typing import Mapping
@@ -65,13 +67,13 @@ PREDICATE_TYPE_NAMES = (
 )
 """Names of types that may be used to represent predicates, including abstract base classes."""
 
-SEQUENCE_TYPES = (list, tuple, MutableSequence, Sequence)
+SEQUENCE_TYPES = (list, tuple, MutableSequence, Sequence, collections.abc.MutableSequence, collections.abc.Sequence)
 """Types that may be used to represent sequences, excluding abstract base classes."""
 
 SEQUENCE_TYPE_NAMES = ("list", "tuple", "MutableSequence", "Sequence")
 """Names of types that may be used to represent sequences, including abstract base classes."""
 
-MAPPING_TYPES = (dict, frozendict, MutableMapping, Mapping)
+MAPPING_TYPES = (dict, frozendict, MutableMapping, Mapping, collections.abc.MutableMapping, collections.abc.Mapping)
 """Types that may be used to represent mappings, excluding abstract base classes."""
 
 MAPPING_TYPE_NAMES = ("dict", "frozendict", "MutableMapping", "Mapping")
@@ -83,15 +85,21 @@ NDARRAY_TYPES = (np.ndarray, NDArray)
 NDARRAY_TYPE_NAMES = ("ndarray", "NDArray")
 """Names of types or generic aliases used for ndarray variables or generic aliases."""
 
+CONTAINER_TYPES = (*SEQUENCE_TYPES, *MAPPING_TYPES, *NDARRAY_TYPES)
+"""All supported container types."""
+
+CONTAINER_TYPE_NAMES = (*SEQUENCE_TYPE_NAMES, *MAPPING_TYPE_NAMES, *NDARRAY_TYPE_NAMES)
+"""All supported container type names."""
+
 PrimitiveTypes = (
     str | float | np.float64 | bool | int | Int64 | dt.date | dt.time | dt.datetime | UUID | bytes | type
 )  # TODO: Rename to PrimitiveType?
 """Type alias for Python classes used to store primitive values."""
 
-SequenceTypes = list | tuple | Sequence | MutableSequence  # TODO: Replace by Sequence or MutableSequence?
+SequenceTypes = list | tuple | Sequence | MutableSequence | collections.abc.MutableSequence | collections.abc.Sequence
 """Type alias for a supported sequence type."""
 
-MappingTypes = dict | frozendict | Mapping | MutableMapping  # TODO: Replace by Mapping or MutableMapping?
+MappingTypes = dict | frozendict | MutableMapping | Mapping | collections.abc.MutableMapping | collections.abc.Mapping
 """Type alias for a supported mapping type."""
 
 FloatArray = np.ndarray[Any, np.dtype[np.float64]]
@@ -122,9 +130,18 @@ def is_empty(
 
 
 def is_type(type_: type) -> TypeGuard[type | GenericAlias]:
-    """Returns true if the argument is a genuine type or a generic alias, including third party aliases."""
+    """Returns true if the argument is a genuine type or a supported container."""
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
-    return isinstance(type_, type) or isinstance(type_, GenericAlias) or get_origin(type_) is not None
+    if type_ is not None:
+        # Recursively call is_type on origin until it is None
+        return (
+                isinstance(type_, type) or
+                ((type_name := getattr(type_, "__name__", None)) is not None and type_name in CONTAINER_TYPE_NAMES) or
+                is_type(get_origin(type_))
+        )
+    else:
+        # Original argument is None or no longer a generic alias and origin is None
+        return False
 
 
 def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:
@@ -204,12 +221,7 @@ def is_ndarray_type(type_: type) -> TypeGuard[type[np.ndarray]]:
 def is_abstract_type(type_: type) -> bool:
     """True if the argument is an abstract class."""
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
-    if (type_name := getattr(type_, "__name__", None)) is not None:
-        return bool(getattr(type_, "__abstractmethods__", None))
-    else:
-        raise RuntimeError(
-            f"The argument of is_abstract_type is an instance of type {type(type_).__name__}\nrather than type variable for this type, use type(arg) instead of arg."
-        )
+    return isabstract(type_)
 
 
 def is_mixin_type(type_: type) -> bool:
