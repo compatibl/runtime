@@ -12,15 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Sequence, MutableSequence, Mapping, MutableMapping
+
 import pytest
 import datetime as dt
 from uuid import UUID
 import numpy as np
 from bson import Int64
+from frozendict import frozendict
+
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import FloatArray
+from cl.runtime.records.protocols import FloatArray, SEQUENCE_TYPES, MAPPING_TYPES, NDARRAY_TYPES
 from cl.runtime.records.protocols import FloatCube
 from cl.runtime.records.protocols import FloatMatrix
 from cl.runtime.records.protocols import FloatVector
@@ -43,7 +47,7 @@ from stubs.cl.runtime import StubDataclassKey
 def test_functions():
     """Test functions defined in the protocols module."""
 
-    # Class groups
+    # Primitive types including aliases
     primitive_types_and_aliases = (
         str,
         float,
@@ -59,29 +63,52 @@ def test_functions():
         bytes,
         type,
     )
+
+    # Abstract types
     abstract_types = (
         KeyMixin,
         RecordMixin,
         DataMixin,
     )
+
+    # Data types
     data_types = (
         DataMixin,
         DataclassMixin,
         StubDataclassData,
     )
+
+    # Key types
     key_types = (
         KeyMixin,
         StubDataclassKey,
     )
+
+    # Record types
     record_types = (
         RecordMixin,
         StubDataclass,
         StubDataclassDerived,
     )
 
-    # For ndarray, the list also includes generic aliases
-    ndarray_types_and_aliases = (
-        np.ndarray,
+    # Includes generic aliases
+    sequence_types_and_aliases = SEQUENCE_TYPES + (
+        list[str],
+        tuple[str, ...],
+        MutableSequence[str],
+        Sequence[str],
+    )
+
+    # Includes generic aliases
+    mapping_types_and_aliases = MAPPING_TYPES + (
+        dict[str, str],
+        frozendict[str, str],
+        MutableMapping[str, str],
+        Mapping[str, str],
+    )
+
+    # Includes generic aliases
+    ndarray_types_and_aliases = NDARRAY_TYPES + (
         FloatArray,
         FloatVector,
         FloatMatrix,
@@ -94,7 +121,14 @@ def test_functions():
 
     # Everything
     all_types = (
-        primitive_types_and_aliases + abstract_types + data_types + key_types + record_types + ndarray_types_and_aliases
+        primitive_types_and_aliases +
+        abstract_types +
+        data_types +
+        key_types +
+        record_types +
+        sequence_types_and_aliases +
+        mapping_types_and_aliases +
+        ndarray_types_and_aliases
     )
 
     # Test is_primitive_type

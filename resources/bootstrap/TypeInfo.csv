@@ -25,8 +25,8 @@ ClassMethodTask,Record,cl.runtime.tasks.class_method_task.ClassMethodTask,None
 ClassifierExperiment,Record,cl.runtime.stat.classifier_experiment.ClassifierExperiment,None
 ClassifierTrial,Record,cl.runtime.stat.classifier_trial.ClassifierTrial,None
 ColumnState,Data,cl.runtime.ui.column_state.ColumnState,None
-Config,Record,cl.runtime.configurations.configuration.Config,None
-ConfigKey,Key,cl.runtime.configurations.configuration_key.ConfigKey,None
+Configuration,Record,cl.runtime.configurations.configuration.Configuration,None
+ConfigurationKey,Key,cl.runtime.configurations.configuration_key.ConfigurationKey,None
 ConfusionMatrixPlot,Record,cl.runtime.plots.confusion_matrix_plot.ConfusionMatrixPlot,None
 ContainerDecl,Data,cl.runtime.schema.container_decl.ContainerDecl,None
 ContainerKind,Enum,cl.runtime.schema.container_kind.ContainerKind,None
@@ -45,8 +45,6 @@ DataSerializer,Data,cl.runtime.serializers.data_serializer.DataSerializer,None
 DataService,Data,cl.runtime.services.data.data_service.DataService,None
 DataSource,Record,cl.runtime.db.data_source.DataSource,None
 DataSourceKey,Key,cl.runtime.db.data_source_key.DataSourceKey,None
-DataSourceTool,Record,cl.runtime.db.data_source_tool.DataSourceTool,None
-DataSourceToolKey,Key,cl.runtime.db.data_source_tool_key.DataSourceToolKey,None
 DataSpec,Data,cl.runtime.schema.data_spec.DataSpec,None
 DataclassFieldDecl,Data,cl.runtime.schema.for_dataclasses.dataclass_field_decl.DataclassFieldDecl,None
 DataclassMixin,Data,cl.runtime.records.for_dataclasses.dataclass_mixin.DataclassMixin,None
@@ -176,6 +174,7 @@ PlottingEngine,Record,cl.runtime.plots.plotting_engine.PlottingEngine,None
 PlottingEngineKey,Key,cl.runtime.plots.plotting_engine_key.PlottingEngineKey,None
 PngView,Record,cl.runtime.views.png_view.PngView,None
 Predicate,Data,cl.runtime.records.predicates.Predicate,None
+PreloadConfiguration,Record,cl.runtime.configurations.preload_configuration.PreloadConfiguration,None
 PreloadSettings,Data,cl.runtime.settings.preload_settings.PreloadSettings,None
 PrimitiveDecl,Record,cl.runtime.schema.primitive_decl.PrimitiveDecl,None
 PrimitiveSerializer,Data,cl.runtime.serializers.primitive_serializer.PrimitiveSerializer,None
@@ -280,7 +279,7 @@ StubPydanticHandlersKey,Key,stubs.cl.runtime.records.for_pydantic.stub_pydantic_
 StubPydanticKey,Key,stubs.cl.runtime.records.for_pydantic.stub_pydantic_key.StubPydanticKey,None
 StubPydanticNestedFields,Record,stubs.cl.runtime.records.for_pydantic.stub_pydantic_nested_fields.StubPydanticNestedFields,None
 StubRelabeledIntEnum,Enum,stubs.cl.runtime.records.enum.stub_relabeled_int_enum.StubRelabeledIntEnum,None
-StubRuntimeConfig,Record,stubs.cl.runtime.configurations.stub_runtime_config.StubRuntimeConfig,None
+StubSamplesConfiguration,Record,stubs.cl.runtime.configurations.stub_samples_configuration.StubSamplesConfiguration,None
 StubSlotted,Record,stubs.cl.runtime.records.for_slotted.stub_slotted.StubSlotted,None
 StubSlottedKey,Key,stubs.cl.runtime.records.for_slotted.stub_slotted_key.StubSlottedKey,None
 StubSupervisedBinaryExperiment,Record,stubs.cl.runtime.stat.stub_supervised_binary_experiment.StubSupervisedBinaryExperiment,None

@@ -15,7 +15,7 @@
 import datetime as dt
 from enum import Enum
 from types import GenericAlias
-from typing import Any
+from typing import Any, get_origin
 from typing import Mapping
 from typing import MutableMapping
 from typing import MutableSequence
@@ -26,6 +26,8 @@ from uuid import UUID
 import numpy as np
 from bson import Int64
 from frozendict import frozendict
+from numpy._typing import NDArray
+
 from cl.runtime.records.typename import typename
 
 PRIMITIVE_TYPES = (
@@ -63,17 +65,20 @@ PREDICATE_TYPE_NAMES = (
 )
 """Names of types that may be used to represent predicates, including abstract base classes."""
 
-SEQUENCE_TYPES = (list, tuple)
+SEQUENCE_TYPES = (list, tuple, MutableSequence, Sequence)
 """Types that may be used to represent sequences, excluding abstract base classes."""
 
-SEQUENCE_TYPE_NAMES = ("MutableSequence", "Sequence", "list", "tuple")
+SEQUENCE_TYPE_NAMES = ("list", "tuple", "MutableSequence", "Sequence")
 """Names of types that may be used to represent sequences, including abstract base classes."""
 
-MAPPING_TYPES = (dict, frozendict)
+MAPPING_TYPES = (dict, frozendict, MutableMapping, Mapping)
 """Types that may be used to represent mappings, excluding abstract base classes."""
 
-MAPPING_TYPE_NAMES = ("MutableMapping", "Mapping", "dict", "frozendict")
+MAPPING_TYPE_NAMES = ("dict", "frozendict", "MutableMapping", "Mapping")
 """Names of types that may be used to represent mappings, including abstract base classes."""
+
+NDARRAY_TYPES = (np.ndarray, NDArray)
+"""Types used for ndarray variables."""
 
 NDARRAY_TYPE_NAMES = ("ndarray", "NDArray")
 """Names of types or generic aliases used for ndarray variables or generic aliases."""
@@ -119,7 +124,7 @@ def is_empty(
 def is_type(type_: type) -> TypeGuard[type | GenericAlias]:
     """Returns true if the argument is a genuine type or a generic alias, including third party aliases."""
     # Do not use isinstance(type_, type) to accept GenericAlias classes, including from packages (e.g., numpy)
-    return isinstance(type_, GenericAlias) or isinstance(type_, type)
+    return isinstance(type_, type) or isinstance(type_, GenericAlias) or get_origin(type_) is not None
 
 
 def is_primitive_type(type_: type) -> TypeGuard[type[PrimitiveTypes]]:

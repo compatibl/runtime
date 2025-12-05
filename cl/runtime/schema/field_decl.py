@@ -21,7 +21,7 @@ from uuid import UUID
 import numpy
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_TYPES
+from cl.runtime.records.protocols import PRIMITIVE_TYPES, SEQUENCE_TYPES, MAPPING_TYPES, NDARRAY_TYPES
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
@@ -127,21 +127,13 @@ class FieldDecl(DataclassMixin):
 
         # Check for one of the supported container types
         outer_container = None
-        supported_containers = [list, tuple, dict]
+        supported_containers = SEQUENCE_TYPES + MAPPING_TYPES
         while field_origin in supported_containers:
-            if field_origin is list:
+            # Process tuple[type, ...] separately because it uses ellipsis
+            if field_origin is tuple:
+                # All sequence types are treated as ContainerKind.LIST in declarations
                 container = ContainerDecl(container_kind=ContainerKind.LIST)
-                # Perform additional checks for list
-                if len(field_args) != 1:
-                    raise RuntimeError(
-                        f"List type hint '{field_type}' for field '{field_name}'\n"
-                        f"in record '{typename(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a list of elements using the syntax 'list[type]'.\n"
-                        f"Other list type hint formats are not supported.\n"
-                    )
-            elif field_origin is tuple:
-                container = ContainerDecl(container_kind=ContainerKind.LIST)
-                # Perform additional checks for tuple
+                # Process ellipsis for tuple[type, ...] and perform additional checks
                 if len(field_args) == 1 or (len(field_args) > 1 and field_args[1] is not Ellipsis):
                     raise RuntimeError(
                         f"Tuple type hint '{field_type}' for field '{field_name}'\n"
@@ -151,7 +143,20 @@ class FieldDecl(DataclassMixin):
                         f"It cannot be used to specify a fixed size tuple or a tuple with\n"
                         f"different element types.\n"
                     )
-            elif field_origin is dict:
+            # Process all other sequence types which do not use ellipsis
+            elif field_origin in SEQUENCE_TYPES + NDARRAY_TYPES:  # TODO: !! Numpy arrays may need to be treated separately
+                # All sequence types are treated as ContainerKind.LIST in declarations
+                container = ContainerDecl(container_kind=ContainerKind.LIST)
+                # Perform additional checks for sequence types that do not use ellipsis
+                if len(field_args) != 1:
+                    raise RuntimeError(
+                        f"Type hint '{field_type}' for a sequence field '{field_name}'\n"
+                        f"in record '{typename(record_type)}' is not supported for DB schema\n"
+                        f"because it has more than one type parameter in square brackets."
+                    )
+            # Process all mapping types
+            elif field_origin in MAPPING_TYPES:
+                # All mapping types are treated as ContainerKind.DICT in declarations
                 container = ContainerDecl(container_kind=ContainerKind.DICT)
                 # Perform additional checks for dict
                 if len(field_args) != 2 and field_args[0] is not str:
@@ -159,13 +164,13 @@ class FieldDecl(DataclassMixin):
                         f"Dict type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{typename(record_type)}' is not supported for DB schema\n"
                         f"because it is not a dictionary with string keys using the syntax 'dict[str, type]'.\n"
-                        f"It cannot be used to specify a dictionary with keys of a different type.\n"
+                        f"It cannot be used to specify a dictionary with key type other than str.\n"
                     )
                 # TODO: Support dict[str, list[x]]
             else:
-                supported_container_names = ", ".join([typename(x) for x in supported_containers])
+                supported_container_names = "\n".join([typename(x) for x in supported_containers])
                 raise RuntimeError(
-                    f"Type {field_origin.__name__} is not one of the supported container types "
+                    f"Type {field_origin.__name__} is not one of the supported container types:\n"
                     f"{supported_container_names}."
                 )
 

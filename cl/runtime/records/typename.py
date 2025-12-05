@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any
+from typing import Any, get_origin
 from memoization import cached
 
 
@@ -32,8 +32,11 @@ def typename(type_: type) -> str:
     This method accepts type only, error if an if instance is provided.
     """
     if isinstance(type_, type):
-        # TODO: Add support for aliases
+        # Non-generic type
         return type_.__name__
+    elif (type_origin := get_origin(type_)) is not None:
+        # Parametrized generic including _GenericAlias
+        return type_origin.__name__
     else:
         raise RuntimeError(
             f"Function typename accepts only type but an instance of {typename(type(type_))} was provided instead."

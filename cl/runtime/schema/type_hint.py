@@ -17,10 +17,9 @@ import typing
 from dataclasses import dataclass
 from enum import Enum
 from typing import Self
-import numpy as np
-from frozendict import frozendict
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, SEQUENCE_TYPES, MAPPING_TYPES, NDARRAY_TYPE_NAMES, \
+    NDARRAY_TYPES
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.records.protocols import is_ndarray_type
@@ -160,7 +159,7 @@ class TypeHint(BootstrapMixin):
 
         # There are two possible forms of origin for optional, typing.Union and types.UnionType
         union_types = [types.UnionType, typing.Union]
-        supported_containers = [list, tuple, dict, frozendict, np.ndarray]
+        supported_containers = SEQUENCE_TYPES + MAPPING_TYPES + NDARRAY_TYPES
         while True:
             # Handle unions that specify optionality and/or predicates
             type_alias_optional = None
@@ -215,25 +214,8 @@ class TypeHint(BootstrapMixin):
             # Parse container definitions and primitive/enum types
             is_container = type_alias_origin in supported_containers
             if is_container:
-                if type_alias_origin is list:
-                    if len(type_alias_args) != 1:
-                        raise RuntimeError(
-                            f"List type hint '{cls._serialize_type_alias(type_alias)}'\n"
-                            f"for field {field_name} in {typename(containing_type)} is not supported\n"
-                            f"because it is not a list of elements using the syntax 'list[type]'\n"
-                        )
-                    # Populate container data and extract inner type alias
-                    type_alias = type_alias_args[0]
-                    type_hint_tokens.append(
-                        TypeHint(
-                            schema_type=list,
-                            optional=type_alias_optional,
-                            predicate=type_alias_predicate,
-                            remaining=None,
-                            subtype=None,
-                        )
-                    )
-                elif type_alias_origin is tuple:
+                # Process tuple[type, ...] separately because it uses ellipsis
+                if type_alias_origin is tuple:
                     if len(type_alias_args) != 2 or type_alias_args[1] is not Ellipsis:
                         raise RuntimeError(
                             f"Tuple type hint '{cls._serialize_type_alias(type_alias)}'\n"
@@ -250,7 +232,26 @@ class TypeHint(BootstrapMixin):
                             subtype=None,
                         )
                     )
-                elif type_alias_origin in (dict, frozendict):
+                # Process all other sequence types which do not use ellipsis
+                elif type_alias_origin in SEQUENCE_TYPES:
+                    if len(type_alias_args) != 1:
+                        raise RuntimeError(
+                            f"Type hint '{cls._serialize_type_alias(type_alias)}'\n"
+                            f"for field {field_name} in {typename(containing_type)} is not supported\n"
+                            f"because it has more than one type parameter in square brackets."
+                    )
+                    # Populate container data and extract inner type alias
+                    type_alias = type_alias_args[0]
+                    type_hint_tokens.append(
+                        TypeHint(
+                            schema_type=type_alias_origin,
+                            optional=type_alias_optional,
+                            predicate=type_alias_predicate,
+                            remaining=None,
+                            subtype=None,
+                        )
+                    )
+                elif type_alias_origin in MAPPING_TYPES:
                     if len(type_alias_args) != 2 or type_alias_args[0] is not str:
                         raise RuntimeError(
                             f"Type hint '{cls._serialize_type_alias(type_alias)}'\n"
@@ -268,7 +269,7 @@ class TypeHint(BootstrapMixin):
                             subtype=None,
                         )
                     )
-                elif type_alias_origin is np.ndarray:
+                elif type_alias_origin in NDARRAY_TYPES:
                     if len(type_alias_args) != 2:
                         raise RuntimeError(
                             f"Type hint '{cls._serialize_type_alias(type_alias)}'\n"
@@ -287,7 +288,7 @@ class TypeHint(BootstrapMixin):
                         )
                     )
                 else:
-                    supported_container_names = ", ".join([typename(x) for x in supported_containers])
+                    supported_container_names = ", ".join(tuple(set(typename(x) for x in supported_containers)))
                     raise RuntimeError(
                         f"Container type {type_alias_origin.__name__} is not one of the supported container types "
                         f"{supported_container_names}."
@@ -336,7 +337,8 @@ class TypeHint(BootstrapMixin):
                         raise RuntimeError(
                             f"Type hint {type_alias} is not supported. Supported type hints include:\n"
                             f"- a union with None (optional) with one of the supported types inside\n"
-                            f"- list, tuple, dict, frozendict with one of the supported types inside\n"
+                            f"- list, tuple, MutableSequence, Sequence with one of the supported types inside\n"
+                            f"- dict, frozendict, MutableMapping, Mapping with one of the supported types inside\n"
                             f"- a type with build method\n"
                             f"- {', '.join(PRIMITIVE_TYPE_NAMES)}\n"
                         )
