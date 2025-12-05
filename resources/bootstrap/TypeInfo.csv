@@ -127,7 +127,7 @@ LayoutStackElement,Data,cl.runtime.ui.layout_stack_element.LayoutStackElement,No
 LinePlot,Record,cl.runtime.plots.line_plot.LinePlot,None
 LocalBinaryFile,Data,cl.runtime.storage.local_binary_file.LocalBinaryFile,None
 LocalCache,Record,cl.runtime.db.local.local_cache.LocalCache,None
-LocalSecretsProvider,Data,cl.runtime.secrets.local_secrets_provider.LocalSecretsProvider,None
+LocalSecretsProvider,Data,cl.runtime.auth.local_secrets_provider.LocalSecretsProvider,None
 LocalStorage,Record,cl.runtime.storage.local_storage.LocalStorage,None
 LocalTextFile,Data,cl.runtime.storage.local_text_file.LocalTextFile,None
 Locale,Record,cl.runtime.parsers.locale.Locale,None
@@ -205,7 +205,7 @@ ScatterValues3D,Data,cl.runtime.plots.scatter_values_3d.ScatterValues3D,None
 ScreensResponse,Data,cl.runtime.services.data.screens_response.ScreensResponse,None
 Script,Record,cl.runtime.views.script.Script,None
 ScriptLanguage,Enum,cl.runtime.views.script_language.ScriptLanguage,None
-SecretsProvider,Data,cl.runtime.secrets.secrets_provider.SecretsProvider,None
+SecretsProvider,Data,cl.runtime.auth.secrets_provider.SecretsProvider,None
 SecretsSettings,Data,cl.runtime.settings.secrets_settings.SecretsSettings,None
 SelectDataResponse,Data,cl.runtime.services.data.select_data_response.SelectDataResponse,None
 Serializer,Data,cl.runtime.serializers.serializer.Serializer,None
@@ -349,7 +349,7 @@ UiTypeStateKey,Key,cl.runtime.ui.ui_type_state_key.UiTypeStateKey,None
 User,Record,cl.runtime.ui.user.User,None
 UserKey,Key,cl.runtime.ui.user_key.UserKey,None
 UserLogMessage,Record,cl.runtime.log.user_log_message.UserLogMessage,None
-UserSecrets,Key,cl.runtime.secrets.user_secrets.UserSecrets,None
+UserSecrets,Key,cl.runtime.auth.user_secrets.UserSecrets,None
 UuidFormat,Enum,cl.runtime.serializers.uuid_format.UuidFormat,None
 ValueDecl,Data,cl.runtime.schema.value_decl.ValueDecl,None
 View,Record,cl.runtime.views.view.View,None

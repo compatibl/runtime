@@ -21,7 +21,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
-from cl.runtime.secrets.secrets_provider import SecretsProvider
+from cl.runtime.auth.secrets_provider import SecretsProvider
 from cl.runtime.settings.secrets_settings import SecretsSettings
 
 _LOGGER = logging.getLogger(__name__)

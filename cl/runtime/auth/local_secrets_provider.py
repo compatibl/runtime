@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import ruamel.yaml
 from cl.runtime.primitive.datetime_util import DatetimeUtil
-from cl.runtime.secrets.secrets_provider import SecretsProvider
+from cl.runtime.auth.secrets_provider import SecretsProvider
 from cl.runtime.file.project_layout import ProjectLayout
 
 
