@@ -19,34 +19,21 @@ from cl.runtime.db.db import Db
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.settings.preload_settings import PreloadSettings
 from cl.runtime.settings.db_settings import DbSettings
 from tools.cl.runtime.init_type_info import init_type_info
 
 
-def init_db(*, force: bool = False) -> None:
-    """Drop old DB, create and populate new DB."""
+def init_db(*, drop_db_interactive: bool = False) -> None:
+    """Populate DB with data, drop previous version if not empty after interactive user approval if needed."""
     with activate(DataSource(db=Db.create()).build()):
-        db = active(DataSource).db
-        db_settings = DbSettings.instance()
-        
-        # Check if this is a temporary database
-        is_temp_db = db.db_id.startswith(db_settings.db_temp_prefix)
-        
-        # Skip confirmation if --force is passed and DB is temporary
-        if force and is_temp_db:
-            print(f"Dropping temporary database '{db.db_id}' without confirmation (--force flag)...")
-            db.drop_temp_db(user_approval=True)
-        else:
-            # Ask for confirmation before dropping the DB
-            confirmation = "yes"
-            # Check for lowercase 'yes'
-            if confirmation == 'yes':
-                print(f"\nDropping the existing DB...")
-                db.drop_temp_db(user_approval=True)
-            else:
-                print("\nDB drop operation aborted by the user.\n")
-                return
+
+        # Get DB instance
+        db = active(DataSource)._get_db()  # TODO: !! Move
+
+        # Handle the case when DB is not empty
+        if not db.is_empty():
+            # Drop previous version if not empty after interactive user approval if needed.
+            db.drop_db(drop_db_interactive=drop_db_interactive)
 
         # Initialize type cache before loading data into DB
         init_type_info()
@@ -57,8 +44,6 @@ def init_db(*, force: bool = False) -> None:
 
 
 if __name__ == "__main__":
-    # Parse command line arguments
-    force = "--force" in sys.argv
-    
-    # Initialize DB
-    init_db(force=force)
+
+    # Initialize DB in interactive mode
+    init_db(drop_db_interactive=True)

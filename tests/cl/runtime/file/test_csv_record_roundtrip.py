@@ -101,10 +101,10 @@ def test_roundtrip(default_db_fixture):
                 ext="csv",
                 file_include_patterns=[record_type_pattern],
             )
-            active(
-                DataSource
-            )._get_db().drop_test_db()  # TODO: !!!! Implement delete_by_type in DataSource and use it here
-            active(DataSource).insert_many(records_from_csv, commit=True)
+
+            ds = active(DataSource)
+            ds.drop_db()  # TODO: !!!! Implement delete_by_type in DataSource and use it here
+            ds.insert_many(records_from_csv, commit=True)
 
             # Load from DB and compare to the originals
             records_from_db = active(DataSource).load_by_type(record_type)

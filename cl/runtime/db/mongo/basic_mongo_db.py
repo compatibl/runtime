@@ -99,6 +99,11 @@ class BasicMongoDb(Db):
         if self.client_uri is None:
             self.client_uri = db_settings.db_mongo_uri
 
+    def is_empty(self) -> bool:
+        """Return true if the database contains no collections."""
+        mongo_db = self._get_mongo_db()
+        return len(mongo_db.list_collection_names()) == 0
+
     def load_many(
         self,
         key_type: type[KeyMixin],
@@ -438,25 +443,14 @@ class BasicMongoDb(Db):
         # Delete from DB
         collection.delete_many(query_dict)
 
-    def drop_test_db(self) -> None:
-        # Check preconditions
-        self.check_drop_test_db_preconditions()
-
-        # Drop the entire database without possibility of recovery.
-        # This relies on the preconditions check above to prevent unintended use
+    def _drop_db_do_not_call_directly(self) -> None:
+        """DO NOT CALL DIRECTLY, call drop_db() instead."""
+        # Drop the database without possibility of recovery after
+        # the preconditions check above to prevent unintended use
         client = self._get_mongo_client()
         db_name = self._get_db_name()
         client.drop_database(db_name)
 
-    def drop_temp_db(self, *, user_approval: bool) -> None:
-        # Check preconditions
-        self.check_drop_temp_db_preconditions(user_approval=user_approval)
-
-        # Drop the entire database without possibility of recovery.
-        # This relies on the preconditions check above to prevent unintended use
-        client = self._get_mongo_client()
-        db_name = self._get_db_name()
-        client.drop_database(db_name)
 
     def close_connection(self) -> None:
         # TODO: Review the use of this method and when it is invoked

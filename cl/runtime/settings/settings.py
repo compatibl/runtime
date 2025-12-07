@@ -35,11 +35,14 @@ load_dotenv()
 _process_timestamp = Timestamp.create()
 """Unique UUIDv7-based timestamp set during the Python process launch."""
 
-# Switch to testing Dynaconf environment if inside a root test process
+# Override Dynaconf settings if inside a root test process
 if QaUtil.is_test_root_process():
-    os.environ.setdefault("CL_SETTINGS_ENV", "testing")
+    # Switch to Dynaconf current_env=testing
+    os.environ["CL_SETTINGS_ENV"] = "testing"
+    # Set env_kind to TEST
+    os.environ["CL_ENV_KIND"] = "TEST"
 
-_all_settings = Dynaconf(
+_DYNACONF_ALL_SETTINGS = Dynaconf(
     environments=True,
     envvar_prefix="CL",
     env_switcher="CL_SETTINGS_ENV",
@@ -55,23 +58,23 @@ _all_settings = Dynaconf(
 Dynaconf settings in raw format (including system settings), some keys may be strings instead of dictionaries or lists.
 """
 
-_user_settings = {k.lower(): v for k, v in _all_settings.as_dict().items()}
+_DYNACONF_USER_SETTINGS = {k.lower(): v for k, v in _DYNACONF_ALL_SETTINGS.as_dict().items()}
 """
 Extract user settings only using as_dict(), then convert containers at all levels to dictionaries and lists
 and convert root level keys to lowercase in case the settings are specified using envvars in uppercase format
 """
 
-_dynaconf_envvar_prefix = _all_settings.envvar_prefix_for_dynaconf
+_DYNACONF_ENVVAR_PREFIX = _DYNACONF_ALL_SETTINGS.envvar_prefix_for_dynaconf
 """Environment variable prefix for overriding dynaconf file settings."""
 
-_dynaconf_file_patterns = _all_settings.settings_file
+_DYNACONF_FILE_PATTERNS = _DYNACONF_ALL_SETTINGS.settings_file
 """List of Dynaconf settings file patterns or file paths."""
 
 # Convert to list if a single string is specified
-if isinstance(_dynaconf_file_patterns, str):
-    _dynaconf_file_patterns = [_dynaconf_file_patterns]
+if isinstance(_DYNACONF_FILE_PATTERNS, str):
+    _DYNACONF_FILE_PATTERNS = [_DYNACONF_FILE_PATTERNS]
 
-_dynaconf_loaded_files = _all_settings._loaded_files  # noqa
+_DYNACONF_LOADED_FILES = _DYNACONF_ALL_SETTINGS._loaded_files  # noqa
 """Loaded dynaconf settings files."""
 
 
@@ -97,7 +100,7 @@ class Settings(BootstrapMixin, ABC):
     def get_prefix(cls) -> str:
         """
         Dynaconf fields will be filtered by 'prefix_' before being passed to the settings class constructor.
-        Defaults to the class name converted to snake_case with _settings suffix removed.
+        Defaults to the class name converted to snake_case with 'Settings' suffix removed.
 
         Notes:
             - If this method provides an override of the default prefix, the returned prefix must be lowercase
@@ -105,6 +108,13 @@ class Settings(BootstrapMixin, ABC):
         """
         result = CaseUtil.pascal_to_snake_case(typename(cls)).removesuffix("_settings")
         result = result if result.endswith("_") else f"{result}_"
+        return result
+
+    @classmethod
+    def get_dynaconf_env(cls) -> str:
+        """
+        Returns CL_SETTINGS_ENV converted to lowercase, defaults to 'development' if CL_SETTINGS_ENV is not set."""
+        result = _DYNACONF_ALL_SETTINGS.current_env.lower()
         return result
 
     @classmethod
@@ -130,7 +140,7 @@ class Settings(BootstrapMixin, ABC):
 
             # Create a new dictionary of fields that start with 'prefix_'
             # This may include fields that are not specified in the settings class
-            settings_dict = {k: v for k, v in _user_settings.items() if k.startswith(prefix)}
+            settings_dict = {k: v for k, v in _DYNACONF_USER_SETTINGS.items() if k.startswith(prefix)}
 
             slots = cls.get_field_names()
             slots_without_prefix = [slot for slot in slots if not slot.startswith(prefix)]
@@ -153,7 +163,7 @@ class Settings(BootstrapMixin, ABC):
             missing_fields = [k for k in required_fields if k not in settings_dict]
             if missing_fields:
                 # Combine the global Dynaconf envvar prefix with settings prefix
-                envvar_prefix = f"{_dynaconf_envvar_prefix}_{prefix.upper()}"
+                envvar_prefix = f"{_DYNACONF_ENVVAR_PREFIX}_{prefix.upper()}"
                 # Environment variables source
                 sources_list = [f"Environment variables in uppercase with prefix '{envvar_prefix}'"]
 
@@ -165,10 +175,10 @@ class Settings(BootstrapMixin, ABC):
                 sources_list.append(f"Dotenv file: {env_file_name}")
 
                 # Dynaconf file source(s) or message that they are not found
-                if _dynaconf_loaded_files:
-                    dynaconf_file_list = _dynaconf_loaded_files
+                if _DYNACONF_LOADED_FILES:
+                    dynaconf_file_list = _DYNACONF_LOADED_FILES
                 else:
-                    _dynaconf_file_patterns_str = ", ".join(_dynaconf_file_patterns)
+                    _dynaconf_file_patterns_str = ", ".join(_DYNACONF_FILE_PATTERNS)
                     dynaconf_file_list = [f"No {_dynaconf_file_patterns_str} file(s) in default search path."]
                 sources_list.extend(f"Dynaconf file: {x}" for x in dynaconf_file_list)
 

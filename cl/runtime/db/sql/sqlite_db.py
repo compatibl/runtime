@@ -57,6 +57,13 @@ _COLUMN_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 @dataclass(slots=True, kw_only=True)
 class SqliteDb(Db):
 
+    def is_empty(self) -> bool:
+        """Return true if the database contains no tables."""
+        connection = self._get_connection()
+        table_names = [row[1] for row in connection.execute("PRAGMA table_list;")]
+        table_count = len([x for x in table_names if not x.startswith("sqlite_")])
+        return table_count == 0
+
     def load_many(
         self,
         key_type: type[KeyMixin],
@@ -479,22 +486,6 @@ class SqliteDb(Db):
         conn = self._get_connection()
         conn.execute(delete_sql, values)
 
-    def drop_test_db(self) -> None:
-        # Check preconditions
-        self.check_drop_test_db_preconditions()
-
-        # Drop the entire database without possibility of recovery.
-        # This relies on the preconditions check above to prevent unintended use
-        self._drop_db()
-
-    def drop_temp_db(self, *, user_approval: bool) -> None:
-        # Check preconditions
-        self.check_drop_temp_db_preconditions(user_approval=user_approval)
-
-        # Drop the entire database without possibility of recovery.
-        # This relies on the preconditions check above to prevent unintended use
-        self._drop_db()
-
     def close_connection(self) -> None:
         if (connection := _connection_dict.get(self.db_id, None)) is not None:
             # Close connection
@@ -577,8 +568,9 @@ class SqliteDb(Db):
         conn = self._get_connection()
         return conn.execute(check_sql, (table_name,)).fetchone()
 
-    def _drop_db(self):
-        """Delete db file."""
+    def _drop_db_do_not_call_directly(self) -> None:
+        """DO NOT CALL DIRECTLY, call drop_db() instead."""
+
         # Close connection
         self.close_connection()
 

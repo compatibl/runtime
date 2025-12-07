@@ -15,19 +15,23 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Sequence, final
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
-from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
+from cl.runtime.records.typename import typenameof
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
+from cl.runtime.settings.env_kind import EnvKind
+from cl.runtime.settings.env_settings import EnvSettings
 
 
 @dataclass(slots=True, kw_only=True)
@@ -36,6 +40,10 @@ class Db(DbKey, RecordMixin, ABC):
 
     def get_key(self) -> DbKey:
         return DbKey(db_id=self.db_id).build()
+
+    @abstractmethod
+    def is_empty(self) -> bool:
+        """Return true if the database contains no collections."""
 
     @abstractmethod
     def load_many(
@@ -195,42 +203,65 @@ class Db(DbKey, RecordMixin, ABC):
             tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             restrict_to: Include only this type and its subtypes, skip other types
         """
-
+        
     @abstractmethod
-    def drop_test_db(self) -> None:
-        """
-        Drop a database as part of a unit test.
-
-        EVERY IMPLEMENTATION OF THIS METHOD MUST FAIL UNLESS THE FOLLOWING CONDITIONS ARE MET:
-        - The method is invoked from a unit test based on active_or_default(Env).testing
-        - db_id starts with db_test_prefix specified in settings.yaml (the default prefix is 'test_')
-        """
-
-    @abstractmethod
-    def drop_temp_db(self, *, user_approval: bool) -> None:
-        """
-        Drop a temporary database with explicit user approval.
-
-        EVERY IMPLEMENTATION OF THIS METHOD MUST FAIL UNLESS THE FOLLOWING CONDITIONS ARE MET:
-        - user_approval is true
-        - db_id starts with db_temp_prefix specified in settings.yaml (the default prefix is 'temp_')
-        """
-
-    @abstractmethod
-    def close_connection(self) -> None:
+    def close_connection(self) -> None:  # TODO: !!! Check if this should be done using a context manager instead
         """Close database connection to releasing resource locks."""
 
-    @classmethod
-    def _get_test_db_name(cls) -> str:  # TODO: Use fixture instead
-        """Get SQLite database with name based on test namespace."""
-        if active_or_default(Env).is_test():
-            result = f"temp;{QaUtil.get_test_name_from_call_stack().replace('.', ';')}"
-            return result
+    @abstractmethod
+    def _drop_db_do_not_call_directly(self) -> None:
+        """DO NOT CALL DIRECTLY because this method does not check user approval, call drop_db() instead."""
+
+    @final
+    def drop_db(self, *, drop_db_interactive: bool = False) -> None:
+        """
+        Drop DB after checking preconditions, request user approval if required and drop_db_interactive is true.
+
+        Notes:
+            This method is marked as final to prevent overrides that bypass the preconditions check.
+            The actual drop is performed by the implementation of the _drop_db_do_not_call_directly() method.
+        """
+
+        # Ensure drop_db_interactive is boolean rather than any other truthy or falsy value
+        if not isinstance(drop_db_interactive, bool):
+            type_name = typenameof(drop_db_interactive)
+            raise RuntimeError(f"Parameter drop_db_interactive must a bool value, type {type_name} found.")
+
+        env_kind = EnvSettings.instance().env_kind
+        env_kind_str = CaseUtil.pascal_to_upper_case(env_kind.name)
+        if env_kind in (EnvKind.TEMP, EnvKind.TEST):
+            # Dropping DB is allowed without requesting approval for TEMP and TEST, proceed to drop DB
+            # TODO: !!! Implement MCP rule to check _drop_db_do_not_call_directly() is only called inside this method
+            self._drop_db_do_not_call_directly()
+        elif env_kind in (EnvKind.UAT, EnvKind.DEV):
+            # Dropping DB is allowed with approval for UAT and DEV
+            if drop_db_interactive:
+                # Request user approval in interactive mode
+                try:
+                    print(f"DATABASE {self.db_id} WILL BE DELETED. THIS ACTION CANNOT BE UNDONE (yes/no): ")
+                    user_response = input().strip().lower()
+                    if user_response == "yes":
+                        print(f"User permission to drop DB {self.db_id} is granted.")
+                        # Permission granted, proceed to drop DB
+                        self._drop_db_do_not_call_directly()
+                    else:
+                        raise RuntimeError(f"User permission to drop DB {self.db_id} is denied.")
+                except (EOFError, KeyboardInterrupt):
+                    raise RuntimeError("\nDB drop operation aborted by the user.\n")
+            else:
+                raise RuntimeError(
+                    f"Dropping DB requires interactive user approval for env_kind={env_kind_str}.\n"
+                    f"Contact your DB admin for assistance or execute this command in interactive mode.\n"
+                )
+        elif env_kind == EnvKind.PROD:
+            raise RuntimeError(
+                f"Dropping DB from code is not allowed even with user approval for env_kind={env_kind_str}.\n"
+                f"Contact your DB admin for assistance.")
         else:
-            raise RuntimeError("Attempting to get test DB name outside a test.")
+            raise ErrorUtil.enum_value_error(env_kind, EnvKind)
 
     @classmethod
-    def create(cls, *, db_type: type | None = None, db_id: str | None = None):
+    def create(cls, *, db_type: type | None = None, db_id: str | None = None):  # TODO: !!!!! Replace by the standard way to create from settings
         """Create DB of the specified type, or use DB type from context settings if not specified."""
 
         # Get DB settings instance for the lookup of defaults
@@ -249,30 +280,6 @@ class Db(DbKey, RecordMixin, ABC):
 
         # Create and return a new DB instance
         return db_type(db_id=db_id).build()
-
-    def check_drop_test_db_preconditions(self) -> None:
-        """Error if db_id does not start from db_test_prefix specified in settings.yaml (defaults to 'test_')."""
-        if not active_or_default(Env).is_test():
-            raise RuntimeError(f"Cannot drop a unit test DB when not invoked from a running unit test.")
-
-        db_settings = DbSettings.instance()
-        if not self.db_id.startswith(db_settings.db_test_prefix):
-            raise RuntimeError(
-                f"Cannot drop a unit test DB from code because its db_id={self.db_id}\n"
-                f"does not start from unit test DB prefix '{db_settings.db_test_prefix}'."
-            )
-
-    def check_drop_temp_db_preconditions(self, *, user_approval: bool) -> None:
-        """
-        Check user approval and raise an error if db_id does not start from db_temp_prefix
-        specified in settings.yaml (defaults to 'temp_').
-        """
-        db_settings = DbSettings.instance()
-        if not user_approval and not self.db_id.startswith(db_settings.db_temp_prefix):
-            raise RuntimeError(
-                f"Cannot drop a DB from code without user approval because its db_id={self.db_id}\n"
-                f"does not start from temporary DB prefix '{db_settings.db_temp_prefix}'."
-            )
 
     @classmethod
     def _check_dataset(cls, dataset: str) -> None:

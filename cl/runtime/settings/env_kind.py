@@ -18,21 +18,23 @@ from enum import auto
 
 class EnvKind(IntEnum):
     """
-    The environment kind determines the policies for data protection and retention
-    and is used to select the Dynaconf environment.
+    The environment kind determines the policies for data protection and retention.
+
+    Notes:
+        It is checked for compatibility with the Dynaconf environment selected using CL_RUNTIME_ENV.
     """
 
     PROD = auto()
-    """Persistent production environment, destructive actions require explicit authorization."""
+    """Requires dynaconf_env=production, database cannot be deleted from code."""
 
-    STAGING = auto()
-    """Persistent staging environment, destructive actions require explicit authorization."""
+    UAT = auto()
+    """Requires dynaconf_env=staging, database can be deleted from code with explicit user approval."""
 
     DEV = auto()
-    """Persistent development environment, destructive actions do not require explicit authorization."""
+    """Requires dynaconf_env=development, database deletion is requested on each server start (denied by default)."""
 
     TEMP = auto()
-    """Temporary development environment, automatically cleared (deleted) before each application start."""
+    """Requires dynaconf_env=development, database is DELETED AUTOMATICALLY on each server start."""
 
     TEST = auto()
-    """Test environment, automatically cleared (deleted) before each test run."""
+    """Requires dynaconf_env=testing, database is DELETED AUTOMATICALLY before and after each test."""

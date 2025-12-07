@@ -39,6 +39,10 @@ class LocalCache(Db):
     __cache: dict[type[KeyMixin], dict[tuple, RecordMixin]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
+    def is_empty(self) -> bool:
+        """Return true if the cache dict is empty."""
+        return len(self.__cache) == 0
+
     def load_many(
         self,
         key_type: type[KeyMixin],
@@ -164,18 +168,8 @@ class LocalCache(Db):
     ) -> None:
         raise NotImplementedError()
 
-    def drop_test_db(self) -> None:
-        # Check preconditions
-        self.check_drop_test_db_preconditions()
-
-        # Create a new cache, the objects in the old cache will no longer be accessible.
-        # This relies on the preconditions check above to prevent unintended use
-        __cache = {}
-
-    def drop_temp_db(self, *, user_approval: bool) -> None:
-        # Check preconditions
-        self.check_drop_temp_db_preconditions(user_approval=user_approval)
-
+    def _drop_db_do_not_call_directly(self) -> None:
+        """DO NOT CALL DIRECTLY, call drop_db() instead."""
         # Create a new cache, the objects in the old cache will no longer be accessible.
         # This relies on the preconditions check above to prevent unintended use
         __cache = {}

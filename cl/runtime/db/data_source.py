@@ -15,7 +15,7 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Self
+from typing import Self, final
 from typing import Sequence
 from typing import cast
 from more_itertools import consume
@@ -157,6 +157,14 @@ class DataSource(DataSourceKey, RecordMixin):
         else:
             # Rollback if there is an exception and let the exception propagate (do not suppress)
             self.rollback()
+
+    def get_db_id(self) -> str:
+        """Get db_id of the primary database of the current data source."""
+        return self._get_db().db_id
+
+    def is_empty(self) -> bool:
+        """Return true if the database contains no collections."""
+        return self._get_db().is_empty()
 
     def load_one(
         self,
@@ -836,6 +844,16 @@ class DataSource(DataSourceKey, RecordMixin):
     def rollback(self) -> None:
         """Cancel all pending deletes, inserts and replacements."""
         self._clear_pending_operations()
+
+    @final
+    def drop_db(self, *, drop_db_interactive: bool = False) -> None:
+        """
+        Drop DB after checking preconditions, request user approval if required and drop_db_interactive is true.
+
+        Notes:
+            This method is marked as final to prevent overrides that bypass the preconditions check.
+        """
+        self._get_db().drop_db(drop_db_interactive=drop_db_interactive)
 
     def _has_pending_operations(self) -> bool:
         """Return True if there are pending operations."""

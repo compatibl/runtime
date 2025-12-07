@@ -29,29 +29,20 @@ class DbSettings(Settings):
     db_id: str = required()  # TODO: Allow f-string parameters
     """Database identifier as string or Python f-string."""
 
-    db_type: str = required()
+    db_type: str = required()  # TODO: !! Refactor to use to_object from settings
     """Database class name."""
 
     db_mongo_uri: str = "mongodb://localhost:27017/"
     """Mongo database URI."""
 
-    db_test_prefix: str = "test_"
-    """
-    Prefix for unit test databases that are created and deleted automatically.
-
-    Notes:
-        DROPPING THE DATABASE AUTOMATICALLY AS PART OF A UNIT TEST WILL FAIL
-        UNLESS DB_ID STARTS FROM THIS PREFIX
-    """
+    db_dev_prefix: str = "dev_"
+    """DB WITH THIS PREFIX IS DELETED ON EVERY BACKEND PROCESS START *** WITH *** USER APPROVAL."""
 
     db_temp_prefix: str = "temp_"
-    """
-    Prefix for temporary databases that are created automatically but require explicit user approval to delete.
+    """DB WITH THIS PREFIX IS DELETED ON EVERY BACKEND PROCESS START *** WITHOUT *** USER APPROVAL."""
 
-    Notes:
-        DROPPING THE DATABASE FROM CODE OR REST API REQUIRES EXPLICIT USER APPROVAL,
-        AND WILL FAIL EVEN WITH APPROVAL UNLESS DB_ID STARTS FROM THIS PREFIX
-    """
+    db_test_prefix: str = "test_"
+    """DB WITH THIS PREFIX IS DELETED BEFORE AND AFTER EVERY UNIT TEST *** WITHOUT *** USER APPROVAL."""
 
     db_dir: str | None = None
     """Directory for database files (optional, defaults to '{project_root}/databases')."""
