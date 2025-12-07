@@ -855,14 +855,14 @@ class DataSource(DataSourceKey, RecordMixin):
         self._clear_pending_operations()
 
     @final
-    def drop_db(self, *, drop_db_interactive: bool = False) -> None:
+    def drop_db(self, *, interactive: bool = False) -> None:
         """
-        Drop DB after checking preconditions, request user approval if required and drop_db_interactive is true.
+        Drop DB after checking preconditions, request user approval if required and interactive is true.
 
         Notes:
             This method is marked as final to prevent overrides that bypass the preconditions check.
         """
-        self._get_db().drop_db(drop_db_interactive=drop_db_interactive)
+        self._get_db().drop_db(interactive=interactive)
 
     def _has_pending_operations(self) -> bool:
         """Return True if there are pending operations."""

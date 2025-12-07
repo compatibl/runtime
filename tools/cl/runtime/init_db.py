@@ -23,20 +23,18 @@ from cl.runtime.settings.db_settings import DbSettings
 from tools.cl.runtime.init_type_info import init_type_info
 
 
-def init_db(*, drop_db_interactive: bool = False) -> None:
+def init_db(*, interactive: bool = False) -> None:
     """Populate DB with data, drop previous version if not empty after interactive user approval if needed."""
     with activate(DataSource(db=Db.create()).build()):
 
-        # Get DB instance
-        db = active(DataSource)._get_db()  # TODO: !! Move
+        # Initialize type cache first
+        init_type_info()
 
         # Handle the case when DB is not empty
-        if not db.is_empty():
+        ds = active(DataSource)
+        if not ds.is_empty(consider_parents=False):
             # Drop previous version if not empty after interactive user approval if needed.
-            db.drop_db(drop_db_interactive=drop_db_interactive)
-
-        # Initialize type cache before loading data into DB
-        init_type_info()
+            ds.drop_db(interactive=interactive)
 
         # Save records from preload directory to DB and execute run_configure on all preloaded Config records
         PreloadConfiguration().build().run_configure()
@@ -46,4 +44,4 @@ def init_db(*, drop_db_interactive: bool = False) -> None:
 if __name__ == "__main__":
 
     # Initialize DB in interactive mode
-    init_db(drop_db_interactive=True)
+    init_db(interactive=True)

@@ -213,29 +213,28 @@ class Db(DbKey, RecordMixin, ABC):
         """DO NOT CALL DIRECTLY because this method does not check user approval, call drop_db() instead."""
 
     @final
-    def drop_db(self, *, drop_db_interactive: bool = False) -> None:
+    def drop_db(self, *, interactive: bool = False) -> None:
         """
-        Drop DB after checking preconditions, request user approval if required and drop_db_interactive is true.
+        Drop DB after checking preconditions, request user approval if required and interactive is true.
 
         Notes:
             This method is marked as final to prevent overrides that bypass the preconditions check.
             The actual drop is performed by the implementation of the _drop_db_do_not_call_directly() method.
         """
 
-        # Ensure drop_db_interactive is boolean rather than any other truthy or falsy value
-        if not isinstance(drop_db_interactive, bool):
-            type_name = typenameof(drop_db_interactive)
-            raise RuntimeError(f"Parameter drop_db_interactive must a bool value, type {type_name} found.")
+        # Ensure interactive is boolean rather than any other truthy or falsy value
+        if not isinstance(interactive, bool):
+            type_name = typenameof(interactive)
+            raise RuntimeError(f"Parameter interactive must a bool value, type {type_name} found.")
 
         env_kind = EnvSettings.instance().env_kind
-        env_kind_str = CaseUtil.pascal_to_upper_case(env_kind.name)
         if env_kind in (EnvKind.TEMP, EnvKind.TEST):
             # Dropping DB is allowed without requesting approval for TEMP and TEST, proceed to drop DB
             # TODO: !!! Implement MCP rule to check _drop_db_do_not_call_directly() is only called inside this method
             self._drop_db_do_not_call_directly()
         elif env_kind in (EnvKind.UAT, EnvKind.DEV):
             # Dropping DB is allowed with approval for UAT and DEV
-            if drop_db_interactive:
+            if interactive:
                 # Request user approval in interactive mode
                 try:
                     print(f"DATABASE {self.db_id} WILL BE DELETED. THIS ACTION CANNOT BE UNDONE (yes/no): ")
@@ -250,12 +249,12 @@ class Db(DbKey, RecordMixin, ABC):
                     raise RuntimeError("\nDB drop operation aborted by the user.\n")
             else:
                 raise RuntimeError(
-                    f"Dropping DB requires interactive user approval for env_kind={env_kind_str}.\n"
+                    f"Dropping DB requires interactive user approval for env_kind={env_kind.name}.\n"
                     f"Contact your DB admin for assistance or execute this command in interactive mode.\n"
                 )
         elif env_kind == EnvKind.PROD:
             raise RuntimeError(
-                f"Dropping DB from code is not allowed even with user approval for env_kind={env_kind_str}.\n"
+                f"Dropping DB from code is not allowed even with user approval for env_kind={env_kind.name}.\n"
                 f"Contact your DB admin for assistance.")
         else:
             raise ErrorUtil.enum_value_error(env_kind, EnvKind)

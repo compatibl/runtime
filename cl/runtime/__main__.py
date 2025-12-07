@@ -25,6 +25,7 @@ from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.events.event_broker import EventBroker
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.log.log_config import uvicorn_empty_logging_config
@@ -36,6 +37,8 @@ from cl.runtime.server.shutdown_aware_server import ShutdownAwareServer
 from cl.runtime.settings.api_settings import ApiSettings
 from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.settings.env_kind import EnvKind
+from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 
@@ -81,21 +84,41 @@ server_app.add_middleware(ContextMiddleware)
 # Add routers
 ServerUtil.include_routers(server_app)
 
-_logger = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__name__)
 
 
-def run_backend() -> None:
-    """Run REST backend."""
+def run_backend(*, interactive: bool = False) -> None:
+    """Run REST backend, request user approvals if required and interactive is true."""
 
     # Set up logging config
     logging.config.dictConfig(logging_config)
 
     with activate(Env().build()), activate(DataSource().build()), activate(EventBroker.create()):
 
-        data_source = active(DataSource)
-        _logger.info(f"Connected to DB type '{typename(type(data_source.db))}', db_id = '{data_source.db.db_id}'.")
+        ds = active(DataSource)
+        _LOGGER.info(f"Connected to DB type '{typename(type(ds.db))}', db_id = '{ds.db.db_id}'.")
 
-        # TODO: This only works for the Mongo celery backend
+        # Save preloads to DB and invoke run_configure for any Configuration records with autorun=True
+        env_kind = EnvSettings.instance().env_kind
+        if env_kind in (EnvKind.PROD, EnvKind.UAT):
+            # Keep the existing DB in PROD and UAT environments, preload only if empty
+            if ds.is_empty(consider_parents=False):
+                _LOGGER.info("DB is empty, preloading records...")
+                PreloadConfiguration().build().run_configure()
+            else:
+                _LOGGER.info("DB is not empty, skip preloading of records.")
+        elif env_kind in (EnvKind.DEV, EnvKind.TEMP):
+            # Drop the existing DB in DEV and TEMP environments and always preload
+            _LOGGER.info("Dropping existing DB...")
+            ds.drop_db(interactive=interactive)
+            _LOGGER.info("Preloading records...")
+            PreloadConfiguration().build().run_configure()
+        elif env_kind == EnvKind.TEST:
+            raise RuntimeError("The backend is not intended to be run for env_kind=TEST.")
+        else:
+            raise ErrorUtil.enum_value_error(env_kind, EnvKind)
+
+        # TODO: !!! This only works for the Mongo celery backend
         if CelerySettings.instance().celery_is_embedded_worker:
             celery_delete_existing_tasks()
 
@@ -107,9 +130,6 @@ def run_backend() -> None:
                 from cl.runtime.tasks.celery.worker_health_monitor import WorkerHealthMonitor
 
                 WorkerHealthMonitor.start_monitoring()
-
-        # Save preloads to DB and invoke run_configure for any Configuration records with autorun=True
-        PreloadConfiguration().build().run_configure()
 
         # Find wwwroot directory, error if not found
         wwwroot_dir = ProjectLayout.get_wwwroot()
@@ -141,5 +161,5 @@ def run_backend() -> None:
 
 if __name__ == "__main__":
 
-    # Run backend
-    run_backend()
+    # Run backend in interactive mode when invoked from the command line
+    run_backend(interactive=True)
