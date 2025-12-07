@@ -16,11 +16,13 @@ from dataclasses import dataclass
 from itertools import chain
 from typing import Sequence
 
+from more_itertools import consume
 from typing_extensions import final
 from cl.runtime.configurations.configuration import Configuration
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_reader import CsvReader
+from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.preload_settings import PreloadSettings
 
 
@@ -39,6 +41,14 @@ class PreloadConfiguration(Configuration):
     """Optional list of filename glob patterns to exclude"""
 
     def run_configure(self):
+        """Load records from files in the specified directories and insert them into the active data source."""
+
+        # Ensure that DB in the active data source is empty, not considering parents
+        if not (ds := active(DataSource)).is_empty(consider_parents=False):
+            raise RuntimeError(
+                f"PreloadConfiguration requires an empty DB in the active data source (not considering parents),\n"
+                f"but found that DB '{ds.get_db_id()}' is not empty."
+            )
 
         # Use preload_dirs if dirs field is None
         preload_settings = PreloadSettings.instance()
@@ -65,11 +75,14 @@ class PreloadConfiguration(Configuration):
 
         if records:
             # Insert into the active data source
-            active(DataSource).insert_many(records, commit=True)
+            ds.insert_many(records, commit=True)
 
             # Execute run_configure on all preloaded Configuration records with autorun=True
             autorun_configurations = [
                 record for record in records
                 if isinstance(record, Configuration) and record.autorun
             ]
-            tuple(autorun_configuration.run_configure() for autorun_configuration in autorun_configurations)
+
+            # Execute their run_configure methods
+            consume(autorun_configuration.run_configure() for autorun_configuration in autorun_configurations)
+

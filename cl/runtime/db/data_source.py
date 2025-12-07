@@ -19,6 +19,8 @@ from typing import Self, final
 from typing import Sequence
 from typing import cast
 from more_itertools import consume
+
+from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset
 from cl.runtime.db.dataset_key import DatasetKey
@@ -114,11 +116,6 @@ class DataSource(DataSourceKey, RecordMixin):
         if self.tenant is None:
             self.tenant = Tenant.get_common()
 
-        # Create default parent with the same Db
-        if self.parent is None:
-            # TODO (Roman): Create default parent Db
-            ...
-
         # TODO: These features are not yet supported
         if self.included is not None:
             raise RuntimeError("DataSource.included is not yet supported.")
@@ -162,9 +159,21 @@ class DataSource(DataSourceKey, RecordMixin):
         """Get db_id of the primary database of the current data source."""
         return self._get_db().db_id
 
-    def is_empty(self) -> bool:
-        """Return true if the database contains no collections."""
-        return self._get_db().is_empty()
+    def is_empty(self, *, consider_parents: bool) -> bool:
+        """
+        Return true if the data source contains no collections, considering
+        collections in parent data sources if consider_parents=True.
+        """
+        if not self._get_db().is_empty():
+            # DB of this data source is not empty, return False irrespective of include_parents value
+            return False
+        elif self.parent is None or not consider_parents:
+            # DB of this data source is empty and either parent is None or include_parents is False, return True
+            return True
+        else:
+            # The result is determined by the parent data source
+            parent_obj = active(DataSource).load_one(self.parent)
+            return parent_obj.is_empty(consider_parents=True)
 
     def load_one(
         self,
