@@ -61,7 +61,6 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None, tenant:
             env_dir=PytestUtil.get_test_path_from_request(request, name_only=False),
         ).build()
     ):
-
         # Replace dots by semicolons
         db_id = test_name.replace(".", ";")
 
@@ -71,15 +70,17 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None, tenant:
         # Create a new DB instance of the specified type (use the type from settings if None)
         db = Db.create(db_type=db_type, db_id=db_id)
 
-        # Delete all existing records in unit test DB before the test in case it was not performed by the preceding run
-        db.drop_test_db()
-
         # Run with the created DB, return db from the fixture
-        with activate(DataSource(db=db, tenant=tenant).build()):
+        with activate(DataSource(db=db, tenant=tenant).build()) as ds:
+
+            # Delete all existing records in unit test DB in case it was not performed by the preceding run
+            ds.drop_db()
+
+            # Yield to perform the test
             yield db
 
-        # Delete all existing records in unit test DB after the test
-        db.drop_test_db()
+            # Delete all existing records in unit test DB after the test
+            ds.drop_db()
 
 
 @pytest.fixture(scope="function")
@@ -162,7 +163,7 @@ def work_dir_fixture(request: FixtureRequest) -> Iterator[str]:
 
     work_dir = PytestUtil.get_test_path_from_request(request, name_only=False)
 
-    # Change test working directory, create if does not exist
+    # Change test working directory, create if it does not exist
     if not os.path.exists(work_dir):
         os.makedirs(work_dir)
     os.chdir(work_dir)
@@ -170,7 +171,7 @@ def work_dir_fixture(request: FixtureRequest) -> Iterator[str]:
     # Back to the test
     yield work_dir
 
-    # Change directory back before exiting the text
+    # Change directory back before exiting the test
     os.chdir(request.config.invocation_dir)  # noqa
 
 
