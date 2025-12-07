@@ -35,6 +35,7 @@ from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.env_kind import EnvKind
+from cl.runtime.settings.qa_settings import QaSettings
 from cl.runtime.settings.sse_settings import SseSettings
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_app
@@ -125,7 +126,7 @@ def basic_mongo_mock_db_fixture(request: FixtureRequest, tenant_fixture) -> Iter
         yield from _db_fixture(request, db_type=BasicMongoMockDb, tenant=tenant_fixture)
 
 
-@pytest.fixture(scope="function", params=[SqliteDb, BasicMongoMockDb])  # TODO: Load the list from settings instead
+@pytest.fixture(scope="function", params=[TypeInfo.from_type_name(x) for x in QaSettings.instance().qa_db_types])
 def multi_db_fixture(request, tenant_fixture) -> Iterator[Db]:
     """
     Pytest module fixture to setup and teardown temporary databases of all types
