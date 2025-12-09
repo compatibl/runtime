@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.context_request import ContextRequest
+from pydantic import BaseModel
 
 
-class TaskRunIdsRequest(ContextRequest):
+class TaskRunIdsRequest(BaseModel):
     """Request data type for bulk operations by task run ids."""
 
     task_run_ids: list[str]

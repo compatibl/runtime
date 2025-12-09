@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import annotations
-from cl.runtime.routers.context_request import ContextRequest
+
+from pydantic import BaseModel
 
 
-class CancelRequest(ContextRequest):
+class CancelRequest(BaseModel):
     """Request data type for the /tasks/cancel route."""
 
     task_run_ids: list[str] = []

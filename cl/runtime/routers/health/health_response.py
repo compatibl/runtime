@@ -14,7 +14,6 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
-from cl.runtime.routers.user_request import UserRequest
 
 
 class HealthResponse(BaseModel):
@@ -24,7 +23,7 @@ class HealthResponse(BaseModel):
     """HTTP status code."""
 
     @classmethod
-    def get_health(cls, request: UserRequest) -> HealthResponse:
+    def get_health(cls) -> HealthResponse:
         """Implements /health route."""
 
         # TODO: Replace stub status code

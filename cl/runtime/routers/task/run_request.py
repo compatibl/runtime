@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.context_request import ContextRequest
+from pydantic import BaseModel
 
 
-class RunRequest(ContextRequest):
+class RunRequest(BaseModel):
     """Request data type for the /task/run route."""
 
     type: str

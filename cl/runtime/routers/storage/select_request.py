@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.context_request import ContextRequest
+from pydantic import BaseModel
 
 
-class SelectRequest(ContextRequest):
+class SelectRequest(BaseModel):
     """Request data type for the /storage/select route."""
 
     type_: str

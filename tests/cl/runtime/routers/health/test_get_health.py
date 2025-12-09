@@ -15,37 +15,32 @@
 import pytest
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.health.health_response import HealthResponse
-from cl.runtime.routers.user_request import UserRequest
 
-requests = [{}, {"user": "TestUser"}]
 expected_result = {"status": 200}
 
 
 def test_method():
     """Test coroutine for /health route."""
 
-    for request in requests:
-        # Run the coroutine wrapper added by the FastAPI decorator and get the result
-        request_obj = UserRequest(**request)
-        result = HealthResponse.get_health(request_obj)
+    # Run the coroutine wrapper added by the FastAPI decorator and get the result
+    result = HealthResponse.get_health()
 
-        # Check if the result is a list
-        assert isinstance(result, HealthResponse)
+    # Check if the result is a list
+    assert isinstance(result, HealthResponse)
 
-        # Check if each item in the result is a valid HealthResponse instance
-        assert result == HealthResponse(**expected_result)
+    # Check if each item in the result is a valid HealthResponse instance
+    assert result == HealthResponse(**expected_result)
 
 
 def test_api():
     """Test REST API for /health route."""
     with QaClient() as test_client:
-        for request in requests:
-            response = test_client.get("/health", headers=request)
-            assert response.status_code == 200
-            result = response.json()
+        response = test_client.get("/health")
+        assert response.status_code == 200
+        result = response.json()
 
-            # Check result
-            assert result == expected_result
+        # Check result
+        assert result == expected_result
 
 
 if __name__ == "__main__":

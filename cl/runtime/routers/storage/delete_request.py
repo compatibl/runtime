@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.context_request import ContextRequest
+from pydantic import BaseModel
+
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 
 
-class DeleteRequest(ContextRequest):
+class DeleteRequest(BaseModel):
 
     delete_keys: list[KeyRequestItem] | None = None
     """List of key objects to delete."""

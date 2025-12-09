@@ -16,16 +16,12 @@ import pytest
 from typing import Any
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.auth.me_response import MeResponse
 from cl.runtime.routers.auth.me_response import _get_user_secrets_public_key
-from cl.runtime.routers.user_request import UserRequest
-
-request_headers = [{}, {"User": "TestUser"}]
 
 
-def get_expected_result(request_obj: UserRequest) -> dict[str, Any]:
+def get_expected_result() -> dict[str, Any]:
     """Get expected result for the user."""
 
     # Get user from the request or use default value if not specified
@@ -45,30 +41,24 @@ def get_expected_result(request_obj: UserRequest) -> dict[str, Any]:
 def test_method(default_db_fixture):
     """Test coroutine for /auth/me route."""
 
-    for headers in request_headers:
-        # Run the coroutine wrapper added by the FastAPI decorator and get the result
-        model_headers = {CaseUtil.pascal_to_snake_case(k): v for k, v in headers.items()}
-        request_obj = UserRequest(**model_headers)
-        result = MeResponse.get_me(request_obj)
+    # Run the coroutine wrapper added by the FastAPI decorator and get the result
+    result = MeResponse.get_me()
 
-        # Check the result
-        expected_result = get_expected_result(request_obj)
-        assert result == MeResponse(**expected_result)
+    # Check the result
+    expected_result = get_expected_result()
+    assert result == MeResponse(**expected_result)
 
 
 def test_api(default_db_fixture):
     """Test REST API for /auth/me route."""
     with QaClient() as test_client:
-        for headers in request_headers:
-            response = test_client.get("/auth/me", headers=headers)
-            assert response.status_code == 200
-            result = response.json()
+        response = test_client.get("/auth/me")
+        assert response.status_code == 200
+        result = response.json()
 
-            # Check result
-            model_headers = {CaseUtil.pascal_to_snake_case(k): v for k, v in headers.items()}
-            request_obj = UserRequest(**model_headers)
-            expected_result = get_expected_result(request_obj)
-            assert result == expected_result
+        # Check result
+        expected_result = get_expected_result()
+        assert result == expected_result
 
 
 if __name__ == "__main__":

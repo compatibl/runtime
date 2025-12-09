@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.context_request import ContextRequest
+from pydantic import BaseModel
 
 
-class PanelsRequest(ContextRequest):
+class PanelsRequest(BaseModel):
     """Request data type for the /entity/list_panels route."""
 
     type_name: str

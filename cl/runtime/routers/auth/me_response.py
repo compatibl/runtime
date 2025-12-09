@@ -65,7 +65,7 @@ class MeResponse(BaseModel):
         populate_by_name = True
 
     @classmethod
-    def get_me(cls, request: Request) -> Self:
+    def get_me(cls) -> Self:
         """Implements /auth/me route."""
 
         # Get user from the request or use default value if not specified

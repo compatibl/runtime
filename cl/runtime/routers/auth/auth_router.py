@@ -13,18 +13,16 @@
 # limitations under the License.
 
 from fastapi import APIRouter
-from fastapi import Header
 from cl.runtime.routers.auth.auth_types_response import AuthTypesResponseItem
 from cl.runtime.routers.auth.me_response import MeResponse
-from cl.runtime.routers.user_request import UserRequest
 
 router = APIRouter()
 
 
 @router.get("/me", response_model=MeResponse)
-async def get_me(user: str = Header(None, description="User identifier or identity token")) -> MeResponse:
+async def get_me() -> MeResponse:
     """Information about the current user."""
-    return MeResponse.get_me(UserRequest(user=user))
+    return MeResponse.get_me()
 
 
 @router.get("/providers", response_model=list[AuthTypesResponseItem])
