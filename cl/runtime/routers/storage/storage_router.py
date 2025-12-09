@@ -15,11 +15,8 @@
 from typing import Annotated
 from fastapi import APIRouter
 from fastapi import Body
-from fastapi import Depends
 from fastapi import Header
 from fastapi import Query
-from cl.runtime.routers.dependencies.context_headers import ContextHeaders
-from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.routers.storage.datasets_request import DatasetsRequest
 from cl.runtime.routers.storage.datasets_response_item import DatasetsResponseItem
 from cl.runtime.routers.storage.delete_request import DeleteRequest
@@ -56,7 +53,6 @@ async def get_datasets(
 
 @router.post("/load", response_model=LoadResponse)
 async def post_load(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     load_keys: Annotated[list[KeyRequestItem] | None, Body(description="List of key objects to load.")] = None,
     ignore_not_found: Annotated[
         bool, Query(description="If true, empty response will be returned without error if the record is not found.")
@@ -66,9 +62,6 @@ async def post_load(
 
     return LoadResponse.get_response(
         LoadRequest(
-            user=context_headers.user,
-            env=context_headers.env,
-            dataset=context_headers.dataset,
             load_keys=load_keys,
             ignore_not_found=ignore_not_found,
         )
@@ -77,7 +70,6 @@ async def post_load(
 
 @router.post("/select", response_model=SelectResponse)
 async def post_select(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     select_body: Annotated[SelectRequestBody, Body(description="Select request body.")],
     limit: Annotated[
         int | None, Query(description="Select a specified number of records from the beginning of the list.")
@@ -92,9 +84,6 @@ async def post_select(
 
     return SelectResponse.get_response(
         SelectRequest(
-            user=context_headers.user,
-            env=context_headers.env,
-            dataset=context_headers.dataset,
             type_=select_body.type,
             query_dict=select_body.query_dict if select_body.query_dict else None,
             limit=limit,
@@ -106,35 +95,30 @@ async def post_select(
 
 @router.post("/delete", response_model=list[KeyRequestItem])
 async def post_delete(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     delete_keys: Annotated[list[KeyRequestItem] | None, Body(description="List of key objects to delete.")] = None,
 ) -> list[KeyRequestItem]:
     """Bulk delete records by list of keys."""
 
     return DeleteResponseUtil.delete_records(
-        DeleteRequest(
-            user=context_headers.user, env=context_headers.env, dataset=context_headers.dataset, delete_keys=delete_keys
-        )
+        DeleteRequest(delete_keys=delete_keys)
     )
 
 
 @router.post("/save", response_model=list[KeyRequestItem])
 async def post_save(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     records: Annotated[list[dict] | None, Body(description="List of records to save.")] = None,
 ) -> list[KeyRequestItem]:
     """Bulk save records to DB. Don't check if the record already exists."""
 
     return SaveResponseUtil.save_records(
         SaveRequest(
-            user=context_headers.user, env=context_headers.env, dataset=context_headers.dataset, records=records
+            records=records
         )
     )
 
 
 @router.post("/update", response_model=list[KeyRequestItem])
 async def post_update(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa unused
     update_items: Annotated[
         list[UpdateRequestItem] | None, Body(description="List of update items.")
     ] = None,  # noqa unused
@@ -151,9 +135,8 @@ async def post_update(
 
 @router.post("/insert", response_model=list[KeyRequestItem])
 async def post_insert(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],  # noqa unused
     records: Annotated[list[dict] | None, Body(description="List of records to insert.")] = None,  # noqa unused
 ) -> list[KeyRequestItem]:
     """Bulk insert records to DB. The same as /storage/save route but fails if the record already exists."""
     # TODO (Roman): Implement /insert route.
-    return await post_save(context_headers, records)
+    return await post_save(records)

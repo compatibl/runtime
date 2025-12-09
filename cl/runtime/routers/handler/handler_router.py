@@ -16,9 +16,6 @@ from typing import Annotated
 from typing import Any
 from fastapi import APIRouter
 from fastapi import Body
-from fastapi import Depends
-from cl.runtime.routers.dependencies.context_headers import ContextHeaders
-from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.routers.handler.run_response_item import RunResponseItem
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.routers.tasks.submit_request_body import SubmitRequestBody
@@ -28,20 +25,15 @@ router = APIRouter()
 
 @router.post("/run", response_model=Any)
 async def post_run(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     submit_body: Annotated[SubmitRequestBody, Body(description="Submit request body.")],
 ) -> Any:
     """Run handler in main process."""
 
     return RunResponseItem.get_response(
         SubmitRequest(
-            user=context_headers.user,
-            env=context_headers.env,
-            dataset=context_headers.dataset,
             type=submit_body.type,
             method=submit_body.method,
             keys=submit_body.keys,
             arguments=submit_body.arguments,
-            user_keys=context_headers.user_keys,
         )
     )

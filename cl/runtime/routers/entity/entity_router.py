@@ -15,10 +15,7 @@
 from typing import Annotated
 from typing import Any
 from fastapi import APIRouter
-from fastapi import Depends
 from fastapi import Query
-from cl.runtime.routers.dependencies.context_headers import ContextHeaders
-from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.routers.entity.panel_request import PanelRequest
 from cl.runtime.routers.entity.panel_response_util import PanelResponseUtil
 from cl.runtime.routers.entity.panels_request import PanelsRequest
@@ -29,16 +26,12 @@ router = APIRouter()
 
 @router.get("/panels", response_model=list[PanelsResponseItem])
 async def get_panels(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     type_name: Annotated[str, Query(description="Type name")],
     key: Annotated[str | None, Query(description="Primary key fields in semicolon-delimited format")] = None,
 ) -> list[PanelsResponseItem]:
     """List of panels for the specified record."""
     return PanelsResponseItem.get_response(
         PanelsRequest(
-            user=context_headers.user,
-            env=context_headers.env,
-            dataset=context_headers.dataset,
             type_name=type_name,
             key=key,
         )
@@ -47,7 +40,6 @@ async def get_panels(
 
 @router.get("/panel", response_model=Any)
 async def get_panel(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
     type_name: Annotated[str, Query(description="Class name")],
     panel_id: Annotated[str, Query(description="View name")],
     key: Annotated[str | None, Query(description="Primary key fields in semicolon-delimited format")] = None,
@@ -56,9 +48,6 @@ async def get_panel(
 
     return PanelResponseUtil.get_response(
         PanelRequest(
-            user=context_headers.user,
-            env=context_headers.env,
-            dataset=context_headers.dataset,
             type_name=type_name,
             panel_id=panel_id,
             key=key,

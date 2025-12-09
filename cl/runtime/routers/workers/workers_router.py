@@ -12,12 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Annotated
 from fastapi import APIRouter
-from fastapi import Depends
 from pydantic import BaseModel
-from cl.runtime.routers.dependencies.context_headers import ContextHeaders
-from cl.runtime.routers.dependencies.context_headers import get_context_headers
 from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.tasks.celery.worker_metrics import WorkerMetrics
 from cl.runtime.tasks.celery.worker_process_manager import WorkerProcessManager
@@ -44,9 +40,7 @@ class WorkersStatusResponse(BaseModel):
 
 
 @router.get("/status", response_model=WorkersStatusResponse)
-async def get_workers_status(
-    context_headers: Annotated[ContextHeaders, Depends(get_context_headers)],
-) -> WorkersStatusResponse:
+async def get_workers_status() -> WorkersStatusResponse:
     """Get status of all worker processes."""
 
     celery_settings = CelerySettings.instance()
@@ -84,7 +78,7 @@ async def get_workers_status(
 
 
 @router.post("/restart")
-async def restart_dead_workers(context_headers: Annotated[ContextHeaders, Depends(get_context_headers)]) -> dict:
+async def restart_dead_workers() -> dict:
     """Restart dead worker processes."""
 
     celery_settings = CelerySettings.instance()
@@ -99,7 +93,7 @@ async def restart_dead_workers(context_headers: Annotated[ContextHeaders, Depend
 
 
 @router.get("/metrics")
-async def get_workers_metrics(context_headers: Annotated[ContextHeaders, Depends(get_context_headers)]) -> dict:
+async def get_workers_metrics() -> dict:
     """Get worker pool metrics."""
 
     celery_settings = CelerySettings.instance()
