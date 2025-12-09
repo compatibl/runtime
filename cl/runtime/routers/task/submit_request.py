@@ -15,8 +15,8 @@
 from cl.runtime.routers.task.base_run_request import BaseRunRequest
 
 
-class RunRequest(BaseRunRequest):
-    """Request data type for the /task/run route."""
+class SubmitRequest(BaseRunRequest):
+    """Request data type for the /task/submit route."""
 
-    key: str | None = None
-    """The key for which to run method."""
+    keys: list[str] | None = None
+    """List of keys for which to submit method."""

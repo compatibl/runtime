@@ -12,11 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.task.base_run_request import BaseRunRequest
+from pydantic import BaseModel
+from cl.runtime.primitive.case_util import CaseUtil
 
 
-class RunRequest(BaseRunRequest):
-    """Request data type for the /task/run route."""
+class BaseRunRequestBody(BaseModel):
+    """Base class for Task run route Request Body parameter."""
 
-    key: str | None = None
-    """The key for which to run method."""
+    class Config:
+        alias_generator = CaseUtil.snake_to_pascal_case
+        populate_by_name = True
+
+    type: str
+    """Select type shortname."""
+
+    method: str
+    """Method name."""
+
+    arguments: dict | None = None
+    """Arguments dict, e.g. {"ArgumentName": 123}."""

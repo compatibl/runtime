@@ -18,6 +18,9 @@ from fastapi import Body
 from cl.runtime.routers.task.run_request import RunRequest
 from cl.runtime.routers.task.run_request_body import RunRequestBody
 from cl.runtime.routers.task.run_response_util import RunResponseUtil
+from cl.runtime.routers.task.submit_request import SubmitRequest
+from cl.runtime.routers.task.submit_request_body import SubmitRequestBody
+from cl.runtime.routers.task.submit_response_item import SubmitResponseItem
 
 router = APIRouter()
 
@@ -26,7 +29,7 @@ router = APIRouter()
 async def post_run(
     run_body: Annotated[RunRequestBody, Body(description="Run request body.")],
 ) -> Any:
-    """Run Celery task."""
+    """Route to run Task and return result in Response."""
 
     return RunResponseUtil.get_response(
         RunRequest(
@@ -37,3 +40,18 @@ async def post_run(
         )
     )
 
+
+@router.post("/submit", response_model=list[SubmitResponseItem])
+async def post_submit(
+    submit_body: Annotated[SubmitRequestBody, Body(description="Submit request body.")],
+) -> list[SubmitResponseItem]:
+    """Route to bulk submit Tasks and return task_run_id's in Response."""
+
+    return SubmitResponseItem.get_response(
+        SubmitRequest(
+            type=submit_body.type,
+            method=submit_body.method,
+            keys=submit_body.key,
+            arguments=submit_body.arguments,
+        )
+    )

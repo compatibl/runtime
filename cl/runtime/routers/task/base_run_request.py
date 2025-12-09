@@ -12,11 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cl.runtime.routers.task.base_run_request import BaseRunRequest
+from pydantic import BaseModel
 
 
-class RunRequest(BaseRunRequest):
-    """Request data type for the /task/run route."""
+class BaseRunRequest(BaseModel):
+    """Base class for Task run route Request."""
 
-    key: str | None = None
-    """The key for which to run method."""
+    type: str
+    """Type shortname."""
+
+    method: str
+    """Method name."""
+
+    arguments: dict | None = None
+    """Arguments dict, e.g. {"ArgumentName": 123}."""
