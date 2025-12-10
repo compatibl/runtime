@@ -13,7 +13,14 @@
 # limitations under the License.
 
 from typing import Any
+
+from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 from cl.runtime.routers.task.run_request import RunRequest
+from cl.runtime.serializers.data_serializers import DataSerializers
+from cl.runtime.tasks.task_util import TaskUtil
+
+_ui_serializer = DataSerializers.FOR_UI
 
 
 class RunResponseUtil:
@@ -21,7 +28,30 @@ class RunResponseUtil:
 
     @classmethod
     def get_response(cls, request: RunRequest) -> Any:
-        """Run task and return result as response."""
+        """Run Task and return result as response."""
 
-        # TODO (Roman): Implement
-        raise NotImplementedError
+        # Create Task from Request data
+        tasks = TaskUtil.create_tasks(
+            type_name=request.type,
+            method_name=request.method,
+            args=request.arguments,
+            str_keys=[request.key] if request.key else None,
+        )
+
+        if len(tasks) != 1:
+            raise RuntimeError(
+                f"It is expected that there will be only one Task for RunResponse. "
+                f"Actual number of tasks: {len(tasks)}."
+            )
+
+        task = tasks[0]
+
+        # Run task in process
+        result = task.run_task_in_process()
+
+        # Serialize Data instances
+        # Do not serialize PydanticMixin instances, since it is supported by FastAPI
+        if result and not isinstance(result, PydanticMixin) and isinstance(result, DataMixin):
+            return _ui_serializer.serialize(result)
+        else:
+            return result

@@ -16,7 +16,6 @@ from typing_extensions import Any
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.typename import typename
-from cl.runtime.routers.tasks.submit_request import SubmitRequest
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
@@ -35,87 +34,66 @@ class TaskUtil:
     """Utilities for working with tasks."""
 
     @classmethod
-    def _deserialize_request_args(cls, request_args: dict[str, Any], task: MethodTask) -> dict[str, Any]:
+    def _deserialize_task_args(cls, args: dict[str, Any], task: MethodTask) -> dict[str, Any]:
         """Deserialize request task arguments from UI format using type hints from method definition."""
 
-        if request_args is None:
+        if args is None:
             return dict()
 
         # Get specific task type hints
         arg_type_hints = task.get_method_arg_type_hints()
 
-        # Deserialize values in argument dict
+        # Deserialize values in args dict
         return {
             k: _ui_serializer.deserialize(v, arg_type_hints.get(k))
-            for k_, v in request_args.items()
+            for k_, v in args.items()
             if (k := CaseUtil.pascal_to_snake_case(k_))
         }
 
     @classmethod
-    def create_tasks_for_submit_request(cls, request: SubmitRequest) -> list[Task]:
-        """Create Task objects from task submit request."""
+    def create_tasks(cls, *, type_name: str, method_name: str, str_keys: list[str] | None, args: dict[str, Any] | None) -> list[MethodTask]:
 
-        # TODO: Refactor
-        # TODO (Roman): request [None] for static handlers explicitly
-        # Workaround for static handlers
-        requested_keys = request.keys if request.keys else [None]
-
-        # Normalize handler name to handler functions naming format
-        handler_name = cls._normalize_handler_name(request.method)
-
-        task_queue = active_or_none(TaskQueue)
         # TODO (Roman): Make 'queue' field in Task optional
-        task_queue_key = task_queue.get_key() if task_queue else TaskQueueKey(queue_id="Handlers Queue").build()
-        tasks = []
+        task_queue_key = task_queue.get_key() if (task_queue := active_or_none(TaskQueue)) else TaskQueueKey(queue_id="Handlers Queue").build()
+        type_ = TypeInfo.from_type_name(type_name)
 
-        for serialized_key in requested_keys:
+        # Create single ClassMethodTask if keys is not specified
+        # TODO (Roman): Consider bulk run for static tasks
+        if not str_keys:
+            label = f"{typename(type_)};{method_name}"
+            static_task = ClassMethodTask(
+                label=label,
+                queue=task_queue_key,
+                type_=type_,
+                method_name=method_name,
+            )
 
-            # Create handler task
-            # TODO: Add request.arguments_ and type_
-            if serialized_key is not None:
-                # Key is not None, this is an instance method
+            # Deserialize method args in UI format
+            static_task.method_args = cls._deserialize_task_args(args, static_task)  # noqa
 
-                record_type = TypeInfo.from_type_name(request.type)
-                key_type = record_type.get_key_type()
-                key = KeySerializers.DELIMITED.deserialize(serialized_key, TypeHint.for_type(key_type))
+            # Return wrapped in list
+            return [static_task.build()]
 
-                label = f"{typename(key_type)};{serialized_key};{handler_name}"
-                handler_task = InstanceMethodTask(
-                    label=label,
+        # Create list of InstanceMethodTask's for keys
+        else:
+            # Get Key type for deserialization
+            key_type = type_.get_key_type()
+
+            # Deserialize Keys and create InstanceMethodTask's
+            instance_tasks = [
+                InstanceMethodTask(
+                    label=f"{typename(key_type)};{str_key};{method_name}",
                     queue=task_queue_key,
-                    key=key,
-                    method_name=handler_name,
+                    key=KeySerializers.DELIMITED.deserialize(str_key, TypeHint.for_type(key_type)),
+                    method_name=method_name,
                 )
+                for str_key in str_keys
+            ]
 
-                # Deserialize request args from UI format
-                handler_task.method_args = cls._deserialize_request_args(request.arguments, handler_task)  # noqa
+            # Deserialize method args in UI format
+            # Do this for each task, since serialization depends on type hints that may change in subclasses
+            for instance_task in instance_tasks:
+                instance_task.method_args = cls._deserialize_task_args(args, instance_task)  # noqa
+                instance_task.build()
 
-                tasks.append(handler_task.build())
-            else:
-                # Key is None, this is a @classmethod or @staticmethod
-                record_type = TypeInfo.from_type_name(request.type)
-                label = f"{typename(record_type)};{handler_name}"
-                handler_task = ClassMethodTask(
-                    label=label,
-                    queue=task_queue_key,
-                    type_=record_type,
-                    method_name=handler_name,
-                )
-
-                # Deserialize request args from UI format
-                handler_task.method_args = cls._deserialize_request_args(request.arguments, handler_task)  # noqa
-
-                tasks.append(handler_task.build())
-
-        return tasks
-
-    @classmethod
-    def _normalize_handler_name(cls, handler_name: str) -> str:
-        """Normalize handler name to snake case, prefixed with 'run_'."""
-        if not CaseUtil.is_snake_case(handler_name):
-            try:
-                handler_name = CaseUtil.pascal_to_snake_case(handler_name)
-            except RuntimeError:
-                raise RuntimeError(f"Invalid handler name format: '{handler_name}'.")
-        handler_name = f"run_{handler_name}"
-        return handler_name
+            return instance_tasks
