@@ -23,7 +23,7 @@ from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassNestedFields
 
 
-def test_csv_file_reader(default_db_fixture):
+def test_csv_reader(default_db_fixture):
     """Test CsvFileUtil class."""
 
     # Create a new instance of local cache for the test
