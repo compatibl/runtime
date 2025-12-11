@@ -139,7 +139,7 @@ class CsvReader(Reader):
             files_list = "".join([f"    {file}\n" for file in files_with_error])
             msg = (
                 f"Found values that should be wrapped in quotes to stop Excel from modifying them on save.\n"
-                f"Run fix_csv_quotes script to fix. CSV preload file(s) that have this error:\n{files_list}"
+                f"RECOMMENDED ACTION: Run fix_csv_quotes script to fix.\n{files_list}"
             )
             if not apply_fix:
                 raise RuntimeError(msg)
