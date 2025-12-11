@@ -13,11 +13,30 @@
 # limitations under the License.
 
 from cl.runtime.file.csv_reader import CsvReader
+from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.settings.env_settings import EnvSettings
 
 if __name__ == '__main__':
 
+    # The list of packages from context settings
+    packages = EnvSettings.instance().env_packages
+
+    dirs = set()
+    for package in packages:
+        # Add paths to source and stubs directories
+        if (x := ProjectLayout.get_source_root(package)) is not None and x not in dirs:
+            dirs.add(x)
+        if (x := ProjectLayout.get_stubs_root(package)) is not None and x not in dirs:
+            dirs.add(x)
+        if (x := ProjectLayout.get_tests_root(package)) is not None and x not in dirs:
+            dirs.add(x)
+        if (x := ProjectLayout.get_preloads_root(package)) is not None and x not in dirs:
+            dirs.add(x)
+
     # Create __init__.py files in subdirectories except for tests
     CsvReader.check_or_fix_quotes(
+        dirs=tuple(dirs),
+        ext="csv",
         apply_fix=True,
         verbose=True,
         # Prevent fixing of the unit test samples
