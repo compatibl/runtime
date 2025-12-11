@@ -27,9 +27,3 @@ class KeyListView(View):
 
     keys: list[KeyMixin] = required()
     """List of generic keys, records are loaded and displayed."""
-
-    def materialize(self) -> RecordListView:
-        """Load records and return RecordListView object. KeyListView is used only for storage in the DB."""
-
-        records = active(DataSource).load_many(self.keys) if self.keys else []
-        return RecordListView(view_for=self.view_for, view_name=self.view_name, records=records)

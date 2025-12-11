@@ -29,11 +29,7 @@ class PlotView(View):
     plot: PlotKey = required()
     """Plot record or key."""
 
-    def materialize(self) -> Self:
-        """Return Self with loaded plot if self.plot is a key."""
-
+    def __init(self):
         if is_key_type(type(self.plot)):
             plot = active(DataSource).load_one(self.plot)
             self.plot = plot
-
-        return self
