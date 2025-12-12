@@ -7,6 +7,7 @@ default:
 
   # Documented in EnvSettings class
   env_id: temp_runtime_main
+  env_kind: DEV
   env_tenant: temp_tenant
   env_packages:
     - cl.runtime
