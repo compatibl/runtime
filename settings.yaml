@@ -53,7 +53,6 @@ testing:
   # Documented in QaSettings class
   qa_db_types:
     - SqliteDb
-    - BasicMongoDb
     - BasicMongoMockDb
 
   # Documented in LogSettings class
