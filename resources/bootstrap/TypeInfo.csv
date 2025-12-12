@@ -114,6 +114,7 @@ InstanceMethodTask,Record,cl.runtime.tasks.instance_method_task.InstanceMethodTa
 IntFormat,Enum,cl.runtime.serializers.int_format.IntFormat,None
 JsonEncoder,Data,cl.runtime.serializers.json_encoder.JsonEncoder,None
 JsonFormat,Enum,cl.runtime.serializers.json_format.JsonFormat,None
+JsonReader,Record,cl.runtime.file.json_reader.JsonReader,None
 JsonSerializer,Data,cl.runtime.serializers.json_serializer.JsonSerializer,None
 KeyDecl,Record,cl.runtime.schema.key_decl.KeyDecl,None
 KeyFormat,Enum,cl.runtime.serializers.key_format.KeyFormat,None
@@ -360,4 +361,5 @@ WorkflowPhaseKey,Key,cl.runtime.workflows.workflow_phase_key.WorkflowPhaseKey,No
 WorkflowPhaseTask,Record,cl.runtime.workflows.workflow_phase_task.WorkflowPhaseTask,None
 WorkflowTask,Record,cl.runtime.workflows.workflow_task.WorkflowTask,None
 YamlEncoder,Data,cl.runtime.serializers.yaml_encoder.YamlEncoder,None
+YamlReader,Record,cl.runtime.file.yaml_reader.YamlReader,None
 YamlSerializer,Data,cl.runtime.serializers.yaml_serializer.YamlSerializer,None
