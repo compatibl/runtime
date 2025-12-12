@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 from typing import Any
 import orjson
+
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.serializers.encoder import Encoder
 from cl.runtime.serializers.json_format import JsonFormat
@@ -48,7 +49,16 @@ class JsonEncoder(Encoder):
         result = orjson.dumps(data, option=option).decode("utf-8")
         return result
 
-    def decode(self, data: str | None) -> Any:  # noqa
-        """Decode from a JSON string."""
-        result = orjson.loads(data.encode("utf-8"))
+    def decode(self, data: str | bytes | None) -> Any:  # noqa
+        """Decode from JSON bytes or string. Accepts bytes to avoid extra utf-8 round-trip."""
+        if data is None:
+            result = None
+        elif isinstance(data, bytes):
+            result = orjson.loads(data)
+        elif isinstance(data, str):
+            result = orjson.loads(data.encode("utf-8"))
+        else:
+            raise TypeError(f"Unsupported type for decode: {type(data).__name__}")
+
+        result = self.normalize(result)
         return result

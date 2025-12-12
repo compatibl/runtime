@@ -1,0 +1,5 @@
+- _type: StubDataclassDerived
+  id: with_type
+  derived_str_field: explicit_type_value
+- id: without_type
+

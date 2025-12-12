@@ -18,6 +18,9 @@ from fnmatch import fnmatch
 from typing import Sequence
 from typing import TypeGuard
 
+from cl.runtime.primitive.case_util import CaseUtil
+from cl.runtime.schema.type_info import TypeInfo
+
 _INVALID_FILENAME_SYMBOLS = r'/\\<>:"|?*\x00\n'
 """Invalid filename symbols."""
 
@@ -168,3 +171,33 @@ class FileUtil:
             return result
         else:
             return None
+
+    @classmethod
+    def get_type_from_filename(cls, file_path: str, error: bool = True) -> type | None:
+        """Validate that filename without extension is a valid type in TypeInfo.
+        Args:
+            file_path: Absolute or relative file path
+            error: If True, raise RuntimeError on invalid type, otherwise return None
+        Returns:
+            Record type corresponding to filename without extension
+        Raises:
+            RuntimeError: If filename is not in PascalCase or not a valid type in TypeInfo
+        """
+        filename = os.path.basename(file_path)
+        filename_without_extension, _ = os.path.splitext(filename)
+
+        # Validate that filename is a valid type in TypeInfo
+        try:
+            # Check for PascalCase
+            CaseUtil.check_pascal_case(filename_without_extension)
+            record_type = TypeInfo.from_type_name(filename_without_extension)
+        except Exception as e:
+            # Neither PascalCase nor valid type ->
+            # Raise or return None based on error flag
+            record_type = None
+            if error:
+                raise RuntimeError(
+                    f"Filename '{filename_without_extension}' is not a valid type. "
+                    f"Error: {e}"
+                )
+        return record_type

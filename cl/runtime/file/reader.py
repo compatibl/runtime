@@ -51,4 +51,8 @@ class Reader(ReaderKey, RecordMixin, ABC):
             ext: File extension to search for without the leading dot (e.g., "json" or "csv")
             file_include_patterns: Optional list of filename glob patterns to include
             file_exclude_patterns: Optional list of filename glob patterns to exclude
+        Returns:
+            Tuple of loaded records
+        Raises:
+            RuntimeError: If an error occurs during file reading or record loading
         """

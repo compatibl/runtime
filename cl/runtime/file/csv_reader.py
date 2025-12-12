@@ -51,44 +51,35 @@ class CsvReader(Reader):
         # Iterate over files
         result = []
         for file_path in file_paths:
+            try:
+                # Determine record type from filename
+                record_type = FileUtil.get_type_from_filename(file_path)
 
-            # Record type is ClassName without extension in PascalCase
-            filename = os.path.basename(file_path)
-            filename_without_extension, _ = os.path.splitext(filename)
+                with open(file_path, mode="r", encoding="utf-8") as file:
 
-            if not CaseUtil.is_pascal_case(filename_without_extension):
-                dirname = os.path.dirname(filename)
-                raise RuntimeError(
-                    f"Filename of a CSV preload file {filename} in directory {dirname} must be "
-                    f"ClassName or its alias in PascalCase without module."
-                )
+                    # The reader is an iterable of row dicts
+                    csv_reader = csv.DictReader(file)
+                    row_dicts = [row_dict for row_dict in csv_reader]
 
-            # Get record type
-            record_type = TypeInfo.from_type_name(filename_without_extension)
+                    invalid_rows = {
+                        index
+                        for index, row_dict in enumerate(row_dicts)
+                        for key in row_dict.keys()
+                        if key is None or key == ""  # TODO: Add other checks for invalid keys
+                    }
 
-            with open(file_path, mode="r", encoding="utf-8") as file:
+                    if invalid_rows:
+                        rows_str = "".join([f"Row: {invalid_row}\n" for invalid_row in invalid_rows])
+                        raise RuntimeError(
+                            "Misaligned values found in the following rows.\n"
+                            "Check the placement of commas and double quotes.\n" + rows_str
+                        )
 
-                # The reader is an iterable of row dicts
-                csv_reader = csv.DictReader(file)
-                row_dicts = [row_dict for row_dict in csv_reader]
-
-                invalid_rows = set(
-                    index
-                    for index, row_dict in enumerate(row_dicts)
-                    for key in row_dict.keys()
-                    if key is None or key == ""  # TODO: Add other checks for invalid keys
-                )
-
-                if invalid_rows:
-                    rows_str = "".join([f"Row: {invalid_row}\n" for invalid_row in invalid_rows])
-                    raise RuntimeError(
-                        f"Misaligned values found in the following rows of CSV file: {file_path}\n"
-                        f"Check the placement of commas and double quotes.\n" + rows_str
-                    )
-
-                # Deserialize rows into records and add to the result
-                loaded = [self._deserialize_row(record_type=record_type, row_dict=row_dict) for row_dict in row_dicts]
-                result.extend(loaded)
+                    # Deserialize rows into records and add to the result
+                    loaded = [self._deserialize_row(record_type=record_type, row_dict=row_dict) for row_dict in row_dicts]
+                    result.extend(loaded)
+            except Exception as e:
+                raise RuntimeError(f"Failed to load CSV file {file_path}. Error: {e}") from e
 
         # Convert to tuple and return
         return tuple(result)
@@ -151,7 +142,15 @@ class CsvReader(Reader):
 
     @classmethod
     def _deserialize_row(cls, *, record_type: type, row_dict: dict[str, Any]) -> RecordMixin:
-        """Deserialize row into a record."""
+        """Deserialize row into a record.
+        Args:
+            record_type: Type of the record to deserialize into
+            row_dict: Dictionary representing a CSV row
+        Returns:
+            Deserialized record
+        Raises:
+            RuntimeError: If deserialization fails
+        """
 
         # Normalize chars and set None for empty strings
         row_dict = {CharUtil.normalize(k): CharUtil.normalize_or_none(v) for k, v in row_dict.items()}

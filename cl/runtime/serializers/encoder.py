@@ -16,6 +16,8 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any
+
+from cl.runtime.primitive.char_util import CharUtil
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 
 
@@ -28,5 +30,23 @@ class Encoder(DataclassMixin, ABC):
         """Encode to a string, pass through None."""
 
     @abstractmethod
-    def decode(self, data: str | None) -> Any:
-        """Decode from a string, pass through None."""
+    def decode(self, data: str | bytes | None) -> Any:
+        """Decode from a string or bytes, pass through None."""
+
+    def normalize(self, data: Any) -> Any:
+        """Recursively normalize serialized data (dicts, lists, strings) for character encoding."""
+        if isinstance(data, dict):
+            # Recursively normalize dictionary keys and values
+            return {
+                CharUtil.normalize(k): self.normalize(v)
+                for k, v in data.items()
+            }
+        elif isinstance(data, list):
+            # Recursively normalize list items
+            return [self.normalize(item) for item in data]
+        elif isinstance(data, str):
+            # Normalize string values, converting empty strings to None
+            return CharUtil.normalize_or_none(data)
+        else:
+            # Return other types (int, float, bool, None) as-is
+            return data

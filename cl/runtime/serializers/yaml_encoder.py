@@ -155,4 +155,5 @@ class YamlEncoder(Encoder):
 
         # Use a YAML reader with PrimitiveToStringConstructor to read all values as strings
         result = yaml_reader.load(StringIO(data))
+        result = self.normalize(result)
         return result

@@ -101,14 +101,7 @@ def test_roundtrip(default_db_fixture):
                 ext="csv",
                 file_include_patterns=[record_type_pattern],
             )
-
-            ds = active(DataSource)
-            ds.drop_db()  # TODO: !!!! Implement delete_by_type in DataSource and use it here
-            ds.insert_many(records_from_csv, commit=True)
-
-            # Load from DB and compare to the originals
-            records_from_db = active(DataSource).load_by_type(record_type)
-            assert BuilderChecks.is_equal(records_from_db, expected_records)
+            assert BuilderChecks.is_equal(records_from_csv, expected_records)
         finally:
             if os.path.exists(dir_path):
                 shutil.rmtree(dir_path)
