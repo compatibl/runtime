@@ -18,7 +18,7 @@ from typing import Self
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
-_VALUE_DECL_NAME_MAP: Dict[str, str] = {
+_VALUE_DECL_NAME_MAP: dict[str, str] = {
     "str": "String",
     "float": "Double",
     "bool": "Bool",

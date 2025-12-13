@@ -26,7 +26,7 @@ from cl.runtime.schema.primitive_spec import PrimitiveSpec
 class DataSpecUtil:
     """Helper methods for type spec."""
 
-    _spec_dict: Dict[str, DataSpec] = {
+    _spec_dict: dict[str, DataSpec] = {
         "str": PrimitiveSpec.from_class(str),
         "float": PrimitiveSpec.from_class(float),
         "bool": PrimitiveSpec.from_class(bool),
@@ -41,7 +41,7 @@ class DataSpecUtil:
     }
     """Dictionary of type specs indexed by type name and initialized with primitive types."""
 
-    _class_dict: Dict[str, type] | None = None
+    _class_dict: dict[str, type] | None = None
     """Dictionary of types indexed by class name."""
 
     @classmethod

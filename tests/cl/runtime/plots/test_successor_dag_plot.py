@@ -25,7 +25,7 @@ def test_smoke(work_dir_fixture):
     @dataclass
     class Node:
         title: str
-        successors: List["Node"] | None = None
+        successors: list["Node"] | None = None
 
     # Define the nodes with successors
     staff_a = Node(title="Staff A")

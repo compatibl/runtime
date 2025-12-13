@@ -61,13 +61,13 @@ class DataSource(DataSourceKey, RecordMixin):
     parent: DataSourceKey | None = None
     """Search in parent if not found in self, default data source is always added as ultimate parent (optional)."""
 
-    included: List[ResourceKey] | None = None
+    included: list[ResourceKey] | None = None
     """Lookup here only the resources on this list, continue to parent for all other resources (optional)."""
 
-    excluded: List[ResourceKey] | None = None
+    excluded: list[ResourceKey] | None = None
     """Continue to parent without lookup here for resources in this list (optional)."""
 
-    designated: List[ResourceKey] | None = None
+    designated: list[ResourceKey] | None = None
     """Lookup these resources only here, not in any child or parent (optional)."""
 
     def get_key(self) -> DataSourceKey:

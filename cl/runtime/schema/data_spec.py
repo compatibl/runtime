@@ -25,16 +25,16 @@ from cl.runtime.schema.type_spec import TypeSpec
 class DataSpec(TypeSpec, ABC):
     """Provides information about a class with fields."""
 
-    fields: List[FieldSpec] = required()
+    fields: list[FieldSpec] = required()
     """Fields in class declaration order."""
 
-    _field_dict: Dict[str, FieldSpec] = required()
+    _field_dict: dict[str, FieldSpec] = required()
     """Dictionary of field specs indexed by field name."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
         self._field_dict = {x.field_name: x for x in self.fields} if self.fields is not None else {}
 
-    def get_field_dict(self) -> Dict[str, FieldSpec]:
+    def get_field_dict(self) -> dict[str, FieldSpec]:
         """Dictionary of field specs indexed by field name."""
         return self._field_dict

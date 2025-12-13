@@ -36,7 +36,7 @@ class ApiSettings(Settings):
     api_port: int | None = None
     """REST API port."""
 
-    api_allow_origins: List[str] | None = None
+    api_allow_origins: list[str] | None = None
     """The list of origins allowed to make cross-origin requests, must include hostname for the UI to run."""
 
     api_allow_origin_regex: str | None = None
@@ -45,13 +45,13 @@ class ApiSettings(Settings):
     api_allow_credentials: bool | None = None
     """Allows cookies and other credentials to be sent in cross-origin requests."""
 
-    api_allow_methods: List[str] | None = None
+    api_allow_methods: list[str] | None = None
     """The list of HTTP methods allowed for cross-origin requests (e.g., "GET", "POST")."""
 
-    api_allow_headers: List[str] | None = None
+    api_allow_headers: list[str] | None = None
     """The list of HTTP request headers allowed for cross-origin requests."""
 
-    api_expose_headers: List[str] | None = None
+    api_expose_headers: list[str] | None = None
     """The list of headers that browsers are allowed to access."""
 
     api_max_age: int | None = None

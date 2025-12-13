@@ -129,7 +129,7 @@ class ErrorUtil:
     @classmethod
     def mutually_exclusive_fields_error(
         cls,
-        fields: List[str],
+        fields: list[str],
         *,
         class_name: str,
         details: str | None = None,
@@ -150,7 +150,7 @@ class ErrorUtil:
     @classmethod
     def mutually_required_fields_error(
         cls,
-        fields: List[str],
+        fields: list[str],
         *,
         class_name: str,
         details: str | None = None,

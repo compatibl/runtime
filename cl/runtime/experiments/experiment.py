@@ -38,7 +38,7 @@ TTrial = TypeVar("TTrial", bound=Trial)
 class Experiment(ExperimentKey, RecordMixin, ABC):
     """Abstract base class for a statistical experiment."""
 
-    scenarios: List[ExperimentScenarioKey] | None = None
+    scenarios: list[ExperimentScenarioKey] | None = None
     """Experiment scenarios (optional)."""
 
     max_trials: int | None = None

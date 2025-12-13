@@ -19,7 +19,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.serializers.sentinel_type import sentinel_value
 from cl.runtime.settings.aliases.package_alias_key import PackageAliasKey
 
-_package_alias_dict: Dict[str, str] = {}
+_package_alias_dict: dict[str, str] = {}
 """Cached package aliases with module as key for faster lookup."""
 
 

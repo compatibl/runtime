@@ -21,12 +21,12 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
 
 
-def get_valid_samples() -> List[Tuple[int, str]]:
+def get_valid_samples() -> list[tuple[int, str]]:
     """Return a list of valid sample date strings in (iso_int, str) format."""
     return [(20030501101530000, "2003-05-01T10:15:30.000Z"), (20030501101530500, "2003-05-01T10:15:30.500Z")]
 
 
-def get_invalid_datetime_samples() -> List[dt.datetime]:
+def get_invalid_datetime_samples() -> list[dt.datetime]:
     """Return a list of invalid sample datetime strings."""
 
     non_utc_timezone = ZoneInfo("America/New_York")
@@ -38,7 +38,7 @@ def get_invalid_datetime_samples() -> List[dt.datetime]:
     ]
 
 
-def get_invalid_string_samples() -> List[str]:
+def get_invalid_string_samples() -> list[str]:
     """Return a list of invalid sample datetime strings."""
     return [
         "2003-05-01",  # Date only with no timezone
@@ -50,7 +50,7 @@ def get_invalid_string_samples() -> List[str]:
     ]
 
 
-def get_invalid_iso_int_samples() -> List[int]:
+def get_invalid_iso_int_samples() -> list[int]:
     """Return a list of invalid sample datetime ISO ints."""
     return [
         20030501,  # Date only
@@ -62,7 +62,7 @@ def get_invalid_iso_int_samples() -> List[int]:
     ]
 
 
-def get_invalid_fields_samples() -> List[Tuple[int, int, int, int, int, int, int]]:
+def get_invalid_fields_samples() -> list[tuple[int, int, int, int, int, int, int]]:
     """Return a list of invalid sample datetimes in fields format."""
     return [
         (1800, 5, 1, 10, 15, 30, 500),
@@ -82,7 +82,7 @@ def get_invalid_fields_samples() -> List[Tuple[int, int, int, int, int, int, int
     ]
 
 
-def get_rounding_samples() -> List[Tuple[dt.datetime, dt.datetime]]:
+def get_rounding_samples() -> list[tuple[dt.datetime, dt.datetime]]:
     """Return a list of datetime objects for testing rounding."""
 
     return [

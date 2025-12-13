@@ -22,7 +22,7 @@ class FloatListUtil(ListUtil):
     """Extends ListUtil to provide helper methods for float lists."""
 
     @classmethod
-    def is_strictly_ascending(cls, values: List[float]) -> bool:
+    def is_strictly_ascending(cls, values: list[float]) -> bool:
         """
         Returns true if the list is sorted in ascending order up to float
         tolerance with equal values not permitted.
@@ -33,7 +33,7 @@ class FloatListUtil(ListUtil):
         return result
 
     @classmethod
-    def is_equal_or_ascending(cls, values: List[float]) -> bool:
+    def is_equal_or_ascending(cls, values: list[float]) -> bool:
         """
         Returns true if the list is sorted in ascending order up to float
         tolerance with equal values permitted.
@@ -44,7 +44,7 @@ class FloatListUtil(ListUtil):
         return result
 
     @classmethod
-    def is_strictly_descending(cls, values: List[float]) -> bool:
+    def is_strictly_descending(cls, values: list[float]) -> bool:
         """
         Returns true if the list is sorted in descending order up to float
         tolerance with equal values not permitted.
@@ -55,7 +55,7 @@ class FloatListUtil(ListUtil):
         return result
 
     @classmethod
-    def is_equal_or_descending(cls, values: List[float]) -> bool:
+    def is_equal_or_descending(cls, values: list[float]) -> bool:
         """
         Returns true if the list is sorted in descending order up to float
         tolerance with equal values permitted.

@@ -26,7 +26,7 @@ class DagNodeData(DataMixin):
     label: str = required()
     """Node label."""
 
-    node_data: Dict[str, str] | None = None
+    node_data: dict[str, str] | None = None
     """Optional node data."""
 
     node_data_reference: KeyProtocol | None = None

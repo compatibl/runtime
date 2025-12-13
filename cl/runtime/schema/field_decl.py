@@ -135,7 +135,7 @@ class FieldDecl(DataMixin):
                     raise RuntimeError(
                         f"List type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a list of elements using the syntax 'List[type]'.\n"
+                        f"because it is not a list of elements using the syntax 'list[type]'.\n"
                         f"Other list type hint formats are not supported.\n"
                     )
             elif field_origin is tuple:
@@ -145,7 +145,7 @@ class FieldDecl(DataMixin):
                     raise RuntimeError(
                         f"Tuple type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a variable-length tuple using the syntax 'Tuple[type, ...]',\n"
+                        f"because it is not a variable-length tuple using the syntax 'tuple[type, ...]',\n"
                         f"where ellipsis '...' is placed second per the standard convention.\n"
                         f"It cannot be used to specify a fixed size tuple or a tuple with\n"
                         f"different element types.\n"
@@ -157,10 +157,10 @@ class FieldDecl(DataMixin):
                     raise RuntimeError(
                         f"Dict type hint '{field_type}' for field '{field_name}'\n"
                         f"in record '{TypeUtil.name(record_type)}' is not supported for DB schema\n"
-                        f"because it is not a dictionary with string keys using the syntax 'Dict[str, type]'.\n"
+                        f"because it is not a dictionary with string keys using the syntax 'dict[str, type]'.\n"
                         f"It cannot be used to specify a dictionary with keys of a different type.\n"
                     )
-                # TODO: Support Dict[str, List[x]]
+                # TODO: Support dict[str, list[x]]
             else:
                 supported_container_names = ", ".join([TypeUtil.name(x) for x in supported_containers])
                 raise RuntimeError(

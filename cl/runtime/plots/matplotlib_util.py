@@ -28,8 +28,8 @@ class MatplotlibUtil:
     def heatmap(
         cls,
         data: np.ndarray,
-        row_labels: List[str],
-        col_labels: List[str],
+        row_labels: list[str],
+        col_labels: list[str],
         ax=None,
         **kwargs,
     ):
@@ -74,8 +74,8 @@ class MatplotlibUtil:
     def annotate_heatmap(
         cls,
         im: AxesImage,
-        labels: List[List[str]],
-        text_colors: Union[str, Tuple[str]] = ("black", "white"),
+        labels: list[list[str]],
+        text_colors: Union[str, tuple[str]] = ("black", "white"),
         threshold: float | None = None,
         **kwargs,  # TODO: Avoid **kwargs
     ):
@@ -120,7 +120,7 @@ class MatplotlibUtil:
         return texts
 
     @classmethod
-    def no_png_metadata(cls) -> Dict[str, str]:
+    def no_png_metadata(cls) -> dict[str, str]:
         """Return empty metadata for Matplotlib png format to prevent version changes from creating test diffs."""
         return {
             "Title": "",
@@ -136,7 +136,7 @@ class MatplotlibUtil:
         }
 
     @classmethod
-    def no_svg_metadata(cls) -> Dict[str, str]:
+    def no_svg_metadata(cls) -> dict[str, str]:
         """Return empty metadata for Matplotlib svg format to prevent version changes from creating test diffs."""
         return {
             "Title": "",

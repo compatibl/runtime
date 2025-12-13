@@ -23,5 +23,5 @@ from cl.runtime.schema.type_decl import TypeDecl
 class EnumDecl(TypeDecl):
     """Enum declaration."""
 
-    items: List[EnumItemDecl] = required()
+    items: list[EnumItemDecl] = required()
     """Array of enum items."""

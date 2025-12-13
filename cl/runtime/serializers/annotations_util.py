@@ -18,7 +18,7 @@ from typing import List
 from typing import Tuple
 from typing import Union
 
-class_hierarchy_annotations_dict: Dict[type, Dict[str, type]] = dict()
+class_hierarchy_annotations_dict: dict[type, dict[str, type]] = dict()
 """Dictionary of class hierarchy annotations."""
 
 
@@ -26,7 +26,7 @@ class AnnotationsUtil:
     """Util class for type annotations."""
 
     @classmethod
-    def get_class_hierarchy_annotations(cls, data_type) -> Dict[str, type]:
+    def get_class_hierarchy_annotations(cls, data_type) -> dict[str, type]:
         """
         Return combined annotations dict for all classes in data_type hierarchy.
         Checks type of fields with the same name and raises RuntimeError if there is a conflict.
@@ -38,7 +38,7 @@ class AnnotationsUtil:
             # Collect all annotations in hierarchy
 
             # Combined annotations for all types in hierarchy {field_name: field_type}
-            hierarchy_annots: Dict[str, type] = {}
+            hierarchy_annots: dict[str, type] = {}
 
             for base in reversed(data_type.__mro__):
                 if annot := getattr(base, "__annotations__", None):
@@ -60,7 +60,7 @@ class AnnotationsUtil:
         if (type_.__class__ is UnionType or getattr(type_, "__origin__", None) is Union) and (
             union_args := getattr(type_, "__args__", None)
         ):
-            not_none_union_args: List[int] = [arg for arg in union_args if arg is not type(None)]
+            not_none_union_args: list[int] = [arg for arg in union_args if arg is not type(None)]
             if len(not_none_union_args) == 1:
                 return not_none_union_args[0]
             else:
@@ -71,7 +71,7 @@ class AnnotationsUtil:
 
     @classmethod
     def extract_origin_type(cls, type_):
-        """Extract origin, e.g. List[int] -> list, Tuple[int, ...] -> tuple."""
+        """Extract origin, e.g. list[int] -> list, tuple[int, ...] -> tuple."""
 
         if type_ is None:
             return None
@@ -88,7 +88,7 @@ class AnnotationsUtil:
 
     @classmethod
     def extract_list_value_annot_type(cls, type_):
-        """Extract generic type arguments from list annotation type, e.g. List[int] -> int"""
+        """Extract generic type arguments from list annotation type, e.g. list[int] -> int"""
 
         if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
             return None
@@ -101,7 +101,7 @@ class AnnotationsUtil:
 
     @classmethod
     def extract_tuple_value_annot_type(cls, type_):
-        """Extract generic type arguments from tuple annotation type, e.g. Tuple[int, ...] -> int"""
+        """Extract generic type arguments from tuple annotation type, e.g. tuple[int, ...] -> int"""
 
         if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
             return None
@@ -109,7 +109,7 @@ class AnnotationsUtil:
             if len(type_args) == 2:
                 # The second type argument is expected to be an ellipsis.
                 if type_args[1] is not ...:
-                    raise RuntimeError(f"Tuple type annotation format should be Tuple[type, ...]. Received: {type_}.")
+                    raise RuntimeError(f"Tuple type annotation format should be tuple[type, ...]. Received: {type_}.")
 
                 # Take first argument as value type
                 return type_args[0]
@@ -118,7 +118,7 @@ class AnnotationsUtil:
 
     @classmethod
     def extract_dict_value_annot_type(cls, type_):
-        """Extract generic type arguments from dict annotation type, e.g. Dict[str, int] -> int"""
+        """Extract generic type arguments from dict annotation type, e.g. dict[str, int] -> int"""
 
         if type_ is None or (type_args := getattr(type_, "__args__", None)) is None:
             return None

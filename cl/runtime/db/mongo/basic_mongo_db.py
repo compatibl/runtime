@@ -54,10 +54,10 @@ data_serializer = DataSerializers.FOR_MONGO
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 filter_serializer = MongoFilterSerializer()
 
-_client_dict: Dict[str, MongoClient] = {}
+_client_dict: dict[str, MongoClient] = {}
 """Dict of MongoClient instances with client_uri key stored outside the class to avoid serializing them."""
 
-_db_dict: Dict[str, Database] = {}
+_db_dict: dict[str, Database] = {}
 """Dict of database instances with client_uri.database_name key stored outside the class to avoid serializing them."""
 
 
@@ -328,7 +328,7 @@ class BasicMongoDb(Db):
             # Remove client from dictionary so connection can be reopened on next access
             del _client_dict[self.client_uri]
 
-    def _convert_op_fields_to_mongo_syntax(self, query_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def _convert_op_fields_to_mongo_syntax(self, query_dict: dict[str, Any]) -> dict[str, Any]:
         """Convert op_* fields to MongoDB $* syntax recursively."""
         if not isinstance(query_dict, dict):
             return query_dict

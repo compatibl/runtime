@@ -32,14 +32,14 @@ from cl.runtime.schema.handler_variable_decl import HandlerVariableDecl
 class HandlerDeclareBlockDecl(DataMixin):
     """Handler declaration block in type declaration."""
 
-    handlers: List[HandlerDeclareDecl] = required()
+    handlers: list[HandlerDeclareDecl] = required()
     """Handler declaration data."""
 
     @classmethod
     def get_type_methods(cls, record_type: type, inherit: bool = False) -> "HandlerDeclareBlockDecl":
         """Extract class public methods."""
 
-        handlers: List[HandlerDeclareDecl] = []
+        handlers: list[HandlerDeclareDecl] = []
         type_members: Iterable[str] = dir(record_type) if inherit else vars(record_type)
 
         # Search for methods in type members
@@ -108,9 +108,9 @@ class HandlerDeclareBlockDecl(DataMixin):
         return handler
 
     @classmethod
-    def get_method_params(cls, method: FunctionType | MethodType) -> List[HandlerParamDecl]:
+    def get_method_params(cls, method: FunctionType | MethodType) -> list[HandlerParamDecl]:
         """Extract parameters from a given method"""
-        params: List[HandlerParamDecl] = []
+        params: list[HandlerParamDecl] = []
 
         method_signature = inspect.signature(method)
         method_params = method_signature.parameters

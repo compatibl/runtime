@@ -161,16 +161,16 @@ TSequence = list | tuple | Sequence
 TMapping = dict | frozendict | Mapping
 """Type alias for a supported mapping type."""
 
-TDataField = Dict[str, "TDataField"] | List["TDataField"] | TPrimitive | Enum
+TDataField = dict[str, "TDataField"] | list["TDataField"] | TPrimitive | Enum
 """Field types for serialized data in dictionary format."""
 
-TDataDict = Dict[str, TDataField]
+TDataDict = dict[str, TDataField]
 """Serialized data in dictionary format."""
 
-TKeyField = Dict[str, "TKeyField"] | TPrimitive | Enum
+TKeyField = dict[str, "TKeyField"] | TPrimitive | Enum
 """Field types for serialized key in dictionary format."""
 
-TKeyDict = Dict[str, TKeyField]
+TKeyDict = dict[str, TKeyField]
 """Serialized key in dictionary format."""
 
 TObj = TypeVar("TObj")

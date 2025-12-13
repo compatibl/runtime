@@ -59,7 +59,7 @@ class Timestamp:
         return result
 
     @classmethod
-    def create_many(cls, count: int) -> List[str]:
+    def create_many(cls, count: int) -> list[str]:
         """
         Within the same process, thread and context returned values are ordered and greater than any previous values.
         In all other cases, the returned values are ordered and greater than values returned in prior milliseconds.

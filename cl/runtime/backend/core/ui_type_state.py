@@ -33,7 +33,7 @@ class UiTypeState(UiTypeStateKey, RecordMixin):
     activated, the main grid data request will not be submitted, it will be taken from the browser cache.
     """
 
-    pinned_handlers: List[str] | None = None
+    pinned_handlers: list[str] | None = None
     """List of names of the handlers pinned for the type"""
 
     def get_key(self) -> UiTypeStateKey:

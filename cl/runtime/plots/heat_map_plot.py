@@ -31,16 +31,16 @@ class HeatMapPlot(MatplotlibPlot):
     title: str = required()
     """Plot title."""
 
-    row_labels: List[str] = required()
+    row_labels: list[str] = required()
     """Row label for each cell in the same order of cells as other fields."""
 
-    col_labels: List[str] = required()
+    col_labels: list[str] = required()
     """Column label for each cell in the same order of cells as other fields."""
 
-    received_values: List[float] = required()
+    received_values: list[float] = required()
     """Received value for each cell in the same order of cells as other fields."""
 
-    expected_values: List[float] = required()
+    expected_values: list[float] = required()
     """Expected (correct) value for each cell in the same order of cells as other fields."""
 
     x_label: str = required()

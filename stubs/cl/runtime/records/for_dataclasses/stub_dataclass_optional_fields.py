@@ -29,19 +29,19 @@ class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin):
     optional_str: str | None = "xyz"
     """Optional string."""
 
-    required_list_of_optional_str: List[str | None] = required(default_factory=lambda: ["abc", None])
+    required_list_of_optional_str: list[str | None] = required(default_factory=lambda: ["abc", None])
     """Required list of optional strings."""
 
-    optional_list_of_optional_str: List[str | None] | None = None
+    optional_list_of_optional_str: list[str | None] | None = None
     """Optional list of optional strings."""
 
     optional_float: float | None = 1.23
     """Optional float."""
 
-    required_list_of_optional_float: List[float | None] = required(default_factory=lambda: [1.23, None])
+    required_list_of_optional_float: list[float | None] = required(default_factory=lambda: [1.23, None])
     """Required list of optional floats."""
 
-    optional_list_of_optional_float: List[float | None] | None = None
+    optional_list_of_optional_float: list[float | None] | None = None
     """Optional list of optional floats."""
 
     # TODO: Add a complete set of optional primitive field types and lists
@@ -49,34 +49,34 @@ class StubDataclassOptionalFields(StubDataclassOptionalFieldsKey, RecordMixin):
     optional_data: StubDataclassData | None = None
     """Optional data."""
 
-    required_list_of_optional_data: List[StubDataclassData | None] = required(
+    required_list_of_optional_data: list[StubDataclassData | None] = required(
         default_factory=lambda: [StubDataclassData(), None]
     )
     """Required list of optional data."""
 
-    optional_list_of_optional_data: List[StubDataclassData | None] | None = None
+    optional_list_of_optional_data: list[StubDataclassData | None] | None = None
     """Optional list of optional data."""
 
     optional_key: StubDataclassKey | None = None
     """Optional key."""
 
-    required_list_of_optional_key: List[StubDataclassKey | None] = required(
+    required_list_of_optional_key: list[StubDataclassKey | None] = required(
         default_factory=lambda: [StubDataclassKey(), None]
     )
     """Required list of optional key."""
 
-    optional_list_of_optional_key: List[StubDataclassKey | None] | None = None
+    optional_list_of_optional_key: list[StubDataclassKey | None] | None = None
     """Optional list of optional key."""
 
     optional_record: StubDataclass | None = None
     """Optional record."""
 
-    required_list_of_optional_record: List[StubDataclass | None] = required(
+    required_list_of_optional_record: list[StubDataclass | None] = required(
         default_factory=lambda: [StubDataclass(), None]
     )
     """Required list of optional record."""
 
-    optional_list_of_optional_record: List[StubDataclass | None] | None = None
+    optional_list_of_optional_record: list[StubDataclass | None] | None = None
     """Optional list of optional record."""
 
     def get_key(self) -> StubDataclassOptionalFieldsKey:

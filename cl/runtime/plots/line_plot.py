@@ -29,15 +29,15 @@ class LinePlot(MatplotlibPlot):
     title: str = required()
     """Plot title."""
 
-    x_values: List[float] = required()
+    x_values: list[float] = required()
     """List of X-coordinates, common for all lines."""
 
-    lines: Dict[str, List[float]] = required()
-    """Dictionary mapping line labels (str) to lists of Y-coordinates (List[float]).
+    lines: dict[str, list[float]] = required()
+    """Dictionary mapping line labels (str) to lists of Y-coordinates (list[float]).
        The order of Y-values must correspond to the order of x_values.
        NaN values in Y-coordinates will create gaps in the lines."""
 
-    line_options: Dict[str, Dict[str, str]] | None = None
+    line_options: dict[str, dict[str, str]] | None = None
     """Optional dictionary mapping line labels to their specific plotting options
        (e.g., {'color': 'red', 'marker': 'x', 'linestyle': '--'}). Keys in the inner
        dictionary correspond to matplotlib.pyplot.plot arguments."""
@@ -48,10 +48,10 @@ class LinePlot(MatplotlibPlot):
     y_axis_label: str | None = None
     """Y-axis label."""
 
-    y_lim: Tuple[float | None, ...] | None = None
+    y_lim: tuple[float | None, ...] | None = None
     """Y-axis limits (min, max). Set elements to None for autoscaling respective end."""
 
-    figsize: Tuple[float, ...] = (10, 6)
+    figsize: tuple[float, ...] = (10, 6)
     """Figure size in inches (width, height)."""
 
     grid: bool = True

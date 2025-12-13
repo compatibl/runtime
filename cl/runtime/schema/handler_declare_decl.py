@@ -36,7 +36,7 @@ class HandlerDeclareDecl(DataMixin):
     type_: str = required()  # TODO: Rename to handler_type for clarity
     """Handler type."""
 
-    params: List[HandlerParamDecl] | None = None
+    params: list[HandlerParamDecl] | None = None
     """Handler parameters."""
 
     return_: HandlerVariableDecl | None = None

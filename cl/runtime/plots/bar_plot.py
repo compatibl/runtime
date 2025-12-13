@@ -28,13 +28,13 @@ class BarPlot(MatplotlibPlot, ABC):
     title: str = required()
     """Plot title."""
 
-    bar_labels: List[str] = required()
+    bar_labels: list[str] = required()
     """List of bar labels."""
 
-    group_labels: List[str] = required()
+    group_labels: list[str] = required()
     """List of group labels."""
 
-    values: List[float] = required()
+    values: list[float] = required()
     """List of values in the same order as bar and group labels."""
 
     bar_axis_label: str | None = None
@@ -43,7 +43,7 @@ class BarPlot(MatplotlibPlot, ABC):
     value_axis_label: str | None = None
     """Value axis label."""
 
-    value_ticks: List[float] | None = None
+    value_ticks: list[float] | None = None
     """Custom ticks for the value axis."""
 
     xtick_rotation: float = 0.0

@@ -32,10 +32,10 @@ class ConfusionMatrixPlot(MatplotlibPlot):
     title: str = required()
     """Plot title."""
 
-    received_categories: List[str] = required()
+    received_categories: list[str] = required()
     """List of received (predicted) categories for each trial."""
 
-    expected_categories: List[str] = required()
+    expected_categories: list[str] = required()
     """List of expected (correct) categories in the same order of trials as received (predicted) categories."""
 
     x_label: str | None = "Predicted"
@@ -71,7 +71,7 @@ class ConfusionMatrixPlot(MatplotlibPlot):
 
         return fig
 
-    def _create_confusion_matrix(self) -> Tuple[pd.DataFrame, List[List[str]]]:
+    def _create_confusion_matrix(self) -> tuple[pd.DataFrame, list[list[str]]]:
         raw_data = pd.DataFrame({"Actual": self.expected_categories, "Predicted": self.received_categories})
 
         data_confusion_matrix = MatrixUtil.create_confusion_matrix(

@@ -24,5 +24,5 @@ from cl.runtime.views.view import View
 class RecordListView(View):
     """View that displays a list of record specified via their primary keys."""
 
-    records: List[str] = required()
+    records: list[str] = required()
     """Primary keys of the displayed records."""

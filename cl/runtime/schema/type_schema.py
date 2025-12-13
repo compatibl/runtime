@@ -38,7 +38,7 @@ class TypeSchema:
     enums and primitive types.
     """
 
-    _spec_dict: Dict[str, TypeSpec] = {
+    _spec_dict: dict[str, TypeSpec] = {
         "str": PrimitiveSpec.from_class(str),
         "float": PrimitiveSpec.from_class(float),
         "bool": PrimitiveSpec.from_class(bool),
@@ -56,10 +56,10 @@ class TypeSchema:
     _class_dict: Mapping[str, type] | None = None
     """Dictionary of types indexed by class name."""
 
-    _modules: Tuple[ModuleType, ...] | None = None
+    _modules: tuple[ModuleType, ...] | None = None
     """Modules from the packages specified in the settings."""
 
-    _packages: Tuple[str, ...] | None = None
+    _packages: tuple[str, ...] | None = None
     """Packages specified in the settings."""
 
     @classmethod

@@ -35,7 +35,7 @@ class DagEdge(DataMixin):
     target: str = required()
     """Target node id."""
 
-    def to_networkx(self) -> Dict[str, Any]:
+    def to_networkx(self) -> dict[str, Any]:
         """Transform node to networkx representation."""
         result = {
             "u_of_edge": self.source,

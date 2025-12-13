@@ -27,7 +27,7 @@ from cl.runtime.records.record_mixin import RecordMixin
 class UiAppState(UiAppStateKey, RecordMixin):
     """UiAppState."""
 
-    opened_tabs: List[TabInfo] | None = None
+    opened_tabs: list[TabInfo] | None = None
     """Information about opened tabs."""
 
     active_tab_index: int | None = None
@@ -36,7 +36,7 @@ class UiAppState(UiAppStateKey, RecordMixin):
     backend_version: str | None = None
     """DEPRECATED. Use versions instead."""
 
-    versions: Dict[str, str] | None = None
+    versions: dict[str, str] | None = None
     """Component versions."""
 
     application_name: str | None = None
@@ -48,7 +48,7 @@ class UiAppState(UiAppStateKey, RecordMixin):
     application_theme: str | None = None
     """Application theme (dark, light, etc.)."""
 
-    user_secret_identifiers: List[str] | None = None
+    user_secret_identifiers: list[str] | None = None
     """
     Suggested key names in My Keys section of the head and shoulders dialog.
 

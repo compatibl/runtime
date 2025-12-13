@@ -55,7 +55,7 @@ def for_type_key_maker(
     return f"{record_type.__module__}.{TypeUtil.name(record_type)}.{dependencies.__hash__}{skip_fields}{skip_handlers}"
 
 
-def get_name_of_type_decl_dict(dict_: Dict[str, Dict]) -> str | None:
+def get_name_of_type_decl_dict(dict_: dict[str, Dict]) -> str | None:
     """Search for the type name in the given dict and return in format {module}.{name} ."""
 
     # Element fields contain "key_" in case of key-field or "data" section in case of data-field
@@ -105,14 +105,14 @@ class TypeDecl(TypeDeclKey, RecordMixin):
     declare: HandlerDeclareBlockDecl | None = None  # TODO: Flatten or use block for abstract flag
     """Handler declaration block."""
 
-    elements: List[ElementDecl] | None = None  # TODO: Deprecated
+    elements: list[ElementDecl] | None = None  # TODO: Deprecated
     """Element declaration block."""
 
-    keys: List[str] | None = None
+    keys: list[str] | None = None
     """Array of key element names (specify in base class only)."""
 
     # TODO: Consider moving to Table class
-    # indexes: List[TypeIndexDecl] | None = None
+    # indexes: list[TypeIndexDecl] | None = None
     """Defines indexes for the type."""
 
     abstract: bool | None = None
@@ -269,7 +269,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
 
     @classmethod
     @cached
-    def as_dict_with_dependencies(cls, record_type: type) -> Dict[str, Dict]:
+    def as_dict_with_dependencies(cls, record_type: type) -> dict[str, Dict]:
         """
         Declarations for the specified type and all dependencies, returned as a dictionary.
 
@@ -299,7 +299,7 @@ class TypeDecl(TypeDeclKey, RecordMixin):
 
     @classmethod
     @cached
-    def get_member_comments(cls, record_type: type) -> Dict[str, str]:
+    def get_member_comments(cls, record_type: type) -> dict[str, str]:
         """Extract class member comments."""
 
         # Include comments from key class fields for base

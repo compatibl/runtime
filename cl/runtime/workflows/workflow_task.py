@@ -26,7 +26,7 @@ from cl.runtime.workflows.workflow_phase_key import WorkflowPhaseKey
 class WorkflowTask(Task):
     """Parent of workflow phase tasks who are in turn parents of tasks assigned to each phase."""
 
-    phases: List[WorkflowPhaseKey] = required()
+    phases: list[WorkflowPhaseKey] = required()
     """Tasks run in parallel in the order of phases, however each phase waits until its prerequisites are completed."""
 
     def _execute(self) -> None:

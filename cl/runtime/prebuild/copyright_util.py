@@ -53,8 +53,8 @@ class CopyrightUtil:
         *,
         fix_trailing_blank_line: bool = False,
         verbose: bool = False,
-        file_include_patterns: List[str] | None = None,
-        file_exclude_patterns: List[str] | None = None,
+        file_include_patterns: list[str] | None = None,
+        file_exclude_patterns: list[str] | None = None,
     ) -> None:
         """
         Check that the correct copyright header (Apache or default, based on the presence of Apache LICENSE file at

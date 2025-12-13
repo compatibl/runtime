@@ -37,7 +37,7 @@ class DatasetUtil:
         return cls._sep
 
     @classmethod
-    def to_levels(cls, dataset: str) -> List[str]:
+    def to_levels(cls, dataset: str) -> list[str]:
         """Convert the dataset from any input format to a list of levels and perform validation."""
 
         if dataset is None or dataset == cls._sep:
@@ -63,7 +63,7 @@ class DatasetUtil:
         return dataset
 
     @classmethod
-    def to_lookup_list(cls, dataset: str) -> List[str]:
+    def to_lookup_list(cls, dataset: str) -> list[str]:
         """
         Convert the dataset in any format to a list of datasets in string format.
         Each element of the returned list represents one step in a hierarchical lookup

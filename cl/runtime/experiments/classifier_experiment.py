@@ -29,7 +29,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class ClassifierExperiment(Experiment, ABC):
     """Unsupervised classifier experiment with string result type representing the class label."""
 
-    class_labels: List[str] = required()
+    class_labels: list[str] = required()
     """List of permitted class labels."""
 
     def get_plot(self, plot_id: str) -> StackBarPlot:

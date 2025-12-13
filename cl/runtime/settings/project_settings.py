@@ -223,7 +223,7 @@ class ProjectSettings:
         return db_dir
 
     @classmethod
-    def normalize_paths(cls, field_name: str, field_value: Iterable[str] | str | None) -> List[str]:
+    def normalize_paths(cls, field_name: str, field_value: Iterable[str] | str | None) -> list[str]:
         """
         Convert to absolute path if path relative to the location of .env or Dynaconf file is specified
         and convert to list if single value is specified.

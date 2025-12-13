@@ -52,8 +52,8 @@ class TimestampFormatUtil:
     def update_timestamps(
         cls,
         *,
-        file_include_patterns: List[str] | None = None,
-        file_exclude_patterns: List[str] | None = None,
+        file_include_patterns: list[str] | None = None,
+        file_exclude_patterns: list[str] | None = None,
     ) -> None:
         """
         Check that timestamp format is correct inside the specified files under the project root.

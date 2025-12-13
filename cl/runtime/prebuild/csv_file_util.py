@@ -29,8 +29,8 @@ class CsvFileUtil:
         *,
         apply_fix: bool,
         verbose: bool = False,
-        file_include_patterns: List[str] | None = None,
-        file_exclude_patterns: List[str] | None = None,
+        file_include_patterns: list[str] | None = None,
+        file_exclude_patterns: list[str] | None = None,
     ) -> None:
         """
         Check csv preload files in all subdirectories of 'root_path' to ensure that each field that

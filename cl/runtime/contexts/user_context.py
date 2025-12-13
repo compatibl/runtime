@@ -27,7 +27,7 @@ from cl.runtime.records.data_mixin import DataMixin
 class UserContext(DataMixin):  # TODO: Rename to SecretsContext?
     """User-specific settings and data."""
 
-    encrypted_secrets: Dict[str, str] | None = None
+    encrypted_secrets: dict[str, str] | None = None
     """User secrets specified here take precedence over those defined via Dynaconf."""
 
     @classmethod

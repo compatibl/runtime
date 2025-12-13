@@ -23,7 +23,7 @@ from cl.runtime.records.protocols import RecordProtocol
 from stubs.cl.runtime.contexts.stub_context import StubContext
 
 
-def _perform_serialization_test(contexts: List[RecordProtocol]):
+def _perform_serialization_test(contexts: list[RecordProtocol]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Serialize current contexts into data and then deserialize data into a ContextSnapshot instance
@@ -40,7 +40,7 @@ def _perform_serialization_test(contexts: List[RecordProtocol]):
         assert not deserialized.contexts
 
 
-def _perform_manager_test(contexts: List[RecordProtocol]):
+def _perform_manager_test(contexts: list[RecordProtocol]):
     """Perform roundtrip test of serialization followed by deserialization and ensure contexts match argument."""
 
     # Capture active contexts before

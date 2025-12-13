@@ -43,7 +43,7 @@ _CSV_SERIALIZER = DataSerializers.FOR_CSV
 """Serializer for CSV serialization."""
 
 
-stub_entries: List[List[RecordProtocol]] = [  # noqa
+stub_entries: list[list[RecordProtocol]] = [  # noqa
     [StubDataclass(id=f"abc1_n{i}").build() for i in range(5)],
     [StubDataclassNestedFields(id=f"abc2_n{i}").build() for i in range(5)],
     [StubDataclassComposite(primitive=f"abc{i}").build() for i in range(5)],
@@ -75,7 +75,7 @@ def save_records_to_csv(records: Iterable, file_path: str) -> None:
     df.to_csv(file_path, index=False)
 
 
-def save_test_records(entries: List[RecordProtocol]) -> Tuple[List[RecordProtocol], Path]:
+def save_test_records(entries: list[RecordProtocol]) -> tuple[list[RecordProtocol], Path]:
     file_path = Path(__file__).parent.joinpath(f"{TypeUtil.name(entries[0])}.csv")
     save_records_to_csv(entries, str(file_path.absolute()))
     return entries, file_path

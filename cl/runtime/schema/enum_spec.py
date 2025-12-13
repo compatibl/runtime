@@ -26,7 +26,7 @@ from cl.runtime.schema.type_spec import TypeSpec
 class EnumSpec(TypeSpec):
     """Provides information about an enum type."""
 
-    members: List[EnumMemberSpec] | None = None
+    members: list[EnumMemberSpec] | None = None
     """List of enum members (use None for a placeholder enum with no members)."""
 
     @classmethod

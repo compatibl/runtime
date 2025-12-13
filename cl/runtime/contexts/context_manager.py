@@ -42,7 +42,7 @@ def _get_or_create_stack_dict() -> defaultdict[tuple[type, str | None], list[Rec
     return stack_dict
 
 
-def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | None = None) -> List[RecordProtocol]:
+def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | None = None) -> list[RecordProtocol]:
     """
     Get or create stack for the (context_key_type, context_id) pair in the current asynchronous environment.
 
@@ -54,7 +54,7 @@ def _get_or_create_stack(context_type: Type[RecordProtocol], context_id: str | N
     return _get_or_create_stack_dict()[(key_type_name, context_id)]
 
 
-def make_active_and_return_stack(context: TRecord, context_id: str | None = None) -> List[RecordProtocol]:
+def make_active_and_return_stack(context: TRecord, context_id: str | None = None) -> list[RecordProtocol]:
     """
     Similar to make_active(...) but returns context stack rather than the context.
 
@@ -111,7 +111,7 @@ def make_inactive(
     exc_type: Any = None,
     exc_val: Any = None,
     exc_tb: Any = None,
-    expected_stack: List[RecordProtocol] | None = None,
+    expected_stack: list[RecordProtocol] | None = None,
 ) -> None:
     """
     Make context inactive and revert to the previous active context (if any).

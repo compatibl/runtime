@@ -57,7 +57,7 @@ class KeyUtil:  # TODO: Review how the methods are used
 
     # TODO: Extract from key class instead
     @classmethod
-    def get_key_fields(cls, record_type: type) -> List[str] | None:
+    def get_key_fields(cls, record_type: type) -> list[str] | None:
         """
         Get primary key fields by parsing the source of 'get_key' method of 'record_type'.
 

@@ -18,14 +18,14 @@ from typing import Tuple
 from cl.runtime.primitive.date_util import DateUtil
 
 
-def get_valid_samples() -> List[Tuple[int, str]]:
+def get_valid_samples() -> list[tuple[int, str]]:
     """Return a list of valid sample date strings in (iso_int, str) format."""
     return [
         (20030501, "2003-05-01"),
     ]
 
 
-def get_invalid_string_samples() -> List[str]:
+def get_invalid_string_samples() -> list[str]:
     """Return a list of invalid sample date strings."""
     return [
         "2003-05-01Z",  # Date with timezone
@@ -44,12 +44,12 @@ def get_invalid_string_samples() -> List[str]:
     ]
 
 
-def get_invalid_iso_int_samples() -> List[int]:
+def get_invalid_iso_int_samples() -> list[int]:
     """Return a list of invalid sample date ISO ints."""
     return [2003050, 18000501, 200305010]  # Int too short  # Year too far back  # Int too long
 
 
-def get_invalid_fields_samples() -> List[Tuple[int, int, int]]:
+def get_invalid_fields_samples() -> list[tuple[int, int, int]]:
     """Return a list of invalid sample dates in fields format."""
     return [
         (1800, 5, 1),

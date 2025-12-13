@@ -29,7 +29,7 @@ class Script(DataMixin):
     language: ScriptLanguage | None = None
     """Script Language."""
 
-    body: List[str] = required()
+    body: list[str] = required()
     """Body"""
 
     word_wrap: bool | None = None

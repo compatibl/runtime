@@ -20,12 +20,12 @@ from zoneinfo import ZoneInfo
 from cl.runtime.primitive.time_util import TimeUtil
 
 
-def get_valid_samples() -> List[Tuple[int, str]]:
+def get_valid_samples() -> list[tuple[int, str]]:
     """Return a list of valid sample date strings in (iso_int, str) format."""
     return [(101530000, "10:15:30.000"), (101530500, "10:15:30.500")]
 
 
-def get_invalid_time_samples() -> List[dt.time]:
+def get_invalid_time_samples() -> list[dt.time]:
     """Return a list of invalid sample time strings."""
 
     non_utc_timezone = ZoneInfo("America/New_York")
@@ -37,7 +37,7 @@ def get_invalid_time_samples() -> List[dt.time]:
     ]
 
 
-def get_invalid_string_samples() -> List[str]:
+def get_invalid_string_samples() -> list[str]:
     """Return a list of invalid sample time strings."""
     return [
         "10:15",  # No seconds
@@ -46,7 +46,7 @@ def get_invalid_string_samples() -> List[str]:
     ]
 
 
-def get_invalid_iso_int_samples() -> List[int]:
+def get_invalid_iso_int_samples() -> list[int]:
     """Return a list of invalid sample time ISO ints."""
     return [
         -1,  # Too small
@@ -57,7 +57,7 @@ def get_invalid_iso_int_samples() -> List[int]:
     ]
 
 
-def get_invalid_fields_samples() -> List[Tuple[int, int, int, int]]:
+def get_invalid_fields_samples() -> list[tuple[int, int, int, int]]:
     """Return a list of invalid sample times in fields format."""
     return [
         (-1, 15, 30, 500),
@@ -71,7 +71,7 @@ def get_invalid_fields_samples() -> List[Tuple[int, int, int, int]]:
     ]
 
 
-def get_rounding_samples() -> List[Tuple[dt.time, dt.time]]:
+def get_rounding_samples() -> list[tuple[dt.time, dt.time]]:
     """Return a list of time objects for testing rounding."""
 
     return [

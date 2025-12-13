@@ -40,10 +40,10 @@ class CategoricalBoxPlot(MatplotlibPlot):
     y_col: str = required()
     """Name of the column in `data` to use for y-axis values (e.g., 'confidence', 'score')."""
 
-    x_order: List[str] = required()
+    x_order: list[str] = required()
     """Order of categories to display on the x-axis (e.g., ['expert', 'non_expert'])."""
 
-    palette: Dict[str, str] = required()
+    palette: dict[str, str] = required()
     """Dictionary mapping category names (from `x_col`) to color specifications (e.g., hex codes, names)."""
 
     xlabel: Optional[str] = None
@@ -52,7 +52,7 @@ class CategoricalBoxPlot(MatplotlibPlot):
     ylabel: Optional[str] = None
     """Label for the y-axis. If None, `y_col` name is used."""
 
-    ylim: Optional[Tuple[Optional[float], ...]] = (None, None)
+    ylim: Optional[tuple[Optional[float], ...]] = (None, None)
     """Tuple defining the y-axis limits (min, max). Use None for automatic limits. Default (None, None)."""
 
     box_width: float = 0.6

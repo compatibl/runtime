@@ -133,7 +133,7 @@ class And(Generic[TObj], Condition[TObj]):
 
     __slots__ = ("op_and",)
 
-    op_and: Tuple[Condition[TObj] | TObj, ...]
+    op_and: tuple[Condition[TObj] | TObj, ...]
     """The sequence of conditions or values in And operator."""
 
     def __init__(self, *args: Condition[TObj] | TObj):
@@ -146,7 +146,7 @@ class Or(Generic[TObj], Condition[TObj]):
 
     __slots__ = ("op_or",)
 
-    op_or: Tuple[Condition[TObj] | TObj, ...]
+    op_or: tuple[Condition[TObj] | TObj, ...]
     """The sequence of conditions or values in Or operator."""
 
     def __init__(self, *args: Condition[TObj] | TObj):
@@ -188,7 +188,7 @@ class In(Generic[TObj], Condition[TObj]):
 
     __slots__ = ("op_in",)
 
-    op_in: Tuple[TObj, ...]
+    op_in: tuple[TObj, ...]
     """Values to compare to."""
 
     def __init__(self, values: Sequence[TObj]):
@@ -206,7 +206,7 @@ class NotIn(Generic[TObj], Condition[TObj]):
 
     __slots__ = ("op_nin",)
 
-    op_nin: Tuple[TObj, ...]
+    op_nin: tuple[TObj, ...]
     """Values to compare to."""
 
     def __init__(self, values: Sequence[TObj]):

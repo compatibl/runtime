@@ -34,7 +34,7 @@ class DagNode(DataMixin):
     data: DagNodeData = required()
     """Node internal data."""
 
-    def to_networkx(self) -> Dict[str, Any]:
+    def to_networkx(self) -> dict[str, Any]:
         """Transform node to networkx representation."""
         result = {
             "node_for_adding": self.id_,

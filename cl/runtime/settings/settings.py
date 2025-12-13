@@ -92,7 +92,7 @@ class Settings(DataMixin, ABC):
     process_timestamp: ClassVar[str] = _process_timestamp
     """Unique UUIDv7-based timestamp set during the Python process launch."""
 
-    __settings_dict: ClassVar[Dict[type, Settings]] = {}
+    __settings_dict: ClassVar[dict[type, Settings]] = {}
     """Dictionary of initialized settings objects indexed by the the settings class type."""
 
     @classmethod

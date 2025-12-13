@@ -88,7 +88,7 @@ class DatetimeUtil:
         return result
 
     @classmethod
-    def to_fields(cls, value: dt.datetime) -> Tuple[int, int, int, int, int, int, int]:
+    def to_fields(cls, value: dt.datetime) -> tuple[int, int, int, int, int, int, int]:
         """Convert dt.datetime in UTC timezone with millisecond precision to fields."""
 
         # Validate the datetime first, this will also confirm rounding to milliseconds

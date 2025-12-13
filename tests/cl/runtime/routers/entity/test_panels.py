@@ -22,7 +22,7 @@ from cl.runtime.routers.entity.panels_response_item import PanelsResponseItem
 from stubs.cl.runtime import StubDataViewers
 
 
-def _get_viewer_names_in_pascal_case(record_type: type) -> List[str]:
+def _get_viewer_names_in_pascal_case(record_type: type) -> list[str]:
     """Get methods with name that starts from 'view_'."""
     result = []
     for name, func in inspect.getmembers(record_type, predicate=inspect.isfunction):

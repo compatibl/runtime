@@ -49,19 +49,19 @@ _TYPE_INFO_HEADERS = ("TypeName", "TypeKind", "QualName", "ParentNames", "ChildN
 class TypeCache:
     """Cache of TypeInfo for the specified packages."""
 
-    _type_info_by_type_name_dict: Dict[str, TypeInfo] = {}
+    _type_info_by_type_name_dict: dict[str, TypeInfo] = {}
     """Dictionary of TypeInfo indexed by type name."""
 
-    _type_by_type_name_dict: Dict[str, type] = {}
+    _type_by_type_name_dict: dict[str, type] = {}
     """Dictionary of classes indexed by type name."""
 
-    _type_by_qual_name_dict: Dict[str, type] = {}
+    _type_by_qual_name_dict: dict[str, type] = {}
     """Dictionary of classes indexed by qual name."""
 
-    _module_dict: Dict[str, ModuleType] = {}
+    _module_dict: dict[str, ModuleType] = {}
     """Dictionary of modules indexed by module name in dot-delimited format."""
 
-    _packages: Tuple[str, ...] = None
+    _packages: tuple[str, ...] = None
     """List of packages to include in the cache."""
 
     @classmethod
@@ -207,7 +207,7 @@ class TypeCache:
             raise cls._type_name_not_found_error(type_name)
 
     @classmethod
-    def get_classes(cls, *, type_kind: TypeKind | None) -> Tuple[type, ...]:
+    def get_classes(cls, *, type_kind: TypeKind | None) -> tuple[type, ...]:
         """Return already cached classes that match the predicate, filter by TypeKind if specified."""
 
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
@@ -271,7 +271,7 @@ class TypeCache:
         cls._save()
 
     @classmethod
-    def _get_packages(cls) -> Tuple[str, ...]:
+    def _get_packages(cls) -> tuple[str, ...]:
         """Get the list of packages specified in settings."""
         if cls._packages is None:
             # Get the list of packages from settings
@@ -279,7 +279,7 @@ class TypeCache:
         return cls._packages
 
     @classmethod
-    def _get_package_modules(cls) -> Tuple[ModuleType, ...]:
+    def _get_package_modules(cls) -> tuple[ModuleType, ...]:
         """Get the list of modules in the packages specified in settings."""
         modules = []
         packages = cls._get_packages()
@@ -297,7 +297,7 @@ class TypeCache:
         return tuple(sorted(modules, key=lambda x: x.__name__))
 
     @classmethod
-    def _get_package_classes(cls) -> Tuple[type, ...]:
+    def _get_package_classes(cls) -> tuple[type, ...]:
         """Get the list of classes in the packages specified in settings."""
         # Enumerate classes in all modules that match is_schema_type predicate
         modules = cls._get_package_modules()
@@ -337,7 +337,7 @@ class TypeCache:
             )
 
     @classmethod
-    def _build_child_names(cls, class_: type) -> Tuple[str, ...]:
+    def _build_child_names(cls, class_: type) -> tuple[str, ...]:
         """Return a tuple subclasses (inclusive of self) that match the predicate, sorted by type name."""
         # This must run after all classes are loaded
         subclasses = [TypeUtil.name(class_)] if is_data_key_or_record(class_) else []  # Include self in subclasses
@@ -352,7 +352,7 @@ class TypeCache:
         return tuple(sorted(set(subclasses)))
 
     @classmethod
-    def _build_parent_names(cls, class_: type) -> Tuple[str, ...]:
+    def _build_parent_names(cls, class_: type) -> tuple[str, ...]:
         """Return a tuple superclasses (inclusive of self) that match the predicate, not cached."""
         # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
         return tuple(sorted(set(TypeUtil.name(x) for x in class_.mro() if is_data_key_or_record(x))))

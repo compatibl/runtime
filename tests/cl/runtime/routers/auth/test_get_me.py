@@ -23,7 +23,7 @@ from cl.runtime.routers.auth.me_response import UserRequest
 request_headers = [{}, {"User": "TestUser"}]
 
 
-def get_expected_result(request_obj: UserRequest) -> Dict[str, Any]:
+def get_expected_result(request_obj: UserRequest) -> dict[str, Any]:
     """Get expected result for the user."""
 
     # Get user from the request or use default value if not specified

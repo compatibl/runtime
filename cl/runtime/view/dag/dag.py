@@ -28,10 +28,10 @@ from cl.runtime.view.dag.nodes.dag_node import DagNode
 class Dag(DagKey, RecordMixin):
     """Structure and visual representation of a directed acyclic graph (DAG)."""
 
-    nodes: List[DagNode] = required()
+    nodes: list[DagNode] = required()
     """List of DAG nodes."""
 
-    edges: List[DagEdge] = required()
+    edges: list[DagEdge] = required()
     """List of DAG edges."""
 
     def get_key(self) -> DagKey:
@@ -117,7 +117,7 @@ class Dag(DagKey, RecordMixin):
         if not nx.is_directed_acyclic_graph(graph):
             raise RuntimeError("Graph is not acyclic!")
 
-    def _build_disconnected_graphs(self) -> List[nx.DiGraph]:
+    def _build_disconnected_graphs(self) -> list[nx.DiGraph]:
         """Build list of disconnected (separated) networkx graphs."""
 
         graph = self._build_graph()

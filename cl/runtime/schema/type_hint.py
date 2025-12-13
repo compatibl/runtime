@@ -213,7 +213,7 @@ class TypeHint(BootstrapMixin):
                         raise RuntimeError(
                             f"List type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
-                            f"because it is not a list of elements using the syntax 'List[type]'\n"
+                            f"because it is not a list of elements using the syntax 'list[type]'\n"
                         )
                     # Populate container data and extract inner type alias
                     type_alias = type_alias_args[0]
@@ -230,7 +230,7 @@ class TypeHint(BootstrapMixin):
                         raise RuntimeError(
                             f"Tuple type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
-                            f"because it is not a variable-length tuple using the syntax 'Tuple[type, ...]'\n"
+                            f"because it is not a variable-length tuple using the syntax 'tuple[type, ...]'\n"
                         )
                     type_alias = type_alias_args[0]
                     type_hint_tokens.append(
@@ -246,7 +246,7 @@ class TypeHint(BootstrapMixin):
                         raise RuntimeError(
                             f"Dict type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"for field {field_name} in {TypeUtil.name(containing_type)} is not supported\n"
-                            f"because it is not a dictionary with string keys using the syntax 'Dict[str, type]'\n"
+                            f"because it is not a dictionary with string keys using the syntax 'dict[str, type]'\n"
                         )
                     type_alias = type_alias_args[1]
                     type_hint_tokens.append(
@@ -338,7 +338,7 @@ class TypeHint(BootstrapMixin):
         return str(alias)
 
     @classmethod
-    def _link_type_hint_tokens(cls, type_hints: List[Self] | None) -> Self | None:
+    def _link_type_hint_tokens(cls, type_hints: list[Self] | None) -> Self | None:
         """Convert a list of type chain tokens into a linked type chain using the 'remaining' field."""
         if type_hints:
             head, *tail = type_hints

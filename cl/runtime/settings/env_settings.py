@@ -41,7 +41,7 @@ class EnvSettings(Settings):
     env_shared: bool | None = None  # TODO: Determine if this should be here or in UserContext, keep one
     """Data is shared by users if True and fully isolated by user if False (the user must be specified either way)."""
 
-    env_packages: Tuple[str, ...] = required()
+    env_packages: tuple[str, ...] = required()
     """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
 
     def __init(self) -> None:

@@ -37,7 +37,7 @@ _local_cache_instance = None
 class LocalCache(Db):
     """In-memory cache for objects without serialization."""
 
-    __cache: Dict[str, Dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
+    __cache: dict[str, dict[tuple, RecordProtocol]] = required(default_factory=lambda: {})
     """Record instance is stored in cache without serialization."""
 
     def load_tables(self) -> Sequence[str]:

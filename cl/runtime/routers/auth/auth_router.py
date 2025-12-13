@@ -28,7 +28,7 @@ async def get_me(user: str = Header(None, description="User identifier or identi
     return MeResponse.get_me(UserRequest(user=user))
 
 
-@router.get("/providers", response_model=List[AuthTypesResponseItem])
-async def get_types() -> List[AuthTypesResponseItem]:
+@router.get("/providers", response_model=list[AuthTypesResponseItem])
+async def get_types() -> list[AuthTypesResponseItem]:
     """Get available authentication types."""
     return AuthTypesResponseItem.get_types()

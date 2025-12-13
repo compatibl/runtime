@@ -42,10 +42,10 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin):
     node_yaml: str = required()
     """Node details in YAML format."""
 
-    successor_nodes: List[SuccessorDagNodeKey] | None = None
+    successor_nodes: list[SuccessorDagNodeKey] | None = None
     """List of successor nodes (must belong to the same DAG)."""
 
-    successor_edges: List[str] | None = None
+    successor_edges: list[str] | None = None
     """List of successor edge names in the same order as successor_nodes (must have the same size if not None)."""
 
     def __init(self) -> None:
@@ -88,7 +88,7 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin):
     def build_dag(
         node: "SuccessorDagNode",
         layout_mode: DagLayout = DagLayout.PLANAR,
-        ignore_fields: List[str] | None = None,
+        ignore_fields: list[str] | None = None,
     ) -> Dag:
         """Build the DAG for the given node.
 

@@ -30,7 +30,7 @@ from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 class TrialContext(DataMixin):
     """Context for a trial in an experiment."""
 
-    trial_chain: Tuple[str, ...]
+    trial_chain: tuple[str, ...]
     """Tuple of trial identifiers in the trial context stack."""
 
     @classmethod

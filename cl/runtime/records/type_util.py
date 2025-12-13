@@ -94,7 +94,7 @@ class TypeUtil:
             return True
 
     @classmethod
-    def _get_alias_dict(cls) -> Dict[type, str]:
+    def _get_alias_dict(cls) -> dict[type, str]:
         """Get or create a dict of type aliases."""
         # TODO: Implement type aliases
         return {}

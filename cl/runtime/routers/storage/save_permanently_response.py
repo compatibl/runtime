@@ -14,7 +14,6 @@
 
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict
 from typing import Iterable
 import pandas as pd
 from pydantic import BaseModel
@@ -32,7 +31,7 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 
 
-def get_type_to_records_map(request: SavePermanentlyRequest) -> DefaultDict[type, TRecord]:
+def get_type_to_records_map(request: SavePermanentlyRequest) -> defaultdict[type, TRecord]:
     """Fetch records from the database and return them."""
 
     request_type = TypeCache.get_class_from_type_name(request.type)

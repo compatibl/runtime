@@ -31,7 +31,7 @@ from cl.runtime.settings.settings import Settings
 class PreloadSettings(Settings):
     """Settings for preloading records from files."""
 
-    preload_dirs: List[str] | None = None
+    preload_dirs: list[str] | None = None
     """
     Absolute or relative (to Dynaconf project root) directory paths under which preloaded data is located.
     
@@ -48,7 +48,7 @@ class PreloadSettings(Settings):
         # Convert to absolute paths if specified as relative paths and convert to list if single value is specified
         self.preload_dirs = ProjectSettings.instance().normalize_paths("dirs", self.preload_dirs)
 
-    def save_and_configure(self, *, final_record_types: List[type] | None = None) -> None:
+    def save_and_configure(self, *, final_record_types: list[type] | None = None) -> None:
         """Save records from preload directory to DB and execute run_configure on all preloaded Config records."""
 
         # Create a list of CSV preloads
@@ -69,7 +69,7 @@ class PreloadSettings(Settings):
         config_records = active(DataSource).load_type(Config)
         tuple(config_record.run_configure() for config_record in config_records)
 
-    def _get_files(self, ext: str) -> List[str]:
+    def _get_files(self, ext: str) -> list[str]:
         # Return empty list if no dirs are specified in settings
         if self.preload_dirs is None or len(self.preload_dirs) == 0:
             return []

@@ -34,7 +34,7 @@ class StubDataclassAnyFields(StubDataclassAnyFieldsKey, RecordMixin):
     any_record: Any = optional(default_factory=lambda: StubDataclass())
     """Any record value."""
 
-    list_of_any: List[Any] = optional(default_factory=lambda: ["any_str", 1, 1.1, StubDataclassKey(), StubDataclass()])
+    list_of_any: list[Any] = optional(default_factory=lambda: ["any_str", 1, 1.1, StubDataclassKey(), StubDataclass()])
     """List of any values."""
 
     def get_key(self) -> StubDataclassAnyFieldsKey:

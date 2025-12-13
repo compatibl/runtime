@@ -26,5 +26,5 @@ class TypeIndexDecl(DataMixin):
     name: str | None = None
     """Index name."""
 
-    elements: List[IndexDecl] = required()
+    elements: list[IndexDecl] = required()
     """Index elements."""

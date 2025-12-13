@@ -160,7 +160,7 @@ class KeySerializer(Serializer):
             )
         return result
 
-    def _to_tuple(self, data: DataProtocol | KeyProtocol | Tuple) -> Tuple[TPrimitive, ...]:
+    def _to_tuple(self, data: DataProtocol | KeyProtocol | Tuple) -> tuple[TPrimitive, ...]:
         """Serialize key into a flattened sequence of primitive types."""
 
         # Check that the argument is a key

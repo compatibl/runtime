@@ -32,8 +32,8 @@ class TypeInfo(BootstrapMixin, ABC):
     qual_name: str
     """Fully qualified name in module.ClassName format."""
 
-    parent_names: Tuple[str, ...] | None
+    parent_names: tuple[str, ...] | None
     """Tuple of parent (superclass) type names or None if none exist."""
 
-    child_names: Tuple[str, ...] | None
+    child_names: tuple[str, ...] | None
     """Tuple of child (subclass) type names or None if none exist or not yet populated."""

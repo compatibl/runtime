@@ -66,7 +66,7 @@ class CsvFileReader(Reader):
             if records:
                 active(DataSource).save_many(records)
 
-    def _deserialize_row(self, row_dict: Dict[str, Any]) -> RecordProtocol:
+    def _deserialize_row(self, row_dict: dict[str, Any]) -> RecordProtocol:
         """Deserialize row into a record."""
 
         # Record type is ClassName without extension in PascalCase

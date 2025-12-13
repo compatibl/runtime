@@ -79,7 +79,7 @@ class RegressionGuard:
     __delegate_to: Self | None
     """Delegate all function calls to this regression guard if set (instance vars are not initialized in this case)."""
 
-    __guard_dict: ClassVar[Dict[str, Dict[str, Self]]] = {}  # TODO: Set using ContextVars
+    __guard_dict: ClassVar[dict[str, dict[str, Self]]] = {}  # TODO: Set using ContextVars
     """Dictionary of existing guards indexed by base_path (outer dict) and channel/ext (inner dict)."""
 
     def __init__(

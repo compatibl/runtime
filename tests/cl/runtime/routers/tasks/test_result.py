@@ -26,7 +26,7 @@ from stubs.cl.runtime import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
 
-def _save_tasks_and_get_requests() -> List[Dict]:
+def _save_tasks_and_get_requests() -> list[Dict]:
     """Creates and saves tasks."""
 
     # Create handler tasks

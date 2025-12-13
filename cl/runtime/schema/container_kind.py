@@ -20,7 +20,7 @@ class ContainerKind(IntEnum):
     """Determines the container API (implementation class will change to immutable after build is invoked)."""
 
     LIST = auto()
-    """Follows List[ValueType] when mutable (list), and Tuple[ValueType, ...] when immutable (tuple)."""
+    """Follows list[ValueType] when mutable (list), and tuple[ValueType, ...] when immutable (tuple)."""
 
     DICT = auto()
-    """Follows Dict[str, ValueType] when mutable (dict), and Mapping[str, ValueType] when immutable (frozendict)."""
+    """Follows dict[str, ValueType] when mutable (dict), and Mapping[str, ValueType] when immutable (frozendict)."""

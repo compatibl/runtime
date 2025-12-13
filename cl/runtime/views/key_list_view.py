@@ -25,7 +25,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 class KeyListView(View):
     """List of generic keys in ClassName;key_field_1;key_field_2 format, records are loaded and displayed."""
 
-    keys: List[str] = required()
+    keys: list[str] = required()
     """List of generic keys in ClassName;key_field_1;key_field_2 format, records are loaded and displayed."""
 
     def materialize(self) -> RecordListView:

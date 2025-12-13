@@ -41,7 +41,7 @@ class DateUtil:
         return result
 
     @classmethod
-    def to_fields(cls, value: dt.date) -> Tuple[int, int, int]:
+    def to_fields(cls, value: dt.date) -> tuple[int, int, int]:
         """Convert dt.date to fields."""
         return value.year, value.month, value.day
 

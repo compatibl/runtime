@@ -32,7 +32,7 @@ class SlotsUtil:
 
     @classmethod
     @cached
-    def get_slots(cls, data_type: type) -> Tuple[str, ...]:
+    def get_slots(cls, data_type: type) -> tuple[str, ...]:
         """Return slots the order of declaration from base to derived."""
 
         if hasattr(data_type, "__slots__"):

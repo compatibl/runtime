@@ -29,7 +29,7 @@ class MultiPlot(MatplotlibPlot):
     title: str = required()
     """Plot title."""
 
-    plots: List[Plot] = required()
+    plots: list[Plot] = required()
     """
     Plots to combine.
     Each Plot instance must implement draw_to_axis(ax) method to be successfully drawn.

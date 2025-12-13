@@ -44,9 +44,9 @@ class ImportUtil:
             raise RuntimeError(f"Import errors occurred on launch:\n{import_errors_str}\n")
 
     @classmethod
-    def _check_package(cls, package_root: str) -> List[str]:
+    def _check_package(cls, package_root: str) -> list[str]:
         """Check package for import errors."""
-        errors: List[str] = []
+        errors: list[str] = []
         try:
             package_import = __import__(package_root)
         except ImportError as error:

@@ -38,7 +38,7 @@ class MatrixUtil:
         return result
 
     @staticmethod
-    def create_confusion_matrix_labels(data: pd.DataFrame, in_percent: bool | None = False) -> List[List[str]]:
+    def create_confusion_matrix_labels(data: pd.DataFrame, in_percent: bool | None = False) -> list[list[str]]:
         # str of each non-zero element of data for annotations
 
         if in_percent:
