@@ -34,12 +34,6 @@ class DeleteResponseUtil:
         if not request.delete_keys:
             return request.delete_keys
 
-        # TODO (Roman): Consider allowing different key types in a single delete request.
-        #  If different key types are prohibited then the delete request model should be simplified.
-        # Check if all requested keys are of the same key type.
-        if not all(key_item.type == request.delete_keys[0].type for key_item in request.delete_keys):
-            raise RuntimeError("Bulk delete records of different key types currently is not supported.")
-
         # Expect all keys to be the same key type.
         key_type = TypeInfo.from_type_name(request.delete_keys[0].type).get_key_type()  # noqa
         key_type_hint = TypeHint.for_type(key_type)  # noqa
