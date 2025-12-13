@@ -6,8 +6,8 @@ default:
   log_filename_prefix: main
 
   # Documented in EnvSettings class
-  env_id: temp_runtime_main
-  env_kind: DEV
+  env_id: Runtime
+  env_kind: TEMP
   env_tenant: temp_tenant
   env_packages:
     - cl.runtime
