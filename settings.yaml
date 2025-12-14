@@ -41,11 +41,12 @@ default:
       - preloads/stubs
 
   # Documented in CelerySettings class
-  celery_workers: 8
-  celery_pool_type: "threads"
-  celery_broker: "sqlite"
-  celery_broker_uri: "mongodb://localhost:27017/celery-{context_id}"
-  celery_broker_queue: "celery"
+  celery_broker_uri: sqlalchemy+sqlite:///{project_dir}/celery-{context_id}.db
+  celery_multiprocess_pool: true  # Enable multiprocess worker pool
+  celery_workers: 8  # Number of worker processes
+  celery_pool_type: solo  # Each worker uses solo pool
+  celery_worker_restart_interval: 30  # Restart workers if unresponsive for 30 seconds
+  celery_worker_log_level: info
 
 # Test environment
 testing:
