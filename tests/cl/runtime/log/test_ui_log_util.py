@@ -23,7 +23,7 @@ from cl.runtime.tasks.task_status import TaskStatus
 from stubs.cl.runtime import StubDataclass
 
 
-def test_flat_logs(basic_mongo_db_fixture):
+def test_flat_logs(multi_db_fixture):
     """Test UiLogUtil.run_get_flat_logs() method."""
 
     logs_before_clear = [
@@ -54,7 +54,7 @@ def test_flat_logs(basic_mongo_db_fixture):
     assert [x["Message"] for x in flat_logs] == [x.message for x in logs_after_clear]
 
 
-def test_multiple_clear_logs(basic_mongo_db_fixture):
+def test_multiple_clear_logs(multi_db_fixture):
     """Test UiLogUtil.run_clear_logs() multiple calls."""
 
     logs_before_clear = [
@@ -76,7 +76,7 @@ def test_multiple_clear_logs(basic_mongo_db_fixture):
     assert flat_logs == []
 
 
-def test_error_logs(basic_mongo_db_fixture):
+def test_error_logs(multi_db_fixture):
     """Test UiLogUtil.run_get_error_logs() method."""
 
     error_logs_before_clear = [
@@ -110,7 +110,7 @@ def test_error_logs(basic_mongo_db_fixture):
     assert [x["Message"] for x in error_logs] == [x.message for x in error_logs_after_clear]
 
 
-def test_task_logs(basic_mongo_db_fixture):
+def test_task_logs(multi_db_fixture):
     """Test UiLogUtil.run_get_logs_by_task() method."""
     task_1 = ClassMethodTask(
         type_=StubDataclass,
