@@ -18,7 +18,7 @@ from fastapi.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.types import Scope, Receive, Send
 from starlette.exceptions import HTTPException
-
+from cl.runtime.settings.frontend_settings import FrontendSettings
 
 _FALLBACK_HTML= """<!DOCTYPE html>
 <html lang="en">
@@ -55,7 +55,7 @@ _FALLBACK_HTML= """<!DOCTYPE html>
                 <ul>
                     <li>
                         Download static frontend files as a ZIP archive:
-                        <a href="https://github.com/compatibl/frontend/archive/refs/tags/0.0.0.zip">frontend-0.0.0.zip</a>
+                        <a href="https://github.com/compatibl/frontend/archive/refs/tags/{version}.zip">frontend-{version}.zip</a>
                     </li>
                     <li>
                         Place the directory 'static' from the archive under the project root
@@ -90,4 +90,9 @@ class FallbackStaticFiles(StaticFiles):
     @classmethod
     def get_fallback_html(cls) -> str:
         """Return the index.html content dynamically."""
-        return _FALLBACK_HTML
+        if (version := FrontendSettings.instance().frontend_version) is not None:
+            return _FALLBACK_HTML.format(version=version)
+        else:
+            raise RuntimeError(
+                f"Cannot install frontend static files because frontend_version is not found in settings.yaml."
+            )
