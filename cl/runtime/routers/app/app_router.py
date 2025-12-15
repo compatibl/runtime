@@ -14,52 +14,48 @@
 
 import os
 from fastapi import APIRouter
-from starlette import status
-from starlette.responses import HTMLResponse
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, HTMLResponse
+
+from cl.runtime.fallback.fallback_static_files import FallbackStaticFiles
 from cl.runtime.file.project_layout import ProjectLayout
 
 router = APIRouter()
 
+def get_index_html_or_none() -> str | None:
+    """Return the index.html content dynamically."""
+    static_dir = ProjectLayout.get_static_dir()
+    index_file_path = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_file_path) and os.path.isfile(index_file_path):
+        with open(index_file_path, "r", encoding="utf-8") as index_file:
+            return index_file.read()
+    else:
+        return None
+
+_INDEX_HTML = get_index_html_or_none()
+"""Content of index.html if static frontend files are installed, otherwise None."""
 
 @router.get(
     path="/",
-    description="Redirect to a specific endpoint for the frontend app to load index.html.",
+    description="Redirect root path to the /app endpoint.",
     response_class=RedirectResponse,
 )
 async def get_app_index_root():
-    """
-    Redirect to '/app' endpoint for the frontend app to load index.html.
-
-    Returns:
-    RedirectResponse: Redirects to '/app' with status code 301 (Moved Permanently).
-    """
-    return RedirectResponse("/app", status_code=status.HTTP_301_MOVED_PERMANENTLY)
-
+    """Redirect to '/app' endpoint if static files are installed, otherwise redirect to index.html."""
+    if _INDEX_HTML is not None:
+        return RedirectResponse("/app")
+    else:
+        return RedirectResponse("/index.html")
 
 @router.get(
     path="/app{_:path}",
-    description="Get application index.html file ignoring paths after the endpoint paths.",
+    description="Support page refresh.",
     response_class=HTMLResponse,
 )
 async def get_app_index(_):
-    """
-    Retrieve the application's index.html file while ignoring paths after the endpoint paths.
+    """Support page refresh by redirecting to SPA root."""
 
-    Parameters:
-    - _: Placeholder parameter to capture the path.
-
-    Returns:
-    HTMLResponse: The content of the index.html file.
-
-    Raises:
-    RuntimeError: If the index.html file or static files directory is not found.
-    """
-
-    static_dir = ProjectLayout.get_static_dir()
-    if static_dir:
-        index_file = os.path.join(static_dir, "index.html")
-        if os.path.isfile(index_file):
-            with open(index_file, "r", encoding="utf-8") as file:
-                return file.read()
-    return RedirectResponse(url="/docs")
+    if _INDEX_HTML is not None:
+        # Return index.html content for SPA routing after page refresh
+        return _INDEX_HTML
+    else:
+        return FallbackStaticFiles.get_fallback_html()

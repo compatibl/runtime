@@ -29,7 +29,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.fallback.index import FallbackStaticFiles
+from cl.runtime.fallback.fallback_static_files import FallbackStaticFiles
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.log.log_config import uvicorn_empty_logging_config

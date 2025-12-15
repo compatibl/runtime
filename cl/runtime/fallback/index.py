@@ -20,7 +20,7 @@ from starlette.types import Scope, Receive, Send
 from starlette.exceptions import HTTPException
 
 
-_INDEX_HTML="""<!DOCTYPE html>
+_FALLBACK_HTML= """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -71,10 +71,6 @@ _INDEX_HTML="""<!DOCTYPE html>
 
 _FALLBACK_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def get_index_html() -> str:
-    """Return the index.html content dynamically."""
-    return _INDEX_HTML
-
 class FallbackStaticFiles(StaticFiles):
     """Static files handler that serves a fallback index.html page when directory 'static' is not found."""
 
@@ -86,7 +82,12 @@ class FallbackStaticFiles(StaticFiles):
         """Generate index.html dynamically."""
         path = scope.get("path", "")
         if path == "" or path == "/" or path == "/index.html":
-            response = HTMLResponse(content=get_index_html())
+            response = HTMLResponse(content=self.get_fallback_html())
             await response(scope, receive, send)
         else:
             await super().__call__(scope, receive, send)
+
+    @classmethod
+    def get_fallback_html(cls) -> str:
+        """Return the index.html content dynamically."""
+        return _FALLBACK_HTML
