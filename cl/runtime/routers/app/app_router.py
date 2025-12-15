@@ -56,7 +56,7 @@ async def get_app_index(_):
     RuntimeError: If the index.html file or static files directory is not found.
     """
 
-    static_dir = ProjectLayout.get_wwwroot()
+    static_dir = ProjectLayout.get_static_dir()
     if static_dir:
         index_file = os.path.join(static_dir, "index.html")
         if os.path.isfile(index_file):

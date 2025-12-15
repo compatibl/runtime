@@ -233,14 +233,14 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
                 return None
 
     @classmethod
-    def get_wwwroot(cls) -> str:
-        """Class method returning path to wwwroot directory under project root directory."""
+    def get_static_dir(cls) -> str:
+        """Directory for the static frontend files."""
         project_root = cls.get_project_root()
-        return os.path.normpath(os.path.join(project_root, "wwwroot"))
+        return os.path.normpath(os.path.join(project_root, "static"))
 
     @classmethod
     def get_databases_dir(cls) -> str:
-        """Class method returning path to databases directory under project root directory."""
+        """Path to databases directory under project root."""
         project_root = cls.get_project_root()
         db_dir = os.path.join(project_root, "databases")
         if not os.path.exists(db_dir):

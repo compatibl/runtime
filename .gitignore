@@ -20,6 +20,7 @@ deployments/
 build/
 dist/
 logs/
+static/
 
 # Using regexp syntax
 syntax: regexp

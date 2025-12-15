@@ -13,11 +13,14 @@
 # limitations under the License.
 
 import logging.config
+import os
 import webbrowser
+from pathlib import Path
+
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, HTMLResponse, RedirectResponse
 from starlette.staticfiles import StaticFiles
 
 from cl.runtime.configurations.preload_configuration import PreloadConfiguration
@@ -26,6 +29,7 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.events.event_broker import EventBroker
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.fallback.index import FallbackStaticFiles
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.log.log_config import logging_config
 from cl.runtime.log.log_config import uvicorn_empty_logging_config
@@ -131,15 +135,22 @@ def run_backend(*, interactive: bool = False) -> None:
 
                 WorkerHealthMonitor.start_monitoring()
 
-        # Find wwwroot directory, error if not found
-        wwwroot_dir = ProjectLayout.get_wwwroot()
+        # Find the directory with static frontend files
+        static_dir = ProjectLayout.get_static_dir()
 
-        # Mount static client files
-        server_app.mount("/", StaticFiles(directory=wwwroot_dir, html=True))
+        if os.path.exists(os.path.join(static_dir, "index.html")):
+            # Mount static frontend files if index.html is found
+            server_app.mount("/", StaticFiles(directory=static_dir, html=True))
 
-        # Open new browser tab in the default browser using http protocol.
-        # It will switch to https if cert is present.
-        webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}")
+            # Open new browser tab in the default browser using http protocol, will switch to https if cert is present
+            webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}")
+        else:
+            # Otherwise generate the fallback page
+            server_app.mount("/", FallbackStaticFiles())
+            _LOGGER.error("Frontend static directory not found, generating the fallback page.")
+
+            # Specify index.html at the end of path in case of fallback, otherwise Swagger will be returned
+            webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}/index.html")
 
         # Run Uvicorn using hostname and port specified by Dynaconf
         config = uvicorn.Config(
