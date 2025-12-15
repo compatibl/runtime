@@ -18,6 +18,7 @@ from starlette.responses import RedirectResponse, HTMLResponse
 
 from cl.runtime.fallback.fallback_static_files import FallbackStaticFiles
 from cl.runtime.file.project_layout import ProjectLayout
+from starlette import status
 
 router = APIRouter()
 
@@ -40,11 +41,11 @@ _INDEX_HTML = get_index_html_or_none()
     response_class=RedirectResponse,
 )
 async def get_app_index_root():
-    """Redirect to '/app' endpoint if static files are installed, otherwise redirect to index.html."""
-    if _INDEX_HTML is not None:
-        return RedirectResponse("/app")
-    else:
-        return RedirectResponse("/index.html")
+    """
+    Redirect to '/app' endpoint for the frontend app to load index.html.
+    If static files are not installed, generate fallback index.html.
+    """
+    return RedirectResponse("/app", status_code=status.HTTP_301_MOVED_PERMANENTLY)
 
 @router.get(
     path="/app{_:path}",
@@ -58,4 +59,5 @@ async def get_app_index(_):
         # Return index.html content for SPA routing after page refresh
         return _INDEX_HTML
     else:
+        # If static files are not installed, generate fallback page
         return FallbackStaticFiles.get_fallback_html()

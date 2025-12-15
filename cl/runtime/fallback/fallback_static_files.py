@@ -25,13 +25,13 @@ _FALLBACK_HTML= """<!DOCTYPE html>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Install frontend files for CompatibL UI</title>
-    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
 <main class="main">
     <div class="logo">
-        <img src="./images/logo-full.png" alt="CompatibL Logo" />
+        <img src="/images/logo-full.png" alt="CompatibL Logo" />
     </div>
     <section class="card">
         {instructions}

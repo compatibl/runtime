@@ -141,16 +141,13 @@ def run_backend(*, interactive: bool = False) -> None:
         if os.path.exists(os.path.join(static_dir, "index.html")):
             # Mount static frontend files if index.html is found
             server_app.mount("/", StaticFiles(directory=static_dir, html=True))
-
-            # Open new browser tab in the default browser using http protocol, will switch to https if cert is present
-            webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}")
         else:
             # Otherwise generate the fallback page
             server_app.mount("/", FallbackStaticFiles())
             _LOGGER.error("Frontend static directory not found, generating the fallback page.")
 
-            # Specify index.html at the end of path in case of fallback, otherwise Swagger will be returned
-            webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}/index.html")
+        # Open new browser tab in the default browser using http protocol, will switch to https if cert is present
+        webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}")
 
         # Run Uvicorn using hostname and port specified by Dynaconf
         config = uvicorn.Config(
