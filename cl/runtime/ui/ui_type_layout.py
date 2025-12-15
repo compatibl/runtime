@@ -31,4 +31,4 @@ class UiTypeLayout(UiTypeLayoutKey, RecordMixin):
     """Name of the active maximized tab. None if no maximized panels."""
 
     def get_key(self) -> UiTypeLayoutKey:
-        return UiTypeLayoutKey(type_=self.type_, user=self.user)
+        return UiTypeLayoutKey(type_=self.type_, user=self.user).build()
