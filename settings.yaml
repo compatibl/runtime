@@ -48,6 +48,9 @@ default:
   celery_worker_restart_interval: 30  # Restart workers if unresponsive for 30 seconds
   celery_worker_log_level: info
 
+  # Documented in FrontendSettings class
+  frontend_version: 25.1215.0
+
 # Test environment
 testing:
 

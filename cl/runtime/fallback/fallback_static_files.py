@@ -17,7 +17,6 @@ import os
 from fastapi.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.types import Scope, Receive, Send
-from starlette.exceptions import HTTPException
 from cl.runtime.settings.frontend_settings import FrontendSettings
 
 _FALLBACK_HTML= """<!DOCTYPE html>
@@ -35,38 +34,65 @@ _FALLBACK_HTML= """<!DOCTYPE html>
         <img src="./images/logo-full.png" alt="CompatibL Logo" />
     </div>
     <section class="card">
-        <h1>Static frontend files for CompatibL UI are not installed</h1>
-        <p class="subtitle">Installation options</p>
-        <hr />
-        <ul>
-            <li>
-                Option 1
-                <ul>
-                    <li>
-                        Execute '__main__.py' from Python or 'run_backend.cmd/sh' from the command line
-                    </li>
-                    <li>
-                        Type 'yes' when prompted to confirm static frontend files download
-                    </li>
-                </ul>
-            </li>
-            <li>
-                Option 2
-                <ul>
-                    <li>
-                        Download static frontend files as a ZIP archive:
-                        <a href="https://github.com/compatibl/frontend/archive/refs/tags/{version}.zip">frontend-{version}.zip</a>
-                    </li>
-                    <li>
-                        Place the directory 'static' from the archive under the project root
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        {instructions}
     </section>
 </main>
 </body>
 </html>
+"""
+
+_INSTALL_HTML = """
+<h1>Static frontend files v{version} are not installed</h1>
+<p class="subtitle">Installation options</p>
+<hr />
+<ul>
+    <li>
+        Option 1
+        <ul>
+            <li>
+                Execute '__main__.py' from Python or 'run_backend.cmd/sh' from the command line
+            </li>
+            <li>
+                Type 'yes' when prompted to confirm static front end files download
+            </li>
+        </ul>
+    </li>
+    <li>
+        Option 2
+        <ul>
+            <li>
+                Download static front end files as a zip or tar.gz archive from:{links}
+            </li>
+            <li>
+                Place the directory 'static' from the archive under the project root
+            </li>
+        </ul>
+    </li>
+</ul>
+"""
+
+_NO_VERSION_HTML = """
+<h1>Front end version is not configured in settings.yaml</h1>
+<p class="subtitle">Configuration options</p>
+<hr />
+<ul>
+    <li>
+        Option 1
+        <ul>
+            <li>
+                Specify 'frontend_version' in 'settings.yaml'
+            </li>
+        </ul>
+    </li>
+    <li>
+        Option 2
+        <ul>
+            <li>
+                Define CL_FRONTEND_VERSION environment variable
+            </li>
+        </ul>
+    </li>
+</ul>
 """
 
 _FALLBACK_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -90,9 +116,30 @@ class FallbackStaticFiles(StaticFiles):
     @classmethod
     def get_fallback_html(cls) -> str:
         """Return the index.html content dynamically."""
-        if (version := FrontendSettings.instance().frontend_version) is not None:
-            return _FALLBACK_HTML.format(version=version)
+
+        # Get instructions based on frontend_version from settings if present or request to specify
+        frontend_settings = FrontendSettings.instance()
+        if (version := frontend_settings.frontend_version) is not None:
+
+            # Substitute version into the download URI template
+            uri = frontend_settings.frontend_download_uri.format(version=version)
+
+            # Provide both .zip and .tar.gz options if extension is not specified in the template
+            if uri.endswith(".zip") or uri.endswith(".tar.gz"):
+                # Extension is specified, return a single option
+                uri_options = (uri,)
+            else:
+                # Return both .zip and .tar.gz options
+                uri_options = (
+                    uri + ".zip",
+                    uri + ".tar.gz",
+                )
+            links = "\n".join('<br><a href="{uri}">{uri}</a>'.format(uri=uri) for uri in uri_options)
+            instructions = _INSTALL_HTML.format(version=version, links=links)
         else:
-            raise RuntimeError(
-                f"Cannot install frontend static files because frontend_version is not found in settings.yaml."
-            )
+            instructions = _NO_VERSION_HTML
+
+        # Insert instructions into the fallback HTML template
+        result = _FALLBACK_HTML.format(instructions=instructions)
+        return result
+
