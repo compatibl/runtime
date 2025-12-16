@@ -12,9 +12,68 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import importlib.util
+import re
+
+# Pattern to find version in setup.py file
+_SETUP_PY_VERSION_RE = r"""version\s*=\s*(?P<q>['"])(?P<version>.+?)(?P=q)"""
+
+# Pattern to find version in _version.py file
+_VERSION_PY_VERSION_RE = r"""__version__\s*=\s*(?P<q>['"])(?P<version>.+?)(?P=q)"""
+
+# Pattern to find version in pyproject.toml file
+_PYPROJECT_TOML_VERSION_RE = r"""version\s*=\s*(?P<q>['"])(?P<version>.+?)(?P=q)"""
+
 
 class VersionUtil:
     """Helper class for working with copyright headers and files."""
+
+    @classmethod
+    def guard_package_version(cls, package: str, *, raise_on_fail: bool = True) -> bool:
+        """
+        Check that the versions in package are the same and matches the CompatibL Platform CalVer format.
+        """
+        try:
+            spec = importlib.util.find_spec(package)
+        except ImportError as error:
+            raise RuntimeError(f"Cannot import module: {error.name}. Check sys.path")
+
+        package_path = os.path.dirname(spec.origin)
+
+        # Get versions from different possible places in the package
+        setup_py_version = cls.find_version_in_setup_py(package_path)
+        version_py_version = cls.find_version_in_version_py(package_path)
+        pyproject_toml_version = cls.find_version_in_version_py(package_path)
+
+        # Verify that versions match each other
+        if setup_py_version == version_py_version == pyproject_toml_version:
+            # Valid if all versions are the same
+            is_valid = True
+        elif setup_py_version is None and version_py_version == pyproject_toml_version:
+            # setup_py_version is optional, so it is valid if setup_py_version is None and
+            # all other versions are the same
+            is_valid = True
+        else:
+            # Not valid in all other cases
+            is_valid = False
+
+        if not is_valid:
+            if raise_on_fail:
+                raise RuntimeError(
+                    f"Versions in package {package} is not valid.\n"
+                    f"The following versions were found in the package:\n"
+                    f" - In pyproject.toml file: {pyproject_toml_version}\n"
+                    f" - In _version.py file: {version_py_version}\n"
+                    f" - In setup.py file [optional]: {setup_py_version}\n"
+                )
+            else:
+                return False
+
+        if all((setup_py_version is None, pyproject_toml_version is None, version_py_version is None)):
+            return True
+        else:
+            return cls.guard_version_string(pyproject_toml_version, raise_on_fail=raise_on_fail)
 
     @classmethod
     def guard_version_string(cls, ver: str, *, raise_on_fail: bool = True) -> bool:
@@ -35,3 +94,49 @@ class VersionUtil:
                                f" - 23.501.1 for patch 1 to May 1, 2023 release\n")
         else:
             return False
+
+    @classmethod
+    def _find_version_in_file(cls, file_path: str, version_re: str) -> str | None:
+        """
+        Find version in file_path using version_re.
+        Return None if file doesn't exist or version is not found.
+        Raise RuntimeError if found more than one version.
+        """
+        if not os.path.isfile(file_path):
+            # Return None if file not found
+            return None
+
+        version_re = re.compile(version_re)
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        matches = version_re.findall(content)
+
+        if not matches:
+            return None
+
+        if len(matches) > 1:
+            versions = [m[1] for m in matches]
+            raise RuntimeError(f"Multiple versions found in {file_path}: {versions}")
+
+        # matches[0] = (quote, version)
+        return matches[0][1]
+
+    @classmethod
+    def find_version_in_setup_py(cls, package_path: str) -> str | None:
+        """Find exactly one version="..." in setup.py."""
+        setup_py_path = os.path.join(os.path.dirname(os.path.dirname(package_path)), "setup.py")
+        return cls._find_version_in_file(setup_py_path, _SETUP_PY_VERSION_RE)
+
+    @classmethod
+    def find_version_in_version_py(cls, package_path: str) -> str | None:
+        """Find exactly one __version__ = "..." in _version.py."""
+        version_py_path = os.path.join(package_path, "_version.py")
+        return cls._find_version_in_file(version_py_path, _VERSION_PY_VERSION_RE)
+
+    @classmethod
+    def find_version_in_pyproject_toml(cls, package_path: str) -> str | None:
+        """Find exactly one version = "..." in pyproject.toml."""
+        setup_py_path = os.path.join(os.path.dirname(os.path.dirname(package_path)), "pyproject.toml")
+        return cls._find_version_in_file(setup_py_path, _SETUP_PY_VERSION_RE)

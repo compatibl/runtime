@@ -14,8 +14,7 @@
 
 import pytest
 
-from cl.runtime.file.file_util import FileUtil
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.prebuild.version_util import VersionUtil
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.frontend_settings import FrontendSettings
 
@@ -24,13 +23,9 @@ def test_version_conventions():
     """Prebuild test to that the version strings comply with CompatibL CalVer conventions."""
 
     # Check package versions
-    packages = EnvSettings.instance().env_packages
-    dirs = [ProjectLayout.get_package_root(package=package) for package in packages]
-    version_files = FileUtil.enumerate_files(
-        dirs=dirs,
-        file_include_patterns="_version.py",
-    )
-    # TODO(Roman): Implement using VersionUtil check
+    env_packages = EnvSettings.instance().env_packages
+    for env_package in env_packages:
+        VersionUtil.guard_package_version(env_package)
 
     # Check frontend version in settings.yaml, creating the instance performs version validation
     FrontendSettings.instance()
