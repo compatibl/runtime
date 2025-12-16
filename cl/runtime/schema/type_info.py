@@ -46,6 +46,8 @@ _TYPE_INFO_HEADERS = (
     "TypeKind",
     "QualName",
     "Subtype",
+    "ParentNames",
+    "ChildNames",
 )
 """Headers of TypeInfo preload file."""
 
@@ -73,6 +75,12 @@ class TypeInfo(BootstrapMixin):
 
     subtype: str | None = None
     """Subtype for primitive types only (optional)."""
+
+    parent_record_type_names: tuple[str, ...] | None
+    """Tuple of parent (superclass) type names or None if none exist."""
+
+    child_record_type_names: tuple[str, ...] | None
+    """Tuple of child (subclass) type names or None if none exist or not yet populated."""
 
     _type_info_dict: ClassVar[dict[str, Self] | None] = None
     """Dictionary of TypeInfo indexed by type name."""
@@ -164,7 +172,7 @@ class TypeInfo(BootstrapMixin):
             found = type_name in cls._type_info_dict
         else:
             # Otherwise get type_info
-            type_info = cls._type_info_dict.get(type_name)
+            type_info = cls._type_info_dict.get(type_name).build()
             if found := type_info is not None:
                 # Type found in cache, compare type_kind
                 if type_info.type_kind == type_kind:
@@ -257,10 +265,17 @@ class TypeInfo(BootstrapMixin):
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
-        # Get types
-        result_types = cls.get_parent_and_self_types(type_, type_kind=type_kind)
-        # Convert to names and sort
-        return tuple(sorted(typename(x) for x in result_types))
+        # Convert type to type name
+        type_name = typename(type_)
+
+        # Get from cached TypeInfo
+        if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
+            result = type_info.parent_record_type_names or ()
+            if type_kind is not None:
+                result = tuple(x for x in result if cls.get_type_name_info(x).type_kind == type_kind)
+            return result
+        else:
+            raise cls._type_name_not_found_error(type_name)
 
     @classmethod
     @cached
@@ -276,8 +291,9 @@ class TypeInfo(BootstrapMixin):
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
-        # Get filtered list of MRO types
-        result = cls._get_data_key_or_record_types(type_.mro(), type_kind=type_kind)
+        parent_type_names = cls.get_parent_and_self_type_names(type_, type_kind=type_kind)
+        result = tuple([cls.from_type_name(x) for x in parent_type_names])
+
         return result
 
     @classmethod
@@ -295,10 +311,28 @@ class TypeInfo(BootstrapMixin):
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
-        # Get types
-        result_types = cls.get_child_and_self_types(type_, type_kind=type_kind)
-        # Convert to names and sort
-        return tuple(sorted(typename(x) for x in result_types))
+        # Convert type to type name
+        type_name = typename(type_)
+
+        # Get from cached TypeInfo
+        if (type_info := cls._type_info_dict.get(type_name, None)) is not None:
+            child_record_type_names = type_info.child_record_type_names
+            if type_kind is not None:
+                child_record_type_names = tuple(
+                    x for x in child_record_type_names if cls.get_type_name_info(x).type_kind == type_kind
+                )
+
+            # Sort child types by depth in hierarchy
+            depth_dict = {
+                x: len(cls._type_info_dict.get(x).parent_record_type_names or []) for x in child_record_type_names
+            }
+            sorted_child_record_type_names = tuple(
+                child_record_type_name
+                for child_record_type_name, depth in sorted(depth_dict.items(), key=lambda item: item[1])
+            )
+            return sorted_child_record_type_names
+        else:
+            raise cls._type_name_not_found_error(type_name)
 
     @classmethod
     @cached
@@ -315,10 +349,9 @@ class TypeInfo(BootstrapMixin):
         # Ensure the type cache is loaded from TypeInfo.csv, will not reload if already loaded
         cls._ensure_loaded()
 
-        # Recursively load subtypes without filtering, because filter may apply to child but not parent
-        subtypes_set = tuple(cls._get_unfiltered_child_types_set(type_))
-        # Filter and sort
-        result = cls._get_data_key_or_record_types(subtypes_set, type_kind=type_kind)
+        child_type_names = cls.get_child_and_self_type_names(type_, type_kind=type_kind)
+        result = tuple([cls.from_type_name(x) for x in sorted(child_type_names)])
+
         return result
 
     @classmethod
@@ -393,6 +426,25 @@ class TypeInfo(BootstrapMixin):
             return None
 
     @classmethod
+    def _build_child_type_names(cls, type_: type) -> tuple[str, ...]:
+        """Return a tuple subtypes (inclusive of self) that match the predicate, sorted by type name."""
+        # This must run after all types are loaded
+        subtypes = [typename(type_)] if is_data_key_or_record_type(type_) else []  # Include self in subtypes
+        for subclass in type_.__subclasses__():
+            # Exclude self from subtypes
+            if subclass is not type_:
+                # Recurse into the subclass hierarchy, avoid adding duplicates
+                subtypes.extend(x for x in cls._build_child_type_names(subclass) if x not in subtypes)
+        # Eliminate duplicates (they should not be present but just to be sure) and sort the names
+        return tuple(sorted(set(subtypes)))
+
+    @classmethod
+    def _build_parent_type_names(cls, type_: type) -> tuple[str, ...]:
+        """Return a tuple superclasses (inclusive of self) that match the predicate, not cached."""
+        # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
+        return tuple(sorted(set(typename(x) for x in cls._get_data_key_or_record_types(types_=type_.mro(), type_kind=None))))
+
+    @classmethod
     def _add_type(cls, type_: type, *, subtype: str | None = None) -> None:
         """Add the specified class to the qual_name and type_name dicts without overwriting the existing values."""
 
@@ -416,6 +468,20 @@ class TypeInfo(BootstrapMixin):
                     f"Only primitive types can have subtypes."
                 )
 
+        # Get parent and child class names for data, keys or records
+        if is_data_key_or_record_type(type_):
+            # Build parent and child name lists
+            parent_record_type_names = cls._build_parent_type_names(type_)
+            child_record_type_names = cls._build_child_type_names(type_)
+
+            # Use None if empty
+            parent_record_type_names = parent_record_type_names if parent_record_type_names else None
+            child_record_type_names = child_record_type_names if child_record_type_names else None
+        else:
+            # Do not generate if not data
+            parent_record_type_names = None
+            child_record_type_names = None
+
         # Get type info without subclass names (which will be done on second pass after all types are loaded)
         type_info = TypeInfo(
             type_name=type_name,
@@ -423,6 +489,8 @@ class TypeInfo(BootstrapMixin):
             qual_name=qualname(type_),
             type_=type_,
             subtype=subtype,
+            parent_record_type_names=parent_record_type_names,
+            child_record_type_names=child_record_type_names,
         ).build()
 
         # Populate the dictionary
@@ -479,14 +547,14 @@ class TypeInfo(BootstrapMixin):
                 # Parse a type info row
                 if len(row_tokens) == len(_TYPE_INFO_HEADERS):
                     # Extract the type name and qual name from the tokens
-                    type_name, type_kind, qual_name, subtype = row_tokens
+                    type_name, type_kind, qual_name, subtype, parent_record_type_names, child_record_type_names = row_tokens
                 else:
                     expected_num_tokens = len(_TYPE_INFO_HEADERS)
                     actual_num_tokens = len(row_tokens)
                     raise RuntimeError(
                         f"Invalid number of comma-delimited tokens {actual_num_tokens} in TypeInfo, "
                         f"should be {expected_num_tokens}.\n"
-                        f"Sample row: TypeName,TypeKind,module.ClassName,subtype\n"
+                        f"Sample row: TypeName,TypeKind,module.ClassName,subtype,Superclass1;Superclass2,Subclass1;Subclass2\n"
                         f"Invalid row: {row.strip()}\n"
                     )
 
@@ -497,7 +565,13 @@ class TypeInfo(BootstrapMixin):
                     type_kind=EnumUtil.from_str(TypeKind, type_kind),
                     qual_name=qual_name,
                     subtype=subtype,
-                ).build()
+                    parent_record_type_names=(
+                        tuple(parent_record_type_names.split(";")) if parent_record_type_names else None
+                    ),
+                    child_record_type_names=(
+                        tuple(child_record_type_names.split(";")) if child_record_type_names else None
+                    ),
+                )
 
                 # Add to the type info dictionary
                 existing_info = cls._type_info_dict.setdefault(type_info.type_name, type_info)
@@ -531,8 +605,16 @@ class TypeInfo(BootstrapMixin):
                 qual_name = type_info.qual_name
                 subtype = type_info.subtype
 
+                # Sort parent and child names (they should already be sorted, just to be sure)
+                parent_record_type_names_str = (
+                    ";".join(sorted(type_info.parent_record_type_names)) if type_info.parent_record_type_names else ""
+                )
+                child_record_type_names_str = (
+                    ";".join(sorted(type_info.child_record_type_names)) if type_info.child_record_type_names else ""
+                )
+
                 # Write comma-separated values for each token, with semicolons-separated lists
-                file.write(f"{type_name},{type_kind_str},{qual_name},{subtype}\n")
+                file.write(f"{type_name},{type_kind_str},{qual_name},{subtype},{parent_record_type_names_str},{child_record_type_names_str}\n")
 
     @classmethod
     def _clear(cls) -> None:
@@ -591,23 +673,6 @@ class TypeInfo(BootstrapMixin):
         # Sort by type name and return
         result = tuple(sorted(result, key=lambda x: typename(x)))
         return result
-
-    @classmethod
-    @cached
-    def _get_unfiltered_child_types_set(cls, type_: type) -> set[type]:  # TODO: Consider if self should be included
-        """Return a tuple of child types (inclusive of self), may include duplicates."""
-
-        # TODO: !! This must run after all types are loaded, refactor to ensure complete load,
-        # TODO: consider filtering by parent instead of using subclasses
-        subtypes = {type_} if is_data_key_or_record_type(type_) else set()  # Include self in subtypes
-        for subtype in type_.__subclasses__():
-            # Exclude self from subtypes
-            if subtype is not type_:
-                # Recurse into the subclass hierarchy, avoid adding duplicates
-                subtypes.update(
-                    x for x in cls._get_unfiltered_child_types_set(subtype) if is_data_key_or_record_type(x)
-                )
-        return subtypes
 
     @classmethod
     @cached
