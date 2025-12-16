@@ -20,6 +20,7 @@ from typing import Any
 from typing import ClassVar
 from typing import Self
 from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.records.protocols import MAPPING_TYPES
 from cl.runtime.records.protocols import SEQUENCE_TYPES
 from cl.runtime.records.protocols import is_key_type
@@ -29,7 +30,7 @@ from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-_supported_extensions = ["txt", "yaml"]
+_supported_extensions = ["txt", "yaml", "png"]
 """The list of supported output file extensions (formats)."""
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -174,9 +175,28 @@ class RegressionGuard:
                 file.write(self._format_txt(value))
                 # Flush immediately to ensure all of the output is on disk in the event of test exception
                 file.flush()
+        elif self.ext == "png":
+            self._write_png(value, received_path)
         else:
             # Should not be reached here because of a previous check in __init__
             _error_extension_not_supported(self.ext)
+
+    def _write_png(self, fig, file_path: str) -> None:
+        """
+        Write matplotlib figure pixel hash to a text file for comparison.
+
+        Args:
+            fig: Matplotlib figure object
+            file_path: Path where to write the pixel hash
+        """
+
+        # Get pixel hash from the figure
+        pixel_hash = PngUtil.get_pixel_hash_from_figure(fig, dpi=100, bbox_inches="tight", pad_inches=0.1)
+
+        # Write the hash to a text file (we store hash, not the actual PNG)
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(pixel_hash)
+            file.flush()
 
     def verify_all(self, *, silent: bool = False) -> bool:
         """
@@ -264,69 +284,135 @@ class RegressionGuard:
 
         if os.path.exists(expected_path):
 
-            # Read both files
-            with open(received_path, "r", encoding="utf-8") as received_file:
-                received_lines = list(received_file.readlines())
-            with open(expected_path, "r", encoding="utf-8") as expected_file:
-                expected_lines = list(expected_file.readlines())
+            # For PNG extension, handle specially
+            if self.ext == "png":
+                # Read received hash (text file with .png.txt extension)
+                with open(received_path, "r", encoding="utf-8") as received_file:
+                    received_hash = received_file.read().strip()
 
-            # Expected file exists, ensure there is the same number of lines and all lines match
-            if len(received_lines) == len(expected_lines) and all(
-                x == y for x, y in zip(received_lines, expected_lines)
-            ):
-                # All received and expected lines match, delete the received file and diff file
-                os.remove(received_path)
-                if os.path.exists(diff_path):
-                    os.remove(diff_path)
+                # Check if expected file exists (should be .png.txt now)
+                # Also check for legacy .expected.png baseline image files
+                expected_png_image_path = f"{self._abs_channel_prefix}expected.png"
 
-                # Return True to indicate verification has been successful
-                return True
-            else:
-                # Some of the lines do not match, generate unified diff
-                # TODO: Handle diff for binary output
-                # Convert to list first because the returned object is a generator but
-                # we will need to iterate over the lines more than once
-                diff = list(
-                    difflib.unified_diff(
-                        expected_lines, received_lines, fromfile=expected_path, tofile=received_path, n=0
+                if os.path.exists(expected_png_image_path) and not os.path.exists(expected_path):
+                    # Legacy baseline: PNG image file exists, extract hash from it
+                    expected_hash = PngUtil.get_pixel_hash_from_png(expected_png_image_path)
+
+                    # Save the extracted hash to .png.txt file for future runs (one-time migration)
+                    expected_dir = os.path.dirname(expected_path)
+                    if not os.path.exists(expected_dir):
+                        os.makedirs(expected_dir)
+                    with open(expected_path, "w", encoding="utf-8") as hash_file:
+                        hash_file.write(expected_hash)
+                        hash_file.flush()
+                else:
+                    # New format: hash stored in .png.txt file
+                    with open(expected_path, "r", encoding="utf-8") as expected_file:
+                        expected_content = expected_file.read().strip()
+
+                    # Verify it looks like a hash (32 hex characters for MD5)
+                    if len(expected_content) == 32 and all(c in '0123456789abcdef' for c in expected_content.lower()):
+                        expected_hash = expected_content
+                    else:
+                        raise RuntimeError(
+                            f"Expected PNG hash file does not contain valid MD5 hash: {expected_path}\n"
+                            f"Content: {expected_content}"
+                        )
+
+                # Compare hashes
+                if received_hash == expected_hash:
+                    # Hashes match, delete received file
+                    os.remove(received_path)
+                    if os.path.exists(diff_path):
+                        os.remove(diff_path)
+                    return True
+                else:
+                    # Hashes don't match, create diff file
+                    with open(diff_path, "w", encoding="utf-8") as diff_file:
+                        diff_file.write(f"Expected pixel hash: {expected_hash}\n")
+                        diff_file.write(f"Received pixel hash: {received_hash}\n")
+                        diff_file.write(f"Pixel hashes DO NOT MATCH\n")
+
+                    # Create exception text
+                    exception_text = (
+                        f"\nPNG pixel hash mismatch:\n"
+                        f"  Expected: {expected_hash}\n"
+                        f"  Received: {received_hash}\n"
+                        f"  See diff file: {diff_path}\n"
                     )
-                )
 
-                # Write the complete unified diff into to the diff file
-                with open(diff_path, "w", encoding="utf-8") as diff_file:
-                    diff_file.write("".join(diff))
+                    self.__exception_text = exception_text
+                    self.__verified = True
 
-                # Truncate to max_lines and surround by begin/end lines for generate exception text
-                line_len = 120
-                max_lines = 5
-                begin_str = "BEGIN REGRESSION TEST UNIFIED DIFF "
-                end_str = "END REGRESSION TEST UNIFIED DIFF "
-                begin_sep = "-" * (line_len - len(begin_str))
-                end_sep = "-" * (line_len - len(end_str))
-                orig_lines = len(diff)
-                if orig_lines > max_lines:
-                    diff = diff[:max_lines]
-                    truncate_str = f"(TRUNCATED {orig_lines-max_lines} ADDITIONAL LINES) "
-                    end_sep = end_sep[: -len(truncate_str)]
+                    if not silent:
+                        raise RuntimeError(exception_text)
+                    else:
+                        return False
+            else:
+                # Original text/yaml handling
+                # Read both files
+                with open(received_path, "r", encoding="utf-8") as received_file:
+                    received_lines = list(received_file.readlines())
+                with open(expected_path, "r", encoding="utf-8") as expected_file:
+                    expected_lines = list(expected_file.readlines())
+
+                # Expected file exists, ensure there is the same number of lines and all lines match
+                if len(received_lines) == len(expected_lines) and all(
+                    x == y for x, y in zip(received_lines, expected_lines)
+                ):
+                    # All received and expected lines match, delete the received file and diff file
+                    os.remove(received_path)
+                    if os.path.exists(diff_path):
+                        os.remove(diff_path)
+
+                    # Return True to indicate verification has been successful
+                    return True
                 else:
-                    truncate_str = ""
-                diff_str = "".join(diff)
-                exception_text = f"\n{begin_str}{begin_sep}\n" + diff_str
-                extra_eol = "" if exception_text.endswith("\n") else "\n"
-                exception_text = exception_text + f"{extra_eol}{end_str}{truncate_str}{end_sep}"
+                    # Some of the lines do not match, generate unified diff
+                    # TODO: Handle diff for binary output
+                    # Convert to list first because the returned object is a generator but
+                    # we will need to iterate over the lines more than once
+                    diff = list(
+                        difflib.unified_diff(
+                            expected_lines, received_lines, fromfile=expected_path, tofile=received_path, n=0
+                        )
+                    )
 
-                # Record into the object even if silent
-                self.__exception_text = exception_text
+                    # Write the complete unified diff into to the diff file
+                    with open(diff_path, "w", encoding="utf-8") as diff_file:
+                        diff_file.write("".join(diff))
 
-                # Set the __verified flag so that verification returns the same result if attempted again
-                # This will prevent further writes to this channel and extension
-                self.__verified = True
+                    # Truncate to max_lines and surround by begin/end lines for generate exception text
+                    line_len = 120
+                    max_lines = 5
+                    begin_str = "BEGIN REGRESSION TEST UNIFIED DIFF "
+                    end_str = "END REGRESSION TEST UNIFIED DIFF "
+                    begin_sep = "-" * (line_len - len(begin_str))
+                    end_sep = "-" * (line_len - len(end_str))
+                    orig_lines = len(diff)
+                    if orig_lines > max_lines:
+                        diff = diff[:max_lines]
+                        truncate_str = f"(TRUNCATED {orig_lines-max_lines} ADDITIONAL LINES) "
+                        end_sep = end_sep[: -len(truncate_str)]
+                    else:
+                        truncate_str = ""
+                    diff_str = "".join(diff)
+                    exception_text = f"\n{begin_str}{begin_sep}\n" + diff_str
+                    extra_eol = "" if exception_text.endswith("\n") else "\n"
+                    exception_text = exception_text + f"{extra_eol}{end_str}{truncate_str}{end_sep}"
 
-                if not silent:
-                    # Raise exception only when not silent
-                    raise RuntimeError(exception_text)
-                else:
-                    return False
+                    # Record into the object even if silent
+                    self.__exception_text = exception_text
+
+                    # Set the __verified flag so that verification returns the same result if attempted again
+                    # This will prevent further writes to this channel and extension
+                    self.__verified = True
+
+                    if not silent:
+                        # Raise exception only when not silent
+                        raise RuntimeError(exception_text)
+                    else:
+                        return False
         else:
             # Expected file does not exist, copy the data from received to expected
             with open(received_path, "rb") as received_file, open(expected_path, "wb") as expected_file:
@@ -384,5 +470,10 @@ class RegressionGuard:
         """The diff between received and expected is written to 'channel.diff.ext' located next to the unit test."""
         if file_type not in (file_types := ["received", "expected", "diff"]):
             raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
-        result = f"{self._abs_channel_prefix}{file_type}.{self.ext}"
+
+        # For PNG, store hash as .txt file to avoid confusion
+        if self.ext == "png":
+            result = f"{self._abs_channel_prefix}{file_type}.png.txt"
+        else:
+            result = f"{self._abs_channel_prefix}{file_type}.{self.ext}"
         return result
