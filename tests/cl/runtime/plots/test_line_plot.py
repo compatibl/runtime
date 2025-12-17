@@ -13,15 +13,31 @@
 # limitations under the License.
 
 import pytest
+from matplotlib import pyplot as plt
 from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
+from cl.runtime.qa.regression_guard import RegressionGuard
 
 
 def test_one_line(work_dir_fixture):
-    StubLinePlots.get_one_line_plot(plot_id="test_line_plot.test_one_line").save()
+    """Test LinePlot with one line using RegressionGuard."""
+
+    guard = RegressionGuard(ext="png", channel="test_line_plot.test_one_line")
+    plot = StubLinePlots.get_one_line_plot(plot_id="test_line_plot.test_one_line")
+    fig = plot._create_figure()
+    guard.write(fig)
+    guard.verify()
+    plt.close(fig)
 
 
 def test_two_line(work_dir_fixture):
-    StubLinePlots.get_two_line_plot(plot_id="test_line_plot.test_two_line").save()
+    """Test LinePlot with two lines using RegressionGuard."""
+
+    guard = RegressionGuard(ext="png", channel="test_line_plot.test_two_line")
+    plot = StubLinePlots.get_two_line_plot(plot_id="test_line_plot.test_two_line")
+    fig = plot._create_figure()
+    guard.write(fig)
+    guard.verify()
+    plt.close(fig)
 
 
 if __name__ == "__main__":

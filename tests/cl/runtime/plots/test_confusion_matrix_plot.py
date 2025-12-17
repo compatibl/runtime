@@ -15,7 +15,9 @@
 import pytest
 from pathlib import Path
 import pandas as pd
+from matplotlib import pyplot as plt
 from cl.runtime.plots.confusion_matrix_plot import ConfusionMatrixPlot
+from cl.runtime.qa.regression_guard import RegressionGuard
 
 
 def test_smoke(work_dir_fixture):
@@ -24,13 +26,19 @@ def test_smoke(work_dir_fixture):
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")
 def test_dark_theme(work_dir_fixture):
+    """Test ConfusionMatrixPlot in dark mode using RegressionGuard."""
+
     raw_data = pd.read_csv(Path(__file__).resolve().parent / "./test_confusion_matrix_plot.csv")
+    guard = RegressionGuard(ext="png", channel="matrix_plot")
     plot = ConfusionMatrixPlot(
         title="ConfusionMatrixPlot",
         expected_categories=raw_data["True Category"].values.tolist(),
         received_categories=raw_data["Predicted"].values.tolist(),
     ).build()
-    plot.save()
+    fig = plot._create_figure()
+    guard.write(fig)
+    guard.verify()
+    plt.close(fig)
 
 
 if __name__ == "__main__":

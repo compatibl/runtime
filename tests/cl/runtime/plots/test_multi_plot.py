@@ -13,12 +13,16 @@
 # limitations under the License.
 
 import pytest
+from matplotlib import pyplot as plt
 from cl.runtime.plots.multi_plot import MultiPlot
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
+from cl.runtime.qa.regression_guard import RegressionGuard
 
 
 def test_multi_heatmap(work_dir_fixture):
-    """Test a multi heat map plot"""
+    """Test a multi heat map plot using RegressionGuard."""
+
+    guard = RegressionGuard(ext="png", channel="test_multi_heat_map_plot.test_multi_heatmap")
     plot = MultiPlot(
         plot_id="test_multi_heat_map_plot.test_multi_heatmap",
         title="MultiPlot",
@@ -29,7 +33,10 @@ def test_multi_heatmap(work_dir_fixture):
             StubHeatMapPlots.get_basic_plot("test"),
         ],
     ).build()
-    plot.save()
+    fig = plot._create_figure()
+    guard.write(fig)
+    guard.verify()
+    plt.close(fig)
 
 
 if __name__ == "__main__":
