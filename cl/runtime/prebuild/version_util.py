@@ -17,13 +17,13 @@ import importlib.util
 import re
 
 # Pattern to find version in setup.py file
-_SETUP_PY_VERSION_RE = r"""version\s*=\s*(?P<q>['"])(?P<version>.+?)(?P=q)"""
+_SETUP_PY_VERSION_RE = r"""(?s)(?!^\s*#)\s*setuptools\.setup\s*\(.*?\bversion\s*=\s*(['"])(?P<version>[^'"]+)\1"""
 
 # Pattern to find version in _version.py file
-_VERSION_PY_VERSION_RE = r"""__version__\s*=\s*(?P<q>['"])(?P<version>.+?)(?P=q)"""
+_VERSION_PY_VERSION_RE = r"""(?m)^\s*(?!#)\s*__version__\s*=\s*(['"])(?P<version>[^'"]+)\1"""
 
 # Pattern to find version in pyproject.toml file
-_PYPROJECT_TOML_VERSION_RE = r"""version\s*=\s*(?P<q>['"])(?P<version>.+?)(?P=q)"""
+_PYPROJECT_TOML_VERSION_RE = r"""(?ms)^\[project\]\s*.*?^\s*(?!#)\s*version\s*=\s*(['"])(?P<version>[^'"]+)\1"""
 
 
 class VersionUtil:
@@ -44,7 +44,7 @@ class VersionUtil:
         # Get versions from different possible places in the package
         setup_py_version = cls.find_version_in_setup_py(package_path)
         version_py_version = cls.find_version_in_version_py(package_path)
-        pyproject_toml_version = cls.find_version_in_version_py(package_path)
+        pyproject_toml_version = cls.find_version_in_pyproject_toml(package_path)
 
         # Verify that versions match each other
         if setup_py_version == version_py_version == pyproject_toml_version:
@@ -62,7 +62,7 @@ class VersionUtil:
             if raise_on_fail:
                 raise RuntimeError(
                     f"Versions in package {package} is not valid.\n"
-                    f"The following versions were found in the package:\n"
+                    f"The following versions were found:\n"
                     f" - In pyproject.toml file: {pyproject_toml_version}\n"
                     f" - In _version.py file: {version_py_version}\n"
                     f" - In setup.py file [optional]: {setup_py_version}\n"
@@ -82,16 +82,16 @@ class VersionUtil:
         is_valid = (
             len(tokens) == 3 and
             all(p.isdigit() and (p == '0' or not p.startswith('0')) for p in tokens)
-            and 25 <= int(tokens[0]) <= 999  # Two-digit year from 2025 to 2999
+            and 2025 <= int(tokens[0]) <= 2999  # Four-digit year from 2025 to 2999
             and 101 <= int(tokens[1]) <= 1231  # Month and day combined from 101 (Jan 1) to 1231 (Dec 31)
         )
         if is_valid:
             return True
         elif raise_on_fail:
             raise RuntimeError(f"Version string {ver} does not follow the CompatibL Platform\n"
-                               f"CalVar convention of YY.MDD.PATCH. Examples:\n"
-                               f" - 23.101.0 for Jan 1, 2023 release\n"
-                               f" - 23.501.1 for patch 1 to May 1, 2023 release\n")
+                               f"CalVar convention of YYYY.MDD.PATCH. Examples:\n"
+                               f" - 2023.101.0 for Jan 1, 2023 release\n"
+                               f" - 2023.501.1 for patch 1 to May 1, 2023 release\n")
         else:
             return False
 
@@ -138,5 +138,5 @@ class VersionUtil:
     @classmethod
     def find_version_in_pyproject_toml(cls, package_path: str) -> str | None:
         """Find exactly one version = "..." in pyproject.toml."""
-        setup_py_path = os.path.join(os.path.dirname(os.path.dirname(package_path)), "pyproject.toml")
-        return cls._find_version_in_file(setup_py_path, _SETUP_PY_VERSION_RE)
+        pyproject_toml_path = os.path.join(os.path.dirname(os.path.dirname(package_path)), "pyproject.toml")
+        return cls._find_version_in_file(pyproject_toml_path, _PYPROJECT_TOML_VERSION_RE)

@@ -8,7 +8,7 @@ with open('./tools/cl/runtime/package_requirements.txt', encoding="utf-8") as pa
 
 setuptools.setup(
     name='cl-runtime',
-    version='2.0.4',
+    version='2025.1217.0',
     author='The Project Contributors',
     description='CompatibL Runtime Community Edition',
     license='Apache Software License',
