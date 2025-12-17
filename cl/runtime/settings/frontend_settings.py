@@ -26,8 +26,22 @@ class FrontendSettings(Settings):
     frontend_version: str | None = None
     """Install a specific frontend version in MAJOR.MINOR.MICRO format."""
 
+    frontend_dir: str = "static"
+    """
+    Directory template for the location of index.html relative to project root.
+    
+    Notes:
+        - May include {version}, in which case the specified frontend_version will be substituted
+    """
+
     frontend_download_uri: str = "https://github.com/compatibl/frontend/archive/refs/tags/{version}"
-    """URI template for frontend download (if file extension is omitted, .zip and .tar.gz options will be provided)."""
+    """
+    URI template for frontend download.
+    
+    Notes:
+        - May include {version}, in which case the specified frontend_version will be substituted
+        - If file extension is omitted, .zip and .tar.gz options will be provided
+    """
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
@@ -35,11 +49,11 @@ class FrontendSettings(Settings):
         # Validate that version string is in CompatibL CalVer format if specified
         if self.frontend_version is not None:
             VersionUtil.guard_version_string(self.frontend_version)
-
-        # Validate that frontend_download_uri contains the {version} parameter
-        if "{version}" not in self.frontend_download_uri:
-            raise ValueError("The setting for frontend_download_uri must contain the '{version}' parameter.")
+        else:
+            if "{frontend_version}" in self.frontend_dir:
+                raise RuntimeError("Field frontend_dir contains {frontend_version} which is not specified.")
+            if "{frontend_version}" in self.frontend_download_uri:
+                raise RuntimeError("Field frontend_download_uri contains {frontend_version} which is not specified.")
 
     def get_frontend_download_uri_templates(self) -> tuple[str, ...]:
         """Get the list of frontend URIs based on the specified template."""
-
