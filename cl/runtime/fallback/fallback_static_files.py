@@ -121,20 +121,9 @@ class FallbackStaticFiles(StaticFiles):
         frontend_settings = FrontendSettings.instance()
         if (version := frontend_settings.frontend_version) is not None:
 
-            # Substitute version into the download URI template
-            uri = frontend_settings.frontend_download_uri.format(version=version)
-
-            # Provide both .zip and .tar.gz options if extension is not specified in the template
-            if uri.endswith(".zip") or uri.endswith(".tar.gz"):
-                # Extension is specified, return a single option
-                uri_options = (uri,)
-            else:
-                # Return both .zip and .tar.gz options
-                uri_options = (
-                    uri + ".zip",
-                    uri + ".tar.gz",
-                )
-            links = "\n".join('<br><a href="{uri}">{uri}</a>'.format(uri=uri) for uri in uri_options)
+            # Get the list of frontend URI choices for the specified template
+            uri_choices = frontend_settings.get_frontend_download_uri_choices()
+            links = "\n".join('<br><a href="{uri}">{uri}</a>'.format(uri=uri) for uri in uri_choices)
             instructions = _INSTALL_HTML.format(version=version, links=links)
         else:
             instructions = _NO_VERSION_HTML
@@ -142,4 +131,3 @@ class FallbackStaticFiles(StaticFiles):
         # Insert instructions into the fallback HTML template
         result = _FALLBACK_HTML.format(instructions=instructions)
         return result
-

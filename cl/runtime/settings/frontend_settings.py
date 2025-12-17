@@ -14,6 +14,8 @@
 
 from dataclasses import dataclass
 from typing_extensions import final  # TODO: Replace by the import from typing
+
+from cl.runtime.contexts.os_util import OsUtil
 from cl.runtime.prebuild.version_util import VersionUtil
 from cl.runtime.settings.settings import Settings
 
@@ -40,7 +42,7 @@ class FrontendSettings(Settings):
     
     Notes:
         - May include {version}, in which case the specified frontend_version will be substituted
-        - If file extension is omitted, .zip and .tar.gz options will be provided
+        - If file extension is omitted, .zip and .tar.gz choices will be provided
     """
 
     def __init(self) -> None:
@@ -55,5 +57,35 @@ class FrontendSettings(Settings):
             if "{frontend_version}" in self.frontend_download_uri:
                 raise RuntimeError("Field frontend_download_uri contains {frontend_version} which is not specified.")
 
-    def get_frontend_download_uri_templates(self) -> tuple[str, ...]:
-        """Get the list of frontend URIs based on the specified template."""
+    def get_frontend_download_uri_choices(self) -> tuple[str, ...]:
+        """Get the list of frontend URI choices for the specified template."""
+
+        # Substitute version into the download URI template
+        base_uri = self.frontend_download_uri.format(version=self.frontend_version)
+
+        # Provide both .zip and .tar.gz choices if extension is not specified in the template
+        if base_uri.endswith(".zip") or base_uri.endswith(".tar.gz"):
+            # Extension is specified, return a single choice
+            return (base_uri,)
+        else:
+            # Return both .zip and .tar.gz choices
+            return (
+                base_uri + ".zip",
+                base_uri + ".tar.gz",
+            )
+
+    def get_frontend_download_uri_preferred_choice(self) -> str:
+        """Get the preferred frontend URIs choice for the specified template and the current OS."""
+
+        # Substitute version into the download URI template
+        base_uri = self.frontend_download_uri.format(version=self.frontend_version)
+
+        # Provide both .zip and .tar.gz choices if extension is not specified in the template
+        if base_uri.endswith(".zip") or base_uri.endswith(".tar.gz"):
+            return base_uri
+        else:
+            # Extension is specified, select based on OS type
+            if OsUtil.is_windows():
+                return base_uri + ".zip"
+            else:
+                return base_uri + ".tar.gz"
