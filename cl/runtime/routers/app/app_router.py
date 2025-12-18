@@ -12,27 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from fastapi import APIRouter
 from starlette.responses import RedirectResponse, HTMLResponse
 
 from cl.runtime.fallback.fallback_static_files import FallbackStaticFiles
-from cl.runtime.file.project_layout import ProjectLayout
 from starlette import status
+
+from cl.runtime.settings.frontend_settings import FrontendSettings
 
 router = APIRouter()
 
 def get_index_html_or_none() -> str | None:
     """Return the index.html content dynamically."""
-    static_dir = ProjectLayout.get_static_dir()
-    index_file_path = os.path.join(static_dir, "index.html")
-    if os.path.exists(index_file_path) and os.path.isfile(index_file_path):
-        with open(index_file_path, "r", encoding="utf-8") as index_file:
+    frontend_settings = FrontendSettings.instance()
+    if frontend_settings.is_frontend_installed():
+        with open(frontend_settings.get_index_file_path(), "r", encoding="utf-8") as index_file:
             return index_file.read()
     else:
         return None
 
-_INDEX_HTML = get_index_html_or_none()
+_INDEX_HTML = None
 """Content of index.html if static frontend files are installed, otherwise None."""
 
 @router.get(
@@ -55,9 +54,20 @@ async def get_app_index_root():
 async def get_app_index(_):
     """Support page refresh by redirecting to SPA root."""
 
-    if _INDEX_HTML is not None:
-        # Return index.html content for SPA routing after page refresh
-        return _INDEX_HTML
+    # Use global to avoid loading index.html for every request
+    global _INDEX_HTML
+
+    if _INDEX_HTML is None:
+        # If _INDEX_HTML is None, try to update it
+        actual_index_html = get_index_html_or_none()
+
+        if actual_index_html is not None:
+            # Update global _INDEX_HTML and return index.html content for SPA routing after page refresh
+            _INDEX_HTML = actual_index_html
+            return actual_index_html
+        else:
+            # If static files are not installed, generate fallback page
+            return FallbackStaticFiles.get_fallback_html()
     else:
-        # If static files are not installed, generate fallback page
-        return FallbackStaticFiles.get_fallback_html()
+        # If _INDEX_HTML is not None, return it
+        return _INDEX_HTML

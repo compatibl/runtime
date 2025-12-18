@@ -43,6 +43,7 @@ from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.frontend_settings import FrontendSettings
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks
 
@@ -135,12 +136,23 @@ def run_backend(*, interactive: bool = False) -> None:
 
                 WorkerHealthMonitor.start_monitoring()
 
-        # Find the directory with static frontend files
-        static_dir = ProjectLayout.get_static_dir()
+        frontend_settings = FrontendSettings.instance()
 
-        if os.path.exists(os.path.join(static_dir, "index.html")):
+        # If frontend is not installed, ask user to install it from GitHub
+        if not frontend_settings.is_frontend_installed():
+            print(
+                f"Static frontend files of version '{frontend_settings.frontend_version}' are not installed. "
+                f"Do you want to install it from GitHub? (yes/no): "
+            )
+            user_response = input().strip().lower()
+            if user_response == "yes":
+                # Install static frontend files from GitHub
+                frontend_settings.install_frontend()
+
+        if frontend_settings.is_frontend_installed():
             # Mount static frontend files if index.html is found
-            server_app.mount("/", StaticFiles(directory=static_dir, html=True))
+            index_file_path = frontend_settings.get_index_file_path()
+            server_app.mount("/", StaticFiles(directory=os.path.dirname(index_file_path), html=True))
         else:
             # Otherwise generate the fallback page
             server_app.mount("/", FallbackStaticFiles())
