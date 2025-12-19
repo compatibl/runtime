@@ -38,6 +38,14 @@ class FrontendSettings(Settings):
     frontend_version: str | None = None
     """Install a specific frontend version in MAJOR.MINOR.MICRO format."""
 
+    frontend_dir: str = "frontend-{version}"
+    """
+    Directory template for the location of index.html relative to project root.
+
+    Notes:
+        - May include {version}, in which case the specified frontend_version will be substituted
+    """
+
     frontend_download_uri: str = "https://github.com/compatibl/frontend/archive/refs/tags/{version}"
     """
     URI template for frontend download.
@@ -54,6 +62,8 @@ class FrontendSettings(Settings):
         if self.frontend_version is not None:
             VersionUtil.guard_version_string(self.frontend_version)
         else:
+            if "{frontend_version}" in self.frontend_dir:
+                raise RuntimeError("Field frontend_dir contains {frontend_version} which is not specified.")
             if "{frontend_version}" in self.frontend_download_uri:
                 raise RuntimeError("Field frontend_download_uri contains {frontend_version} which is not specified.")
 
@@ -100,14 +110,11 @@ class FrontendSettings(Settings):
         # Get project root
         project_root = ProjectLayout.get_project_root()
 
-        # Create frontend dir name in format 'frontend-{version}'
-        # If version is not specified, frontend dir name will be 'frontend'
-        frontend_dir_name = "frontend"
-        if self.frontend_version is not None:
-            frontend_dir_name += f"-{self.frontend_version}"
+        # Substitute version into the frontend_dir
+        frontend_dir = self.frontend_dir.format(version=self.frontend_version)
 
-        # Join paths to get path of index.html file
-        return os.path.join(project_root, frontend_dir_name, "static", "index.html")
+        # Join paths to get path to index.html file
+        return os.path.join(project_root, frontend_dir, "static", "index.html")
 
     def is_frontend_installed(self) -> bool:
         """Check if frontend is installed by presence of index.html file in frontend static files dir."""
@@ -117,7 +124,9 @@ class FrontendSettings(Settings):
     def install_frontend(self) -> None:
         """Download frontend archive from GitHub and extract to project root."""
 
-        frontend_path = os.path.dirname(self.get_index_file_path())
+        # Get frontend path as the second parent of the index.html file
+        frontend_path = os.path.dirname(os.path.dirname(self.get_index_file_path()))
+
         if self.is_frontend_installed():
             # If frontend installed, nothing to do
             return
@@ -128,8 +137,8 @@ class FrontendSettings(Settings):
         # Raise error if frontend_version is not specified
         if self.frontend_version is None:
             raise RuntimeError(
-                "Can not install frontend without a version. "
-                "Please specify a 'frontend_version' in settings.yaml."
+                "Cannot install frontend because the frontend version is missing.\n"
+                "Please specify 'frontend_version' in settings.yaml."
             )
 
         # Get download URI
@@ -137,7 +146,6 @@ class FrontendSettings(Settings):
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             archive_path = os.path.join(tmp_dir, "frontend_archive")
-            project_root = ProjectLayout.get_project_root()
 
             # Download archive to temp dir
             try:
@@ -152,20 +160,72 @@ class FrontendSettings(Settings):
             except urllib.error.URLError as exc:
                 raise RuntimeError(f"Failed to reach URL {uri}: {exc.reason}") from exc
 
+            extract_path = os.path.join(tmp_dir, "extract")
             # Detect archive type and extract to project root
             if zipfile.is_zipfile(archive_path):
                 with zipfile.ZipFile(archive_path) as zip_file:
-                    zip_file.extractall(project_root)
+                    top_archive_level = self._get_zip_top_level_name(zip_file)
+                    zip_file.extractall(extract_path)
             elif tarfile.is_tarfile(archive_path):
                 with tarfile.open(archive_path) as tar_file:
-                    tar_file.extractall(project_root)
+                    top_archive_level = self._get_tar_top_level_name(tar_file)
+                    tar_file.extractall(extract_path)
             else:
                 raise RuntimeError(
                     f"Unsupported frontend archive format downloaded from '{uri}': {os.path.basename(archive_path)}."
                 )
+
+            # Move extracted archive data to frontend_path
+            extract_data_path = os.path.join(extract_path, top_archive_level)
+            shutil.move(extract_data_path, frontend_path)
 
         # Post-install validation
         if not self.is_frontend_installed():
             raise RuntimeError(f"Frontend installation failed.")
         else:
             _logger.info(f"Frontend installation succeeded in '{os.path.dirname(self.get_index_file_path())}'.")
+
+    @classmethod
+    def _get_zip_top_level_name(cls, zip_file: zipfile.ZipFile) -> str:
+        """Check that the .zip archive contains one root element and return its name."""
+        top_levels = set()
+
+        for name in zip_file.namelist():
+            # Normalize and split
+            parts = name.strip("/").split("/", 1)
+            if parts:
+                top_levels.add(parts[0])
+
+        if len(top_levels) == 1:
+            return next(iter(top_levels))
+        else:
+            raise RuntimeError(
+                "Unexpected archive structure.\n"
+                "Expected the archive to contain exactly one top-level directory "
+                "(e.g. 'frontend-<version>').\n"
+                f"Found top-level entries: {sorted(top_levels)}"
+            )
+
+    @classmethod
+    def _get_tar_top_level_name(cls, tar_file: tarfile.TarFile) -> str:
+        """Check that the .tar.gz archive contains one root element and return its name."""
+        top_levels = set()
+
+        for member in tar_file.getmembers():
+            # Normalize and split
+            name = member.name.strip("/")
+            if not name:
+                continue
+
+            parts = name.split("/", 1)
+            top_levels.add(parts[0])
+
+        if len(top_levels) == 1:
+            return next(iter(top_levels))
+        else:
+            raise RuntimeError(
+                "Unexpected archive structure.\n"
+                "Expected the archive to contain exactly one top-level directory "
+                "(e.g. 'frontend-<version>').\n"
+                f"Found top-level entries: {sorted(top_levels)}"
+            )
