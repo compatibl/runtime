@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from matplotlib import pyplot as plt
+
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 from cl.runtime.qa.regression_guard import RegressionGuard
 
@@ -21,12 +21,17 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 def test_basic(work_dir_fixture):
     """Test a basic heat map plot using RegressionGuard."""
 
-    guard = RegressionGuard(ext="png", channel="test_heat_map_plot.test_basic")
+    # Create regression guard
+    guard = RegressionGuard(channel="test_heat_map_plot.test_basic")
+
+    # Arrange: Generate plot
     plot = StubHeatMapPlots.get_basic_plot("test_heat_map_plot.test_basic")
-    fig = plot._create_figure()
-    guard.write(fig)
+
+    # Act: Write plot to regression guard
+    guard.write(plot)
+
+    # Assert: Verify plot
     guard.verify()
-    plt.close(fig)
 
 
 @pytest.mark.skip("Restore test when it becomes possible to override the default theme.")

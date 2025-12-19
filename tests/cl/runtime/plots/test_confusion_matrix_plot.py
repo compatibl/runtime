@@ -28,18 +28,22 @@ def test_smoke(work_dir_fixture):
 def test_dark_theme(work_dir_fixture):
     """Test ConfusionMatrixPlot in dark mode using RegressionGuard."""
 
+    # Create regression guard
+    guard = RegressionGuard(channel="test_confusion_matrix_plot.test_dark_theme")
+
+    # Arrange: Generate plot
     raw_data = pd.read_csv(Path(__file__).resolve().parent / "./test_confusion_matrix_plot.csv")
-    guard = RegressionGuard(ext="png", channel="matrix_plot")
     plot = ConfusionMatrixPlot(
         title="ConfusionMatrixPlot",
         expected_categories=raw_data["True Category"].values.tolist(),
         received_categories=raw_data["Predicted"].values.tolist(),
     ).build()
-    fig = plot._create_figure()
-    guard.write(fig)
-    guard.verify()
-    plt.close(fig)
 
+    # Act: Write plot to regression guard
+    guard.write(plot)
+
+    # Assert: Verify plot
+    guard.verify()
 
 if __name__ == "__main__":
     pytest.main([__file__])
