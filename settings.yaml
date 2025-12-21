@@ -49,7 +49,7 @@ default:
   celery_worker_log_level: info
 
   # Documented in FrontendSettings class
-  frontend_version: 25.1215.0
+  frontend_version: 2025.1217.0
 
 # Test environment
 testing:
