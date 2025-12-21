@@ -50,6 +50,8 @@ default:
 
   # Documented in FrontendSettings class
   frontend_version: 2025.1217.0
+  frontend_dir: frontend-{frontend_version}
+  frontend_download_uri: https://github.com/compatibl/frontend/archive/refs/tags/{frontend_version}
 
 # Test environment
 testing:

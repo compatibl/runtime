@@ -71,7 +71,7 @@ class FrontendSettings(Settings):
         """Get the list of frontend URI choices for the specified template."""
 
         # Substitute version into the download URI template
-        base_uri = self.frontend_download_uri.format(version=self.frontend_version)
+        base_uri = self.frontend_download_uri.format(frontend_version=self.frontend_version)
 
         # Provide both .zip and .tar.gz choices if extension is not specified in the template
         if base_uri.endswith(".zip") or base_uri.endswith(".tar.gz"):
@@ -88,7 +88,7 @@ class FrontendSettings(Settings):
         """Get the preferred frontend URIs choice for the specified template and the current OS."""
 
         # Substitute version into the download URI template
-        base_uri = self.frontend_download_uri.format(version=self.frontend_version)
+        base_uri = self.frontend_download_uri.format(frontend_version=self.frontend_version)
 
         # Provide both .zip and .tar.gz choices if extension is not specified in the template
         if base_uri.endswith(".zip") or base_uri.endswith(".tar.gz"):
@@ -111,7 +111,7 @@ class FrontendSettings(Settings):
         project_root = ProjectLayout.get_project_root()
 
         # Substitute version into the frontend_dir
-        frontend_dir = self.frontend_dir.format(version=self.frontend_version)
+        frontend_dir = self.frontend_dir.format(frontend_version=self.frontend_version)
 
         # Join paths to get path to index.html file
         return os.path.join(project_root, frontend_dir, "static", "index.html")

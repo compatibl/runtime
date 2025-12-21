@@ -119,12 +119,12 @@ class FallbackStaticFiles(StaticFiles):
 
         # Get instructions based on frontend_version from settings if present or request to specify
         frontend_settings = FrontendSettings.instance()
-        if (version := frontend_settings.frontend_version) is not None:
+        if (frontend_version := frontend_settings.frontend_version) is not None:
 
             # Get the list of frontend URI choices for the specified template
             uri_choices = frontend_settings.get_frontend_download_uri_choices()
             links = "\n".join('<br><a href="{uri}">{uri}</a>'.format(uri=uri) for uri in uri_choices)
-            instructions = _INSTALL_HTML.format(version=version, links=links)
+            instructions = _INSTALL_HTML.format(frontend_version=frontend_version, links=links)
         else:
             instructions = _NO_VERSION_HTML
 
