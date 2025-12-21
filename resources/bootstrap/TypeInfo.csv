@@ -86,6 +86,7 @@ ExperimentInterrupt,Record,cl.runtime.stat.experiment_interrupt.ExperimentInterr
 ExperimentInterruptKey,Key,cl.runtime.stat.experiment_interrupt_key.ExperimentInterruptKey,None
 ExperimentKey,Key,cl.runtime.stat.experiment_key.ExperimentKey,None
 ExperimentKeyQuery,Data,cl.runtime.stat.experiment_key_query.ExperimentKeyQuery,None
+ExternalLink,Data,cl.runtime.ui.external_link.ExternalLink,None
 FieldDecl,Data,cl.runtime.schema.field_decl.FieldDecl,None
 FieldLabel,Record,cl.runtime.settings.labels.field_label.FieldLabel,None
 FieldLabelKey,Key,cl.runtime.settings.labels.field_label_key.FieldLabelKey,None
@@ -99,6 +100,7 @@ FilterKey,Key,cl.runtime.db.filter_key.FilterKey,None
 FilterMany,Record,cl.runtime.db.filter_many.FilterMany,None
 FilterScreenItem,Data,cl.runtime.services.data.filter_screen_item.FilterScreenItem,None
 FloatFormat,Enum,cl.runtime.serializers.float_format.FloatFormat,None
+FrontendSettings,Data,cl.runtime.settings.frontend_settings.FrontendSettings,None
 FstringTemplateEngine,Record,cl.runtime.templates.fstring_template_engine.FstringTemplateEngine,None
 GroupBarPlot,Record,cl.runtime.plots.group_bar_plot.GroupBarPlot,None
 Gt,Data,cl.runtime.records.predicates.Gt,None
@@ -341,6 +343,7 @@ UiAppStateKey,Key,cl.runtime.ui.ui_app_state_key.UiAppStateKey,None
 UiClearLogsMarker,Record,cl.runtime.log.ui_clear_logs_marker.UiClearLogsMarker,None
 UiClearLogsMarkerKey,Key,cl.runtime.log.ui_clear_logs_marker_key.UiClearLogsMarkerKey,None
 UiLogUtil,Data,cl.runtime.log.ui_log_util.UiLogUtil,None
+UiNavigationLink,Data,cl.runtime.ui.ui_navigation_link.UiNavigationLink,None
 UiRecordUtil,Data,cl.runtime.records.ui_record_util.UiRecordUtil,None
 UiSupportUtil,Data,cl.runtime.ui.ui_support_util.UiSupportUtil,None
 UiTypeLayout,Record,cl.runtime.ui.ui_type_layout.UiTypeLayout,None
