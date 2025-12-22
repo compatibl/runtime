@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.plots.multi_plot import MultiPlot
-from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 from cl.runtime.qa.regression_guard import RegressionGuard
+from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 
 
 def test_multi_heatmap(work_dir_fixture):

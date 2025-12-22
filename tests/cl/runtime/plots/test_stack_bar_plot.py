@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import pytest
-
-from stubs.cl.runtime.plots.stub_stack_bar_plots import StubStackBarPlots
 from cl.runtime.qa.regression_guard import RegressionGuard
+from stubs.cl.runtime.plots.stub_stack_bar_plots import StubStackBarPlots
 
 
 def test_single_stack(work_dir_fixture):
@@ -49,6 +48,7 @@ def test_4_groups_2_bars(work_dir_fixture):
     # Assert: Verify plot
     guard.verify()
 
+
 def test_4_stacks_5_bars(work_dir_fixture):
     """Test GroupBarPlot plot with 4 groups and 5 bars using RegressionGuard."""
 
@@ -63,6 +63,7 @@ def test_4_stacks_5_bars(work_dir_fixture):
 
     # Assert: Verify plot
     guard.verify()
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

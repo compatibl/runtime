@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import pytest
-
-from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 from cl.runtime.qa.regression_guard import RegressionGuard
+from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 
 
 def test_one_line(work_dir_fixture):

@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import io
 import pytest
+import io
 from matplotlib import pyplot as plt
-
-from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.plots.matplotlib_util import MatplotlibUtil
+from cl.runtime.qa.png_util import PngUtil
 
 
 class TestPngUtil:
@@ -32,11 +31,11 @@ class TestPngUtil:
 
         # Save to BytesIO twice
         buf1 = io.BytesIO()
-        fig.savefig(buf1, format='png', metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
+        fig.savefig(buf1, format="png", metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
         png1 = buf1.getvalue()
 
         buf2 = io.BytesIO()
-        fig.savefig(buf2, format='png', metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
+        fig.savefig(buf2, format="png", metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
         png2 = buf2.getvalue()
 
         plt.close(fig)
@@ -44,7 +43,7 @@ class TestPngUtil:
         # Compare with metadata excluded
         result = PngUtil.compare_png_bytes(png1, png2, exclude_metadata=True)
 
-        assert result['match'], f"Checksums don't match: {result['hash1']} vs {result['hash2']}"
+        assert result["match"], f"Checksums don't match: {result['hash1']} vs {result['hash2']}"
         print(f"✓ Checksums match: {result['hash1']}")
 
     def test_different_metadata_same_image(self):
@@ -55,24 +54,25 @@ class TestPngUtil:
 
         # Save with empty metadata
         buf1 = io.BytesIO()
-        fig.savefig(buf1, format='png', metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
+        fig.savefig(buf1, format="png", metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
         png1 = buf1.getvalue()
 
         # Save with different metadata
         buf2 = io.BytesIO()
-        fig.savefig(buf2, format='png', metadata={'Title': 'Test', 'Author': 'TestUser'}, dpi=100)
+        fig.savefig(buf2, format="png", metadata={"Title": "Test", "Author": "TestUser"}, dpi=100)
         png2 = buf2.getvalue()
 
         plt.close(fig)
 
         # Should NOT match with metadata included
         result_with_metadata = PngUtil.compare_png_bytes(png1, png2, exclude_metadata=False)
-        assert not result_with_metadata['match'], "Images should differ when metadata is included"
+        assert not result_with_metadata["match"], "Images should differ when metadata is included"
 
         # SHOULD match with metadata excluded
         result_without_metadata = PngUtil.compare_png_bytes(png1, png2, exclude_metadata=True)
-        assert result_without_metadata['match'], \
-            f"Images should match when metadata is excluded: {result_without_metadata['hash1']} vs {result_without_metadata['hash2']}"
+        assert result_without_metadata[
+            "match"
+        ], f"Images should match when metadata is excluded: {result_without_metadata['hash1']} vs {result_without_metadata['hash2']}"
 
         print(f"✓ With metadata: {result_with_metadata['hash1']} != {result_with_metadata['hash2']}")
         print(f"✓ Without metadata: {result_without_metadata['hash1']} == {result_without_metadata['hash2']}")
@@ -83,7 +83,7 @@ class TestPngUtil:
         fig1, ax1 = plt.subplots()
         ax1.plot([1, 2, 3], [1, 4, 9])
         buf1 = io.BytesIO()
-        fig1.savefig(buf1, format='png', metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
+        fig1.savefig(buf1, format="png", metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
         png1 = buf1.getvalue()
         plt.close(fig1)
 
@@ -91,14 +91,14 @@ class TestPngUtil:
         fig2, ax2 = plt.subplots()
         ax2.plot([1, 2, 3], [1, 2, 3])  # Different data
         buf2 = io.BytesIO()
-        fig2.savefig(buf2, format='png', metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
+        fig2.savefig(buf2, format="png", metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
         png2 = buf2.getvalue()
         plt.close(fig2)
 
         # Compare
         result = PngUtil.compare_png_bytes(png1, png2, exclude_metadata=True)
 
-        assert not result['match'], "Different images should not match"
+        assert not result["match"], "Different images should not match"
         print(f"✓ Different images have different checksums: {result['hash1']} != {result['hash2']}")
 
     def test_checksum_calculation(self):
@@ -108,7 +108,7 @@ class TestPngUtil:
         ax.plot([1, 2, 3], [1, 4, 9])
 
         buf = io.BytesIO()
-        fig.savefig(buf, format='png', metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
+        fig.savefig(buf, format="png", metadata=MatplotlibUtil.no_png_metadata(), dpi=100)
         png_data = buf.getvalue()
         plt.close(fig)
 
@@ -122,4 +122,3 @@ class TestPngUtil:
 
 if __name__ == "__main__":
     pytest.main(__file__)
-

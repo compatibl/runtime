@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import pytest
-
-from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
 from cl.runtime.qa.regression_guard import RegressionGuard
+from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
 
 
 def test_single_group(work_dir_fixture):

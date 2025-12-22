@@ -15,7 +15,6 @@
 import pytest
 from pathlib import Path
 import pandas as pd
-from matplotlib import pyplot as plt
 from cl.runtime.plots.confusion_matrix_plot import ConfusionMatrixPlot
 from cl.runtime.qa.regression_guard import RegressionGuard
 
@@ -44,6 +43,7 @@ def test_dark_theme(work_dir_fixture):
 
     # Assert: Verify plot
     guard.verify()
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

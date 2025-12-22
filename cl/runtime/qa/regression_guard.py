@@ -19,9 +19,6 @@ from enum import Enum
 from typing import Any
 from typing import ClassVar
 from typing import Self
-
-from matplotlib.figure import Figure
-
 from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
 from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.qa.qa_util import QaUtil
@@ -361,7 +358,6 @@ class RegressionGuard:
                 value = _YAML_SERIALIZER.serialize(value)
         elif is_key_type(type(value)):
             value = _KEY_SERIALIZER.serialize(value)
-
 
         value_type = type(value)
         if value_type in primitive_types:

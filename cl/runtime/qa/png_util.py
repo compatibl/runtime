@@ -13,12 +13,12 @@
 # limitations under the License.
 
 import hashlib
+import struct
 from io import BytesIO
 from pathlib import Path
-from typing import Union, Any
-import struct
-from PIL import Image
+from typing import Any
 import numpy as np
+from PIL import Image
 
 
 class PngUtil:
@@ -26,26 +26,26 @@ class PngUtil:
 
     # PNG chunk types that contain metadata (should be excluded from comparison)
     METADATA_CHUNKS = {
-        b'tEXt',  # Textual data
-        b'zTXt',  # Compressed textual data
-        b'iTXt',  # International textual data
-        b'tIME',  # Last modification time
-        b'pHYs',  # Physical pixel dimensions
-        b'sPLT',  # Suggested palette
-        b'iCCP',  # ICC color profile
-        b'sRGB',  # Standard RGB color space
-        b'sBIT',  # Significant bits
-        b'gAMA',  # Image gamma
-        b'cHRM',  # Primary chromaticities
-        b'eXIf',  # Exif metadata
+        b"tEXt",  # Textual data
+        b"zTXt",  # Compressed textual data
+        b"iTXt",  # International textual data
+        b"tIME",  # Last modification time
+        b"pHYs",  # Physical pixel dimensions
+        b"sPLT",  # Suggested palette
+        b"iCCP",  # ICC color profile
+        b"sRGB",  # Standard RGB color space
+        b"sBIT",  # Significant bits
+        b"gAMA",  # Image gamma
+        b"cHRM",  # Primary chromaticities
+        b"eXIf",  # Exif metadata
     }
 
     # Critical chunks that define the actual image data (must be preserved)
     CRITICAL_CHUNKS = {
-        b'IHDR',  # Image header
-        b'PLTE',  # Palette
-        b'IDAT',  # Image data
-        b'IEND',  # Image end
+        b"IHDR",  # Image header
+        b"PLTE",  # Palette
+        b"IDAT",  # Image data
+        b"IEND",  # Image end
     }
 
     @staticmethod
@@ -65,12 +65,12 @@ class PngUtil:
 
         # Render figure to BytesIO buffer
         buffer = BytesIO()
-        fig.savefig(buffer, format='png', dpi=dpi, bbox_inches=bbox_inches, pad_inches=pad_inches, transparent=False)
+        fig.savefig(buffer, format="png", dpi=dpi, bbox_inches=bbox_inches, pad_inches=pad_inches, transparent=False)
         buffer.seek(0)
 
         # Load as pixel array
         with Image.open(buffer) as img:
-            img_rgba = img.convert('RGBA')
+            img_rgba = img.convert("RGBA")
             arr = np.array(img_rgba, dtype=np.uint8)
 
         buffer.close()
@@ -92,7 +92,7 @@ class PngUtil:
 
         # Load as pixel array
         with Image.open(png_source) as img:
-            img_rgba = img.convert('RGBA')
+            img_rgba = img.convert("RGBA")
             arr = np.array(img_rgba, dtype=np.uint8)
 
         # Calculate MD5 hash of pixel data
@@ -118,11 +118,11 @@ class PngUtil:
 
         # Load images as pixel arrays
         with Image.open(file1) as img1:
-            img1_rgba = img1.convert('RGBA')
+            img1_rgba = img1.convert("RGBA")
             arr1 = np.array(img1_rgba, dtype=np.uint8)
 
         with Image.open(file2) as img2:
-            img2_rgba = img2.convert('RGBA')
+            img2_rgba = img2.convert("RGBA")
             arr2 = np.array(img2_rgba, dtype=np.uint8)
 
         # Calculate MD5 hash of pixel data
@@ -130,11 +130,11 @@ class PngUtil:
         hash2 = hashlib.md5(arr2.tobytes()).hexdigest()
 
         return {
-            'match': hash1 == hash2,
-            'pixel_hash1': hash1,
-            'pixel_hash2': hash2,
-            'shape1': arr1.shape,
-            'shape2': arr2.shape,
+            "match": hash1 == hash2,
+            "pixel_hash1": hash1,
+            "pixel_hash2": hash2,
+            "shape1": arr1.shape,
+            "shape2": arr2.shape,
         }
 
     @classmethod
@@ -149,7 +149,7 @@ class PngUtil:
             bytes: PNG file with only critical and ancillary data chunks (no metadata)
         """
         # Verify PNG signature
-        if png_bytes[:8] != b'\x89PNG\r\n\x1a\n':
+        if png_bytes[:8] != b"\x89PNG\r\n\x1a\n":
             raise ValueError("Invalid PNG signature")
 
         # Start with PNG signature
@@ -161,31 +161,31 @@ class PngUtil:
             # Read chunk length (4 bytes, big-endian)
             if offset + 4 > len(png_bytes):
                 break
-            chunk_length = struct.unpack('>I', png_bytes[offset:offset + 4])[0]
+            chunk_length = struct.unpack(">I", png_bytes[offset : offset + 4])[0]
             offset += 4
 
             # Read chunk type (4 bytes)
             if offset + 4 > len(png_bytes):
                 break
-            chunk_type = png_bytes[offset:offset + 4]
+            chunk_type = png_bytes[offset : offset + 4]
             offset += 4
 
             # Read chunk data
             if offset + chunk_length > len(png_bytes):
                 break
-            chunk_data = png_bytes[offset:offset + chunk_length]
+            chunk_data = png_bytes[offset : offset + chunk_length]
             offset += chunk_length
 
             # Read CRC (4 bytes)
             if offset + 4 > len(png_bytes):
                 break
-            chunk_crc = png_bytes[offset:offset + 4]
+            chunk_crc = png_bytes[offset : offset + 4]
             offset += 4
 
             # Include chunk if it's not metadata
             if chunk_type not in cls.METADATA_CHUNKS:
                 # Write chunk length
-                result.extend(struct.pack('>I', chunk_length))
+                result.extend(struct.pack(">I", chunk_length))
                 # Write chunk type
                 result.extend(chunk_type)
                 # Write chunk data
@@ -194,7 +194,7 @@ class PngUtil:
                 result.extend(chunk_crc)
 
             # Stop at IEND chunk
-            if chunk_type == b'IEND':
+            if chunk_type == b"IEND":
                 break
 
         return bytes(result)
@@ -230,16 +230,15 @@ class PngUtil:
         hash2 = hashlib.md5(data2).hexdigest()
 
         return {
-            'match': hash1 == hash2,
-            'hash1': hash1,
-            'hash2': hash2,
-            'size1': len(data1),
-            'size2': len(data2),
+            "match": hash1 == hash2,
+            "hash1": hash1,
+            "hash2": hash2,
+            "size1": len(data1),
+            "size2": len(data2),
         }
 
     @classmethod
-    def compare_png_files(cls, file1: Union[str, Path], file2: Union[str, Path],
-                         exclude_metadata: bool = True) -> dict:
+    def compare_png_files(cls, file1: str | Path, file2: str | Path, exclude_metadata: bool = True) -> dict:
         """
         Compare two PNG files byte-by-byte.
 
@@ -251,10 +250,10 @@ class PngUtil:
         Returns:
             dict: Comparison result (see compare_png_bytes for details)
         """
-        with open(file1, 'rb') as f1:
+        with open(file1, "rb") as f1:
             png1 = f1.read()
 
-        with open(file2, 'rb') as f2:
+        with open(file2, "rb") as f2:
             png2 = f2.read()
 
         return cls.compare_png_bytes(png1, png2, exclude_metadata)
@@ -277,7 +276,7 @@ class PngUtil:
         return hashlib.md5(png_data).hexdigest()
 
     @classmethod
-    def get_png_file_checksum(cls, file_path: Union[str, Path], exclude_metadata: bool = True) -> str:
+    def get_png_file_checksum(cls, file_path: str | Path, exclude_metadata: bool = True) -> str:
         """
         Calculate MD5 checksum of a PNG file.
 
@@ -288,13 +287,13 @@ class PngUtil:
         Returns:
             str: Hexadecimal MD5 checksum
         """
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             png_data = f.read()
 
         return cls.get_png_checksum(png_data, exclude_metadata)
 
     @classmethod
-    def save_png_without_metadata(cls, input_path: Union[str, Path], output_path: Union[str, Path]) -> None:
+    def save_png_without_metadata(cls, input_path: str | Path, output_path: str | Path) -> None:
         """
         Save a PNG file with metadata chunks removed.
 
@@ -302,10 +301,10 @@ class PngUtil:
             input_path: Path to the input PNG file
             output_path: Path to save the output PNG file
         """
-        with open(input_path, 'rb') as f:
+        with open(input_path, "rb") as f:
             png_data = f.read()
 
         filtered_data = cls.extract_png_data_chunks(png_data)
 
-        with open(output_path, 'wb') as f:
+        with open(output_path, "wb") as f:
             f.write(filtered_data)
