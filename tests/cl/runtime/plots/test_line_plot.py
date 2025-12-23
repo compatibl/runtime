@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import pytest
+from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime.plots.stub_line_plots import StubLinePlots
 
@@ -27,7 +28,7 @@ def test_one_line(work_dir_fixture):
     plot = StubLinePlots.get_one_line_plot(plot_id="test_line_plot.test_one_line")
 
     # Act: Write plot to regression guard
-    guard.write(plot)
+    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()
@@ -43,7 +44,7 @@ def test_two_line(work_dir_fixture):
     plot = StubLinePlots.get_two_line_plot(plot_id="test_line_plot.test_two_line")
 
     # Act: Write plot to regression guard
-    guard.write(plot)
+    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()

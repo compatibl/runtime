@@ -19,8 +19,6 @@ from enum import Enum
 from typing import Any
 from typing import ClassVar
 from typing import Self
-from cl.runtime.plots.matplotlib_plot import MatplotlibPlot
-from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.protocols import MAPPING_TYPES
 from cl.runtime.records.protocols import SEQUENCE_TYPES
@@ -351,11 +349,7 @@ class RegressionGuard:
 
         # Convert to one of the supported output types
         if is_record_type(type(value)) or value.__class__ in SEQUENCE_TYPES or value.__class__ in MAPPING_TYPES:
-            if issubclass(type(value), MatplotlibPlot):
-                figure = value._create_figure()
-                value = PngUtil.get_pixel_hash_from_figure(figure)
-            else:
-                value = _YAML_SERIALIZER.serialize(value)
+            value = _YAML_SERIALIZER.serialize(value)
         elif is_key_type(type(value)):
             value = _KEY_SERIALIZER.serialize(value)
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import pytest
+from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime.plots.stub_group_bar_plots import StubGroupBarPlots
 
@@ -27,7 +28,7 @@ def test_single_group(work_dir_fixture):
     plot = StubGroupBarPlots.get_single_group_plot("test_group_bar_plot.group_bar_plot")
 
     # Act: Write plot to regression guard
-    guard.write(plot)
+    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()
@@ -48,7 +49,7 @@ def test_4_groups_2_bars(work_dir_fixture):
     plot = StubGroupBarPlots.get_4_groups_2_bars_plot("test_group_bar_plot.test_4_groups_2_bars")
 
     # Act: Write plot to regression guard
-    guard.write(plot)
+    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()
@@ -64,7 +65,7 @@ def test_4_groups_5_bars(work_dir_fixture):
     plot = StubGroupBarPlots.get_4_groups_5_bars("test_group_bar_plot.test_4_groups_5_bars")
 
     # Act: Write plot to regression guard
-    guard.write(plot)
+    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()

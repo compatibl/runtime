@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import pytest
+from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 
@@ -27,7 +28,7 @@ def test_basic(work_dir_fixture):
     plot = StubHeatMapPlots.get_basic_plot("test_heat_map_plot.test_basic")
 
     # Act: Write plot to regression guard
-    guard.write(plot)
+    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()
