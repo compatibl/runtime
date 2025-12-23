@@ -13,7 +13,8 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.qa.qa_client import QaClient
+
+from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.routers.task.run_response_util import RunResponseUtil
 from cl.runtime.routers.task.run_request import RunRequest
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic import StubPydantic
@@ -52,23 +53,13 @@ _handler_with_dict_result_request = RunRequest(
 )
 
 
-def _api_run(run_request: RunRequest):
-    """Execute run request with test API client."""
-    request_body = run_request.model_dump()
-
-    with QaClient() as test_client:
-        response = test_client.post("/task/run", json=request_body)
-        assert response.status_code == 200
-        return response.json()
-
-
 def test_method_simple_handler():
     response = RunResponseUtil.get_response(_simple_handler_request)
     assert response is None
 
 
 def test_api_simple_method():
-    response = _api_run(_simple_handler_request)
+    response = PytestUtil.api_task_run(_simple_handler_request)
     assert response is None
 
 
@@ -78,7 +69,7 @@ def test_method_handler_with_primitive_args_and_result():
 
 
 def test_api_handler_with_primitive_args_and_result():
-    response = _api_run(_handler_with_primitive_args_and_result_request)
+    response = PytestUtil.api_task_run(_handler_with_primitive_args_and_result_request)
     assert response == "Completed"
 
 
@@ -88,7 +79,7 @@ def test_method_handler_with_mixed_args_and_result():
 
 
 def test_api_handler_with_mixed_args_and_result():
-    response = _api_run(_handler_with_mixed_args_and_result_request)
+    response = PytestUtil.api_task_run(_handler_with_mixed_args_and_result_request)
     assert response == StubPydantic().build().model_dump(by_alias=True)
 
 
@@ -98,7 +89,7 @@ def test_method_handler_with_dict_result():
 
 
 def test_api_handler_with_dict_result():
-    response = _api_run(_handler_with_dict_result_request)
+    response = PytestUtil.api_task_run(_handler_with_dict_result_request)
     assert response is not None
 
 

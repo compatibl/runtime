@@ -16,8 +16,11 @@ import inspect
 from typing import Any
 from typing import Iterable
 from _pytest.fixtures import FixtureRequest
+
+from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.typename import typename
+from cl.runtime.routers.task.run_request import RunRequest
 
 
 class PytestUtil:
@@ -92,3 +95,13 @@ class PytestUtil:
         # Log information
         params_output = ",".join(f"{arg}={values[arg]}" for arg in args)
         logger.info(f"Called {method_name}({params_output})")
+
+    @classmethod
+    def api_task_run(cls, run_request: RunRequest):
+        """Execute task/run request with test API client."""
+        request_body = run_request.model_dump()
+
+        with QaClient() as test_client:
+            response = test_client.post("/task/run", json=request_body)
+            assert response.status_code == 200
+            return response.json()
