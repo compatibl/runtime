@@ -20,7 +20,6 @@ deployments/
 build/
 dist/
 logs/
-static/
 frontend-*/
 
 # Using regexp syntax
