@@ -1,0 +1,24 @@
+{
+  "projectType": "python",
+  "srcRoots": [
+    "."
+  ],
+  "testFolders": [
+    "."
+  ],
+  "exclude": [
+    "**/__pycache__": true,
+    "**/.cursor": true,
+    "**/.idea": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.venv": true,
+    "**/.vscode": true,
+    "**/frontend-*": true
+  ],
+  "pythonVersion": "3.11",
+  "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+  "env": {
+    "PYTHONPATH": "."
+  }
+}

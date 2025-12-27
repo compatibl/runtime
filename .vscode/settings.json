@@ -1,0 +1,29 @@
+{
+  "python.analysis.extraPaths": [
+    "."
+  ],
+  "python.envFile": ".",
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "."
+  },
+  "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.cursor": true,
+    "**/.idea": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.venv": true,
+    "**/.vscode": true,
+    "**/frontend-*": true
+  },
+  "python.testing.unittestEnabled": false,
+  "cursorpyright.analysis.extraPaths": [
+    "."
+  ],
+  "files.eol": "\r\n"
+}
