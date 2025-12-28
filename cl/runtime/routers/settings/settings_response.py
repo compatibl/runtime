@@ -17,7 +17,7 @@ import os
 from dataclasses import field
 from typing import Self
 from pydantic import BaseModel
-from cl.runtime._version import __api_schema_version__
+from cl.runtime import __version__
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
@@ -69,7 +69,7 @@ class SettingsResponse(BaseModel):
         alias_generator = CaseUtil.snake_to_pascal_case
         populate_by_name = True
 
-    schema_version: str = __api_schema_version__
+    schema_version: str = __version__
     """Version of the backend-frontend API contract (schema). Used to ensure compatibility between backend and frontend."""
 
     # TODO: Switch to the standard design pattern using Dynaconf
