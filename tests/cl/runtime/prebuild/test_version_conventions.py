@@ -22,10 +22,8 @@ from cl.runtime.settings.frontend_settings import FrontendSettings
 def test_version_conventions():
     """Prebuild test to that the version strings comply with CompatibL CalVer conventions."""
 
-    # Check package versions
-    env_packages = EnvSettings.instance().env_packages
-    for env_package in env_packages:
-        VersionUtil.guard_package_version(env_package)
+    # Check Python package versions
+    VersionUtil.guard_versions()
 
     # Check frontend version in settings.yaml, creating the instance performs version validation
     FrontendSettings.instance()

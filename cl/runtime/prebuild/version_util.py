@@ -11,132 +11,72 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from importlib.util import find_spec
 
-import os
-import importlib.util
-import re
-
-# Pattern to find version in setup.py file
-_SETUP_PY_VERSION_RE = r"""(?s)(?!^\s*#)\s*setuptools\.setup\s*\(.*?\bversion\s*=\s*(['"])(?P<version>[^'"]+)\1"""
-
-# Pattern to find version in _version.py file
-_VERSION_PY_VERSION_RE = r"""(?m)^\s*(?!#)\s*__version__\s*=\s*(['"])(?P<version>[^'"]+)\1"""
-
-# Pattern to find version in pyproject.toml file
-_PYPROJECT_TOML_VERSION_RE = r"""(?ms)^\[project\]\s*.*?^\s*(?!#)\s*version\s*=\s*(['"])(?P<version>[^'"]+)\1"""
+from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.version_settings import VersionSettings
 
 
 class VersionUtil:
     """Helper class for working with copyright headers and files."""
 
     @classmethod
-    def guard_package_version(cls, package: str, *, raise_on_fail: bool = True) -> bool:
+    def guard_versions(cls, raise_on_fail: bool = True) -> bool:
         """
-        Check that the versions in package are the same and matches the CompatibL Platform CalVer format.
+        Check that the version in each package follows the CompatibL Platform CalVer convention.
         """
-        try:
-            spec = importlib.util.find_spec(package)
-        except ImportError as error:
-            raise RuntimeError(f"Cannot import module: {error.name}. Check sys.path")
-
-        package_path = os.path.dirname(spec.origin)
-
-        # Get versions from different possible places in the package
-        setup_py_version = cls.find_version_in_setup_py(package_path)
-        version_py_version = cls.find_version_in_version_py(package_path)
-        pyproject_toml_version = cls.find_version_in_pyproject_toml(package_path)
-
-        # Verify that versions match each other
-        if setup_py_version == version_py_version == pyproject_toml_version:
-            # Valid if all versions are the same
-            is_valid = True
-        elif setup_py_version is None and version_py_version == pyproject_toml_version:
-            # setup_py_version is optional, so it is valid if setup_py_version is None and
-            # all other versions are the same
-            is_valid = True
-        else:
-            # Not valid in all other cases
-            is_valid = False
-
-        if not is_valid:
-            if raise_on_fail:
-                raise RuntimeError(
-                    f"Versions in package {package} is not valid.\n"
-                    f"The following versions were found:\n"
-                    f" - In pyproject.toml file: {pyproject_toml_version}\n"
-                    f" - In _version.py file: {version_py_version}\n"
-                    f" - In setup.py file [optional]: {setup_py_version}\n"
-                )
-            else:
-                return False
-
-        if all((setup_py_version is None, pyproject_toml_version is None, version_py_version is None)):
-            return True
-        else:
-            return cls.guard_version_string(pyproject_toml_version, raise_on_fail=raise_on_fail)
+        env_settings = EnvSettings.instance()
+        env_packages = env_settings.env_packages
+        for env_package in env_packages:
+            try:
+                # Import the package
+                package_spec = find_spec(env_package)
+                # Load __version__ from the package __init__.py
+                if package_spec and package_spec.loader:
+                    module = package_spec.loader.load_module()
+                    version = getattr(module, "__version__", None)
+                    if version is not None:
+                        cls.guard_version(version=version, package=env_package, raise_on_fail=raise_on_fail)
+                else:
+                    raise RuntimeError(f"Cannot find module: {env_package}. Check sys.path")
+            except ImportError as error:
+                raise RuntimeError(f"Cannot import module: {error.name}. Check sys.path")
 
     @classmethod
-    def guard_version_string(cls, ver: str, *, raise_on_fail: bool = True) -> bool:
-        """Check that the version string matches the CompatibL Platform CalVer format."""
-        tokens = ver.split(".")
-        is_valid = (
-            len(tokens) == 3 and
-            all(p.isdigit() and (p == '0' or not p.startswith('0')) for p in tokens)
-            and 2025 <= int(tokens[0]) <= 2999  # Four-digit year from 2025 to 2999
-            and 101 <= int(tokens[1]) <= 1231  # Month and day combined from 101 (Jan 1) to 1231 (Dec 31)
-        )
-        if is_valid:
+    def guard_version(cls, *, version: str, package: str, raise_on_fail: bool = True) -> bool:
+        """Check that the version string matches the CompatibL Platform CalVer convention."""
+
+        # Exit early if version format check is disabled
+        version_settings = VersionSettings.instance()
+        if not version_settings.version_format_check:
+            return True
+
+        # Evaluate each criterion and collect reasons for failure
+        tokens = version.split(".")
+        reasons = []
+        if len(tokens) != 3:
+            reasons.append(f"Version must have exactly 3 dot-delimited tokens but has {len(tokens)}")
+        if not all(p.isdigit() and (p == '0' or not p.startswith('0')) for p in tokens):
+            reasons.append(f"All tokens must be numbers without leading zeros, except when the value is zero")
+        if not(2000 <= int(tokens[0]) <= 2999):
+            reasons.append(f"YYYY token {tokens[0]} is not between 2000 and 2999")
+        if not(101 <= int(tokens[1]) <= 1231):
+            reasons.append(f"MMDD token {tokens[1]} is not between 101 (Jan 1) and 1231 (Dec 31)")
+        if not(0 <= int(tokens[2]) <= 2359):
+            reasons.append(f"HHMM token {tokens[2]} is not between 0000 (midnight) and 2359 (12:59pm)")
+
+        # Result is based on meeting all the criteria
+        if not reasons:
             return True
         elif raise_on_fail:
-            raise RuntimeError(f"Version string {ver} does not follow the CompatibL Platform\n"
-                               f"CalVar convention of YYYY.MDD.PATCH. Examples:\n"
-                               f" - 2023.101.0 for Jan 1, 2023 release\n"
-                               f" - 2023.501.1 for patch 1 to May 1, 2023 release\n")
+            reasons_str = "\n".join("  - " + reason for reason in reasons)
+            raise RuntimeError(f"Version string {version} for package {package} does not follow\n"
+                               f"the YYYY.MMDD.HHMM CalVer format with no leading zeroes.\n"
+                               f"\nReasons:\n"
+                               f"{reasons_str}\n"
+                               f"\nExamples:\n"
+                               f" - 2003.501.0 for May 1, 2003 release at midnight\n"
+                               f" - 2003.1231.2359 for Dec 31, 2003 release at 11:59pm\n"
+                               f"\nTo disable, set version_format_check to False in settings.yaml.\n")
         else:
             return False
-
-    @classmethod
-    def _find_version_in_file(cls, file_path: str, version_re: str) -> str | None:
-        """
-        Find version in file_path using version_re.
-        Return None if file doesn't exist or version is not found.
-        Raise RuntimeError if found more than one version.
-        """
-        if not os.path.isfile(file_path):
-            # Return None if file not found
-            return None
-
-        version_re = re.compile(version_re)
-
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
-
-        matches = version_re.findall(content)
-
-        if not matches:
-            return None
-
-        if len(matches) > 1:
-            versions = [m[1] for m in matches]
-            raise RuntimeError(f"Multiple versions found in {file_path}: {versions}")
-
-        # matches[0] = (quote, version)
-        return matches[0][1]
-
-    @classmethod
-    def find_version_in_setup_py(cls, package_path: str) -> str | None:
-        """Find exactly one version="..." in setup.py."""
-        setup_py_path = os.path.join(os.path.dirname(os.path.dirname(package_path)), "setup.py")
-        return cls._find_version_in_file(setup_py_path, _SETUP_PY_VERSION_RE)
-
-    @classmethod
-    def find_version_in_version_py(cls, package_path: str) -> str | None:
-        """Find exactly one __version__ = "..." in _version.py."""
-        version_py_path = os.path.join(package_path, "_version.py")
-        return cls._find_version_in_file(version_py_path, _VERSION_PY_VERSION_RE)
-
-    @classmethod
-    def find_version_in_pyproject_toml(cls, package_path: str) -> str | None:
-        """Find exactly one version = "..." in pyproject.toml."""
-        pyproject_toml_path = os.path.join(os.path.dirname(os.path.dirname(package_path)), "pyproject.toml")
-        return cls._find_version_in_file(pyproject_toml_path, _PYPROJECT_TOML_VERSION_RE)
