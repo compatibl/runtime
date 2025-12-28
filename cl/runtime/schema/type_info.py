@@ -28,6 +28,7 @@ from typing import Sequence
 from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -41,7 +42,6 @@ from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.typename import qualname
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_kind import TypeKind
-from cl.runtime.file.project_layout import ProjectLayout
 
 _TYPE_INFO_HEADERS = (
     "TypeName",

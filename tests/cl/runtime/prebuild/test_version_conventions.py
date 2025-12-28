@@ -13,9 +13,7 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.prebuild.version_util import VersionUtil
-from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.frontend_settings import FrontendSettings
 
 

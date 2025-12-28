@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import os
-from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.settings.env_settings import EnvSettings
 
 
 class InitFileUtil:

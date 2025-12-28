@@ -13,13 +13,14 @@
 # limitations under the License.
 
 import os
-
 from fastapi.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
-from starlette.types import Scope, Receive, Send
+from starlette.types import Receive
+from starlette.types import Scope
+from starlette.types import Send
 from cl.runtime.settings.frontend_settings import FrontendSettings
 
-_FALLBACK_HTML= """<!DOCTYPE html>
+_FALLBACK_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -96,6 +97,7 @@ _NO_VERSION_HTML = """
 """
 
 _FALLBACK_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 class FallbackStaticFiles(StaticFiles):
     """Static files handler that serves a fallback index.html page when directory 'static' is not found."""

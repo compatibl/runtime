@@ -15,14 +15,14 @@
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Sequence, final
+from typing import Sequence
+from typing import final
 from cl.runtime.contexts.context_manager import active_or_default
 from cl.runtime.db.db_key import DbKey
 from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.db.save_policy import SavePolicy
 from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.record_mixin import TRecord
@@ -203,7 +203,7 @@ class Db(DbKey, RecordMixin, ABC):
             tenant: Unique tenant identifier, tenants are isolated when sharing the same DB
             restrict_to: Include only this type and its subtypes, skip other types
         """
-        
+
     @abstractmethod
     def close_connection(self) -> None:  # TODO: !!! Check if this should be done using a context manager instead
         """Close database connection to releasing resource locks."""
@@ -255,12 +255,15 @@ class Db(DbKey, RecordMixin, ABC):
         elif env_kind == EnvKind.PROD:
             raise RuntimeError(
                 f"Dropping DB from code is not allowed even with user approval for env_kind={env_kind.name}.\n"
-                f"Contact your DB admin for assistance.")
+                f"Contact your DB admin for assistance."
+            )
         else:
             raise ErrorUtil.enum_value_error(env_kind, EnvKind)
 
     @classmethod
-    def create(cls, *, db_type: type | None = None, db_id: str | None = None):  # TODO: !!!!! Replace by the standard way to create from settings
+    def create(
+        cls, *, db_type: type | None = None, db_id: str | None = None
+    ):  # TODO: !!!!! Replace by the standard way to create from settings
         """Create DB of the specified type, or use DB type from context settings if not specified."""
 
         # Get DB settings instance for the lookup of defaults

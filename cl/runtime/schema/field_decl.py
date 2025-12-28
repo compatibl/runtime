@@ -21,7 +21,10 @@ from uuid import UUID
 import numpy
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import PRIMITIVE_TYPES, SEQUENCE_TYPES, MAPPING_TYPES, NDARRAY_TYPES
+from cl.runtime.records.protocols import MAPPING_TYPES
+from cl.runtime.records.protocols import NDARRAY_TYPES
+from cl.runtime.records.protocols import PRIMITIVE_TYPES
+from cl.runtime.records.protocols import SEQUENCE_TYPES
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
@@ -144,7 +147,9 @@ class FieldDecl(DataclassMixin):
                         f"different element types.\n"
                     )
             # Process all other sequence types which do not use ellipsis
-            elif field_origin in SEQUENCE_TYPES + NDARRAY_TYPES:  # TODO: !! Numpy arrays may need to be treated separately
+            elif (
+                field_origin in SEQUENCE_TYPES + NDARRAY_TYPES
+            ):  # TODO: !! Numpy arrays may need to be treated separately
                 # All sequence types are treated as ContainerKind.LIST in declarations
                 container = ContainerDecl(container_kind=ContainerKind.LIST)
                 # Perform additional checks for sequence types that do not use ellipsis

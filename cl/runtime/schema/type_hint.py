@@ -18,8 +18,12 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Self
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
-from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES, SEQUENCE_TYPES, MAPPING_TYPES, NDARRAY_TYPE_NAMES, \
-    NDARRAY_TYPES, CONTAINER_TYPE_NAMES, CONTAINER_TYPES
+from cl.runtime.records.protocols import CONTAINER_TYPE_NAMES
+from cl.runtime.records.protocols import CONTAINER_TYPES
+from cl.runtime.records.protocols import MAPPING_TYPES
+from cl.runtime.records.protocols import NDARRAY_TYPES
+from cl.runtime.records.protocols import PRIMITIVE_TYPE_NAMES
+from cl.runtime.records.protocols import SEQUENCE_TYPES
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.records.protocols import is_ndarray_type
@@ -239,7 +243,7 @@ class TypeHint(BootstrapMixin):
                             f"Type hint '{cls._serialize_type_alias(type_alias)}'\n"
                             f"for field {field_name} in {typename(containing_type)} is not supported\n"
                             f"because it has more than one type parameter in square brackets."
-                    )
+                        )
                     # Populate container data and extract inner type alias
                     type_alias = type_alias_args[0]
                     type_hint_tokens.append(

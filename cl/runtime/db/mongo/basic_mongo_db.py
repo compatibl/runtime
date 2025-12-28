@@ -451,7 +451,6 @@ class BasicMongoDb(Db):
         db_name = self._get_db_name()
         client.drop_database(db_name)
 
-
     def close_connection(self) -> None:
         # TODO: Review the use of this method and when it is invoked
         self._get_mongo_client().close()

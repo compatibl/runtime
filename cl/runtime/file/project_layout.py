@@ -294,4 +294,3 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
         # Return as a normalized path string
         result = os.path.normpath(result)
         return result
-

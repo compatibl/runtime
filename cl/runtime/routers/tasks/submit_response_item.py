@@ -14,12 +14,12 @@
 
 from __future__ import annotations
 from pydantic import BaseModel
+from cl.runtime.auth.user_secrets import UserSecrets
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.routers.tasks.submit_request import SubmitRequest
-from cl.runtime.auth.user_secrets import UserSecrets
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_queue import TaskQueue

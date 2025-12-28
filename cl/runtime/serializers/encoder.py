@@ -16,7 +16,6 @@ from abc import ABC
 from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Any
-
 from cl.runtime.primitive.char_util import CharUtil
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 
@@ -37,10 +36,7 @@ class Encoder(DataclassMixin, ABC):
         """Recursively normalize serialized data (dicts, lists, strings) for character encoding."""
         if isinstance(data, dict):
             # Recursively normalize dictionary keys and values
-            return {
-                CharUtil.normalize(k): self.normalize(v)
-                for k, v in data.items()
-            }
+            return {CharUtil.normalize(k): self.normalize(v) for k, v in data.items()}
         elif isinstance(data, list):
             # Recursively normalize list items
             return [self.normalize(item) for item in data]

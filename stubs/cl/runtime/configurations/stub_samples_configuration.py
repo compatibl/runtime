@@ -118,7 +118,9 @@ class StubSamplesConfiguration(Configuration):
         active(DataSource).replace_many(
             (
                 StubGroupBarPlots.get_single_group_plot(self.configuration_id + "stub_group_bar_plots.single_group"),
-                StubGroupBarPlots.get_4_groups_2_bars_plot(self.configuration_id + "stub_group_bar_plots.4_groups_2_bars"),
+                StubGroupBarPlots.get_4_groups_2_bars_plot(
+                    self.configuration_id + "stub_group_bar_plots.4_groups_2_bars"
+                ),
                 StubGroupBarPlots.get_4_groups_5_bars(self.configuration_id + "stub_group_bar_plots.4_groups_5_bars"),
             ),
             commit=True,

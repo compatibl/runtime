@@ -22,12 +22,12 @@ from typing import Self
 from dotenv import find_dotenv
 from dotenv import load_dotenv
 from dynaconf import Dynaconf
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.typename import typename
-from cl.runtime.file.project_layout import ProjectLayout
 
 # Load dotenv first (the priority order is envvars first, then dotenv, then settings.yaml and .secrets.yaml)
 load_dotenv()

@@ -13,14 +13,14 @@
 # limitations under the License.
 
 from fastapi import APIRouter
-from starlette.responses import RedirectResponse, HTMLResponse
-
-from cl.runtime.fallback.fallback_static_files import FallbackStaticFiles
 from starlette import status
-
+from starlette.responses import HTMLResponse
+from starlette.responses import RedirectResponse
+from cl.runtime.fallback.fallback_static_files import FallbackStaticFiles
 from cl.runtime.settings.frontend_settings import FrontendSettings
 
 router = APIRouter()
+
 
 def get_index_html_or_none() -> str | None:
     """Return the index.html content dynamically."""
@@ -31,8 +31,10 @@ def get_index_html_or_none() -> str | None:
     else:
         return None
 
+
 _INDEX_HTML = None
 """Content of index.html if static frontend files are installed, otherwise None."""
+
 
 @router.get(
     path="/",
@@ -45,6 +47,7 @@ async def get_app_index_root():
     If static files are not installed, generate fallback index.html.
     """
     return RedirectResponse("/app", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
 
 @router.get(
     path="/app{_:path}",

@@ -15,14 +15,12 @@
 from dataclasses import dataclass
 from itertools import chain
 from typing import Sequence
-
 from more_itertools import consume
 from typing_extensions import final
 from cl.runtime.configurations.configuration import Configuration
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_reader import CsvReader
-from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.preload_settings import PreloadSettings
 
 
@@ -79,10 +77,8 @@ class PreloadConfiguration(Configuration):
 
             # Execute run_configure on all preloaded Configuration records with autorun=True
             autorun_configurations = [
-                record for record in records
-                if isinstance(record, Configuration) and record.autorun
+                record for record in records if isinstance(record, Configuration) and record.autorun
             ]
 
             # Execute their run_configure methods
             consume(autorun_configuration.run_configure() for autorun_configuration in autorun_configurations)
-

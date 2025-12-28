@@ -15,14 +15,11 @@
 import logging.config
 import os
 import webbrowser
-from pathlib import Path
-
 import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse, HTMLResponse, RedirectResponse
+from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-
 from cl.runtime.configurations.preload_configuration import PreloadConfiguration
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
@@ -40,7 +37,6 @@ from cl.runtime.server.env import Env
 from cl.runtime.server.shutdown_aware_server import ShutdownAwareServer
 from cl.runtime.settings.api_settings import ApiSettings
 from cl.runtime.settings.celery_settings import CelerySettings
-from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.frontend_settings import FrontendSettings

@@ -13,14 +13,12 @@
 # limitations under the License.
 
 import logging
-
 from cl.runtime.configurations.preload_configuration import PreloadConfiguration
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.tenant_key import TenantKey
 from cl.runtime.events.event_broker import EventBroker
-from cl.runtime.settings.preload_settings import PreloadSettings
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 
 _logger = logging.getLogger(__name__)

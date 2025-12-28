@@ -17,8 +17,6 @@ import os
 import shutil
 from typing import Iterable
 import pandas as pd
-from cl.runtime.contexts.context_manager import active
-from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.csv_reader import CsvReader
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.builder_checks import BuilderChecks

@@ -129,5 +129,6 @@ def test_get_type_from_filename():
     result = FileUtil.get_type_from_filename("/path/to/invalid_name.json", error=False)
     assert result is None
 
+
 if __name__ == "__main__":
     pytest.main([__file__])

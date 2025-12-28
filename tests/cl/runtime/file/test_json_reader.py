@@ -13,16 +13,15 @@
 # limitations under the License.
 
 import pytest
-import os
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.json_reader import JsonReader
 from cl.runtime.qa.qa_util import QaUtil
-from stubs.cl.runtime import StubDataclassComposite, StubDataclass
+from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime import StubDataclassComposite
 from stubs.cl.runtime import StubDataclassDerived
 from stubs.cl.runtime import StubDataclassKey
 from stubs.cl.runtime import StubDataclassNestedFields
-
 
 TEST_INPUTS = [
     "StubDataclass.json",
@@ -32,29 +31,30 @@ TEST_INPUTS = [
     "StubDataclassSingle.json",
 ]
 
-EXPECTED_OUTPUTS = [
-    StubDataclassDerived(
-        id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}"
-    ) for i in range(1, 3)
-] + [
-    StubDataclassComposite(
-        primitive=f"nested_primitive_{i}",
-        embedded_1=StubDataclassKey(id=f"embedded_key_id_{i}a"),
-        embedded_2=StubDataclassKey(id=f"embedded_key_id_{i}b"),
-    ) for i in range(1, 4)
-] + [
-    StubDataclassNestedFields(),
-    StubDataclassDerived(
-        id=f"with_type",
-        derived_str_field=f"explicit_type_value"
-    ),
-    StubDataclass(
-        id=f"without_type",
-    ),
-    StubDataclass(
-        id=f"single_record",
-    )
-]
+EXPECTED_OUTPUTS = (
+    [
+        StubDataclassDerived(id=f"derived_id_{i}", derived_str_field=f"test_derived_str_field_value_{i}")
+        for i in range(1, 3)
+    ]
+    + [
+        StubDataclassComposite(
+            primitive=f"nested_primitive_{i}",
+            embedded_1=StubDataclassKey(id=f"embedded_key_id_{i}a"),
+            embedded_2=StubDataclassKey(id=f"embedded_key_id_{i}b"),
+        )
+        for i in range(1, 4)
+    ]
+    + [
+        StubDataclassNestedFields(),
+        StubDataclassDerived(id=f"with_type", derived_str_field=f"explicit_type_value"),
+        StubDataclass(
+            id=f"without_type",
+        ),
+        StubDataclass(
+            id=f"single_record",
+        ),
+    ]
+)
 
 
 def test_json_reader(default_db_fixture):
@@ -77,4 +77,3 @@ def test_json_reader(default_db_fixture):
 
 if __name__ == "__main__":
     pytest.main([__file__])
-

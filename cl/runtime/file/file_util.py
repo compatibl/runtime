@@ -17,7 +17,6 @@ import re
 from fnmatch import fnmatch
 from typing import Sequence
 from typing import TypeGuard
-
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.schema.type_info import TypeInfo
 
@@ -196,8 +195,5 @@ class FileUtil:
             # Raise or return None based on error flag
             record_type = None
             if error:
-                raise RuntimeError(
-                    f"Filename '{filename_without_extension}' is not a valid type. "
-                    f"Error: {e}"
-                )
+                raise RuntimeError(f"Filename '{filename_without_extension}' is not a valid type. " f"Error: {e}")
         return record_type

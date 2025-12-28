@@ -15,15 +15,13 @@
 from dataclasses import dataclass
 from getpass import getuser
 from typing_extensions import final
-from cl.runtime.exceptions.error_util import ErrorUtil
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.identifier_util import IdentifierUtil
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.typename import typename
 from cl.runtime.settings.env_kind import EnvKind
-from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.settings import Settings
 from cl.runtime.settings.settings_util import SettingsUtil
 
@@ -82,8 +80,7 @@ class EnvSettings(Settings):
             )
         elif not type(self.env_kind) is EnvKind:
             raise RuntimeError(
-                f"The value of env_kind={self.env_kind} in {typename(type(self))}\n"
-                f"is not a string or EnvKind enum."
+                f"The value of env_kind={self.env_kind} in {typename(type(self))}\n" f"is not a string or EnvKind enum."
             )
 
         dynaconf_env_mapping = {
@@ -104,9 +101,9 @@ class EnvSettings(Settings):
                     f"but current_env={actual_dynaconf_env} was found.\n"
                 )
         else:
-            env_kind_choices_str = '\n'.join([
-                CaseUtil.upper_to_pascal_case(e.name) for e in dynaconf_env_mapping.keys()
-            ])
+            env_kind_choices_str = "\n".join(
+                [CaseUtil.upper_to_pascal_case(e.name) for e in dynaconf_env_mapping.keys()]
+            )
             raise RuntimeError(f"Unsupported env_kind={self.env_kind}, valid choices are:\n{env_kind_choices_str}\n")
 
         if self.env_id is None:

@@ -12,20 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import collections
-from typing import Sequence, MutableSequence, Mapping, MutableMapping
-
 import pytest
+import collections
 import datetime as dt
+from typing import Mapping
+from typing import MutableMapping
+from typing import MutableSequence
+from typing import Sequence
 from uuid import UUID
 import numpy as np
 from bson import Int64
 from frozendict import frozendict
-
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import FloatArray, SEQUENCE_TYPES, MAPPING_TYPES, NDARRAY_TYPES
+from cl.runtime.records.protocols import MAPPING_TYPES
+from cl.runtime.records.protocols import NDARRAY_TYPES
+from cl.runtime.records.protocols import SEQUENCE_TYPES
+from cl.runtime.records.protocols import FloatArray
 from cl.runtime.records.protocols import FloatCube
 from cl.runtime.records.protocols import FloatMatrix
 from cl.runtime.records.protocols import FloatVector
@@ -133,7 +137,7 @@ def test_functions():
         *record_types,
         *sequence_types_and_aliases,
         *mapping_types_and_aliases,
-        *ndarray_types_and_aliases
+        *ndarray_types_and_aliases,
     )
 
     # Test is_primitive_type

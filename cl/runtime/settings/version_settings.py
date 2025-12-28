@@ -14,7 +14,6 @@
 
 from dataclasses import dataclass
 from typing_extensions import final
-
 from cl.runtime.records.typename import typenameof
 from cl.runtime.settings.settings import Settings
 

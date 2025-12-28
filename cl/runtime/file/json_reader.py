@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from typing import Any, Sequence
-
+from typing import Any
+from typing import Sequence
 from cl.runtime.file.file_util import FileUtil
 from cl.runtime.file.reader import Reader
 from cl.runtime.records.record_mixin import RecordMixin
@@ -62,9 +62,7 @@ class JsonReader(Reader):
                     elif isinstance(json_data, list):
                         object_dicts = json_data
                     else:
-                        raise RuntimeError(
-                            "JSON file must contain either a JSON object or an array of JSON objects."
-                        )
+                        raise RuntimeError("JSON file must contain either a JSON object or an array of JSON objects.")
 
                     invalid_objects = {
                         index
@@ -81,12 +79,13 @@ class JsonReader(Reader):
                         )
 
                     # Deserialize rows into records and add to the result
-                    loaded = [self._deserialize_object(record_type=record_type, object_dict=object_dict)
-                              for object_dict in object_dicts]
+                    loaded = [
+                        self._deserialize_object(record_type=record_type, object_dict=object_dict)
+                        for object_dict in object_dicts
+                    ]
                     result.extend(loaded)
             except Exception as e:
-                raise RuntimeError(f"Failed to upload JSON file {file_path}.\n"
-                                   f"Error: {e}") from e
+                raise RuntimeError(f"Failed to upload JSON file {file_path}.\n" f"Error: {e}") from e
 
         # Convert to tuple and return
         return tuple(result)
@@ -101,7 +100,7 @@ class JsonReader(Reader):
             Deserialized record.
         Raises:
             RuntimeError: If record type cannot be determined or deserialization fails.
-         """
+        """
 
         # First, check if _type is provided in the JSON object
         # If _type is provided and valid, use it and ignore record_type from filename.

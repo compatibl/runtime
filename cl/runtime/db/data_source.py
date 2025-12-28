@@ -15,11 +15,11 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Self, final
+from typing import Self
 from typing import Sequence
 from typing import cast
+from typing import final
 from more_itertools import consume
-
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source_key import DataSourceKey
 from cl.runtime.db.dataset import Dataset

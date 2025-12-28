@@ -17,19 +17,19 @@ import datetime as dt
 from enum import Enum
 from inspect import isabstract
 from types import GenericAlias
-from typing import Any, get_origin
+from typing import Any
 from typing import Mapping
 from typing import MutableMapping
 from typing import MutableSequence
 from typing import Sequence
 from typing import TypeGuard
 from typing import TypeVar
+from typing import get_origin
 from uuid import UUID
 import numpy as np
 from bson import Int64
 from frozendict import frozendict
 from numpy._typing import NDArray
-
 from cl.runtime.records.typename import typename
 
 PRIMITIVE_TYPES = (
@@ -135,9 +135,9 @@ def is_type(type_: type) -> TypeGuard[type | GenericAlias]:
     if type_ is not None:
         # Recursively call is_type on origin until it is None
         return (
-                isinstance(type_, type) or
-                ((type_name := getattr(type_, "__name__", None)) is not None and type_name in CONTAINER_TYPE_NAMES) or
-                is_type(get_origin(type_))
+            isinstance(type_, type)
+            or ((type_name := getattr(type_, "__name__", None)) is not None and type_name in CONTAINER_TYPE_NAMES)
+            or is_type(get_origin(type_))
         )
     else:
         # Original argument is None or no longer a generic alias and origin is None

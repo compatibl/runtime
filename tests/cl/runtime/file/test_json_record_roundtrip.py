@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import pytest
-import orjson
 import os
 import shutil
 from typing import Iterable
+import orjson
 from cl.runtime.file.json_reader import JsonReader
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.builder_checks import BuilderChecks
@@ -202,5 +202,3 @@ def test_roundtrip_mixed_types():
 
 if __name__ == "__main__":
     pytest.main([__file__])
-
-

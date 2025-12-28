@@ -15,13 +15,12 @@
 import logging
 import os
 import shutil
+import tarfile
 import tempfile
 import urllib.request
 import zipfile
-import tarfile
 from dataclasses import dataclass
 from typing_extensions import final  # TODO: Replace by the import from typing
-
 from cl.runtime.contexts.os_util import OsUtil
 from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.prebuild.version_util import VersionUtil
