@@ -82,9 +82,8 @@ dependencies = [
     "websockets>=10.4",
     "xmltodict>=0.12.0",
 ]
-urls = {
-    "Repository" = "https://github.com/compatibl/runtime",
-}
+[project.urls]
+"Repository" = "https://github.com/compatibl/runtime"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cl/runtime"]
