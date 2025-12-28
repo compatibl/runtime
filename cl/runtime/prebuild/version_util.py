@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from importlib.util import find_spec
 
+from importlib.util import find_spec
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.version_settings import VersionSettings
 
@@ -36,11 +36,16 @@ class VersionUtil:
                     module = package_spec.loader.load_module()
                     version = getattr(module, "__version__", None)
                     if version is not None:
-                        cls.guard_version(version=version, package=env_package, raise_on_fail=raise_on_fail)
+                        if not cls.guard_version(version=version, package=env_package, raise_on_fail=raise_on_fail):
+                            # Version check failed, return False if exception was not raised by guard_version
+                            return False
                 else:
                     raise RuntimeError(f"Cannot find module: {env_package}. Check sys.path")
             except ImportError as error:
                 raise RuntimeError(f"Cannot import module: {error.name}. Check sys.path")
+
+        # All versions passed the checks
+        return True
 
     @classmethod
     def guard_version(cls, *, version: str, package: str, raise_on_fail: bool = True) -> bool:
@@ -56,13 +61,13 @@ class VersionUtil:
         reasons = []
         if len(tokens) != 3:
             reasons.append(f"Version must have exactly 3 dot-delimited tokens but has {len(tokens)}")
-        if not all(p.isdigit() and (p == '0' or not p.startswith('0')) for p in tokens):
+        if not all(p.isdigit() and (p == "0" or not p.startswith("0")) for p in tokens):
             reasons.append(f"All tokens must be numbers without leading zeros, except when the value is zero")
-        if not(2000 <= int(tokens[0]) <= 2999):
+        if not (2000 <= int(tokens[0]) <= 2999):
             reasons.append(f"YYYY token {tokens[0]} is not between 2000 and 2999")
-        if not(101 <= int(tokens[1]) <= 1231):
+        if not (101 <= int(tokens[1]) <= 1231):
             reasons.append(f"MMDD token {tokens[1]} is not between 101 (Jan 1) and 1231 (Dec 31)")
-        if not(0 <= int(tokens[2]) <= 2359):
+        if not (0 <= int(tokens[2]) <= 2359):
             reasons.append(f"HHMM token {tokens[2]} is not between 0000 (midnight) and 2359 (12:59pm)")
 
         # Result is based on meeting all the criteria
@@ -70,13 +75,15 @@ class VersionUtil:
             return True
         elif raise_on_fail:
             reasons_str = "\n".join("  - " + reason for reason in reasons)
-            raise RuntimeError(f"Version string {version} for package {package} does not follow\n"
-                               f"the YYYY.MMDD.HHMM CalVer format with no leading zeroes.\n"
-                               f"\nReasons:\n"
-                               f"{reasons_str}\n"
-                               f"\nExamples:\n"
-                               f" - 2003.501.0 for May 1, 2003 release at midnight\n"
-                               f" - 2003.1231.2359 for Dec 31, 2003 release at 11:59pm\n"
-                               f"\nTo disable, set version_format_check to False in settings.yaml.\n")
+            raise RuntimeError(
+                f"Version string {version} for package {package} does not follow\n"
+                f"the YYYY.MMDD.HHMM CalVer format with no leading zeroes.\n"
+                f"\nReasons:\n"
+                f"{reasons_str}\n"
+                f"\nExamples:\n"
+                f" - 2003.501.0 for May 1, 2003 release at midnight\n"
+                f" - 2003.1231.2359 for Dec 31, 2003 release at 11:59pm\n"
+                f"\nTo disable, set version_format_check to False in settings.yaml.\n"
+            )
         else:
             return False
