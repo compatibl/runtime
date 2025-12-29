@@ -256,8 +256,9 @@ class DataSerializer(Serializer):
             if is_mapping_type(type(data)):
                 # Attempt to extract type information from the mapping data
                 if (type_name := data.get(self.type_field, None) if data else None) is not None:
-                    # Type name is specified, look up the class
-                    type_spec = TypeSchema.for_type_name(type_name)
+                    # Type name is specified, convert to Python type and look up the class
+                    type_ = TypeInfo.from_type_name(type_name)
+                    type_spec = TypeSchema.for_type(type_)
                     type_hint = TypeHint.for_type(type_spec.type_)
                     # Recursive call is needed because of nested containers
                     return self.deserialize(data, type_hint)

@@ -21,6 +21,7 @@ from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.records.typename import typename
 from cl.runtime.records.typename import typenameof
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
+from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.slots_util import SlotsUtil
 from cl.runtime.settings.settings import Settings
 
@@ -179,7 +180,7 @@ class SettingsUtil:
 
         # Get a dict with all fields that have the prefix
         field_names = SlotsUtil.get_field_names(type(settings))
-        result_dict = {x.removeprefix(prefix): getattr(settings, x, None) for x in field_names if x.startswith(prefix)}
+        result_dict = {x: getattr(settings, x, None) for x in field_names if x.startswith(prefix)}
 
         # Remove all values that are None
         result_dict = {k: v for k, v in result_dict.items() if v is not None}
@@ -197,7 +198,7 @@ class SettingsUtil:
                 )
 
             # Deserialize based on _type
-            result = _SERIALIZER.deserialize(result_dict).build()
+            result = DataSerializers.DEFAULT.deserialize(result_dict).build()
             return result
         else:
             # None of the fields with the specified prefix are set, return None
