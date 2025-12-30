@@ -1,3 +1,4 @@
+__version__ = "2025.1230.200"
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields import StubDataclassOptionalFields
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 from stubs.cl.runtime.records.enum.stub_relabeled_int_enum import StubRelabeledIntEnum
