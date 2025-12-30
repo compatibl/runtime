@@ -16,9 +16,12 @@ import importlib
 import os
 from dataclasses import field
 from typing import Self
+
+from frozendict import frozendict
 from pydantic import BaseModel
 from cl.runtime import __version__
 from cl.runtime.contexts.context_manager import active
+from cl.runtime.prebuild.version_util import VersionUtil
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import optional
@@ -29,27 +32,9 @@ from cl.runtime.settings.env_settings import EnvSettings
 SESSION_ID = Timestamp.create()
 
 
-def _collect_package_versions() -> dict[str, str]:
-    """
-    Collects versions of all packages listed in EnvSettings.
-
-    Returns:
-        dict: Mapping of package names to their version strings.
-    """
-    result = {}
-    packages = EnvSettings.instance().env_packages
-
-    for package in packages:
-        version = "0.1.0"  # TODO: Use another code for the default version
-        try:
-            version = importlib.metadata.version(package)
-        except Exception:
-            module = importlib.import_module(package)
-            if hasattr(module, "__version__") and module.__version__:
-                version = str(module.__version__)
-        result[package] = version
-
-    return result
+def _collect_package_versions() -> frozendict[str, str]:
+    """Get versions of all packages listed in EnvSettings and validate version formats."""
+    return VersionUtil.get_version_dict(version_format_check=True)
 
 
 def _get_envs() -> list[EnvInfo]:

@@ -21,7 +21,7 @@ def test_version_conventions():
     """Prebuild test to that the version strings comply with CompatibL CalVer conventions."""
 
     # Check Python package versions
-    VersionUtil.guard_versions()
+    VersionUtil.guard_version_dict(VersionUtil.get_version_dict(), raise_on_fail=True)
 
     # Check frontend version in settings.yaml, creating the instance performs version validation
     FrontendSettings.instance()
