@@ -2,7 +2,7 @@
 default:
 
   # Documented in PackageSettings class
-  package_dirs:
+  package_source_dirs:
     cl.runtime: .
     stubs.cl.runtime: .
 

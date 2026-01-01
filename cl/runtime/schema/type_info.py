@@ -199,7 +199,7 @@ class TypeInfo(BootstrapMixin):
         result = cls._type_info_dict.get(type_name)
         if not result:
             raise RuntimeError(
-                f"Type name {type_name} is not found in package_dirs or TypeInfo requires rebuild."
+                f"Type name {type_name} is not found in package_source_dirs or TypeInfo requires rebuild."
             )
 
         # Invoking build imports the class and updates type_info.type_ in cache so it does not have to be imported again

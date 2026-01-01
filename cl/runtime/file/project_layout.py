@@ -119,7 +119,7 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
         Source code root directory (the entry in PYTHONPATH) for the specified package.
 
         Notes:
-            Error if the directory does not contains __init__.py
+            Error if the directory does not contain __init__.py
 
         Args:
             package: Dot-delimited package root, e.g. 'cl.runtime'
@@ -155,7 +155,7 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
         Stubs root directory for the specified package.
 
         Notes:
-            Error if the directory does not contains __init__.py
+            Error if the directory does not contain __init__.py
 
         Args:
             package: Dot-delimited package root, e.g. 'cl.runtime'
