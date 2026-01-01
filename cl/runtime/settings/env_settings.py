@@ -62,9 +62,6 @@ class EnvSettings(Settings):
     - env_tenant
     """
 
-    env_packages: tuple[str, ...] = required()
-    """List of packages to load in dot-delimited format, for example 'cl.runtime' or 'stubs.cl.runtime'."""
-
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
@@ -154,5 +151,3 @@ class EnvSettings(Settings):
         # Check env_dir for safety after the substitution
         IdentifierUtil.guard_valid_identifier(self.env_dir, allow_directory_separators=True)
 
-        # Convert the list of packages to tuple
-        self.env_packages = SettingsUtil.to_str_tuple(self.env_packages)

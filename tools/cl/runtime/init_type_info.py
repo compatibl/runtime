@@ -14,7 +14,6 @@
 
 from cl.runtime.prebuild.init_file_util import InitFileUtil
 from cl.runtime.schema.type_info import TypeInfo
-from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.package_settings import PackageSettings
 
 

@@ -1,6 +1,11 @@
 # Default environment
 default:
 
+  # Documented in PackageSettings class
+  package_dirs:
+    cl.runtime: .
+    stubs.cl.runtime: .
+
   # Documented in LogSettings class
   log_level: info
   log_filename_prefix: main
@@ -9,9 +14,6 @@ default:
   env_id: Runtime
   env_kind: TEMP
   env_tenant: temp_tenant
-  env_packages:
-    - cl.runtime
-    - stubs.cl.runtime
 
   # Documented in DbSettings class
   db_id: temp_runtime_main

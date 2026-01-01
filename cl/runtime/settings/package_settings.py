@@ -29,9 +29,7 @@ class PackageSettings(Settings):
     package_dirs: Mapping[str, str] = required()
     """
     Mapping of package (e.g., cl.runtime) to its directory relative to project root.
-
-    Note:
-      If the package is directly under project root (e.g. {project_root}\cl\runtime), specify "." as the value.
+    If the package is directly under project root, specify "." as the value.
     """
 
     def __init(self) -> None:
