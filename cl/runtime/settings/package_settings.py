@@ -16,7 +16,6 @@ import os
 import sys
 from dataclasses import dataclass
 from typing import Mapping
-
 from frozendict import frozendict
 from typing_extensions import final
 from cl.runtime.records.for_dataclasses.extensions import required
