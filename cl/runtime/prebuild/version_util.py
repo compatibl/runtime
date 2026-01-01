@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import importlib
-from importlib.metadata import version, PackageNotFoundError
 from frozendict import frozendict
 from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.version_settings import VersionSettings

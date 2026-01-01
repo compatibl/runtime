@@ -13,9 +13,6 @@
 # limitations under the License.
 
 import pytest
-import os
-from pathlib import Path
-from cl.runtime.file.project_layout import ProjectLayout
 
 
 def test_project_settings():
