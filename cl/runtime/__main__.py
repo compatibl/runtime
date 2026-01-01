@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+import os
+
+# Extend PYTHONPATH to include sources and stubs from settings.yaml
+sys.path.append(os.path.normpath(os.path.join(os.path.dirname(__file__), "../..")))
+import cl.runtime.settings.package_loader
+
 import importlib
 import logging.config
 import os
@@ -21,30 +28,6 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
-import sys
-from pathlib import Path
-
-# Extent PYTHONPATH to include cl.runtime package source
-try:
-    # Try to import package_settings module dynamically
-    module = importlib.import_module("cl.runtime.settings.package_settings")
-except ImportError as e:
-    runtime_path = str(Path(__file__).resolve().parents[2])
-    print(f"Adding cl.runtime source to PYTHONPATH: {runtime_path}")
-    # Update sys.path for the current running process
-    sys.path.append(runtime_path)
-    # Update os.environ["PYTHONPATH"] for any future subprocesses
-    if current_pythonpath := os.environ.get("PYTHONPATH", ""):
-        # Append to the existing PYTHONPATH
-        os.environ["PYTHONPATH"] = current_pythonpath + os.pathsep + runtime_path
-    else:
-        # Initialize PYTHONPATH if not present
-        os.environ["PYTHONPATH"] = runtime_path
-
-# Extent PYTHONPATH to include all other package sources and stubs
-from cl.runtime.settings.package_settings import PackageSettings
-PackageSettings.instance().configure_pythonpath()
-
 from cl.runtime.configurations.preload_configuration import PreloadConfiguration
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
