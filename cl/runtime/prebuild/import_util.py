@@ -55,7 +55,8 @@ class ImportUtil:
         modules = [x for x in packages if not x.ispkg]
         for m in modules:
             try:
-                package_import = importlib.import_module(m.name)
+                # Attempt module import
+                importlib.import_module(m.name)
             except SyntaxError as error:
                 errors.append(
                     f"Cannot import module: {m.name}. Error: {error.msg}. Line: {error.lineno}, {error.offset}"
@@ -67,7 +68,7 @@ class ImportUtil:
         return errors
 
     @classmethod
-    def get_package_modules(cls, *, packages: Sequence[str]) -> tuple[ModuleType, ...]:
+    def get_modules(cls, *, packages: Sequence[str]) -> tuple[ModuleType, ...]:
         """Get the list of modules in the specified packages."""
         modules = []
         for package in packages:
@@ -84,7 +85,7 @@ class ImportUtil:
         return tuple(sorted(modules, key=lambda x: x.__name__))
 
     @classmethod
-    def get_package_types(cls, *, packages: Sequence[str], predicate: Callable[[type], bool]) -> tuple[type, ...]:
+    def get_types(cls, *, packages: Sequence[str], predicate: Callable[[type], bool]) -> tuple[type, ...]:
         """
         Get the list of types in the packages specified in settings.
 
@@ -93,7 +94,7 @@ class ImportUtil:
             predicate: Only the types for which the predicate is true will be returned
         """
         # Enumerate types in all modules that match is_schema_type predicate
-        modules = cls.get_package_modules(packages=packages)
+        modules = cls.get_modules(packages=packages)
         types = tuple(
             type_
             for module in modules

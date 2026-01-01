@@ -375,7 +375,7 @@ class TypeInfo(BootstrapMixin):
         # Add each class after performing checks for duplicates
         consume(
             cls._add_type(type_)
-            for type_ in ImportUtil.get_package_types(packages=packages, predicate=is_schema_type)
+            for type_ in ImportUtil.get_types(packages=packages, predicate=is_schema_type)
         )
 
         # Overwrite the cache file on disk with the new data
