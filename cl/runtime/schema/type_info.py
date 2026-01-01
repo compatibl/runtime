@@ -29,6 +29,7 @@ from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.prebuild.import_util import ImportUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -372,40 +373,13 @@ class TypeInfo(BootstrapMixin):
             raise RuntimeError("Packages list provided to rebuild is None or empty.")
 
         # Add each class after performing checks for duplicates
-        consume(cls._add_type(type_) for type_ in cls._get_package_types(packages=packages))
+        consume(
+            cls._add_type(type_)
+            for type_ in ImportUtil.get_package_types(packages=packages, predicate=is_schema_type)
+        )
 
         # Overwrite the cache file on disk with the new data
         cls._save()
-
-    @classmethod
-    def _get_package_modules(cls, *, packages: Sequence[str]) -> tuple[ModuleType, ...]:
-        """Get the list of modules in the packages specified in settings."""
-        modules = []
-        for package in packages:
-            # Import root module of the package
-            root_module = importlib.import_module(package)
-            # Add the root module itself
-            modules.append(root_module)
-            # Get module info for all submodules, note the trailing period added per walk_packages documentation
-            for module_info in walk_packages(root_module.__path__, root_module.__name__ + "."):
-                module_name = module_info.name
-                # Import the submodule using its full name
-                submodule = importlib.import_module(module_name)
-                modules.append(submodule)
-        return tuple(sorted(modules, key=lambda x: x.__name__))
-
-    @classmethod
-    def _get_package_types(cls, *, packages: Sequence[str]) -> tuple[type, ...]:
-        """Get the list of types in the packages specified in settings."""
-        # Enumerate types in all modules that match is_schema_type predicate
-        modules = cls._get_package_modules(packages=packages)
-        types = tuple(
-            type_
-            for module in modules
-            for _, type_ in getmembers(module, is_schema_type)
-            if module.__name__ == type_.__module__
-        )
-        return tuple(sorted(types, key=lambda x: x.__name__))
 
     @classmethod
     def _get_type_kind(cls, type_: type) -> TypeKind | None:

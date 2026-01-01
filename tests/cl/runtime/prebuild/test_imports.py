@@ -14,11 +14,14 @@
 
 import pytest
 from cl.runtime.prebuild.import_util import ImportUtil
+from cl.runtime.settings.env_settings import EnvSettings
 
 
 def test_import():
-    """Check that all imports succeed."""
-    ImportUtil.check_imports()
+    """Check that all imports succeed for the packages specified in settings.yaml."""
+    # Get the list of packages
+    packages = EnvSettings.instance().env_packages
+    ImportUtil.check_imports(packages=packages)
 
 
 if __name__ == "__main__":
