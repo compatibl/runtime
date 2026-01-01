@@ -37,10 +37,10 @@ class ImportUtil:
             modules.append(root_module)
             # Get module info for all submodules, note the trailing period added per walk_packages documentation
             for module_info in walk_packages(root_module.__path__, root_module.__name__ + "."):
-                module_name = module_info.name
-                # Import the submodule using its full name
-                submodule = importlib.import_module(module_name)
-                modules.append(submodule)
+                if (module_name := module_info.name).startswith(package):
+                    # Import the submodule
+                    submodule = importlib.import_module(module_name)
+                    modules.append(submodule)
         return tuple(sorted(modules, key=lambda x: x.__name__))
 
     @classmethod
