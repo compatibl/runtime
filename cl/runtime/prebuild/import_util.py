@@ -26,51 +26,6 @@ class ImportUtil:
     """Helper methods for working with imports."""
 
     @classmethod
-    def check_imports(cls, *, packages: Sequence[str]) -> None:
-        """Check that all imports succeed in the specified packages."""
-        packages_and_tests = []
-        for package in packages:
-            if package.startswith("stubs.") or package.startswith("tests."):
-                packages_and_tests.append(package)
-            else:
-                # TODO: Also support tests
-                packages_and_tests.extend([package, f"stubs.{package}"])
-
-        # Find import errors in each package
-        import_errors = [item for sublist in map(cls.check_package, packages_and_tests) for item in sublist]
-
-        # Report errors
-        if import_errors:
-            # TODO: Improve formatting of the report
-            import_errors_str = "\n".join(import_errors)
-            raise RuntimeError(f"Import errors occurred on launch:\n{import_errors_str}\n")
-
-    @classmethod
-    def check_package(cls, package: str) -> list[str]:
-        """Check the specified package for import errors."""
-        errors: list[str] = []
-        try:
-            package_import = __import__(package)
-        except ImportError as error:
-            raise Exception(f"Cannot import module: {error.name}. Check sys.path")
-
-        packages = list(pkgutil.walk_packages(path=package_import.__path__, prefix=package_import.__name__ + "."))
-        modules = [x for x in packages if not x.ispkg]
-        for m in modules:
-            try:
-                # Attempt module import
-                importlib.import_module(m.name)
-            except SyntaxError as error:
-                errors.append(
-                    f"Cannot import module: {m.name}. Error: {error.msg}. Line: {error.lineno}, {error.offset}"
-                )
-                continue
-            except Exception as error:
-                errors.append(f"Cannot import module: {m.name}. Error: {error.args}")
-
-        return errors
-
-    @classmethod
     @cached
     def get_modules(cls, *, packages: Sequence[str]) -> tuple[ModuleType, ...]:
         """Get the list of modules in the specified packages."""

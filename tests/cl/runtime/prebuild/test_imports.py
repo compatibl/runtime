@@ -19,9 +19,11 @@ from cl.runtime.settings.env_settings import EnvSettings
 
 def test_import():
     """Check that all imports succeed for the packages specified in settings.yaml."""
-    # Get the list of packages
+    # Get the list of packages from EnvSettings
     packages = EnvSettings.instance().env_packages
-    ImportUtil.check_imports(packages=packages)
+
+    # Getting modules will fail in case of import errors
+    ImportUtil.get_modules(packages=packages)
 
 
 if __name__ == "__main__":
