@@ -15,9 +15,7 @@
 import os
 from dataclasses import field
 from typing import Self
-from frozendict import frozendict
 from pydantic import BaseModel
-from cl.runtime import __version__
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.prebuild.version_util import VersionUtil
 from cl.runtime.primitive.case_util import CaseUtil
@@ -25,13 +23,9 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.routers.settings.env_info import EnvInfo
 from cl.runtime.server.env import Env
+from cl.runtime.settings.env_settings import EnvSettings
 
 SESSION_ID = Timestamp.create()
-
-
-def _collect_package_versions() -> frozendict[str, str]:
-    """Get versions of all packages listed in EnvSettings and validate version formats."""
-    return VersionUtil.get_version_dict(version_format_check=True)
 
 
 def _get_envs() -> list[EnvInfo]:
@@ -51,7 +45,7 @@ class SettingsResponse(BaseModel):
         alias_generator = CaseUtil.snake_to_pascal_case
         populate_by_name = True
 
-    schema_version: str = __version__
+    schema_version: str = VersionUtil.get_version(module="cl.runtime.routers")  # TODO: !!! Rename to .api or .server?
     """Version of the backend-frontend API contract (schema). Used to ensure compatibility between backend and frontend."""
 
     # TODO: Switch to the standard design pattern using Dynaconf
@@ -65,7 +59,11 @@ class SettingsResponse(BaseModel):
     If specified, displayed as a badge in the UI header to the right of the app logo.
     """
 
-    versions: dict[str, str] | None = field(default_factory=_collect_package_versions)
+    versions: dict[str, str] | None = field(
+        default_factory=lambda: VersionUtil.get_version_dict(
+            packages=EnvSettings.instance().env_packages
+        )
+    )
     """Dictionary of component/package names and their versions."""
 
     event_transport: str = "SSE"
