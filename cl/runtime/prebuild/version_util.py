@@ -25,13 +25,13 @@ class VersionUtil:
 
     @classmethod
     @cached
-    def get_version(cls, *, module: str) -> str:
+    def get_module_version(cls, *, module: str) -> str:
         """Get the version string for the specified module."""
         module_obj = ImportUtil.get_module(module=module)
         try:
             return module_obj.__version__
         except AttributeError:
-            raise RuntimeError(f"Module {module} does not define __version__ variable.")
+            raise RuntimeError(f"Module {module} does not import or define a __version__ variable.")
 
     @classmethod
     @cached
@@ -48,13 +48,21 @@ class VersionUtil:
         return result
 
     @classmethod
-    def guard_version(cls, *, version: str, package: str, raise_on_fail: bool = True) -> bool:
-        """Check that the version string matches the CompatibL Platform CalVer convention."""
+    def guard_module_version(cls, *, version: str, module: str, raise_on_fail: bool = True) -> bool:
+        """
+        Check that the version string is present. If version_format_check is true,
+        also check matches the convention specified in settings.
+
+        Args:
+            version: Version string
+            module: Module name for checking the version format and error messages
+            raise_on_fail: If the check fails, return False or raise an error depending on raise_on_fail
+        """
 
         # Error if version is not specified, even if version_format_check is False in settings
         if version is None:
             raise RuntimeError(
-                f"Required constant __version__ is not specified in root __init__.py of package {package}.\n"
+                f"Required constant __version__ is not specified in root __init__.py of module {module}.\n"
             )
 
         # Exit early if version format check is False in settings
@@ -82,7 +90,7 @@ class VersionUtil:
         elif raise_on_fail:
             reasons_str = "\n".join("  - " + reason for reason in reasons)
             raise RuntimeError(
-                f"Version string {version} for package {package} does not follow\n"
+                f"Version string {version} for module {module} does not follow\n"
                 f"the YYYY.MMDD.HHMM CalVer format with no leading zeroes.\n"
                 f"\nReasons:\n"
                 f"{reasons_str}\n"
@@ -97,10 +105,11 @@ class VersionUtil:
     @classmethod
     def guard_version_dict(cls, version_dict: frozendict[str, str], *, raise_on_fail: bool = True) -> bool:
         """
-        Check that the version in each package follows the CompatibL Platform CalVer convention.
+        Check that each version in the dict is not empty or None. If version_format_check is true,
+        also check matches the convention specified in settings.
         """
-        for package, ver in version_dict.items():
-            if not cls.guard_version(version=ver, package=package, raise_on_fail=raise_on_fail):
+        for module, version in version_dict.items():
+            if not cls.guard_module_version(version=version, module=module, raise_on_fail=raise_on_fail):
                 # Version check failed, return False if exception was not raised by guard_version
                 return False
         # All versions passed the checks

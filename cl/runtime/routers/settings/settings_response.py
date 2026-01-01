@@ -45,7 +45,7 @@ class SettingsResponse(BaseModel):
         alias_generator = CaseUtil.snake_to_pascal_case
         populate_by_name = True
 
-    schema_version: str = VersionUtil.get_version(module="cl.runtime.routers")  # TODO: !!! Rename to .api or .server?
+    schema_version: str = VersionUtil.get_module_version(module="cl.runtime.routers")  # TODO: !!! Rename to .api or .server?
     """Version of the backend-frontend API contract (schema). Used to ensure compatibility between backend and frontend."""
 
     # TODO: Switch to the standard design pattern using Dynaconf
