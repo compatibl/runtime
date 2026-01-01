@@ -13,10 +13,11 @@
 # limitations under the License.
 
 import importlib
-from types import ModuleType
-from typing import Sequence, Callable
 from inspect import getmembers
 from pkgutil import walk_packages
+from types import ModuleType
+from typing import Callable
+from typing import Sequence
 from memoization import cached
 
 

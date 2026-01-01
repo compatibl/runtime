@@ -14,9 +14,8 @@
 
 import pytest
 from cl.runtime.prebuild.version_util import VersionUtil
-from cl.runtime.settings.env_settings import EnvSettings
-from cl.runtime.settings.package_settings import PackageSettings
 from cl.runtime.settings.frontend_settings import FrontendSettings
+from cl.runtime.settings.package_settings import PackageSettings
 
 
 def test_version_conventions():

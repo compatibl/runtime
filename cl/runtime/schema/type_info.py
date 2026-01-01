@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib
 import os
 import sys
 from dataclasses import dataclass
 from importlib import import_module
-from inspect import getmembers
 from inspect import isclass
-from pkgutil import walk_packages
 from types import ModuleType
 from typing import ClassVar
 from typing import Collection
@@ -373,10 +370,7 @@ class TypeInfo(BootstrapMixin):
             raise RuntimeError("Packages list provided to rebuild is None or empty.")
 
         # Add each class after performing checks for duplicates
-        consume(
-            cls._add_type(type_)
-            for type_ in ImportUtil.get_types(packages=packages, predicate=is_schema_type)
-        )
+        consume(cls._add_type(type_) for type_ in ImportUtil.get_types(packages=packages, predicate=is_schema_type))
 
         # Overwrite the cache file on disk with the new data
         cls._save()

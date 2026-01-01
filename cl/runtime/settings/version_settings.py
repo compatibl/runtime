@@ -14,10 +14,8 @@
 
 from dataclasses import dataclass
 from typing import Mapping
-
 from frozendict import frozendict
 from typing_extensions import final
-
 from cl.runtime.prebuild.version_format import VersionFormat
 from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.settings.settings import Settings
@@ -43,11 +41,8 @@ class VersionSettings(Settings):
 
         # Convert each value to enum
         if is_mapping_type(type(self.version_format_exceptions)):
-            self.version_format_exceptions = frozendict({
-                k: SettingsUtil.to_enum(v, enum_type=VersionFormat)
-                for k, v in self.version_format_exceptions.items()
-            })
+            self.version_format_exceptions = frozendict(
+                {k: SettingsUtil.to_enum(v, enum_type=VersionFormat) for k, v in self.version_format_exceptions.items()}
+            )
         else:
             raise RuntimeError(f"VersionSettings.version_format_exceptions is not a mapping.")
-
-

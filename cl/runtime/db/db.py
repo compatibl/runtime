@@ -32,7 +32,6 @@ from cl.runtime.server.env import Env
 from cl.runtime.settings.db_settings import DbSettings
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.env_settings import EnvSettings
-from cl.runtime.settings.package_settings import PackageSettings
 
 
 @dataclass(slots=True, kw_only=True)

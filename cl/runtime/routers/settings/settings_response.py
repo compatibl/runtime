@@ -23,7 +23,6 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.routers.settings.env_info import EnvInfo
 from cl.runtime.server.env import Env
-from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.package_settings import PackageSettings
 
 SESSION_ID = Timestamp.create()
@@ -46,7 +45,9 @@ class SettingsResponse(BaseModel):
         alias_generator = CaseUtil.snake_to_pascal_case
         populate_by_name = True
 
-    schema_version: str = VersionUtil.get_module_version(module="cl.runtime.routers")  # TODO: !!! Rename to .api or .server?
+    schema_version: str = VersionUtil.get_module_version(
+        module="cl.runtime.routers"
+    )  # TODO: !!! Rename to .api or .server?
     """Version of the backend-frontend API contract (schema). Used to ensure compatibility between backend and frontend."""
 
     # TODO: Switch to the standard design pattern using Dynaconf
@@ -61,9 +62,7 @@ class SettingsResponse(BaseModel):
     """
 
     versions: dict[str, str] | None = field(
-        default_factory=lambda: VersionUtil.get_version_dict(
-            packages=PackageSettings.instance().get_packages()
-        )
+        default_factory=lambda: VersionUtil.get_version_dict(packages=PackageSettings.instance().get_packages())
     )
     """Dictionary of component/package names and their versions."""
 

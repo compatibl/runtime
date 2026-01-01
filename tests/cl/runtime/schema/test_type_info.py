@@ -22,7 +22,6 @@ from cl.runtime.records.typename import qualname
 from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
-from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.package_settings import PackageSettings
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData

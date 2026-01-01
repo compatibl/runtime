@@ -13,10 +13,8 @@
 # limitations under the License.
 
 from typing import Sequence
-
 from frozendict import frozendict
 from memoization import cached
-
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.prebuild.import_util import ImportUtil
 from cl.runtime.prebuild.version_format import VersionFormat

@@ -20,7 +20,6 @@ from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.server.env_key import EnvKey
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.env_settings import EnvSettings
-from cl.runtime.settings.package_settings import PackageSettings
 
 
 @dataclass(slots=True, kw_only=True)
