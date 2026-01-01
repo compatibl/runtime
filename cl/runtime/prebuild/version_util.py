@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from typing import Sequence
 
 from frozendict import frozendict
@@ -33,12 +34,12 @@ class VersionUtil:
 
         # Check if specified for the specific module first
         result = None
-        if (format_dict := version_settings.version_format) is not None:
+        if (format_dict := version_settings.version_format_exceptions) is not None:
             result = format_dict.get(module, None)
 
         # If the dictionary is not specified or it does not include the module, check for the default version
         if result is None:
-            result = version_settings.version_format_default
+            result = version_settings.version_format
 
         # The result will be None if neither is specified
         return result

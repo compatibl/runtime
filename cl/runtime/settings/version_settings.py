@@ -20,7 +20,6 @@ from typing_extensions import final
 
 from cl.runtime.prebuild.version_format import VersionFormat
 from cl.runtime.records.protocols import is_mapping_type
-from cl.runtime.records.typename import typenameof
 from cl.runtime.settings.settings import Settings
 from cl.runtime.settings.settings_util import SettingsUtil
 
@@ -30,24 +29,25 @@ from cl.runtime.settings.settings_util import SettingsUtil
 class VersionSettings(Settings):
     """Version settings."""
 
-    version_format_default: VersionFormat | None = None
-    """Default version format applies when version_format is not specified for the individual module."""
+    version_format: VersionFormat = VersionFormat.CAL_VER
+    """Default version format applies when exception is not specified for the module."""
 
-    version_format: Mapping[str, VersionFormat] | None = None
-    """Version format as a dictionary of module-format pairs, overrides the default format."""
+    version_format_exceptions: Mapping[str, VersionFormat] = frozendict({"cl.runtime.routers": VersionFormat.SEM_VER})
+    """Version format exceptions for individual modules, overrides the default format."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Convert to enum if specified
-        self.version_format_default = SettingsUtil.to_enum_or_none(self.version_format_default, enum_type=VersionFormat)
+        self.version_format = SettingsUtil.to_enum(self.version_format, enum_type=VersionFormat)
 
         # Convert each value to enum
-        if is_mapping_type(type(self.version_format)):
-            self.version_format = frozendict({
+        if is_mapping_type(type(self.version_format_exceptions)):
+            self.version_format_exceptions = frozendict({
                 k: SettingsUtil.to_enum(v, enum_type=VersionFormat)
-                for k, v in self.version_format.items()
+                for k, v in self.version_format_exceptions.items()
             })
         else:
-            raise RuntimeError(f"The field version_format is not a mapping of module to a valid version format string.")
+            raise RuntimeError(f"VersionSettings.version_format_exceptions is not a mapping.")
+
 

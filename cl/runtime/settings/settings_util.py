@@ -68,6 +68,10 @@ class SettingsUtil:
         if not value:
             return None
 
+        # Pass through an instance of the specified enum type
+        if isinstance(value, enum_type):
+            return value
+
         # Accept various input formats
         if CaseUtil.is_upper_case(value):
             upper_case_value = value
