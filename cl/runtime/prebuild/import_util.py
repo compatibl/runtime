@@ -19,6 +19,9 @@ from typing import Sequence, Callable
 from inspect import getmembers
 from pkgutil import walk_packages
 
+from memoization import cached
+
+
 class ImportUtil:
     """Helper methods for working with imports."""
 
@@ -34,7 +37,7 @@ class ImportUtil:
                 packages_and_tests.extend([package, f"stubs.{package}"])
 
         # Find import errors in each package
-        import_errors = [item for sublist in map(cls._check_package, packages_and_tests) for item in sublist]
+        import_errors = [item for sublist in map(cls.check_package, packages_and_tests) for item in sublist]
 
         # Report errors
         if import_errors:
@@ -43,7 +46,7 @@ class ImportUtil:
             raise RuntimeError(f"Import errors occurred on launch:\n{import_errors_str}\n")
 
     @classmethod
-    def _check_package(cls, package: str) -> list[str]:
+    def check_package(cls, package: str) -> list[str]:
         """Check the specified package for import errors."""
         errors: list[str] = []
         try:
@@ -68,6 +71,7 @@ class ImportUtil:
         return errors
 
     @classmethod
+    @cached
     def get_modules(cls, *, packages: Sequence[str]) -> tuple[ModuleType, ...]:
         """Get the list of modules in the specified packages."""
         modules = []
@@ -85,6 +89,7 @@ class ImportUtil:
         return tuple(sorted(modules, key=lambda x: x.__name__))
 
     @classmethod
+    @cached
     def get_types(cls, *, packages: Sequence[str], predicate: Callable[[type], bool]) -> tuple[type, ...]:
         """
         Get the list of types in the packages specified in settings.
