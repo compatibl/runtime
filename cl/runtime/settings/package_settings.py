@@ -41,5 +41,5 @@ class PackageSettings(Settings):
             raise RuntimeError(f"Field 'package_dirs' must be a mapping, but got {typenameof(self.package_dirs)}.")
 
     def get_packages(self) -> tuple[str, ...]:
-        """Return packages from the package_dirs field as a tuple, ignoring their directories."""
+        """Return package_dirs keys as a tuple, ignoring their directories."""
         return tuple(self.package_dirs.keys())

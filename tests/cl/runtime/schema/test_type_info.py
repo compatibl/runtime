@@ -23,6 +23,7 @@ from cl.runtime.schema.type_decl import TypeDecl
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_kind import TypeKind
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.package_settings import PackageSettings
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime import StubDataclassData
 from stubs.cl.runtime import StubDataclassDerived
@@ -40,7 +41,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_underscore import _
 
 def test_rebuild_cache():
     """Test TypeInfo.reload_cache method, this also generates and saves a new TypeInfo.csv file."""
-    packages = EnvSettings.instance().env_packages
+    packages = PackageSettings.instance().get_packages()
     TypeInfo.rebuild(packages=packages)
 
 

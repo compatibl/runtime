@@ -15,11 +15,12 @@
 from cl.runtime.file.csv_reader import CsvReader
 from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.package_settings import PackageSettings
 
 if __name__ == '__main__':
 
     # The list of packages from context settings
-    packages = EnvSettings.instance().env_packages
+    packages = PackageSettings.instance().get_packages()
 
     dirs = set()
     for package in packages:

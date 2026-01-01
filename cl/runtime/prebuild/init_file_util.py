@@ -15,6 +15,7 @@
 import os
 from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.package_settings import PackageSettings
 
 
 class InitFileUtil:
@@ -37,7 +38,7 @@ class InitFileUtil:
         """
 
         # The list of packages from context settings
-        packages = EnvSettings.instance().env_packages
+        packages = PackageSettings.instance().get_packages()
 
         missing_files = []
         all_root_paths = set()

@@ -15,13 +15,14 @@
 import pytest
 from cl.runtime.prebuild.import_util import ImportUtil
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.package_settings import PackageSettings
 
 
 def test_import():
     """Check that all imports succeed for the packages specified in settings.yaml."""
 
     # Get the list of packages from EnvSettings
-    packages = EnvSettings.instance().env_packages
+    packages = PackageSettings.instance().get_packages()
 
     # Getting modules will fail in case of import errors
     ImportUtil.get_modules(packages=packages)

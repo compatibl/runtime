@@ -39,6 +39,8 @@ from cl.runtime.settings.api_settings import ApiSettings
 from cl.runtime.settings.celery_settings import CelerySettings
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.package_settings import PackageSettings
+from cl.runtime.settings.package_settings import PackageSettings
 from cl.runtime.settings.frontend_settings import FrontendSettings
 from cl.runtime.tasks.celery.celery_queue import CeleryQueue
 from cl.runtime.tasks.celery.celery_queue import celery_delete_existing_tasks

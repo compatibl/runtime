@@ -18,6 +18,7 @@ from typing import Sequence
 from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.package_settings import PackageSettings
 
 APACHE_LICENSE_MD5 = "f9154a63c383844813d6abf79e4230d1"
 
@@ -68,7 +69,7 @@ class CopyrightUtil:
         """
 
         # The list of packages from context settings
-        packages = EnvSettings.instance().env_packages
+        packages = PackageSettings.instance().get_packages()
 
         files_with_copyright_header_error = []
         files_with_trailing_line_error = []

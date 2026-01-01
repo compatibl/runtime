@@ -15,6 +15,7 @@
 from cl.runtime.prebuild.init_file_util import InitFileUtil
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.settings.env_settings import EnvSettings
+from cl.runtime.settings.package_settings import PackageSettings
 
 
 def init_type_info() -> None:
@@ -26,7 +27,7 @@ def init_type_info() -> None:
 
     # Rebuild type cache and save TypeInfo.csv file to the bootstrap resources directory
     print("Initializing the type cache...")
-    packages = EnvSettings.instance().env_packages
+    packages = PackageSettings.instance().get_packages()
     TypeInfo.rebuild(packages=packages)
 
 
