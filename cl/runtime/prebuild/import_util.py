@@ -13,17 +13,24 @@
 # limitations under the License.
 
 import importlib
-import pkgutil
 from types import ModuleType
 from typing import Sequence, Callable
 from inspect import getmembers
 from pkgutil import walk_packages
-
 from memoization import cached
 
 
 class ImportUtil:
     """Helper methods for working with imports."""
+
+    @classmethod
+    @cached
+    def get_module(cls, *, module: str) -> ModuleType:
+        """Get the module object from the specified module string."""
+        try:
+            return importlib.import_module(module)
+        except:
+            raise RuntimeError(f"Import failed for module {module}.")
 
     @classmethod
     @cached

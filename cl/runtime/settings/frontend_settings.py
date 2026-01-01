@@ -59,7 +59,7 @@ class FrontendSettings(Settings):
 
         # Validate that version string is in CompatibL CalVer format if specified
         if self.frontend_version is not None:
-            VersionUtil.guard_version(ver=self.frontend_version, package="Frontend")
+            VersionUtil.guard_version(version=self.frontend_version, package="Frontend")
         else:
             if "{frontend_version}" in self.frontend_dir:
                 raise RuntimeError("Field frontend_dir contains {frontend_version} which is not specified.")

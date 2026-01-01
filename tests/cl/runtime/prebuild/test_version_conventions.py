@@ -14,6 +14,7 @@
 
 import pytest
 from cl.runtime.prebuild.version_util import VersionUtil
+from cl.runtime.settings.env_settings import EnvSettings
 from cl.runtime.settings.frontend_settings import FrontendSettings
 
 
@@ -21,7 +22,9 @@ def test_version_conventions():
     """Prebuild test to that the version strings comply with CompatibL CalVer conventions."""
 
     # Check Python package versions
-    VersionUtil.guard_version_dict(VersionUtil.get_version_dict(), raise_on_fail=True)
+    packages = EnvSettings.instance().env_packages
+    version_dict = VersionUtil.get_version_dict(packages=packages)
+    VersionUtil.guard_version_dict(version_dict, raise_on_fail=True)
 
     # Check frontend version in settings.yaml, creating the instance performs version validation
     FrontendSettings.instance()
