@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import locate
+
+# Ensure bootstrap module can be found
+locate.append_sys_path("../../..")
+
+# Import bootstrap module first to configure PYTHONPATH and other settings
+import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
+
 from cl.runtime.file.csv_reader import CsvReader
 from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.settings.package_settings import PackageSettings
