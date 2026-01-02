@@ -90,7 +90,7 @@ class UiRecordUtil(DataclassMixin):  # TODO: Move to the appropriate directory
 
         if handlers:
             result += [
-                RecordPanel(name=h.label, kind=cls._get_panel_kind(h), persistable=False)
+                RecordPanel(name=h.name, label=h.label, kind=cls._get_panel_kind(h), persistable=False)
                 for h in handlers
                 if h.type_ == "Viewer"
             ]

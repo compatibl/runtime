@@ -71,19 +71,12 @@ class HandlerDeclareBlockDecl(DataclassMixin):
         return None
 
     @classmethod
-    def _remove_handler_prefixes(cls, name: str) -> str:
-        """Remove special handler prefixes."""
-        name = name.removeprefix("run_")
-        name = name.removeprefix("view_")
-        return name
-
-    @classmethod
     def _build_handler_declaration(
         cls, record_type: type, member_name: str, member: FunctionType | MethodType, handler_type: str
     ) -> HandlerDeclareDecl:
         """Build HandlerDeclareDecl object from properties."""
         handler = HandlerDeclareDecl()
-        handler.name = cls._remove_handler_prefixes(member_name)
+        handler.name = member_name
         handler.comment = member.__doc__
         handler.static = (
             # The handler is considered static if it is declared as staticmethod or classmethod.

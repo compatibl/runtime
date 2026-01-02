@@ -21,6 +21,9 @@ class RecordPanel(PydanticMixin):
     name: str
     """Panel name."""
 
+    label: str | None = None
+    """Panel label."""
+
     kind: str | None = None
     """Panel kind."""
 
