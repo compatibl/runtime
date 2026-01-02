@@ -22,7 +22,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_TYPES
 from cl.runtime.records.typename import typenameof
 from cl.runtime.settings.settings import Settings
-from runtime.cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.file.project_layout import ProjectLayout
 
 
 @dataclass(slots=True, kw_only=True)
