@@ -15,7 +15,7 @@
 import os
 import sys
 from dataclasses import dataclass
-from typing import Mapping
+from typing import Mapping, Sequence
 from frozendict import frozendict
 from typing_extensions import final
 from cl.runtime.records.for_dataclasses.extensions import required
@@ -81,42 +81,46 @@ class PackageSettings(Settings):
         """Return source and stub directories relative to project root without duplicates."""
         return tuple(set(self.package_source_dirs.values()) | set(self.package_stub_dirs.values()))
 
-    def configure_pythonpath(self) -> None:
+    def configure_paths(self) -> None:
         """
-        Ensure all source and stub directories are in PYTHONPATH and sys.path.
+        Ensure all source and stub directories are in sys.path and PYTHONPATH
 
         Directories are only added if they are not already present,
         irrespective of relative vs. absolute path format or OS separators.
         """
 
-        # Prepare the list of source and stub directories
+        # Absolute paths to source and stub directories for all packages
         project_root = ProjectLayout.get_project_root()
         package_paths = tuple(os.path.join(project_root, x) for x in self.get_source_and_stub_dirs())
+        package_paths = self._normalize_paths(package_paths)
 
-        # Canonicalize existing paths in sys.path for comparison
-        # This handles cross-OS separators and relative/absolute discrepancies
-        existing_canonical_paths = {os.path.abspath(os.path.normpath(p)) for p in sys.path if p}
-
-        # Identify which directories are actually missing
-        paths_to_add = []
+        # Add to sys.path without duplicates
+        sys_path_set = set(self._normalize_paths(sys.path))
         for path in package_paths:
-            canonical_path = os.path.abspath(os.path.normpath(path))
-            if canonical_path not in existing_canonical_paths:
-                paths_to_add.append(path)
-                # Avoid adding the same dir twice if it's in both source and stub
-                existing_canonical_paths.add(canonical_path)
+            if path not in sys_path_set:
+                # Add path from package_paths
+                sys.path.append(path)
 
-        # If there are new directories, update the environment and current process
-        if paths_to_add:
-            # Update sys.path for the current running process
-            sys.path.extend(paths_to_add)
-            # Update os.environ["PYTHONPATH"] for any future subprocesses
-            if current_pythonpath := os.environ.get("PYTHONPATH", ""):
-                # Append to existing PYTHONPATH
-                os.environ["PYTHONPATH"] = current_pythonpath + os.pathsep + os.pathsep.join(paths_to_add)
-            else:
-                # Initialize PYTHONPATH
-                os.environ["PYTHONPATH"] = os.pathsep.join(paths_to_add)
+        # Add to PYTHONPATH without duplicates
+        python_path_str = os.environ.get("PYTHONPATH", "")
+        python_path_set = set(self._normalize_paths(python_path_str.split(os.pathsep)))
+        python_path_added = False
+        for path in package_paths:
+            if path not in python_path_set:
+                python_path_added = True
+                if python_path_str:
+                    # Add separator unless empty
+                    python_path_str += os.pathsep
+                # Add path from package_paths
+                python_path_str += path
+        if python_path_added:
+            # Only if paths have been added
+            os.environ["PYTHONPATH"] = python_path_str
+
+    @classmethod
+    def _normalize_paths(cls, paths: Sequence[str]) -> tuple[str, ...]:
+        """Convert paths to canonical format."""
+        return tuple(os.path.abspath(os.path.normpath(p)) for p in paths)
 
     @classmethod
     def _normalize_dirs(cls, dirs: Mapping[str, str] | None, *, field_name: str) -> frozendict[str, str] | None:

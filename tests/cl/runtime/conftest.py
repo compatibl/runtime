@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
+import locate
 
-# Extend sys.path to ensure package_loader can be imported
-sys.path.append(os.path.normpath(os.path.join(os.path.dirname(__file__), "../../..")))
+# Ensure bootstrap module can be found
+locate.append_sys_path("../..")
 
-# Extend PYTHONPATH to include sources and stubs from settings.yaml
-import cl.runtime.settings.package_loader  # isort: skip This comment prevents isort from moving this line
+# Import bootstrap module first to configure PYTHONPATH and other settings
+import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
 
 # Use noqa to prevent linters from removing the imports
 from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_db_fixture  # noqa
