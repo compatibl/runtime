@@ -15,14 +15,15 @@
 import os
 import sys
 from dataclasses import dataclass
-from typing import Mapping, Sequence
+from typing import Mapping
+from typing import Sequence
 from frozendict import frozendict
 from typing_extensions import final
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_TYPES
 from cl.runtime.records.typename import typenameof
 from cl.runtime.settings.settings import Settings
-from cl.runtime.file.project_layout import ProjectLayout
 
 
 @dataclass(slots=True, kw_only=True)
