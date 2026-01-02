@@ -36,4 +36,5 @@ except ImportError as e:
 
 # Extent PYTHONPATH to include all other package sources and stubs
 from cl.runtime.settings.package_settings import PackageSettings
+
 PackageSettings.instance().configure_pythonpath()

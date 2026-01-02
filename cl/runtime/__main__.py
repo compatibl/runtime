@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import os
+import sys
 
 # Extend sys.path to ensure package_loader can be imported
 sys.path.append(os.path.normpath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -21,7 +21,6 @@ sys.path.append(os.path.normpath(os.path.join(os.path.dirname(__file__), "../.."
 # Extend PYTHONPATH to include sources and stubs from settings.yaml
 import cl.runtime.settings.package_loader  # isort: skip This comment prevents isort from moving this line
 
-import importlib
 import logging.config
 import os
 import webbrowser

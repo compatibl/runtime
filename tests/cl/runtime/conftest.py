@@ -23,7 +23,6 @@ import cl.runtime.settings.package_loader  # isort: skip This comment prevents i
 
 # Use noqa to prevent linters from removing the imports
 from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_db_fixture  # noqa
-from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_db_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_mock_db_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import celery_queue_fixture  # noqa
 from cl.runtime.qa.pytest.pytest_fixtures import configure_logging_fixture  # noqa

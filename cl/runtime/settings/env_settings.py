@@ -23,7 +23,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.typename import typename
 from cl.runtime.settings.env_kind import EnvKind
 from cl.runtime.settings.settings import Settings
-from cl.runtime.settings.settings_util import SettingsUtil
 
 
 @dataclass(slots=True, kw_only=True)
@@ -150,4 +149,3 @@ class EnvSettings(Settings):
 
         # Check env_dir for safety after the substitution
         IdentifierUtil.guard_valid_identifier(self.env_dir, allow_directory_separators=True)
-

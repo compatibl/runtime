@@ -22,7 +22,6 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_TYPES
 from cl.runtime.records.typename import typenameof
 from cl.runtime.settings.settings import Settings
-
 from runtime.cl.runtime.file.project_layout import ProjectLayout
 
 
@@ -63,10 +62,9 @@ class PackageSettings(Settings):
 
         if self.package_test_dirs is None:
             # If test_dirs is None, it will be initialized to 'tests' subdirectories of source_dirs
-            self.package_test_dirs = frozendict({
-                k: os.path.join(v, 'tests')
-                for k, v in self.package_source_dirs.items()
-            })
+            self.package_test_dirs = frozendict(
+                {k: os.path.join(v, "tests") for k, v in self.package_source_dirs.items()}
+            )
         else:
             # Otherwise ensure it does not add any new packages relative to source dirs
             if missing_source_packages := self.package_test_dirs.keys() - self.package_source_dirs.keys():
@@ -97,9 +95,7 @@ class PackageSettings(Settings):
 
         # Canonicalize existing paths in sys.path for comparison
         # This handles cross-OS separators and relative/absolute discrepancies
-        existing_canonical_paths = {
-            os.path.abspath(os.path.normpath(p)) for p in sys.path if p
-        }
+        existing_canonical_paths = {os.path.abspath(os.path.normpath(p)) for p in sys.path if p}
 
         # Identify which directories are actually missing
         paths_to_add = []
@@ -137,14 +133,12 @@ class PackageSettings(Settings):
 
         # Validate that it is a mapping
         if not isinstance(dirs, MAPPING_TYPES):
-            raise RuntimeError(
-                f"PackageSettings.{field_name} must be a mapping, but got {typenameof(dirs)}."
-            )
+            raise RuntimeError(f"PackageSettings.{field_name} must be a mapping, but got {typenameof(dirs)}.")
 
         for package_name, path in dirs.items():
             # Validate keys: valid dot-delimited package names
             # We check if each part of the dot-split string is a valid Python identifier
-            if not all(part.isidentifier() for part in package_name.split('.')):
+            if not all(part.isidentifier() for part in package_name.split(".")):
                 raise ValueError(
                     f"Invalid package name '{package_name}' in {field_name}. "
                     "Keys must be valid dot-delimited package names."
