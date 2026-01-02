@@ -19,7 +19,7 @@ import sys
 sys.path.append(os.path.normpath(os.path.join(os.path.dirname(__file__), "../../..")))
 
 # Extend PYTHONPATH to include sources and stubs from settings.yaml
-import cl.runtime.settings.package_loader
+import cl.runtime.settings.package_loader  # isort: skip This comment prevents isort from moving this line
 
 # Use noqa to prevent linters from removing the imports
 from cl.runtime.qa.pytest.pytest_fixtures import basic_mongo_db_fixture  # noqa
