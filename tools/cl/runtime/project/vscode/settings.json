@@ -1,0 +1,37 @@
+{
+  "python.analysis.extraPaths": [
+    "runtime",
+	"convince",
+	"admin"
+  ],
+  "python.envFile": ".",
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "runtime;convince;admin"
+  },
+  "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "runtime/tests",
+	"convince/tests",
+	"admin/tests"
+  ],
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.cursor": true,
+    "**/.idea": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.venv": true,
+    "**/.vscode": true,
+    "**/frontend-*": true
+  },
+  "python.testing.unittestEnabled": false,
+  "cursorpyright.analysis.extraPaths": [
+    "runtime",
+	"convince",
+	"admin"
+  ],
+  "files.eol": "\r\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true
+}

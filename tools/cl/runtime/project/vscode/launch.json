@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Backend",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/runtime/cl/runtime/__main__.py",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Init Type Info",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/runtime/tools/cl/runtime/init_type_info.py",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Run Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "-v",
+        "runtime/tests",
+        "convince/tests",
+        "admin/tests"
+      ],
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
