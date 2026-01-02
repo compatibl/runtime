@@ -26,4 +26,6 @@
     "."
   ],
   "files.eol": "\r\n"
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true
 }
