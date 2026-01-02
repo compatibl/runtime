@@ -17,22 +17,31 @@ import pytest
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
+from cl.runtime.records.typename import typename
 from cl.runtime.routers.task.run_request import RunRequest
 from cl.runtime.routers.task.run_response_util import RunResponseUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
+from stubs.cl.runtime import StubHandlers, StubDataclass
 
 _class_method_1a_request = RunRequest(
-    type="StubHandlers",
+    type=typename(StubHandlers),
     method="run_class_method_1a",
 )
 
 _instance_method_1a_request = RunRequest(
-    type="StubHandlers",
+    type=typename(StubHandlers),
     key="stub_record",
     method="run_instance_method_1a",
+)
+
+_method_persist_record_request = RunRequest(
+    type=typename(StubHandlers),
+    key="stub_record",
+    method="run_method_persist_record",
+    arguments={"Record": {"Id": "record_saved_in_handler", "_t": typename(StubDataclass)}},
 )
 
 def _save_record_for_request(request: RunRequest):
@@ -55,24 +64,43 @@ def _save_record_for_request(request: RunRequest):
     active(DataSource).replace_one(record, commit=True)
 
 
-def test_method_class_method_1a():
+def test_method_class_method_1a(default_db_fixture, event_broker_fixture):
     response = RunResponseUtil.get_response(_class_method_1a_request)
     assert response is None
 
-
-def test_api_class_method_1a():
+def test_api_class_method_1a(default_db_fixture, event_broker_fixture):
     response = PytestUtil.api_task_run(_class_method_1a_request)
     assert response is None
 
-def test_method_instance_method_1a(default_db_fixture):
+def test_method_instance_method_1a(default_db_fixture, event_broker_fixture):
     _save_record_for_request(_instance_method_1a_request)
     response = RunResponseUtil.get_response(_instance_method_1a_request)
     assert response is None
 
-def test_api_instance_method_1a(default_db_fixture):
+def test_api_instance_method_1a(default_db_fixture, event_broker_fixture):
     _save_record_for_request(_instance_method_1a_request)
     response = PytestUtil.api_task_run(_instance_method_1a_request)
     assert response is None
+
+def test_method_persist_record(default_db_fixture, event_broker_fixture):
+    _save_record_for_request(_method_persist_record_request)
+    response = RunResponseUtil.get_response(_method_persist_record_request)
+    assert response is None
+
+    # Check that record successfully saved from handler
+    record_arg = DataSerializers.FOR_UI.deserialize(_method_persist_record_request.arguments["Record"])
+    record_saved_in_handler = active(DataSource).load_one_or_none(record_arg.get_key())
+    assert record_saved_in_handler is not None
+
+def test_api_persist_record(default_db_fixture, event_broker_fixture):
+    _save_record_for_request(_method_persist_record_request)
+    response = PytestUtil.api_task_run(_method_persist_record_request)
+    assert response is None
+
+    # Check that record successfully saved from handler
+    record_arg = DataSerializers.FOR_UI.deserialize(_method_persist_record_request.arguments["Record"])
+    record_saved_in_handler = active(DataSource).load_one_or_none(record_arg.get_key())
+    assert record_saved_in_handler is not None
 
 
 if __name__ == "__main__":

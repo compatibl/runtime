@@ -18,14 +18,17 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
+from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_sequence_type, is_key_type, is_data_key_or_record_type
 from cl.runtime.routers.task.run_request import RunRequest
 from cl.runtime.serializers.data_serializers import DataSerializers
+from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_util import TaskUtil
 from cl.runtime.views.key_list_view import KeyListView
 from cl.runtime.views.key_view import KeyView
 from cl.runtime.views.record_list_view import RecordListView
 from cl.runtime.views.record_view import RecordView
+from cl.runtime.views.view import View
 
 _ui_serializer = DataSerializers.FOR_UI
 
@@ -56,15 +59,18 @@ class RunResponseUtil:
         # TODO (Roman): Use TypeDecl to determine method type
         if method_task.method_name.startswith("view_"):
 
+            if not isinstance(method_task, InstanceMethodTask):
+                raise RuntimeError("Static view methods is not supported.")
+
             # Run task in process
             # TODO (Roman): Check for Dynamic View and load from DB instead of running Task
             result = method_task.run_task_in_process()
 
             # Process viewer result according to conventions
-            result = cls._process_viewer_result(result)
+            result = cls._process_viewer_result(result, view_for=method_task.key, view_name=method_task.method_name)
 
             # Build Data object
-            if is_data_key_or_record_type(result):
+            if result and is_data_key_or_record_type(type(result)):
                 result.build()
 
         else:
@@ -79,7 +85,7 @@ class RunResponseUtil:
             return result
 
     @classmethod
-    def _process_viewer_result(cls, viewer_result: Any) -> Any:
+    def _process_viewer_result(cls, viewer_result: Any, view_for: KeyMixin, view_name: str) -> Any:
         """
         Convert viewer result according to conventions.
 
@@ -92,22 +98,34 @@ class RunResponseUtil:
 
         if is_key_type(type(viewer_result)):
             # Load Key from DB
-            return active(DataSource).load_one_or_none(viewer_result)
+            result = active(DataSource).load_one_or_none(viewer_result)
         elif is_sequence_type(type(viewer_result)):
             # Process items in sequence
-            return tuple(cls._process_viewer_result(x) for x in viewer_result)
+            result = tuple(cls._process_viewer_result(x, view_for, view_name) for x in viewer_result)
         elif isinstance(viewer_result, KeyListView):
             # Process KeyListView by unpacking the 'keys' field
-            return cls._process_viewer_result(viewer_result.keys)
+            result = cls._process_viewer_result(viewer_result.keys, view_for, view_name)
         elif isinstance(viewer_result, RecordListView):
             # Process RecordListView by unpacking the 'records' field
-            return cls._process_viewer_result(viewer_result.records)
+            result = cls._process_viewer_result(viewer_result.records, view_for, view_name)
         elif isinstance(viewer_result, KeyView):
             # Process KeyView by unpacking the 'key' field
-            return cls._process_viewer_result(viewer_result.key)
+            result = cls._process_viewer_result(viewer_result.key, view_for, view_name)
         elif isinstance(viewer_result, RecordView):
             # Process RecordView by unpacking the 'record' field
-            return cls._process_viewer_result(viewer_result.record)
+            result = cls._process_viewer_result(viewer_result.record, view_for, view_name)
         else:
             # Other types return unchanged
-            return viewer_result
+            result = viewer_result
+
+        # TODO (Roman): Make it possible not to specify 'view_for', 'view_name' fields if
+        #  the view object is returned from the view method
+        # Add 'view_name' and 'view_for' values to avoid validation error
+        if isinstance(result, View):
+            if result.view_for is None:
+                result.view_for = view_for
+
+            if result.view_name is None:
+                result.view_name = view_name
+
+        return result

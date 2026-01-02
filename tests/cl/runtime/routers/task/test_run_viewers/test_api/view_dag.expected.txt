@@ -1,0 +1,125 @@
+_t: Dag
+Name: dag_data
+Nodes:
+- _t: TextInputNode
+  Id_: root
+  Position:
+    _t: DagNodePosition
+    X: -333.5593367804
+    Y: -184.3354229576
+  Data:
+    _t: DagNodeData
+    Label: Input
+  Text: root
+- _t: AddTextNode
+  Id_: a
+  Position:
+    _t: DagNodePosition
+    X: 509.1168824543
+    Y: -184.3354229576
+  Data:
+    _t: DagNodeData
+    Label: A
+  TextToAdd: add A
+- _t: AddTextNode
+  Id_: b
+  Position:
+    _t: DagNodePosition
+    X: -263.3363185109
+    Y: -114.112404688
+  Data:
+    _t: DagNodeData
+    Label: B
+  TextToAdd: add B
+- _t: AddTextNode
+  Id_: c
+  Position:
+    _t: DagNodePosition
+    X: -193.1133002413
+    Y: -43.8893864185
+  Data:
+    _t: DagNodeData
+    Label: C
+  TextToAdd: add C
+- _t: AddTextNode
+  Id_: d
+  Position:
+    _t: DagNodePosition
+    X: -122.8902819717
+    Y: 26.3336318511
+  Data:
+    _t: DagNodeData
+    Label: D
+  TextToAdd: add D
+- _t: AddTextNode
+  Id_: e
+  Position:
+    _t: DagNodePosition
+    X: 228.2248093761
+    Y: 96.5566501206
+  Data:
+    _t: DagNodeData
+    Label: E
+  TextToAdd: add E
+- _t: TextOutputNode
+  Id_: output1
+  Position:
+    _t: DagNodePosition
+    X: 87.778772837
+    Y: 166.7796683902
+  Data:
+    _t: DagNodeData
+    Label: Output 1
+- _t: TextOutputNode
+  Id_: output2
+  Position:
+    _t: DagNodePosition
+    X: 87.778772837
+    Y: 237.0026866598
+  Data:
+    _t: DagNodeData
+    Label: Output 2
+Edges:
+- _t: DagEdge
+  Id_: root;a
+  Label: main stream
+  Source: root
+  Target: a
+- _t: DagEdge
+  Id_: a;b
+  Label: filtered stream
+  Source: a
+  Target: b
+- _t: DagEdge
+  Id_: a;e
+  Label: main stream
+  Source: a
+  Target: e
+- _t: DagEdge
+  Id_: e;output1
+  Label: to text
+  Source: e
+  Target: output1
+- _t: DagEdge
+  Id_: e;output2
+  Label: to file
+  Source: e
+  Target: output2
+- _t: DagEdge
+  Id_: d;output2
+  Label: to file
+  Source: d
+  Target: output2
+- _t: DagEdge
+  Id_: d;e
+  Source: d
+  Target: e
+- _t: DagEdge
+  Id_: c;d
+  Source: c
+  Target: d
+- _t: DagEdge
+  Id_: b;c
+  Source: b
+  Target: c
+
