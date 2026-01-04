@@ -1,0 +1,38 @@
+{
+  "python.analysis.extraPaths": [
+{%- for package in packages %}
+    "{{ package }}"{% if not loop.last %},{% endif %}
+{%- endfor %}
+  ],
+  "python.envFile": ".",
+  "terminal.integrated.env.windows": {
+    "PYTHONPATH": "{{ packages|join(';') }}"
+  },
+  "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+{%- for package in packages %}
+    "{{ package }}/tests"{% if not loop.last %},{% endif %}
+{%- endfor %}
+  ],
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.cursor": true,
+    "**/.idea": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.venv": true,
+    "**/.vscode": true,
+    "**/frontend-*": true
+  },
+  "python.testing.unittestEnabled": false,
+  "cursorpyright.analysis.extraPaths": [
+{%- for package in packages %}
+    "{{ package }}"{% if not loop.last %},{% endif %}
+{%- endfor %}
+  ],
+  "files.eol": "\r\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true
+}
+

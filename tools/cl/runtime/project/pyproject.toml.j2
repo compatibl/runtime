@@ -1,0 +1,36 @@
+[tool.autoflake]
+recursive = true
+in-place = true
+remove-all-unused-imports = true
+ignore-init-module-imports = true
+exclude = ["venv", ".git", "__pycache__"]
+
+[tool.black]
+line-length = 120
+include = '\.pyi?$'
+target-version = ['py310']
+force-exclude = '''
+/(
+    \.idea
+  | \.git
+  | \.mypy_cache
+  | \.pytest_cache
+  | \.tox
+  | \.venv
+  | __pycache__
+  | _build
+  | build
+  | dist
+)/
+'''
+
+[build-system]
+requires = ["hatchling>=1.21.0"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+addopts = "-p no:warnings"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = [{% for package in packages %}"{{ package }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+testpaths = [{% for package in packages %}"{{ package }}/tests"{% if not loop.last %}, {% endif %}{% endfor %}]
+

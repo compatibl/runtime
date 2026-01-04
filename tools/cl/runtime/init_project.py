@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+from pathlib import Path
+
 import locate
+from jinja2 import Environment, FileSystemLoader
 
 # Ensure bootstrap module can be found
 locate.append_sys_path("../../..")
@@ -20,6 +24,7 @@ locate.append_sys_path("../../..")
 # Import bootstrap module first to configure PYTHONPATH and other settings
 import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
 
+from cl.runtime.file.project_layout import ProjectLayout
 from cl.runtime.prebuild.init_file_util import InitFileUtil
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.settings.package_settings import PackageSettings
@@ -28,7 +33,45 @@ from cl.runtime.settings.package_settings import PackageSettings
 def init_project() -> None:
     """Initialize project files."""
 
-    # TODO: Implement
+    # Get package settings
+    package_settings = PackageSettings.instance()
+
+    # Extract unique package directory names (excluding stubs and ".")
+    # Filter to only get main packages (cl.*) and their directory values
+    packages = PackageSettings.instance().get_source_and_stub_dirs()
+
+    # Get project root
+    project_root = ProjectLayout.get_project_root()
+
+    # Get template directory (where this script is located)
+    script_dir = Path(__file__).parent
+    template_dir = script_dir / "project"
+
+    # Create Jinja2 environment
+    env = Environment(loader=FileSystemLoader(str(template_dir)), trim_blocks=True, lstrip_blocks=True)
+
+    # Template mappings: (template_path, output_path)
+    templates = [
+        ("cursor/config.json.j2", ".cursor/config.json"),
+        ("pyproject.toml.j2", "pyproject.toml"),
+        ("vscode/launch.json.j2", ".vscode/launch.json"),
+        ("vscode/settings.json.j2", ".vscode/settings.json"),
+    ]
+
+    # Render each template
+    for template_path, output_path in templates:
+        template = env.get_template(template_path)
+        content = template.render(packages=packages)
+
+        # Create output file path
+        output_file = os.path.join(project_root, output_path)
+
+        # Create output directory if it doesn't exist
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
+        # Write rendered content
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(content)
 
 
 if __name__ == '__main__':
