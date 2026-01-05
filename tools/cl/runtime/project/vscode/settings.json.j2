@@ -1,7 +1,7 @@
 {
   "python.analysis.extraPaths": [
 {%- for package in packages %}
-    "{{ package }}"{% if not loop.last %},{% endif %}
+	"{{ package }}"{% if not loop.last %},{% endif %}
 {%- endfor %}
   ],
   "python.envFile": ".",
@@ -12,7 +12,7 @@
   "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": [
 {%- for package in packages %}
-    "{{ package }}/tests"{% if not loop.last %},{% endif %}
+	"{{ package }}/tests"{% if not loop.last %},{% endif %}
 {%- endfor %}
   ],
   "files.exclude": {
@@ -28,7 +28,7 @@
   "python.testing.unittestEnabled": false,
   "cursorpyright.analysis.extraPaths": [
 {%- for package in packages %}
-    "{{ package }}"{% if not loop.last %},{% endif %}
+	"{{ package }}"{% if not loop.last %},{% endif %}
 {%- endfor %}
   ],
   "files.eol": "\r\n",

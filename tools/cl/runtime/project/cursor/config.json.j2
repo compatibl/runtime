@@ -2,24 +2,24 @@
   "projectType": "python",
   "srcRoots": [
 {%- for package in packages %}
-    "{{ package }}"{% if not loop.last %},{% endif %}
+	"{{ package }}"{% if not loop.last %},{% endif %}
 {%- endfor %}
   ],
   "testFolders": [
 {%- for package in packages %}
-    "{{ package }}/tests"{% if not loop.last %},{% endif %}
+	"{{ package }}/tests"{% if not loop.last %},{% endif %}
 {%- endfor %}
   ],
-  "exclude": {
-    "**/__pycache__": true,
-    "**/.cursor": true,
-    "**/.idea": true,
-    "**/.mypy_cache": true,
-    "**/.pytest_cache": true,
-    "**/.venv": true,
-    "**/.vscode": true,
-    "**/frontend-*": true
-  },
+  "exclude": [
+	"**/__pycache__": true,
+	"**/.cursor": true,
+	"**/.idea": true,
+	"**/.mypy_cache": true,
+	"**/.pytest_cache": true,
+	"**/.venv": true,
+	"**/.vscode": true,
+	"**/frontend-*": true
+  ],
   "pythonVersion": "3.11",
   "python.defaultInterpreterPath": ".venv/Scripts/python.exe",
   "env": {

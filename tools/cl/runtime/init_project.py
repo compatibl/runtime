@@ -47,8 +47,13 @@ def init_project() -> None:
     script_dir = Path(__file__).parent
     template_dir = script_dir / "project"
 
-    # Create Jinja2 environment
-    env = Environment(loader=FileSystemLoader(str(template_dir)), trim_blocks=True, lstrip_blocks=True)
+    # Create Jinja2 environment with settings to preserve exact formatting
+    env = Environment(
+        loader=FileSystemLoader(str(template_dir)),
+        trim_blocks=True,
+        lstrip_blocks=True,
+        keep_trailing_newline=True,
+    )
 
     # Template mappings: (template_path, output_path)
     templates = [
@@ -69,8 +74,8 @@ def init_project() -> None:
         # Create output directory if it doesn't exist
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
-        # Write rendered content
-        with open(output_file, "w", encoding="utf-8") as f:
+        # Write rendered content with newline='' to preserve exact line endings from template
+        with open(output_file, "w", encoding="utf-8", newline="") as f:
             f.write(content)
 
 
