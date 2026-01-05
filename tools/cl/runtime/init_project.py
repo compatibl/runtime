@@ -28,9 +28,12 @@ locate.append_sys_path("../../..")
 import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
 
 from cl.runtime.file.project_layout import ProjectLayout
-from cl.runtime.prebuild.init_file_util import InitFileUtil
-from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.settings.package_settings import PackageSettings
+
+
+def transform_part(part: str) -> str:
+    """Replace dot_ prefix by . in file or directory name token."""
+    return "." + part.removeprefix("dot_") if part.startswith("dot_") else part
 
 
 def init_project() -> None:
@@ -44,7 +47,7 @@ def init_project() -> None:
     package_dirs = PackageSettings.instance().get_package_dirs()
 
     # Get project root
-    project_root = ProjectLayout.get_project_root()
+    project_root = Path(ProjectLayout.get_project_root())
 
     # Get template directory (where this script is located)
     script_dir = Path(__file__).parent
@@ -60,24 +63,35 @@ def init_project() -> None:
         keep_trailing_newline=True,
     )
 
-    # Template mappings: (template_path, output_path)
-    templates = [
-        ("cursor/config.json.j2", ".cursor/config.json"),
-        ("pyproject.toml.j2", "pyproject.toml"),
-        ("vscode/launch.json.j2", ".vscode/launch.json"),
-        ("vscode/settings.json.j2", ".vscode/settings.json"),
-    ]
+    # Find all .j2 files recursively in the template directory
+    template_files = list(template_dir.rglob("*.j2"))
 
-    # Render each template
-    for template_path, output_path in templates:
-        template = env.get_template(template_path)
+    # Process each template file
+    for template_file in template_files:
+        # Get relative path from template directory
+        relative_path = template_file.relative_to(template_dir)
+
+        # Convert to string and split into parts
+        path_parts = list(relative_path.parts)
+
+        output_path = Path(*[
+            # Remove suffix .j2 only from the last part of the path (the filename)
+            transform_part(p.removesuffix(".j2") if i == len(path_parts) - 1 else p)
+            for i, p in enumerate(path_parts)
+        ])
+
+        # Jinja2 expects POSIX-style paths even on Windows
+        template_path_str = relative_path.as_posix()
+
+        # Get template and render
+        template = env.get_template(template_path_str)
         content = template.render(packages=package_dirs)
 
         # Create output file path
-        output_file = os.path.join(project_root, output_path)
+        output_file = project_root / output_path
 
         # Create output directory if it doesn't exist
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
 
         # Normalize content to use LF, then let Python convert based on newline parameter
         # Replace any existing CRLF or CR with LF
