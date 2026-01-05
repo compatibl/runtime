@@ -48,10 +48,11 @@ def init_project() -> None:
     template_dir = script_dir / "project"
 
     # Create Jinja2 environment with settings to preserve exact formatting
+    # Use trim_blocks to remove newlines after block tags, but preserve content newlines
     env = Environment(
         loader=FileSystemLoader(str(template_dir)),
-        trim_blocks=True,
-        lstrip_blocks=True,
+        trim_blocks=False,
+        lstrip_blocks=False,
         keep_trailing_newline=True,
     )
 
