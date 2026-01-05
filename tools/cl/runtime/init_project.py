@@ -13,10 +13,13 @@
 # limitations under the License.
 
 import os
+import platform
 from pathlib import Path
 
 import locate
 from jinja2 import Environment, FileSystemLoader
+
+from cl.runtime.contexts.os_util import OsUtil
 
 # Ensure bootstrap module can be found
 locate.append_sys_path("../../..")
@@ -51,6 +54,7 @@ def init_project() -> None:
     # Use trim_blocks to remove newlines after block tags, but preserve content newlines
     env = Environment(
         loader=FileSystemLoader(str(template_dir)),
+        newline_sequence=OsUtil.newline_sequence(),
         trim_blocks=False,
         lstrip_blocks=False,
         keep_trailing_newline=True,
@@ -75,8 +79,15 @@ def init_project() -> None:
         # Create output directory if it doesn't exist
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
-        # Write rendered content with newline='' to preserve exact line endings from template
-        with open(output_file, "w", encoding="utf-8", newline="") as f:
+        # Normalize content to use LF, then let Python convert based on newline parameter
+        # Replace any existing CRLF or CR with LF
+        content = content.replace("\r\n", "\n").replace("\r", "\n")
+
+        # Use CRLF on Windows, LF on Linux
+        newline_char = "\r\n" if platform.system() == "Windows" else "\n"
+
+        # Write rendered content with OS-appropriate line endings
+        with open(output_file, "w", encoding="utf-8", newline=newline_char) as f:
             f.write(content)
 
 

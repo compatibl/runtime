@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+from typing import Literal
 
 
 class OsUtil:  # TODO: Review how this class is used
@@ -22,3 +23,9 @@ class OsUtil:  # TODO: Review how this class is used
     def is_windows(cls) -> bool:
         """Return true if the operating system is Windows."""
         return os.name == "nt"
+
+    @classmethod
+    def newline_sequence(cls) -> Literal["\n", "\r\n"]:
+        """Return \r\n on Windows and \n otherwise."""
+        return "\r\n" if cls.is_windows() else "\n"
+
