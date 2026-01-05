@@ -16,6 +16,7 @@ from typing import Any
 
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
+from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 from cl.runtime.records.key_mixin import KeyMixin
@@ -43,7 +44,7 @@ class RunResponseUtil:
         # Create Task from Request data
         tasks = TaskUtil.create_tasks(
             type_name=request.type,
-            method_name=request.method,
+            method_name=CaseUtil.pascal_to_snake_case(request.method),
             args=request.arguments,
             str_keys=[request.key] if request.key else None,
         )

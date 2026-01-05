@@ -44,8 +44,14 @@ class SubmitResponseItem(BaseModel):
 
         response_items = []
         task_queue = active(TaskQueue)
+        tasks = TaskUtil.create_tasks(
+            type_name=request.type,
+            method_name=CaseUtil.pascal_to_snake_case(request.method),
+            args=request.arguments,
+            str_keys=request.keys,
+        )
 
-        for handler_task in TaskUtil.create_tasks_for_submit_request(request):
+        for handler_task in tasks:
 
             # Save and submit task
             active(DataSource).replace_one(handler_task, commit=True)

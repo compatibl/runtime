@@ -76,7 +76,7 @@ class HandlerDeclareBlockDecl(DataclassMixin):
     ) -> HandlerDeclareDecl:
         """Build HandlerDeclareDecl object from properties."""
         handler = HandlerDeclareDecl()
-        handler.name = member_name
+        handler.name = CaseUtil.snake_to_pascal_case(member_name)
         handler.comment = member.__doc__
         handler.static = (
             # The handler is considered static if it is declared as staticmethod or classmethod.
@@ -85,7 +85,7 @@ class HandlerDeclareBlockDecl(DataclassMixin):
             isinstance(inspect.getattr_static(record_type, member_name), (staticmethod, classmethod))
         )
 
-        handler.label = titleize(humanize(handler.name))
+        handler.label = cls._get_handler_label(member_name)
         handler.type_ = handler_type
 
         # Add schema info about handler parameters
@@ -98,6 +98,13 @@ class HandlerDeclareBlockDecl(DataclassMixin):
             handler.return_ = HandlerVariableDecl.create(value_type=return_type, record_type=record_type)
 
         return handler
+
+    @classmethod
+    def _get_handler_label(cls, member_name: str) -> str:
+        """Get handler label by removing 'view_' and 'run_' prefix from method name and converting to Title case."""
+        result = member_name.removeprefix("view_")
+        result = result.removeprefix("run_")
+        return CaseUtil.snake_to_title_case(result)
 
     @classmethod
     def get_method_params(cls, method: FunctionType | MethodType) -> list[HandlerParamDecl]:
