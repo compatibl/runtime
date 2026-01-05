@@ -15,12 +15,20 @@
 from typing import Annotated, Any
 from fastapi import APIRouter
 from fastapi import Body
+
+from cl.runtime.routers.task.cancel_request import CancelRequest
+from cl.runtime.routers.task.cancel_response_item import CancelResponseItem
+from cl.runtime.routers.task.result_request import ResultRequest
+from cl.runtime.routers.task.result_response_item import ResultResponseItem
 from cl.runtime.routers.task.run_request import RunRequest
 from cl.runtime.routers.task.run_request_body import RunRequestBody
 from cl.runtime.routers.task.run_response_util import RunResponseUtil
+from cl.runtime.routers.task.status_request import StatusRequest
+from cl.runtime.routers.task.status_response_item import StatusResponseItem
 from cl.runtime.routers.task.submit_request import SubmitRequest
 from cl.runtime.routers.task.submit_request_body import SubmitRequestBody
 from cl.runtime.routers.task.submit_response_item import SubmitResponseItem
+from cl.runtime.routers.task.task_run_ids_request_body import TaskRunIdsRequestBody
 
 router = APIRouter()
 
@@ -51,7 +59,57 @@ async def post_submit(
         SubmitRequest(
             type=submit_body.type,
             method=submit_body.method,
-            keys=submit_body.key,
+            keys=submit_body.keys,
             arguments=submit_body.arguments,
+        )
+    )
+
+@router.post("/cancel", response_model=list[CancelResponseItem])
+async def post_cancel(
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to cancel.")],
+) -> list[CancelResponseItem]:
+    """Cancel tasks by run ids."""
+
+    return CancelResponseItem.get_response(
+        CancelRequest(
+            task_run_ids=task_run_ids.task_run_ids,
+        )
+    )
+
+
+@router.post("/cancel_all", response_model=list[CancelResponseItem])
+async def post_cancel_all() -> list[CancelResponseItem]:
+    """Cancel all running tasks."""
+
+    return CancelResponseItem.get_response(
+        CancelRequest(
+            task_run_ids=[],  # Empty list for cancel_all
+            cancel_all=True,
+        )
+    )
+
+
+@router.post("/status", response_model=list[StatusResponseItem])
+async def post_status(
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to get status.")],
+) -> list[StatusResponseItem]:
+    """Bulk request task statuses by run ids."""
+
+    return StatusResponseItem.get_response(
+        StatusRequest(
+            task_run_ids=task_run_ids.task_run_ids,
+        )
+    )
+
+
+@router.post("/result", response_model=list[ResultResponseItem])
+async def post_result(
+    task_run_ids: Annotated[TaskRunIdsRequestBody, Body(description="Task run ids to get result.")],
+) -> list[ResultResponseItem]:
+    """Bulk request task results by run ids."""
+
+    return ResultResponseItem.get_response(
+        ResultRequest(
+            task_run_ids=task_run_ids.task_run_ids,
         )
     )
