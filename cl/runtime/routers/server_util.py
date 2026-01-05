@@ -16,14 +16,11 @@ from fastapi import Depends
 from fastapi import FastAPI
 from cl.runtime.routers.app import app_router
 from cl.runtime.routers.auth import auth_router
-from cl.runtime.routers.entity import entity_router
-from cl.runtime.routers.handler import handler_router
 from cl.runtime.routers.health import health_router
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.settings import settings_router
 from cl.runtime.routers.sse import sse_router
 from cl.runtime.routers.storage import storage_router
-from cl.runtime.routers.tasks import tasks_router
 from cl.runtime.routers.task import task_router
 from cl.runtime.routers.workers.workers_router import router as workers_router
 from cl.runtime.server.auth_dependency import activate_auth_context
@@ -50,16 +47,7 @@ class ServerUtil:
             storage_router.router, prefix="/storage", tags=["Storage"], dependencies=[Depends(activate_auth_context)]
         )
         server_app.include_router(
-            entity_router.router, prefix="/entity", tags=["Entity"], dependencies=[Depends(activate_auth_context)]
-        )
-        server_app.include_router(
-            tasks_router.router, prefix="/tasks", tags=["Tasks"], dependencies=[Depends(activate_auth_context)]
-        )
-        server_app.include_router(
             task_router.router, prefix="/task", tags=["Task"], dependencies=[Depends(activate_auth_context)]
-        )
-        server_app.include_router(
-            handler_router.router, prefix="/handler", tags=["Handler"], dependencies=[Depends(activate_auth_context)]
         )
         server_app.include_router(
             workers_router, prefix="/workers", tags=["Workers"], dependencies=[Depends(activate_auth_context)]
