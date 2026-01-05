@@ -49,8 +49,9 @@ _DYNACONF_ALL_SETTINGS = Dynaconf(
     envvar="CL_SETTINGS_FILES",
     settings_files=[
         # Specify the exact path to prevent uncertainty associated with searching in multiple directories
-        os.path.normpath(os.path.join(ProjectLayout.get_project_root(), "settings.yaml")),
-        os.path.normpath(os.path.join(ProjectLayout.get_project_root(), ".secrets.yaml")),
+        os.path.normpath(os.path.join(ProjectLayout.get_project_root(), "settings.yaml")),  # Run configuration
+        os.path.normpath(os.path.join(ProjectLayout.get_project_root(), "project.yaml")),  # Project configuration
+        os.path.normpath(os.path.join(ProjectLayout.get_project_root(), ".secrets.yaml")),  # Secrets
     ],
     dotenv_override=True,
 )
