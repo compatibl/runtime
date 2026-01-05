@@ -11,17 +11,17 @@ inherit:
   name: StubHandlersKey
 declare:
   handlers:
-  - name: class_method_1a
+  - name: RunClassMethod1A
     label: Class Method 1A
     comment: Stub handler.
     type_: Job
     static: true
-  - name: class_method_1b
+  - name: RunClassMethod1B
     label: Class Method 1B
     comment: Stub handler.
     type_: Job
     static: true
-  - name: class_method_2a_with_params
+  - name: RunClassMethod2AWithParams
     label: Class Method 2A With Params
     comment: Stub handler.
     type_: Job
@@ -33,8 +33,8 @@ declare:
         type_: String
       name: Param2
     static: true
-  - name: class_method_2b
-    label: Class Method 2B
+  - name: RunClassMethod2BWithParams
+    label: Class Method 2B With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -46,8 +46,8 @@ declare:
       optional: true
       name: Param2
     static: true
-  - name: class_method_3a
-    label: Class Method 3A
+  - name: RunClassMethod3AWithParams
+    label: Class Method 3A With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -59,8 +59,8 @@ declare:
       optional: true
       name: Param2
     static: true
-  - name: class_method_3b
-    label: Class Method 3B
+  - name: RunClassMethod3BWithParams
+    label: Class Method 3B With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -72,7 +72,7 @@ declare:
       optional: true
       name: Param2
     static: true
-  - name: class_method_with_binary_param
+  - name: RunClassMethodWithBinaryParam
     label: Class Method With Binary Param
     comment: Stub method.
     type_: Job
@@ -105,17 +105,12 @@ declare:
           comment: Embedded binary content to be displayed as the current view.
       name: PdfFile
     static: true
-  - name: generate_list_of_long_handlers
-    label: Generate List Of Long Handlers
-    comment: Generate a lot of long handlers.
-    type_: Job
-    static: true
-  - name: instance_method_1a
+  - name: RunInstanceMethod1A
     label: Instance Method 1A
     comment: Stub handler.
     type_: Job
     static: false
-  - name: instance_method_1a_with_int_param
+  - name: RunInstanceMethod1AWithIntParam
     label: Instance Method 1A With Int Param
     comment: Stub handler.
     type_: Job
@@ -124,45 +119,54 @@ declare:
         type_: Int
       name: IntParam
     static: false
-  - name: instance_method_1a_with_primitive_params
+  - name: RunInstanceMethod1AWithPrimitiveParams
     label: Instance Method 1A With Primitive Params
     comment: Stub handler.
     type_: Job
     params:
     - value:
         type_: String
+      optional: true
       name: StrParam
     - value:
         type_: Double
+      optional: true
       name: FloatParam
     - value:
         type_: Bool
+      optional: true
       name: BoolParam
     - value:
         type_: Int
+      optional: true
       name: IntParam
     - value:
         type_: Date
+      optional: true
       name: DateParam
     - value:
         type_: Time
+      optional: true
       name: TimeParam
     - value:
         type_: DateTime
+      optional: true
       name: DatetimeParam
     - value:
         type_: UUID
+      optional: true
       name: UuidParam
     - value:
         type_: Binary
+      optional: true
       name: BytesParam
     static: false
-  - name: instance_method_1b
+  - name: RunInstanceMethod1B
     label: Instance Method 1B
     comment: Stub handler.
     type_: Job
     static: false
-  - name: instance_method_2a_with_params
+  - name: RunInstanceMethod2AWithParams
     label: Instance Method 2A With Params
     comment: Stub handler.
     type_: Job
@@ -175,8 +179,8 @@ declare:
       optional: true
       name: Param2
     static: false
-  - name: instance_method_2b
-    label: Instance Method 2B
+  - name: RunInstanceMethod2BWithParams
+    label: Instance Method 2B With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -188,8 +192,8 @@ declare:
       optional: true
       name: Param2
     static: false
-  - name: instance_method_3a
-    label: Instance Method 3A
+  - name: RunInstanceMethod3AWithParams
+    label: Instance Method 3A With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -201,8 +205,8 @@ declare:
       optional: true
       name: Param2
     static: false
-  - name: instance_method_3b
-    label: Instance Method 3B
+  - name: RunInstanceMethod3BWithParams
+    label: Instance Method 3B With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -214,7 +218,7 @@ declare:
       optional: true
       name: Param2
     static: false
-  - name: instance_method_with_binary_param
+  - name: RunInstanceMethodWithBinaryParam
     label: Instance Method With Binary Param
     comment: Stub method.
     type_: Job
@@ -250,31 +254,56 @@ declare:
         type_: String
       name: NoteParam
     static: false
-  - name: long_handler
+  - name: RunLongHandler
     label: Long Handler
     type_: Job
-    static: true
-  - name: long_handler_with_error
+    static: false
+  - name: RunLongHandlerWithError
     label: Long Handler With Error
     type_: Job
     static: false
-  - name: save_to_db
-    label: Save To Db
+  - name: RunLongStaticHandler
+    label: Long Static Handler
+    type_: Job
+    static: true
+  - name: RunMethodPersistRecord
+    label: Method Persist Record
     comment: Stub method.
     type_: Job
+    params:
+    - data:
+        module:
+          module_name: cl
+        name: StubDataclass
+        label: Stub Dataclass
+        comment: Stub record base class.
+        type_kind: Record
+        display_kind: Basic
+        inherit:
+          module:
+            module_name: cl
+          name: StubDataclassKey
+        elements:
+        - value:
+            type_: String
+          name: Id
+          comment: Unique identifier.
+        keys:
+        - Id
+      name: Record
     static: false
-  - name: static_method_1a
+  - name: RunStaticMethod1A
     label: Static Method 1A
     comment: Stub handler.
     type_: Job
     static: true
-  - name: static_method_1b
+  - name: RunStaticMethod1B
     label: Static Method 1B
     comment: Stub handler.
     type_: Job
     static: true
-  - name: static_method_2a
-    label: Static Method 2A
+  - name: RunStaticMethod2AWithParams
+    label: Static Method 2A With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -286,8 +315,8 @@ declare:
       optional: true
       name: Param2
     static: true
-  - name: static_method_2b
-    label: Static Method 2B
+  - name: RunStaticMethod2BWithParams
+    label: Static Method 2B With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -299,8 +328,8 @@ declare:
       optional: true
       name: Param2
     static: true
-  - name: static_method_3a
-    label: Static Method 3A
+  - name: RunStaticMethod3AWithParams
+    label: Static Method 3A With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -312,8 +341,8 @@ declare:
       optional: true
       name: Param2
     static: true
-  - name: static_method_3b
-    label: Static Method 3B
+  - name: RunStaticMethod3BWithParams
+    label: Static Method 3B With Params
     comment: Stub handler.
     type_: Job
     params:
@@ -325,46 +354,27 @@ declare:
       optional: true
       name: Param2
     static: true
-  - name: with_args_and_optional
-    label: With Args And Optional
+  - name: RunSumParams
+    label: Sum Params
     comment: Stub method.
     type_: Job
     params:
     - value:
         type_: String
-      name: Arg1
+      name: Param1
     - value:
         type_: String
-      name: Arg2
-    - value:
-        type_: String
-      optional: true
-      name: Arg3
+      name: Param2
     return_:
       value:
         type_: String
     static: false
-  - name: with_error
+  - name: RunWithError
     label: With Error
     comment: Stub method.
     type_: Job
     static: false
-  - name: with_two_args
-    label: With Two Args
-    comment: Stub method.
-    type_: Job
-    params:
-    - value:
-        type_: String
-      name: Arg1
-    - value:
-        type_: String
-      name: Arg2
-    return_:
-      value:
-        type_: String
-    static: false
-  - name: with_user_error
+  - name: RunWithUserError
     label: With User Error
     comment: Stub method.
     type_: Job

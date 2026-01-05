@@ -28,19 +28,19 @@ from stubs.cl.runtime import StubHandlers, StubDataclass
 
 _class_method_1a_request = RunRequest(
     type=typename(StubHandlers),
-    method="run_class_method_1a",
+    method="RunClassMethod1A",
 )
 
 _instance_method_1a_request = RunRequest(
     type=typename(StubHandlers),
     key="stub_record",
-    method="run_instance_method_1a",
+    method="RunInstanceMethod1A",
 )
 
 _method_persist_record_request = RunRequest(
     type=typename(StubHandlers),
     key="stub_record",
-    method="run_method_persist_record",
+    method="RunMethodPersistRecord",
     arguments={"Record": {"Id": "record_saved_in_handler", "_t": typename(StubDataclass)}},
 )
 

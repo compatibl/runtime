@@ -36,14 +36,14 @@ _media_key = _KEY_SERIALIZER.serialize(_stub_media_viewers.get_key())
 
 
 panel_requests = [
-    RunRequest(type=typename(StubDataViewers), method="view_none", key=_data_key),
-    RunRequest(type=typename(StubDataViewers), method="view_nested_fields", key=_data_key),
-    RunRequest(type=typename(StubDataViewers), method="view_record_list", key=_data_key),
-    RunRequest(type=typename(StubDataViewers), method="view_png", key=_media_key),
-    RunRequest(type=typename(StubDataViewers), method="view_pdf", key=_media_key),
-    RunRequest(type=typename(StubDataViewers), method="view_html", key=_media_key),
-    RunRequest(type=typename(StubDataViewers), method="view_dag", key=_media_key),
-    RunRequest(type=typename(StubDataViewers), method="view_markdown", key=_media_key),
+    RunRequest(type=typename(StubDataViewers), method="ViewNone", key=_data_key),
+    RunRequest(type=typename(StubDataViewers), method="ViewNestedFields", key=_data_key),
+    RunRequest(type=typename(StubDataViewers), method="ViewRecordList", key=_data_key),
+    RunRequest(type=typename(StubDataViewers), method="ViewPng", key=_media_key),
+    RunRequest(type=typename(StubDataViewers), method="ViewPdf", key=_media_key),
+    RunRequest(type=typename(StubDataViewers), method="ViewHtml", key=_media_key),
+    RunRequest(type=typename(StubDataViewers), method="ViewDag", key=_media_key),
+    RunRequest(type=typename(StubDataViewers), method="ViewMarkdown", key=_media_key),
 ]
 
 def test_method(default_db_fixture, event_broker_fixture):

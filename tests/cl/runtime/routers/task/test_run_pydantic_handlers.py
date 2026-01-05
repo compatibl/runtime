@@ -21,12 +21,12 @@ from stubs.cl.runtime.records.for_pydantic.stub_pydantic import StubPydantic
 
 _simple_handler_request = RunRequest(
     type="StubPydanticHandlers",
-    method="run_simple_handler",
+    method="RunSimpleHandler",
 )
 
 _handler_with_primitive_args_and_result_request = RunRequest(
     type="StubPydanticHandlers",
-    method="run_handler_with_primitive_args_and_result",
+    method="RunHandlerWithPrimitiveArgsAndResult",
     arguments={  # noqa
         "StrArg": "str_value",
         "IntArg": 22,
@@ -36,7 +36,7 @@ _handler_with_primitive_args_and_result_request = RunRequest(
 
 _handler_with_mixed_args_and_result_request = RunRequest(
     type="StubPydanticHandlers",
-    method="run_handler_with_mixed_args_and_result",
+    method="RunHandlerWithMixedArgsAndResult",
     arguments={  # noqa
         "StrArg": "str_value",
         "GenericKeyArg": "StubPydanticKey;stub_generic_key_id1",
@@ -49,7 +49,7 @@ _handler_with_mixed_args_and_result_request = RunRequest(
 
 _handler_with_dict_result_request = RunRequest(
     type="StubPydanticHandlers",
-    method="run_handler_with_dict_result",
+    method="RunHandlerWithDictResult",
 )
 
 

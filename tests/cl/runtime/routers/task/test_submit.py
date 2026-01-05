@@ -29,16 +29,14 @@ def get_simple_requests(key_str: str):
     """Get requests for testing."""
     return [
         {
-            "dataset": "",
             "type": "StubHandlers",
+            "method": "RunInstanceMethod1a",
             "keys": [key_str],
             "arguments": {},
-            "method": "RunInstanceMethod1a",
         },
         {
-            "dataset": "",
             "type": "StubHandlers",
-            "method": "StaticMethod1a",
+            "method": "RunStaticMethod1a",
             "keys": [],
             "arguments": {},
         },
@@ -49,11 +47,10 @@ def get_save_to_db_requests(key_str: str):
     """Get requests for testing."""
     return [
         {
-            "dataset": "",
             "type": "StubHandlers",
+            "method": "RunMethodPersistRecord",
             "keys": [key_str],
-            "method": "save_to_db",
-            "arguments": {},
+            "arguments": {"Record": {"Id": "saved_from_handler", "_t": "StubDataclass"}},
         }
     ]
 
