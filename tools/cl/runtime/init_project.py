@@ -38,7 +38,7 @@ def init_project() -> None:
 
     # Extract unique package directory names (excluding stubs and ".")
     # Filter to only get main packages (cl.*) and their directory values
-    packages = PackageSettings.instance().get_source_and_stub_dirs()
+    package_dirs = PackageSettings.instance().get_package_dirs()
 
     # Get project root
     project_root = ProjectLayout.get_project_root()
@@ -61,7 +61,7 @@ def init_project() -> None:
     # Render each template
     for template_path, output_path in templates:
         template = env.get_template(template_path)
-        content = template.render(packages=packages)
+        content = template.render(packages=package_dirs)
 
         # Create output file path
         output_file = os.path.join(project_root, output_path)

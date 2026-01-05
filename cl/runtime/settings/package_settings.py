@@ -76,11 +76,24 @@ class PackageSettings(Settings):
 
     def get_packages(self) -> tuple[str, ...]:
         """Return package_source_dirs keys as a tuple, ignoring their directories."""
-        return tuple(self.package_source_dirs.keys())
+        # Convert to lists with preserved order
+        source_packages = list(self.package_source_dirs.keys())
+        stub_packages = list(self.package_stub_dirs.keys())
 
-    def get_source_and_stub_dirs(self) -> tuple[str, ...]:
-        """Return source and stub directories relative to project root without duplicates."""
-        return tuple(set(self.package_source_dirs.values()) | set(self.package_stub_dirs.values()))
+        # Deduplicate preserving order in each list, source first, and return as tuple
+        return tuple(dict.fromkeys(source_packages + stub_packages))
+
+    def get_package_dirs(self) -> tuple[str, ...]:
+        """
+        Return source and stub directories relative to project root without duplicates. Result order is
+        all source directories first (in their listed order), then stub directories (in their listed order).
+        """
+        # Convert to lists with preserved order
+        source_dirs = list(self.package_source_dirs.values())
+        stub_dirs = list(self.package_stub_dirs.values())
+
+        # Deduplicate preserving order in each list, source first, and return as tuple
+        return tuple(dict.fromkeys(source_dirs + stub_dirs))
 
     def configure_paths(self) -> None:
         """
@@ -92,7 +105,7 @@ class PackageSettings(Settings):
 
         # Absolute paths to source and stub directories for all packages
         project_root = ProjectLayout.get_project_root()
-        package_paths = tuple(os.path.join(project_root, x) for x in self.get_source_and_stub_dirs())
+        package_paths = tuple(os.path.join(project_root, x) for x in self.get_package_dirs())
         package_paths = self._normalize_paths(package_paths)
 
         # Add to sys.path without duplicates
