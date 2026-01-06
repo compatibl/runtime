@@ -20,6 +20,7 @@ from typing import Sequence
 from frozendict import frozendict
 from typing_extensions import final
 from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_checks import ProjectChecks
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_TYPES
 from cl.runtime.records.typename import typenameof
@@ -49,6 +50,9 @@ class PackageSettings(Settings):
     If this field is None, test_dirs will be initialized to 'tests' subdirectories of source_dirs.
     """
 
+    package_requirements: Sequence[str] | None = None
+    """This list is used to generate the requirements in requirements.txt and pyproject.toml."""
+
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
@@ -73,6 +77,10 @@ class PackageSettings(Settings):
                     f"PackageSettings.package_test_dirs specifies tests for packages that are not "
                     f"defined in PackageSettings.package_source_dirs: {', '.join(sorted(missing_source_packages))}"
                 )
+
+        # Validate package requirements format
+        if self.package_requirements is not None:
+            ProjectChecks.guard_requirements(self.package_requirements)
 
     def get_packages(self) -> tuple[str, ...]:
         """Return package_source_dirs keys as a tuple, ignoring their directories."""
