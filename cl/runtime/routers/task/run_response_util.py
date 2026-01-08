@@ -20,8 +20,9 @@ from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_sequence_type, is_key_type, is_data_key_or_record_type
+from cl.runtime.records.protocols import is_sequence_type, is_key_type, is_data_key_or_record_type, is_primitive_type
 from cl.runtime.routers.task.run_request import RunRequest
+from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_util import TaskUtil
@@ -78,12 +79,17 @@ class RunResponseUtil:
             # Run task in process
             result = method_task.run_task_in_process()
 
-        # Serialize Data instances
-        # Do not serialize PydanticMixin instances, since it is supported by FastAPI
-        if result and not isinstance(result, PydanticMixin) and isinstance(result, DataMixin):
-            return _ui_serializer.serialize(result)
-        else:
+        if isinstance(result, PydanticMixin):
+            # Do not serialize PydanticMixin instances, since it is supported by FastAPI
             return result
+        elif isinstance(result, dict):
+            # Do not serialize dict, as we temporarily support custom untyped dict responses
+            return result
+        elif result is None or is_primitive_type(type(result)):
+            # Do not serialize Primitive, as its serialization does not work without type hinting
+            return result
+        else:
+            return _ui_serializer.serialize(result)
 
     @classmethod
     def _process_viewer_result(cls, viewer_result: Any, view_for: KeyMixin, view_name: str) -> Any:
