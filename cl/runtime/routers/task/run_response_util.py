@@ -82,14 +82,26 @@ class RunResponseUtil:
         if isinstance(result, PydanticMixin):
             # Do not serialize PydanticMixin instances, since it is supported by FastAPI
             return result
-        elif isinstance(result, dict):
-            # Do not serialize dict, as we temporarily support custom untyped dict responses
+        elif cls._is_dict_or_list_of_dicts(result):
+            # TODO (Roman): Stop using custom responses without serialization
+            # Do not serialize dict or list of dicts, as we temporarily support custom untyped dict responses
             return result
         elif result is None or is_primitive_type(type(result)):
             # Do not serialize Primitive, as its serialization does not work without type hinting
             return result
         else:
             return _ui_serializer.serialize(result)
+
+    @classmethod
+    def _is_dict_or_list_of_dicts(cls, value: Any) -> bool:
+        """Return True if value is a dict or a list of dicts."""
+        if isinstance(value, dict):
+            return True
+
+        if isinstance(value, list) and all(isinstance(item, dict) for item in value):
+            return True
+
+        return False
 
     @classmethod
     def _process_viewer_result(cls, viewer_result: Any, view_for: KeyMixin, view_name: str) -> Any:
