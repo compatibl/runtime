@@ -1,0 +1,25 @@
+@echo off
+
+echo.
+echo Activate venv
+call .venv\Scripts\activate.bat
+
+:: List of package subdirectories
+set "dirs={% for package in packages %}{{ package }}{% if not loop.last %} {% endif %}{% endfor %}"
+
+echo.
+echo Run scripts in each package
+for %%d in (%dirs%) do (
+    echo Running scripts in %%d
+    pushd %%d\scripts
+    for %%f in (formatters.cmd) do (
+        echo Running %%f
+        call %%f
+    )
+    popd
+)
+pause
+
+echo.
+echo Deactivate venv
+call .venv\Scripts\deactivate.bat

@@ -1,0 +1,15 @@
+@echo off
+
+echo.
+echo Activate venv
+call .venv\Scripts\activate.bat
+
+set PYTHONPATH={% for package in packages %}.\{{ package }};{% endfor %}%PYTHONPATH%
+
+echo.
+echo Run backend
+python -m cl.runtime
+
+echo.
+echo Deactivate venv
+call .venv\Scripts\deactivate.bat
