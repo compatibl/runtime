@@ -45,7 +45,7 @@ class FrontendSettings(Settings):
         - May include {version}, in which case the specified frontend_version will be substituted
     """
 
-    frontend_download_uri: str = "https://github.com/compatibl/frontend/archive/refs/tags/{version}"
+    frontend_download_uri: str = "https://github.com/compatibl/frontend/archive/refs/tags/{frontend_version}"
     """
     URI template for frontend download.
 

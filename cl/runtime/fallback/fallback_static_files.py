@@ -43,7 +43,7 @@ _FALLBACK_HTML = """<!DOCTYPE html>
 """
 
 _INSTALL_HTML = """
-<h1>Static frontend files v{version} are not installed</h1>
+<h1>Static frontend files v{frontend_version} are not installed</h1>
 <p class="subtitle">Installation options</p>
 <hr />
 <ul>
