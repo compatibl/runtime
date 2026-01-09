@@ -14,7 +14,6 @@
 
 from dataclasses import field
 from typing import Self
-from fastapi import Request
 from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource

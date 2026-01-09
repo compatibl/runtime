@@ -13,16 +13,16 @@
 # limitations under the License.
 
 from typing import Any
-
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.primitive.case_util import CaseUtil
-from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.records.for_pydantic.pydantic_mixin import PydanticMixin
 from cl.runtime.records.key_mixin import KeyMixin
-from cl.runtime.records.protocols import is_sequence_type, is_key_type, is_data_key_or_record_type, is_primitive_type
+from cl.runtime.records.protocols import is_data_key_or_record_type
+from cl.runtime.records.protocols import is_key_type
+from cl.runtime.records.protocols import is_primitive_type
+from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.routers.task.run_request import RunRequest
-from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_util import TaskUtil

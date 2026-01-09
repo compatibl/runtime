@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import pytest
-
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
-from cl.runtime.routers.task.run_response_util import RunResponseUtil
 from cl.runtime.routers.task.run_request import RunRequest
+from cl.runtime.routers.task.run_response_util import RunResponseUtil
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic import StubPydantic
 
 _simple_handler_request = RunRequest(

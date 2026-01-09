@@ -46,6 +46,7 @@ panel_requests = [
     RunRequest(type=typename(StubDataViewers), method="ViewMarkdown", key=_media_key),
 ]
 
+
 def test_method(default_db_fixture, event_broker_fixture):
     active(DataSource).replace_one(_stub_data_viewers, commit=True)
     active(DataSource).replace_one(_stub_media_viewers, commit=True)

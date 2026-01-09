@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from pydantic import BaseModel
-
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 
 

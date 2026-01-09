@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from typing import Self
-
 from pydantic import BaseModel
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource

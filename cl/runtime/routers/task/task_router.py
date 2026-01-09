@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Annotated, Any
+from typing import Annotated
+from typing import Any
 from fastapi import APIRouter
 from fastapi import Body
-
 from cl.runtime.routers.task.cancel_request import CancelRequest
 from cl.runtime.routers.task.cancel_response_item import CancelResponseItem
 from cl.runtime.routers.task.result_request import ResultRequest
@@ -63,6 +63,7 @@ async def post_submit(
             arguments=submit_body.arguments,
         )
     )
+
 
 @router.post("/cancel", response_model=list[CancelResponseItem])
 async def post_cancel(

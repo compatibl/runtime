@@ -99,9 +99,7 @@ async def post_delete(
 ) -> list[KeyRequestItem]:
     """Bulk delete records by list of keys."""
 
-    return DeleteResponseUtil.delete_records(
-        DeleteRequest(delete_keys=delete_keys)
-    )
+    return DeleteResponseUtil.delete_records(DeleteRequest(delete_keys=delete_keys))
 
 
 @router.post("/save", response_model=list[KeyRequestItem])
@@ -110,11 +108,7 @@ async def post_save(
 ) -> list[KeyRequestItem]:
     """Bulk save records to DB. Don't check if the record already exists."""
 
-    return SaveResponseUtil.save_records(
-        SaveRequest(
-            records=records
-        )
-    )
+    return SaveResponseUtil.save_records(SaveRequest(records=records))
 
 
 @router.post("/update", response_model=list[KeyRequestItem])

@@ -23,7 +23,6 @@ from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.class_method_task import ClassMethodTask
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.method_task import MethodTask
-from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_queue import TaskQueue
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 
@@ -51,10 +50,16 @@ class TaskUtil:
         }
 
     @classmethod
-    def create_tasks(cls, *, type_name: str, method_name: str, str_keys: list[str] | None, args: dict[str, Any] | None) -> list[MethodTask]:
+    def create_tasks(
+        cls, *, type_name: str, method_name: str, str_keys: list[str] | None, args: dict[str, Any] | None
+    ) -> list[MethodTask]:
 
         # TODO (Roman): Make 'queue' field in Task optional
-        task_queue_key = task_queue.get_key() if (task_queue := active_or_none(TaskQueue)) else TaskQueueKey(queue_id="Handlers Queue").build()
+        task_queue_key = (
+            task_queue.get_key()
+            if (task_queue := active_or_none(TaskQueue))
+            else TaskQueueKey(queue_id="Handlers Queue").build()
+        )
         type_ = TypeInfo.from_type_name(type_name)
 
         # Create single ClassMethodTask if keys is not specified

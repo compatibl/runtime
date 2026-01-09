@@ -15,6 +15,7 @@
 from typing import Sequence
 from packaging.requirements import Requirement
 
+
 class ProjectChecks:
     """Checks for project settings."""
 

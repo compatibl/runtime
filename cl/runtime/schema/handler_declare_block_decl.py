@@ -17,8 +17,6 @@ from dataclasses import dataclass
 from types import FunctionType
 from types import MethodType
 from typing import Iterable
-from inflection import humanize
-from inflection import titleize
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required

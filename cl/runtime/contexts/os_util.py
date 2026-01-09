@@ -28,4 +28,3 @@ class OsUtil:  # TODO: Review how this class is used
     def newline_sequence(cls) -> Literal["\n", "\r\n"]:
         """Return \r\n on Windows and \n otherwise."""
         return "\r\n" if cls.is_windows() else "\n"
-

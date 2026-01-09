@@ -24,9 +24,6 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.qa.pytest.pytest_util import PytestUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
-from cl.runtime.schema.type_info import TypeInfo
-from cl.runtime.tasks.class_method_task import ClassMethodTask
-from cl.runtime.tasks.task_queue import TaskQueue
 from stubs.cl.runtime import StubDataclass
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
@@ -69,21 +66,35 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         if str_param is not None and not isinstance(str_param, str):
             raise RuntimeError(f"The type of 'str_param' is '{type(str_param)}' rather than {typename(str)} or None.")
         if float_param is not None and not isinstance(float_param, float):
-            raise RuntimeError(f"The type of 'float_param' is '{type(float_param)}' rather than {typename(float)} or None.")
+            raise RuntimeError(
+                f"The type of 'float_param' is '{type(float_param)}' rather than {typename(float)} or None."
+            )
         if bool_param is not None and not isinstance(bool_param, bool):
-            raise RuntimeError(f"The type of 'bool_param' is '{type(bool_param)}' rather than {typename(bool)} or None.")
+            raise RuntimeError(
+                f"The type of 'bool_param' is '{type(bool_param)}' rather than {typename(bool)} or None."
+            )
         if int_param is not None and not isinstance(int_param, int):
             raise RuntimeError(f"The type of 'int_param' is '{type(int_param)}' rather than {typename(int)} or None.")
         if date_param is not None and not isinstance(date_param, dt.date):
-            raise RuntimeError(f"The type of 'date_param' is '{type(date_param)}' rather than {typename(dt.date)} or None.")
+            raise RuntimeError(
+                f"The type of 'date_param' is '{type(date_param)}' rather than {typename(dt.date)} or None."
+            )
         if time_param is not None and not isinstance(time_param, dt.time):
-            raise RuntimeError(f"The type of 'time_param' is '{type(time_param)}' rather than {typename(dt.time)} or None.")
+            raise RuntimeError(
+                f"The type of 'time_param' is '{type(time_param)}' rather than {typename(dt.time)} or None."
+            )
         if datetime_param is not None and not isinstance(datetime_param, dt.datetime):
-            raise RuntimeError(f"The type of 'datetime_param' is '{type(datetime_param)}' rather than {typename(dt.datetime)} or None.")
+            raise RuntimeError(
+                f"The type of 'datetime_param' is '{type(datetime_param)}' rather than {typename(dt.datetime)} or None."
+            )
         if uuid_param is not None and not isinstance(uuid_param, UUID):
-            raise RuntimeError(f"The type of 'uuid_param' is '{type(uuid_param)}' rather than {typename(UUID)} or None.")
+            raise RuntimeError(
+                f"The type of 'uuid_param' is '{type(uuid_param)}' rather than {typename(UUID)} or None."
+            )
         if bytes_param is not None and not isinstance(bytes_param, bytes):
-            raise RuntimeError(f"The type of 'bytes_param' is '{type(bytes_param)}' rather than {typename(bytes)} or None.")
+            raise RuntimeError(
+                f"The type of 'bytes_param' is '{type(bytes_param)}' rather than {typename(bytes)} or None."
+            )
 
     def run_instance_method_1b(self) -> None:
         """Stub handler."""
