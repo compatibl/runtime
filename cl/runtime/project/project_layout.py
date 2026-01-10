@@ -15,6 +15,8 @@
 import os
 from pathlib import Path
 from typing import Iterable
+
+from cl.runtime.project.project_layout_kind import ProjectLayoutKind
 from cl.runtime.records.typename import typename
 
 # Possible project root locations for each layout relative to this module
@@ -25,13 +27,13 @@ MONOREPO_ROOT_DIR = os.path.normpath(Path(__file__).parents[3])
 root_filenames = [".env", "settings.yaml", "settings.json", "settings.toml"]
 
 PROJECT_ROOT = None
-PROJECT_LEVELS = None
+PROJECT_LAYOUT_KIND: ProjectLayoutKind | None = None
 try:
     if os.path.exists(MULTIREPO_ROOT_DIR):
-        # Supermodule directory takes priority but only if it contains one of the settings files
+        # Multirepo root takes priority but only if it contains one of the settings files
         if any(os.path.exists(os.path.join(MULTIREPO_ROOT_DIR, x)) for x in root_filenames):
             PROJECT_ROOT = MULTIREPO_ROOT_DIR
-            PROJECT_LEVELS = 2
+            PROJECT_LAYOUT_KIND = ProjectLayoutKind.MULTIREPO
 # Handle the possibility that directory access is prohibited
 except FileNotFoundError:
     pass
@@ -44,7 +46,7 @@ if PROJECT_ROOT is None:
             # Monorepo directory is searched next
             if any(os.path.exists(os.path.join(MONOREPO_ROOT_DIR, x)) for x in root_filenames):
                 PROJECT_ROOT = MONOREPO_ROOT_DIR
-                PROJECT_LEVELS = 1
+                PROJECT_LAYOUT_KIND = ProjectLayoutKind.MONOREPO
     # Handle the possibility that directory access is prohibited
     except FileNotFoundError:
         pass
@@ -57,13 +59,10 @@ if PROJECT_ROOT is None:
     raise RuntimeError(
         f"Project root could not be confirmed by the presence of at least one of the following files:\n"
         f"{root_filenames_str}\n\n"
-        f"Project root locations searched:\n"
-        f"1. {MULTIREPO_ROOT_DIR}\n"
-        f"2. {MONOREPO_ROOT_DIR}\n"
+        f"Potential project root locations searched:\n"
+        f"Multirepo root: {MULTIREPO_ROOT_DIR}\n"
+        f"Monorepo root: {MONOREPO_ROOT_DIR}\n"
     )
-
-if PROJECT_LEVELS not in (1, 2):
-    raise RuntimeError(f"{PROJECT_LEVELS} project levels found, only 1 or 2 levels are supported.")
 
 
 class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil or ProjectLayout and make static
@@ -71,27 +70,27 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
     Information about the project location and layout used to search for settings and packages.
     This class finds the location of .env or settings.yaml and detects one of two supported layouts:
 
-    One-level (suitable for monorepo git layout):
-        - project and packages root (one level layout)
+    Multirepo layout (suitable for submodules or subtree git setup for each package):
+        - project root (first level of multirepo layout)
+            -- project files
+            -- package root (second level of multirepo layout)
+                --- package files (files from each package are under a separate package root)
+
+    Monorepo layout (suitable for interleaved git merge of packages under a common root):
+        - project and packages root (single-level monorepo layout)
             -- project files
             -- package files (files from all packages are interleaved under a common root)
-
-    Two-level (suitable for submodules or subtree git layout):
-        - project root (first level of two-level layout)
-            -- project files
-            -- package root (second level of two-level layout)
-                --- package files (files from each package are under a separate package root)
     """
+
+    @classmethod
+    def get_project_layout_kind(cls) -> ProjectLayoutKind:
+        """Specifies monorepo vs multirepo project layout."""
+        return PROJECT_LAYOUT_KIND
 
     @classmethod
     def get_project_root(cls) -> str:
         """Project root directory is the location of .env or settings.yaml file."""
         return PROJECT_ROOT
-
-    @classmethod
-    def get_project_levels(cls) -> int:
-        """Number of levels in project layout (one or two)."""
-        return PROJECT_LEVELS
 
     @classmethod
     def get_resources_root(cls) -> str:
@@ -101,8 +100,8 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
     @classmethod
     def get_package_root(cls, package: str) -> str:
         """
-        Package root directory for the specified package, same as project root in one-level layout
-        and project_root/package_name for two-level layout. Not the same as get_source_root.
+        Package root directory for the specified package, same as project root in monorepo layout
+        and project_root/package_name for multirepo layout. Not the same as get_source_root.
 
         Args:
             package: Dot-delimited package root, e.g. 'cl.runtime'
@@ -125,18 +124,18 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
             package: Dot-delimited package root, e.g. 'cl.runtime'
         """
         relative_path = package.replace(".", os.sep)
-        if PROJECT_LEVELS == 1:
-            # One-level project, search directly under project root
+        if PROJECT_LAYOUT_KIND == ProjectLayoutKind.MONOREPO:
+            # Monorepo layout, search directly under project root
             search_paths = [os.path.normpath(os.path.join(PROJECT_ROOT, relative_path, "__init__.py"))]
-        elif PROJECT_LEVELS == 2:
-            # Two-level project, check each dot-delimited package token in reverse order as potential package root
+        elif PROJECT_LAYOUT_KIND == ProjectLayoutKind.MULTIREPO:
+            # Multirepo layout, check each dot-delimited package token in reverse order as potential package root
             package_tokens = package.split(".")
             package_tokens.reverse()
             search_paths = [
                 os.path.normpath(os.path.join(PROJECT_ROOT, x, relative_path, "__init__.py")) for x in package_tokens
             ]
         else:
-            raise RuntimeError(f"Field 'ProjectLayout.project_levels' must be 1 or 2.")
+            raise RuntimeError(f"PROJECT_LAYOUT_KIND must be MONOREPO or MULTIREPO.")
 
         # Find the first directory with __init__.py
         init_path = next((x for x in search_paths if os.path.exists(x)), None)
