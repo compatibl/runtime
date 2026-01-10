@@ -1,15 +1,10 @@
 @echo off
 
-set PYTHONPATH={% for package in packages %}.\{{ package }};{% endfor %}%PYTHONPATH%
+call activate
 
-echo.
-echo Activate venv
-call .venv\Scripts\activate.bat
+set PYTHONPATH={% for package in packages %}.\{{ package }};{% endfor %}%PYTHONPATH%
 
 echo.
 echo Initialize DB (error if not a DEV or TEST DB)
 python -m tools.cl.runtime.init_db
 
-echo.
-echo Deactivate venv
-call .venv\Scripts\deactivate.bat

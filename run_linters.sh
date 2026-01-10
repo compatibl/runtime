@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Validate using flake8
+source ./activate.sh
+
 echo ""
 echo "Validate using flake8"
 flake8 cl --config=.flake8

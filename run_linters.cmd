@@ -1,5 +1,7 @@
 @echo off
 
+call activate
+
 echo.
 echo Validate using flake8
 flake8 cl --config=.flake8

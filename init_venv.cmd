@@ -10,9 +10,7 @@ echo Create an empty .venv
 IF EXIST ".venv" rd /s /q .venv
 python -m venv .venv
 
-echo.
-echo Activate .venv
-call .venv\Scripts\activate.bat
+call activate
 
 echo.
 echo Upgrade pip
@@ -21,8 +19,3 @@ python -m pip install --upgrade pip
 echo.
 echo Install requirements (excludes linter and build requirements)
 pip install -r requirements.txt
-
-echo.
-echo Exit without deactivating .venv
-
-:END

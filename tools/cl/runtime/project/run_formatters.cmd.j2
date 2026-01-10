@@ -1,10 +1,7 @@
 @echo off
 
-echo.
-echo Activate venv
-call .venv\Scripts\activate.bat
+call activate
 
-:: List of package subdirectories
 set "dirs={% for package in packages %}{{ package }}{% if not loop.last %} {% endif %}{% endfor %}"
 
 echo.
@@ -18,8 +15,4 @@ for %%d in (%dirs%) do (
     )
     popd
 )
-pause
 
-echo.
-echo Deactivate venv
-call .venv\Scripts\deactivate.bat
