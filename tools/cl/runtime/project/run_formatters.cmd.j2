@@ -11,8 +11,8 @@ echo.
 echo Run scripts in each package
 for %%d in (%dirs%) do (
     echo Running scripts in %%d
-    pushd %%d\scripts
-    for %%f in (formatters.cmd) do (
+    pushd %%d
+    for %%f in (run_formatters.cmd) do (
         echo Running %%f
         call %%f
     )

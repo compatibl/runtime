@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd ..
-
 # Format using isort
 echo "Format using isort"
 isort cl --sp=.isort.cfg
@@ -14,6 +12,3 @@ echo "Format using black"
 black -q cl --config=pyproject.toml
 black -q stubs --config=pyproject.toml
 black -q tests --config=pyproject.toml
-
-# Change back to the original directory
-cd -

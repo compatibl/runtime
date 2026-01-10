@@ -1,7 +1,5 @@
 @echo off
 
-pushd ..
-
 echo.
 echo Remove unused imports using autoflake
 autoflake cl --check --quiet
@@ -22,5 +20,3 @@ echo Format using black
 black -q cl --config=pyproject.toml
 black -q stubs --config=pyproject.toml
 black -q tests --config=pyproject.toml
-
-popd

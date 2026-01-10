@@ -1,7 +1,5 @@
 @echo off
 
-pushd ..
-
 :PROMPT
 set CONFIRM=n
 set /p CONFIRM="ATTENTION - overwrite existing .venv? (y/n)? "
@@ -27,5 +25,4 @@ pip install -r requirements.txt
 echo.
 echo Exit without deactivating .venv
 
-popd
 :END
