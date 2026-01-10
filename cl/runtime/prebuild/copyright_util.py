@@ -90,13 +90,13 @@ class CopyrightUtil:
 
             # Add paths to source, stubs, and test directories
             package_root_paths = []
-            if (x := ProjectLayout.get_source_root(package)) is not None and x not in all_root_paths:
+            if (x := ProjectLayout.get_package_source_root(package)) is not None and x not in all_root_paths:
                 package_root_paths.append(x)
                 all_root_paths.add(x)
-            if (x := ProjectLayout.get_stubs_root(package)) is not None and x not in all_root_paths:
+            if (x := ProjectLayout.get_package_stubs_root(package)) is not None and x not in all_root_paths:
                 package_root_paths.append(x)
                 all_root_paths.add(x)
-            if (x := ProjectLayout.get_tests_root(package)) is not None and x not in all_root_paths:
+            if (x := ProjectLayout.get_package_tests_root(package)) is not None and x not in all_root_paths:
                 package_root_paths.append(x)
                 all_root_paths.add(x)
 

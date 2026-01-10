@@ -32,13 +32,13 @@ if __name__ == '__main__':
     dirs = set()
     for package in packages:
         # Add paths to source and stubs directories
-        if (x := ProjectLayout.get_source_root(package)) is not None and x not in dirs:
+        if (x := ProjectLayout.get_package_source_root(package)) is not None and x not in dirs:
             dirs.add(x)
-        if (x := ProjectLayout.get_stubs_root(package)) is not None and x not in dirs:
+        if (x := ProjectLayout.get_package_stubs_root(package)) is not None and x not in dirs:
             dirs.add(x)
-        if (x := ProjectLayout.get_tests_root(package)) is not None and x not in dirs:
+        if (x := ProjectLayout.get_package_tests_root(package)) is not None and x not in dirs:
             dirs.add(x)
-        if (x := ProjectLayout.get_preloads_root(package)) is not None and x not in dirs:
+        if (x := ProjectLayout.get_package_preloads_root(package)) is not None and x not in dirs:
             dirs.add(x)
 
     # Create __init__.py files in subdirectories except for tests

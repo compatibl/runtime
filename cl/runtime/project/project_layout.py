@@ -108,12 +108,12 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
         """
         package_tokens = package.split(".")
         package_tokens_len = len(package_tokens)
-        source_root = cls.get_source_root(package)
+        source_root = cls.get_package_source_root(package)
         result = os.path.normpath(str(Path(source_root).parents[package_tokens_len - 1]))
         return result
 
     @classmethod
-    def get_source_root(cls, package: str) -> str:
+    def get_package_source_root(cls, package: str) -> str:
         """
         Source code root directory (the entry in PYTHONPATH) for the specified package.
 
@@ -149,7 +149,7 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
             )
 
     @classmethod
-    def get_stubs_root(cls, package: str) -> str | None:
+    def get_package_stubs_root(cls, package: str) -> str | None:
         """
         Stubs root directory for the specified package.
 
@@ -161,7 +161,7 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
         """
         package_tokens = package.split(".")
         package_tokens_len = len(package_tokens)
-        source_root = cls.get_source_root(package)
+        source_root = cls.get_package_source_root(package)
         common_root = str(Path(source_root).parents[package_tokens_len - 1])
         if package_tokens[0] == "tests":
             # Do not look for stubs relative to tests
@@ -178,7 +178,7 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
                 return None
 
     @classmethod
-    def get_tests_root(cls, package: str) -> str | None:
+    def get_package_tests_root(cls, package: str) -> str | None:
         """
         Tests root directory for the specified package.
 
@@ -190,7 +190,7 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
         """
         package_tokens = package.split(".")
         package_tokens_len = len(package_tokens)
-        source_root = cls.get_source_root(package)
+        source_root = cls.get_package_source_root(package)
         common_root = str(Path(source_root).parents[package_tokens_len - 1])
         if package_tokens[0] == "tests":
             # Tests package is specified directly
@@ -207,7 +207,7 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
                 return None
 
     @classmethod
-    def get_preloads_root(cls, package: str) -> str | None:
+    def get_package_preloads_root(cls, package: str) -> str | None:
         """Preloads root directory for the specified package.
 
         Notes:
@@ -218,7 +218,7 @@ class ProjectLayout:  # TODO: !!!! Derive from Settings or rename to ProjectUtil
         """
         package_tokens = package.split(".")
         package_tokens_len = len(package_tokens)
-        source_root = cls.get_source_root(package)
+        source_root = cls.get_package_source_root(package)
         common_root = str(Path(source_root).parents[package_tokens_len - 1])
         if package_tokens[0] == "preloads":
             # Preloads directory is specified directly in module format
