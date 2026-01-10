@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.settings.package_settings import PackageSettings
 
 

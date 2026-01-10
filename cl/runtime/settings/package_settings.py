@@ -19,7 +19,7 @@ from typing import Mapping
 from typing import Sequence
 from frozendict import frozendict
 from typing_extensions import final
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.project.project_checks import ProjectChecks
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import MAPPING_TYPES

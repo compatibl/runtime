@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from typing_extensions import final
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.settings.settings import Settings
 
 
@@ -26,7 +26,7 @@ class PreloadSettings(Settings):
     preload_dirs: list[str] | None = None
     """
     Absolute or relative (to Dynaconf project root) directory paths under which preloaded data is located.
-    
+
     Notes:
         - Each element of 'dir_path' will be searched for csv, yaml, and json subdirectories
         - For CSV, the data is in csv/.../ClassName.csv where ... is optional dataset

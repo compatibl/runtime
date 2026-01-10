@@ -15,7 +15,7 @@
 import os
 from fnmatch import fnmatch
 from typing import Sequence
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.primitive.string_util import StringUtil
 from cl.runtime.settings.package_settings import PackageSettings
 

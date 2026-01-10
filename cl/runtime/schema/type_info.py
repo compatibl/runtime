@@ -25,7 +25,7 @@ from typing import Sequence
 from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.prebuild.import_util import ImportUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin

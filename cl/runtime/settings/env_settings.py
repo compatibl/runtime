@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from getpass import getuser
 from typing_extensions import final
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.enum_util import EnumUtil
 from cl.runtime.primitive.identifier_util import IdentifierUtil
@@ -43,7 +43,7 @@ class EnvSettings(Settings):
     """
     Unique tenant identifier, tenants are isolated when sharing the same DB.
     Defaults to env_user if not specified. The following variables can be used inside braces:
-    
+
     - env_id
     - env_kind (converted to snake_case)
     - env_user
@@ -52,7 +52,7 @@ class EnvSettings(Settings):
     env_dir: str = required()
     """
     Defaults to project_resources if not specified. The following variables can be used inside braces:
-    
+
     - project_root
     - project_resources
     - env_id

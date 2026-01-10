@@ -21,7 +21,7 @@ locate.append_sys_path("../../..")
 import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
 
 from cl.runtime.file.csv_reader import CsvReader
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.settings.package_settings import PackageSettings
 
 if __name__ == '__main__':

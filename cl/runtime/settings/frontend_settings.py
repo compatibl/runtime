@@ -22,7 +22,7 @@ import zipfile
 from dataclasses import dataclass
 from typing_extensions import final  # TODO: Replace by the import from typing
 from cl.runtime.contexts.os_util import OsUtil
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.prebuild.version_util import VersionUtil
 from cl.runtime.settings.settings import Settings
 
@@ -48,7 +48,7 @@ class FrontendSettings(Settings):
     frontend_download_uri: str = "https://github.com/compatibl/frontend/archive/refs/tags/{version}"
     """
     URI template for frontend download.
-    
+
     Notes:
         - May include {version}, in which case the specified frontend_version will be substituted
         - If file extension is omitted, .zip and .tar.gz choices will be provided

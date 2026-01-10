@@ -14,7 +14,7 @@
 
 import pytest
 import os
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.storage.local_storage import LocalStorage
 from cl.runtime.storage.storage_mode import StorageMode

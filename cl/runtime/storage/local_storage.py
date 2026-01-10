@@ -14,7 +14,7 @@
 
 import os
 from dataclasses import dataclass
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.typename import typename
 from cl.runtime.storage.binary_file import BinaryFile

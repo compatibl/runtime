@@ -27,7 +27,7 @@ locate.append_sys_path("../../..")
 # Import bootstrap module first to configure PYTHONPATH and other settings
 import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
 
-from cl.runtime.file.project_layout import ProjectLayout
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.settings.package_settings import PackageSettings
 
 
