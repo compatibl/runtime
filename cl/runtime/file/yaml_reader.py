@@ -51,7 +51,7 @@ class YamlReader(Reader):
         result = []
         for file_path in file_paths:
             try:
-                record_type = FileUtil.get_type_from_filename(file_path, error=False)
+                record_type = FileUtil.get_type_from_filename(file_path, raise_on_fail=False)
 
                 with open(file_path, mode="r", encoding="utf-8") as file:
                     yaml_data = _ENCODER.decode(file.read())

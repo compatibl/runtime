@@ -107,10 +107,10 @@ def test_get_type_from_filename():
         FileUtil.get_type_from_filename("lowercase.json")
 
     # Test with invalid PascalCase and error=False (should return None, not raise)
-    result = FileUtil.get_type_from_filename("invalid_name.json", error=False)
+    result = FileUtil.get_type_from_filename("invalid_name.json", raise_on_fail=False)
     assert result is None
 
-    result = FileUtil.get_type_from_filename("lowercase.json", error=False)
+    result = FileUtil.get_type_from_filename("lowercase.json", raise_on_fail=False)
     assert result is None
 
     # Test with valid PascalCase but non-existent type and error=True (should raise)
@@ -118,7 +118,7 @@ def test_get_type_from_filename():
         FileUtil.get_type_from_filename("NonExistentType.json")
 
     # Test with valid PascalCase but non-existent type and error=False (should return None)
-    result = FileUtil.get_type_from_filename("NonExistentType.json", error=False)
+    result = FileUtil.get_type_from_filename("NonExistentType.json", raise_on_fail=False)
     assert result is None
 
     # Test with path containing invalid PascalCase
@@ -126,7 +126,7 @@ def test_get_type_from_filename():
         FileUtil.get_type_from_filename("/path/to/invalid_name.json")
 
     # Test with path and error=False
-    result = FileUtil.get_type_from_filename("/path/to/invalid_name.json", error=False)
+    result = FileUtil.get_type_from_filename("/path/to/invalid_name.json", raise_on_fail=False)
     assert result is None
 
 

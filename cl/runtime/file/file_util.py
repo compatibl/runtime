@@ -172,11 +172,11 @@ class FileUtil:
             return None
 
     @classmethod
-    def get_type_from_filename(cls, file_path: str, error: bool = True) -> type | None:
+    def get_type_from_filename(cls, file_path: str, *, raise_on_fail: bool = True) -> type | None:
         """Validate that filename without extension is a valid type in TypeInfo.
         Args:
             file_path: Absolute or relative file path
-            error: If True, raise RuntimeError on invalid type, otherwise return None
+            raise_on_fail: If True, raise RuntimeError on invalid type, otherwise return None
         Returns:
             Record type corresponding to filename without extension
         Raises:
@@ -185,15 +185,18 @@ class FileUtil:
         filename = os.path.basename(file_path)
         filename_without_extension, _ = os.path.splitext(filename)
 
+        # Filename has format Type;KeyField1;KeyField2;...
+        type_from_filename = filename_without_extension.split(";", 1)[0]
+
         # Validate that filename is a valid type in TypeInfo
         try:
             # Check for PascalCase
-            CaseUtil.check_pascal_case(filename_without_extension)
-            record_type = TypeInfo.from_type_name(filename_without_extension)
+            CaseUtil.check_pascal_case(type_from_filename)
+            record_type = TypeInfo.from_type_name(type_from_filename)
         except Exception as e:
             # Neither PascalCase nor valid type ->
             # Raise or return None based on error flag
             record_type = None
-            if error:
-                raise RuntimeError(f"Filename '{filename_without_extension}' is not a valid type. " f"Error: {e}")
+            if raise_on_fail:
+                raise RuntimeError(f"Filename '{type_from_filename}' is not a valid type. " f"Error: {e}")
         return record_type
