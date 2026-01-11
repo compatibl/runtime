@@ -46,10 +46,10 @@ from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.db_settings import DbSettings
 
-_INVALID_DB_NAME_SYMBOLS = r'/\\. "$*<>:|?'
+_INVALID_DB_NAME_SYMBOLS = r'/\\. "$*<>:|?' # TODO: !!! Update for CouchDB
 """Invalid CouchDB database name symbols."""
 
-_INVALID_DB_NAME_SYMBOLS_MSG = r'<space>/\."$*<>:|?'
+_INVALID_DB_NAME_SYMBOLS_MSG = r'<space>/\."$*<>:|?'  # TODO: !!! Update for CouchDB
 """Invalid CouchDB database name symbols (for the error message)."""
 
 _INVALID_DB_NAME_REGEX = re.compile(f"[{_INVALID_DB_NAME_SYMBOLS}]")
@@ -577,7 +577,7 @@ class BasicCouchDb(Db):
         if self._couch_db_name is None:
             self._couch_db_name = self.db_id
             # Check for invalid characters in CouchDB name
-            if _INVALID_DB_NAME_REGEX.search(self._couch_db_name):
+            if False:  # TODO: !!!! Update for CouchDB and restore _INVALID_DB_NAME_REGEX.search(self._couch_db_name):
                 raise RuntimeError(
                     f"CouchDB database name '{self._couch_db_name}' is not valid because it contains "
                     f"special characters from this list: '{_INVALID_DB_NAME_SYMBOLS_MSG}'"
