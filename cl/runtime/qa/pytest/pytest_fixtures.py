@@ -22,6 +22,7 @@ from _pytest.fixtures import FixtureRequest
 from bson import UUID_SUBTYPE
 from bson import Binary
 from cl.runtime.contexts.context_manager import activate
+from cl.runtime.db.couch.basic_couch_db import BasicCouchDb
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.db.db import Db
 from cl.runtime.db.mongo.basic_mongo_db import BasicMongoDb
@@ -62,8 +63,8 @@ def _db_fixture(request: FixtureRequest, *, db_type: type | None = None, tenant:
             env_dir=PytestUtil.get_test_path_from_request(request, name_only=False),
         ).build()
     ):
-        # Replace dots by semicolons
-        db_id = test_name.replace(".", ";")
+        # Replace dots by the separator specified in DbSettings
+        db_id = test_name.replace(".", DbSettings.instance().db_name_separator)
 
         # Extract tenant from fixture request params
         tenant = TenantKey(tenant_id=tenant) if tenant else None
@@ -124,6 +125,17 @@ def basic_mongo_mock_db_fixture(request: FixtureRequest, tenant_fixture) -> Iter
     # Patch 'from_uuid' method
     with mock.patch("bson.binary.Binary.from_uuid", side_effect=convert_uuid_to_binary):
         yield from _db_fixture(request, db_type=BasicMongoMockDb, tenant=tenant_fixture)
+
+
+@pytest.fixture(scope="function")
+def basic_couch_db_fixture(request: FixtureRequest, tenant_fixture) -> Iterator[Db]:
+    """
+    Pytest module fixture to set up and tear down temporary databases using BasicCouchDb.
+
+    Notes:
+        This requires a running CouchDB server with DB create and drop permissions.
+    """
+    yield from _db_fixture(request, db_type=BasicCouchDb, tenant=tenant_fixture)
 
 
 @pytest.fixture(scope="function", params=[TypeInfo.from_type_name(x) for x in QaSettings.instance().qa_db_types])

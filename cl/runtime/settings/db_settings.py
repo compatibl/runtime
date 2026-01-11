@@ -41,6 +41,9 @@ class DbSettings(Settings):
     db_password: str | None = None
     """Password provided to the database client."""
 
+    db_name_separator: str | None = None
+    """Separator for the tokens in database name."""
+
     db_dev_prefix: str = "dev_"
     """DB WITH THIS PREFIX IS DELETED ON EVERY BACKEND PROCESS START *** WITH *** USER APPROVAL."""
 
@@ -85,6 +88,18 @@ class DbSettings(Settings):
                 self.db_client_uri = f"{uri_prefix}{self.db_username}@{uri_suffix}"
             else:
                 self.db_client_uri = f"{uri_prefix}{uri_suffix}"
+
+        if self.db_name_separator is None:
+            # Set the separator symbol based on the database type
+            if self.db_type.endswith("MongoDb"):
+                self.db_name_separator = ";"
+            elif self.db_type.endswith("CouchDb"):
+                self.db_name_separator = "/"
+            else:
+                raise RuntimeError(
+                    f"{typenameof(self)}.db_name_separator is not set and no\n"
+                    f"suitable default exists for db_type={self.db_type}."
+                )
 
     @classmethod
     def get_db_dir(cls) -> str:
