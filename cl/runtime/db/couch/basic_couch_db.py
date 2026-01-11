@@ -27,6 +27,7 @@ from cl.runtime.db.sort_order import SortOrder
 from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.records.cast_util import CastUtil
 from cl.runtime.records.key_mixin import KeyMixin
+from cl.runtime.records.none_checks import NoneChecks
 from cl.runtime.records.protocols import is_data_key_or_record_type
 from cl.runtime.records.protocols import is_enum_type
 from cl.runtime.records.protocols import is_key_type
@@ -97,8 +98,24 @@ class BasicCouchDb(Db):
 
         # Set CouchDB URI from settings if not specified
         if self.client_uri is None:
-            # Default to CouchDB URI from settings
-            self.client_uri = db_settings.db_client_uri
+            # Default to CouchDB URI from settings if not specified in this class
+            if db_settings.db_client_uri is not None:
+                self.client_uri = db_settings.db_client_uri
+            else:
+                # If neither is specified, use localhost with the default CouchDB port and credentials
+                self.client_uri = "http://{db_username}:{db_password}@localhost:5984/"
+
+        # Check that variables that are actually used in the URI are set
+        client_uri_dict = {}
+        if "{db_username}" in self.client_uri:
+            NoneChecks.guard_not_none(db_settings.db_username)
+            client_uri_dict["db_username"] = db_settings.db_username
+        if "{db_password}" in self.client_uri:
+            NoneChecks.guard_not_none(db_settings.db_password)
+            client_uri_dict["db_password"] = db_settings.db_password
+
+        # Perform variable substitution
+        self.client_uri = self.client_uri.format(client_uri_dict)
 
     def is_empty(self) -> bool:
         """Return true if the database contains no documents."""

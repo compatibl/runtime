@@ -32,7 +32,7 @@ class DbSettings(Settings):
     db_type: str = required()  # TODO: !! Refactor to use to_object from settings
     """Database class name."""
 
-    db_client_uri: str = required()
+    db_client_uri: str | None = None
     """URI provided to the database client."""
 
     db_username: str | None = None
@@ -67,27 +67,6 @@ class DbSettings(Settings):
         if not isinstance(self.db_type, str):
             # TODO: Check the class is valid
             raise RuntimeError(f"{typename(type(self))} field 'db_type' must be Db class name in PascalCase format.")
-
-        if self.db_client_uri is None:
-            # Use default client URI protocol, hostname and port depending on the database type
-            if self.db_type.endswith("MongoDb"):
-                uri_prefix = "mongodb://"
-                uri_suffix = "localhost:27017/"
-            elif self.db_type.endswith("CouchDb"):
-                uri_prefix = "http://"
-                uri_suffix = "localhost:5984/"
-            else:
-                raise RuntimeError(
-                    f"{typenameof(self)}.db_client_uri is not set and no\n"
-                    f"suitable default exists for db_type={self.db_type}."
-                )
-            # Substitute username and password if specified
-            if self.db_username is not None and self.db_password is not None:
-                self.db_client_uri = f"{uri_prefix}{self.db_username}:{self.db_password}@{uri_suffix}"
-            elif self.db_username is not None:
-                self.db_client_uri = f"{uri_prefix}{self.db_username}@{uri_suffix}"
-            else:
-                self.db_client_uri = f"{uri_prefix}{uri_suffix}"
 
         if self.db_name_separator is None:
             # Set the separator symbol based on the database type
