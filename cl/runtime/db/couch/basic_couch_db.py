@@ -18,7 +18,6 @@ from typing import Any
 from typing import Iterable
 from typing import Sequence
 from typing import cast
-import pycouchdb
 from pycouchdb import Server
 from pycouchdb.exceptions import NotFound
 from cl.runtime.db.db import Db
@@ -63,16 +62,19 @@ _KEY_SERIALIZER = KeySerializers.DELIMITED
 """Used for key serialization."""
 
 # TODO (Roman): Clean up open connections on worker shutdown
-_couch_server_dict: dict[tuple[type, str | None], Server] = {}
+_couch_server_dict: dict[str, Server] = {}
 """CouchDB server dict for caching and reusing CouchDB connection."""
 
 
 @dataclass(slots=True, kw_only=True)
-class BasicCouchDB(Db):
+class BasicCouchDb(Db):
     """CouchDB database without bitemporal support."""
 
     client_uri: str | None = None
-    """CouchDB client URI, defaults to http://localhost:5984/"""
+    """
+    Client URI is taken from DbSettings when not specified, must include credentials.
+    Example: http://username:password@localhost:5984/
+    """
 
     _couch_server: Server | None = None
     """CouchDB server instance, initialized once and stored."""
@@ -95,8 +97,8 @@ class BasicCouchDB(Db):
 
         # Set CouchDB URI from settings if not specified
         if self.client_uri is None:
-            # Default to CouchDB URI
-            self.client_uri = getattr(db_settings, "db_couch_uri", None) or "http://localhost:5984/"
+            # Default to CouchDB URI from settings
+            self.client_uri = db_settings.db_client_uri
 
     def is_empty(self) -> bool:
         """Return true if the database contains no documents."""
@@ -554,24 +556,17 @@ class BasicCouchDB(Db):
             self._collection_name_dict[key_type] = collection_name
         return collection_name
 
-    def _get_couch_server_type(self) -> type:
-        """Get the type of CouchDB server object."""
-        return Server
-
     def _get_couch_server(self) -> Server:
         """Get CouchDB server object."""
 
         # TODO (Roman): Refactor. Consider removing _couch_server from instance-level fields
         if self._couch_server is None:
-            couch_server_type = self._get_couch_server_type()
 
-            couch_server_key = (couch_server_type, self.client_uri)
-            cached_couch_server = _couch_server_dict.get(couch_server_key)
-
+            cached_couch_server = _couch_server_dict.get(self.client_uri)
             if cached_couch_server is None:
-                couch_server = couch_server_type(self.client_uri)
+                couch_server = Server(self.client_uri)
                 self._couch_server = couch_server
-                _couch_server_dict[couch_server_key] = couch_server
+                _couch_server_dict[self.client_uri] = couch_server
             else:
                 self._couch_server = cached_couch_server
 
@@ -588,8 +583,8 @@ class BasicCouchDB(Db):
                     f"special characters from this list: '{_INVALID_DB_NAME_SYMBOLS_MSG}'"
                 )
 
-            # Check for maximum byte length of less than 64 (use Unicode bytes, not string chars to count)
-            max_bytes = 63
+            # Check for maximum byte length of less than 249 (use Unicode bytes, not string chars to count)
+            max_bytes = 249
             actual_bytes = len(self._couch_db_name.encode("utf-8"))
             if actual_bytes > max_bytes:
                 raise RuntimeError(
