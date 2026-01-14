@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pathlib
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 import ruamel.yaml
 from cl.runtime.auth.secrets_provider import SecretsProvider
-from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.project.project_layout import ProjectLayout
+from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.settings.secrets_settings import SecretsSettings
 
 
 @dataclass(slots=True, kw_only=True)
 class LocalSecretsProvider(SecretsProvider):
     """Retrieve secrets from local file based vault."""
-
-    path_to_secrets: str = "keys/"
-    """Path to .secrets.yaml file."""
 
     def add_secret(self, name: str, value, *, content_type: str | None = None) -> None:
         data = self._load_secrets()
@@ -81,8 +79,8 @@ class LocalSecretsProvider(SecretsProvider):
             "version": version,
         }
 
-    def _get_secrets_dir(self) -> pathlib.Path:
-        return pathlib.Path(ProjectLayout.get_project_root()).joinpath(pathlib.Path(self.path_to_secrets))
+    def _get_secrets_dir(self) -> Path:
+        return Path(ProjectLayout.get_project_root()).joinpath(Path(SecretsSettings.instance().secrets_path))
 
     def _load_secrets(self) -> dict[str, dict]:
         secrets_path = self._get_secrets_dir() / ".secrets.yaml"
