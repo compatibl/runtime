@@ -89,12 +89,11 @@ class EnvSettings(Settings):
 
         expected_dynaconf_env = dynaconf_env_mapping.get(self.env_kind, None)
         if expected_dynaconf_env is not None:
-            actual_dynaconf_env = Settings.get_dynaconf_env()
-            if actual_dynaconf_env != expected_dynaconf_env:
+            if self.dynaconf_env != expected_dynaconf_env:
                 raise RuntimeError(
                     f"The value of env_kind={self.env_kind.name} set via settings.yaml or an environment variable\n"
                     f"requires Dynaconf current_env={expected_dynaconf_env}, "
-                    f"but current_env={actual_dynaconf_env} was found.\n"
+                    f"but current_env={self.dynaconf_env} was found.\n"
                 )
         else:
             env_kind_choices_str = "\n".join(
