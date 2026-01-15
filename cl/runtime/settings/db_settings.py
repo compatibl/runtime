@@ -17,8 +17,7 @@ from dataclasses import dataclass
 from typing_extensions import final
 from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.typename import typename
-from cl.runtime.records.typename import typenameof
+from cl.runtime.records.typename import typename, typenameof
 from cl.runtime.settings.settings import Settings
 
 
@@ -71,7 +70,7 @@ class DbSettings(Settings):
 
         if self.db_name_separator is None:
             # Set the separator symbol based on the database type
-            if self.db_type.endswith("SqliteDb") or self.db_type.endswith("MongoDb"):
+            if self.db_type.endswith("MongoDb") or self.db_type.endswith("SqliteDb"):
                 self.db_name_separator = ";"
             elif self.db_type.endswith("CouchDb"):
                 self.db_name_separator = "/"
