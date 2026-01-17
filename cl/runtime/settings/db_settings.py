@@ -70,7 +70,7 @@ class DbSettings(Settings):
 
         if self.db_name_separator is None:
             # Set the separator symbol based on the database type
-            if self.db_type.endswith("MongoDb"):
+            if self.db_type.endswith("SqliteDb") or self.db_type.endswith("MongoDb"):
                 self.db_name_separator = ";"
             elif self.db_type.endswith("CouchDb"):
                 self.db_name_separator = "/"
