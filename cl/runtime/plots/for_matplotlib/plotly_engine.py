@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 from dataclasses import dataclass
 import plotly.graph_objects as go
 import plotly.io as pio
@@ -187,3 +188,12 @@ class PlotlyEngine(PlottingEngine):
                 return result
             else:
                 raise RuntimeError(f"Color enum {color} is not supported by {typenameof(self)}")
+
+    @staticmethod
+    def sanitize_plotly_html(html: str) -> str:
+        """Remove version-dependent content from Plotly HTML for stable test output."""
+        # Replace versioned CDN URL: plotly-X.X.X.min.js -> plotly.min.js
+        html = re.sub(r"plotly-[\d.]+\.min\.js", "plotly.min.js", html)
+        # Remove integrity hash (changes with version)
+        html = re.sub(r'\s+integrity="[^"]*"', "", html)
+        return html
