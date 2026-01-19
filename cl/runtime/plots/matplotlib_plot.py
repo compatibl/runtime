@@ -39,6 +39,17 @@ class MatplotlibPlot(Plot, ABC):
     def _create_figure(self) -> plt.Figure:
         """Return Matplotlib figure object for the plot."""
 
+    def get_png(self) -> bytes:
+        """Return PNG image bytes for the plot."""
+        self.check_frozen()
+
+        # Create figure and get PNG bytes
+        fig = self._create_figure()
+        png_bytes = MatplotlibUtil.get_png_bytes(
+            fig, transparent=self.is_dark_theme(), dpi=100, bbox_inches="tight", pad_inches=0.1
+        )
+        return png_bytes
+
     def get_view(self) -> PngView:
         """Return a view object for the plot, implement using 'create_figure' method."""
         self.check_frozen()
@@ -59,7 +70,7 @@ class MatplotlibPlot(Plot, ABC):
         result = PngView(png_bytes=png_bytes)
         return result
 
-    def save(self, format_: str = "png") -> None:
+    def save(self, format_: str = "png") -> None:  # TODO: Do not use string format, create separate methods instead
         """Save in given format to 'base_dir/plot_id.format_', implement using 'create_figure' method."""
         self.check_frozen()
 

@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from io import BytesIO
 from typing import Union
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.image import AxesImage
 
 
@@ -141,3 +143,40 @@ class MatplotlibUtil:
             "Creator": "",
             "Date": "",
         }
+
+    @classmethod
+    def get_png_bytes(
+        cls,
+        fig: Figure,
+        *,
+        transparent: bool = False,
+        dpi: int = 100,
+        bbox_inches: str = "tight",
+        pad_inches: float = 0.1,
+    ) -> bytes:
+        """
+        Get PNG bytes from a matplotlib figure.
+
+        Args:
+            fig: Matplotlib figure object
+            transparent: If True, use transparent background
+            dpi: DPI for rendering (default: 100)
+            bbox_inches: Bounding box setting (default: "tight")
+            pad_inches: Padding in inches (default: 0.1)
+
+        Returns:
+            bytes: PNG image data
+        """
+        buffer = BytesIO()
+        fig.savefig(
+            buffer,
+            format="png",
+            dpi=dpi,
+            bbox_inches=bbox_inches,
+            pad_inches=pad_inches,
+            transparent=transparent,
+            metadata=cls.no_png_metadata(),
+        )
+        png_bytes = buffer.getvalue()
+        buffer.close()
+        return png_bytes

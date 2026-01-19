@@ -14,7 +14,6 @@
 
 import pytest
 from cl.runtime.plots.multi_plot import MultiPlot
-from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.qa.regression_guard import RegressionGuard
 from stubs.cl.runtime.plots.stub_heat_map_plots import StubHeatMapPlots
 
@@ -38,7 +37,7 @@ def test_multi_heatmap(work_dir_fixture):
     ).build()
 
     # Act: Write plot to regression guard
-    guard.write(PngUtil.get_png_bytes_from_figure(plot._create_figure()))
+    guard.write(plot.get_png())
 
     # Assert: Verify plot
     guard.verify()
