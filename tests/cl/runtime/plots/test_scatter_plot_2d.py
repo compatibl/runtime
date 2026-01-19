@@ -17,6 +17,7 @@ from cl.runtime.plots.for_matplotlib.plotly_engine import PlotlyEngine
 from cl.runtime.plots.plot_line_style import PlotLineStyle
 from cl.runtime.plots.scatter_plot_2d import ScatterPlot2D
 from cl.runtime.plots.scatter_values_2d import ScatterValues2D
+from cl.runtime.qa.regression_guard import RegressionGuard
 
 
 def create_plot():
@@ -63,6 +64,7 @@ def test_html(work_dir_fixture):
     assert "plotly" in html.lower()
     assert "X Axis" in html
 
-    # Save to disk
-    with open("scatter_plot_2d.plotly.html", "w", encoding="utf-8") as f:
-        f.write(html)
+    # Verify against expected output (RegressionGuard auto-detects Plotly and sanitizes for comparison)
+    guard = RegressionGuard(ext="html", channel="scatter_plot_2d.plotly")
+    guard.write(html)
+    guard.verify()

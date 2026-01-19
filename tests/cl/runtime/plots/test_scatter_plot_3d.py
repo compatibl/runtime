@@ -17,6 +17,7 @@ from cl.runtime.plots.for_matplotlib.plotly_engine import PlotlyEngine
 from cl.runtime.plots.plot_surface_style import PlotSurfaceStyle
 from cl.runtime.plots.scatter_plot_3d import ScatterPlot3D
 from cl.runtime.plots.scatter_values_3d import ScatterValues3D
+from cl.runtime.qa.regression_guard import RegressionGuard
 
 
 def create_plot():
@@ -63,6 +64,7 @@ def test_html(work_dir_fixture):
     assert "plotly" in html.lower()
     assert "X Axis" in html
 
-    # Save to disk
-    with open("scatter_plot_3d.plotly.html", "w", encoding="utf-8") as f:
-        f.write(html)
+    # Verify against expected output (RegressionGuard auto-detects Plotly and sanitizes for comparison)
+    guard = RegressionGuard(ext="html", channel="scatter_plot_3d.plotly")
+    guard.write(html)
+    guard.verify()
