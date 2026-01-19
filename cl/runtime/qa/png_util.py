@@ -49,6 +49,29 @@ class PngUtil:
     }
 
     @staticmethod
+    def get_png_bytes_from_figure(fig, dpi: int = 100, bbox_inches: str = "tight", pad_inches: float = 0.1) -> bytes:
+        """
+        Get PNG bytes from a matplotlib figure.
+
+        Args:
+            fig: Matplotlib figure object
+            dpi: DPI for rendering (default: 100)
+            bbox_inches: Bounding box setting (default: "tight")
+            pad_inches: Padding in inches (default: 0.1)
+
+        Returns:
+            bytes: PNG image data
+        """
+
+        # Render figure to BytesIO buffer
+        buffer = BytesIO()
+        fig.savefig(buffer, format="png", dpi=dpi, bbox_inches=bbox_inches, pad_inches=pad_inches, transparent=False)
+        png_bytes = buffer.getvalue()
+        buffer.close()
+
+        return png_bytes
+
+    @staticmethod
     def get_pixel_hash_from_figure(fig, dpi: int = 100, bbox_inches: str = "tight", pad_inches: float = 0.1) -> str:
         """
         Get MD5 hash of pixel data from a matplotlib figure.

@@ -23,7 +23,7 @@ def test_multi_heatmap(work_dir_fixture):
     """Test a multi heat map plot using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(channel="test_multi_heat_map_plot.test_multi_heatmap")
+    guard = RegressionGuard(ext="png", channel="test_multi_heat_map_plot.test_multi_heatmap")
 
     # Arrange: Generate plot
     plot = MultiPlot(
@@ -38,7 +38,7 @@ def test_multi_heatmap(work_dir_fixture):
     ).build()
 
     # Act: Write plot to regression guard
-    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
+    guard.write(PngUtil.get_png_bytes_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()

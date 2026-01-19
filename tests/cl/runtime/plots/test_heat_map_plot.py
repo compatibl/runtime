@@ -22,13 +22,13 @@ def test_basic(work_dir_fixture):
     """Test a basic heat map plot using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(channel="test_heat_map_plot.test_basic")
+    guard = RegressionGuard(ext="png", channel="test_heat_map_plot.test_basic")
 
     # Arrange: Generate plot
     plot = StubHeatMapPlots.get_basic_plot("test_heat_map_plot.test_basic")
 
     # Act: Write plot to regression guard
-    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
+    guard.write(PngUtil.get_png_bytes_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()

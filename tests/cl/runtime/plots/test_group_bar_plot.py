@@ -22,13 +22,13 @@ def test_single_group(work_dir_fixture):
     """Test GroupBarPlot with one group using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(channel="test_group_bar_plot.group_bar_plot")
+    guard = RegressionGuard(ext="png", channel="test_group_bar_plot.group_bar_plot")
 
     # Arrange: Generate plot
     plot = StubGroupBarPlots.get_single_group_plot("test_group_bar_plot.group_bar_plot")
 
     # Act: Write plot to regression guard
-    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
+    guard.write(PngUtil.get_png_bytes_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()
@@ -43,13 +43,13 @@ def test_4_groups_2_bars(work_dir_fixture):
     """Test GroupBarPlot with 4 groups with 2 bars each using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(channel="test_group_bar_plot.test_4_groups_2_bars")
+    guard = RegressionGuard(ext="png", channel="test_group_bar_plot.test_4_groups_2_bars")
 
     # Arrange: Generate plot
     plot = StubGroupBarPlots.get_4_groups_2_bars_plot("test_group_bar_plot.test_4_groups_2_bars")
 
     # Act: Write plot to regression guard
-    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
+    guard.write(PngUtil.get_png_bytes_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()
@@ -59,13 +59,13 @@ def test_4_groups_5_bars(work_dir_fixture):
     """Test GroupBarPlot plot with 4 groups and 5 bars using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(channel="test_group_bar_plot.test_4_groups_5_bars")
+    guard = RegressionGuard(ext="png", channel="test_group_bar_plot.test_4_groups_5_bars")
 
     # Arrange: Generate plot
     plot = StubGroupBarPlots.get_4_groups_5_bars("test_group_bar_plot.test_4_groups_5_bars")
 
     # Act: Write plot to regression guard
-    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
+    guard.write(PngUtil.get_png_bytes_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()

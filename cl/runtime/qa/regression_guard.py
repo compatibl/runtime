@@ -30,7 +30,7 @@ from cl.runtime.schema.field_decl import primitive_types
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 
-_supported_extensions = ["txt", "yaml", "html"]
+_supported_extensions = ["txt", "yaml", "html", "png"]
 """The list of supported output file extensions (formats)."""
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
@@ -182,6 +182,13 @@ class RegressionGuard:
             with open(received_path, "w", encoding="utf-8") as file:
                 file.write(value)
                 file.flush()
+        elif self.ext == "png":
+            # For PNG, value must be bytes; save as-is (pixel hash comparison happens during verification)
+            if not isinstance(value, bytes):
+                raise RuntimeError(f"PNG extension requires bytes value, got {type(value).__name__}")
+            with open(received_path, "wb") as file:
+                file.write(value)
+                file.flush()
         else:
             # Should not be reached here because of a previous check in __init__
             _error_extension_not_supported(self.ext)
@@ -272,22 +279,32 @@ class RegressionGuard:
 
         if os.path.exists(expected_path):
 
-            # Read both files
-            with open(received_path, "r", encoding="utf-8") as received_file:
-                received_content = received_file.read()
-            with open(expected_path, "r", encoding="utf-8") as expected_file:
-                expected_content = expected_file.read()
+            # For PNG files, use pixel hash comparison
+            if self.ext == "png":
+                from cl.runtime.qa.png_util import PngUtil
 
-            # For HTML files with Plotly content, sanitize in memory for comparison
-            if self.ext == "html" and self._is_plotly_html(received_content):
-                received_for_comparison = self._sanitize_plotly_html(received_content)
-                expected_for_comparison = self._sanitize_plotly_html(expected_content)
+                received_hash = PngUtil.get_pixel_hash_from_png(received_path)
+                expected_hash = PngUtil.get_pixel_hash_from_png(expected_path)
+                content_matches = received_hash == expected_hash
             else:
-                received_for_comparison = received_content
-                expected_for_comparison = expected_content
+                # Read both files as text
+                with open(received_path, "r", encoding="utf-8") as received_file:
+                    received_content = received_file.read()
+                with open(expected_path, "r", encoding="utf-8") as expected_file:
+                    expected_content = expected_file.read()
 
-            # Compare (sanitized for HTML, as-is for other formats)
-            if received_for_comparison == expected_for_comparison:
+                # For HTML files with Plotly content, sanitize in memory for comparison
+                if self.ext == "html" and self._is_plotly_html(received_content):
+                    received_for_comparison = self._sanitize_plotly_html(received_content)
+                    expected_for_comparison = self._sanitize_plotly_html(expected_content)
+                else:
+                    received_for_comparison = received_content
+                    expected_for_comparison = expected_content
+
+                content_matches = received_for_comparison == expected_for_comparison
+
+            # Compare
+            if content_matches:
                 # Content matches (after sanitization for HTML)
                 # Delete the received file and diff file
                 os.remove(received_path)
@@ -297,40 +314,59 @@ class RegressionGuard:
                 # Return True to indicate verification has been successful
                 return True
             else:
-                # Content differs, generate unified diff (use sanitized content for HTML)
-                received_lines = received_for_comparison.splitlines(keepends=True)
-                expected_lines = expected_for_comparison.splitlines(keepends=True)
-
-                # Convert to list first because the returned object is a generator but
-                # we will need to iterate over the lines more than once
-                diff = list(
-                    difflib.unified_diff(
-                        expected_lines, received_lines, fromfile=expected_path, tofile=received_path, n=0
+                # Content differs
+                if self.ext == "png":
+                    # For PNG, write pixel hash comparison to diff file
+                    diff_content = (
+                        f"PNG pixel hash mismatch:\n"
+                        f"  Expected: {expected_hash}\n"
+                        f"  Received: {received_hash}\n"
                     )
-                )
+                    with open(diff_path, "w", encoding="utf-8") as diff_file:
+                        diff_file.write(diff_content)
 
-                # Write the complete unified diff into to the diff file
-                with open(diff_path, "w", encoding="utf-8") as diff_file:
-                    diff_file.write("".join(diff))
-
-                # Truncate to max_lines and surround by begin/end lines for generate exception text
-                line_len = 120
-                max_lines = 5
-                begin_str = "BEGIN REGRESSION TEST UNIFIED DIFF "
-                end_str = "END REGRESSION TEST UNIFIED DIFF "
-                begin_sep = "-" * (line_len - len(begin_str))
-                end_sep = "-" * (line_len - len(end_str))
-                orig_lines = len(diff)
-                if orig_lines > max_lines:
-                    diff = diff[:max_lines]
-                    truncate_str = f"(TRUNCATED {orig_lines-max_lines} ADDITIONAL LINES) "
-                    end_sep = end_sep[: -len(truncate_str)]
+                    exception_text = (
+                        f"\nPNG regression test failed.\n"
+                        f"  Expected pixel hash: {expected_hash}\n"
+                        f"  Received pixel hash: {received_hash}\n"
+                        f"  Expected file: {expected_path}\n"
+                        f"  Received file: {received_path}\n"
+                    )
                 else:
-                    truncate_str = ""
-                diff_str = "".join(diff)
-                exception_text = f"\n{begin_str}{begin_sep}\n" + diff_str
-                extra_eol = "" if exception_text.endswith("\n") else "\n"
-                exception_text = exception_text + f"{extra_eol}{end_str}{truncate_str}{end_sep}"
+                    # Generate unified diff for text formats (use sanitized content for HTML)
+                    received_lines = received_for_comparison.splitlines(keepends=True)
+                    expected_lines = expected_for_comparison.splitlines(keepends=True)
+
+                    # Convert to list first because the returned object is a generator but
+                    # we will need to iterate over the lines more than once
+                    diff = list(
+                        difflib.unified_diff(
+                            expected_lines, received_lines, fromfile=expected_path, tofile=received_path, n=0
+                        )
+                    )
+
+                    # Write the complete unified diff into to the diff file
+                    with open(diff_path, "w", encoding="utf-8") as diff_file:
+                        diff_file.write("".join(diff))
+
+                    # Truncate to max_lines and surround by begin/end lines for generate exception text
+                    line_len = 120
+                    max_lines = 5
+                    begin_str = "BEGIN REGRESSION TEST UNIFIED DIFF "
+                    end_str = "END REGRESSION TEST UNIFIED DIFF "
+                    begin_sep = "-" * (line_len - len(begin_str))
+                    end_sep = "-" * (line_len - len(end_str))
+                    orig_lines = len(diff)
+                    if orig_lines > max_lines:
+                        diff = diff[:max_lines]
+                        truncate_str = f"(TRUNCATED {orig_lines-max_lines} ADDITIONAL LINES) "
+                        end_sep = end_sep[: -len(truncate_str)]
+                    else:
+                        truncate_str = ""
+                    diff_str = "".join(diff)
+                    exception_text = f"\n{begin_str}{begin_sep}\n" + diff_str
+                    extra_eol = "" if exception_text.endswith("\n") else "\n"
+                    exception_text = exception_text + f"{extra_eol}{end_str}{truncate_str}{end_sep}"
 
                 # Record into the object even if silent
                 self.__exception_text = exception_text

@@ -29,7 +29,7 @@ def test_dark_theme(work_dir_fixture):
     """Test ConfusionMatrixPlot in dark mode using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(channel="test_confusion_matrix_plot.test_dark_theme")
+    guard = RegressionGuard(ext="png", channel="test_confusion_matrix_plot.test_dark_theme")
 
     # Arrange: Generate plot
     raw_data = pd.read_csv(Path(__file__).resolve().parent / "./test_confusion_matrix_plot.csv")
@@ -40,7 +40,7 @@ def test_dark_theme(work_dir_fixture):
     ).build()
 
     # Act: Write plot to regression guard
-    guard.write(PngUtil.get_pixel_hash_from_figure(plot._create_figure()))
+    guard.write(PngUtil.get_png_bytes_from_figure(plot._create_figure()))
 
     # Assert: Verify plot
     guard.verify()
