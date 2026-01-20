@@ -21,7 +21,7 @@ def test_single_group(work_dir_fixture):
     """Test GroupBarPlot with one group using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_group_bar_plot.group_bar_plot")
+    guard = RegressionGuard(ext="png", prefix="test_group_bar_plot.group_bar_plot")
 
     # Arrange: Generate plot
     plot = StubGroupBarPlots.get_single_group_plot("test_group_bar_plot.group_bar_plot")
@@ -42,7 +42,7 @@ def test_4_groups_2_bars(work_dir_fixture):
     """Test GroupBarPlot with 4 groups with 2 bars each using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_group_bar_plot.test_4_groups_2_bars")
+    guard = RegressionGuard(ext="png", prefix="test_group_bar_plot.test_4_groups_2_bars")
 
     # Arrange: Generate plot
     plot = StubGroupBarPlots.get_4_groups_2_bars_plot("test_group_bar_plot.test_4_groups_2_bars")
@@ -58,7 +58,7 @@ def test_4_groups_5_bars(work_dir_fixture):
     """Test GroupBarPlot plot with 4 groups and 5 bars using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_group_bar_plot.test_4_groups_5_bars")
+    guard = RegressionGuard(ext="png", prefix="test_group_bar_plot.test_4_groups_5_bars")
 
     # Arrange: Generate plot
     plot = StubGroupBarPlots.get_4_groups_5_bars("test_group_bar_plot.test_4_groups_5_bars")

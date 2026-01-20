@@ -58,7 +58,7 @@ def test_serialization():  # TODO: Rename to test_delimited
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(type(sample)))
-        guard = RegressionGuard(channel=snake_case_type_name)
+        guard = RegressionGuard(prefix=snake_case_type_name)
         guard.write(serialized)
     RegressionGuard().verify_all()
 
@@ -118,7 +118,7 @@ def test_for_sqlite():
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(type(sample)))
-        guard = RegressionGuard(channel=snake_case_type_name)
+        guard = RegressionGuard(prefix=snake_case_type_name)
         guard.write(serialized)
     RegressionGuard().verify_all()
 

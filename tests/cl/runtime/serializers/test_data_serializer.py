@@ -145,7 +145,7 @@ def test_bidirectional():
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(type(sample).__name__)
-        guard = RegressionGuard(channel=snake_case_type_name)
+        guard = RegressionGuard(prefix=snake_case_type_name)
         guard.write(result_str)
 
     RegressionGuard().verify_all()
@@ -181,7 +181,7 @@ def test_unidirectional():
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(type(sample).__name__)
-        guard = RegressionGuard(channel=snake_case_type_name)
+        guard = RegressionGuard(prefix=snake_case_type_name)
         guard.write(result_str)
 
     RegressionGuard().verify_all()

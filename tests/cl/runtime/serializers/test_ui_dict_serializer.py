@@ -59,7 +59,7 @@ def test_data_serialization():
 
         # Record in RegressionGuard
         result_str = BootstrapSerializers.YAML.serialize(serialized)
-        guard = RegressionGuard(channel=sample_type.__name__)
+        guard = RegressionGuard(prefix=sample_type.__name__)
         guard.write(result_str)
     RegressionGuard().verify_all()
 

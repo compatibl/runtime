@@ -65,6 +65,6 @@ def test_html(work_dir_fixture):
     assert "X Axis" in html
 
     # Verify against expected output (RegressionGuard auto-detects Plotly and sanitizes for comparison)
-    guard = RegressionGuard(ext="html", channel="scatter_plot_2d.plotly")
+    guard = RegressionGuard(ext="html", prefix="scatter_plot_2d.plotly")
     guard.write(html)
     guard.verify()

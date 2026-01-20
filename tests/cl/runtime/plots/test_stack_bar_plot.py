@@ -21,7 +21,7 @@ def test_single_stack(work_dir_fixture):
     """Test stacked bar plot with single stack using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_stack_bar_plot.stack_bar_plot")
+    guard = RegressionGuard(ext="png", prefix="test_stack_bar_plot.stack_bar_plot")
 
     # Arrange: Generate the plot
     plot = StubStackBarPlots.get_single_stack_plot("test_stack_bar_plot.stack_bar_plot")
@@ -37,7 +37,7 @@ def test_4_groups_2_bars(work_dir_fixture):
     """Test StackBarPlot with 4 stacks with 2 bars each using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_stack_bar_plot.test_4_stacks_2_bars")
+    guard = RegressionGuard(ext="png", prefix="test_stack_bar_plot.test_4_stacks_2_bars")
 
     # Arrange: Generate plot
     plot = StubStackBarPlots.get_4_stacks_2_bars_plot("test_stack_bar_plot.test_4_stacks_2_bars")
@@ -53,7 +53,7 @@ def test_4_stacks_5_bars(work_dir_fixture):
     """Test GroupBarPlot plot with 4 groups and 5 bars using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_stack_bar_plot.test_4_stacks_5_bars")
+    guard = RegressionGuard(ext="png", prefix="test_stack_bar_plot.test_4_stacks_5_bars")
 
     # Arrange: Generate plot
     plot = StubStackBarPlots.get_4_stacks_5_bars("test_stack_bar_plot.test_4_stacks_5_bars")

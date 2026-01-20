@@ -58,7 +58,7 @@ def test_roundtrip():
 
     for encoder_name, encoder in _ENCODERS:
         for sample in _SAMPLES:
-            guard = RegressionGuard(channel=encoder_name)
+            guard = RegressionGuard(prefix=encoder_name)
 
             # Test encoding
             encoded = encoder.encode(sample)

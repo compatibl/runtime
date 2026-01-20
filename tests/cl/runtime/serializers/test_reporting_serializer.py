@@ -78,7 +78,7 @@ def test_json():
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(sample_type.__name__)
-        guard = RegressionGuard(channel=snake_case_type_name)
+        guard = RegressionGuard(prefix=snake_case_type_name)
         guard.write(result_str)
 
     RegressionGuard().verify_all()

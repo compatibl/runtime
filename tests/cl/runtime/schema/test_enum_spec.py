@@ -39,7 +39,7 @@ def test_init():
         type_spec_str = BootstrapSerializers.YAML.serialize(type_spec)
 
         # Record in RegressionGuard
-        guard = RegressionGuard(channel=typename(type_spec.type_))
+        guard = RegressionGuard(prefix=typename(type_spec.type_))
         guard.write(type_spec_str)
     RegressionGuard().verify_all()
 

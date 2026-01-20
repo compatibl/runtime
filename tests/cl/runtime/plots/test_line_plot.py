@@ -21,7 +21,7 @@ def test_one_line(work_dir_fixture):
     """Test LinePlot with one line using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_line_plot.test_one_line")
+    guard = RegressionGuard(ext="png", prefix="test_line_plot.test_one_line")
 
     # Arrange: Generate plot
     plot = StubLinePlots.get_one_line_plot(plot_id="test_line_plot.test_one_line")
@@ -37,7 +37,7 @@ def test_two_line(work_dir_fixture):
     """Test LinePlot with two lines using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_line_plot.test_two_line")
+    guard = RegressionGuard(ext="png", prefix="test_line_plot.test_two_line")
 
     # Arrange: Generate plot
     plot = StubLinePlots.get_two_line_plot(plot_id="test_line_plot.test_two_line")

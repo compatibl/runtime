@@ -58,7 +58,7 @@ def test_data_serialization():
         assert BuilderChecks.is_equal(deserialized, sample)
 
         # Record in RegressionGuard
-        guard = RegressionGuard(channel=f"{sample_type.__name__}")
+        guard = RegressionGuard(prefix=f"{sample_type.__name__}")
         guard.write(serialized)
     RegressionGuard().verify_all()
 

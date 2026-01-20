@@ -24,25 +24,25 @@ def perform_testing(base_path: str, full: bool = False):
 
     test_str = "perform_testing"
 
-    # Guard without channel
-    guard_without_channel = RegressionGuard()
-    assert guard_without_channel._abs_channel_prefix == os.path.join(base_path, "")
+    # Guard without prefix
+    guard_without_prefix = RegressionGuard()
+    assert guard_without_prefix._abs_dir_and_prefix == os.path.join(base_path, "")  # noqa
 
     # Write output
-    guard_without_channel.write(test_str)
+    guard_without_prefix.write(test_str)
 
     # Verify single guard
-    guard_without_channel.verify()
+    guard_without_prefix.verify()
 
     # Run additional tests only if full testing is specified
     if full:
-        # Test channels
-        guard_with_channel_1 = RegressionGuard(channel="channel")
-        guard_with_channel_1.write(f"{test_str}.1")
+        # Test with prefix
+        guard_with_prefix_1 = RegressionGuard(prefix="prefix")
+        guard_with_prefix_1.write(f"{test_str}.1")
 
-        # Second instance of guard for the same channel, created using string
-        guard_with_channel_2 = RegressionGuard(channel="channel")
-        guard_with_channel_2.write(f"{test_str}.2")
+        # Second instance of guard for the same prefix, created using string
+        guard_with_prefix_2 = RegressionGuard(prefix="prefix")
+        guard_with_prefix_2.write(f"{test_str}.2")
 
         # Test dict output
         test_dict = {
@@ -57,7 +57,7 @@ def perform_testing(base_path: str, full: bool = False):
             "str_list_key": ["abc", "def"],
             "int_list_key": [1, 2],
         }
-        RegressionGuard(channel="dict_txt").write(test_dict)
+        RegressionGuard(prefix="dict_txt").write(test_dict)
 
         # Verify all guards
         RegressionGuard().verify_all()
@@ -86,7 +86,7 @@ class TestClass:
 
 
 def test_multiple_extensions():
-    """Test regression guards for the same channel with more than one extension."""
+    """Test regression guards for the same prefix with more than one extension."""
 
     root_guard_txt = RegressionGuard()
     root_guard_txt.write("abc")
@@ -95,12 +95,12 @@ def test_multiple_extensions():
     root_guard_yaml.write("abc")
     root_guard_yaml.verify()
 
-    channel_guard_txt = RegressionGuard(channel="channel")
-    channel_guard_txt.write("abc")
-    channel_guard_txt.verify()
-    channel_guard_yaml = RegressionGuard(channel="channel", ext="yaml")
-    channel_guard_yaml.write("abc")
-    channel_guard_yaml.verify()
+    prefix_guard_txt = RegressionGuard(prefix="prefix")
+    prefix_guard_txt.write("abc")
+    prefix_guard_txt.verify()
+    prefix_guard_yaml = RegressionGuard(prefix="prefix", ext="yaml")
+    prefix_guard_yaml.write("abc")
+    prefix_guard_yaml.verify()
 
 
 if __name__ == "__main__":

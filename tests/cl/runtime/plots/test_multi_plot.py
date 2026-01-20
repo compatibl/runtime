@@ -22,7 +22,7 @@ def test_multi_heatmap(work_dir_fixture):
     """Test a multi heat map plot using RegressionGuard."""
 
     # Create regression guard
-    guard = RegressionGuard(ext="png", channel="test_multi_heat_map_plot.test_multi_heatmap")
+    guard = RegressionGuard(ext="png", prefix="test_multi_heat_map_plot.test_multi_heatmap")
 
     # Arrange: Generate plot
     plot = MultiPlot(

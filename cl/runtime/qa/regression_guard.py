@@ -50,15 +50,16 @@ def _error_extension_not_supported(ext: str) -> Any:
 @dataclass(slots=True, init=False)
 class RegressionGuard:
     """
-    Detects changes (regression) of output across multiple channels during unit testing.
+    Detects changes (regression) of multiple output files per unit test.
 
     Notes:
-        - Channel name is module.test_function or module.test_class.test_method
-        - The output is recorded in 'channel.received.ext' located next to the unit test
-        - If 'channel.expected.ext' does not exist, it is created with the same data as 'channel.received.ext'
-        - Otherwise, the test fails if 'channel.expected.ext' and 'channel.received.ext' differ
-        - To record a new 'channel.expected.ext' file, delete the existing one
-        - File extension 'ext' is determined based on the verify method(s) called
+        - Output files are 'expected.txt' and 'received.txt' if prefix is None
+          and '{prefix}.expected.txt' and '{prefix}.received.txt' if prefix is specified
+        - The output is recorded in '{prefix}.received.ext' located next to the unit test
+        - If '{prefix}.expected.ext' does not exist, it is created with the same data as '{prefix}.received.ext'
+        - Otherwise, the test fails if '{prefix}.expected.ext' and '{prefix}.received.ext' differ
+        - To record a new '{prefix}.expected.ext' file, delete the existing one
+        - If file extension is not specified as 'ext' parameter, it is determined from the data when possible
     """
 
     abs_dir: str
@@ -67,8 +68,8 @@ class RegressionGuard:
     ext: str
     """Output file extension (format), defaults to '.txt'"""
 
-    _abs_channel_prefix: str
-    """Combines abs_dir and the channel, 'verify' method applies to file with this prefix only."""
+    _abs_dir_and_prefix: str
+    """Combines abs_dir and the prefix, 'verify' method applies to file with this prefix only."""
 
     __verified: bool
     """Verify method sets this flag to true, after which further writes raise an error."""
@@ -80,28 +81,38 @@ class RegressionGuard:
     """Delegate all function calls to this regression guard if set (instance vars are not initialized in this case)."""
 
     __guard_dict: ClassVar[dict[str, dict[str, Self]]] = {}  # TODO: Set using ContextVars
-    """Dictionary of existing guards indexed by base_path (outer dict) and channel/ext (inner dict)."""
+    """Dictionary of existing guards indexed by base_path (outer dict) and prefix/ext (inner dict)."""
 
     def __init__(
         self,
         *,
+        prefix: str | None = None,
         ext: str = None,
-        channel: str | None = None,
     ):
         """
-        Initialize the regression guard, optionally specifying channel.
+        Initialize the regression guard, output files are 'expected.txt' and 'received.txt' if prefix is None
+        and '{prefix}.expected.txt' and '{prefix}.received.txt' if prefix is specified.
 
         Args:
-            ext: File extension (format) without the dot prefix, defaults to 'txt'
-            channel: Dot-delimited string for the channel or None for no channel
+            prefix: Regression file prefix, use when a single test produces more than one regression file.
+            ext: File extension without the leading dot, determined from the data when not specified
+
+        Notes:
+            - Output files are 'expected.txt' and 'received.txt' if prefix is None
+              and '{prefix}.expected.txt' and '{prefix}.received.txt' if prefix is specified
+            - The output is recorded in '{prefix}.received.ext' located next to the unit test
+            - If '{prefix}.expected.ext' does not exist, it is created with the same data as '{prefix}.received.ext'
+            - Otherwise, the test fails if '{prefix}.expected.ext' and '{prefix}.received.ext' differ
+            - To record a new '{prefix}.expected.ext' file, delete the existing one
+            - If file extension is not specified as 'ext' parameter, it is determined from the data when possible
         """
 
         # Find base path by examining call stack
         base_path = QaUtil.get_test_dir_from_call_stack()
 
-        # Make channel the filename prefix with dot delimiter if specified
-        if channel is not None and channel != "":
-            output_path = os.path.join(base_path, f"{channel}.")
+        # Use filename prefix with dot delimiter if specified
+        if prefix is not None and prefix != "":
+            output_path = os.path.join(base_path, f"{prefix}.")
         else:
             output_path = os.path.join(base_path, "")
 
@@ -117,8 +128,8 @@ class RegressionGuard:
         # Get inner dictionary using base path
         inner_dict = self.__guard_dict.setdefault(base_path, dict())
 
-        # Check if regression guard already exists in inner dictionary for the same combination of channel and ext
-        inner_key = f"{channel}::{ext}"
+        # Check if regression guard already exists in inner dictionary for the same combination of prefix and ext
+        inner_key = f"{prefix}::{ext}"
         if (existing_dict := inner_dict.get(inner_key, None)) is not None:
             # Delegate to the existing guard if found, do not initialize other fields
             self.__delegate_to = existing_dict
@@ -131,7 +142,7 @@ class RegressionGuard:
             self.__verified = False
             self.__exception_text = None
             self.abs_dir = base_path
-            self._abs_channel_prefix = output_path
+            self._abs_dir_and_prefix = output_path
             self.ext = ext
 
             # Delete the existing received file if exists
@@ -195,19 +206,19 @@ class RegressionGuard:
 
     def verify_all(self, *, silent: bool = False) -> bool:
         """
-        Verify for all guards in this test that 'channel.received.ext' is the same as 'channel.expected.ext'.
+        Verify for all guards in this test that '{prefix}.received.ext' is the same as '{prefix}.expected.ext'.
         Defaults to silent=True (no exception) to permit other tests to proceed.
 
         Notes:
-            - If 'channel.expected.ext' does not exist, create from 'channel.received.ext'
-            - If files are the same, delete 'channel.received.ext' and 'channel.diff.ext'
-            - If files differ, write 'channel.diff.ext' and raise exception unless silent=True
+            - If '{prefix}.expected.ext' does not exist, create from '{prefix}.received.ext'
+            - If files are the same, delete '{prefix}.received.ext' and '{prefix}.diff.ext'
+            - If files differ, write '{prefix}.diff.ext' and raise exception unless silent=True
 
         Returns:
             bool: True if verification succeeds and false otherwise
 
         Args:
-            silent: If true, do not raise exception and only write the 'channel.diff.ext' file
+            silent: If true, do not raise exception and only write the '{prefix}.diff.ext' file
         """
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
@@ -240,19 +251,19 @@ class RegressionGuard:
 
     def verify(self, *, silent: bool = False) -> bool:
         """
-        Verify for this regression guard that 'channel.received.ext' is the same as 'channel.expected.ext'.
+        Verify for this regression guard that '{prefix}.received.ext' is the same as '{prefix}.expected.ext'.
         Defaults to silent=True (no exception) to permit other tests to proceed.
 
         Notes:
-            - If 'channel.expected.ext' does not exist, create from 'channel.received.ext'
-            - If files are the same, delete 'channel.received.ext' and 'channel.diff.ext'
-            - If files differ, write 'channel.diff.ext' and raise exception unless silent=True
+            - If '{prefix}.expected.ext' does not exist, create from '{prefix}.received.ext'
+            - If files are the same, delete '{prefix}.received.ext' and '{prefix}.diff.ext'
+            - If files differ, write '{prefix}.diff.ext' and raise exception unless silent=True
 
         Returns:
             bool: True if verification succeeds and false otherwise
 
         Args:
-            silent: If true, do not raise exception and only write the 'channel.diff.ext' file
+            silent: If true, do not raise exception and only write the '{prefix}.diff.ext' file
         """
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
@@ -372,7 +383,7 @@ class RegressionGuard:
                 self.__exception_text = exception_text
 
                 # Set the __verified flag so that verification returns the same result if attempted again
-                # This will prevent further writes to this channel and extension
+                # This will prevent further writes to this prefix and extension
                 self.__verified = True
 
                 if not silent:
@@ -391,7 +402,7 @@ class RegressionGuard:
                 os.remove(diff_path)
 
             # Set the __verified flag so that verification returns the same result if attempted again
-            # This will prevent further writes to this channel and extension
+            # This will prevent further writes to this prefix and extension
             self.__verified = True
 
             # Verification is considered successful if expected file has been created
@@ -433,10 +444,10 @@ class RegressionGuard:
             return self.__exception_text
 
     def _get_file_path(self, file_type: str) -> str:
-        """The diff between received and expected is written to 'channel.diff.ext' located next to the unit test."""
+        """The diff between received and expected is written to '{prefix}.diff.ext' located next to the unit test."""
         if file_type not in (file_types := ["received", "expected", "diff"]):
             raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
-        result = f"{self._abs_channel_prefix}{file_type}.{self.ext}"
+        result = f"{self._abs_dir_and_prefix}{file_type}.{self.ext}"
         return result
 
     @staticmethod
