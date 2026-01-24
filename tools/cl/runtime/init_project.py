@@ -16,17 +16,16 @@ import os
 import platform
 from pathlib import Path
 
-import locate
-from jinja2 import Environment, FileSystemLoader
-
-from cl.runtime.contexts.os_util import OsUtil
+import locate # isort: skip Prevent isort from moving this line
 
 # Ensure bootstrap module can be found
-locate.append_sys_path("../../..")
+locate.append_sys_path("../../..") # isort: skip Prevent isort from moving this line
 
 # Import bootstrap module first to configure PYTHONPATH and other settings
 import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
 
+from jinja2 import Environment, FileSystemLoader
+from cl.runtime.contexts.os_util import OsUtil
 from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.settings.package_settings import PackageSettings
 
