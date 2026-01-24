@@ -19,7 +19,7 @@ from pathlib import Path
 import locate # isort: skip Prevent isort from moving this line
 
 # Ensure bootstrap module can be found
-locate.append_sys_path("../../..") # isort: skip Prevent isort from moving this line
+locate.append_sys_path("../../..")
 
 # Import bootstrap module first to configure PYTHONPATH and other settings
 import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
