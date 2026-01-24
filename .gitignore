@@ -1,26 +1,25 @@
 # Using glob syntax
 syntax: glob
 
+**/.*secrets*
 **/.env
 **/.mypy_cache
 **/.pytest_cache
-**/.*secrets*
-**/__pycache__
+**/.ruff_cache
 **/.venv
+**/__pycache__
 *.db
-*.egg
 *.egg-info/
 *.idea
+*.local
 *.py[cod]
 *.so
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
-deployments/
-build/
 dist/
-logs/
 frontend-*/
+logs/
 
 # Using regexp syntax
 syntax: regexp
