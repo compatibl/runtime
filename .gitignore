@@ -17,6 +17,7 @@ syntax: glob
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+databases/
 dist/
 frontend-*/
 logs/
