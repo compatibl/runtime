@@ -85,8 +85,7 @@ class DynaconfLoader(BootstrapMixin):
 
         if self.settings_files is None:
             self.settings_files = (
-                "settings.yaml", # Launch configuration
-                "project.yaml", # Build configuration
+                "settings.yaml", # Settings including project configuration
                 ".secrets.yaml",  # Secrets
             )
 
