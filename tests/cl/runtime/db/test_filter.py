@@ -20,9 +20,9 @@ from cl.runtime.db.filter import Filter
 from cl.runtime.db.filter_by_query import FilterByQuery
 from cl.runtime.db.filter_by_type import FilterByType
 from cl.runtime.db.filter_many import FilterMany
-from stubs.cl.runtime import StubDataclassDerived
-from stubs.cl.runtime import StubDataclassKey
-from stubs.cl.runtime import StubDataclassOtherDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_other_derived import StubDataclassOtherDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 
 

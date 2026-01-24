@@ -23,7 +23,7 @@ from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.time_util import TimeUtil
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 @dataclass(slots=True, kw_only=True)

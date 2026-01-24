@@ -14,9 +14,9 @@
 
 import pytest
 from cl.runtime.qa.regression_guard import RegressionGuard
-from stubs.cl.runtime import StubDataclassData
-from stubs.cl.runtime import StubDataclassDerivedData
-from stubs.cl.runtime import StubDataclassDoubleDerivedData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived_data import StubDataclassDoubleDerivedData
 
 
 def test_cast():

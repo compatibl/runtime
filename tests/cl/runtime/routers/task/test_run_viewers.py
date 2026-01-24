@@ -22,8 +22,8 @@ from cl.runtime.routers.task.run_request import RunRequest
 from cl.runtime.routers.task.run_response_util import RunResponseUtil
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
-from stubs.cl.runtime import StubDataViewers
-from stubs.cl.runtime import StubMediaViewers
+from stubs.cl.runtime.views.stub_data_viewers import StubDataViewers
+from stubs.cl.runtime.views.stub_media_viewers import StubMediaViewers
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 

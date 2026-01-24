@@ -43,10 +43,10 @@ from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_record_type
 from cl.runtime.records.protocols import is_type
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubDataclassData
-from stubs.cl.runtime import StubDataclassDerived
-from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 
 
 def test_functions():

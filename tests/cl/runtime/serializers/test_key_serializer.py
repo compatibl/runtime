@@ -22,8 +22,8 @@ from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
-from stubs.cl.runtime import StubDataclassCompositeKey
-from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key import StubDataclassCompositeKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_base_key import StubDataclassPolymorphicBaseKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_composite_key import (
     StubDataclassPolymorphicCompositeKey,

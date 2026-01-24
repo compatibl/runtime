@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime import StubDataclassDerivedData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_data import StubDataclassDerivedData
 
 
 def test_get_field_names():

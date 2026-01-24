@@ -21,7 +21,7 @@ from cl.runtime.records.typename import typename
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.routers.storage.load_request import LoadRequest
 from cl.runtime.routers.storage.load_response import LoadResponse
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 def test_method(default_db_fixture):

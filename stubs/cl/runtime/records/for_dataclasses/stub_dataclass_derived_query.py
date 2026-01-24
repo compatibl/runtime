@@ -15,7 +15,7 @@
 from dataclasses import dataclass
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.predicates import Predicate
-from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_query import StubDataclassQuery
 
 

@@ -21,7 +21,7 @@ from cl.runtime.routers.task.result_request import ResultRequest
 from cl.runtime.routers.task.result_response_item import ResultResponseItem
 from cl.runtime.tasks.instance_method_task import InstanceMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
-from stubs.cl.runtime import StubHandlers
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers import StubHandlers
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 
 

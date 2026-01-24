@@ -16,8 +16,8 @@ import pytest
 from cl.runtime.contexts.context_manager import activate
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 
 
 def test_commit(multi_db_fixture):

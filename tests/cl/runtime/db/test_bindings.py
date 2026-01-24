@@ -14,11 +14,11 @@
 
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubDataclassDerived
-from stubs.cl.runtime import StubDataclassDoubleDerived
-from stubs.cl.runtime import StubDataclassKey
-from stubs.cl.runtime import StubDataclassOtherDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived import StubDataclassDoubleDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_other_derived import StubDataclassOtherDerived
 
 
 def test_get_common_base_record_type(default_db_fixture):

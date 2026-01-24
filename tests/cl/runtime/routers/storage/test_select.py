@@ -19,7 +19,7 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.routers.storage.select_request import SelectRequest
 from cl.runtime.routers.storage.select_response import SelectResponse
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 def test_method(default_db_fixture):

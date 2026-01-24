@@ -19,7 +19,7 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.delete_request import DeleteRequest
 from cl.runtime.routers.storage.delete_response_util import DeleteResponseUtil
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
-from stubs.cl.runtime import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
 
 
 def test_method(default_db_fixture):

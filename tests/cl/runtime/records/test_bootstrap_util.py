@@ -14,19 +14,19 @@
 
 import pytest
 from cl.runtime.records.bootstrap_util import BootstrapUtil
-from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerived
-from stubs.cl.runtime import StubDataclassDictFields
-from stubs.cl.runtime import StubDataclassDictListFields
-from stubs.cl.runtime import StubDataclassDoubleDerived
-from stubs.cl.runtime import StubDataclassListDictFields
-from stubs.cl.runtime import StubDataclassListFields
-from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassOtherDerived
-from stubs.cl.runtime import StubDataclassPrimitiveFields
-from stubs.cl.runtime import StubDataclassSingleton
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite import StubDataclassComposite
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_fields import StubDataclassDictFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_dict_list_fields import StubDataclassDictListFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived import StubDataclassDoubleDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_dict_fields import StubDataclassListDictFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import StubDataclassListFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields import StubDataclassNestedFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields import StubDataclassOptionalFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_other_derived import StubDataclassOtherDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_singleton import StubDataclassSingleton
 
 
 def test_bootstrap_build():

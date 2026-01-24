@@ -25,7 +25,7 @@ from cl.runtime.tasks.class_method_task import ClassMethodTask
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
-from stubs.cl.runtime import StubHandlers
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers import StubHandlers
 
 
 def _create_task(queue: TaskQueueKey) -> TaskKey:

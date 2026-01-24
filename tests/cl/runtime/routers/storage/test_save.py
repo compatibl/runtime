@@ -19,8 +19,8 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.routers.storage.key_request_item import KeyRequestItem
 from cl.runtime.routers.storage.save_request import SaveRequest
 from cl.runtime.routers.storage.save_response_util import SaveResponseUtil
-from stubs.cl.runtime import StubDataclassDerived
-from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 
 # Test save record payloads
 create_record_payload = {"Id": "new_record", "DerivedStrField": "test", "_t": "StubDataclassDerived"}

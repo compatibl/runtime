@@ -17,11 +17,11 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.file.yaml_reader import YamlReader
 from cl.runtime.qa.qa_util import QaUtil
-from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassDerived
-from stubs.cl.runtime import StubDataclassKey
-from stubs.cl.runtime import StubDataclassNestedFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite import StubDataclassComposite
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields import StubDataclassNestedFields
 
 TEST_INPUTS = [
     "StubDataclass.yaml",

@@ -19,7 +19,7 @@ from cl.runtime.records.protocols import FloatArray
 from cl.runtime.records.protocols import FloatCube
 from cl.runtime.records.protocols import FloatMatrix
 from cl.runtime.records.protocols import FloatVector
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 @dataclass(slots=True, kw_only=True)

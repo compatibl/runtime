@@ -24,7 +24,7 @@ from cl.runtime.records.predicates import Not
 from cl.runtime.records.predicates import NotIn
 from cl.runtime.records.predicates import Or
 from cl.runtime.records.predicates import Range
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 def test_range_condition():

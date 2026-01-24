@@ -15,12 +15,12 @@
 import pytest
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.key_serializers import KeySerializers
-from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassListFields
-from stubs.cl.runtime import StubDataclassNestedFields
-from stubs.cl.runtime import StubDataclassOptionalFields
-from stubs.cl.runtime import StubDataclassPrimitiveFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite import StubDataclassComposite
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import StubDataclassListFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields import StubDataclassNestedFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields import StubDataclassOptionalFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 
 _KEY_SERIALIZER = KeySerializers.DELIMITED
 

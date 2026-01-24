@@ -21,7 +21,7 @@ from cl.runtime.records.predicates import In
 from cl.runtime.records.predicates import Not
 from cl.runtime.records.predicates import NotIn
 from cl.runtime.records.predicates import Or
-from stubs.cl.runtime import StubDataclassPrimitiveFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_query import (
     StubDataclassPrimitiveFieldsQuery,
 )

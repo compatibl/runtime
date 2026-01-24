@@ -17,7 +17,7 @@ from cl.runtime.db.query_mixin import QueryMixin
 from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.predicates import Predicate
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 @dataclass(slots=True, kw_only=True)

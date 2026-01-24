@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.records.key_util import KeyUtil
-from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 
 
 def test_get_hash():

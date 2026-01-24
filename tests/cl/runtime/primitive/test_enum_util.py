@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.primitive.enum_util import EnumUtil
-from stubs.cl.runtime import StubIntEnum
+from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 
 
 def test_to_str():

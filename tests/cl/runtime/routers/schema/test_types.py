@@ -20,7 +20,7 @@ from cl.runtime.qa.qa_client import QaClient
 from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.routers.schema import schema_router
 from cl.runtime.routers.schema.types_response_item import TypesResponseItem
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 expected_result = {"Kind": None, "Name": "StubDataclass", "Label": "Stub Dataclass"}
 

@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import pytest
-from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassCompositeKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite import StubDataclassComposite
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key import StubDataclassCompositeKey
 
 
 def test_key():

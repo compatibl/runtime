@@ -13,11 +13,11 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from stubs.cl.runtime import StubDataclassComposite
-from stubs.cl.runtime import StubDataclassCompositeKey
-from stubs.cl.runtime import StubDataclassKey
-from stubs.cl.runtime import StubDataclassListFields
-from stubs.cl.runtime import StubDataclassNestedFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite import StubDataclassComposite
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key import StubDataclassCompositeKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import StubDataclassListFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields import StubDataclassNestedFields
 from stubs.cl.runtime.views.stub_viewers import StubViewers
 
 nested_fields_key = StubDataclassKey(id="B0").build()

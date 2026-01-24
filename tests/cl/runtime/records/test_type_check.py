@@ -15,10 +15,10 @@
 import pytest
 from frozendict import frozendict
 from cl.runtime.records.type_check import TypeCheck
-from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubDataclassData
-from stubs.cl.runtime import StubDataclassDerived
-from stubs.cl.runtime import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_data import StubDataclassData
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 
 _DATA_INSTANCE = StubDataclassData().build()
 _DATA_INSTANCE_NOT_FROZEN = StubDataclassData()

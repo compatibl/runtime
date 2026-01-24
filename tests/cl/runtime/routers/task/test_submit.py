@@ -21,8 +21,8 @@ from cl.runtime.routers.task.submit_response_item import SubmitResponseItem
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.tasks.task import Task
 from cl.runtime.tasks.task_key import TaskKey
-from stubs.cl.runtime import StubDataclass
-from stubs.cl.runtime import StubHandlers
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers import StubHandlers
 
 
 def get_simple_requests(key_str: str):

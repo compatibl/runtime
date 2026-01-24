@@ -16,7 +16,7 @@ import pytest
 import time
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
-from stubs.cl.runtime import StubDataclassPrimitiveFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 
 
 @pytest.mark.skip("Performance test.")

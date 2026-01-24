@@ -15,7 +15,7 @@
 import pytest
 from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.serializers.enum_serializers import EnumSerializers
-from stubs.cl.runtime import StubIntEnum
+from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 
 
 def test_serialize():

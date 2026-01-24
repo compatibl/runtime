@@ -18,7 +18,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_key_type
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
-from stubs.cl.runtime import StubIntEnum
+from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic import StubPydantic
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic_data import StubPydanticData
 from stubs.cl.runtime.records.for_pydantic.stub_pydantic_handlers_key import StubPydanticHandlersKey

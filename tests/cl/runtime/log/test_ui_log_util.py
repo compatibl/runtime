@@ -20,7 +20,7 @@ from cl.runtime.log.ui_log_util import UiLogUtil
 from cl.runtime.tasks.class_method_task import ClassMethodTask
 from cl.runtime.tasks.task_queue_key import TaskQueueKey
 from cl.runtime.tasks.task_status import TaskStatus
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 def test_flat_logs(multi_db_fixture):

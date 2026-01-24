@@ -14,7 +14,7 @@
 
 import pytest
 from cl.runtime.records.builder_checks import BuilderChecks
-from stubs.cl.runtime import StubDataclass
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 def test_guard_frozen():
