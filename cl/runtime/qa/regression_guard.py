@@ -462,4 +462,6 @@ class RegressionGuard:
         html = re.sub(r"plotly-[\d.]+\.min\.js", "plotly.min.js", html)
         # Remove integrity hash (changes with version)
         html = re.sub(r'\s+integrity="[^"]*"', "", html)
+        # Remove lowercase GUIDs (e.g., 1d6cd542-2bef-4533-9d0b-40e9723ce8f5)
+        html = re.sub(r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}", "", html)
         return html
