@@ -13,9 +13,9 @@ autoflake tests --in-place
 
 echo.
 echo Format using isort
-isort cl --sp=.isort.cfg
-isort stubs --sp=.isort.cfg
-isort tests --sp=.isort.cfg
+isort cl
+isort stubs
+isort tests
 
 echo.
 echo Format using black
