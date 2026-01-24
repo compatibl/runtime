@@ -329,9 +329,7 @@ class RegressionGuard:
                 if self.ext == "png":
                     # For PNG, write pixel hash comparison to diff file
                     diff_content = (
-                        f"PNG pixel hash mismatch:\n"
-                        f"  Expected: {expected_hash}\n"
-                        f"  Received: {received_hash}\n"
+                        f"PNG pixel hash mismatch:\n" f"  Expected: {expected_hash}\n" f"  Received: {received_hash}\n"
                     )
                     with open(diff_path, "w", encoding="utf-8") as diff_file:
                         diff_file.write(diff_content)

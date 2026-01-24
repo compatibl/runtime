@@ -18,8 +18,8 @@ from dataclasses import dataclass
 from datetime import datetime
 import ruamel.yaml
 from cl.runtime.auth.secrets_provider import SecretsProvider
-from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.primitive.datetime_util import DatetimeUtil
+from cl.runtime.project.project_layout import ProjectLayout
 
 
 @dataclass(slots=True, kw_only=True)

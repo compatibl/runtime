@@ -22,8 +22,8 @@ import zipfile
 from dataclasses import dataclass
 from typing_extensions import final  # TODO: Replace by the import from typing
 from cl.runtime.contexts.os_util import OsUtil
-from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.prebuild.version_util import VersionUtil
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.settings.settings import Settings
 
 _logger = logging.getLogger(__name__)

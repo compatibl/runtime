@@ -15,7 +15,6 @@
 import os
 from pathlib import Path
 from typing import Iterable
-
 from cl.runtime.project.project_layout_kind import ProjectLayoutKind
 from cl.runtime.records.typename import typename
 

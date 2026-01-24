@@ -25,9 +25,9 @@ from typing import Sequence
 from memoization import cached
 from more_itertools import consume
 from cl.runtime.exceptions.error_util import ErrorUtil
-from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.prebuild.import_util import ImportUtil
 from cl.runtime.primitive.enum_util import EnumUtil
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.protocols import is_data_key_or_record_type
@@ -442,7 +442,9 @@ class TypeInfo(BootstrapMixin):
     def _build_parent_type_names(cls, type_: type) -> tuple[str, ...]:
         """Return a tuple superclasses (inclusive of self) that match the predicate, not cached."""
         # Eliminate duplicates (they should not be present but just to be sure) and sort the names in MRO list
-        return tuple(sorted(set(typename(x) for x in cls._get_data_key_or_record_types(types_=type_.mro(), type_kind=None))))
+        return tuple(
+            sorted(set(typename(x) for x in cls._get_data_key_or_record_types(types_=type_.mro(), type_kind=None)))
+        )
 
     @classmethod
     def _add_type(cls, type_: type, *, subtype: str | None = None) -> None:
@@ -547,7 +549,9 @@ class TypeInfo(BootstrapMixin):
                 # Parse a type info row
                 if len(row_tokens) == len(_TYPE_INFO_HEADERS):
                     # Extract the type name and qual name from the tokens
-                    type_name, type_kind, qual_name, subtype, parent_record_type_names, child_record_type_names = row_tokens
+                    type_name, type_kind, qual_name, subtype, parent_record_type_names, child_record_type_names = (
+                        row_tokens
+                    )
                 else:
                     expected_num_tokens = len(_TYPE_INFO_HEADERS)
                     actual_num_tokens = len(row_tokens)
@@ -614,7 +618,9 @@ class TypeInfo(BootstrapMixin):
                 )
 
                 # Write comma-separated values for each token, with semicolons-separated lists
-                file.write(f"{type_name},{type_kind_str},{qual_name},{subtype},{parent_record_type_names_str},{child_record_type_names_str}\n")
+                file.write(
+                    f"{type_name},{type_kind_str},{qual_name},{subtype},{parent_record_type_names_str},{child_record_type_names_str}\n"
+                )
 
     @classmethod
     def _clear(cls) -> None:

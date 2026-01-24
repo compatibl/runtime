@@ -21,9 +21,9 @@ from cl.runtime.db.filter_by_query import FilterByQuery
 from cl.runtime.db.filter_by_type import FilterByType
 from cl.runtime.db.filter_many import FilterMany
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived import StubDataclassDerived
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_other_derived import StubDataclassOtherDerived
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_derived_query import StubDataclassDerivedQuery
 
 
 def _test_filter(*, filter: Filter, expected_values: Sequence[str]):

@@ -20,8 +20,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclas
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite import StubDataclassComposite
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_list_fields import StubDataclassListFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_nested_fields import StubDataclassNestedFields
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_optional_fields import StubDataclassOptionalFields
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields import StubDataclassPrimitiveFields
 
 
 def test_method():

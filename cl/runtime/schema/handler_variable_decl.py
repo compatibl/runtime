@@ -20,8 +20,8 @@ from typing import Union
 from typing import get_args
 from typing import get_origin
 from memoization import cached
-from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.records.protocols import is_enum_type
+from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.records.protocols import is_primitive_type
 from cl.runtime.records.protocols import is_sequence_type
 from cl.runtime.schema.member_decl import MemberDecl
@@ -53,8 +53,8 @@ class HandlerVariableDecl(MemberDecl):
         Args:
             value_type: Type of the value
         """
-        from cl.runtime.schema.type_decl import TypeDecl
         from cl.runtime.schema.enum_decl import EnumDecl
+        from cl.runtime.schema.type_decl import TypeDecl
 
         result = cls()
 

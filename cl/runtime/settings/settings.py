@@ -15,18 +15,21 @@
 from abc import ABC
 from dataclasses import MISSING
 from dataclasses import dataclass
-from typing import ClassVar, Sequence
+from typing import ClassVar
 from typing import Self
+from typing import Sequence
 from dotenv import find_dotenv
 from cl.runtime.primitive.case_util import CaseUtil
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.typename import typename
-from cl.runtime.settings.dynaconf_loader import DynaconfLoader, ENVVAR_PREFIX
+from cl.runtime.settings.dynaconf_loader import ENVVAR_PREFIX
+from cl.runtime.settings.dynaconf_loader import DynaconfLoader
 
 PROCESS_TIMESTAMP = Timestamp.create()
 """Unique UUIDv7-based timestamp set during the Python process launch."""
+
 
 @dataclass(slots=True, kw_only=True)
 class Settings(BootstrapMixin, ABC):
@@ -154,8 +157,7 @@ class Settings(BootstrapMixin, ABC):
         """Return a string listing the fields names in envvar/.env and settings format."""
         # Include envvar/.env and settings format
         field_formats_list = [
-            f"  - '{ENVVAR_PREFIX}_{k.upper()}' (envvar/.env) or '{k}' (settings files)"
-            for k in field_names
+            f"  - '{ENVVAR_PREFIX}_{k.upper()}' (envvar/.env) or '{k}' (settings files)" for k in field_names
         ]
         result = "\n".join(field_formats_list)
         return result

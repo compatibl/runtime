@@ -14,8 +14,9 @@
 
 import inspect
 from dataclasses import dataclass
-from types import FunctionType, NoneType
+from types import FunctionType
 from types import MethodType
+from types import NoneType
 from typing import Iterable
 from typing import get_type_hints
 from cl.runtime.primitive.case_util import CaseUtil

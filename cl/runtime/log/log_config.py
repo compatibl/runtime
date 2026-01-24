@@ -18,10 +18,10 @@ import socket
 import threading
 from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.db.data_source import DataSource
-from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.log.task_log import TaskLog
 from cl.runtime.primitive.datetime_util import DatetimeUtil
 from cl.runtime.primitive.timestamp import Timestamp
+from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.settings.log_settings import LogSettings
 
 max_log_file_size_bytes = 1024 * 1024 * 10  # 10MB

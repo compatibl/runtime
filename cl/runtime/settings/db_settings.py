@@ -17,7 +17,8 @@ from dataclasses import dataclass
 from typing_extensions import final
 from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.typename import typename, typenameof
+from cl.runtime.records.typename import typename
+from cl.runtime.records.typename import typenameof
 from cl.runtime.settings.settings import Settings
 
 

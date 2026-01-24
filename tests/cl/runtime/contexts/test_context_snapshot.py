@@ -18,8 +18,8 @@ from cl.runtime.contexts.context_manager import active_or_none
 from cl.runtime.contexts.context_manager import get_active_contexts_and_ids
 from cl.runtime.contexts.context_snapshot import ContextSnapshot
 from cl.runtime.records.record_mixin import RecordMixin
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 from stubs.cl.runtime.contexts.stub_context import StubContext
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 
 def _perform_serialization_test(contexts: list[RecordMixin]):

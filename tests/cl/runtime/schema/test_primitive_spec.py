@@ -20,8 +20,8 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 from cl.runtime.records.typename import typename
 from cl.runtime.schema.primitive_spec import PrimitiveSpec
 from cl.runtime.serializers.bootstrap_serializers import BootstrapSerializers
-from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 from stubs.cl.runtime.records.enum.stub_int_enum import StubIntEnum
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
 
 _FROM_CLASS_VALID_CASES = [
     str,

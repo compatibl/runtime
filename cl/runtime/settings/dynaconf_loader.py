@@ -14,11 +14,12 @@
 
 import os
 from dataclasses import dataclass
-from typing import Sequence, Any, Mapping, Self
+from typing import Any
+from typing import Mapping
+from typing import Sequence
 from dotenv import load_dotenv
 from dynaconf import Dynaconf
 from frozendict import frozendict
-
 from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
@@ -85,7 +86,7 @@ class DynaconfLoader(BootstrapMixin):
 
         if self.settings_files is None:
             self.settings_files = (
-                "settings.yaml", # Settings including project configuration
+                "settings.yaml",  # Settings including project configuration
                 ".secrets.yaml",  # Secrets
             )
 

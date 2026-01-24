@@ -47,7 +47,7 @@ from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.serializers.key_serializers import KeySerializers
 from cl.runtime.settings.db_settings import DbSettings
 
-_INVALID_DB_NAME_SYMBOLS = r'/\\. "$*<>:|?' # TODO: !!! Update for CouchDB
+_INVALID_DB_NAME_SYMBOLS = r'/\\. "$*<>:|?'  # TODO: !!! Update for CouchDB
 """Invalid CouchDB database name symbols."""
 
 _INVALID_DB_NAME_SYMBOLS_MSG = r'<space>/\."$*<>:|?'  # TODO: !!! Update for CouchDB
@@ -728,7 +728,14 @@ class BasicCouchDb(Db):
 
         return record_dict
 
-    def _build_mango_query(self, selector: dict[str, Any], *, limit: int | None = None, skip: int | None = None, sort: list[dict[str, str]] | None = None) -> dict[str, Any]:
+    def _build_mango_query(
+        self,
+        selector: dict[str, Any],
+        *,
+        limit: int | None = None,
+        skip: int | None = None,
+        sort: list[dict[str, str]] | None = None,
+    ) -> dict[str, Any]:
         """Build a CouchDB Mango query from selector and options."""
         query = {"selector": selector}
         if limit is not None:
@@ -739,7 +746,9 @@ class BasicCouchDb(Db):
             query["sort"] = sort
         return query
 
-    def _get_couch_keys_filter(self, keys: Sequence[KeyMixin], *, dataset: str, tenant: str, collection_name: str) -> dict[str, Any]:
+    def _get_couch_keys_filter(
+        self, keys: Sequence[KeyMixin], *, dataset: str, tenant: str, collection_name: str
+    ) -> dict[str, Any]:
         """Get filter for loading records that match one of the specified keys."""
         serialized_keys = tuple(_KEY_SERIALIZER.serialize(key) for key in keys)
         # Build list of document IDs
@@ -774,9 +783,7 @@ class BasicCouchDb(Db):
 
             # Create design document for Mango index
             design_doc_id = f"_design/index_{typename(query_type).replace('.', '_')}"
-            index_def = {
-                "fields": [{"name": field, "type": "string"} for field in index_fields]
-            }
+            index_def = {"fields": [{"name": field, "type": "string"} for field in index_fields]}
 
             try:
                 # Try to get existing design document
@@ -786,12 +793,7 @@ class BasicCouchDb(Db):
                 couch_db.save(design_doc)
             except NotFound:
                 # Create new design document
-                design_doc = {
-                    "_id": design_doc_id,
-                    "indexes": {
-                        f"index_{typename(query_type)}": index_def
-                    }
-                }
+                design_doc = {"_id": design_doc_id, "indexes": {f"index_{typename(query_type)}": index_def}}
                 couch_db.save(design_doc)
 
             # Add to the set of query types for which the index has already been added
