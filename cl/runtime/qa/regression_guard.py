@@ -72,11 +72,11 @@ class RegressionGuard:
     use_hash: bool | None
     """If True, verify using SHA256 hash comparison instead of full file comparison (defaults to None)."""
 
-    _abs_dir: str
-    """Absolute path to the output directory, 'verify_all' method applies everything in this directory."""
+    _output_dir: str
+    """Absolute path to the test output directory, 'verify_all' method applies everything in this directory."""
 
-    _abs_dir_and_prefix: str
-    """Combines _abs_dir and the prefix, 'verify' method applies to file with this prefix only."""
+    _output_dir_and_prefix: str
+    """Combines _output_dir and the prefix, 'verify' method applies to file with this prefix only."""
 
     __verified: bool
     """Verify method sets this flag to true, after which further writes raise an error."""
@@ -142,8 +142,8 @@ class RegressionGuard:
             if use_hash != existing_guard.use_hash:
                 raise RuntimeError(
                     f"Two RegressionGuard instances have different values of use_hash:\n"
-                    f"Instance 1 (use_hash={use_hash}): {self._abs_dir_and_prefix}\n"
-                    f"Instance 2 (use_hash={existing_guard.use_hash}): {existing_guard._abs_dir_and_prefix}\n"
+                    f"Instance 1 (use_hash={use_hash}): {self._output_dir_and_prefix}\n"
+                    f"Instance 2 (use_hash={existing_guard.use_hash}): {existing_guard._output_dir_and_prefix}\n"
                     )
         else:
             # Otherwise add self to dictionary
@@ -156,12 +156,16 @@ class RegressionGuard:
             self.prefix = prefix
             self.ext = ext
             self.use_hash = use_hash
-            self._abs_dir = base_path
-            self._abs_dir_and_prefix = output_path
+            self._output_dir = base_path
+            self._output_dir_and_prefix = output_path
 
             # Delete the existing received file if exists
             if os.path.exists(received_path := self._get_file_path("received")):
                 os.remove(received_path)
+
+    def get_output_dir(self) -> str:
+        """Return absolute output directory path."""
+        return self._output_dir
 
     def write(self, value: Any) -> None:
         """
@@ -240,7 +244,7 @@ class RegressionGuard:
             return self.__delegate_to.verify_all(silent=silent)
 
         # Get inner dictionary using base path
-        inner_dict = self.__guard_dict[self._abs_dir]
+        inner_dict = self.__guard_dict[self._output_dir]
 
         # Skip the delegated guards
         inner_dict = {k: v for k, v in inner_dict.items() if v.__delegate_to is None}
@@ -565,14 +569,14 @@ class RegressionGuard:
         """The diff between received and expected is written to '{prefix}.diff.ext' located next to the unit test."""
         if file_type not in (file_types := ["received", "expected", "diff"]):
             raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
-        result = f"{self._abs_dir_and_prefix}{file_type}.{self.ext}"
+        result = f"{self._output_dir_and_prefix}{file_type}.{self.ext}"
         return result
 
     def _get_hash_file_path(self, file_type: str) -> str:
         """Get path for hash file: '{prefix}.{file_type}.sha256' located next to the unit test."""
         if file_type not in (file_types := ["received", "expected", "diff"]):
             raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
-        result = f"{self._abs_dir_and_prefix}{file_type}.sha256"
+        result = f"{self._output_dir_and_prefix}{file_type}.sha256"
         return result
 
     @classmethod

@@ -26,7 +26,7 @@ def perform_testing(base_path: str, full: bool = False):
 
     # Guard without prefix
     guard_without_prefix = RegressionGuard()
-    assert guard_without_prefix._abs_dir_and_prefix == os.path.join(base_path, "")  # noqa
+    assert guard_without_prefix._output_dir_and_prefix == os.path.join(base_path, "")  # noqa
 
     # Write output
     guard_without_prefix.write(test_str)
