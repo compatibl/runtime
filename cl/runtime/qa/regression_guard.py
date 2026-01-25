@@ -69,6 +69,9 @@ class RegressionGuard:
     ext: str
     """Output file extension (format), defaults to '.txt'"""
 
+    use_hash: bool
+    """If True, verify using SHA256 hash comparison instead of full file comparison."""
+
     _abs_dir_and_prefix: str
     """Combines abs_dir and the prefix, 'verify' method applies to file with this prefix only."""
 
@@ -89,6 +92,7 @@ class RegressionGuard:
         *,
         prefix: str | None = None,
         ext: str = None,
+        use_hash: bool = False,
     ):
         """
         Initialize the regression guard, output files are 'expected.txt' and 'received.txt' if prefix is None
@@ -97,6 +101,7 @@ class RegressionGuard:
         Args:
             prefix: Regression file prefix, use when a single test produces more than one regression file.
             ext: File extension without the leading dot, determined from the data when not specified
+            use_hash: If True, verify using SHA256 hash comparison instead of full file comparison
 
         Notes:
             - Output files are 'expected.txt' and 'received.txt' if prefix is None
@@ -129,8 +134,8 @@ class RegressionGuard:
         # Get inner dictionary using base path
         inner_dict = self.__guard_dict.setdefault(base_path, dict())
 
-        # Check if regression guard already exists in inner dictionary for the same combination of prefix and ext
-        inner_key = f"{prefix}::{ext}"
+        # Check if regression guard already exists in inner dictionary for the same combination of prefix, ext, use_hash
+        inner_key = f"{prefix}::{ext}::{use_hash}"
         if (existing_dict := inner_dict.get(inner_key, None)) is not None:
             # Delegate to the existing guard if found, do not initialize other fields
             self.__delegate_to = existing_dict
@@ -145,6 +150,7 @@ class RegressionGuard:
             self.abs_dir = base_path
             self._abs_dir_and_prefix = output_path
             self.ext = ext
+            self.use_hash = use_hash
 
             # Delete the existing received file if exists
             if os.path.exists(received_path := self._get_file_path("received")):
@@ -256,6 +262,7 @@ class RegressionGuard:
         Defaults to silent=True (no exception) to permit other tests to proceed.
 
         Notes:
+            - If use_hash=True, uses SHA256 hash comparison storing only hash files
             - If '{prefix}.expected.ext' does not exist, create from '{prefix}.received.ext'
             - If files are the same, delete '{prefix}.received.ext' and '{prefix}.diff.ext'
             - If files differ, write '{prefix}.diff.ext' and raise exception unless silent=True
@@ -279,6 +286,15 @@ class RegressionGuard:
             else:
                 # Otherwise return True if exception text is None (it is set on verification failure)
                 return self.__exception_text is None
+
+        # Dispatch to hash-based or content-based verification
+        if self.use_hash:
+            return self._verify_with_hash(silent=silent)
+        else:
+            return self._verify_with_content(silent=silent)
+
+    def _verify_with_content(self, *, silent: bool = False) -> bool:
+        """Verify by comparing full file content."""
 
         received_path = self._get_file_path("received")
         expected_path = self._get_file_path("expected")
@@ -407,36 +423,8 @@ class RegressionGuard:
             # Verification is considered successful if expected file has been created
             return True
 
-    def verify_hash(self, *, silent: bool = False) -> bool:
-        """
-        Verify using SHA256 hash comparison, storing only hash files instead of expected/received files.
-
-        Notes:
-            - Computes SHA256 hash of '{prefix}.received.ext'
-            - Stores hashes in '{prefix}.expected.sha256' and '{prefix}.received.sha256'
-            - If '{prefix}.expected.sha256' does not exist, create it from the hash of received file
-            - If hashes match, delete '{prefix}.received.ext', '{prefix}.received.sha256' and '{prefix}.diff.sha256'
-            - If hashes differ, write '{prefix}.diff.sha256' and raise exception unless silent=True
-
-        Returns:
-            bool: True if verification succeeds and false otherwise
-
-        Args:
-            silent: If true, do not raise exception and only write the '{prefix}.diff.sha256' file
-        """
-
-        # Delegate to a previously created guard with the same combination of output_path and ext if exists
-        if self.__delegate_to is not None:
-            return self.__delegate_to.verify_hash(silent=silent)
-
-        if self.__verified:
-            # Already verified
-            if not silent:
-                # Use the existing exception text to raise if silent=False
-                raise RuntimeError(self.__exception_text)
-            else:
-                # Otherwise return True if exception text is None (it is set on verification failure)
-                return self.__exception_text is None
+    def _verify_with_hash(self, *, silent: bool = False) -> bool:
+        """Verify using SHA256 hash comparison, storing only hash files instead of expected/received files."""
 
         received_path = self._get_file_path("received")
         expected_hash_path = self._get_hash_file_path("expected")

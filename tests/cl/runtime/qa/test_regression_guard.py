@@ -104,18 +104,18 @@ def test_multiple_extensions():
 
 
 def test_verify_hash():
-    """Test verify_hash method that uses SHA256 hash comparison."""
+    """Test verify with use_hash=True that uses SHA256 hash comparison."""
 
     # Test without prefix
-    guard = RegressionGuard(prefix="hash_test")
+    guard = RegressionGuard(prefix="hash_test", use_hash=True)
     guard.write("Test string")
-    result = guard.verify_hash()
+    result = guard.verify()
     assert result is True
 
     # Test with different content to verify hash is computed correctly
-    guard_with_dict = RegressionGuard(prefix="hash_test_dict")
+    guard_with_dict = RegressionGuard(prefix="hash_test_dict", use_hash=True)
     guard_with_dict.write({"key": "value", "number": 42})
-    result = guard_with_dict.verify_hash()
+    result = guard_with_dict.verify()
     assert result is True
 
 
