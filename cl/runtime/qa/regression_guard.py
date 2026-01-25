@@ -54,13 +54,12 @@ class RegressionGuard:
     Detects changes (regression) of multiple output files per unit test.
 
     Notes:
-        - Output files are 'expected.txt' and 'received.txt' if prefix is None
-          and '{prefix}.expected.txt' and '{prefix}.received.txt' if prefix is specified
-        - The output is recorded in '{prefix}.received.ext' located next to the unit test
+        - If param use_hash=True, output has extension ".sha256" but received file has original ext in case of diff
+        - Output files are '{prefix}.expected.ext' and '{prefix}.received.ext', or 'expected.ext' and 'received.ext'
+          if prefix is None
         - If '{prefix}.expected.ext' does not exist, it is created with the same data as '{prefix}.received.ext'
         - Otherwise, the test fails if '{prefix}.expected.ext' and '{prefix}.received.ext' differ
         - To record a new '{prefix}.expected.ext' file, delete the existing one
-        - If file extension is not specified as 'ext' parameter, it is determined from the data when possible
     """
 
     abs_dir: str
@@ -69,8 +68,8 @@ class RegressionGuard:
     ext: str
     """Output file extension (format), defaults to '.txt'"""
 
-    use_hash: bool
-    """If True, verify using SHA256 hash comparison instead of full file comparison."""
+    use_hash: bool | None
+    """If True, verify using SHA256 hash comparison instead of full file comparison (defaults to None)."""
 
     _abs_dir_and_prefix: str
     """Combines abs_dir and the prefix, 'verify' method applies to file with this prefix only."""
@@ -91,26 +90,24 @@ class RegressionGuard:
         self,
         *,
         prefix: str | None = None,
-        ext: str = None,
-        use_hash: bool = False,
+        ext: str = "txt",
+        use_hash: bool | None = None,
     ):
         """
-        Initialize the regression guard, output files are 'expected.txt' and 'received.txt' if prefix is None
-        and '{prefix}.expected.txt' and '{prefix}.received.txt' if prefix is specified.
+        Initialize the regression guard.
 
         Args:
-            prefix: Regression file prefix, use when a single test produces more than one regression file.
-            ext: File extension without the leading dot, determined from the data when not specified
-            use_hash: If True, verify using SHA256 hash comparison instead of full file comparison
+            prefix: Regression file prefix, use when a single test produces more than one regression file
+            ext: File extension without the leading dot (defaults to "txt")
+            use_hash: If True, verify using SHA256 hash comparison instead of full file comparison (defaults to None)
 
         Notes:
-            - Output files are 'expected.txt' and 'received.txt' if prefix is None
-              and '{prefix}.expected.txt' and '{prefix}.received.txt' if prefix is specified
-            - The output is recorded in '{prefix}.received.ext' located next to the unit test
+            - If param use_hash=True, output has extension ".sha256" but received file has original ext in case of diff
+            - Output files are '{prefix}.expected.ext' and '{prefix}.received.ext', or 'expected.ext' and 'received.ext'
+              if prefix is None
             - If '{prefix}.expected.ext' does not exist, it is created with the same data as '{prefix}.received.ext'
             - Otherwise, the test fails if '{prefix}.expected.ext' and '{prefix}.received.ext' differ
             - To record a new '{prefix}.expected.ext' file, delete the existing one
-            - If file extension is not specified as 'ext' parameter, it is determined from the data when possible
         """
 
         # Find base path by examining call stack
@@ -128,17 +125,22 @@ class RegressionGuard:
             if ext not in _supported_extensions:
                 _error_extension_not_supported(ext)
         else:
-            # Use txt if not specified
-            ext = "txt"
+            raise RuntimeError("Param 'ext' is not specified in RegressionGuard.")
 
         # Get inner dictionary using base path
         inner_dict = self.__guard_dict.setdefault(base_path, dict())
 
         # Check if regression guard already exists in inner dictionary for the same combination of prefix, ext, use_hash
-        inner_key = f"{prefix}::{ext}::{use_hash}"
-        if (existing_dict := inner_dict.get(inner_key, None)) is not None:
+        inner_key = f"{prefix}::{ext}"
+        if (existing_guard := inner_dict.get(inner_key, None)) is not None:
             # Delegate to the existing guard if found, do not initialize other fields
-            self.__delegate_to = existing_dict
+            self.__delegate_to = existing_guard
+            if use_hash != existing_guard.use_hash:
+                raise RuntimeError(
+                    f"Two RegressionGuard instances have different values of use_hash:\n"
+                    f"Instance 1 (use_hash={use_hash}): {self._abs_dir_and_prefix}\n"
+                    f"Instance 2 (use_hash={existing_guard.use_hash}): {existing_guard._abs_dir_and_prefix}\n"
+                    )
         else:
             # Otherwise add self to dictionary
             inner_dict[inner_key] = self
