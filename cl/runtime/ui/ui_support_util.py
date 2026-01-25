@@ -70,8 +70,8 @@ class UiSupportUtil(DataclassMixin):
         zip_file_name = quote(zip_file_name)  # Quoting special characters
         return cls._create_zip_archive(zip_file_name, files_to_zip=list(BASE_LOG_DIR.glob("*.log")))
 
-    @staticmethod
-    def _create_zip_archive(zip_file_name: str, files_to_zip: list[Path]) -> FileData:
+    @classmethod
+    def _create_zip_archive(cls, zip_file_name: str, files_to_zip: list[Path]) -> FileData:
         """Create an in-memory zip archive."""
 
         zip_buffer = io.BytesIO()
@@ -83,8 +83,8 @@ class UiSupportUtil(DataclassMixin):
 
         return FileData(name=zip_file_name, file_bytes=zip_bytes, file_kind=FileKind.ZIP)
 
-    @staticmethod
-    def _get_application_name() -> str | None:
+    @classmethod
+    def _get_application_name(cls) -> str | None:
         """Get the application name."""
 
         app_state_record = UiAppState.get_global_app_state()

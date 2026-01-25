@@ -163,8 +163,8 @@ class WorkerProcessManager:
 
         _logger.info("Started worker %s with PID %s", worker_name, worker_process.pid)
 
-    @staticmethod
-    def _worker_target(worker_id: int, worker_name: str, log_config: Dict) -> None:
+    @classmethod
+    def _worker_target(cls, worker_id: int, worker_name: str, log_config: Dict) -> None:
         """Target function for worker process."""
         import logging.config
         from cl.runtime.tasks.celery.celery_queue import celery_app

@@ -48,8 +48,8 @@ class PngUtil:
         b"IEND",  # Image end
     }
 
-    @staticmethod
-    def get_pixel_hash_from_png(png_source: str | BytesIO) -> str:
+    @classmethod
+    def get_pixel_hash_from_png(cls, png_source: str | BytesIO) -> str:
         """
         Get MD5 hash of pixel data from a PNG file or BytesIO object.
 
@@ -68,8 +68,8 @@ class PngUtil:
         # Calculate MD5 hash of pixel data
         return hashlib.md5(arr.tobytes()).hexdigest()
 
-    @staticmethod
-    def compare_pixel_data(file1: str | BytesIO, file2: str | BytesIO) -> dict[str, Any]:
+    @classmethod
+    def compare_pixel_data(cls, file1: str | BytesIO, file2: str | BytesIO) -> dict[str, Any]:
         """
         Compare actual pixel data of two PNG files, ignoring compression/encoding differences.
 

@@ -23,16 +23,16 @@ from cl.runtime.views.view_key_query import ViewKeyQuery
 class ViewPersistenceUtil:
     """Util class with methods for persistent views."""
 
-    @staticmethod
-    def load_view_or_none(view_for: KeyMixin, view_name: str) -> View | None:
+    @classmethod
+    def load_view_or_none(cls, view_for: KeyMixin, view_name: str) -> View | None:
         """Load persisted view or return None if it does not exist."""
         persisted_view = active(DataSource).load_one_or_none(
             key_or_record=ViewKey(view_for=view_for, view_name=view_name).build()
         )
         return persisted_view
 
-    @staticmethod
-    def load_all_views_for_record(record: KeyMixin) -> list[View]:
+    @classmethod
+    def load_all_views_for_record(cls, record: KeyMixin) -> list[View]:
         """Load all persisted views for a record."""
         query = ViewKeyQuery(view_for=record).build()
         persisted_views = active(DataSource).load_by_query(
@@ -40,8 +40,8 @@ class ViewPersistenceUtil:
         )
         return list(persisted_views)
 
-    @staticmethod
-    def get_panel_kind_from_view(view: View) -> str | None:
+    @classmethod
+    def get_panel_kind_from_view(cls, view: View) -> str | None:
         """Get type of the view."""
         if view.view_name == "view_self":
             return "Primary"

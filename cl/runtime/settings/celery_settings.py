@@ -82,8 +82,8 @@ class CelerySettings(Settings):
         else:
             raise RuntimeError(f"Unsupported Celery broker: {self.celery_broker}")
 
-    @staticmethod
-    def _ensure_databases_dir_exists(db_dir) -> None:
+    @classmethod
+    def _ensure_databases_dir_exists(cls, db_dir) -> None:
         """Checks if a dir for celery exists, and creates it if it does not."""
 
         if not os.path.exists(db_dir):

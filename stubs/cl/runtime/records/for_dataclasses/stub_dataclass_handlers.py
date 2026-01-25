@@ -186,28 +186,18 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         if param_2 is not None and not isinstance(param_2, str):
             raise RuntimeError(f"The type of 'param_2' is '{type(param_2)}' rather than {typename(str)} or None.")
 
-    @staticmethod
-    def run_static_method_1a() -> None:
+    @classmethod
+    def run_static_method_1a(cls) -> None:
         """Stub handler."""
         PytestUtil.log_method_info(_logger)
 
-    @staticmethod
-    def run_static_method_1b() -> None:
+    @classmethod
+    def run_static_method_1b(cls) -> None:
         """Stub handler."""
         PytestUtil.log_method_info(_logger)
 
-    @staticmethod
-    def run_static_method_2a_with_params(param_1: str, param_2: str | None = None) -> None:
-        """Stub handler."""
-        PytestUtil.log_method_info(_logger)
-
-        if not isinstance(param_1, str):
-            raise RuntimeError(f"The type of 'param_1' is '{type(param_1)}' rather than {typename(str)}.")
-        if param_2 is not None and not isinstance(param_2, str):
-            raise RuntimeError(f"The type of 'param_2' is '{type(param_2)}' rather than {typename(str)} or None.")
-
-    @staticmethod
-    def run_static_method_2b_with_params(param_1: str, param_2: str | None = None) -> None:
+    @classmethod
+    def run_static_method_2a_with_params(cls, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
         PytestUtil.log_method_info(_logger)
 
@@ -216,8 +206,8 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         if param_2 is not None and not isinstance(param_2, str):
             raise RuntimeError(f"The type of 'param_2' is '{type(param_2)}' rather than {typename(str)} or None.")
 
-    @staticmethod
-    def run_static_method_3a_with_params(*, param_1: str, param_2: str | None = None) -> None:
+    @classmethod
+    def run_static_method_2b_with_params(cls, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
         PytestUtil.log_method_info(_logger)
 
@@ -226,8 +216,18 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         if param_2 is not None and not isinstance(param_2, str):
             raise RuntimeError(f"The type of 'param_2' is '{type(param_2)}' rather than {typename(str)} or None.")
 
-    @staticmethod
-    def run_static_method_3b_with_params(*, param_1: str, param_2: str | None = None) -> None:
+    @classmethod
+    def run_static_method_3a_with_params(cls, *, param_1: str, param_2: str | None = None) -> None:
+        """Stub handler."""
+        PytestUtil.log_method_info(_logger)
+
+        if not isinstance(param_1, str):
+            raise RuntimeError(f"The type of 'param_1' is '{type(param_1)}' rather than {typename(str)}.")
+        if param_2 is not None and not isinstance(param_2, str):
+            raise RuntimeError(f"The type of 'param_2' is '{type(param_2)}' rather than {typename(str)} or None.")
+
+    @classmethod
+    def run_static_method_3b_with_params(cls, *, param_1: str, param_2: str | None = None) -> None:
         """Stub handler."""
         PytestUtil.log_method_info(_logger)
 
@@ -281,8 +281,8 @@ class StubHandlers(StubHandlersKey, RecordMixin):
         if not isinstance(note_param, str):
             raise RuntimeError(f"The type of 'note_param' is '{type(note_param)}' rather than {typename(str)}.")
 
-    @staticmethod
-    def run_class_method_with_binary_param(pdf_file: FileData):
+    @classmethod
+    def run_class_method_with_binary_param(cls, pdf_file: FileData):
         """Stub method."""
         PytestUtil.log_method_info(_logger)
         _logger.info(f"Binary_data len={len(pdf_file.file_bytes)}")
@@ -302,8 +302,8 @@ class StubHandlers(StubHandlersKey, RecordMixin):
             time.sleep(3)
         _logger.info("Finished.")
 
-    @staticmethod
-    def run_long_static_handler():
+    @classmethod
+    def run_long_static_handler(cls):
         for i in range(10):
             _logger.info(f"Message {i}")
             time.sleep(3)

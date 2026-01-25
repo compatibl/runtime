@@ -83,8 +83,9 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin):
         """DAG view for the node."""
         return self.build_dag(node=self)
 
-    @staticmethod
+    @classmethod
     def build_dag(
+        cls,
         node: "SuccessorDagNode",
         layout_mode: DagLayout = DagLayout.PLANAR,
         ignore_fields: list[str] | None = None,
@@ -199,8 +200,9 @@ class SuccessorDagNode(SuccessorDagNodeKey, RecordMixin):
         node_data.node_data = {"title": self.node_id, "data": self.node_yaml}
         return DagNode(id_=self.node_id, data=node_data)
 
-    @staticmethod
+    @classmethod
     def __append_empty_node(
+        cls,
         source_node: DagNode,
         node_id: str,
         edge_label: str,

@@ -18,8 +18,8 @@ from sklearn.metrics import confusion_matrix
 
 class MatrixUtil:
 
-    @staticmethod
-    def create_confusion_matrix(data: pd.DataFrame, true_column_name: str, predicted_column_name: str) -> pd.DataFrame:
+    @classmethod
+    def create_confusion_matrix(cls, data: pd.DataFrame, true_column_name: str, predicted_column_name: str) -> pd.DataFrame:
         categories = data[true_column_name].unique().tolist()
         data_confusion_matrix = confusion_matrix(
             y_true=data[true_column_name], y_pred=data[predicted_column_name], labels=categories
@@ -29,15 +29,15 @@ class MatrixUtil:
 
         return result
 
-    @staticmethod
-    def convert_confusion_matrix_to_percent(data: pd.DataFrame) -> pd.DataFrame:
+    @classmethod
+    def convert_confusion_matrix_to_percent(cls, data: pd.DataFrame) -> pd.DataFrame:
         # convert to percents row-wise
         result = data / data.values.sum(axis=1, keepdims=True) * 100
 
         return result
 
-    @staticmethod
-    def create_confusion_matrix_labels(data: pd.DataFrame, in_percent: bool | None = False) -> list[list[str]]:
+    @classmethod
+    def create_confusion_matrix_labels(cls, data: pd.DataFrame, in_percent: bool | None = False) -> list[list[str]]:
         # str of each non-zero element of data for annotations
 
         if in_percent:

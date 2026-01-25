@@ -36,8 +36,9 @@ class Dag(DagKey, RecordMixin):
     def get_key(self) -> DagKey:
         return DagKey(name=self.name).build()
 
-    @staticmethod
+    @classmethod
     def auto_layout_dag(
+        cls,
         dag: "Dag",
         layout_mode: DagLayout = DagLayout.SPRING,
         offset_x: int = 600,
@@ -88,8 +89,8 @@ class Dag(DagKey, RecordMixin):
 
         return dag
 
-    @staticmethod
-    def build_edge_between_nodes(source: DagNode, target: DagNode, label: str | None = None) -> DagEdge:
+    @classmethod
+    def build_edge_between_nodes(cls, source: DagNode, target: DagNode, label: str | None = None) -> DagEdge:
         """Create a connection between two DagNode instances."""
         return DagEdge(
             id_=f"e-{source.id_}-{target.id_}",
@@ -109,8 +110,8 @@ class Dag(DagKey, RecordMixin):
         self._validate_graph(graph)
         return graph
 
-    @staticmethod
-    def _validate_graph(graph: nx.DiGraph):
+    @classmethod
+    def _validate_graph(cls, graph: nx.DiGraph):
         """Validate that graph has no cycles."""
 
         if not nx.is_directed_acyclic_graph(graph):
