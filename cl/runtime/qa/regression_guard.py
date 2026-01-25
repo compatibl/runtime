@@ -63,17 +63,20 @@ class RegressionGuard:
         - To record a new '{prefix}.expected.ext' file, delete the existing one
     """
 
-    abs_dir: str
-    """Absolute path to the output directory, 'verify_all' method applies everything in this directory."""
+    prefix: str | None
+    """Regression file prefix, use when a single test produces more than one regression file."""
 
     ext: str
-    """Output file extension (format), defaults to '.txt'"""
+    """Output file extension (format), defaults to 'txt'."""
 
     use_hash: bool | None
     """If True, verify using SHA256 hash comparison instead of full file comparison (defaults to None)."""
 
+    _abs_dir: str
+    """Absolute path to the output directory, 'verify_all' method applies everything in this directory."""
+
     _abs_dir_and_prefix: str
-    """Combines abs_dir and the prefix, 'verify' method applies to file with this prefix only."""
+    """Combines _abs_dir and the prefix, 'verify' method applies to file with this prefix only."""
 
     __verified: bool
     """Verify method sets this flag to true, after which further writes raise an error."""
@@ -150,10 +153,11 @@ class RegressionGuard:
             self.__delegate_to = None
             self.__verified = False
             self.__exception_text = None
-            self.abs_dir = base_path
-            self._abs_dir_and_prefix = output_path
+            self.prefix = prefix
             self.ext = ext
             self.use_hash = use_hash
+            self._abs_dir = base_path
+            self._abs_dir_and_prefix = output_path
 
             # Delete the existing received file if exists
             if os.path.exists(received_path := self._get_file_path("received")):
@@ -236,7 +240,7 @@ class RegressionGuard:
             return self.__delegate_to.verify_all(silent=silent)
 
         # Get inner dictionary using base path
-        inner_dict = self.__guard_dict[self.abs_dir]
+        inner_dict = self.__guard_dict[self._abs_dir]
 
         # Skip the delegated guards
         inner_dict = {k: v for k, v in inner_dict.items() if v.__delegate_to is None}
