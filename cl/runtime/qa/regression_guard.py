@@ -22,6 +22,7 @@ from typing import Any
 from typing import ClassVar
 from typing import Self
 from cl.runtime.qa.qa_util import QaUtil
+from cl.runtime.qa.png_util import PngUtil
 from cl.runtime.records.protocols import MAPPING_TYPES
 from cl.runtime.records.protocols import SEQUENCE_TYPES
 from cl.runtime.records.protocols import is_key_type
@@ -295,6 +296,22 @@ class RegressionGuard:
         else:
             return self._verify_with_content(silent=silent)
 
+    def _read_and_sanitize(self, file_path: str) -> str:
+        """
+        Read file content and apply sanitization for stable comparison.
+
+        Returns:
+            Content suitable for comparison (sanitized for HTML with Plotly, pixel hash for PNG, etc.)
+        """
+        if self.ext == "png":
+            return PngUtil.get_pixel_hash_from_png(file_path)
+        else:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            if self.ext == "html" and self._is_plotly_html(content):
+                content = self._sanitize_plotly_html(content)
+            return content
+
     def _verify_with_content(self, *, silent: bool = False) -> bool:
         """Verify by comparing full file content."""
 
@@ -335,8 +352,7 @@ class RegressionGuard:
 
             # Compare
             if content_matches:
-                # Content matches (after sanitization for HTML)
-                # Delete the received file and diff file
+                # Content matches (after sanitization), delete the received file and diff file
                 os.remove(received_path)
                 if os.path.exists(diff_path):
                     os.remove(diff_path)
@@ -438,8 +454,9 @@ class RegressionGuard:
             # Do not set the __verified flag so that verification can be performed again at a later time
             return True
 
-        # Compute SHA256 hash of received file
-        received_hash = self._compute_file_hash(received_path)
+        # Read and sanitize content, then compute hash
+        received_content = self._read_and_sanitize(received_path)
+        received_hash = hashlib.sha256(received_content.encode("utf-8")).hexdigest()
 
         if os.path.exists(expected_hash_path):
             # Read expected hash
@@ -553,16 +570,6 @@ class RegressionGuard:
             raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
         result = f"{self._abs_dir_and_prefix}{file_type}.sha256"
         return result
-
-    @staticmethod
-    def _compute_file_hash(file_path: str) -> str:
-        """Compute SHA256 hash of a file and return as hex string."""
-        sha256_hash = hashlib.sha256()
-        with open(file_path, "rb") as f:
-            # Read in chunks to handle large files efficiently
-            for chunk in iter(lambda: f.read(8192), b""):
-                sha256_hash.update(chunk)
-        return sha256_hash.hexdigest()
 
     @staticmethod
     def _is_plotly_html(html: str) -> bool:
