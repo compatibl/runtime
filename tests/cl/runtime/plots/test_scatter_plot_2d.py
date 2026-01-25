@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import numpy as np
-from cl.runtime.plots.for_matplotlib.plotly_engine import PlotlyEngine
+from cl.runtime.plots.for_plotly.plotly_engine import PlotlyEngine
 from cl.runtime.plots.plot_line_style import PlotLineStyle
 from cl.runtime.plots.scatter_plot_2d import ScatterPlot2D
 from cl.runtime.plots.scatter_values_2d import ScatterValues2D
