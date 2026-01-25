@@ -23,4 +23,4 @@ class StubTask(Task):
 
     def _execute(self) -> None:
         """Reports its label to RegressionGuard during execution."""
-        RegressionGuard().write(f"Running StubTask with label: {self.label}")
+        RegressionGuard().build().write(f"Running StubTask with label: {self.label}")

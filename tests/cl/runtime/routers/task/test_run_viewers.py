@@ -55,9 +55,9 @@ def test_method(default_db_fixture, event_broker_fixture):
         response = RunResponseUtil.get_response(request)
 
         result = BootstrapSerializers.YAML.serialize(response)
-        RegressionGuard(prefix=request.method).write(result)
+        RegressionGuard(prefix=request.method).build().write(result)
 
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 def test_api(default_db_fixture, event_broker_fixture):
@@ -68,9 +68,9 @@ def test_api(default_db_fixture, event_broker_fixture):
         response = PytestUtil.api_task_run(request)
 
         result = BootstrapSerializers.YAML.serialize(response)
-        RegressionGuard(prefix=request.method).write(result)
+        RegressionGuard(prefix=request.method).build().write(result)
 
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 if __name__ == "__main__":

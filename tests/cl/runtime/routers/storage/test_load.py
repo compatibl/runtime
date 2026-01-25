@@ -42,7 +42,7 @@ def test_method(default_db_fixture):
     assert [x.strip("_") for x in dict(result).keys()] == ["schema", "data"]
 
     # Check result.
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     guard.write(result.model_dump(by_alias=True))
     guard.verify()
 
@@ -64,7 +64,7 @@ def test_api(default_db_fixture):
         result = response.json()
 
         # Check result.
-        guard = RegressionGuard()
+        guard = RegressionGuard().build()
         guard.write(result)
         guard.verify()
 

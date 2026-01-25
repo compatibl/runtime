@@ -145,10 +145,10 @@ def test_bidirectional():
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(type(sample).__name__)
-        guard = RegressionGuard(prefix=snake_case_type_name)
+        guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(result_str)
 
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
     for sample, match in _INVALID_SAMPLES:
         with pytest.raises(Exception, match=match):
@@ -181,10 +181,10 @@ def test_unidirectional():
 
         # Write to regression guard
         snake_case_type_name = CaseUtil.pascal_to_snake_case(type(sample).__name__)
-        guard = RegressionGuard(prefix=snake_case_type_name)
+        guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(result_str)
 
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
     for sample, match in _INVALID_SAMPLES:
         with pytest.raises(Exception, match=match):

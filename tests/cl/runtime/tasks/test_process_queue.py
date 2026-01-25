@@ -23,7 +23,7 @@ from stubs.cl.runtime.tasks.stub_task import StubTask
 def test_process_queue(default_db_fixture, event_broker_fixture):
     """Test ProcessQueue class."""
 
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
 
     # Create queue
     queue = ProcessQueue(queue_id="test_process_queue")

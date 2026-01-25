@@ -27,7 +27,7 @@ def test_is_empty():
 def test_digest():
     """Test EntryKey.create_key method."""
 
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
 
     # Record type
     locale = "en-GB"

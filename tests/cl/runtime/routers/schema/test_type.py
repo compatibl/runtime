@@ -28,9 +28,9 @@ def test_method():
         # Run the coroutine wrapper added by the FastAPI decorator and validate the result
         request_obj = TypeRequest(**request)
         result_dict = TypeResponseUtil.get_type(request_obj)
-        RegressionGuard().write(result_dict)
+        RegressionGuard().build().write(result_dict)
 
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 def test_api():
@@ -42,9 +42,9 @@ def test_api():
             response = test_client.get("/schema/type", params=request)
             assert response.status_code == 200
             result = response.json()
-            RegressionGuard().write(result)
+            RegressionGuard().build().write(result)
 
-        RegressionGuard().verify_all()
+        RegressionGuard().build().verify_all()
 
 
 if __name__ == "__main__":

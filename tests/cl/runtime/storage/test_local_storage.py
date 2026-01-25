@@ -33,7 +33,7 @@ _EXCEPTION_REL_PATHS = (
 def test_local_storage():
     """Test LocalTextFile class."""
 
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     abs_dir = guard.get_output_dir()
     rel_dir = os.path.relpath(abs_dir, start=ProjectLayout.get_project_root())
     extensions = ("txt", "bin")
@@ -84,13 +84,13 @@ def test_local_storage():
                         if extension == "bin":
                             read_result = read_result.decode()
                         guard.write(read_result)
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 def test_local_storage_exceptions():
 
     # Test invalid storage modes
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     abs_dir = guard.get_output_dir()
     rel_dir = os.path.relpath(abs_dir, start=ProjectLayout.get_project_root())
     extensions = ("txt", "bin")

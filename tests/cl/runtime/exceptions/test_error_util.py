@@ -19,7 +19,7 @@ from cl.runtime.qa.regression_guard import RegressionGuard
 
 def test_value_error():
     """Test for ErrorUtil.value_error method."""
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     guard.write(ErrorUtil.value_error(value=123))
     guard.write(ErrorUtil.value_error(value=123, value_name="sample_value_name"))
     guard.write(
@@ -50,7 +50,7 @@ def test_value_error():
 
 def test_of_field():
     """Test for ErrorUtil._of_field method."""
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     assert ErrorUtil._of_field() == ""
     guard.write(ErrorUtil._of_field(field_name="sample_field"))
     guard.write(ErrorUtil._of_field(field_name="sample_field", data_type="SampleRecord"))
@@ -60,7 +60,7 @@ def test_of_field():
 
 def test_of_param():
     """Test for ErrorUtil._of_param method."""
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     assert ErrorUtil._of_param() == ""
     guard.write(ErrorUtil._of_param(param_name="sample_param"))
     guard.write(ErrorUtil._of_param(param_name="sample_param", method_name="sample_function"))

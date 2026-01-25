@@ -25,7 +25,7 @@ def perform_testing(base_path: str, full: bool = False):
     test_str = "perform_testing"
 
     # Guard without prefix
-    guard_without_prefix = RegressionGuard()
+    guard_without_prefix = RegressionGuard().build()
     assert guard_without_prefix._output_dir_and_prefix == os.path.join(base_path, "")  # noqa
 
     # Write output
@@ -37,11 +37,11 @@ def perform_testing(base_path: str, full: bool = False):
     # Run additional tests only if full testing is specified
     if full:
         # Test with prefix
-        guard_with_prefix_1 = RegressionGuard(prefix="prefix")
+        guard_with_prefix_1 = RegressionGuard(prefix="prefix").build()
         guard_with_prefix_1.write(f"{test_str}.1")
 
         # Second instance of guard for the same prefix, created using string
-        guard_with_prefix_2 = RegressionGuard(prefix="prefix")
+        guard_with_prefix_2 = RegressionGuard(prefix="prefix").build()
         guard_with_prefix_2.write(f"{test_str}.2")
 
         # Test dict output
@@ -57,13 +57,13 @@ def perform_testing(base_path: str, full: bool = False):
             "str_list_key": ["abc", "def"],
             "int_list_key": [1, 2],
         }
-        RegressionGuard(prefix="dict_txt").write(test_dict)
+        RegressionGuard(prefix="dict_txt").build().write(test_dict)
 
         # Verify all guards
-        RegressionGuard().verify_all()
+        RegressionGuard().build().verify_all()
 
         # Verify again, should have no effect
-        RegressionGuard().verify_all()
+        RegressionGuard().build().verify_all()
 
 
 def test_function():
@@ -88,17 +88,17 @@ class TestClass:
 def test_multiple_extensions():
     """Test regression guards for the same prefix with more than one extension."""
 
-    root_guard_txt = RegressionGuard()
+    root_guard_txt = RegressionGuard().build()
     root_guard_txt.write("abc")
     root_guard_txt.verify()
-    root_guard_yaml = RegressionGuard(ext="yaml")
+    root_guard_yaml = RegressionGuard(ext="yaml").build()
     root_guard_yaml.write("abc")
     root_guard_yaml.verify()
 
-    prefix_guard_txt = RegressionGuard(prefix="prefix")
+    prefix_guard_txt = RegressionGuard(prefix="prefix").build()
     prefix_guard_txt.write("abc")
     prefix_guard_txt.verify()
-    prefix_guard_yaml = RegressionGuard(prefix="prefix", ext="yaml")
+    prefix_guard_yaml = RegressionGuard(prefix="prefix", ext="yaml").build()
     prefix_guard_yaml.write("abc")
     prefix_guard_yaml.verify()
 
@@ -107,13 +107,13 @@ def test_verify_hash():
     """Test verify with use_hash=True that uses SHA256 hash comparison."""
 
     # Test without prefix
-    guard = RegressionGuard(prefix="hash_test", use_hash=True)
+    guard = RegressionGuard(prefix="hash_test", use_hash=True).build()
     guard.write("Test string")
     result = guard.verify()
     assert result is True
 
     # Test with different content to verify hash is computed correctly
-    guard_with_dict = RegressionGuard(prefix="hash_test_dict", use_hash=True)
+    guard_with_dict = RegressionGuard(prefix="hash_test_dict", use_hash=True).build()
     guard_with_dict.write({"key": "value", "number": 42})
     result = guard_with_dict.verify()
     assert result is True

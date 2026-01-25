@@ -58,7 +58,7 @@ def test_roundtrip():
 
     for encoder_name, encoder in _ENCODERS:
         for sample in _SAMPLES:
-            guard = RegressionGuard(prefix=encoder_name)
+            guard = RegressionGuard(prefix=encoder_name).build()
 
             # Test encoding
             encoded = encoder.encode(sample)
@@ -68,7 +68,7 @@ def test_roundtrip():
             decoded = encoder.decode(encoded)
             assert decoded == sample
 
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ def test_clone():
     """Test BuilderMixin.clone method."""
 
     # Create target from source
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     source = StubDataclassData(str_field="xyz", _regression_guard=guard)
     target = source.clone()
 
@@ -54,7 +54,7 @@ def test_clone_as():
     """Test BuilderMixin.clone_as method."""
 
     # Create target from source
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     source = StubDataclassData(str_field="xyz", int_field=789, _regression_guard=guard)
     target = source.clone_as(StubDataclassDerivedData)
 

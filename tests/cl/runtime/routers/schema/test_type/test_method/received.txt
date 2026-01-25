@@ -1,0 +1,135 @@
+cl.UiAppState:
+  Module:
+    ModuleName: cl
+  Name: UiAppState
+  Label: Ui App State
+  Comment: UiAppState.
+  TypeKind: Record
+  DisplayKind: Basic
+  Inherit:
+    Module:
+      ModuleName: cl
+    Name: UiAppStateKey
+  Elements:
+  - Key:
+      Module:
+        ModuleName: cl
+      Name: UserKey
+    Name: User
+    Comment: A user the app state is applied for.
+  - Data:
+      Module:
+        ModuleName: cl
+      Name: TabInfo
+    Name: OpenedTabs
+    Comment: Information about opened tabs.
+    Vector: true
+    Optional: true
+  - Value:
+      Type: String
+    Name: Favorites
+    Comment: Information about favorite tables, types and filters.
+    Vector: true
+    Optional: true
+  - Value:
+      Type: Int
+    Name: ActiveTabIndex
+    Comment: Index of active opened tab.
+    Optional: true
+  - Value:
+      Type: String
+    Name: BackendVersion
+    Comment: DEPRECATED. Use versions instead.
+    Optional: true
+  - Value:
+      Type: Dict
+    Name: Versions
+    Comment: Component versions.
+    Optional: true
+  - Value:
+      Type: String
+    Name: ApplicationName
+    Comment: Application name.
+    Optional: true
+  - Value:
+      Type: Bool
+    Name: ReadOnly
+    Comment: Flag indicating that UI is read-only.
+    Optional: true
+  - Value:
+      Type: String
+    Name: ApplicationTheme
+    Comment: Application theme (dark, light, etc.).
+    Optional: true
+  - Value:
+      Type: String
+    Name: UserSecretIdentifiers
+    Comment: |-
+      Suggested key names in My Keys section of the head and shoulders dialog.
+
+      Notes:
+          - This is a list of suggestions, no restriction on entering secrets with other names
+          - The secret names should be in snake_case, for example ["openai_api_key", "anthropic_api_key"] 
+    Vector: true
+    Optional: true
+  - Value:
+      Type: Bool
+    Name: FullScreenMode
+    Comment: |-
+      Flag indicating whether the UI is in full-screen mode (e.g., only a single active tab is visible with a 
+      minimalistic interface).
+    Optional: true
+  Keys:
+  - User
+cl.TabInfo:
+  Module:
+    ModuleName: cl
+  Name: TabInfo
+  Label: Tab Info
+  Comment: Tab info.
+  TypeKind: Data
+  DisplayKind: Basic
+  Elements:
+  - Value:
+      Type: String
+    Name: TableName
+    Comment: Table name of the Tab.
+  - Value:
+      Type: String
+    Name: TypeName
+    Comment: Record type of the Tab.
+    Optional: true
+  - Value:
+      Type: String
+    Name: FilterName
+    Comment: Filter name of the Tab.
+    Optional: true
+cl.UiAppStateKey:
+  Module:
+    ModuleName: cl
+  Name: UiAppStateKey
+  Label: Ui App State Key
+  Comment: UiAppState.
+  TypeKind: Data
+  DisplayKind: Basic
+  Elements:
+  - Key:
+      Module:
+        ModuleName: cl
+      Name: UserKey
+    Name: User
+    Comment: A user the app state is applied for.
+cl.UserKey:
+  Module:
+    ModuleName: cl
+  Name: UserKey
+  Label: User Key
+  Comment: User which is allowed to log in.
+  TypeKind: Data
+  DisplayKind: Basic
+  Elements:
+  - Value:
+      Type: String
+    Name: Username
+    Comment: Unique user identifier.
+

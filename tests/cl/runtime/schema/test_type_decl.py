@@ -70,9 +70,9 @@ def test_type_decl():
         type_decl_str = BootstrapSerializers.YAML.serialize(type_decl)
 
         # Record in regression guard
-        guard = RegressionGuard(prefix=type_name)
+        guard = RegressionGuard(prefix=type_name).build()
         guard.write(type_decl_str)
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 if __name__ == "__main__":

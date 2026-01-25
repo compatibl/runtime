@@ -40,10 +40,10 @@ def test_method():
         result_obj = DataclassTypeDecl.for_type(sample_type)
         result_dict = BootstrapSerializers.FOR_UI.serialize(result_obj)
 
-        guard = RegressionGuard(prefix=sample_type.__module__.rsplit(".", 1)[1])
+        guard = RegressionGuard(prefix=sample_type.__module__.rsplit(".", 1)[1]).build()
         guard.write(result_dict)
 
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 if __name__ == "__main__":

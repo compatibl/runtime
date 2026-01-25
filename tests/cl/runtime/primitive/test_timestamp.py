@@ -74,7 +74,7 @@ def test_time_ordering():
 
 def test_validate():
     """Test Timestamp.validate method."""
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     try:
         Timestamp.validate("123")
     except Exception as e:

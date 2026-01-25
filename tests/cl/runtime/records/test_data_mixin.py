@@ -22,7 +22,7 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_double_derived_data
 def test_build():
     """Test DataMixin.build method."""
 
-    guard = RegressionGuard()
+    guard = RegressionGuard().build()
     guard.write("Testing Base:")
     StubDataclassData(_regression_guard=guard).build()
     guard.write("Testing Derived:")

@@ -23,6 +23,7 @@ from typing import ClassVar
 from typing import Self
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.qa.png_util import PngUtil
+from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.protocols import MAPPING_TYPES
 from cl.runtime.records.protocols import SEQUENCE_TYPES
 from cl.runtime.records.protocols import is_key_type
@@ -50,7 +51,7 @@ def _error_extension_not_supported(ext: str) -> Any:
 
 
 @dataclass(slots=True, init=False)
-class RegressionGuard:
+class RegressionGuard(BootstrapMixin):
     """
     Detects changes (regression) of multiple output files per unit test.
 
@@ -137,14 +138,20 @@ class RegressionGuard:
         # Check if regression guard already exists in inner dictionary for the same combination of prefix, ext, use_hash
         inner_key = f"{prefix}::{ext}"
         if (existing_guard := inner_dict.get(inner_key, None)) is not None:
-            # Delegate to the existing guard if found, do not initialize other fields
+            # Delegate to the existing guard if found
             self.__delegate_to = existing_guard
             if use_hash != existing_guard.use_hash:
                 raise RuntimeError(
                     f"Two RegressionGuard instances have different values of use_hash:\n"
                     f"Instance 1 (use_hash={use_hash}): {self._output_dir_and_prefix}\n"
                     f"Instance 2 (use_hash={existing_guard.use_hash}): {existing_guard._output_dir_and_prefix}\n"
-                    )
+                )
+            # Copy fields from existing guard for build() compatibility
+            self.prefix = existing_guard.prefix
+            self.ext = existing_guard.ext
+            self.use_hash = existing_guard.use_hash
+            self._output_dir = existing_guard._output_dir
+            self._output_dir_and_prefix = existing_guard._output_dir_and_prefix
         else:
             # Otherwise add self to dictionary
             inner_dict[inner_key] = self
@@ -165,6 +172,7 @@ class RegressionGuard:
 
     def get_output_dir(self) -> str:
         """Return absolute output directory path."""
+        self.check_frozen()
         return self._output_dir
 
     def write(self, value: Any) -> None:
@@ -174,6 +182,7 @@ class RegressionGuard:
         Args:
             value: Data to be recorded, accepted data types depend on the specified file extension
         """
+        self.check_frozen()
 
         # Perform type conversion
         if isinstance(value, Exception):
@@ -238,6 +247,7 @@ class RegressionGuard:
         Args:
             silent: If true, do not raise exception and only write the '{prefix}.diff.ext' file
         """
+        self.check_frozen()
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
         if self.__delegate_to is not None:
@@ -284,6 +294,7 @@ class RegressionGuard:
         Args:
             silent: If true, do not raise exception and only write the '{prefix}.diff.ext' file
         """
+        self.check_frozen()
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
         if self.__delegate_to is not None:

@@ -59,9 +59,9 @@ def test_data_serialization():
 
         # Record in RegressionGuard
         result_str = BootstrapSerializers.YAML.serialize(serialized)
-        guard = RegressionGuard(prefix=sample_type.__name__)
+        guard = RegressionGuard(prefix=sample_type.__name__).build()
         guard.write(result_str)
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 if __name__ == "__main__":

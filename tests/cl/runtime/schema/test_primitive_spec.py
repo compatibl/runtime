@@ -68,9 +68,9 @@ def test_init():
         prefix = f"{typename(type_spec.type_)}.{subtype}" if subtype else typename(type_spec.type_)
 
         # Record in RegressionGuard
-        guard = RegressionGuard(prefix=prefix)
+        guard = RegressionGuard(prefix=prefix).build()
         guard.write(type_spec_str)
-    RegressionGuard().verify_all()
+    RegressionGuard().build().verify_all()
 
 
 def test_init_exceptions():
