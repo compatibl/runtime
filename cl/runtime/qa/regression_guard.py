@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import difflib
+import hashlib
 import os
 import re
 from dataclasses import dataclass
@@ -406,6 +407,114 @@ class RegressionGuard:
             # Verification is considered successful if expected file has been created
             return True
 
+    def verify_hash(self, *, silent: bool = False) -> bool:
+        """
+        Verify using SHA256 hash comparison, storing only hash files instead of expected/received files.
+
+        Notes:
+            - Computes SHA256 hash of '{prefix}.received.ext'
+            - Stores hashes in '{prefix}.expected.sha256' and '{prefix}.received.sha256'
+            - If '{prefix}.expected.sha256' does not exist, create it from the hash of received file
+            - If hashes match, delete '{prefix}.received.ext', '{prefix}.received.sha256' and '{prefix}.diff.sha256'
+            - If hashes differ, write '{prefix}.diff.sha256' and raise exception unless silent=True
+
+        Returns:
+            bool: True if verification succeeds and false otherwise
+
+        Args:
+            silent: If true, do not raise exception and only write the '{prefix}.diff.sha256' file
+        """
+
+        # Delegate to a previously created guard with the same combination of output_path and ext if exists
+        if self.__delegate_to is not None:
+            return self.__delegate_to.verify_hash(silent=silent)
+
+        if self.__verified:
+            # Already verified
+            if not silent:
+                # Use the existing exception text to raise if silent=False
+                raise RuntimeError(self.__exception_text)
+            else:
+                # Otherwise return True if exception text is None (it is set on verification failure)
+                return self.__exception_text is None
+
+        received_path = self._get_file_path("received")
+        expected_hash_path = self._get_hash_file_path("expected")
+        received_hash_path = self._get_hash_file_path("received")
+        diff_hash_path = self._get_hash_file_path("diff")
+
+        # If received file does not yet exist, return True
+        if not os.path.exists(received_path):
+            # Do not set the __verified flag so that verification can be performed again at a later time
+            return True
+
+        # Compute SHA256 hash of received file
+        received_hash = self._compute_file_hash(received_path)
+
+        if os.path.exists(expected_hash_path):
+            # Read expected hash
+            with open(expected_hash_path, "r", encoding="utf-8") as f:
+                expected_hash = f.read().strip()
+
+            if received_hash == expected_hash:
+                # Hashes match, delete received file and hash files
+                os.remove(received_path)
+                if os.path.exists(received_hash_path):
+                    os.remove(received_hash_path)
+                if os.path.exists(diff_hash_path):
+                    os.remove(diff_hash_path)
+
+                # Return True to indicate verification has been successful
+                return True
+            else:
+                # Hashes differ, write received hash and diff
+                with open(received_hash_path, "w", encoding="utf-8") as f:
+                    f.write(received_hash)
+
+                diff_content = f"SHA256 hash mismatch:\n  Expected: {expected_hash}\n  Received: {received_hash}\n"
+                with open(diff_hash_path, "w", encoding="utf-8") as f:
+                    f.write(diff_content)
+
+                exception_text = (
+                    f"\nSHA256 hash regression test failed.\n"
+                    f"  Expected hash: {expected_hash}\n"
+                    f"  Received hash: {received_hash}\n"
+                    f"  Expected hash file: {expected_hash_path}\n"
+                    f"  Received hash file: {received_hash_path}\n"
+                    f"  Received full file: {received_path}\n"
+                )
+
+                # Record into the object even if silent
+                self.__exception_text = exception_text
+
+                # Set the __verified flag so that verification returns the same result if attempted again
+                # This will prevent further writes to this prefix and extension
+                self.__verified = True
+
+                if not silent:
+                    # Raise exception only when not silent
+                    raise RuntimeError(exception_text)
+                else:
+                    return False
+        else:
+            # Expected hash file does not exist, create it from the received file hash
+            with open(expected_hash_path, "w", encoding="utf-8") as f:
+                f.write(received_hash)
+
+            # Delete the received file and hash files
+            os.remove(received_path)
+            if os.path.exists(received_hash_path):
+                os.remove(received_hash_path)
+            if os.path.exists(diff_hash_path):
+                os.remove(diff_hash_path)
+
+            # Set the __verified flag so that verification returns the same result if attempted again
+            # This will prevent further writes to this prefix and extension
+            self.__verified = True
+
+            # Verification is considered successful if expected hash file has been created
+            return True
+
     def _format_txt(self, value: Any) -> str:
         """Format text for regression testing."""
 
@@ -447,6 +556,23 @@ class RegressionGuard:
             raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
         result = f"{self._abs_dir_and_prefix}{file_type}.{self.ext}"
         return result
+
+    def _get_hash_file_path(self, file_type: str) -> str:
+        """Get path for hash file: '{prefix}.{file_type}.sha256' located next to the unit test."""
+        if file_type not in (file_types := ["received", "expected", "diff"]):
+            raise RuntimeError(f"Unknown file type {file_type}, supported types are: {', '.join(file_types)}")
+        result = f"{self._abs_dir_and_prefix}{file_type}.sha256"
+        return result
+
+    @staticmethod
+    def _compute_file_hash(file_path: str) -> str:
+        """Compute SHA256 hash of a file and return as hex string."""
+        sha256_hash = hashlib.sha256()
+        with open(file_path, "rb") as f:
+            # Read in chunks to handle large files efficiently
+            for chunk in iter(lambda: f.read(8192), b""):
+                sha256_hash.update(chunk)
+        return sha256_hash.hexdigest()
 
     @staticmethod
     def _is_plotly_html(html: str) -> bool:

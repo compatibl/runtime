@@ -103,5 +103,21 @@ def test_multiple_extensions():
     prefix_guard_yaml.verify()
 
 
+def test_verify_hash():
+    """Test verify_hash method that uses SHA256 hash comparison."""
+
+    # Test without prefix
+    guard = RegressionGuard(prefix="hash_test")
+    guard.write("Test string")
+    result = guard.verify_hash()
+    assert result is True
+
+    # Test with different content to verify hash is computed correctly
+    guard_with_dict = RegressionGuard(prefix="hash_test_dict")
+    guard_with_dict.write({"key": "value", "number": 42})
+    result = guard_with_dict.verify_hash()
+    assert result is True
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
