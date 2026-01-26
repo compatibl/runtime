@@ -43,13 +43,6 @@ _YAML_SERIALIZER = BootstrapSerializers.YAML
 """Serializer for classes and containers."""
 
 
-def _error_extension_not_supported(ext: str) -> Any:
-    raise RuntimeError(
-        f"Extension {ext} is not supported by RegressionGuard. "
-        f"Supported extensions: {', '.join(_supported_extensions)}"
-    )
-
-
 @dataclass(slots=True, kw_only=True)
 class RegressionGuard(BootstrapMixin):
     """
@@ -107,11 +100,11 @@ class RegressionGuard(BootstrapMixin):
             # Remove dot prefix if specified
             self.ext = self.ext.removeprefix(".")
             if self.ext not in _supported_extensions:
-                _error_extension_not_supported(self.ext)
+                self._error_extension_not_supported(self.ext)
         else:
             raise RuntimeError("Param 'ext' is not specified in RegressionGuard.")
 
-        # Get inner dictionary using base path
+        # Get inner dictionary using _output_dir
         inner_dict = self._guard_dict.setdefault(self._output_dir, dict())
 
         # Check if regression guard already exists in inner dictionary for the same combination of prefix, ext, use_hash
@@ -199,12 +192,13 @@ class RegressionGuard(BootstrapMixin):
                 file.flush()
         else:
             # Should not be reached here because of a previous check in __init__
-            _error_extension_not_supported(self.ext)
+            self._error_extension_not_supported(self.ext)
 
         # Return self for method call chaining
         return self
 
-    def verify_all(self, *, silent: bool = False) -> bool:
+    @classmethod
+    def verify_all(cls, *, silent: bool = False) -> bool:
         """
         Verify for all guards in this test that '{prefix}.received.ext' is the same as '{prefix}.expected.ext'.
         Defaults to silent=True (no exception) to permit other tests to proceed.
@@ -220,14 +214,9 @@ class RegressionGuard(BootstrapMixin):
         Args:
             silent: If true, do not raise exception and only write the '{prefix}.diff.ext' file
         """
-        self.check_frozen()
-
-        # Delegate to a previously created guard with the same combination of output_path and ext if exists
-        if self._delegate_to is not None:
-            return self._delegate_to.verify_all(silent=silent)
-
-        # Get inner dictionary using base path
-        inner_dict = self._guard_dict[self._output_dir]
+        # Get inner dictionary using output_dir
+        output_dir = QaUtil.get_test_dir_from_call_stack()
+        inner_dict = cls._guard_dict[output_dir]
 
         # Skip the delegated guards
         inner_dict = {k: v for k, v in inner_dict.items() if v._delegate_to is None}
@@ -269,7 +258,7 @@ class RegressionGuard(BootstrapMixin):
         """
         self.check_frozen()
 
-        # Delegate to a previously created guard with the same combination of output_path and ext if exists
+        # Delegate to a previously created guard with the same output_dir if exists
         if self._delegate_to is not None:
             return self._delegate_to.verify(silent=silent)
 
@@ -578,3 +567,10 @@ class RegressionGuard(BootstrapMixin):
         # Remove lowercase GUIDs (e.g., 1d6cd542-2bef-4533-9d0b-40e9723ce8f5)
         html = re.sub(r"[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}", "", html)
         return html
+
+    @classmethod
+    def _error_extension_not_supported(cls, ext: str) -> Any:
+        raise RuntimeError(
+            f"Extension {ext} is not supported by RegressionGuard. "
+            f"Supported extensions: {', '.join(_supported_extensions)}"
+        )
