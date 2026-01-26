@@ -278,22 +278,6 @@ class RegressionGuard(BootstrapMixin):
         else:
             return self._verify_with_content(raise_on_fail=raise_on_fail)
 
-    def _read_and_sanitize(self, file_path: str) -> str:
-        """
-        Read file content and apply sanitization for stable comparison.
-
-        Returns:
-            Content suitable for comparison (sanitized for HTML with Plotly, pixel hash for PNG, etc.)
-        """
-        if self.ext == "png":
-            return PngUtil.get_pixel_hash_from_png(file_path)
-        else:
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-            if self.ext == "html" and self._is_plotly_html(content):
-                content = self._sanitize_plotly_html(content)
-            return content
-
     def _verify_with_content(self, *, raise_on_fail: bool) -> bool:
         """Verify by comparing full file content."""
 
@@ -503,6 +487,22 @@ class RegressionGuard(BootstrapMixin):
 
             # Verification is considered successful if expected hash file has been created
             return True
+
+    def _read_and_sanitize(self, file_path: str) -> str:
+        """
+        Read file content and apply sanitization for stable comparison.
+
+        Returns:
+            Content suitable for comparison (sanitized for HTML with Plotly, pixel hash for PNG, etc.)
+        """
+        if self.ext == "png":
+            return PngUtil.get_pixel_hash_from_png(file_path)
+        else:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            if self.ext == "html" and self._is_plotly_html(content):
+                content = self._sanitize_plotly_html(content)
+            return content
 
     def _format_txt(self, value: Any) -> str:
         """Format text for regression testing."""
