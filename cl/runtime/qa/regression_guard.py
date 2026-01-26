@@ -198,21 +198,22 @@ class RegressionGuard(BootstrapMixin):
         return self
 
     @classmethod
-    def verify_all(cls, *, silent: bool = False) -> bool:
+    def verify_all(cls, *, raise_on_fail: bool = True) -> bool:
         """
         Verify for all guards in this test that '{prefix}.received.ext' is the same as '{prefix}.expected.ext'.
-        Defaults to silent=True (no exception) to permit other tests to proceed.
 
         Notes:
+            - If param use_hash=True, uses SHA256 hash comparison storing only hash files
             - If '{prefix}.expected.ext' does not exist, create from '{prefix}.received.ext'
             - If files are the same, delete '{prefix}.received.ext' and '{prefix}.diff.ext'
-            - If files differ, write '{prefix}.diff.ext' and raise exception unless silent=True
+            - If files differ, write '{prefix}.diff.ext' always and raise exception if raise_on_fail is True
 
         Returns:
             bool: True if verification succeeds and false otherwise
 
         Args:
-            silent: If true, do not raise exception and only write the '{prefix}.diff.ext' file
+            raise_on_fail: If True (default), write '{prefix}.diff.ext' and raise an error
+                           If False, write '{prefix}.diff.ext' file but not raise an error so other tests can proceed
         """
         # Get inner dictionary using output_dir
         output_dir = QaUtil.get_test_dir_from_call_stack()
@@ -221,11 +222,11 @@ class RegressionGuard(BootstrapMixin):
         # Skip the delegated guards
         inner_dict = {k: v for k, v in inner_dict.items() if v._delegate_to is None}
 
-        # Call verify for all guards silently and check if all are true
+        # Call verify for all guards without raising an error and check if all are true
         # Because 'all' is used, the comparison will not stop early
-        errors_found = not all(guard.verify(silent=True) for guard in inner_dict.values())
+        errors_found = not all(guard.verify(raise_on_fail=False) for guard in inner_dict.values())
 
-        if errors_found and not silent:
+        if errors_found and raise_on_fail:
             # Collect exception text from guards where it is present
             exc_text_blocks = [
                 exception_text
@@ -239,33 +240,33 @@ class RegressionGuard(BootstrapMixin):
 
         return not errors_found
 
-    def verify(self, *, silent: bool = False) -> bool:
+    def verify(self, *, raise_on_fail: bool = True) -> bool:
         """
         Verify for this regression guard that '{prefix}.received.ext' is the same as '{prefix}.expected.ext'.
-        Defaults to silent=True (no exception) to permit other tests to proceed.
 
         Notes:
-            - If use_hash=True, uses SHA256 hash comparison storing only hash files
+            - If param use_hash=True, uses SHA256 hash comparison storing only hash files
             - If '{prefix}.expected.ext' does not exist, create from '{prefix}.received.ext'
             - If files are the same, delete '{prefix}.received.ext' and '{prefix}.diff.ext'
-            - If files differ, write '{prefix}.diff.ext' and raise exception unless silent=True
+            - If files differ, write '{prefix}.diff.ext' always and raise exception if raise_on_fail is True
 
         Returns:
             bool: True if verification succeeds and false otherwise
 
         Args:
-            silent: If true, do not raise exception and only write the '{prefix}.diff.ext' file
+            raise_on_fail: If True (default), write '{prefix}.diff.ext' and raise an error
+                           If False, write '{prefix}.diff.ext' file but not raise an error so other tests can proceed
         """
         self.check_frozen()
 
         # Delegate to a previously created guard with the same output_dir if exists
         if self._delegate_to is not None:
-            return self._delegate_to.verify(silent=silent)
+            return self._delegate_to.verify(raise_on_fail=raise_on_fail)
 
         if self._verified:
             # Already verified
-            if not silent:
-                # Use the existing exception text to raise if silent=False
+            if raise_on_fail:
+                # Use the existing exception text to raise if raise_on_fail is True
                 raise RuntimeError(self._exception_text)
             else:
                 # Otherwise return True if exception text is None (it is set on verification failure)
@@ -273,9 +274,9 @@ class RegressionGuard(BootstrapMixin):
 
         # Dispatch to hash-based or content-based verification
         if self.use_hash:
-            return self._verify_with_hash(silent=silent)
+            return self._verify_with_hash(raise_on_fail=raise_on_fail)
         else:
-            return self._verify_with_content(silent=silent)
+            return self._verify_with_content(raise_on_fail=raise_on_fail)
 
     def _read_and_sanitize(self, file_path: str) -> str:
         """
@@ -293,7 +294,7 @@ class RegressionGuard(BootstrapMixin):
                 content = self._sanitize_plotly_html(content)
             return content
 
-    def _verify_with_content(self, *, silent: bool = False) -> bool:
+    def _verify_with_content(self, *, raise_on_fail: bool) -> bool:
         """Verify by comparing full file content."""
 
         received_path = self._get_file_path("received")
@@ -393,15 +394,15 @@ class RegressionGuard(BootstrapMixin):
                     extra_eol = "" if exception_text.endswith("\n") else "\n"
                     exception_text = exception_text + f"{extra_eol}{end_str}{truncate_str}{end_sep}"
 
-                # Record into the object even if silent
+                # Record even if raise_on_fail is False
                 self._exception_text = exception_text
 
                 # Set the _verified flag so that verification returns the same result if attempted again
                 # This will prevent further writes to this prefix and extension
                 self._verified = True
 
-                if not silent:
-                    # Raise exception only when not silent
+                if raise_on_fail:
+                    # Raise exception only when raise_on_fail is True
                     raise RuntimeError(exception_text)
                 else:
                     return False
@@ -422,7 +423,7 @@ class RegressionGuard(BootstrapMixin):
             # Verification is considered successful if expected file has been created
             return True
 
-    def _verify_with_hash(self, *, silent: bool = False) -> bool:
+    def _verify_with_hash(self, *, raise_on_fail: bool) -> bool:
         """Verify using SHA256 hash comparison, storing only hash files instead of expected/received files."""
 
         received_path = self._get_file_path("received")
@@ -472,15 +473,15 @@ class RegressionGuard(BootstrapMixin):
                     f"  Received full file: {received_path}\n"
                 )
 
-                # Record into the object even if silent
+                # Record even if raise_on_fail is Falce
                 self._exception_text = exception_text
 
                 # Set the _verified flag so that verification returns the same result if attempted again
                 # This will prevent further writes to this prefix and extension
                 self._verified = True
 
-                if not silent:
-                    # Raise exception only when not silent
+                if raise_on_fail:
+                    # Raise exception only when raise_on_fail is True
                     raise RuntimeError(exception_text)
                 else:
                     return False
