@@ -84,7 +84,7 @@ def test_local_storage():
                         if extension == "bin":
                             read_result = read_result.decode()
                         guard.write(read_result)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_local_storage_exceptions():

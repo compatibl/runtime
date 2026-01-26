@@ -60,7 +60,7 @@ def test_data_serialization():
         # Record in RegressionGuard
         guard = RegressionGuard(prefix=f"{sample_type.__name__}").build()
         guard.write(serialized)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

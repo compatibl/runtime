@@ -54,7 +54,7 @@ def test_digest():
     guard.write(StringUtil.digest(text="Multiline\nText", text_params=(locale,), hash_params=("Sample Data",)))
 
     # Verify
-    guard.verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

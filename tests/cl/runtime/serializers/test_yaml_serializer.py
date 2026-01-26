@@ -72,7 +72,7 @@ def test_to_yaml():
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(obj_yaml)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_from_yaml():

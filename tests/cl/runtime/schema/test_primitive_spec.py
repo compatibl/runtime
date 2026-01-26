@@ -70,7 +70,7 @@ def test_init():
         # Record in RegressionGuard
         guard = RegressionGuard(prefix=prefix).build()
         guard.write(type_spec_str)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_init_exceptions():

@@ -30,7 +30,7 @@ def test_method():
         result_dict = TypeResponseUtil.get_type(request_obj)
         RegressionGuard().build().write(result_dict)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_api():
@@ -44,7 +44,7 @@ def test_api():
             result = response.json()
             RegressionGuard().build().write(result)
 
-        RegressionGuard().build().verify_all()
+        RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

@@ -88,7 +88,7 @@ def test_get_type_spec():
         # Record in RegressionGuard
         guard = RegressionGuard(prefix=typename(type_spec.type_)).build()
         guard.write(type_spec_str)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_get_type_spec_exceptions():

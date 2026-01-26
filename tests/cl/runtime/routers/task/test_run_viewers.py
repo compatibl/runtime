@@ -57,7 +57,7 @@ def test_method(default_db_fixture, event_broker_fixture):
         result = BootstrapSerializers.YAML.serialize(response)
         RegressionGuard(prefix=request.method).build().write(result)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_api(default_db_fixture, event_broker_fixture):
@@ -70,7 +70,7 @@ def test_api(default_db_fixture, event_broker_fixture):
         result = BootstrapSerializers.YAML.serialize(response)
         RegressionGuard(prefix=request.method).build().write(result)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

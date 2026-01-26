@@ -148,7 +148,7 @@ def test_bidirectional():
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(result_str)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
     for sample, match in _INVALID_SAMPLES:
         with pytest.raises(Exception, match=match):
@@ -184,7 +184,7 @@ def test_unidirectional():
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(result_str)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
     for sample, match in _INVALID_SAMPLES:
         with pytest.raises(Exception, match=match):

@@ -70,7 +70,7 @@ def test_unidirectional():
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(result_str)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

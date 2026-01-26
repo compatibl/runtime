@@ -136,7 +136,7 @@ def test_events(default_db_fixture, event_broker_fixture):
 
         # Verify output
         RegressionGuard().build().write(event_stream_data)
-        RegressionGuard().build().verify_all()
+        RegressionGuard.verify_all()
 
 
 def test_events_multi_listener(default_db_fixture, event_broker_fixture):

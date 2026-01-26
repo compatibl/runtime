@@ -63,7 +63,7 @@ def test_default():
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(result_str)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_compact():
@@ -80,7 +80,7 @@ def test_compact():
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(result_str)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_for_reporting():
@@ -97,7 +97,7 @@ def test_for_reporting():
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(result_str)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

@@ -60,10 +60,10 @@ def perform_testing(base_path: str, full: bool = False):
         RegressionGuard(prefix="dict_txt").build().write(test_dict)
 
         # Verify all guards
-        RegressionGuard().build().verify_all()
+        RegressionGuard.verify_all()
 
         # Verify again, should have no effect
-        RegressionGuard().build().verify_all()
+        RegressionGuard.verify_all()
 
 
 def test_function():
@@ -105,7 +105,7 @@ def test_multiple_extensions():
     RegressionGuard(prefix="verify_all_yaml", ext="yaml").build().write("def")
 
     # Verify all guards in the same output dir
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 def test_verify_hash():
     """Test verify with use_hash=True that uses SHA256 hash comparison."""

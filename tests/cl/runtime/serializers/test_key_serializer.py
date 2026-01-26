@@ -60,7 +60,7 @@ def test_serialization():  # TODO: Rename to test_delimited
         snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(type(sample)))
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(serialized)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_polymorphic():
@@ -120,7 +120,7 @@ def test_for_sqlite():
         snake_case_type_name = CaseUtil.pascal_to_snake_case(typename(type(sample)))
         guard = RegressionGuard(prefix=snake_case_type_name).build()
         guard.write(serialized)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 def test_serialization_exceptions():

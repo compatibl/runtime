@@ -82,7 +82,7 @@ def test_populate_index_dict():
         )
         index_dict = dict(index_list)
         RegressionGuard(prefix=typename(sample_type)).build().write(index_dict)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

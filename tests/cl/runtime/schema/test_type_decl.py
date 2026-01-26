@@ -72,7 +72,7 @@ def test_type_decl():
         # Record in regression guard
         guard = RegressionGuard(prefix=type_name).build()
         guard.write(type_decl_str)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

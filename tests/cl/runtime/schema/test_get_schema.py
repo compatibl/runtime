@@ -43,7 +43,7 @@ def test_method():
         guard = RegressionGuard(prefix=sample_type.__module__.rsplit(".", 1)[1]).build()
         guard.write(result_dict)
 
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":

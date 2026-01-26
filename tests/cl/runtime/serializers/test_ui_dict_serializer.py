@@ -61,7 +61,7 @@ def test_data_serialization():
         result_str = BootstrapSerializers.YAML.serialize(serialized)
         guard = RegressionGuard(prefix=sample_type.__name__).build()
         guard.write(result_str)
-    RegressionGuard().build().verify_all()
+    RegressionGuard.verify_all()
 
 
 if __name__ == "__main__":
