@@ -50,7 +50,7 @@ def _error_extension_not_supported(ext: str) -> Any:
     )
 
 
-@dataclass(slots=True, init=False)
+@dataclass(slots=True, kw_only=True)
 class RegressionGuard(BootstrapMixin):
     """
     Detects changes (regression) of multiple output files per unit test.
@@ -64,107 +64,74 @@ class RegressionGuard(BootstrapMixin):
         - To record a new '{prefix}.expected.ext' file, delete the existing one
     """
 
-    prefix: str | None
+    prefix: str | None = None
     """Regression file prefix, use when a single test produces more than one regression file."""
 
-    ext: str
-    """Output file extension (format), defaults to 'txt'."""
+    ext: str = "txt"
+    """Output file extension without the leading dot, defaults to 'txt'."""
 
-    use_hash: bool | None
+    use_hash: bool | None = None
     """If True, verify using SHA256 hash comparison instead of full file comparison (defaults to None)."""
 
-    _output_dir: str
+    _output_dir: str | None = None
     """Absolute path to the test output directory, 'verify_all' method applies everything in this directory."""
 
-    _output_dir_and_prefix: str
-    """Combines _output_dir and the prefix, 'verify' method applies to file with this prefix only."""
+    _output_dir_and_prefix: str | None = None
+    """Combines _output_dir and prefix, 'verify' method applies to file with this prefix only."""
 
-    __verified: bool
+    _verified: bool | None = None
     """Verify method sets this flag to true, after which further writes raise an error."""
 
-    __exception_text: str | None
+    _exception_text: str | None = None
     """Exception text from an earlier verification is reused instead of comparing the files again."""
 
-    __delegate_to: Self | None
+    _delegate_to: Self | None = None
     """Delegate all function calls to this regression guard if set (instance vars are not initialized in this case)."""
 
-    __guard_dict: ClassVar[dict[str, dict[str, Self]]] = {}  # TODO: Set using ContextVars
-    """Dictionary of existing guards indexed by base_path (outer dict) and prefix/ext (inner dict)."""
+    _guard_dict: ClassVar[dict[str, dict[str | None, Self]]] = {}  # TODO: Define using ContextVars for multithreading
+    """Dictionary of existing guards indexed by output_dir (outer dict) and prefix (inner dict)."""
 
-    def __init__(
-        self,
-        *,
-        prefix: str | None = None,
-        ext: str = "txt",
-        use_hash: bool | None = None,
-    ):
-        """
-        Initialize the regression guard.
-
-        Args:
-            prefix: Regression file prefix, use when a single test produces more than one regression file
-            ext: File extension without the leading dot (defaults to "txt")
-            use_hash: If True, verify using SHA256 hash comparison instead of full file comparison (defaults to None)
-
-        Notes:
-            - If param use_hash=True, output has extension ".sha256" but received file has original ext in case of diff
-            - Output files are '{prefix}.expected.ext' and '{prefix}.received.ext', or 'expected.ext' and 'received.ext'
-              if prefix is None
-            - If '{prefix}.expected.ext' does not exist, it is created with the same data as '{prefix}.received.ext'
-            - Otherwise, the test fails if '{prefix}.expected.ext' and '{prefix}.received.ext' differ
-            - To record a new '{prefix}.expected.ext' file, delete the existing one
-        """
+    def __init(self) -> None:
+        """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
         # Find base path by examining call stack
-        base_path = QaUtil.get_test_dir_from_call_stack()
+        self._output_dir = QaUtil.get_test_dir_from_call_stack()
 
         # Use filename prefix with dot delimiter if specified
-        if prefix is not None and prefix != "":
-            output_path = os.path.join(base_path, f"{prefix}.")
+        if self.prefix is not None and self.prefix != "":
+            self._output_dir_and_prefix = os.path.join(self._output_dir, f"{self.prefix}.")
         else:
-            output_path = os.path.join(base_path, "")
+            self._output_dir_and_prefix = os.path.join(self._output_dir, "")
 
-        if ext is not None:
+        if self.ext is not None:
             # Remove dot prefix if specified
-            ext = ext.removeprefix(".")
-            if ext not in _supported_extensions:
-                _error_extension_not_supported(ext)
+            self.ext = self.ext.removeprefix(".")
+            if self.ext not in _supported_extensions:
+                _error_extension_not_supported(self.ext)
         else:
             raise RuntimeError("Param 'ext' is not specified in RegressionGuard.")
 
         # Get inner dictionary using base path
-        inner_dict = self.__guard_dict.setdefault(base_path, dict())
+        inner_dict = self._guard_dict.setdefault(self._output_dir, dict())
 
         # Check if regression guard already exists in inner dictionary for the same combination of prefix, ext, use_hash
-        inner_key = f"{prefix}::{ext}"
-        if (existing_guard := inner_dict.get(inner_key, None)) is not None:
+        if (existing_guard := inner_dict.get(self.prefix, None)) is not None:
             # Delegate to the existing guard if found
-            self.__delegate_to = existing_guard
-            if use_hash != existing_guard.use_hash:
+            self._delegate_to = existing_guard
+            if self.ext != existing_guard.ext:
                 raise RuntimeError(
-                    f"Two RegressionGuard instances have different values of use_hash:\n"
-                    f"Instance 1 (use_hash={use_hash}): {self._output_dir_and_prefix}\n"
-                    f"Instance 2 (use_hash={existing_guard.use_hash}): {existing_guard._output_dir_and_prefix}\n"
+                    f"Two RegressionGuard instances for the same output directory and prefix\n"
+                    f"have different file extensions.\nOutput directory: {self._output_dir}\nPrefix: {self.prefix}\n"
+                    f"Extensions: {self.ext}, {existing_guard.ext}\n"
                 )
-            # Copy fields from existing guard for build() compatibility
-            self.prefix = existing_guard.prefix
-            self.ext = existing_guard.ext
-            self.use_hash = existing_guard.use_hash
-            self._output_dir = existing_guard._output_dir
-            self._output_dir_and_prefix = existing_guard._output_dir_and_prefix
+            if self.use_hash != existing_guard.use_hash:
+                raise RuntimeError(
+                    f"Two RegressionGuard instances for the same output directory and prefix\n"
+                    f"have different values of use_hash.\nOutput directory: {self._output_dir}\nPrefix: {self.prefix}\n"
+                )
         else:
-            # Otherwise add self to dictionary
-            inner_dict[inner_key] = self
-
-            # Initialize fields
-            self.__delegate_to = None
-            self.__verified = False
-            self.__exception_text = None
-            self.prefix = prefix
-            self.ext = ext
-            self.use_hash = use_hash
-            self._output_dir = base_path
-            self._output_dir_and_prefix = output_path
+            # Otherwise add self to dictionary of guards for this output dir
+            inner_dict[self.prefix] = self
 
             # Delete the existing received file if exists
             if os.path.exists(received_path := self._get_file_path("received")):
@@ -175,12 +142,15 @@ class RegressionGuard(BootstrapMixin):
         self.check_frozen()
         return self._output_dir
 
-    def write(self, value: Any) -> None:
+    def write(self, value: Any) -> Self:
         """
         Record the argument for regression testing purposes.
 
         Args:
             value: Data to be recorded, accepted data types depend on the specified file extension
+
+        Returns:
+            Self for method call chaining, will return delegated to guard in case of delegation
         """
         self.check_frozen()
 
@@ -188,13 +158,13 @@ class RegressionGuard(BootstrapMixin):
         if isinstance(value, Exception):
             value = f"Raises {typename(type(value))} with the message:\n{str(value)}"
 
-        # Delegate to a previously created guard with the same combination of output_path and ext if exists
-        if self.__delegate_to is not None:
-            self.__delegate_to.write(value)
-            return
+        # Delegate to a previously created guard with the same output_path if it exists
+        if self._delegate_to is not None:
+            # Invoke write on the delegated to guard and return that guard
+            return self._delegate_to.write(value)
 
         received_path = self._get_file_path("received")
-        if self.__verified:  # TODO: Improve logic to avoid rerunning in this case
+        if self._verified:  # TODO: Improve logic to avoid rerunning in this case
             raise RuntimeError(
                 f"Cannot write to a received file for RegressionGuard because a difference between\n"
                 f"received and expected file occurred during a previous test for the same file,\n"
@@ -231,6 +201,9 @@ class RegressionGuard(BootstrapMixin):
             # Should not be reached here because of a previous check in __init__
             _error_extension_not_supported(self.ext)
 
+        # Return self for method call chaining
+        return self
+
     def verify_all(self, *, silent: bool = False) -> bool:
         """
         Verify for all guards in this test that '{prefix}.received.ext' is the same as '{prefix}.expected.ext'.
@@ -250,14 +223,14 @@ class RegressionGuard(BootstrapMixin):
         self.check_frozen()
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
-        if self.__delegate_to is not None:
-            return self.__delegate_to.verify_all(silent=silent)
+        if self._delegate_to is not None:
+            return self._delegate_to.verify_all(silent=silent)
 
         # Get inner dictionary using base path
-        inner_dict = self.__guard_dict[self._output_dir]
+        inner_dict = self._guard_dict[self._output_dir]
 
         # Skip the delegated guards
-        inner_dict = {k: v for k, v in inner_dict.items() if v.__delegate_to is None}
+        inner_dict = {k: v for k, v in inner_dict.items() if v._delegate_to is None}
 
         # Call verify for all guards silently and check if all are true
         # Because 'all' is used, the comparison will not stop early
@@ -297,17 +270,17 @@ class RegressionGuard(BootstrapMixin):
         self.check_frozen()
 
         # Delegate to a previously created guard with the same combination of output_path and ext if exists
-        if self.__delegate_to is not None:
-            return self.__delegate_to.verify(silent=silent)
+        if self._delegate_to is not None:
+            return self._delegate_to.verify(silent=silent)
 
-        if self.__verified:
+        if self._verified:
             # Already verified
             if not silent:
                 # Use the existing exception text to raise if silent=False
-                raise RuntimeError(self.__exception_text)
+                raise RuntimeError(self._exception_text)
             else:
                 # Otherwise return True if exception text is None (it is set on verification failure)
-                return self.__exception_text is None
+                return self._exception_text is None
 
         # Dispatch to hash-based or content-based verification
         if self.use_hash:
@@ -340,7 +313,7 @@ class RegressionGuard(BootstrapMixin):
 
         # If received file does not yet exist, return True
         if not os.path.exists(received_path):
-            # Do not set the __verified flag so that verification can be performed again at a later time
+            # Do not set the _verified flag so that verification can be performed again at a later time
             return True
 
         if os.path.exists(expected_path):
@@ -432,11 +405,11 @@ class RegressionGuard(BootstrapMixin):
                     exception_text = exception_text + f"{extra_eol}{end_str}{truncate_str}{end_sep}"
 
                 # Record into the object even if silent
-                self.__exception_text = exception_text
+                self._exception_text = exception_text
 
-                # Set the __verified flag so that verification returns the same result if attempted again
+                # Set the _verified flag so that verification returns the same result if attempted again
                 # This will prevent further writes to this prefix and extension
-                self.__verified = True
+                self._verified = True
 
                 if not silent:
                     # Raise exception only when not silent
@@ -453,9 +426,9 @@ class RegressionGuard(BootstrapMixin):
             if os.path.exists(diff_path):
                 os.remove(diff_path)
 
-            # Set the __verified flag so that verification returns the same result if attempted again
+            # Set the _verified flag so that verification returns the same result if attempted again
             # This will prevent further writes to this prefix and extension
-            self.__verified = True
+            self._verified = True
 
             # Verification is considered successful if expected file has been created
             return True
@@ -470,7 +443,7 @@ class RegressionGuard(BootstrapMixin):
 
         # If received file does not yet exist, return True
         if not os.path.exists(received_path):
-            # Do not set the __verified flag so that verification can be performed again at a later time
+            # Do not set the _verified flag so that verification can be performed again at a later time
             return True
 
         # Read and sanitize content, then compute hash
@@ -511,11 +484,11 @@ class RegressionGuard(BootstrapMixin):
                 )
 
                 # Record into the object even if silent
-                self.__exception_text = exception_text
+                self._exception_text = exception_text
 
-                # Set the __verified flag so that verification returns the same result if attempted again
+                # Set the _verified flag so that verification returns the same result if attempted again
                 # This will prevent further writes to this prefix and extension
-                self.__verified = True
+                self._verified = True
 
                 if not silent:
                     # Raise exception only when not silent
@@ -534,9 +507,9 @@ class RegressionGuard(BootstrapMixin):
             if os.path.exists(diff_hash_path):
                 os.remove(diff_hash_path)
 
-            # Set the __verified flag so that verification returns the same result if attempted again
+            # Set the _verified flag so that verification returns the same result if attempted again
             # This will prevent further writes to this prefix and extension
-            self.__verified = True
+            self._verified = True
 
             # Verification is considered successful if expected hash file has been created
             return True
@@ -569,12 +542,12 @@ class RegressionGuard(BootstrapMixin):
 
     def _get_exception_text(self) -> str | None:
         """Get exception text from this guard or the guard it delegates to."""
-        if self.__delegate_to is not None:
+        if self._delegate_to is not None:
             # Get from the guard this guard delegates to
-            return self.__delegate_to._get_exception_text()
+            return self._delegate_to._get_exception_text()
         else:
             # Get from this guard
-            return self.__exception_text
+            return self._exception_text
 
     def _get_file_path(self, file_type: str) -> str:
         """The diff between received and expected is written to '{prefix}.diff.ext' located next to the unit test."""
