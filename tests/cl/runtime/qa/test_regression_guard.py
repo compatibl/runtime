@@ -86,22 +86,26 @@ class TestClass:
 
 
 def test_multiple_extensions():
-    """Test regression guards for the same prefix with more than one extension."""
+    """Test simultaneously writing to two regression guards with different prefixes and extensions."""
 
-    root_guard_txt = RegressionGuard().build()
-    root_guard_txt.write("abc")
-    root_guard_txt.verify()
-    root_guard_yaml = RegressionGuard(ext="yaml").build()
-    root_guard_yaml.write("abc")
-    root_guard_yaml.verify()
+    # First line for both
+    RegressionGuard(prefix="verify_one_text").build().write("abc")
+    RegressionGuard(prefix="verify_one_yaml", ext="yaml").build().write("abc")
 
-    prefix_guard_txt = RegressionGuard(prefix="prefix").build()
-    prefix_guard_txt.write("abc")
-    prefix_guard_txt.verify()
-    prefix_guard_yaml = RegressionGuard(prefix="prefix", ext="yaml").build()
-    prefix_guard_yaml.write("abc")
-    prefix_guard_yaml.verify()
+    # Second line for both and verify
+    RegressionGuard(prefix="verify_one_text").build().write("def").verify()
+    RegressionGuard(prefix="verify_one_yaml", ext="yaml").build().write("def").verify()
 
+    # First line for both
+    RegressionGuard(prefix="verify_all_text").build().write("abc")
+    RegressionGuard(prefix="verify_all_yaml", ext="yaml").build().write("abc")
+
+    # Second line for both
+    RegressionGuard(prefix="verify_all_text").build().write("def")
+    RegressionGuard(prefix="verify_all_yaml", ext="yaml").build().write("def")
+
+    # Verify all guards in the same output dir
+    RegressionGuard().build().verify_all()
 
 def test_verify_hash():
     """Test verify with use_hash=True that uses SHA256 hash comparison."""
