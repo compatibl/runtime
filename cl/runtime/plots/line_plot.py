@@ -51,6 +51,12 @@ class LinePlot(MatplotlibPlot):
     grid: bool = True
     """Whether to display grid lines."""
 
+    hide_legend: bool | None = None
+    """If True, completely hide the legend from the plot."""
+
+    hide_markers: bool | None = None
+    """If True, do not display markers on the lines."""
+
     def _create_figure(self) -> plt.Figure:
         # Load style object or create with default settings if not specified
         theme = self._get_pyplot_theme()
@@ -68,7 +74,7 @@ class LinePlot(MatplotlibPlot):
                 specific_options = self.line_options.get(label, {}) if self.line_options else {}
                 plot_kwargs.update(specific_options)
 
-                if "marker" not in plot_kwargs:
+                if "marker" not in plot_kwargs and not self.hide_markers:
                     if len(self.lines) > 1:
                         plot_kwargs["marker"] = default_marker_cycle[line_num % len(default_marker_cycle)]
 
@@ -95,6 +101,7 @@ class LinePlot(MatplotlibPlot):
             if self.grid:
                 axes.grid(True, which="both", linestyle="--", linewidth=0.5)
 
-            axes.legend()
+            if not self.hide_legend:
+                axes.legend()
 
         return fig
