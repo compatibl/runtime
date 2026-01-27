@@ -45,7 +45,7 @@ class TemplateEngine(TemplateEngineKey, RecordMixin, ABC):
     def render(self, text: str, data: DataMixin | dict[str, Any]) -> str:
         """Render the template text by taking parameters from the data object."""
 
-    def render_dir(self, input_dir: str, output_dir, data: DataMixin | dict[str, Any]) -> None:
+    def render_dir(self, *, input_dir: str, output_dir, data: DataMixin | dict[str, Any]) -> None:
         """
         Render all templates with filename.ext.j2 name in input_dir and its subdirectories by taking parameters
         from data object or dict, write output to filename.ext in the matching subdirectory of output_dir.
@@ -63,18 +63,19 @@ class TemplateEngine(TemplateEngineKey, RecordMixin, ABC):
             # Convert to string and split into parts
             path_parts = list(relative_path.parts)
 
-            # Template path relative to input_dir
-            relative_path = Path(*[
+            # Output path relative to output_dir
+            output_relative_path = Path(*[
                 # Remove suffix .j2 only from the last part of the path (the filename)
                 transform_part(p.removesuffix(".j2") if i == len(path_parts) - 1 else p)
                 for i, p in enumerate(path_parts)
             ])
 
-            # Render the template
-            content = self.render(data=data)
+            # Read template file content and render
+            template_text = template_file.read_text(encoding="utf-8")
+            content = self.render(template_text, data)
 
             # Create output file path
-            output_file = output_dir / relative_path
+            output_file = output_dir / output_relative_path
 
             # Create output directory if it doesn't exist
             output_file.parent.mkdir(parents=True, exist_ok=True)

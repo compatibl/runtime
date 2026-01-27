@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import platform
 from pathlib import Path
 
 import locate # isort: skip Prevent isort from moving this line
@@ -24,22 +22,13 @@ locate.append_sys_path("../../..")
 # Import bootstrap module first to configure PYTHONPATH and other settings
 import cl.runtime.bootstrap  # isort: skip Prevent isort from moving this line
 
-from jinja2 import Environment, FileSystemLoader
-from cl.runtime.contexts.os_util import OsUtil
 from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.settings.package_settings import PackageSettings
-
-
-def transform_part(part: str) -> str:
-    """Replace dot_ prefix by . in file or directory name token."""
-    return "." + part.removeprefix("dot_") if part.startswith("dot_") else part
+from cl.runtime.templates.jinja_template_engine import JinjaTemplateEngine
 
 
 def init_project() -> None:
     """Initialize project files."""
-
-    # Get package settings
-    package_settings = PackageSettings.instance()
 
     # Extract unique package directory names (excluding stubs and ".")
     # Filter to only get main packages (cl.*) and their directory values
@@ -48,60 +37,12 @@ def init_project() -> None:
     # Get project root
     project_root = Path(ProjectLayout.get_project_root())
 
-    # Get template directory (where this script is located)
-    script_dir = Path(__file__).parent
-    template_dir = script_dir / "multirepo"
+    # Get template directory path relative to where the current Python file is located
+    template_dir = str(Path(__file__).parent / "multirepo")
 
-    # Create Jinja2 environment with settings to preserve exact formatting
-    # Use trim_blocks to remove newlines after block tags, but preserve content newlines
-    env = Environment(
-        loader=FileSystemLoader(str(template_dir)),
-        newline_sequence=OsUtil.newline_sequence(),
-        trim_blocks=False,
-        lstrip_blocks=False,
-        keep_trailing_newline=True,
-    )
-
-    # Find all .j2 files recursively in the template directory
-    template_files = list(template_dir.rglob("*.j2"))
-
-    # Process each template file
-    for template_file in template_files:
-        # Get relative path from template directory
-        relative_path = template_file.relative_to(template_dir)
-
-        # Convert to string and split into parts
-        path_parts = list(relative_path.parts)
-
-        output_path = Path(*[
-            # Remove suffix .j2 only from the last part of the path (the filename)
-            transform_part(p.removesuffix(".j2") if i == len(path_parts) - 1 else p)
-            for i, p in enumerate(path_parts)
-        ])
-
-        # Jinja2 expects POSIX-style paths even on Windows
-        template_path_str = relative_path.as_posix()
-
-        # Get template and render
-        template = env.get_template(template_path_str)
-        content = template.render(packages=package_dirs)
-
-        # Create output file path
-        output_file = project_root / output_path
-
-        # Create output directory if it doesn't exist
-        output_file.parent.mkdir(parents=True, exist_ok=True)
-
-        # Normalize content to use LF, then let Python convert based on newline parameter
-        # Replace any existing CRLF or CR with LF
-        content = content.replace("\r\n", "\n").replace("\r", "\n")
-
-        # Use CRLF on Windows, LF on Linux
-        newline_char = "\r\n" if platform.system() == "Windows" else "\n"
-
-        # Write rendered content with OS-appropriate line endings
-        with open(output_file, "w", encoding="utf-8", newline=newline_char) as f:
-            f.write(content)
+    # Create Jinja2 template engine and render all templates
+    engine = JinjaTemplateEngine().build()
+    engine.render_dir(input_dir=template_dir, output_dir=project_root, data={"packages": package_dirs})
 
 
 if __name__ == '__main__':
