@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from typing import Any
 from box import Box
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.typename import typenameof
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.templates.template_engine import TemplateEngine
 
@@ -26,7 +27,23 @@ class FstringTemplateEngine(TemplateEngine):
 
     def render(self, text: str, data: DataMixin | dict[str, Any]) -> str:
         """Render the template text by taking parameters from the data object or dict."""
+
+        if isinstance(data, DataMixin):
+            # Serialize data to dict if DataMixin
+            data_dict = DataSerializers.DEFAULT.serialize(data)
+        elif isinstance(data, dict):
+            # Otherwise keep as dict
+            data_dict = data
+        else:
+            raise RuntimeError(
+                f"Param 'data' in {typenameof(self)}.render(text, data) must be\n"
+                f"a data object derived from DataMixin or a dict."
+            )
+
+        # Wrap into Box to permit both dot notation and dictionary field access at every level
+        data_dict = Box(data_dict)
+
         # Serialize data to dict if DataMixin, otherwise use as-is, then wrap in Box for dot notation access
-        data_dict = Box(DataSerializers.DEFAULT.serialize(data) if isinstance(data, DataMixin) else data)
+        # data_dict = Box(DataSerializers.DEFAULT.serialize(data) if isinstance(data, DataMixin) else data)
         result = str.format(text.format_map(data_dict))
         return result

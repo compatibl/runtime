@@ -21,8 +21,8 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields im
 def test_primitive_fields():
     """Test rendering StubDataclassPrimitiveFields."""
 
-    engine = FstringTemplateEngine()
-    data = StubDataclassPrimitiveFields()
+    engine = FstringTemplateEngine().build()
+    data = StubDataclassPrimitiveFields().build()
     body = (
         "obj_str_field: {obj_str_field}\n"
         "obj_str_with_eol_field: {obj_str_with_eol_field}\n"
@@ -66,17 +66,16 @@ def test_primitive_fields():
 
 
 def test_nested_fields():
-    """Test rendering StubDataclassPrimitiveFields."""
+    """Test rendering StubDataclassNestedFields."""
 
-    engine = FstringTemplateEngine()
-    data = StubDataclassNestedFields()
+    engine = FstringTemplateEngine().build()
+    data = StubDataclassNestedFields().build()
     body = (
         "base_field.str_field: {base_field.str_field}\n"
         "base_field.int_field: {base_field.int_field}\n"
         "polymorphic_derived_field.double_derived_str_field: {polymorphic_derived_field.double_derived_str_field}\n"
     )
 
-    # Since bytes and large bytes might not render nicely, we format them carefully
     expected_result = (
         "base_field.str_field: abc\n"
         "base_field.int_field: 123\n"
@@ -84,6 +83,58 @@ def test_nested_fields():
     )
 
     # Render and validate
+    result = engine.render(body, data)
+    assert result == expected_result
+
+
+def test_flat_dict():
+    """Test rendering with a flat dict as input."""
+
+    engine = FstringTemplateEngine().build()
+    data = {"name": "Alice", "age": 30, "active": True}
+    body = "Name: {name}, Age: {age}, Active: {active}"
+
+    expected_result = "Name: Alice, Age: 30, Active: True"
+
+    result = engine.render(body, data)
+    assert result == expected_result
+
+
+def test_dict_with_nested_dict():
+    """Test rendering with nested dicts as input."""
+
+    engine = FstringTemplateEngine().build()
+    data = {
+        "user": {"name": "Bob", "email": "bob@example.com"},
+        "settings": {"theme": "dark", "notifications": True},
+    }
+    body = (
+        "User: {user.name} ({user.email})\n"
+        "Theme: {settings.theme}, Notifications: {settings.notifications}"
+    )
+
+    expected_result = (
+        "User: Bob (bob@example.com)\n"
+        "Theme: dark, Notifications: True"
+    )
+
+    result = engine.render(body, data)
+    assert result == expected_result
+
+
+def test_dict_with_object():
+    """Test rendering with dict containing DataMixin objects as values."""
+
+    engine = FstringTemplateEngine().build()
+    nested_obj = StubDataclassNestedFields().build()
+    data = {
+        "label": "Test Label",
+        "nested": nested_obj.base_field,
+    }
+    body = "Label: {label}, Nested str: {nested.str_field}, Nested int: {nested.int_field}"
+
+    expected_result = "Label: Test Label, Nested str: abc, Nested int: 123"
+
     result = engine.render(body, data)
     assert result == expected_result
 

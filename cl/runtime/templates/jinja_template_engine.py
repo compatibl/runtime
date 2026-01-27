@@ -17,6 +17,7 @@ from typing import Any
 from box import Box
 from jinja2 import Environment
 from cl.runtime.records.data_mixin import DataMixin
+from cl.runtime.records.typename import typename, typenameof
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.templates.template_engine import TemplateEngine
 
@@ -28,8 +29,17 @@ class JinjaTemplateEngine(TemplateEngine):
     def render(self, text: str, data: DataMixin | dict[str, Any]) -> str:
         """Render the template text by taking parameters from the data object or dict."""
 
-        # Serialize data to dict if DataMixin, otherwise use as-is, then wrap in Box for dot notation access
-        data_dict = Box(DataSerializers.DEFAULT.serialize(data) if isinstance(data, DataMixin) else data)
+        if isinstance(data, DataMixin):
+            # Serialize data to dict if DataMixin
+            data_dict = DataSerializers.DEFAULT.serialize(data)
+        elif isinstance(data, dict):
+            # Use as-is if a dict
+            data_dict = data
+        else:
+            raise RuntimeError(
+                f"Param 'data' in {typenameof(self)}.render(text, data) must be\n"
+                f"a data object derived from DataMixin or a dict."
+            )
 
         # Create Jinja2 environment with default {{ }} delimiters
         env = Environment(
