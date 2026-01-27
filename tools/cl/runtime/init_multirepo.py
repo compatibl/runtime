@@ -50,7 +50,7 @@ def init_project() -> None:
 
     # Get template directory (where this script is located)
     script_dir = Path(__file__).parent
-    template_dir = script_dir / "project"
+    template_dir = script_dir / "multirepo"
 
     # Create Jinja2 environment with settings to preserve exact formatting
     # Use trim_blocks to remove newlines after block tags, but preserve content newlines

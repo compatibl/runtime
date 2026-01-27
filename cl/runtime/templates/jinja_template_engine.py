@@ -15,18 +15,31 @@
 from dataclasses import dataclass
 from typing import Any
 from box import Box
+from jinja2 import Environment
 from cl.runtime.records.data_mixin import DataMixin
 from cl.runtime.serializers.data_serializers import DataSerializers
 from cl.runtime.templates.template_engine import TemplateEngine
 
 
 @dataclass(slots=True, kw_only=True)
-class FstringTemplateEngine(TemplateEngine):
-    """Uses Python f-string engine to render the template."""
+class JinjaTemplateEngine(TemplateEngine):
+    """Uses Jinja2 engine to render the template."""
 
     def render(self, text: str, data: DataMixin | dict[str, Any]) -> str:
         """Render the template text by taking parameters from the data object or dict."""
+
         # Serialize data to dict if DataMixin, otherwise use as-is, then wrap in Box for dot notation access
         data_dict = Box(DataSerializers.DEFAULT.serialize(data) if isinstance(data, DataMixin) else data)
-        result = str.format(text.format_map(data_dict))
+
+        # Create Jinja2 environment with default {{ }} delimiters
+        env = Environment(
+            trim_blocks=False,
+            lstrip_blocks=False,
+            keep_trailing_newline=True,
+        )
+
+        # Create template from string and render with data
+        template = env.from_string(text)
+        result = template.render(data_dict)
         return result
+

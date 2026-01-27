@@ -73,11 +73,11 @@ class DataMixin(BuilderMixin, ABC):
         return result_type(**{k: getattr(self, k) for k in self.get_field_names()})
 
 
-TDataField = dict[str, "TDataField"] | list["TDataField"] | PrimitiveTypes | Enum
+TDataField = dict[str, "TDataField"] | list["TDataField"] | PrimitiveTypes | Enum  # TODO: Review potential replacement by a non-generic hint
 """Field types for serialized data in dictionary format."""
 
-TDataDict = dict[str, TDataField]
+TDataDict = dict[str, TDataField]  # TODO: Review potential replacement by a non-generic hint
 """Serialized data in dictionary format."""
 
-TData = TypeVar("TData", bound=DataMixin)
+TData = TypeVar("TData", bound=DataMixin)  # TODO: Review potential replacement by a non-generic hint
 """Generic type parameter for a class that has slots and implements the builder pattern."""
