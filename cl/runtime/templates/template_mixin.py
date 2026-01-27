@@ -41,5 +41,5 @@ class TemplateMixin(RecordMixin, ABC):
     def render(self, data: TData) -> str:
         """Render the template by substituting parameters from the specified data object."""
         engine = active(DataSource).load_one(self.engine, cast_to=TemplateEngine)
-        result = engine.render(self.body, data)
+        result = engine.render(body=self.body, data=data)
         return result

@@ -42,8 +42,8 @@ class TemplateEngine(TemplateEngineKey, RecordMixin, ABC):
             self.engine_id = Timestamp.create()
 
     @abstractmethod
-    def render(self, text: str, data: DataMixin | dict[str, Any]) -> str:
-        """Render the template text by taking parameters from the data object."""
+    def render(self, *, body: str, data: DataMixin | dict[str, Any]) -> str:
+        """Render the template body by taking parameters from the data object."""
 
     def render_dir(self, *, input_dir: str, output_dir, data: DataMixin | dict[str, Any]) -> None:
         """
@@ -72,7 +72,7 @@ class TemplateEngine(TemplateEngineKey, RecordMixin, ABC):
 
             # Read template file content and render
             template_text = template_file.read_text(encoding="utf-8")
-            content = self.render(template_text, data)
+            content = self.render(body=template_text, data=data)
 
             # Create output file path
             output_file = output_dir / output_relative_path

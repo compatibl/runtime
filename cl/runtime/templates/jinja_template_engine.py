@@ -26,8 +26,8 @@ from cl.runtime.templates.template_engine import TemplateEngine
 class JinjaTemplateEngine(TemplateEngine):
     """Uses Jinja2 engine to render the template."""
 
-    def render(self, text: str, data: DataMixin | dict[str, Any]) -> str:
-        """Render the template text by taking parameters from the data object or dict."""
+    def render(self, *, body: str, data: DataMixin | dict[str, Any]) -> str:
+        """Render the template body by taking parameters from the data object or dict."""
 
         if isinstance(data, DataMixin):
             # Serialize data to dict if DataMixin
@@ -37,7 +37,7 @@ class JinjaTemplateEngine(TemplateEngine):
             data_dict = data
         else:
             raise RuntimeError(
-                f"Param 'data' in {typenameof(self)}.render(text, data) must be\n"
+                f"Param 'data' in {typenameof(self)}.render(template, data) must be\n"
                 f"a data object derived from DataMixin or a dict."
             )
 
@@ -49,7 +49,7 @@ class JinjaTemplateEngine(TemplateEngine):
         )
 
         # Create template from string and render with data
-        template = env.from_string(text)
-        result = template.render(data_dict)
+        body = env.from_string(body)
+        result = body.render(data_dict)
         return result
 

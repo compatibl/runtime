@@ -25,8 +25,8 @@ from cl.runtime.templates.template_engine import TemplateEngine
 class FstringTemplateEngine(TemplateEngine):
     """Uses Python f-string engine to render the template."""
 
-    def render(self, text: str, data: DataMixin | dict[str, Any]) -> str:
-        """Render the template text by taking parameters from the data object or dict."""
+    def render(self, *, body: str, data: DataMixin | dict[str, Any]) -> str:
+        """Render the template body by taking parameters from the data object or dict."""
 
         if isinstance(data, DataMixin):
             # Serialize data to dict if DataMixin
@@ -36,7 +36,7 @@ class FstringTemplateEngine(TemplateEngine):
             data_dict = data
         else:
             raise RuntimeError(
-                f"Param 'data' in {typenameof(self)}.render(text, data) must be\n"
+                f"Param 'data' in {typenameof(self)}.render(template, data) must be\n"
                 f"a data object derived from DataMixin or a dict."
             )
 
@@ -45,5 +45,5 @@ class FstringTemplateEngine(TemplateEngine):
 
         # Serialize data to dict if DataMixin, otherwise use as-is, then wrap in Box for dot notation access
         # data_dict = Box(DataSerializers.DEFAULT.serialize(data) if isinstance(data, DataMixin) else data)
-        result = str.format(text.format_map(data_dict))
+        result = str.format(body.format_map(data_dict))
         return result

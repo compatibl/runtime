@@ -61,7 +61,7 @@ def test_primitive_fields():
     )
 
     # Render and validate
-    result = engine.render(body, data)
+    result = engine.render(body=body, data=data)
     assert result == expected_result
 
 
@@ -83,7 +83,7 @@ def test_nested_fields():
     )
 
     # Render and validate
-    result = engine.render(body, data)
+    result = engine.render(body=body, data=data)
     assert result == expected_result
 
 
@@ -96,7 +96,7 @@ def test_flat_dict():
 
     expected_result = "Name: Alice, Age: 30, Active: True"
 
-    result = engine.render(body, data)
+    result = engine.render(body=body, data=data)
     assert result == expected_result
 
 
@@ -118,7 +118,7 @@ def test_dict_with_nested_dict():
         "Theme: dark, Notifications: True"
     )
 
-    result = engine.render(body, data)
+    result = engine.render(body=body, data=data)
     assert result == expected_result
 
 
@@ -135,7 +135,7 @@ def test_dict_with_object():
 
     expected_result = "Label: Test Label, Nested str: abc, Nested int: 123"
 
-    result = engine.render(body, data)
+    result = engine.render(body=body, data=data)
     assert result == expected_result
 
 
