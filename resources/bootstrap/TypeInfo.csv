@@ -172,7 +172,7 @@ PlotLineStyle,Enum,cl.runtime.plots.plot_line_style.PlotLineStyle,None
 PlotMarkerStyle,Enum,cl.runtime.plots.plot_marker_style.PlotMarkerStyle,None
 PlotSurfaceStyle,Enum,cl.runtime.plots.plot_surface_style.PlotSurfaceStyle,None
 PlotView,Record,cl.runtime.views.plot_view.PlotView,None
-PlotlyEngine,Record,cl.runtime.plots.for_matplotlib.plotly_engine.PlotlyEngine,None
+PlotlyEngine,Record,cl.runtime.plots.for_plotly.plotly_engine.PlotlyEngine,None
 PlottingEngine,Record,cl.runtime.plots.plotting_engine.PlottingEngine,None
 PlottingEngineKey,Key,cl.runtime.plots.plotting_engine_key.PlottingEngineKey,None
 PngView,Record,cl.runtime.views.png_view.PngView,None
