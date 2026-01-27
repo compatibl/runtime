@@ -16,8 +16,6 @@ from pathlib import Path
 
 import locate # isort: skip Prevent isort from moving this line
 
-from cl.runtime.project.project_layout_kind import ProjectLayoutKind
-
 # Ensure bootstrap module can be found
 locate.append_sys_path("../../..")
 
@@ -29,11 +27,8 @@ from cl.runtime.settings.package_settings import PackageSettings
 from cl.runtime.templates.jinja_template_engine import JinjaTemplateEngine
 
 
-def init_multirepo() -> None:
+def init_packages() -> None:
     """Initialize project files."""
-
-    if (project_layout := ProjectLayout.get_project_layout_kind()) != ProjectLayoutKind.MULTIREPO:
-        raise RuntimeError(f"Cannot run init_multirepo script when project layout is {project_layout.name.lower()}.")
 
     # Extract unique package directory names (excluding stubs and ".")
     # Filter to only get main packages (cl.*) and their directory values
@@ -53,4 +48,4 @@ def init_multirepo() -> None:
 if __name__ == '__main__':
 
     # Initialize project files
-    init_multirepo()
+    init_packages()
