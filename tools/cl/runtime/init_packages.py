@@ -28,24 +28,21 @@ from cl.runtime.templates.jinja_template_engine import JinjaTemplateEngine
 
 
 def init_packages() -> None:
-    """Initialize project files."""
-
-    # Extract unique package directory names (excluding stubs and ".")
-    # Filter to only get main packages (cl.*) and their directory values
-    package_dirs = PackageSettings.instance().get_package_dirs()
-
-    # Get project root
-    project_root = Path(ProjectLayout.get_project_root())
+    """Initialize package files for each package."""
 
     # Get template directory path relative to where the current Python file is located
-    template_dir = str(Path(__file__).parent / "multirepo")
+    template_dir = str(Path(__file__).parent / "init_packages")
 
-    # Create Jinja2 template engine and render all templates
+    # Create Jinja2 template engine
     engine = JinjaTemplateEngine().build()
-    engine.render_dir(input_dir=template_dir, output_dir=project_root, data={"packages": package_dirs})
+
+    # Iterate over each package and render templates into the package root
+    for package in PackageSettings.instance().get_packages():
+        package_root = ProjectLayout.get_package_root(package)
+        engine.render_dir(input_dir=template_dir, output_dir=package_root, data={"package": package})
 
 
 if __name__ == '__main__':
 
-    # Initialize project files
+    # Initialize package files
     init_packages()
