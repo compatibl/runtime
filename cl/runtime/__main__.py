@@ -142,16 +142,22 @@ def run_backend(*, interactive: bool = False) -> None:
 
         frontend_settings = FrontendSettings.instance()
 
-        # If frontend is not installed, ask user to install it from GitHub
+        # If frontend is not installed, ask user to install it from GitHub (only in interactive mode)
         if not frontend_settings.is_frontend_installed():
-            print(
-                f"Static frontend files of version '{frontend_settings.frontend_version}' are not installed. "
-                f"Do you want to install it from GitHub? (yes/no): "
-            )
-            user_response = input().strip().lower()
-            if user_response == "yes":
-                # Install static frontend files from GitHub
-                frontend_settings.install_frontend()
+            if interactive:
+                print(
+                    f"Static frontend files of version '{frontend_settings.frontend_version}' are not installed. "
+                    f"Do you want to install it from GitHub? (yes/no): "
+                )
+                user_response = input().strip().lower()
+                if user_response == "yes":
+                    # Install static frontend files from GitHub
+                    frontend_settings.install_frontend()
+            else:
+                _LOGGER.warning(
+                    f"Static frontend files of version '{frontend_settings.frontend_version}' are not installed. "
+                    f"Skipping installation prompt in non-interactive mode."
+                )
 
         if frontend_settings.is_frontend_installed():
             # Mount static frontend files if index.html is found
@@ -163,7 +169,9 @@ def run_backend(*, interactive: bool = False) -> None:
             _LOGGER.error("Frontend static directory not found, generating the fallback page.")
 
         # Open new browser tab in the default browser using http protocol, will switch to https if cert is present
-        webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}")
+        # Only open browser in interactive mode
+        if interactive:
+            webbrowser.open_new_tab(f"http://{api_settings.api_hostname}:{api_settings.api_port}")
 
         # Run Uvicorn using hostname and port specified by Dynaconf
         config = uvicorn.Config(
@@ -184,6 +192,11 @@ def run_backend(*, interactive: bool = False) -> None:
 
 
 if __name__ == "__main__":
+    # TODO: !!! Refactor to standardize the handling of CL_INTERACTIVE parameter
+    # Determine interactive mode from environment variable, default to True for backward compatibility
+    # Set CL_INTERACTIVE=false for Docker/non-interactive runs
+    interactive_env = os.getenv("CL_INTERACTIVE", "true").lower()
+    interactive = interactive_env in ("true", "1", "yes", "on")
 
-    # Run backend in interactive mode when invoked from the command line
-    run_backend(interactive=True)
+    # Run backend with determined interactive mode
+    run_backend(interactive=interactive)
