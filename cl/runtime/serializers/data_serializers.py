@@ -16,6 +16,7 @@ from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_encoders import JsonEncoders
 from cl.runtime.serializers.key_serializers import KeySerializers
+from cl.runtime.serializers.null_inclusion import NullInclusion
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_inclusion import TypeInclusion
 from cl.runtime.serializers.type_placement import TypePlacement
@@ -79,6 +80,7 @@ class DataSerializers:
         primitive_serializer=PrimitiveSerializers.FOR_UI,
         enum_serializer=EnumSerializers.DEFAULT,
         key_serializer=KeySerializers.DELIMITED,
+        null_inclusion=NullInclusion.ALWAYS,
         type_inclusion=TypeInclusion.ALWAYS,
         type_field="_t",
         pascalize_keys=True,

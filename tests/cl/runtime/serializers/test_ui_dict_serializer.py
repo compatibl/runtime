@@ -64,5 +64,13 @@ def test_data_serialization():
     RegressionGuard.verify_all()
 
 
+def test_null_fields_inclusion():
+    """Test correct None fields inclusion in UI serialized data."""
+    sample = StubDataclassOptionalFields().build()
+    serialized = DataSerializers.FOR_UI.serialize(sample)
+    # Check that fields with None value are included
+    assert [key for key in serialized if serialized[key] is None]
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

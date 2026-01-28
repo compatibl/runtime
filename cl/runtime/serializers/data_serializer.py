@@ -35,6 +35,7 @@ from cl.runtime.schema.type_hint import TypeHint
 from cl.runtime.schema.type_info import TypeInfo
 from cl.runtime.schema.type_schema import TypeSchema
 from cl.runtime.serializers.encoder import Encoder
+from cl.runtime.serializers.null_inclusion import NullInclusion
 from cl.runtime.serializers.serializer import Serializer
 from cl.runtime.serializers.type_format import TypeFormat
 from cl.runtime.serializers.type_inclusion import TypeInclusion
@@ -59,6 +60,9 @@ class DataSerializer(Serializer):
 
     inner_encoder: Encoder | None = None
     """Encode the output of inner serializer if specified."""
+
+    null_inclusion: NullInclusion = NullInclusion.OMIT
+    """When to include fields with None value in serialized data."""
 
     type_inclusion: TypeInclusion = TypeInclusion.AS_NEEDED
     """When to include type information in serialized data."""
@@ -215,6 +219,15 @@ class DataSerializer(Serializer):
             # Use self to serialize keys unless a key serializer is specified
             key_serializer = self.key_serializer if self.key_serializer is not None else self
 
+            # Determine if null (None) should be included in dict or the key omitted
+
+            if self.null_inclusion == NullInclusion.OMIT:
+                include_null = False
+            elif self.null_inclusion == NullInclusion.ALWAYS:
+                include_null = True
+            else:
+                raise ErrorUtil.enum_value_error(self.null_inclusion, NullInclusion)
+
             # Serialize slot values in the order of declaration except those that are None
             data_type_spec = data.get_type_spec()
             result.update(
@@ -233,7 +246,7 @@ class DataSerializer(Serializer):
                         )
                     )
                     for field_spec in data_type_spec.fields
-                    if not is_empty(field_value := getattr(data, field_name := field_spec.field_name))
+                    if not is_empty(field_value := getattr(data, field_name := field_spec.field_name)) or include_null
                 }
             )
 
@@ -415,7 +428,7 @@ class DataSerializer(Serializer):
                     else (
                         self.inner_serializer.deserialize(self.inner_encoder.decode(field_value), field_hint)
                         if (
-                            (field_hint := field_dict[snake_case_k].field_type_hint).schema_type != str
+                            (field_hint := field_dict[snake_case_k].field_type_hint).schema_type is not str
                             and self.inner_encoder is not None
                             and isinstance(field_value, str)
                             and len(field_value) > 0

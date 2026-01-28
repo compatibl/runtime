@@ -124,8 +124,20 @@ def test_task_logs(multi_db_fixture):
     active(DataSource).replace_one(task_1, commit=True)
 
     task_1_logs = [
-        LogMessage(message="Task 1. Info message 1.", level="Info", task_run_id=task_1_run_id).build(),
-        LogMessage(message="Task 1. Info message 2.", level="Info", task_run_id=task_1_run_id).build(),
+        LogMessage(
+            message="Task 1. Info message 1.",
+            level="Info",
+            task_run_id=task_1_run_id,
+            record_type_name="test",
+            handler_name="test",
+        ).build(),
+        LogMessage(
+            message="Task 1. Info message 2.",
+            level="Info",
+            task_run_id=task_1_run_id,
+            record_type_name="test",
+            handler_name="test",
+        ).build(),
     ]
 
     # Save task logs before clear marker
@@ -152,8 +164,20 @@ def test_task_logs(multi_db_fixture):
     active(DataSource).replace_one(task_2, commit=True)
 
     task_2_logs = [
-        LogMessage(message="Task 2. Info message 1.", level="Info", task_run_id=task_2_run_id).build(),
-        LogMessage(message="Task 2. Info message 2.", level="Info", task_run_id=task_2_run_id).build(),
+        LogMessage(
+            message="Task 2. Info message 1.",
+            level="Info",
+            task_run_id=task_2_run_id,
+            record_type_name="test",
+            handler_name="test",
+        ).build(),
+        LogMessage(
+            message="Task 2. Info message 2.",
+            level="Info",
+            task_run_id=task_2_run_id,
+            record_type_name="test",
+            handler_name="test",
+        ).build(),
     ]
 
     # Save task logs after clear marker

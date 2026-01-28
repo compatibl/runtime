@@ -22,6 +22,7 @@ from cl.runtime.records.builder_checks import BuilderChecks
 from cl.runtime.serializers.data_serializer import DataSerializer
 from cl.runtime.serializers.enum_serializers import EnumSerializers
 from cl.runtime.serializers.json_serializer import orjson_default
+from cl.runtime.serializers.null_inclusion import NullInclusion
 from cl.runtime.serializers.primitive_serializers import PrimitiveSerializers
 from cl.runtime.serializers.type_inclusion import TypeInclusion
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclass
@@ -190,6 +191,35 @@ def test_unidirectional():
         with pytest.raises(Exception, match=match):
             sample = sample.build()
             serializer.serialize(sample)
+
+
+def test_null_fields_inclusion_option():
+    """Test NullInclusion option in data serializer."""
+    sample = StubDataclassOptionalFields().build()
+
+    # Create the serializer that omits fields with None value
+    serializer = DataSerializer(
+        type_inclusion=TypeInclusion.OMIT,
+        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        enum_serializer=EnumSerializers.DEFAULT,
+        null_inclusion=NullInclusion.OMIT,
+    ).build()
+
+    serialized = serializer.serialize(sample)
+    # Check that fields with None value are not included
+    assert not [key for key in serialized if serialized[key] is None]
+
+    # Create the serializer that includes fields with None value
+    serializer = DataSerializer(
+        type_inclusion=TypeInclusion.OMIT,
+        primitive_serializer=PrimitiveSerializers.PASSTHROUGH,
+        enum_serializer=EnumSerializers.DEFAULT,
+        null_inclusion=NullInclusion.ALWAYS,
+    ).build()
+
+    serialized = serializer.serialize(sample)
+    # Check that fields with None value are included
+    assert [key for key in serialized if serialized[key] is None]
 
 
 if __name__ == "__main__":
