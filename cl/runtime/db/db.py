@@ -228,33 +228,37 @@ class Db(DbKey, RecordMixin, ABC):
             raise RuntimeError(f"Parameter interactive must a bool value, type {type_name} found.")
 
         env_kind = EnvSettings.instance().env_kind
-        if env_kind in (EnvKind.TEMP, EnvKind.TEST):
-            # Dropping DB is allowed without requesting approval for TEMP and TEST, proceed to drop DB
+        if interactive:
+            # In interactive mode, dropping DB is allowed without requesting approval for TEMP and TEST
+            noninteractive_drop_permitted = env_kind in (EnvKind.TEMP, EnvKind.TEST)
+            # Interactive approval is required for DEV and UAT
+            interactive_drop_permitted = env_kind in (EnvKind.DEV, EnvKind.UAT)
+        else:
+            # In non-interactive mode, dropping DB is allowed without requesting approval for DEV, TEMP and TEST
+            noninteractive_drop_permitted = env_kind in (EnvKind.DEV, EnvKind.TEMP, EnvKind.TEST)
+            # Interactive approval is not supported
+            interactive_drop_permitted = False
+
+        if noninteractive_drop_permitted:
+            # Dropping DB is allowed without requesting approval for DEV, TEMP and TEST, proceed to drop DB
             # TODO: !!! Implement MCP rule to check _drop_db_do_not_call_directly() is only called inside this method
             self._drop_db_do_not_call_directly()
-        elif env_kind in (EnvKind.UAT, EnvKind.DEV):
-            # Dropping DB is allowed with approval for UAT and DEV
-            if interactive:
-                # Request user approval in interactive mode
-                try:
-                    print(f"DATABASE {self.db_id} WILL BE DELETED. THIS ACTION CANNOT BE UNDONE (yes/no): ")
-                    user_response = input().strip().lower()
-                    if user_response == "yes":
-                        print(f"User permission to drop DB {self.db_id} is granted.")
-                        # Permission granted, proceed to drop DB
-                        self._drop_db_do_not_call_directly()
-                    else:
-                        raise RuntimeError(f"User permission to drop DB {self.db_id} is denied.")
-                except (EOFError, KeyboardInterrupt):
-                    raise RuntimeError("\nDB drop operation aborted by the user.\n")
-            else:
-                raise RuntimeError(
-                    f"Dropping DB requires interactive user approval for env_kind={env_kind.name}.\n"
-                    f"Contact your DB admin for assistance or execute this command in interactive mode.\n"
-                )
+        elif interactive_drop_permitted:
+            # Request user approval in interactive mode
+            try:
+                print(f"DATABASE {self.db_id} WILL BE DELETED. THIS ACTION CANNOT BE UNDONE (yes/no): ")
+                user_response = input().strip().lower()
+                if user_response == "yes":
+                    print(f"User permission to drop DB {self.db_id} is granted.")
+                    # Permission granted, proceed to drop DB
+                    self._drop_db_do_not_call_directly()
+                else:
+                    raise RuntimeError(f"User permission to drop DB {self.db_id} is denied.")
+            except (EOFError, KeyboardInterrupt):
+                raise RuntimeError("\nDB drop operation aborted by the user.\n")
         elif env_kind == EnvKind.PROD:
             raise RuntimeError(
-                f"Dropping DB from code is not allowed even with user approval for env_kind={env_kind.name}.\n"
+                f"Dropping DB from code is not allowed for env_kind={env_kind.name}.\n"
                 f"Contact your DB admin for assistance."
             )
         else:
