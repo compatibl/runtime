@@ -17,7 +17,7 @@ from cl.runtime.records.for_dataclasses.dataclass_mixin import DataclassMixin
 from cl.runtime.records.for_dataclasses.extensions import required
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, kw_only=True)
 class ExternalLink(DataclassMixin):
     """Represents a reference link to the external resource."""
 
