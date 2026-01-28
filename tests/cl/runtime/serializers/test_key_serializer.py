@@ -127,9 +127,7 @@ def test_serialization_exceptions():
     """Test exception handling in KeySerializer.serialize method."""
 
     for sample in _SERIALIZATION_EXCEPTION_SAMPLES:
-        # Attempt serialization
         with pytest.raises(RuntimeError):
-            print(f"Serializing type {type(sample)}")
             KeySerializers.DELIMITED.serialize(sample)
 
 

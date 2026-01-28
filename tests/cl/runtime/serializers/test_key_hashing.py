@@ -38,15 +38,27 @@ _KEY_SAMPLES = [
     StubDataclassPolymorphicKey().build(),
 ]
 
+_EXCEPTION_SAMPLES = [
+    StubDataclassKey(),  # Build is not called, not frozen as a result
+]
+
 
 def test_key_hashing():
     """Test key __hash__ method."""
 
     guard = RegressionGuard().build()
     for sample in _KEY_SAMPLES:
-        guard.write(hash(sample))
+        hash(sample)
     RegressionGuard.verify_all()
 
+
+def test_key_hashing_exceptions():
+    """Test exception handling in KeySerializer.serialize method."""
+
+    for sample in _EXCEPTION_SAMPLES:
+        # Attempt hashing
+        with pytest.raises(RuntimeError, match="because it is not frozen"):
+            hash(sample)
 
 if __name__ == "__main__":
     pytest.main([__file__])
