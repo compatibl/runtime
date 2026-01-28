@@ -18,22 +18,33 @@ from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key impor
 
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_key import StubDataclassKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_polymorphic_key import StubDataclassPolymorphicKey
+from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_primitive_fields_key import StubDataclassPrimitiveFieldsKey
+
+_KEY_SAMPLES = [
+    StubDataclassKey().build(),
+    StubDataclassCompositeKey().build(),
+    StubDataclassPrimitiveFieldsKey().build(),
+    StubDataclassPolymorphicKey().build(),
+]
+
+_EXCEPTION_SAMPLES = [
+    StubDataclassKey(),  # Build is not called, not frozen as a result
+]
 
 
-def test_get_hash():
-    """Test KeyMixin.get_hash method."""
+def test_hashing_basics():
+    """Test hashing of frozen and unfrozen types."""
 
-    sample_a = StubDataclassKey(id="a").build()
-    sample_b = StubDataclassKey(id="b").build()
-    sample_set_a = {KeyUtil.get_hash(sample_a), KeyUtil.get_hash(sample_a)}
-    assert len(sample_set_a) == 1
+    # Test hashing of key sample types
+    for sample in _KEY_SAMPLES:
+        hash(sample)
 
-    sample_set_b = {KeyUtil.get_hash(sample_a), KeyUtil.get_hash(sample_b)}
-    assert len(sample_set_b) == 2
-
-    with pytest.raises(Exception, match="not frozen"):
-        # Not frozen
-        KeyUtil.get_hash(StubDataclassKey(id="a"))
+    # Expected exceptions
+    for sample in _EXCEPTION_SAMPLES:
+        # Attempt hashing
+        with pytest.raises(RuntimeError, match="because it is not frozen"):
+            hash(sample)
 
 
 def test_key_hash():
