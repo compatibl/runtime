@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import pytest
-from cl.runtime.records.key_util import KeyUtil
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_composite_key import StubDataclassCompositeKey
 
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass_handlers_key import StubHandlersKey

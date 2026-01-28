@@ -17,7 +17,6 @@ from dataclasses import dataclass
 from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.stack_bar_plot import StackBarPlot
-from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.stat.binary_trial import BinaryTrial
 from cl.runtime.stat.case import Case
 from cl.runtime.stat.experiment import Experiment
@@ -51,7 +50,7 @@ class BinaryExperiment(Experiment, ABC):
             bar_labels.extend(["True", "False"])
 
             # Get trials for the condition
-            trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.param, param))
+            trials = tuple(trial for trial in all_trials if trial.param == param.get_key())
             total = len(trials)
             if total != 0:
                 true_trials = sum(trial.outcome for trial in trials)

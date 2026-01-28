@@ -19,7 +19,6 @@ from cl.runtime.contexts.context_manager import active
 from cl.runtime.db.data_source import DataSource
 from cl.runtime.plots.heat_map_plot import HeatMapPlot
 from cl.runtime.plots.multi_plot import MultiPlot
-from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.stat.case import Case
 from cl.runtime.stat.classifier_experiment import ClassifierExperiment
 from cl.runtime.stat.supervised_classifier_trial import SupervisedClassifierTrial
@@ -46,7 +45,7 @@ class SupervisedClassifierExperiment(ClassifierExperiment, ABC):
         params = active(DataSource).load_many(self.cases, cast_to=Case)
         for param in params:
             # Get trials for the condition
-            trials = tuple(trial for trial in all_trials if KeyUtil.is_equal(trial.param, param))
+            trials = tuple(trial for trial in all_trials if trial.param == param.get_key())
 
             y_true = [trial.label for trial in trials]
             y_pred = [trial.expected_label for trial in trials]

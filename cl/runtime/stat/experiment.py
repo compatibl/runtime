@@ -22,7 +22,6 @@ from cl.runtime.log.exceptions.user_error import UserError
 from cl.runtime.plots.plot import Plot
 from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import required
-from cl.runtime.records.key_util import KeyUtil
 from cl.runtime.records.record_mixin import RecordMixin
 from cl.runtime.records.typename import typename
 from cl.runtime.stat.case import Case
@@ -232,7 +231,7 @@ class Experiment(ExperimentKey, RecordMixin, ABC):
         """
         trial_query = TrialQuery(experiment=self.get_key()).build()
         trials = active(DataSource).load_by_query(trial_query)  # TODO: Use project_to=Trial to reduce data transfer
-        counts = tuple(sum(1 for t in trials if KeyUtil.is_equal(t.param, c)) for c in self.cases)
+        counts = tuple(sum(1 for t in trials if t.param == c) for c in self.cases)
         return counts
 
     def calc_num_additional_trials(self) -> tuple[int, ...]:
