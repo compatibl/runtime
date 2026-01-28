@@ -19,7 +19,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from stubs.cl.runtime.records.for_dataclasses.stub_dataclass import StubDataclassKey
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class StubDataclassCompositeKey(DataclassMixin, KeyMixin):
     """Stub for a composite key that contains other key fields."""
 

@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class FieldLabelKey(DataclassMixin, KeyMixin):
     """
     Custom field label overrides the standard 'field_name' -> 'Field Name' transformation.

@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class WorkflowPhaseKey(DataclassMixin, KeyMixin):
     """
     Determines the order of task execution within the workflow.

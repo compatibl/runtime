@@ -19,7 +19,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.ui.user_key import UserKey
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class UiAppStateKey(DataclassMixin, KeyMixin):
     """UiAppState."""
 

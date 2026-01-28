@@ -19,7 +19,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.stat.experiment_key import ExperimentKey
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class ExperimentInterruptKey(DataclassMixin, KeyMixin):
     """Stores a request for an action such as pause."""
 

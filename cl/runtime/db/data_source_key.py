@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class DataSourceKey(DataclassMixin, KeyMixin):
     """Rules for hierarchical lookup in multiple databases and datasets with data access control."""
 

@@ -20,7 +20,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.schema.module_decl_key import ModuleDeclKey
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class TypeDeclKey(DataclassMixin, KeyMixin):
     """Provides information about a class, its fields, and its methods."""
 

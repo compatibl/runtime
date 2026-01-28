@@ -22,7 +22,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 GLOBAL_MODULE_NAME: Final[str] = "cl"
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class ModuleDeclKey(DataclassMixin, KeyMixin):
     """Specifies module path in dot-delimited format."""
 

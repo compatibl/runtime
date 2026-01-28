@@ -20,7 +20,7 @@ from cl.runtime.schema.type_decl_key import TypeDeclKey
 from cl.runtime.ui.user_key import UserKey
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class UiTypeLayoutKey(DataclassMixin, KeyMixin):
     """Represents of the type's layout."""
 

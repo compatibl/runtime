@@ -20,7 +20,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.records.protocols import is_key_type
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class TaskKey(DataclassMixin, KeyMixin):
     """
     The task 'run_task' method is invoked by the queue to which the task is submitted.

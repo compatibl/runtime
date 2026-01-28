@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class StubDataclassAliasedKey(DataclassMixin, KeyMixin):  # TODO: Specify alias and add derived aliased class
     """Stub record class with typename alias."""
 

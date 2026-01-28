@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class PackageAliasKey(DataclassMixin, KeyMixin):
     """Custom package alias defined using module glob pattern, use to organize types and DB tables by package."""
 

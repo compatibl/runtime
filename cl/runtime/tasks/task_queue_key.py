@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class TaskQueueKey(DataclassMixin, KeyMixin):
     """
     Run a query on tasks, run all returned tasks sequentially or in parallel, then repeat.

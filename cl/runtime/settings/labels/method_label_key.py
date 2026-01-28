@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class MethodLabelKey(DataclassMixin, KeyMixin):
     """
     Custom method label overrides the standard 'method_name' -> 'Method Name' transformation.

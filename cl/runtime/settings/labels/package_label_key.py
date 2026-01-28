@@ -18,7 +18,7 @@ from cl.runtime.records.for_dataclasses.extensions import required
 from cl.runtime.records.key_mixin import KeyMixin
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class PackageLabelKey(DataclassMixin, KeyMixin):
     """
     Define custom label for package alias to override the default 'package_alias' -> 'Package Alias'.

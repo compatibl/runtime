@@ -20,7 +20,7 @@ from cl.runtime.records.key_mixin import KeyMixin
 from cl.runtime.views.view_key import ViewKey
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class ViewKeyQuery(DataclassMixin, QueryMixin):
     """Query all views for given record."""
 
