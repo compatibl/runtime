@@ -25,16 +25,16 @@ class EnvKind(IntEnum):
     """
 
     PROD = auto()
-    """Requires dynaconf_env=production, database cannot be deleted from code."""
+    """Production, DB cannot be deleted from code."""
 
     UAT = auto()
-    """Requires dynaconf_env=staging, database can be deleted from code with explicit user approval."""
+    """Staging, DB can be deleted from code with explicit user approval but is not automatically requested."""
 
     DEV = auto()
-    """Requires dynaconf_env=development, database deletion is requested on each server start (denied by default)."""
+    """Development, DB deletion is requested on each server start (denied by default)."""
 
-    TEMP = auto()
-    """Requires dynaconf_env=development, database is DELETED AUTOMATICALLY on each server start."""
+    TEMP = auto()  # TODO: !! Remove TEMP and keep DEV only
+    """Temporary, DB is DELETED AUTOMATICALLY on each server start."""
 
     TEST = auto()
-    """Requires dynaconf_env=testing, database is DELETED AUTOMATICALLY before and after each test."""
+    """Invoked by a test runner, database is DELETED AUTOMATICALLY before and after each test."""

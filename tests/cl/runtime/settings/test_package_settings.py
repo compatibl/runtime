@@ -14,11 +14,15 @@
 
 import pytest
 
+from cl.runtime.settings.package_settings import PackageSettings
+from cl.runtime.settings.project_settings import ProjectSettings
 
-def test_project_settings():
+
+def test_package_settings():
     """Test ProjectLayout class."""
 
-    # TODO: Update and rename or remove this test after PackageSettings is fully implemented
+    runtime_settings = PackageSettings.instance(package="cl.runtime")
+    pass
 
 
 if __name__ == "__main__":

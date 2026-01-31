@@ -29,12 +29,12 @@ from cl.runtime.settings.settings import Settings
 
 @dataclass(slots=True, kw_only=True)
 @final
-class MultirepoSettings(Settings):
+class ProjectSettings(Settings):
     """Defines the location of packages and settings in multirepo projects."""
 
-    multirepo_package_dirs: Sequence[str] = required()
+    project_dirs: Mapping[str, str] = required()
     """
-    List of package directories relative to project root in the order of dependencies
+    Ordered mapping of package source namespace to package directory relative to project root
     where dependent packages follow the packages they depend on.
     """
 

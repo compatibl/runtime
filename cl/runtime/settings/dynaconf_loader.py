@@ -14,16 +14,20 @@
 
 import os
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, ClassVar
 from typing import Mapping
 from typing import Sequence
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from dynaconf import Dynaconf
 from frozendict import frozendict
+from requests.packages import package
+from typing_extensions import Self
+
 from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.qa.qa_util import QaUtil
 from cl.runtime.records.bootstrap_mixin import BootstrapMixin
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.records.protocols import is_mapping_type
 from cl.runtime.settings.env_kind import EnvKind
 
 ENVVAR_PREFIX = "CL"
@@ -47,13 +51,6 @@ load_dotenv()
 # Override Dynaconf settings if inside a root test process
 if QaUtil.is_test_root_process():
     # Switch to Dynaconf current_env=testing
-    os.environ["CL_SETTINGS_ENV"] = "testing"
-    # Set env_kind to TEST
-    os.environ["CL_ENV_KIND"] = "TEST"
-
-# Override Dynaconf settings if inside a root test process
-if QaUtil.is_test_root_process():
-    # Switch to Dynaconf current_env=testing
     os.environ[ENV_SWITCHER_ENVVAR] = "testing"
     # Set env_kind to TEST
     os.environ[ENV_KIND_ENVVAR] = EnvKind.TEST.name
@@ -66,34 +63,63 @@ class DynaconfLoader(BootstrapMixin):
     Envvars will override the data in the settings files.
     """
 
-    settings_dir: str = required()
-    """Directory where Dynaconf settings files are located."""
+    package: str = required()
+    """Package namespace for which the loader is created, affects settings directory and the list of settings files."""
 
-    settings_files: Sequence[str] = required()
-    """Names of the Dynaconf settings files to load."""
+    _settings_dir: str = required()
+    """Absolute path to the settings directory."""
 
-    loaded_files: Sequence[str] = required()
-    """Names of the actually loaded Dynaconf settings files."""
+    _settings_files: tuple[str, ...] = required()
+    """Dynaconf settings files for the specified package or for project root if package is not specified."""
 
-    dynaconf_env: str = required()
-    """Current Dynaconf environment."""
+    _settings_dict: frozendict[str, Any] = required()
+    """Dictionary of settings key-value pairs obtained from the Dynaconf object."""
 
-    fields_dict: Mapping[str, Any] = required()
-    """Dictionary of settings field values indexed by field name."""
+    _package_dirs: frozendict[str, str] = required()
+    """
+    Ordered mapping of package source namespace to package directory relative to project root
+    where dependent packages follow the packages they depend on.
+    """
+
+    __loader_dict: ClassVar[dict[str | None, Self]] = {}
+    """Dictionary of DynaconfLoader instances indexed by the relative settings dir."""
 
     def __init(self) -> None:
         """Use instead of __init__ in the builder pattern, invoked by the build method in base to derived order."""
 
-        if self.settings_files is None:
-            self.settings_files = (
-                "settings.yaml",  # Settings including project configuration
-                ".secrets.yaml",  # Secrets
-            )
+        if self.package is not None:
+            # Get Dynaconf loader for the project root first
+            project_loader = DynaconfLoader.instance()
+            # Use it to get settings directory for the package
+            rel_settings_dir = project_loader.get_package_dir(package=self.package)
+        else:
+            # Settings directory is project root when package is None
+            rel_settings_dir = ProjectLayout.get_project_root()
 
-        # Absolute paths to settings directory
-        settings_dir_path = ProjectLayout.get_project_root()
-        if self.settings_dir is not None:
-            settings_dir_path = os.path.normpath(os.path.join(settings_dir_path, self.settings_dir))
+        # Absolute path to the settings directory
+        self._settings_dir = ProjectLayout.get_project_root()
+        if rel_settings_dir is not None:
+            self._settings_dir = os.path.normpath(os.path.join(self._settings_dir, rel_settings_dir))
+
+        # Package-specific settings file
+        if self.package is not None:
+            # Begin from the settings file for the individual package with the lowest priority
+            settings_files = [f"{self.package}.yaml"]
+        else:
+            # No additional settings files when package is None
+            settings_files = []
+
+        # Project-wide settings files
+        settings_files.append("settings.yaml")  # Baseline
+        if (settings_env := os.environ.get(ENV_SWITCHER_ENVVAR)) is not None:
+            # Settings for the Dynaconf environment, add only if the environment is not None
+            settings_files.append(f"settings.{settings_env}.yaml")
+        settings_files.append(".secrets.yaml")  # Secrets
+        settings_files.append("settings.local.yaml")  # Local settings file overrides all other settings
+        self._settings_files = tuple(settings_files)
+
+        # Combine settings file names with absolute settings directory path
+        abs_settings_files = [os.path.normpath(os.path.join(self._settings_dir, x)) for x in self._settings_files]
 
         # Dynaconf settings in raw format (including system settings),
         # some keys may be strings instead of dictionaries or lists
@@ -102,20 +128,97 @@ class DynaconfLoader(BootstrapMixin):
             envvar_prefix=ENVVAR_PREFIX,
             env_switcher=ENV_SWITCHER_ENVVAR,
             envvar=SETTINGS_FILES_ENVVAR,
-            settings_files=[os.path.normpath(os.path.join(settings_dir_path, x)) for x in self.settings_files],
+            settings_files=abs_settings_files,
             dotenv_override=True,
         )
 
-        # Actually loaded Dynaconf settings files
-        self.loaded_files = dynaconf._loaded_files  # noqa
-
-        # Current Dynaconf environment
-        self.dynaconf_env = str(dynaconf.current_env.lower())
+        # Set package_namespace field using the package parameter
+        dynaconf["package_namespace"] = self.package
 
         # Extract user settings using as_dict(), then convert containers at all levels to dictionaries and lists
         # and convert root level keys to lowercase in case the settings are specified using envvars in uppercase format
-        self.fields_dict = frozendict({k.lower(): v for k, v in dynaconf.as_dict().items()})
+        self._settings_dict = frozendict({k.lower(): v for k, v in dynaconf.as_dict().items()})
 
-    def get_fields_dict(self, field_names: Sequence[str]) -> Mapping[str, Any]:
-        """Return a dictionary of filed name-value pairs limited to the specified field names."""
-        return {k: self.fields_dict[k] for k in field_names if k in self.fields_dict}
+        if (package_dirs := self._settings_dict.get("package_dirs", None)) is not None:
+            if not is_mapping_type(type(package_dirs)):
+                raise RuntimeError(
+                    "Field 'package_dirs' is specified but is not a mapping of package namespaces\n"
+                    "to package root directories relative to project root."
+                )
+
+            for package_name, path in package_dirs.items():
+                # Validate keys: valid dot-delimited package names
+                # We check if each part of the dot-split string is a valid Python identifier
+                if not all(part.isidentifier() for part in package_name.split(".")):
+                    raise ValueError(
+                        f"Invalid package name '{package_name}' in 'package_dirs' mapping in settings.\n"
+                        "Keys must be valid dot-delimited package names."
+                    )
+
+                # Validate values: must be relative paths
+                if os.path.isabs(path):
+                    raise ValueError(
+                        f"Invalid path '{path}' in 'package_dirs' mapping in settings.\n"
+                        "Directories must be specified as relative paths to project root."
+                    )
+
+            self._package_dirs = frozendict(package_dirs)
+        else:
+            raise RuntimeError(
+                "Field 'package_dirs' with the mapping of package namespaces to package root directories \n"
+                "relative to project root to is required for multirepo layout."
+            )
+
+    @classmethod
+    def instance(cls, *, package: str | None = None) -> Self:
+        """
+        Singleton instance of loader for the specified package, or for the project root if package is not specified.
+
+        Args:
+            package: Package namespace, e.g. 'cl.runtime' (optional)
+        """
+        # Check for an existing loader object, create if not found, otherwise return cached value
+        if (result := cls.__loader_dict.get(package, None)) is None:
+            result = DynaconfLoader(package=package).build()
+            cls.__loader_dict[package] = result
+        return result
+
+    def get_settings_dir(self) -> str:
+        """Absolute path to the settings directory."""
+        return self._settings_dir
+
+    def get_settings_files(self) -> tuple[str, ...]:
+        """Dynaconf settings files for the specified package or for project root if package is not specified."""
+        return self._settings_files
+
+    def get_settings_dict(self) -> frozendict[str, Any]:
+        """Dictionary of settings key-value pairs obtained from the Dynaconf object."""
+        return self._settings_dict
+
+    def get_package_dir(self, *, package: str) -> str:
+        """Get package root directory relative to project root."""
+        if (result := self._package_dirs.get(package, None)) is not None:
+            return result
+        else:
+            raise RuntimeError(f"Field 'package_dirs' does not include the directory for package={package}")
+
+    def get_sources_str(self, *, prefix: str) -> str:
+        """Return the list of sources in the order of priority"""
+
+        # Combine the global Dynaconf envvar prefix with settings prefix
+        envvar_prefix = f"{ENVVAR_PREFIX}_{prefix.upper()}_"
+        sources_list = [f"Envvars with prefix '{envvar_prefix}'"]
+
+        # Dotenv file source or message that it is not found
+        if (env_file := find_dotenv()) != "":
+            sources_list.append(f"Fields with prefix '{prefix}_' in .env file: {env_file}")
+
+        # Dynaconf settings files
+        settings_files_str = ", ".join(self.get_settings_files())
+        sources_list.extend(f"Fields with prefix '{prefix}_' in settings files: {settings_files_str}")
+
+        # Convert sources list to string
+        sources_str ="\n".join(f"  - {x}" for x in sources_list)
+        settings_dir_str = self.get_settings_dir()
+        result =  f"Sources:\n{sources_str}\nSettings directory: {settings_dir_str}\n"
+        return result

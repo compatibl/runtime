@@ -1,0 +1,11 @@
+# Default environment
+default:
+
+  # Documented in PackageSettings class
+  package_dependencies:
+    - aiofiles>=0.8.0
+    - aiomysql>=0.1.1
+
+
+# Test environment
+testing:

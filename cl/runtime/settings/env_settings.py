@@ -79,28 +79,6 @@ class EnvSettings(Settings):
                 f"The value of env_kind={self.env_kind} in {typename(type(self))}\n" f"is not a string or EnvKind enum."
             )
 
-        dynaconf_env_mapping = {
-            EnvKind.PROD: "production",
-            EnvKind.UAT: "staging",
-            EnvKind.DEV: "development",
-            EnvKind.TEMP: "development",
-            EnvKind.TEST: "testing",
-        }
-
-        expected_dynaconf_env = dynaconf_env_mapping.get(self.env_kind, None)
-        if expected_dynaconf_env is not None:
-            if self.dynaconf_env != expected_dynaconf_env:
-                raise RuntimeError(
-                    f"The value of env_kind={self.env_kind.name} set via settings.yaml or an environment variable\n"
-                    f"requires Dynaconf current_env={expected_dynaconf_env}, "
-                    f"but current_env={self.dynaconf_env} was found.\n"
-                )
-        else:
-            env_kind_choices_str = "\n".join(
-                [CaseUtil.upper_to_pascal_case(e.name) for e in dynaconf_env_mapping.keys()]
-            )
-            raise RuntimeError(f"Unsupported env_kind={self.env_kind}, valid choices are:\n{env_kind_choices_str}\n")
-
         if self.env_id is None:
             raise RuntimeError("Field env_id is not specified via settings.yaml or an environment variable.")
         # Check env_id for safety before substitution
