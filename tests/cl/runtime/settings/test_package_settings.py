@@ -15,7 +15,6 @@
 import pytest
 
 from cl.runtime.settings.package_settings import PackageSettings
-from cl.runtime.settings.project_settings import ProjectSettings
 
 
 def test_package_settings():
