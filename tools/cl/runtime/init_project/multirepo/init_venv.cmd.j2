@@ -6,8 +6,8 @@ set /p CONFIRM="ATTENTION - overwrite existing venv? (y/n)? "
 IF /I "%CONFIRM%" NEQ "y" GOTO END
 
 echo.
-echo Create an empty venv
-IF EXIST ".venv" rd /s /q venv
+echo Create venv
+IF EXIST ".venv" rd /s /q .venv
 python -m venv .venv
 
 call activate

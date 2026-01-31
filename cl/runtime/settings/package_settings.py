@@ -68,8 +68,12 @@ class PackageSettings(Settings):
         ProjectChecks.guard_requirements(self.package_dependencies)
 
     def get_packages(self) -> tuple[str, ...]:
-        """Return a tuple of package namespaces."""
+        """Ordered tuple of package namespaces (keys) from package_dirs mapping."""
         return tuple(self.package_dirs.keys())
+
+    def get_dirs(self) -> tuple[str, ...]:
+        """Ordered tuple of package directories (values) from package_dirs mapping with duplicates removed."""
+        return tuple(dict.fromkeys(self.package_dirs.values()))
 
     def configure_paths(self) -> None:
         """

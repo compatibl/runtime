@@ -16,6 +16,7 @@ from pathlib import Path
 
 import locate # isort: skip Prevent isort from moving this line
 
+from cl.runtime.exceptions.error_util import ErrorUtil
 from cl.runtime.project.project_layout_kind import ProjectLayoutKind
 
 # Ensure bootstrap module can be found
@@ -29,7 +30,7 @@ from cl.runtime.settings.package_settings import PackageSettings
 from cl.runtime.templates.jinja_template_engine import JinjaTemplateEngine
 
 
-def init_multirepo() -> None:
+def init_project() -> None:
     """Initialize project files."""
 
     if (project_layout := ProjectLayout.get_project_layout_kind()) != ProjectLayoutKind.MULTIREPO:
@@ -37,13 +38,18 @@ def init_multirepo() -> None:
 
     # Extract unique package directory names (excluding stubs and ".")
     # Filter to only get main packages (cl.*) and their directory values
-    package_dirs = PackageSettings.instance().get_package_dirs()
+    package_dirs = PackageSettings.instance().get_dirs()
 
     # Get project root
     project_root = Path(ProjectLayout.get_project_root())
 
     # Get template directory path relative to where the current Python file is located
-    template_dir = str(Path(__file__).parent / "multirepo")
+    if (layout_kind := ProjectLayout.get_project_layout_kind()) == ProjectLayoutKind.MULTIREPO:
+        template_dir = str(Path(__file__).parent / "init_project/multirepo")
+    elif layout_kind == ProjectLayoutKind.MONOREPO:
+        template_dir = str(Path(__file__).parent / "init_project/monorepo")
+    else:
+        raise ErrorUtil.enum_value_error(layout_kind, ProjectLayoutKind)
 
     # Create Jinja2 template engine and render all templates
     engine = JinjaTemplateEngine().build()
@@ -53,4 +59,4 @@ def init_multirepo() -> None:
 if __name__ == '__main__':
 
     # Initialize project files
-    init_multirepo()
+    init_project()
