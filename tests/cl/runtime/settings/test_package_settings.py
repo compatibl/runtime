@@ -20,8 +20,11 @@ from cl.runtime.settings.package_settings import PackageSettings
 def test_package_settings():
     """Test ProjectLayout class."""
 
-    runtime_settings = PackageSettings.instance(package="cl.runtime")
-    pass
+    # Project settings
+    PackageSettings.instance()
+
+    # Runtime package settings
+    PackageSettings.instance(package="cl.runtime")
 
 
 if __name__ == "__main__":

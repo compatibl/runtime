@@ -14,6 +14,8 @@
 
 import locate  # isort: skip Prevent isort from moving this line
 
+from cl.runtime.settings.dynaconf_loader import ENVVAR_PREFIX
+
 # Ensure bootstrap module can be found
 locate.append_sys_path("../..")
 
@@ -195,7 +197,7 @@ if __name__ == "__main__":
     # TODO: !!! Refactor to standardize the handling of CL_INTERACTIVE parameter
     # Determine interactive mode from environment variable, default to True for backward compatibility
     # Set CL_INTERACTIVE=false for Docker/non-interactive runs
-    interactive_env = os.getenv("CL_INTERACTIVE", "true").lower()
+    interactive_env = os.getenv(f"{ENVVAR_PREFIX}_INTERACTIVE", "true").lower()
     interactive = interactive_env in ("true", "1", "yes", "on")
 
     # Run backend with determined interactive mode

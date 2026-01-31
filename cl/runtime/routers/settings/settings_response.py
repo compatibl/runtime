@@ -23,6 +23,7 @@ from cl.runtime.primitive.timestamp import Timestamp
 from cl.runtime.records.for_dataclasses.extensions import optional
 from cl.runtime.routers.settings.env_info import EnvInfo
 from cl.runtime.server.env import Env
+from cl.runtime.settings.dynaconf_loader import ENVVAR_PREFIX, DynaconfLoader
 from cl.runtime.settings.package_settings import PackageSettings
 
 SESSION_ID = Timestamp.create()
@@ -50,12 +51,14 @@ class SettingsResponse(BaseModel):
     )  # TODO: !!! Rename to .api or .server?
     """Version of the backend-frontend API contract (schema). Used to ensure compatibility between backend and frontend."""
 
-    # TODO: Switch to the standard design pattern using Dynaconf
-    application_name: str | None = optional(default_factory=lambda: os.environ.get("CL_APP_TITLE"))
+    application_name: str | None = optional(
+        default_factory=lambda: DynaconfLoader.get_envvar_value(f"{ENVVAR_PREFIX}_APP_TITLE")  # TODO: !! Switch to the standard design pattern using a Settings class
+    )
     """Name of the application."""
 
-    # TODO: Switch to the standard design pattern using Dynaconf
-    environment: str | None = optional(default_factory=lambda: os.environ.get("CL_ENVIRONMENT"))
+    environment: str | None = optional(
+        default_factory=lambda: DynaconfLoader.get_envvar_value(f"{ENVVAR_PREFIX}_ENVIRONMENT")  # TODO: !! Switch to the standard design pattern using a Settings class
+    )
     """
     Active application environment (e.g., 'dev', 'staging', 'prod').
     If specified, displayed as a badge in the UI header to the right of the app logo.

@@ -24,6 +24,7 @@ from typing_extensions import final  # TODO: !!! Do not import from typing_exten
 from cl.runtime.project.project_checks import ProjectChecks
 from cl.runtime.project.project_layout import ProjectLayout
 from cl.runtime.records.for_dataclasses.extensions import required
+from cl.runtime.settings.dynaconf_loader import DynaconfLoader
 from cl.runtime.settings.settings import Settings
 
 
@@ -96,7 +97,7 @@ class PackageSettings(Settings):
                 sys.path.append(path)
 
         # Add to PYTHONPATH without duplicates
-        python_path_str = os.environ.get("PYTHONPATH", "")
+        python_path_str = DynaconfLoader.get_envvar_value("PYTHONPATH", "")
         python_path_set = set(self._normalize_paths(python_path_str.split(os.pathsep)))
         python_path_added = False
         for path in package_paths:
