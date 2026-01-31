@@ -19,6 +19,9 @@ from enum import auto
 class VersionFormat(IntEnum):
     """Format to specify module version."""
 
+    ANY = auto()
+    """Any version format is accepted."""
+
     SEM_VER = auto()
     """Semantic versioning with three dot-delimited numerical tokens, for example 1.2.0."""
 

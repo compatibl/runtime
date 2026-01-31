@@ -6,6 +6,5 @@ default:
     - aiofiles>=0.8.0
     - aiomysql>=0.1.1
 
-
 # Test environment
 testing:

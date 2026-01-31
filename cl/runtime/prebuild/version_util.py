@@ -92,9 +92,16 @@ class VersionUtil:
         if version_format is None:
             return True
 
+        # Must not be empty even if format is Any
+        if not version:
+            raise RuntimeError(f"Version string for module {module} is None or empty.")
+
         tokens = version.split(".")
         reasons = []
-        if version_format == VersionFormat.SEM_VER:
+        if version_format == VersionFormat.ANY:
+            # Do nothing, any version format is accepted
+            pass
+        elif version_format == VersionFormat.SEM_VER:
             if len(tokens) != 3:
                 reasons.append(f"SemVer must have exactly 3 dot-delimited tokens but has {len(tokens)}")
             if not all(p.isdigit() and (p == "0" or not p.startswith("0")) for p in tokens):
@@ -127,8 +134,8 @@ class VersionUtil:
                     f"SemVer MAJOR.MINOR.PATCH format with no leading zeroes.\n"
                     f"\nReasons:\n"
                     f"{reasons_str}\n\n"
-                    f"To disable version format check, clear version_format and version_format_default\n"
-                    f"fields in settings.yaml.\n"
+                    f"To specify a custom format, use version_format and version_format_exceptions\n"
+                    f"fields in settings.yaml with values Any, SemVer and CalVer (CalVer is default).\n"
                 )
             elif version_format == VersionFormat.CAL_VER:
                 raise RuntimeError(
@@ -139,8 +146,8 @@ class VersionUtil:
                     f"\nExamples:\n"
                     f" - 2003.501.0 for May 1, 2003 release at midnight\n"
                     f" - 2003.1231.2359 for Dec 31, 2003 release at 11:59pm\n\n"
-                    f"To disable version format check, clear version_format and version_format_default\n"
-                    f"fields in settings.yaml.\n"
+                    f"To specify a custom format, use version_format and version_format_exceptions\n"
+                    f"fields in settings.yaml with values Any, SemVer and CalVer (CalVer is default).\n"
                 )
             else:
                 ErrorUtil.enum_value_error(version_format, VersionFormat)  # noqa
